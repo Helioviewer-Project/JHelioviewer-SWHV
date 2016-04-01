@@ -27,6 +27,7 @@ public class HEKDownloader extends SWEKDownloader {
     @Override
     protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
         JSONArray results = eventJSON.getJSONArray("result");
+        ArrayList<JHVDatabase.Event2Db> event2db_list = new ArrayList<JHVDatabase.Event2Db>();
 
         for (int i = 0; i < results.length(); i++) {
             JSONObject result = results.getJSONObject(i);
@@ -69,11 +70,13 @@ public class HEKDownloader extends SWEKDownloader {
                 Log.error("compression error");
                 return false;
             }
-            int id = JHVDatabase.dump_event2db(compressedJson, start, end, uid, type, paramList);
-            if (id == -1) {
-                Log.error("failed to dump to database");
-                return false;
-            }
+            event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, uid, paramList));
+
+        }
+        int id = JHVDatabase.dump_event2db(event2db_list, type);
+        if (id == -1) {
+            Log.error("failed to dump to database");
+            return false;
         }
         return true;
     }

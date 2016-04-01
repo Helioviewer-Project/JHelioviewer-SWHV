@@ -35,6 +35,23 @@ import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
 public class JHVDatabase {
+    public static class Event2Db {
+        byte[] compressedJson;
+        long start;
+        long end;
+        String uid;
+        ArrayList<JHVDatabaseParam> paramList;
+
+        public Event2Db(byte[] _compressedJson, long _start, long _end, String _uid, ArrayList<JHVDatabaseParam> _paramList) {
+            compressedJson = _compressedJson;
+            start = _start;
+            end = _end;
+            uid = _uid;
+            paramList = _paramList;
+        }
+
+    }
+
     private final static ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(10000);
     private final static ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
 
@@ -274,8 +291,8 @@ public class JHVDatabase {
         return generatedKey;
     }
 
-    public static Integer dump_event2db(byte[] compressedJson, long start, long end, String uid, JHVEventType type, ArrayList<JHVDatabaseParam> paramList) {
-        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(compressedJson, start, end, uid, type, paramList));
+    public static Integer dump_event2db(ArrayList<Event2Db> event2db_list, JHVEventType type) {
+        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(event2db_list, type));
         executor.execute(ft);
         try {
             return ft.get();
@@ -289,20 +306,12 @@ public class JHVDatabase {
     }
 
     private static class DumpEvent2Db implements Callable<Integer> {
-        private final long start;
-        private final long end;
-        private final byte[] compressedJson;
-        private final String uid;
-        JHVEventType type;
-        private final ArrayList<JHVDatabaseParam> paramList;
+        private final JHVEventType type;
+        private final ArrayList<Event2Db> event2db_list;
 
-        public DumpEvent2Db(byte[] _compressedJson, long _start, long _end, String _uid, JHVEventType _type, ArrayList<JHVDatabaseParam> _paramList) {
-            compressedJson = _compressedJson;
-            uid = _uid;
-            start = _start;
-            end = _end;
+        public DumpEvent2Db(ArrayList<Event2Db> _event2db_list, JHVEventType _type) {
+            event2db_list = _event2db_list;
             type = _type;
-            paramList = _paramList;
         }
 
         @Override
@@ -310,70 +319,82 @@ public class JHVDatabase {
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
                 return -1;
-
+            int errorcode = 0;
             try
             {
+                connection.setAutoCommit(false);
                 int typeId = getEventTypeId(connection, type);
-                if (typeId != -1) {
-                    int generatedKey = getEventId(uid);
+                for (Event2Db event2db : event2db_list) {
+                    if (typeId != -1) {
+                        int generatedKey = getEventId(event2db.uid);
 
-                    if (generatedKey == -1) {
-                        {
-                            PreparedStatement pstatement = getPreparedStatement(connection, INSERT_FULL_EVENT);
+                        if (generatedKey == -1) {
+                            {
+                                PreparedStatement pstatement = getPreparedStatement(connection, INSERT_FULL_EVENT);
+                                pstatement.setInt(1, typeId);
+                                pstatement.setString(2, event2db.uid);
+                                pstatement.setLong(3, event2db.start);
+                                pstatement.setLong(4, event2db.end);
+                                pstatement.setBinaryStream(5, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
+                                pstatement.executeUpdate();
+                            }
+                            {
+                                PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_INSERT);
+                                ResultSet generatedKeys = pstatement.executeQuery();
+                                if (generatedKeys.next()) {
+                                    generatedKey = generatedKeys.getInt(1);
+                                }
+                                generatedKeys.close();
+                            }
+                        } else {
+                            PreparedStatement pstatement = getPreparedStatement(connection, UPDATE_EVENT);
                             pstatement.setInt(1, typeId);
-                            pstatement.setString(2, uid);
-                            pstatement.setLong(3, start);
-                            pstatement.setLong(4, end);
-                            pstatement.setBinaryStream(5, new ByteArrayInputStream(compressedJson), compressedJson.length);
+                            pstatement.setString(2, event2db.uid);
+                            pstatement.setLong(3, event2db.start);
+                            pstatement.setLong(4, event2db.end);
+                            pstatement.setBinaryStream(5, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
+                            pstatement.setInt(6, generatedKey);
                             pstatement.executeUpdate();
                         }
                         {
-                            PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_INSERT);
-                            ResultSet generatedKeys = pstatement.executeQuery();
-                            if (generatedKeys.next()) {
-                                generatedKey = generatedKeys.getInt(1);
+                            String fieldString = "";
+                            String varString = "";
+                            for (JHVDatabaseParam p : event2db.paramList) {
+                                fieldString += "," + p.getParamName();
+                                varString += ",?";
                             }
-                            generatedKeys.close();
+                            String full_statement = "INSERT INTO " + type.getSupplier().getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
+
+                            PreparedStatement pstatement = getPreparedStatement(connection, full_statement);
+                            pstatement.setInt(1, generatedKey);
+                            int index = 2;
+                            for (JHVDatabaseParam p : event2db.paramList) {
+                                if (p.isInt()) {
+                                    pstatement.setInt(index, p.getIntValue());
+                                } else if (p.isString()) {
+                                    pstatement.setString(index, p.getStringValue());
+                                }
+                                index++;
+                            }
+                            pstatement.executeUpdate();
                         }
                     } else {
-                        PreparedStatement pstatement = getPreparedStatement(connection, UPDATE_EVENT);
-                        pstatement.setInt(1, typeId);
-                        pstatement.setString(2, uid);
-                        pstatement.setLong(3, start);
-                        pstatement.setLong(4, end);
-                        pstatement.setBinaryStream(5, new ByteArrayInputStream(compressedJson), compressedJson.length);
-                        pstatement.setInt(6, generatedKey);
-                        pstatement.executeUpdate();
+                        Log.error("Failed to insert event");
                     }
-                    {
-                        String fieldString = "";
-                        String varString = "";
-                        for (JHVDatabaseParam p : this.paramList) {
-                            fieldString += "," + p.getParamName();
-                            varString += ",?";
-                        }
-                        String sql = "INSERT INTO " + type.getSupplier().getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
-                        PreparedStatement pstatement = getPreparedStatement(connection, sql);
-                        pstatement.setInt(1, generatedKey);
-                        int index = 2;
-                        for (JHVDatabaseParam p : this.paramList) {
-                            if (p.isInt()) {
-                                pstatement.setInt(index, p.getIntValue());
-                            } else if (p.isString()) {
-                                pstatement.setString(index, p.getStringValue());
-                            }
-                            index++;
-                        }
-                        pstatement.executeUpdate();
-                    }
-                } else {
-                    Log.error("Failed to insert event");
                 }
+                connection.commit();
             } catch (SQLException e) {
                 Log.error("Could not insert event " + e.getMessage());
-                return -1;
+                errorcode = -1;
+            } finally {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException ea) {
+                    Log.error("Could not reset autocommit " + ea.getMessage());
+                    errorcode = -1;
+                }
             }
-            return 0;
+            return errorcode;
         }
     }
 
@@ -397,6 +418,7 @@ public class JHVDatabase {
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
                 return;
+
             HashMap<JHVEventType, RequestCache> dCache = ConnectionThread.downloadedCache;
             RequestCache typedCache = dCache.get(type);
             if (typedCache == null)
@@ -404,6 +426,7 @@ public class JHVDatabase {
             typedCache.adaptRequestCache(start, end);
             int typeId = getEventTypeId(connection, type);
             try {
+                connection.setAutoCommit(false);
                 PreparedStatement dstatement = getPreparedStatement(connection, DELETE_DATERANGE);
                 dstatement.setInt(1, typeId);
                 dstatement.executeUpdate();
@@ -416,8 +439,15 @@ public class JHVDatabase {
                         pstatement.executeUpdate();
                     }
                 }
+                connection.commit();
             } catch (SQLException e) {
                 Log.error("Could not serialize date_range to database " + e.getMessage());
+            } finally {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    Log.error("Could not reset autocommit " + e.getMessage());
+                }
             }
         }
 
