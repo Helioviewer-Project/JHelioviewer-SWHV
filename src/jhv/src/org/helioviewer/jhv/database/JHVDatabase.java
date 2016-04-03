@@ -1,10 +1,8 @@
 package org.helioviewer.jhv.database;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -116,14 +114,13 @@ public class JHVDatabase {
             }
             if (isCompressed(compressed)) {
                 GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed));
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gis, "UTF-8"));
-
-                StringBuffer buf = new StringBuffer();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    buf.append(line);
+                ByteArrayOutputStream result = new ByteArrayOutputStream();
+                byte[] buffer = new byte[8192];
+                int length;
+                while ((length = gis.read(buffer)) != -1) {
+                    result.write(buffer, 0, length);
                 }
-                outStr = buf.toString();
+                outStr = result.toString("UTF-8");
             } else {
                 outStr = new String(compressed);
             }

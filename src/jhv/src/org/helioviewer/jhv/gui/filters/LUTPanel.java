@@ -48,9 +48,10 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
         invertButton.addActionListener(this);
 
         enhanceButton = new JToggleButton(enhanceIcon);
-        enhanceButton.setToolTipText("Radially enhance corona");
+        enhanceButton.setToolTipText("Enhance off-disk corona");
         enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         enhanceButton.addActionListener(this);
+
         buttonPanel = new JPanel();
         buttonPanel.add(invertButton);
         buttonPanel.add(enhanceButton);
