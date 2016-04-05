@@ -84,7 +84,9 @@ public class JHVGlobals {
 
                 version = mainAttributes.getValue("version");
                 revision = mainAttributes.getValue("revision");
-                agent += version + "." + revision;
+                agent += version + "." + revision + " (" + 
+                         System.getProperty("os.arch") + " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") " +
+                         System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
 
                 System.setProperty("jhv.version", version);
                 System.setProperty("jhv.revision", revision);
