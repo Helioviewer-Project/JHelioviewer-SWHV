@@ -8,9 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -550,7 +550,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     String obs = InstrumentsPanel.this.getObservatory();
                     String ins = InstrumentsPanel.this.getInstrument();
 
-                    Vector<ItemPair> values = new Vector<ItemPair>();
+                    ArrayList<ItemPair> values = new ArrayList<ItemPair>();
                     Item[] detectors = DataSources.getSingletonInstance().getDetectors(obs, ins);
 
                     for (Item detector : detectors) {
@@ -611,8 +611,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * @param container
          *            combobox where to add the items.
          */
-        private void setComboBox(JComboBox container, Vector<ItemPair> items) {
-            container.setModel(new DefaultComboBoxModel(items));
+        private void setComboBox(JComboBox container, ArrayList<ItemPair> items) {
+            container.setModel(new DefaultComboBoxModel(items.toArray()));
             for (int i = 0; i < items.size(); i++) {
                 if (items.get(i).isDefaultItem()) {
                     container.setSelectedIndex(i);
