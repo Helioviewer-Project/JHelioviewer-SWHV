@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.gui.components.base;
 
 import java.awt.Component;
 import java.awt.event.KeyEvent;

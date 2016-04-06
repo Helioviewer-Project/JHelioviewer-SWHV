@@ -23,8 +23,8 @@ public class GimpGradientSegment {
     double ar;
     int blendingType;
     int blendingColor;
-    int blendingColorLeft;
-    int blendingColorRight;
+    // int blendingColorLeft;
+    // int blendingColorRight;
 
     /**
      * Creates a gimp gradient segment with the given parameters
@@ -60,7 +60,7 @@ public class GimpGradientSegment {
      * @param blendingColorRight
      *            Blending function right-color-type
      */
-    public GimpGradientSegment(double leftStop, double midStop, double rightStop, double rl, double gl, double bl, double al, double rr, double gr, double br, double ar, int blendingType, int blendingColor, int blendingColorLeft, int blendingColorRight) {
+    public GimpGradientSegment(double leftStop, double midStop, double rightStop, double rl, double gl, double bl, double al, double rr, double gr, double br, double ar, int blendingType, int blendingColor/*, int blendingColorLeft, int blendingColorRight*/) {
         this.leftStop = leftStop;
         this.midStop = midStop;
         this.rightStop = rightStop;
@@ -74,8 +74,8 @@ public class GimpGradientSegment {
         this.ar = ar;
         this.blendingType = blendingType;
         this.blendingColor = blendingColor;
-        this.blendingColorLeft = blendingColorLeft;
-        this.blendingColorRight = blendingColorRight;
+        // this.blendingColorLeft = blendingColorLeft;
+        // this.blendingColorRight = blendingColorRight;
     }
 
     /**

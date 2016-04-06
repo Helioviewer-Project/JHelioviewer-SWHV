@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * A generic Interval class, used for any type of ranges. Different types of
@@ -21,12 +20,12 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * Start of the interval
      */
-    protected TimeFormat start;
+    private TimeFormat start;
 
     /**
      * End of the interval
      */
-    protected TimeFormat end;
+    private TimeFormat end;
 
     /**
      * Copyconstructor. Does not deepcopy the start and end fields of the given
@@ -291,8 +290,9 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * @param other
      * @return result of the exclusion
      */
-    public Vector<Interval<TimeFormat>> exclude(Interval<TimeFormat> other) {
-        Vector<Interval<TimeFormat>> result = new Vector<Interval<TimeFormat>>();
+/*
+    public ArrayList<Interval<TimeFormat>> exclude(Interval<TimeFormat> other) {
+        ArrayList<Interval<TimeFormat>> result = new ArrayList<Interval<TimeFormat>>();
         if (this.equals(other)) {
             return result;
         }
@@ -326,6 +326,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         removeDegenerated(result);
         return result;
     }
+*/
 
     public static ArrayList<Interval<Date>> splitInterval(final Interval<Date> interval, int days) {
         final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
@@ -364,7 +365,8 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      *
      * @param toClean
      */
-    private void removeDegenerated(Vector<Interval<TimeFormat>> toClean) {
+/*
+    private void removeDegenerated(ArrayList<Interval<TimeFormat>> toClean) {
         Iterator<Interval<TimeFormat>> intIterator = toClean.iterator();
         while (intIterator.hasNext()) {
             Interval<TimeFormat> curInterval = intIterator.next();
@@ -373,6 +375,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
             }
         }
     }
+*/
 
     /**
      * Overridden equals method.
