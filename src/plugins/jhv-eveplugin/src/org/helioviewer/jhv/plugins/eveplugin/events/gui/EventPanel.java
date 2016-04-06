@@ -55,11 +55,14 @@ public class EventPanel implements DrawableElement {
             JHVRelatedEvents highlightedEvent = null;
             int spacePerLine = 6;
 
+            ArrayList<Long> endDates = new ArrayList<Long>();
+
             for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> entry : events.entrySet()) {
                 JHVEventType eventType = entry.getKey();
                 SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = entry.getValue();
 
-                ArrayList<Long> endDates = new ArrayList<Long>();
+                endDates.clear();
+
                 int nrLines = 0;
                 EventPlotConfiguration shouldRedraw = null;
 
