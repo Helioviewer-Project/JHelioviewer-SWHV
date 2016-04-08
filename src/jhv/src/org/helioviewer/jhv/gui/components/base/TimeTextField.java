@@ -73,7 +73,11 @@ public class TimeTextField extends JTextField {
             try {
                 return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time + ":00"));
             } catch (ParseException e2) {
-                return defaultTime;
+                try {
+                    return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time + ":00:00"));
+                } catch (ParseException e3) {
+                    return defaultTime;
+                }
             }
         }
     }
@@ -92,9 +96,14 @@ public class TimeTextField extends JTextField {
                 return TimeUtils.timeDateFormat.parse(time + ":00");
             } catch (ParseException e2) {
                 try {
-                    return TimeUtils.timeDateFormat.parse(defaultTime);
-                } catch (ParseException e4) {
-                    return null;
+                    return TimeUtils.timeDateFormat.parse(time + ":00:00");
+                } catch (ParseException e3) {
+                    try {
+                        return TimeUtils.timeDateFormat.parse(defaultTime);
+                    } catch (ParseException e4) {
+                        return null;
+                    }
+
                 }
 
             }
