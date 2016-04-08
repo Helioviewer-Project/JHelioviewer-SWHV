@@ -22,7 +22,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
  *
  * @author Helge Dietert
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class TimeTextField extends JTextField {
     /**
      * Default value used to set
@@ -66,10 +66,23 @@ public class TimeTextField extends JTextField {
      * @return formatted input or default time if its not valid
      */
     public String getFormattedInput() {
+        String time = getText();
         try {
-            return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(getText()));
+            return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time));
         } catch (ParseException e) {
-            return defaultTime;
+            try {
+                return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse("0" + time));
+            } catch (ParseException e1) {
+                try {
+                    return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time + ":00"));
+                } catch (ParseException e2) {
+                    try {
+                        return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse("0" + time + ":00"));
+                    } catch (ParseException e3) {
+                        return defaultTime;
+                    }
+                }
+            }
         }
     }
 
@@ -79,14 +92,26 @@ public class TimeTextField extends JTextField {
      * @return Date with selected time (or defaultTime if invalid)
      */
     public Date getValue() {
+        String time = getText();
         try {
-            return TimeUtils.timeDateFormat.parse(getText());
+            return TimeUtils.timeDateFormat.parse(time);
         } catch (ParseException e) {
             try {
-                return TimeUtils.timeDateFormat.parse(defaultTime);
+                return TimeUtils.timeDateFormat.parse("0" + time);
             } catch (ParseException e1) {
-                // The default time should always parseable
-                return null;
+                try {
+                    return TimeUtils.timeDateFormat.parse(time + ":00");
+                } catch (ParseException e2) {
+                    try {
+                        return TimeUtils.timeDateFormat.parse("0" + time + ":00");
+                    } catch (ParseException e3) {
+                        try {
+                            return TimeUtils.timeDateFormat.parse(defaultTime);
+                        } catch (ParseException e4) {
+                            return null;
+                        }
+                    }
+                }
             }
         }
     }
