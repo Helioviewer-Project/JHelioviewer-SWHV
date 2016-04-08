@@ -71,17 +71,9 @@ public class TimeTextField extends JTextField {
             return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time));
         } catch (ParseException e) {
             try {
-                return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse("0" + time));
-            } catch (ParseException e1) {
-                try {
-                    return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time + ":00"));
-                } catch (ParseException e2) {
-                    try {
-                        return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse("0" + time + ":00"));
-                    } catch (ParseException e3) {
-                        return defaultTime;
-                    }
-                }
+                return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time + ":00"));
+            } catch (ParseException e2) {
+                return defaultTime;
             }
         }
     }
@@ -97,21 +89,14 @@ public class TimeTextField extends JTextField {
             return TimeUtils.timeDateFormat.parse(time);
         } catch (ParseException e) {
             try {
-                return TimeUtils.timeDateFormat.parse("0" + time);
-            } catch (ParseException e1) {
+                return TimeUtils.timeDateFormat.parse(time + ":00");
+            } catch (ParseException e2) {
                 try {
-                    return TimeUtils.timeDateFormat.parse(time + ":00");
-                } catch (ParseException e2) {
-                    try {
-                        return TimeUtils.timeDateFormat.parse("0" + time + ":00");
-                    } catch (ParseException e3) {
-                        try {
-                            return TimeUtils.timeDateFormat.parse(defaultTime);
-                        } catch (ParseException e4) {
-                            return null;
-                        }
-                    }
+                    return TimeUtils.timeDateFormat.parse(defaultTime);
+                } catch (ParseException e4) {
+                    return null;
                 }
+
             }
         }
     }
