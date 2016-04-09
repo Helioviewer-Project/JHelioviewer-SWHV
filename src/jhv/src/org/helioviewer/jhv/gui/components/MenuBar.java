@@ -68,14 +68,14 @@ public class MenuBar extends JMenuBar {
         add(viewMenu);
 
         JMenu movieMenu = new JMenu("Movie");
-        movieMenu.setMnemonic(KeyEvent.VK_A);
+        movieMenu.setMnemonic(KeyEvent.VK_M);
         movieMenu.add(MoviePanel.getPlayPauseAction());
         movieMenu.add(MoviePanel.getPreviousFrameAction());
         movieMenu.add(MoviePanel.getNextFrameAction());
         add(movieMenu);
 
         JMenu pluginsMenu = new JMenu("Plug-ins");
-        pluginsMenu.setMnemonic(KeyEvent.VK_I);
+        pluginsMenu.setMnemonic(KeyEvent.VK_P);
         pluginsMenu.add(new ShowDialogAction("Manage Plug-ins...", PluginsDialog.class));
         add(pluginsMenu);
 
