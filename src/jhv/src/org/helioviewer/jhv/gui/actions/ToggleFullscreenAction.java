@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -20,8 +21,8 @@ public class ToggleFullscreenAction extends AbstractAction {
     public ToggleFullscreenAction() {
         super("Toggle Fullscreen");
         putValue(SHORT_DESCRIPTION, "Toggle fullscreen");
-        putValue(MNEMONIC_KEY, KeyEvent.VK_T);
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.ALT_MASK));
+        putValue(MNEMONIC_KEY, KeyEvent.VK_F);
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
     @Override

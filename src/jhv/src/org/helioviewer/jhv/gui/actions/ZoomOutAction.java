@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -22,7 +23,7 @@ public class ZoomOutAction extends AbstractAction {
         super("Zoom Out", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_OUT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_OUT)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom out");
         putValue(MNEMONIC_KEY, KeyEvent.VK_O);
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_PERIOD, KeyEvent.ALT_MASK));
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
     @Override

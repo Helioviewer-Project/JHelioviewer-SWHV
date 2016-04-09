@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -28,10 +29,10 @@ public class ZoomOneToOneAction extends AbstractAction {
      *            icon for the action
      */
     public ZoomOneToOneAction(boolean small, boolean useIcon) {
-        super("Zoom 1:1", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_1TO1_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_1TO1)) : null);
+        super("Actual Size", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_1TO1_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_1TO1)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom to native resolution");
         putValue(MNEMONIC_KEY, KeyEvent.VK_Z);
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK));
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
     @Override
