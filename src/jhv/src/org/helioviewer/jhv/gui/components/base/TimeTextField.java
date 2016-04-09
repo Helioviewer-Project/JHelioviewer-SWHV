@@ -22,16 +22,10 @@ import org.helioviewer.jhv.base.time.TimeUtils;
  *
  * @author Helge Dietert
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class TimeTextField extends JTextField {
-    /**
-     * Default value used to set
-     */
-    private static final String defaultTime = "00:00:00";
 
-    /**
-     * Used time formatter
-     */
+    private static final String defaultTime = "00:00:00";
 
     /**
      * Creates a new time text field
@@ -103,9 +97,7 @@ public class TimeTextField extends JTextField {
                     } catch (ParseException e4) {
                         return null;
                     }
-
                 }
-
             }
         }
     }

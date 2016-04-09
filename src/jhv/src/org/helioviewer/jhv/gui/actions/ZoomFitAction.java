@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -26,7 +27,7 @@ public class ZoomFitAction extends AbstractAction {
         super("Zoom to Fit", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_FIT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_FIT)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom to fit");
         putValue(MNEMONIC_KEY, KeyEvent.VK_F);
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.ALT_MASK));
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_9, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
     @Override
