@@ -58,10 +58,10 @@ public class MenuBar extends JMenuBar {
         viewMenu.setMnemonic(KeyEvent.VK_V);
         viewMenu.add(new ToggleFullscreenAction());
         viewMenu.addSeparator();
+        viewMenu.add(new ZoomOneToOneAction(true, false));
+        viewMenu.add(new ZoomFitAction(true, false));
         viewMenu.add(new ZoomInAction(true, false));
         viewMenu.add(new ZoomOutAction(true, false));
-        viewMenu.add(new ZoomFitAction(true, false));
-        viewMenu.add(new ZoomOneToOneAction(true, false));
         viewMenu.addSeparator();
         viewMenu.add(new ResetCameraAction(true, false));
         viewMenu.add(new ClearAnnotationsAction(true, false));
@@ -69,9 +69,9 @@ public class MenuBar extends JMenuBar {
 
         JMenu movieMenu = new JMenu("Movie");
         movieMenu.setMnemonic(KeyEvent.VK_A);
-        movieMenu.add(new MoviePanel.StaticPlayPauseAction());
-        movieMenu.add(new MoviePanel.StaticPreviousFrameAction());
-        movieMenu.add(new MoviePanel.StaticNextFrameAction());
+        movieMenu.add(MoviePanel.getPlayPauseAction());
+        movieMenu.add(MoviePanel.getPreviousFrameAction());
+        movieMenu.add(MoviePanel.getNextFrameAction());
         add(movieMenu);
 
         JMenu pluginsMenu = new JMenu("Plug-ins");
