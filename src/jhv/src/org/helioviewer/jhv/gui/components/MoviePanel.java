@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -472,9 +473,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == advancedButton) {
@@ -511,9 +509,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void stateChanged(ChangeEvent e) {
         // Jump to different frame
@@ -527,30 +522,18 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseClicked(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseEntered(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseExited(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mousePressed(MouseEvent e) {
         someoneIsDragging = true;
@@ -560,9 +543,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (isEnabled()) {
@@ -574,9 +554,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseReleased(MouseEvent e) {
         if (wasPlaying) {
@@ -623,23 +600,43 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
+
+    private static AbstractAction PlayPause = null;
+    private static AbstractAction PreviousFrame = null;
+    private static AbstractAction NextFrame = null;
+
+    public static AbstractAction getPlayPauseAction() {
+        if (PlayPause == null)
+            PlayPause = new PlayPauseAction();
+        return PlayPause;
+    }
+
+    public static AbstractAction getPreviousFrameAction() {
+        if (PreviousFrame == null)
+            PreviousFrame = new PreviousFrameAction();
+        return PreviousFrame;
+    }
+
+    public static AbstractAction getNextFrameAction() {
+        if (NextFrame == null)
+            NextFrame = new NextFrameAction();
+        return NextFrame;
+    }
+
     /**
      * Action to play or pause the active layer, if it is an image series.
      *
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
-    public static class StaticPlayPauseAction extends AbstractAction implements ActionListener {
+    private static class PlayPauseAction extends AbstractAction implements ActionListener {
 
-        public StaticPlayPauseAction() {
+        public PlayPauseAction() {
             super("Play/Pause Movie");
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.ALT_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void actionPerformed(ActionEvent e) {
             Layers.toggleMovie();
@@ -655,17 +652,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
-    public static class StaticPreviousFrameAction extends AbstractAction implements ActionListener {
+    private static class PreviousFrameAction extends AbstractAction implements ActionListener {
 
-        public StaticPreviousFrameAction() {
+        public PreviousFrameAction() {
             super("Step to Previous Frame");
             putValue(MNEMONIC_KEY, KeyEvent.VK_P);
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.ALT_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void actionPerformed(ActionEvent e) {
             instance.actionPerformed(new ActionEvent(previousFrameButton, 0, ""));
@@ -680,17 +674,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
-    public static class StaticNextFrameAction extends AbstractAction implements ActionListener {
+    private static class NextFrameAction extends AbstractAction implements ActionListener {
 
-        public StaticNextFrameAction() {
+        public NextFrameAction() {
             super("Step to Next Frame");
             putValue(MNEMONIC_KEY, KeyEvent.VK_N);
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.ALT_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void actionPerformed(ActionEvent e) {
             instance.actionPerformed(new ActionEvent(nextFrameButton, 0, ""));
