@@ -33,10 +33,6 @@ import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
  */
 public class JHVUpdate implements Runnable {
     /**
-     * File address to check for updates
-     */
-    private final URL updateURL;
-    /**
      * Determines whether to show a message box if already the latest version is
      * running and if a message box is shown in case of an error.
      *
@@ -44,10 +40,6 @@ public class JHVUpdate implements Runnable {
      * suspend the checks.
      */
     private boolean verbose;
-
-    private final AlphanumComparator comparator = new AlphanumComparator();
-
-    private NewVersionDialog dialog;
 
     /**
      * Verbose whether a dialog box should be popped up.
@@ -58,8 +50,6 @@ public class JHVUpdate implements Runnable {
      */
     public JHVUpdate(boolean _verbose) throws MalformedURLException {
         verbose = _verbose;
-        updateURL = new URL(JHVGlobals.downloadURL + "VERSION");
-        dialog = new NewVersionDialog(verbose);
     }
 
     /**
@@ -109,15 +99,19 @@ public class JHVUpdate implements Runnable {
             return;
         }
         try {
+            URL updateURL = new URL(JHVGlobals.downloadURL + "VERSION");
             BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(updateURL, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout()).getInput()));
             String version = in.readLine();
             if (version == null || version.equals("")) {
                 throw new IOException("JHVUpdate: Empty version string");
             }
 
+            AlphanumComparator comparator = new AlphanumComparator();
             if (comparator.compare(version, runningVersion) > 0) {
                 String message = in.readLine();
                 Log.info("Found newer version " + version);
+
+                NewVersionDialog dialog = new NewVersionDialog(verbose);
                 dialog.init(version, message);
                 dialog.showDialog();
                 if (!verbose) {

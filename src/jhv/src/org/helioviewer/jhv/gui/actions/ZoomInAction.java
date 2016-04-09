@@ -22,7 +22,6 @@ public class ZoomInAction extends AbstractAction {
     public ZoomInAction(boolean small, boolean useIcon) {
         super("Zoom In", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_IN_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_IN)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom in");
-        putValue(MNEMONIC_KEY, KeyEvent.VK_I);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 

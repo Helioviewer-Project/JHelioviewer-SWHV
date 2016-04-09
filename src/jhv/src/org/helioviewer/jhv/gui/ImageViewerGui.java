@@ -244,7 +244,7 @@ public class ImageViewerGui {
     /**
      * Toggles the visibility of the control panel on the left side.
      */
-    public static void toggleShowSidePanel() {
+    public static void toggleSidePanel() {
         leftScrollPane.setVisible(!leftScrollPane.isVisible());
 
         int lastLocation = midSplitPane.getLastDividerLocation();

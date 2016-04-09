@@ -638,7 +638,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         public PlayPauseAction() {
             super("Play/Pause Movie");
-            putValue(MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
@@ -661,7 +660,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         public PreviousFrameAction() {
             super("Step to Previous Frame");
-            putValue(MNEMONIC_KEY, KeyEvent.VK_P);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
@@ -683,7 +681,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         public NextFrameAction() {
             super("Step to Next Frame");
-            putValue(MNEMONIC_KEY, KeyEvent.VK_N);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
