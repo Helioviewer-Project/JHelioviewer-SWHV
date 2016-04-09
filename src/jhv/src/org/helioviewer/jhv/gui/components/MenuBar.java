@@ -19,7 +19,6 @@ import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
-import org.helioviewer.jhv.gui.dialogs.HelpDialog;
 //import org.helioviewer.jhv.gui.dialogs.OpenRemoteFileDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
 import org.helioviewer.jhv.gui.dialogs.plugins.PluginsDialog;
@@ -27,12 +26,6 @@ import org.helioviewer.jhv.platform.OSXHandler;
 
 /**
  * Menu bar of the main window.
- *
- * <p>
- * Basically, contains all actions from {@link org.helioviewer.jhv.gui.actions}.
- *
- * @author Markus Langenberg
- *
  */
 @SuppressWarnings("serial")
 public class MenuBar extends JMenuBar {
@@ -98,13 +91,10 @@ public class MenuBar extends JMenuBar {
         }
 
         helpMenu.add(new OpenURLinBrowserAction("Open User Manual", "http://swhv.oma.be/user_manual/"));
-        helpMenu.add(new ShowDialogAction("Show Shortcuts...", HelpDialog.class));
-        helpMenu.addSeparator();
-        helpMenu.add(new OpenURLinBrowserAction("Report a Bug", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
-        helpMenu.add(new OpenURLinBrowserAction("Submit a Feature Request", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
-        helpMenu.addSeparator();
-        helpMenu.add(new CheckUpdateAction());
         helpMenu.add(new OpenURLinBrowserAction("Open Website", "http://www.jhelioviewer.org"));
+        helpMenu.add(new CheckUpdateAction());
+        helpMenu.addSeparator();
+        helpMenu.add(new OpenURLinBrowserAction("Report a Bug/Feature Request", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
         add(helpMenu);
     }
 
