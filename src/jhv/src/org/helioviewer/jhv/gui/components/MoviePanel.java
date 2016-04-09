@@ -238,6 +238,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.addMouseListener(this);
         addMouseWheelListener(this);
 
+        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RIGHT_ARROW");
+        timeSlider.getActionMap().put("RIGHT_ARROW", getNextFrameAction());
+        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LEFT_ARROW");
+        timeSlider.getActionMap().put("LEFT_ARROW", getPreviousFrameAction());
+
         mainPanel.add(timeSlider);
 
         JPanel secondLine = new JPanel(new BorderLayout());
