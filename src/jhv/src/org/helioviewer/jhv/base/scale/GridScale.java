@@ -120,8 +120,8 @@ public abstract class GridScale {
         public Vec2 mouseToGrid(Point point, Viewport vp, Camera camera, GridChoiceType gridChoice) {
             double w = camera.getWidth();
             Vec2 translation = camera.getCurrentTranslation();
-            double x = (CameraHelper.computeNormalizedX(vp, point) * w - translation.x / vp.aspect) + 0.5;
-            double y = (CameraHelper.computeNormalizedY(vp, point) * w - translation.y) + 0.5;
+            double x = (CameraHelper.computeNormalizedX(vp, point.x) * w - translation.x / vp.aspect) + 0.5;
+            double y = (CameraHelper.computeNormalizedY(vp, point.y) * w - translation.y) + 0.5;
             return new Vec2(getInterpolatedXValue(x), getInterpolatedYValue(y));
         }
 
@@ -129,8 +129,8 @@ public abstract class GridScale {
         public Vec2 mouseToGridInv(Point point, Viewport vp, Camera camera) {
             double w = camera.getWidth();
             Vec2 translation = camera.getCurrentTranslation();
-            double x = (CameraHelper.computeNormalizedX(vp, point) * w - translation.x / vp.aspect);
-            double y = (CameraHelper.computeNormalizedY(vp, point) * w - translation.y);
+            double x = (CameraHelper.computeNormalizedX(vp, point.x) * w - translation.x / vp.aspect);
+            double y = (CameraHelper.computeNormalizedY(vp, point.y) * w - translation.y);
             return new Vec2(x, y);
         }
     }
