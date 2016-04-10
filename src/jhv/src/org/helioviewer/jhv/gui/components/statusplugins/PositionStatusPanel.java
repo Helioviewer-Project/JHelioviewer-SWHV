@@ -34,25 +34,26 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         } else if (Displayer.mode == Displayer.DisplayMode.POLAR || Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
             setText(String.format("(\u03B8,\u03c1) : (%.2f\u00B0,%.2fR\u2299)", coord.x, coord.y));
         } else {
-            double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
             double x = CameraHelper.computeUpX(camera, vp, position.x);
             double y = CameraHelper.computeUpY(camera, vp, position.y);
+            double r = Math.sqrt(x * x + y * y);
+
             double d = camera.getViewpoint().distance;
             int px = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(x, d));
             int py = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(y, d));
 
-            setText(formatOrtho(coord, radius, px, py));
+            setText(formatOrtho(coord, r, px, py));
         }
     }
 
-    private String formatOrtho(Vec2 coord, double radius, int px, int py) {
+    private String formatOrtho(Vec2 coord, double r, int px, int py) {
         String coordStr;
         if (coord != null)
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
         else
             coordStr = nullCoordStr;
 
-        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : (%+5d\u2033,%+5d\u2033)", coordStr, radius, px, py);
+        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : (%+5d\u2033,%+5d\u2033)", coordStr, r, px, py);
     }
 
     @Override

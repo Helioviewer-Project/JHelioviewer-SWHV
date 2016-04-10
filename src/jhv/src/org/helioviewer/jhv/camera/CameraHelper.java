@@ -105,12 +105,6 @@ public class CameraHelper {
         return null;
     }
 
-    public static double getRadiusFromSphereAlt(Camera camera, Viewport vp, Point viewportCoordinates) {
-        double up1x = computeUpX(camera, vp, viewportCoordinates.x);
-        double up1y = computeUpY(camera, vp, viewportCoordinates.y);
-        return Math.sqrt(up1x * up1x + up1y * up1y);
-    }
-
     public static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, Point viewportCoordinates) {
         double up1x = computeUpX(camera, vp, viewportCoordinates.x);
         double up1y = computeUpY(camera, vp, viewportCoordinates.y);
