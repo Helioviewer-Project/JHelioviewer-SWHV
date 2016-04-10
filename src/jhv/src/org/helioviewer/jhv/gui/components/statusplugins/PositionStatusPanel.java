@@ -19,6 +19,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private static String rhoFormat = " | \u03c1 : %.2f R\u2299";
     private static String emptyPos = "(\u03C6, \u03B8) : (--\u00B0, --\u00B0)";
+    private static String xyFormat = "(x, y) : ( %5d\u2033, %5d\u2033) ";
 
     private static Camera camera;
 
@@ -29,16 +30,24 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private void update(Point position) {
         Viewport vp = Displayer.getActiveViewport();
         Vec2 coord = ImageViewerGui.getRenderableGrid().gridPoint(camera, vp, position);
-        double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
 
-        if (coord == null) {
-            setText(emptyPos + String.format(rhoFormat, radius));
-        } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
+        if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
             setText(String.format("(\u03C6, \u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y));
         } else if (Displayer.mode == Displayer.DisplayMode.POLAR || Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
             setText(String.format("\u03B8 : %.2f\u00B0", coord.x) + String.format(rhoFormat, coord.y));
         } else {
-            setText(String.format("(\u03C6, \u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y) + String.format(rhoFormat, radius));
+            double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
+            double x = CameraHelper.computeUpX(camera, vp, position.x);
+            double y = CameraHelper.computeUpY(camera, vp, position.y);
+            double d = camera.getViewpoint().distance;
+            int px = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(x, d));
+            int py = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(y, d));
+            String xyPos = String.format(xyFormat, px, py);
+
+            if (coord == null)
+                setText(xyPos + emptyPos + String.format(rhoFormat, radius));
+            else
+                setText(xyPos + String.format("(\u03C6, \u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y) + String.format(rhoFormat, radius));
         }
     }
 
