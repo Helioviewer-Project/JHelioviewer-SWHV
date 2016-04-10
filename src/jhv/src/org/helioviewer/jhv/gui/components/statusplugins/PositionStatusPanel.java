@@ -17,14 +17,12 @@ import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 @SuppressWarnings("serial")
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener, InputControllerPlugin {
 
-    private static String rhoFormat = " | \u03c1 : %.2f R\u2299";
-    private static String emptyPos = "(\u03C6, \u03B8) : (--\u00B0, --\u00B0)";
-    private static String xyFormat = "(x, y) : ( %5d\u2033, %5d\u2033) ";
+    private static final String nullCoordStr = "---\u00B0,---\u00B0";
 
     private static Camera camera;
 
     public PositionStatusPanel() {
-        setText(emptyPos + String.format(rhoFormat, 0.));
+        setText(formatOrtho(null, 0, 0, 0));
     }
 
     private void update(Point position) {
@@ -32,9 +30,9 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         Vec2 coord = ImageViewerGui.getRenderableGrid().gridPoint(camera, vp, position);
 
         if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            setText(String.format("(\u03C6, \u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y));
+            setText(String.format("(\u03C6,\u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y));
         } else if (Displayer.mode == Displayer.DisplayMode.POLAR || Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
-            setText(String.format("\u03B8 : %.2f\u00B0", coord.x) + String.format(rhoFormat, coord.y));
+            setText(String.format("(\u03B8,\u03c1) : (%.2f\u00B0,%.2fR\u2299)", coord.x, coord.y));
         } else {
             double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
             double x = CameraHelper.computeUpX(camera, vp, position.x);
@@ -42,13 +40,19 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             double d = camera.getViewpoint().distance;
             int px = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(x, d));
             int py = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(y, d));
-            String xyPos = String.format(xyFormat, px, py);
 
-            if (coord == null)
-                setText(xyPos + emptyPos + String.format(rhoFormat, radius));
-            else
-                setText(xyPos + String.format("(\u03C6, \u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y) + String.format(rhoFormat, radius));
+            setText(formatOrtho(coord, radius, px, py));
         }
+    }
+
+    private String formatOrtho(Vec2 coord, double radius, int px, int py) {
+        String coordStr;
+        if (coord != null)
+            coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
+        else
+            coordStr = nullCoordStr;
+
+        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : (%+5d\u2033,%+5d\u2033)", coordStr, radius, px, py);
     }
 
     @Override
