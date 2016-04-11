@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -18,6 +19,7 @@ import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener, InputControllerPlugin {
 
     private static final String nullCoordStr = "---\u00B0,---\u00B0";
+    private static final String nullXYStr = "---\u2033,---\u2033";
 
     private static Camera camera;
 
@@ -48,12 +50,18 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private String formatOrtho(Vec2 coord, double r, int px, int py) {
         String coordStr;
-        if (coord != null)
-            coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        else
+        if (coord == null)
             coordStr = nullCoordStr;
+        else
+            coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
 
-        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : (%+5d\u2033,%+5d\u2033)", coordStr, r, px, py);
+        String xyStr;
+        if (camera != null /* camera may be null on first call */ && camera.getCurrentDragRotation().equals(Quat.ZERO))
+            xyStr = String.format("%+5d\u2033,%+5d\u2033", px, py);
+        else
+            xyStr = nullXYStr;
+
+        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : (%s)", coordStr, r, xyStr);
     }
 
     @Override
