@@ -55,7 +55,7 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
      * @param sharpen
      *            New opacity value. Must be within [0, 1]
      */
-    void setValue(float opacity) {
+    private void setValue(float opacity) {
         opacitySlider.setValue((int) (opacity * 100.f));
     }
 

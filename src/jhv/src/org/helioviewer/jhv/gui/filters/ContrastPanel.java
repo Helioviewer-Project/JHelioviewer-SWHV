@@ -71,7 +71,7 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         }
     }
 
-    void setValue(float contrast) {
+    private void setValue(float contrast) {
         contrastSlider.setValue((int) (contrast * sliderToContrastScale));
     }
 

@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -34,7 +35,7 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
     private final JLabel title;
 
     public LUTPanel() {
-        lutMap = LUT.getStandardList();
+        lutMap = new TreeMap<String, LUT>(LUT.getStandardList());
 
         title = new JLabel("Color", JLabel.RIGHT);
         combobox = new JComboBox(lutMap.keySet().toArray());
@@ -80,22 +81,14 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
         Displayer.display();
     }
 
-    public void setLutByName(String name) {
-        combobox.setSelectedItem(name);
-    }
-/*
-    public void addLut(LUT lut) {
-        if (lutMap.put(lut.getName(), lut) == null)
-            combobox.addItem(lut.getName());
-        combobox.setSelectedItem(lut.getName());
-        image.setLUT(lut, invertButton.isSelected());
-    }
-*/
-
-    void setValue(LUT lut, boolean invertLUT, boolean enhanced) {
+    private void setValue(LUT lut, boolean invertLUT, boolean enhanced) {
         invertButton.setSelected(invertLUT);
         enhanceButton.setSelected(enhanced);
-        combobox.setSelectedItem(lut.getName());
+
+        String name = lut.getName();
+        if (lutMap.put(name, lut) == null)
+            combobox.addItem(name);
+        combobox.setSelectedItem(name);
 
         if (invertLUT) {
             invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));

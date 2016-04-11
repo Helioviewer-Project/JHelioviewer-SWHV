@@ -113,7 +113,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
      * @param gamma
      *            New gamma value, must be within [0.1, 10]
      */
-    void setValue(float gamma) {
+    private void setValue(float gamma) {
         gammaSlider.setValue((int) (Math.log(gamma) / factor));
     }
 
