@@ -25,7 +25,6 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.AlphanumComparator;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -221,8 +220,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
         private final JHVCalendarDatePicker calendarStartDate;
         private final JHVCalendarDatePicker calendarEndDate;
 
-        private static final AlphanumComparator comparator = new AlphanumComparator();
-
         private boolean setFromOutside = false;
 
         public TimeSelectionPanel() {
@@ -341,7 +338,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *         date.
          */
         public boolean isStartDateBeforeEndDate() {
-            return comparator.compare(getStartTime(), getEndTime()) <= 0;
+            return JHVGlobals.alphanumComparator.compare(getStartTime(), getEndTime()) <= 0;
         }
 
         /**

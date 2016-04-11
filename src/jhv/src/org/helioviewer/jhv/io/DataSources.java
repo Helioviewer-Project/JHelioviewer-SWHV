@@ -7,7 +7,6 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,7 +16,6 @@ import java.util.TreeSet;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.base.AlphanumComparator;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
@@ -94,8 +92,6 @@ public class DataSources {
 
     public static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
-    private static final Comparator<String> keyComparator = new AlphanumComparator();
-
     public static class Item implements Comparable<Item> {
 
         // Flag if this should take as default item
@@ -131,7 +127,7 @@ public class DataSources {
 
         @Override
         public int compareTo(Item other) {
-            return keyComparator.compare(key, other.key);
+            return JHVGlobals.alphanumComparator.compare(key, other.key);
         }
 
        @Override
