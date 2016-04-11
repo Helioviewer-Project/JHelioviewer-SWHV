@@ -19,7 +19,6 @@ import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener, InputControllerPlugin {
 
     private static final String nullCoordStr = "---\u00B0,---\u00B0";
-    private static final String nullXYStr = "---\u2033,---\u2033";
 
     private static Camera camera;
 
