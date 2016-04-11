@@ -10,7 +10,7 @@ public class ZoomStatusPanel extends StatusPanel.StatusPlugin {
     }
 
     public void update(double cameraWidth) {
-        setText(String.format("FOV: %.2f R\u2299", 2 * cameraWidth));
+        setText(String.format("FOV: %.2fR\u2299", 2 * cameraWidth));
     }
 
 }

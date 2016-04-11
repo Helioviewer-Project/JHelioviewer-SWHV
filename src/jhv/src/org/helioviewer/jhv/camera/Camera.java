@@ -87,7 +87,7 @@ public class Camera {
         currentTranslation.y = y;
     }
 
-    Quat getCurrentDragRotation() {
+    public Quat getCurrentDragRotation() {
         return currentDragRotation;
     }
 
