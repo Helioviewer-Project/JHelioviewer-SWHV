@@ -54,7 +54,7 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
      * @param sharpen
      *            New sharpen value. Must be within [0, 10]
      */
-    void setValue(float sharpen) {
+    private void setValue(float sharpen) {
         sharpeningSlider.setValue((int) (sharpen * 10.f));
     }
 

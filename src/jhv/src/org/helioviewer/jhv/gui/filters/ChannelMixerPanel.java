@@ -66,7 +66,7 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
      * @param colorMask
      *            Mask representing the new values
      */
-    void setValue(ColorMask colorMask) {
+    private void setValue(ColorMask colorMask) {
         redCheckBox.setSelected(colorMask.showRed());
         greenCheckBox.setSelected(colorMask.showGreen());
         blueCheckBox.setSelected(colorMask.showBlue());
