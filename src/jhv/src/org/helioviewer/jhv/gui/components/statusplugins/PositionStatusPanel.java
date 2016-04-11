@@ -5,8 +5,8 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
-import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
@@ -36,13 +36,13 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         } else if (Displayer.mode == Displayer.DisplayMode.POLAR || Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
             setText(String.format("(\u03B8,\u03c1) : (%.2f\u00B0,%.2fR\u2299)", coord.x, coord.y));
         } else {
-            double x = CameraHelper.computeUpX(camera, vp, position.x);
-            double y = CameraHelper.computeUpY(camera, vp, position.y);
-            double r = Math.sqrt(x * x + y * y);
+            Vec2 n = new Vec2(CameraHelper.computeNormalizedX(vp, position.x), CameraHelper.computeNormalizedY(vp, position.y));
+            Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, n, camera.getCurrentDragRotation());
+            double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
             double d = camera.getViewpoint().distance;
-            int px = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(x, d));
-            int py = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(y, d));
+            int px = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(v.x, d));
+            int py = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(v.y, d));
 
             setText(formatOrtho(coord, r, px, py));
         }
@@ -55,13 +55,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
 
-        String xyStr;
-        if (camera != null /* camera may be null on first call */ && camera.getCurrentDragRotation().equals(Quat.ZERO))
-            xyStr = String.format("%+5d\u2033,%+5d\u2033", px, py);
-        else
-            xyStr = nullXYStr;
-
-        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : (%s)", coordStr, r, xyStr);
+        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : (%+5d\u2033,%+5d\u2033)", coordStr, r, px, py);
     }
 
     @Override
