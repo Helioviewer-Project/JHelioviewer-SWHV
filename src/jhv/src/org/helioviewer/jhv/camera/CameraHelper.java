@@ -49,11 +49,11 @@ public class CameraHelper {
         gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
-    private static double computeNormalizedX(Viewport vp, int screenX) {
+    public static double computeNormalizedX(Viewport vp, int screenX) {
         return 2. * ((screenX - vp.x) / (double) vp.width - 0.5);
     }
 
-    private static double computeNormalizedY(Viewport vp, int screenY) {
+    public static double computeNormalizedY(Viewport vp, int screenY) {
         return -2. * ((screenY - vp.yAWT) / (double) vp.height - 0.5);
     }
 
@@ -83,8 +83,8 @@ public class CameraHelper {
 
         Vec3 hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
-        if (radius2 <= 1.) {
-            hitPoint = new Vec3(up1x, up1y, Math.sqrt(1. - radius2));
+        if (radius2 <= Sun.Radius2) {
+            hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
             return camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
         }
         return null;
@@ -129,8 +129,8 @@ public class CameraHelper {
         Vec3 hitPoint;
         Vec3 rotatedHitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
-        if (radius2 <= 1) {
-            hitPoint = new Vec3(up1x, up1y, Math.sqrt(1. - radius2));
+        if (radius2 <= Sun.Radius2) {
+            hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
             rotatedHitPoint = cameraDifferenceRotation.rotateInverseVector(hitPoint);
             if (rotatedHitPoint.z > 0.) {
                 return rotatedHitPoint;
