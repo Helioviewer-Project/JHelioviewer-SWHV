@@ -52,7 +52,7 @@ public class Settings {
             defaultProperties.load(defaultPropStream);
             defaultPropStream.close();
             if (verbose) {
-                Log.debug(">> Settings.load() > Load default system settings: " + defaultProperties.toString());
+                Log.debug(">> Settings.load() > Load default system settings: " + defaultProperties);
             }
             if (propFile.exists()) {
                 FileInputStream fileInput = new FileInputStream(propFile);
