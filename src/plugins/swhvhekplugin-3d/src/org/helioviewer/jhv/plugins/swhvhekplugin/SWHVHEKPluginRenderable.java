@@ -207,8 +207,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositioningInformation();
-        if (pi.centralPoint() != null) {
-            Vec3 pt = pi.centralPoint();
+        Vec3 pt = pi.centralPoint();
+
+        if (pt != null) {
             String type = evt.getJHVEventType().getEventType().getEventName();
             bindTexture(gl, type, evtr.getIcon());
             Color color = evtr.getColor();
@@ -243,8 +244,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
         JHVPositionInformation pi = evt.getPositioningInformation();
-        if (pi.centralPoint() != null) {
-            Vec3 pt = pi.centralPoint();
+        Vec3 pt = pi.centralPoint();
+
+        if (pt != null) {
             pt = camera.getViewpoint().orientation.rotateVector(pt);
             Vec2 tf = scale.transform(pt);
             String type = evt.getJHVEventType().getEventType().getEventName();
