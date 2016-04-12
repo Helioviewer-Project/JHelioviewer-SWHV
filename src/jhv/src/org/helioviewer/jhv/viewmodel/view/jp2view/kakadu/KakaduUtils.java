@@ -293,8 +293,8 @@ public class KakaduUtils {
         if (xmlBox != null) {
             try {
                 // Grab the xml data if available
-                if (xmlBox.Get_remaining_bytes() > 0) {
-                    int len = (int) xmlBox.Get_remaining_bytes();
+                int len = (int) xmlBox.Get_remaining_bytes();
+                if (len > 0) {
                     byte[] buf = new byte[len];
                     xmlBox.Read(buf, len);
                     xml = new String(buf, "UTF-8");
@@ -343,8 +343,8 @@ public class KakaduUtils {
 
         try {
             // Grab the xml data if available
-            if (xmlBox.Get_remaining_bytes() > 0) {
-                int len = (int) xmlBox.Get_remaining_bytes();
+            int len = (int) xmlBox.Get_remaining_bytes();
+            if (len > 0) {
                 byte[] buf = new byte[len];
                 xmlBox.Read(buf, len);
                 xml = new String(buf, "UTF-8");

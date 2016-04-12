@@ -58,11 +58,11 @@ public class CameraHelper {
     }
 
     public static double deNormalizeX(Viewport vp, double normalizedX) {
-        return vp.width * (normalizedX / 2. + 0.5) + vp.x;
+        return 0.5 * vp.width * (1 + normalizedX) + vp.x;
     }
 
     public static double deNormalizeY(Viewport vp, double normalizedY) {
-        return (-0.5 * normalizedY + 0.5) * vp.height + vp.yAWT;
+        return 0.5 * vp.height * (1 - normalizedY) + vp.yAWT;
     }
 
     public static double computeUpX(Camera camera, Viewport vp, double screenX) {
