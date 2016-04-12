@@ -50,7 +50,8 @@ public class ViewROI {
 
             Quat camDiff = Quat.rotateWithConjugate(camera.getRotation(), m.getViewpoint().orientation);
             for (int i = 0; i < pointlist.length; i++) {
-                Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, pointlist[i], camDiff);
+                Vec2 pl = pointlist[i];
+                Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, CameraHelper.deNormalizeX(vp, pl.x), CameraHelper.deNormalizeY(vp, pl.y), camDiff);
                 minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                 minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                 maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);

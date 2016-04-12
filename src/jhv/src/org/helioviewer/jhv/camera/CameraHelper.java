@@ -49,45 +49,32 @@ public class CameraHelper {
         gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
-    public static double computeNormalizedX(Viewport vp, int screenX) {
-        return 2. * ((screenX - vp.x) / (double) vp.width - 0.5);
+    public static double computeNormalizedX(Viewport vp, double screenX) {
+        return 2. * ((screenX - vp.x) / vp.width - 0.5);
     }
 
-    public static double computeNormalizedY(Viewport vp, int screenY) {
-        return -2. * ((screenY - vp.yAWT) / (double) vp.height - 0.5);
+    public static double computeNormalizedY(Viewport vp, double screenY) {
+        return -2. * ((screenY - vp.yAWT) / vp.height - 0.5);
     }
 
-    public static double computeUpX(Camera camera, Viewport vp, int screenX) {
+    public static double deNormalizeX(Viewport vp, double normalizedX) {
+        return vp.width * (normalizedX / 2. + 0.5) + vp.x;
+    }
+
+    public static double deNormalizeY(Viewport vp, double normalizedY) {
+        return (-0.5 * normalizedY + 0.5) * vp.height + vp.yAWT;
+    }
+
+    public static double computeUpX(Camera camera, Viewport vp, double screenX) {
         double width = camera.getWidth();
         Vec2 translation = camera.getCurrentTranslation();
         return computeNormalizedX(vp, screenX) * width * vp.aspect - translation.x;
     }
 
-    public static double computeUpY(Camera camera, Viewport vp, int screenY) {
+    public static double computeUpY(Camera camera, Viewport vp, double screenY) {
         double width = camera.getWidth();
         Vec2 translation = camera.getCurrentTranslation();
         return computeNormalizedY(vp, screenY) * width - translation.y;
-    }
-
-    public static Vec3 getVectorFromSphere(Camera camera, Viewport vp, Point screenPos) {
-        Vec3 hitPoint = getVectorFromSphereAlt(camera, vp, screenPos);
-        if (hitPoint != null) {
-            return camera.getViewpoint().orientation.rotateInverseVector(hitPoint);
-        }
-        return null;
-    }
-
-    public static Vec3 getVectorFromSphereAlt(Camera camera, Viewport vp, Point screenPos) {
-        double up1x = computeUpX(camera, vp, screenPos.x);
-        double up1y = computeUpY(camera, vp, screenPos.y);
-
-        Vec3 hitPoint;
-        double radius2 = up1x * up1x + up1y * up1y;
-        if (radius2 <= Sun.Radius2) {
-            hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
-            return camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
-        }
-        return null;
     }
 
     public static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, Point screenPos) {
@@ -119,26 +106,33 @@ public class CameraHelper {
         return currentDragRotation.rotateInverseVector(hitPoint);
     }
 
-    public static Vec3 getVectorFromSphereOrPlane(Camera camera, Viewport vp, Vec2 normalizedScreenpos, Quat cameraDifferenceRotation) {
-        double width = camera.getWidth();
-        Vec2 translation = camera.getCurrentTranslation();
-
-        double up1x = normalizedScreenpos.x * width * vp.aspect - translation.x;
-        double up1y = normalizedScreenpos.y * width - translation.y;
+    public static Vec3 getVectorFromSphere(Camera camera, Viewport vp, double screenx, double screeny, Quat rotation, boolean correctDrag) {
+        double up1x = computeUpX(camera, vp, screenx);
+        double up1y = computeUpY(camera, vp, screeny);
 
         Vec3 hitPoint;
-        Vec3 rotatedHitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= Sun.Radius2) {
             hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
-            rotatedHitPoint = cameraDifferenceRotation.rotateInverseVector(hitPoint);
-            if (rotatedHitPoint.z > 0.) {
-                return rotatedHitPoint;
-            }
+            if (correctDrag)
+                hitPoint = camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
+            return rotation.rotateInverseVector(hitPoint);
         }
+        return null;
+    }
+
+    public static Vec3 getVectorFromSphereOrPlane(Camera camera, Viewport vp, double x, double y, Quat cameraDifferenceRotation) {
+        Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, cameraDifferenceRotation, false);
+        double up1x = computeUpX(camera, vp, x);
+        double up1y = computeUpY(camera, vp, y);
+
+        if (rotatedHitPoint != null && rotatedHitPoint.z > 0.) {
+            return rotatedHitPoint;
+        }
+
         Vec3 altnormal = cameraDifferenceRotation.rotateVector(Vec3.ZAxis);
         double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
-        hitPoint = new Vec3(up1x, up1y, zvalue);
+        Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
 
         return cameraDifferenceRotation.rotateInverseVector(hitPoint);
     }
