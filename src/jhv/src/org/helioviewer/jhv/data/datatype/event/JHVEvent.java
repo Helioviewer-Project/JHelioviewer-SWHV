@@ -115,21 +115,23 @@ public class JHVEvent {
      *            was the event in the configuration file
      */
     public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured) {
-        allParameters.put(parameter.getParameterName(), parameter);
+        String name = parameter.getParameterName();
+
+        allParameters.put(name, parameter);
         if (configured) {
             if (visible) {
-                allVisibleParameters.put(parameter.getParameterName(), parameter);
+                allVisibleParameters.put(name, parameter);
                 if (parameter.getParameterValue() == null || (parameter.getParameterValue().trim().length() == 0)) {
-                    allVisibleNullParameters.put(parameter.getParameterName(), parameter);
+                    allVisibleNullParameters.put(name, parameter);
                 } else {
-                    allVisibleNotNullParameters.put(parameter.getParameterName(), parameter);
+                    allVisibleNotNullParameters.put(name, parameter);
                 }
             } else {
-                allNonVisibleParameters.put(parameter.getParameterName(), parameter);
+                allNonVisibleParameters.put(name, parameter);
                 if (parameter.getParameterValue() == null || (parameter.getParameterValue().trim().length() == 0)) {
-                    allNonVisibleNullParameters.put(parameter.getParameterName(), parameter);
+                    allNonVisibleNullParameters.put(name, parameter);
                 } else {
-                    allNonVisibleNotNullParameters.put(parameter.getParameterName(), parameter);
+                    allNonVisibleNotNullParameters.put(name, parameter);
                 }
             }
         }
