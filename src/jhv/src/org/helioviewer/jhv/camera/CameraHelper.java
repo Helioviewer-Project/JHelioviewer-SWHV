@@ -91,21 +91,6 @@ public class CameraHelper {
         return camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
     }
 
-    public static Vec3 getVectorFromPlane(Camera camera, Viewport vp, Point screenPos) {
-        double up1x = computeUpX(camera, vp, screenPos.x);
-        double up1y = computeUpY(camera, vp, screenPos.y);
-
-        Quat currentDragRotation = camera.getCurrentDragRotation();
-        Vec3 altnormal = currentDragRotation.rotateVector(Vec3.ZAxis);
-        if (altnormal.z == 0) {
-            return null;
-        }
-        double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
-
-        Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
-        return currentDragRotation.rotateInverseVector(hitPoint);
-    }
-
     public static Vec3 getVectorFromSphere(Camera camera, Viewport vp, double screenx, double screeny, Quat rotation, boolean correctDrag) {
         double up1x = computeUpX(camera, vp, screenx);
         double up1y = computeUpY(camera, vp, screeny);
@@ -121,20 +106,34 @@ public class CameraHelper {
         return null;
     }
 
+    public static Vec3 getVectorFromPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
+        double up1x = computeUpX(camera, vp, screenX);
+        double up1y = computeUpY(camera, vp, screenY);
+        Quat currentDragRotation = camera.getCurrentDragRotation();
+        Vec3 altnormal = rotation.rotateVector(Vec3.ZAxis);
+        if (correctDrag) {
+            altnormal = currentDragRotation.rotateVector(Vec3.ZAxis);
+        }
+
+        if (altnormal.z == 0) {
+            return null;
+        }
+        double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
+
+        Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
+        if (correctDrag) {
+            hitPoint = currentDragRotation.rotateInverseVector(hitPoint);
+        }
+        return rotation.rotateInverseVector(hitPoint);
+    }
+
     public static Vec3 getVectorFromSphereOrPlane(Camera camera, Viewport vp, double x, double y, Quat cameraDifferenceRotation) {
         Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, cameraDifferenceRotation, false);
-        double up1x = computeUpX(camera, vp, x);
-        double up1y = computeUpY(camera, vp, y);
 
         if (rotatedHitPoint != null && rotatedHitPoint.z > 0.) {
             return rotatedHitPoint;
         }
-
-        Vec3 altnormal = cameraDifferenceRotation.rotateVector(Vec3.ZAxis);
-        double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
-        Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
-
-        return cameraDifferenceRotation.rotateInverseVector(hitPoint);
+        return getVectorFromPlane(camera, vp, x, y, cameraDifferenceRotation, false);
     }
 
     public static void zoomToFit(Camera camera) {
