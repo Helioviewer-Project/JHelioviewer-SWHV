@@ -193,7 +193,7 @@ public abstract class GridScale {
 
         @Override
         public Vec2 mouseToGrid(Point point, Viewport vp, Camera camera, GridChoiceType gridChoice) {
-            Vec3 p = CameraHelper.getVectorFromSphereAlt(camera, vp, point);
+            Vec3 p = CameraHelper.getVectorFromSphere(camera, vp, point.x, point.y, Quat.ZERO, true);
             if (p == null)
                 return null;
 

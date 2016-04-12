@@ -48,7 +48,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
     protected Vec3 computePoint(Point p) {
         Vec3 pt;
         if (Displayer.mode == DisplayMode.ORTHO) {
-            pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), p);
+            pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), p.x, p.y, camera.getViewpoint().orientation, true);
         } else {
             pt = GridScale.current.transformInverse(GridScale.current.mouseToGrid(p, Displayer.getActiveViewport(), camera, GridChoiceType.VIEWPOINT));
         }

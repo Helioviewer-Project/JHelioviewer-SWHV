@@ -35,8 +35,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         } else if (Displayer.mode == Displayer.DisplayMode.POLAR || Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
             setText(String.format("(\u03B8,\u03c1) : (%.2f\u00B0,%.2fR\u2299)", coord.x, coord.y));
         } else {
-            Vec2 n = new Vec2(CameraHelper.computeNormalizedX(vp, position.x), CameraHelper.computeNormalizedY(vp, position.y));
-            Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, n, camera.getCurrentDragRotation());
+            Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, position.x, position.y, camera.getCurrentDragRotation());
             double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
             double d = camera.getViewpoint().distance;
