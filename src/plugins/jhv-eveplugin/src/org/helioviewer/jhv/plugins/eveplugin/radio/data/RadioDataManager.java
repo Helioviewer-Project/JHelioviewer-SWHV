@@ -248,7 +248,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      *            The identifier of the plot for which new data is requested
      */
     public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
-        if (!requestBuffer.hasData() && !requestForDataBusy) {
+        if (!requestForDataBusy && !requestBuffer.hasData()) {
             requestForDataBusy = true;
             requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));
             while (requestBuffer.hasData()) {

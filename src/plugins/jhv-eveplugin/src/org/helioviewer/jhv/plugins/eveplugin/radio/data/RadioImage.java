@@ -139,7 +139,7 @@ public class RadioImage {
                         currentBest = rs;
                     }
                 }
-                if (rs.getResolutionLevel() == 0 && currentBest == null) {
+                if (currentBest == null && rs.getResolutionLevel() == 0) {
                     currentBest = rs;
                 }
             }
