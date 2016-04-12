@@ -114,13 +114,13 @@ public class JHVDatabase {
             }
             if (isCompressed(compressed)) {
                 GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed));
-                ByteArrayOutputStream result = new ByteArrayOutputStream();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 byte[] buffer = new byte[8192];
                 int length;
                 while ((length = gis.read(buffer)) != -1) {
-                    result.write(buffer, 0, length);
+                    baos.write(buffer, 0, length);
                 }
-                outStr = result.toString("UTF-8");
+                outStr = baos.toString("UTF-8");
             } else {
                 outStr = new String(compressed);
             }
@@ -146,10 +146,10 @@ public class JHVDatabase {
             pstatement.setString(1, event.getEventType().getEventName());
             pstatement.setString(2, event.getSupplier().getSupplierName());
             ResultSet rs = pstatement.executeQuery();
-            if (!rs.isClosed() && rs.next()) {
+            if (rs.next()) {
                 typeId = rs.getInt(1);
-                rs.close();
             }
+            rs.close();
         } catch (SQLException e) {
             Log.error("Could not fetch event type " + event.getEventType().getEventName() + event.getSupplier().getSupplierName() + e.getMessage());
         }
@@ -195,10 +195,10 @@ public class JHVDatabase {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_ID_FROM_UID);
             pstatement.setString(1, uid);
             ResultSet rs = pstatement.executeQuery();
-            if (!rs.isClosed() && rs.next()) {
+            if (rs.next()) {
                 id = rs.getInt(1);
-                rs.close();
             }
+            rs.close();
         } catch (SQLException e) {
             Log.error("Could not fetch id from uid " + e.getMessage());
         }
@@ -489,7 +489,7 @@ public class JHVDatabase {
                         PreparedStatement pstatement = getPreparedStatement(connection, SELECT_DATERANGE);
                         pstatement.setInt(1, typeId);
                         ResultSet rs = pstatement.executeQuery();
-                        while (!rs.isClosed() && rs.next()) {
+                        while (rs.next()) {
                             Date beginDate = new Date(Math.min(invalidationDate, rs.getLong(1)));
                             Date endDate = new Date(Math.min(invalidationDate, rs.getLong(2)));
                             typedCache.adaptRequestCache(beginDate, endDate);
@@ -516,7 +516,7 @@ public class JHVDatabase {
                 PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_EVENT);
                 pstatement.setInt(1, typeId);
                 ResultSet rs = pstatement.executeQuery();
-                if (!rs.isClosed() && rs.next()) {
+                if (rs.next()) {
                     last_timestamp = rs.getLong(1);
                 }
                 rs.close();
@@ -599,7 +599,7 @@ public class JHVDatabase {
                     pstatement.setInt(3, typeId);
                     ResultSet rs = pstatement.executeQuery();
                     boolean next = rs.next();
-                    while (!rs.isClosed() && next) {
+                    while (next) {
                         int id = rs.getInt(1);
                         long start = rs.getLong(2);
                         long end = rs.getLong(3);
@@ -656,7 +656,7 @@ public class JHVDatabase {
                     pstatement.setInt(3, typeId);
                     ResultSet rs = pstatement.executeQuery();
                     boolean next = rs.next();
-                    while (!rs.isClosed() && next) {
+                    while (next) {
                         int left = rs.getInt(1);
                         int right = rs.getInt(2);
                         assocList.add(new JHVAssociation(left, right));
@@ -725,7 +725,7 @@ public class JHVDatabase {
                     pstatement.setLong(2, event_id);
                     ResultSet rs = pstatement.executeQuery();
                     boolean next = rs.next();
-                    while (!rs.isClosed() && next) {
+                    while (next) {
                         int left = rs.getInt(1);
                         int right = rs.getInt(2);
                         assocList.add(new JHVAssociation(left, right));
