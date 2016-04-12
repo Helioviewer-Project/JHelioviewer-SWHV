@@ -41,12 +41,12 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
         textType.setMargin(new Insets(0, 0, 0, 0));
 
         JTextArea textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getStartDate()));
-        textStartTime.setBackground(this.getBackground());
+        textStartTime.setBackground(getBackground());
         textStartTime.setFont(labelIcon.getFont());
         textStartTime.setMargin(new Insets(0, 0, 0, 0));
 
         JTextArea textEndTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getEndDate()));
-        textEndTime.setBackground(this.getBackground());
+        textEndTime.setBackground(getBackground());
         textEndTime.setFont(labelIcon.getFont());
         textEndTime.setMargin(new Insets(0, 0, 0, 0));
 

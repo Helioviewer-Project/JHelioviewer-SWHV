@@ -39,14 +39,21 @@ public class JHVEventCache {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (o instanceof SortedDateInterval)
+                return compareTo((SortedDateInterval) o) == 0;
+            return false;
+        }
+
+        @Override
         public int compareTo(SortedDateInterval o2) {
-            if (this.start < o2.start)
+            if (start < o2.start)
                 return -1;
-            else if (this.start == o2.start && this.end < o2.end)
+            else if (start == o2.start && end < o2.end)
                 return -1;
-            else if (this.start == o2.start && this.end == o2.end && o2.id < this.id)
+            else if (start == o2.start && end == o2.end && o2.id < id)
                 return -1;
-            else if (this.start == o2.start && this.end == o2.end && o2.id == this.id)
+            else if (start == o2.start && end == o2.end && o2.id == id)
                 return 0;
             return 1;
         }
@@ -85,8 +92,9 @@ public class JHVEventCache {
     }
 
     public void add(JHVEvent event) {
-        if (relEvents.containsKey(event.getUniqueID())) {
-            relEvents.get(event.getUniqueID()).swapEvent(event, events);
+        Integer id = event.getUniqueID();
+        if (relEvents.containsKey(id)) {
+            relEvents.get(id).swapEvent(event, events);
             return;
         }
         checkAssociation(true, event);

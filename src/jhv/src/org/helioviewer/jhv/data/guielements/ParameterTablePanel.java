@@ -57,17 +57,17 @@ public class ParameterTablePanel extends JPanel {
         super();
         setLayout(new BorderLayout());
         parameterModel = new ParameterTableModel(parameters);
-        table = new JTable(parameterModel) {
-            /*
+        table = new JTable(parameterModel);
+            /* {
              * @Override public boolean getScrollableTracksViewportWidth() {
              * return getPreferredSize().width < getParent().getWidth(); }
+             * };
              */
-        };
         table.setAutoCreateRowSorter(true);
-        table.getColumnModel().getColumn(0).setPreferredWidth(180);
-        table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.getColumnModel().getColumn(0).setResizable(false);
         table.getColumnModel().getColumn(0).setMaxWidth(180);
+        table.getColumnModel().getColumn(0).setPreferredWidth(180);
+        table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.setPreferredScrollableViewportSize(new Dimension(table.getWidth(), 150));
         // table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
@@ -122,9 +122,10 @@ public class ParameterTablePanel extends JPanel {
                 setText(str);
             }
 
-            setSize(table.getColumnModel().getColumn(column).getWidth(), getPreferredSize().height);
-            if (table.getRowHeight(row) != getPreferredSize().height) {
-                table.setRowHeight(row, getPreferredSize().height);
+            int h = getPreferredSize().height;
+            setSize(table.getColumnModel().getColumn(column).getWidth(), h);
+            if (table.getRowHeight(row) != h) {
+                table.setRowHeight(row, h);
             }
             return this;
         }
