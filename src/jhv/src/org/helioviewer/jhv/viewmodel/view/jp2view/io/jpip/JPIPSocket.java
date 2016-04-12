@@ -76,36 +76,33 @@ public class JPIPSocket extends HTTPSocket {
         req.setQuery(query.toString());
 
         JPIPResponse res = null;
-
         while (res == null && isConnected()) {
             send(req);
             res = receive();
         }
-
         if (res == null)
             throw new IOException("The server did not send a response after connection.");
 
         HashMap<String, String> map = null;
-        if (res.getHeader("JPIP-cnew") != null) {
+        String cnew = res.getHeader("JPIP-cnew");
+        if (cnew != null) {
             map = new HashMap<String, String>();
-            String[] parts = res.getHeader("JPIP-cnew").split(",");
+            String[] parts = cnew.split(",");
             for (int i = 0; i < parts.length; i++)
                 for (int j = 0; j < cnewParams.length; j++)
                     if (parts[i].startsWith(cnewParams[j] + "="))
                         map.put(cnewParams[j], parts[i].substring(cnewParams[j].length() + 1));
         }
-
         if (map == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server!");
 
-        jpipChannelID = map.get("cid");
-
         jpipPath = "/" + map.get("path");
 
+        jpipChannelID = map.get("cid");
         if (jpipChannelID == null)
             throw new IOException("The channel id was not sent by the server");
 
-        if (map.get("transport") == null || !map.get("transport").equals("http"))
+        if (!"http".equals(map.get("transport")))
             throw new IOException("The client currently only supports http transport.");
 
         return res;
@@ -215,15 +212,9 @@ public class JPIPSocket extends HTTPSocket {
 
         if (res.getCode() != 200)
             throw new IOException("Invalid status code returned (" + res.getCode() + ")");
-
-        String field;
-
-        field = res.getHeader("Transfer-Encoding");
-        if (field == null || !field.equals("chunked"))
+        if (!"chunked".equals(res.getHeader("Transfer-Encoding")))
             throw new IOException("Only chunked responses are supported");
-
-        field = res.getHeader("Content-Type");
-        if (field != null && !field.equals("image/jpp-stream"))
+        if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content!");
 
         replyTextTm = System.currentTimeMillis();
@@ -231,8 +222,7 @@ public class JPIPSocket extends HTTPSocket {
         ChunkedInputStreamAlt input = new ChunkedInputStreamAlt(new BufferedInputStream(getInputStream(), 65536));
 
         JPIPDataInputStream jpip;
-        field = res.getHeader("Content-Encoding");
-        if (field != null && field.equals("gzip"))
+        if ("gzip".equals(res.getHeader("Content-Encoding")))
             jpip = new JPIPDataInputStream(new GZIPInputStream(input));
         else
             jpip = new JPIPDataInputStream(input);
@@ -241,7 +231,7 @@ public class JPIPSocket extends HTTPSocket {
         while ((seg = jpip.readSegment()) != null)
             res.addJpipDataSegment(seg);
 
-        if (res.getHeader("Connection") != null && res.getHeader("Connection").equals("close")) {
+        if ("close".equals(res.getHeader("Connection"))) {
             super.close();
         }
         replyDataTm = System.currentTimeMillis();

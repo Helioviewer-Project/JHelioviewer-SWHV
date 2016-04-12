@@ -125,9 +125,9 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     public static void renderSceneScale(Camera camera, GL2 gl) {
         if (Displayer.mode == Displayer.DisplayMode.POLAR) {
-            GridScale.polar.set(0, 360, 0, Layers.getLargestPhysicalSize() / 2);
+            GridScale.polar.set(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize());
         } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
-            GridScale.logpolar.set(0, 360, 0.05, Layers.getLargestPhysicalSize() / 2);
+            GridScale.logpolar.set(0, 360, 0.05, 0.5 * Layers.getLargestPhysicalSize());
         }
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);

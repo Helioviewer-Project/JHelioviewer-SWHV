@@ -15,10 +15,10 @@ import org.helioviewer.jhv.renderable.components.RenderableGrid.GridChoiceType;
 
 public abstract class GridScale {
 
-    public static GridScale polar = new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar);
-    public static GridScale latitudinal = new GridScale.GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
-    public static GridScale logpolar = new GridScale.GridScaleLogY(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar);
-    public static GridScale ortho = new GridScale.GridScaleOrtho(0, 0, 0, 0, Transform.transformlatitudinal);
+    public static final GridScale polar = new GridScale.GridScaleIdentity(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
+    public static final GridScale latitudinal = new GridScale.GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
+    public static final GridScale logpolar = new GridScale.GridScaleLogY(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
+    public static final GridScale ortho = new GridScale.GridScaleOrtho(0, 0, 0, 0, Transform.transformlatitudinal);
 
     public static GridScale current = ortho;
 
@@ -61,10 +61,7 @@ public abstract class GridScale {
         protected final Transform transform;
 
         public GridScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
-            xStart = _xStart;
-            xStop = _xStop;
-            yStart = scaleY(_yStart);
-            yStop = scaleY(_yStop);
+            set(_xStart, _xStop, _yStart, _yStop);
             transform = _transform;
         }
 

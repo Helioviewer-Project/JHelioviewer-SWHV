@@ -141,20 +141,22 @@ public class DownloadStream {
             } catch (IOException e) {
                 Log.warn("HTTP connection failed: " + url + " " + e);
             }
+
             // Check the connection code
-            if (httpC.getResponseCode() > 400) {
-                Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
-                throw new IOException("Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
+            int code = httpC.getResponseCode();
+            if (code > 400) {
+                Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + code);
+                throw new IOException("Error opening http connection to " + url + " Response code: " + code);
             }
 
-            if (!ignore400 && httpC.getResponseCode() == 400) {
-                Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
-                throw new IOException("Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
+            if (!ignore400 && code == 400) {
+                Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + code);
+                throw new IOException("Error opening http connection to " + url + " Response code: " + code);
             }
 
             String encoding = httpC.getContentEncoding();
-            if (httpC.getResponseCode() == 400) {
-                this.response400 = true;
+            if (code == 400) {
+                response400 = true;
                 in = getEncodedStream(encoding, httpC.getErrorStream());
             } else {
                 in = getEncodedStream(encoding, httpC.getInputStream());
