@@ -315,9 +315,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 } catch (ParseException e1) {
                     Log.error("Could not parse start date " + getStartTime());
                 }
-            }
-
-            if (e.getSource() == calendarEndDate) {
+            } else if (e.getSource() == calendarEndDate) {
                 GregorianCalendar calendar = new GregorianCalendar();
                 try {
                     calendar.setTime(TimeUtils.apiDateFormat.parse(getEndTime()));
@@ -329,16 +327,13 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
 
         /**
-         * Checks if the selected start date is before selected end date. The
-         * methods checks the entered times when the dates are equal. If the
-         * start time is greater or equal than the end time the method will
-         * return false.
+         * Checks if the selected start date is before or equal to selected end date.
          *
-         * @return boolean value if selected start date is before selected end
+         * @return boolean value if selected start date is before or equal to selected end
          *         date.
          */
         public boolean isStartDateBeforeEndDate() {
-            return JHVGlobals.alphanumComparator.compare(getStartTime(), getEndTime()) <= 0;
+            return calendarStartDate.getDate().getTime() <= calendarEndDate.getDate().getTime();
         }
 
         /**
