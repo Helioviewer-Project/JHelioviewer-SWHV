@@ -74,7 +74,7 @@ public class JHVGlobals {
             jarPath = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             Log.info(">> JHVGlobals.determineVersionAndRevision() > Look for jar file: " + jarPath.getAbsolutePath());
         } catch (URISyntaxException e1) {
-            Log.error(">> JHVGlobals.determineVersionAndRevision() > Could not open code source location: " + JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toString());
+            Log.error(">> JHVGlobals.determineVersionAndRevision() > Could not open code source location: " + JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation());
             Log.warn(">> JHVGlobals.determineVersionAndRevision() > Set version and revision to null.");
             return;
         }
@@ -185,7 +185,7 @@ public class JHVGlobals {
             } catch (Exception e) {
                 StringWriter errors = new StringWriter();
                 e.printStackTrace(new PrintWriter(errors));
-                Log.error(">> displayNotification " + errors.toString());
+                Log.error(">> displayNotification " + errors);
             }
         }
     }

@@ -143,7 +143,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 
         String stackTrace = e.getClass().getCanonicalName() + "\n";
         for (StackTraceElement el : e.getStackTrace()) {
-            stackTrace = stackTrace + "at " + el.toString() + "\n";
+            stackTrace = stackTrace + "at " + el + "\n";
         }
 
         String msg = "Uncaught Exception detected.\n\nConfiguration:\n";

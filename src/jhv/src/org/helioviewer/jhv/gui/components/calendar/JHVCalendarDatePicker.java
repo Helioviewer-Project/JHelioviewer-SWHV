@@ -44,15 +44,15 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 public class JHVCalendarDatePicker extends JPanel implements FocusListener, ActionListener, KeyListener, JHVCalendarListener {
 
     private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final Calendar calendar = new GregorianCalendar();
 
     private JHVCalendar jhvCalendar = null;
-    private final Icon icon = IconBank.getIcon(JHVIcon.DATE);
     private final JTextField textField = new JTextField();
 
-    private final Date startDate = JHVDate.parseDateTime("1970-01-01T00:00:00").getDate();
-    private final Date endDate = JHVDate.parseDateTime("2050-01-01T00:00:00").getDate();
+    private static final Icon icon = IconBank.getIcon(JHVIcon.DATE);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final Date startDate = JHVDate.parseDateTime("1970-01-01T00:00:00").getDate();
+    private static final Date endDate = JHVDate.parseDateTime("2050-01-01T00:00:00").getDate();
 
     public JTextField getTextField() {
         return textField;

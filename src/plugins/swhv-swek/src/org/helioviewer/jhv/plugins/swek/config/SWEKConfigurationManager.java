@@ -148,7 +148,7 @@ public class SWEKConfigurationManager {
      */
     private boolean isManuallyChanged() {
         try {
-            Log.debug("configURL: " + configFileURL.toString());
+            Log.debug("configURL: " + configFileURL);
             InputStream configIs = configFileURL.openStream();
             StringBuilder sb = new StringBuilder();
             BufferedReader br = new BufferedReader(new InputStreamReader(configIs));
@@ -284,7 +284,7 @@ public class SWEKConfigurationManager {
             try {
                 URI fileLocation = new URI(fileName);
                 configFileURL = fileLocation.toURL();
-                Log.debug("Config file: " + configFileURL.toString());
+                Log.debug("Config file: " + configFileURL);
                 return true;
             } catch (URISyntaxException e) {
                 Log.debug("Wrong URI syntax for the found file name: " + fileName);

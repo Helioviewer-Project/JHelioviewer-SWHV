@@ -226,7 +226,7 @@ public class SWEKSourceManager {
             jarURLList.add(dest.toURI().toURL());
             return true;
         } catch (IOException e) {
-            Log.error("IO exception received for source " + source.toString() + ". Given error was " + e);
+            Log.error("IO exception received for source " + source + ". Given error was " + e);
             e.printStackTrace();
         }
         return false;

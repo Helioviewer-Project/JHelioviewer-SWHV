@@ -71,7 +71,7 @@ public class DownloadStream {
      */
     public DownloadStream(URI uri, int connectTimeout, int readTimeout) throws URISyntaxException, MalformedURLException {
         if (!uri.isAbsolute()) {
-            uri = new URI("file:" + uri.toString());
+            uri = new URI("file:" + uri);
         }
         url = uri.toURL();
         this.readTimeout = readTimeout;
@@ -147,7 +147,7 @@ public class DownloadStream {
                 throw new IOException("Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
             }
 
-            if (httpC.getResponseCode() == 400 && !(this.ignore400)) {
+            if (!ignore400 && httpC.getResponseCode() == 400) {
                 Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
                 throw new IOException("Error opening http connection to " + url + " Response code: " + httpC.getResponseCode());
             }

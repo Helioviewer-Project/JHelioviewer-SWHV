@@ -39,7 +39,7 @@ public class UploadStream {
      */
     public UploadStream(URI uri) throws MalformedURLException, URISyntaxException {
         if (!uri.isAbsolute()) {
-            uri = new URI("file:" + uri.toString());
+            uri = new URI("file:" + uri);
         }
         this.uri = uri;
     }
