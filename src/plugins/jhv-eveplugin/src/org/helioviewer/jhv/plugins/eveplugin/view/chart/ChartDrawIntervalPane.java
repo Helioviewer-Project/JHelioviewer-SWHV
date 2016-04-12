@@ -548,7 +548,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
         eveState.setMouseTimeIntervalDragging(false);
         if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint) {
-            Log.info(" Mouse released ");
+            // Log.info(" Mouse released ");
             resizeSelectedInterval(p, true);
         } else if (mouseOverInterval) {
             moveSelectedInterval(p, true);

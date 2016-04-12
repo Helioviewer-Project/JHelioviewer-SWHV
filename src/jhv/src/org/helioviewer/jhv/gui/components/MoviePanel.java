@@ -735,6 +735,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         private static final Color partialCachedColor = new Color(0x8080FF);
         private static final Color completeCachedColor = new Color(0x4040FF);
 
+        private static final BasicStroke thickStroke = new BasicStroke(4);
+        private static final BasicStroke thinStroke = new BasicStroke(1);
+
         /**
          * Default constructor.
          *
@@ -782,11 +785,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void paintTrack(Graphics g) {
-            int y = slider.getSize().height / 2;
-
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setStroke(new BasicStroke(4));
+            g2d.setStroke(thickStroke);
 
+            int y = slider.getSize().height / 2;
             View view = Layers.getActiveView();
             if (view == null) {
                 g2d.setColor(notCachedColor);
@@ -811,7 +813,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                     g2d.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
                 }
             }
-            g2d.setStroke(new BasicStroke(1));
+            g2d.setStroke(thinStroke);
         }
 
         /**

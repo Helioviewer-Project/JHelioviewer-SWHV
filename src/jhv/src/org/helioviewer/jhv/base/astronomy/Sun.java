@@ -117,6 +117,7 @@ public class Sun {
     }
 
     // better precison, to be recovered later
+/*
     private static double getL0Degree(long milli) {
         double mjd = milli2mjd(milli);
         double t = mjd2jcy(mjd, 2451545.);
@@ -151,6 +152,7 @@ public class Sun {
         double long0 = (eta - theta) % 360. + 360.;
         return long0;
     }
+*/
 
     public static double calculateRotationInRadians(double latitude, double deltaTsec) {
         /*
