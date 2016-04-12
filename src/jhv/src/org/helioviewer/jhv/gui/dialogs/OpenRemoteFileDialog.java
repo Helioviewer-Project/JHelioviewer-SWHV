@@ -288,13 +288,10 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                 return;
             }
 
-            if (urlHttpServer.getHost() != null && urlJpipServer.getHost() != null && (!urlHttpServer.getHost().equals(urlJpipServer.getHost()))) {
-                if (advancedOptions) {
-                    Message.err("JPIP and HTTP address do not fit.", "", false);
-                    return;
-                }
+            if (advancedOptions && urlHttpServer.getHost() != null && urlJpipServer.getHost() != null && !urlHttpServer.getHost().equals(urlJpipServer.getHost())) {
+                Message.err("JPIP and HTTP address do not fit.", "", false);
+                return;
             }
-
         } catch (URISyntaxException e) {
             Message.err("Invalid server address.", "", false);
             return;
