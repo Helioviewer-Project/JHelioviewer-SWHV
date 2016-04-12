@@ -230,7 +230,7 @@ public class DownloadController {
         @Override
         public void run() {
             try {
-                if (interval != null && interval.getStart() != null && interval.getEnd() != null && band != null) {
+                if (interval.getStart() != null && interval.getEnd() != null) {
                     requestData();
                 }
             } finally {

@@ -54,7 +54,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     // private final Map<YAxisElement, String> axisUnitMap;
 
     private DrawController() {
-
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
         yAxisSet = new ArrayList<YAxisElement>();
@@ -63,7 +62,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
         // axisUnitMap = new HashMap<YAxisElement, String>();
-
     }
 
     public static DrawController getSingletonInstance() {
@@ -332,10 +330,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
-        return setSelectedInterval(newSelectedInterval, useFullValueSpace, true, resetAvailable);
+        setSelectedInterval(newSelectedInterval, useFullValueSpace, true, resetAvailable);
+        return selectedInterval;
     }
 
-    private Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace, boolean updatePlotAreaSpace, boolean resetAvailable) {
+    private void setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace, boolean willUpdatePlotAreaSpace, boolean resetAvailable) {
         keepFullValueRange = useFullValueSpace;
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             selectedInterval = new Interval<Date>(null, null);
@@ -375,8 +374,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                 }
             }
 
-            if (updatePlotAreaSpace) {
-                updatePlotAreaSpace(selectedInterval);
+            if (willUpdatePlotAreaSpace) {
+                updatePlotAreaSpace();
             }
 
             fireSelectedIntervalChanged(useFullValueSpace);
@@ -385,7 +384,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             Log.debug("Start was after end. Set by: ");
             Thread.dumpStack();
         }
-        return selectedInterval;
     }
 
     public Interval<Date> getSelectedInterval() {
@@ -398,7 +396,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private void updatePlotAreaSpace(Interval<Date> selectedInterval) {
+    private void updatePlotAreaSpace() {
         if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
             long diffAvailable = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
             double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
