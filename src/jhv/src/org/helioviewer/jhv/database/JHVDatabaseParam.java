@@ -1,8 +1,9 @@
 package org.helioviewer.jhv.database;
 
 public class JHVDatabaseParam {
-    public static String DBSTRINGTYPE = "TEXT";
-    public static String DBINTTYPE = "INTEGER";
+
+    public static final String DBSTRINGTYPE = "TEXT";
+    public static final String DBINTTYPE = "INTEGER";
 
     private int intp;
     private String stringp;

@@ -34,6 +34,7 @@ import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
 public class JHVDatabase {
+
     public static class Event2Db {
         byte[] compressedJson;
         long start;
@@ -122,7 +123,7 @@ public class JHVDatabase {
                 }
                 outStr = baos.toString("UTF-8");
             } else {
-                outStr = new String(compressed);
+                outStr = new String(compressed, "UTF-8");
             }
         } catch (IOException e) {
             System.out.println("could not decompress");
