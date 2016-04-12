@@ -75,11 +75,12 @@ public class JHVRelatedEvents {
             eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
         eventsMap.get(eventType).remove(interval);
+        eventsMap.get(found.getJHVEventType()).remove(found.getInterval());
+
         interval.start = Math.min(interval.start, found.getStart());
         interval.end = Math.max(interval.end, found.getEnd());
         events.addAll(found.getEvents());
         associations.addAll(found.getAssociations());
-        eventsMap.remove(found.getInterval());
         eventsMap.get(eventType).put(interval, this);
     }
 
