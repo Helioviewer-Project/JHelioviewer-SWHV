@@ -81,7 +81,8 @@ class J2KRender implements Runnable {
         Kdu_dims actualRenderedRegion = compositorBuf.Get_rendering_region();
 
         // avoid gc
-        Kdu_coords actualOffset = new Kdu_coords(actualRenderedRegion.Access_pos().Get_x(), actualRenderedRegion.Access_pos().Get_y());
+        Kdu_coords actualPos = actualRenderedRegion.Access_pos();
+        Kdu_coords actualOffset = new Kdu_coords(actualPos.Get_x(), actualPos.Get_y());
         Kdu_coords actualSize = actualRenderedRegion.Access_size();
         int aWidth = actualSize.Get_x(), aHeight = actualSize.Get_y();
 
