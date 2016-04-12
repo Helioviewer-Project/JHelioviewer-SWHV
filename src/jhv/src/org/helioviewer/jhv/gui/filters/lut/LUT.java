@@ -21,7 +21,7 @@ import org.helioviewer.jhv.base.logging.Log;
  */
 public class LUT {
 
-    public final static char angstrom = '\u212B';
+    private final static char angstrom = '\u212B';
 
     private final String lutName;
 
@@ -276,6 +276,7 @@ public class LUT {
      * @param name
      * @return 16bit lookup table
      */
+/*
     private static int[] internal16Readin(String name) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(FileUtils.getResourceInputStream("/luts/" + name)));
@@ -284,12 +285,9 @@ public class LUT {
             int[] intArray = new int[65536];
             int counter = 0;
             while ((strLine = br.readLine()) != null) {
-
                 String[] array = strLine.split(" ");
-
                 for (int i = 0; i < array.length; i++) {
                     if (array[i].equals(" ") || array[i].equals("")) {
-
                     } else {
                         intArray[counter] = Integer.parseInt(array[i]);
                         counter++;
@@ -303,5 +301,5 @@ public class LUT {
             return null;
         }
     }
-
+*/
 }
