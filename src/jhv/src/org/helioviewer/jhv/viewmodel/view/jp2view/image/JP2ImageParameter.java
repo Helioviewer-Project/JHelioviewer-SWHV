@@ -51,9 +51,9 @@ public class JP2ImageParameter {
     public boolean equals(Object o) {
         if (o instanceof JP2ImageParameter) {
             JP2ImageParameter p = (JP2ImageParameter) o;
-            return jp2Image.equals(p.jp2Image) && viewpoint.equals(p.viewpoint) &&
-                   subImage.equals(p.subImage) && resolution.equals(p.resolution) &&
-                   compositionLayer == p.compositionLayer && factor == p.factor;
+            return compositionLayer == p.compositionLayer && factor == p.factor &&
+                   jp2Image.equals(p.jp2Image) && viewpoint.equals(p.viewpoint) &&
+                   subImage.equals(p.subImage) && resolution.equals(p.resolution);
         }
         return false;
     }

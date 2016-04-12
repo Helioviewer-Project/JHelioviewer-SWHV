@@ -77,7 +77,7 @@ public class JPIPSocket extends HTTPSocket {
 
         JPIPResponse res = null;
 
-        while (isConnected() && (res == null)) {
+        while (res == null && isConnected()) {
             send(req);
             res = receive();
         }
@@ -155,7 +155,7 @@ public class JPIPSocket extends HTTPSocket {
         if (!_req.headerExists(HTTPHeaderKey.HOST.toString()))
             _req.setHeader(HTTPHeaderKey.HOST.toString(), (getHost() + ":" + getPort()));
         // Adds a necessary JPIP request field
-        if ((queryStr.indexOf("cid=") == -1) && (queryStr.indexOf("cclose") == -1) && jpipChannelID != null)
+        if ((jpipChannelID != null && queryStr.indexOf("cid=") == -1) && (queryStr.indexOf("cclose") == -1))
             queryStr += "&cid=" + jpipChannelID;
 
         if (_req.getMethod() == Method.GET) {

@@ -112,10 +112,7 @@ public class ParameterTablePanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            String str = "";
-            if (value != null) {
-                str = value.toString();
-            }
+            String str = "" + value;
 
             if (isRolloverCell(table, row, column) && isValueURL(value)) {
                 setText("<html><u><font color='blue'>" + str + "</font></u></html>");
@@ -143,8 +140,8 @@ public class ParameterTablePanel extends JPanel {
             }
         }
 
-        protected boolean isRolloverCell(JTable table, int row, int column) {
-            return !table.isEditing() && this.row == row && col == column && isRollover;
+        protected boolean isRolloverCell(JTable table, int _row, int column) {
+            return row == _row && col == column && isRollover /* && !table.isEditing() */;
         }
 
         private boolean isURLColumn(JTable table, int col, int row) {

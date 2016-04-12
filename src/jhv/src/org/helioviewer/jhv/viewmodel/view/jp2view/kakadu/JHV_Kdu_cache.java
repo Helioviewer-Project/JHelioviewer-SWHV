@@ -66,7 +66,7 @@ public class JHV_Kdu_cache extends Kdu_cache {
             if (compositionLayer >= 0) {
                 if (_data.classID.getKakaduClassID() == KakaduConstants.KDU_PRECINCT_DATABIN && status.getImageStatus(compositionLayer) == CacheStatus.HEADER)
                     status.setImageStatus(compositionLayer, CacheStatus.PARTIAL);
-                else if (_data.classID.getKakaduClassID() == KakaduConstants.KDU_MAIN_HEADER_DATABIN && _data.isFinal)
+                else if (_data.isFinal && _data.classID.getKakaduClassID() == KakaduConstants.KDU_MAIN_HEADER_DATABIN)
                     status.setImageStatus(compositionLayer, CacheStatus.HEADER);
             }
         }
