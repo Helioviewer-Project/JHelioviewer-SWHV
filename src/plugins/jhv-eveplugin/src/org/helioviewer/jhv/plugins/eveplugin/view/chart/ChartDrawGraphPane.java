@@ -416,15 +416,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseClicked(final MouseEvent e) {
         JHVRelatedEvents event = eventModel.getEventUnderMouse();
+        Point p = e.getPoint();
+
         if (event != null) {
-            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(mouseToDate(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE))));
+            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(mouseToDate(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE))));
             dialog.setLocation(e.getLocationOnScreen());
             dialog.validate();
             dialog.pack();
             dialog.setVisible(true);
-
-        } else if (graphArea.contains(e.getPoint())) {
-            setMovieFrameManually(e.getPoint());
+        } else if (graphArea.contains(p)) {
+            setMovieFrameManually(p);
         }
     }
 
@@ -447,27 +448,28 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mousePressed(final MouseEvent e) {
         final Rectangle movieFrame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
+        Point p = e.getPoint();
 
-        mousePressedOnMovieFrame = movieFrame.contains(e.getPoint());
-        mousePressedPosition = plotArea.contains(e.getPoint()) ? e.getPoint() : null;
-        if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height && !(eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE)) != null)) {
+        mousePressedOnMovieFrame = movieFrame.contains(p);
+        mousePressedPosition = plotArea.contains(p) ? p : null;
+        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height &&
+            !(eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) != null)) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }
 
     @Override
     public void mouseReleased(final MouseEvent e) {
-        if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height) {
+        Point p = e.getPoint();
+        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
-        if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
 
-            final int mouseX = e.getX();
-            final int mouseY = e.getY();
-            double distanceX = -1 * (mouseX - mousePressedPosition.x);
-            double distanceY = mouseY - mousePressedPosition.y;
+        if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
+            double distanceX = mousePressedPosition.x - p.x;
+            double distanceY = p.y - mousePressedPosition.y;
             double ratioTime = graphArea.width / (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
             double startTime = plotAreaSpace.getScaledSelectedMinTime() + distanceX / ratioTime;
 
@@ -490,7 +492,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseDragged(final MouseEvent e) {
-        mouseDragPosition = e.getPoint();
+        Point p = e.getPoint();
+
+        mouseDragPosition = p;
 
         if (mousePressedPosition != null && mousePressedOnMovieFrame) {
             setMovieFrameManually(mouseDragPosition);
@@ -498,37 +502,36 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (mousePressedPosition != null && !mousePressedOnMovieFrame) {
             setCursor(UIGlobals.closedHandCursor);
-            final int mouseX = e.getX();
-            final int mouseY = e.getY();
-            double distanceX = (-mouseX + mousePressedPosition.x);
-            double distanceY = mouseY - mousePressedPosition.y;
+            double distanceX = mousePressedPosition.x - p.x;
+            double distanceY = p.y - mousePressedPosition.y;
             double ratioTime = graphArea.width / (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
             double startTime = plotAreaSpace.getScaledSelectedMinTime() + distanceX / ratioTime;
             double endTime = startTime + graphArea.width / ratioTime;
 
             plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
             mouseHelper(distanceY);
-
         }
-        mousePressedPosition = e.getPoint();
+        mousePressedPosition = p;
     }
 
     @Override
     public void mouseMoved(final MouseEvent e) {
-        mousePosition = new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE);
         final Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
+        Point p = e.getPoint();
 
-        if (movieLinePosition >= 0 && drawController.getIntervalAvailable() && frame.contains(e.getPoint())) {
+        mousePosition = new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE);
+
+        if (movieLinePosition >= 0 && drawController.getIntervalAvailable() && frame.contains(p)) {
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         } else if (EventModel.getSingletonInstance().getEventUnderMouse() != null) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
             mouseOverEvent = true;
-        } else if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height) {
+        } else if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
-        if (mouseOverEvent && (eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE)) == null)) {
+        if (mouseOverEvent && (eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) == null)) {
             mouseOverEvent = false;
         }
         redrawGraph();

@@ -461,14 +461,16 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        Point p = e.getPoint();
+
         if ((e.getModifiers() & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
-            if (e.getPoint().x >= DrawConstants.GRAPH_LEFT_SPACE && e.getPoint().x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
+            if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
                 mousePressed = new Point(leftIntervalBorderPosition + (rightIntervalBorderPosition - leftIntervalBorderPosition) / 2, 0);
-                moveSelectedInterval(e.getPoint(), true);
+                moveSelectedInterval(p, true);
                 mousePressed = null;
             }
         } else if ((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK) {
-            jumpSelectedInterval(e.getPoint());
+            jumpSelectedInterval(p);
         }
 
     }
@@ -508,7 +510,9 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        if (e.getPoint().x >= DrawConstants.GRAPH_LEFT_SPACE && e.getPoint().x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
+        Point p = e.getPoint();
+
+        if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -540,12 +544,14 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        Point p = e.getPoint();
+
         eveState.setMouseTimeIntervalDragging(false);
         if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint) {
             Log.info(" Mouse released ");
-            resizeSelectedInterval(e.getPoint(), true);
+            resizeSelectedInterval(p, true);
         } else if (mouseOverInterval) {
-            moveSelectedInterval(e.getPoint(), true);
+            moveSelectedInterval(p, true);
             setCursor(UIGlobals.openHandCursor);
         }
         mousePressed = null;
@@ -565,19 +571,21 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        Point p = e.getPoint();
+
         mouseOverInterval = false;
         mouseOverLeftGraspPoint = false;
         mouseOverRightGraspPoint = false;
 
         // is mouse cursor above selected interval?
-        if (e.getPoint().x >= leftIntervalBorderPosition && e.getPoint().x <= rightIntervalBorderPosition) {
+        if (p.x >= leftIntervalBorderPosition && p.x <= rightIntervalBorderPosition) {
             mouseOverInterval = true;
             setCursor(UIGlobals.openHandCursor);
         }
 
         // reset cursor if it does not point to the interval area
         if (!mouseOverInterval) {
-            if (e.getPoint().x >= DrawConstants.GRAPH_LEFT_SPACE && e.getPoint().x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
+            if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
                 setCursor(new Cursor(Cursor.HAND_CURSOR));
             } else {
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
