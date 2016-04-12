@@ -238,8 +238,9 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
 
     @Override
     public void tableChanged(TableModelEvent e) {
-        if (tableModel.getRowCount() > 0) {
-            grid.setRowSelectionInterval(tableModel.getRowCount() - 1, tableModel.getRowCount() - 1);
+        int n = tableModel.getRowCount();
+        if (n > 0) {
+            grid.setRowSelectionInterval(n - 1, n - 1);
         }
         checkOptionPanel();
     }
