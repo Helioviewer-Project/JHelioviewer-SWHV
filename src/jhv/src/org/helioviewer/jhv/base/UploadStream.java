@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -37,7 +36,7 @@ public class UploadStream {
      * @param uri
      *            uri to connect
      */
-    public UploadStream(URI uri) throws MalformedURLException, URISyntaxException {
+    public UploadStream(URI uri) throws URISyntaxException {
         if (!uri.isAbsolute()) {
             uri = new URI("file:" + uri);
         }

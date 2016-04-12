@@ -12,7 +12,7 @@ public class GLInfo {
     public static int maxTextureSize;
 
     public static int[] pixelScale = new int[] { 1, 1 };
-    public static float[] pixelScaleFloat = new float[] { 1f, 1f };
+    static float[] pixelScaleFloat = new float[] { 1f, 1f };
 
     public static void update(GL2 gl) {
         String version = gl.glGetString(GL2.GL_VERSION);

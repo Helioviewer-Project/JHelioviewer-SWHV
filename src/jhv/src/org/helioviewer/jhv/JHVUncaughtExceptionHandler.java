@@ -9,8 +9,8 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -67,7 +67,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
      *            Object to display in the main area of the dialog.
      */
     public static void showErrorDialog(final String title, final Object msg) {
-        Vector<Object> objects = new Vector<Object>();
+        ArrayList<Object> objects = new ArrayList<Object>();
 
         JLabel fatal = new JLabel("Fatal error detected.");
         objects.add(fatal);
