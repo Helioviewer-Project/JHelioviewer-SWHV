@@ -713,7 +713,7 @@ public class JHVDatabase {
             if (type_left_id != -1 && type_right_id != -1) {
                 try {
                     String table_left_name = type_left.getSupplier().getDatabaseName();
-                    String table_right_name = type_left.getSupplier().getDatabaseName();
+                    String table_right_name = type_right.getSupplier().getDatabaseName();
 
                     String sqlt = "SELECT tl.event_id, tr.event_id FROM "
                             + table_left_name + " AS tl," + table_right_name + " AS tr"
