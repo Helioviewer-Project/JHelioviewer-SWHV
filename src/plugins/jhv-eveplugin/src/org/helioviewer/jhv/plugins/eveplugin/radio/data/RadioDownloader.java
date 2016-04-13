@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -237,17 +235,6 @@ public class RadioDownloader {
 
     private Date calculateOneDayFurtherAsDate(Date date) {
         return new Date(date.getTime() + 86400000);
-    }
-
-    private Date parseDate(String date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        try {
-            return sdf.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     /**
