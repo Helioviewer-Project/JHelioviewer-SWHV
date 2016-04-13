@@ -19,6 +19,7 @@ public class TimeUtils {
     public static final FastDateFormat apiDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'");
     public static final FastDateFormat filenameDateFormat = FastDateFormat.getInstance("yyyy-MM-dd_HH.mm.ss");
     public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
+    public static final FastDateFormat dateFormat = FastDateFormat.getInstance("yyyy-MM-dd");
 
     public static final JHVDate Epoch = JHVDate.parseDateTime("2000-01-01T00:00:00");
 
