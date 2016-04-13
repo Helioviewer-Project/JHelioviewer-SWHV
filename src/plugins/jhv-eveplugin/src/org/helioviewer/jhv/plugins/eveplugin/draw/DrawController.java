@@ -172,7 +172,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if (selectedInterval == null) {
             return false;
         } else {
-            return selectedInterval.start != null && selectedInterval.end != null;
+            return true;
         }
     }
 

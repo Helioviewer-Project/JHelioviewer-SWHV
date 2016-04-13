@@ -225,9 +225,7 @@ public class DownloadController {
         @Override
         public void run() {
             try {
-                if (interval.start != null && interval.end != null) {
-                    requestData();
-                }
+                requestData();
             } finally {
                 downloadFinished(band, interval);
             }
