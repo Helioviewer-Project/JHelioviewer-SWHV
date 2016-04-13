@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -51,8 +50,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private final List<DrawControllerListener> listeners;
 
-    // private final Map<YAxisElement, String> axisUnitMap;
-
     private DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
@@ -61,27 +58,23 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         keepFullValueRange = false;
         gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
-        // axisUnitMap = new HashMap<YAxisElement, String>();
 
         Date d = new Date();
         availableInterval = new Interval(new Date(d.getTime() - 86400 * 1000), d);
         selectedInterval = availableInterval;
+
+        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
+        pas = PlotAreaSpace.getSingletonInstance();
+        pas.addPlotAreaSpaceListener(this);
     }
 
     public static DrawController getSingletonInstance() {
         if (instance == null) {
             instance = new DrawController();
-            instance.init();
             JHVRelatedEvents.addHighlightListener(instance);
             JHVRelatedEvents.addHighlightListener(Displayer.getSingletonInstance());
         }
         return instance;
-    }
-
-    private void init() {
-        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        pas = PlotAreaSpace.getSingletonInstance();
-        pas.addPlotAreaSpaceListener(this);
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
@@ -101,15 +94,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void updateDrawableElement(DrawableElement drawableElement, boolean needsFire) {
-        this.addDrawableElement(drawableElement, false);
-
+        addDrawableElement(drawableElement, false);
         if (needsFire && drawableElement.hasElementsToDraw()) {
-            this.fireRedrawRequest();
+            fireRedrawRequest();
         }
-    }
-
-    public void updateDrawableElement(DrawableElement drawableElement) {
-        updateDrawableElement(drawableElement, true);
     }
 
     private void addDrawableElement(DrawableElement element, boolean redraw) {
@@ -118,7 +106,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             elements = new HashSet<DrawableElement>();
             drawableElements.put(element.getDrawableElementType().getLevel(), elements);
         }
-
         elements.add(element);
 
         if (element.getYAxisElement() != null) {
@@ -127,7 +114,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             }
         }
         if (redraw) {
-            this.fireRedrawRequest();
+            fireRedrawRequest();
         }
     }
 
@@ -138,7 +125,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             createYAxisSet();
         }
         if (redraw) {
-            this.fireRedrawRequest();
+            fireRedrawRequest();
         }
     }
 
@@ -152,20 +139,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public Map<DrawableType, Set<DrawableElement>> getDrawableElements() {
         return drawableElements;
-    }
-
-    public List<DrawableElement> getAllDrawableElements() {
-        Collection<Set<DrawableElement>> allValues = getDrawableElements().values();
-        ArrayList<DrawableElement> deList = new ArrayList<DrawableElement>();
-        for (Set<DrawableElement> tempList : allValues) {
-            deList.addAll(tempList);
-        }
-        return deList;
-    }
-
-    public boolean hasElementsToBeDrawn() {
-        List<DrawableElement> allElements = this.getAllDrawableElements();
-        return !allElements.isEmpty();
     }
 
     public void setSelectedRange(Range selectedRange) {

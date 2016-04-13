@@ -212,7 +212,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
             ndc.setVisible(isVisible);
         }
         if (isVisible) {
-            drawController.updateDrawableElement(radioImagePane);
+            drawController.updateDrawableElement(radioImagePane, true);
         } else {
             drawController.removeDrawableElement(radioImagePane);
         }
@@ -578,7 +578,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     private void intervalTooBig() {
         plotConfigList = new HashMap<Long, PlotConfig>();
         radioImagePane.setIntervalTooBig(true);
-        drawController.updateDrawableElement(radioImagePane);
+        drawController.updateDrawableElement(radioImagePane, true);
     }
 
     /*
@@ -593,9 +593,9 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         }
     }
 
-    private void fireDrawNewBufferedImage() {// BufferedImage
+    private void fireDrawNewBufferedImage() {
         radioImagePane.setYAxisElement(yAxisElement);
-        drawController.updateDrawableElement(radioImagePane);
+        drawController.updateDrawableElement(radioImagePane, true);
     }
 
     private BufferedImage createBufferedImage(int width, int height, byte[] data) {

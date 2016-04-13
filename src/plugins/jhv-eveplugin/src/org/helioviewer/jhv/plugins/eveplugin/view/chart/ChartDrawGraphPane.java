@@ -271,7 +271,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
 
         // inform when no data is available
-        if (!drawController.hasElementsToBeDrawn()) {
+        if (drawController.getDrawableElements().isEmpty()) {
             final String text = DrawConstants.absentText;
             final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
             final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
