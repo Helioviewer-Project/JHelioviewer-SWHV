@@ -2,13 +2,14 @@ package org.helioviewer.jhv.plugins.eveplugin.settings;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class BandType {
+
     private String baseUrl;
     private BandGroup group;
     private String label;
@@ -21,10 +22,9 @@ public class BandType {
     private boolean isLog = false;
 
     public URL buildUrl(Interval interval) {
-        final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
         URL url = null;
         try {
-            url = new URL(baseUrl + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.start) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.end) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + this.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
+            url = new URL(baseUrl + EVEAPI.API_URL_PARAMETER_STARTDATE + TimeUtils.dateFormat.format(interval.start) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + TimeUtils.dateFormat.format(interval.end) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + this.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
         } catch (MalformedURLException e) {
             Log.error("Something is wrong with the EVEAPI url", e);
         }

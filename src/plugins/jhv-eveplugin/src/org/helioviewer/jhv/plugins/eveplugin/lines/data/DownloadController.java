@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -23,6 +22,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVEAPI;
@@ -282,9 +282,7 @@ public class DownloadController {
         }
 
         private URL buildRequestURL(final Interval interval, final BandType type) throws MalformedURLException {
-            final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
-
-            return new URL(type.getBaseUrl() + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.start) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.end) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + type.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
+            return new URL(type.getBaseUrl() + EVEAPI.API_URL_PARAMETER_STARTDATE + TimeUtils.dateFormat.format(interval.start) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + TimeUtils.dateFormat.format(interval.end) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + type.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
         }
 
         private void addDataToCache(final Band band, final float[] values, final long[] dates) {
