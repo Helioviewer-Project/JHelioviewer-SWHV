@@ -214,13 +214,11 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private Interval zoomTo(final ZOOM zoom, final long value) {
-        Interval newInterval = new Interval(null, null);
         Interval selectedInterval = drawController.getSelectedInterval();
         Interval availableInterval = drawController.getAvailableInterval();
+
+        Interval newInterval;
         switch (zoom) {
-        case CUSTOM:
-            newInterval = selectedInterval;
-            break;
         case All:
             newInterval = availableInterval;
             break;
@@ -241,6 +239,10 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
             break;
         case Movie:
             newInterval = computeMovieInterval();
+            break;
+        case CUSTOM:
+        default:
+            newInterval = selectedInterval;
         }
         return drawController.setSelectedInterval(newInterval, true, true);
     }
