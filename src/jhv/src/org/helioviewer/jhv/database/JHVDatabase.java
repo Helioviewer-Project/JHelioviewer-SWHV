@@ -360,11 +360,11 @@ public class JHVDatabase {
                             pstatement.executeUpdate();
                         }
                         {
-                            String fieldString = "";
-                            String varString = "";
+                            StringBuilder fieldString = new StringBuilder();
+                            StringBuilder varString = new StringBuilder();
                             for (JHVDatabaseParam p : event2db.paramList) {
-                                fieldString += "," + p.getParamName();
-                                varString += ",?";
+                                fieldString.append(",").append(p.getParamName());
+                                varString.append(",?");
                             }
                             String full_statement = "INSERT INTO " + type.getSupplier().getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
 
