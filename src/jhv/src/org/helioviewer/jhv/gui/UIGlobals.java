@@ -28,7 +28,6 @@ public class UIGlobals {
         if (instance == null) {
             instance = new UIGlobals();
 
-
             Font font = UIManager.getDefaults().getFont("Label.font");
             int defaultSize = font.getSize();
 

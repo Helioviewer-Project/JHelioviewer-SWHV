@@ -250,13 +250,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // Control buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));
 
-        previousFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.BACK), "Step to previous frame", this);
+        previousFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.BACK), "Step to previous frame", getPreviousFrameAction());
         buttonPanel.add(previousFrameButton);
 
-        playButton = ButtonCreator.createButton(playIcon, "Play movie", this);
+        playButton = ButtonCreator.createButton(playIcon, "Play movie", getPlayPauseAction());
         buttonPanel.add(playButton);
 
-        nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
+        nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", getNextFrameAction());
         buttonPanel.add(nextFrameButton);
 
         recordButton = new RecordButton();
@@ -295,7 +295,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(20), Double.valueOf(1), Double.valueOf(speedMax), Double.valueOf(speedMin)));
         speedSpinner.setToolTipText("Maximum " + speedMax + " fps");
         speedSpinner.addChangeListener(this);
-        ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField().addActionListener(this);
 
         JFormattedTextField fx = ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField();
         fx.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "", speedMin, speedMax));
@@ -480,36 +479,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == advancedButton) {
+        Object source = e.getSource();
+        if (source == advancedButton) {
             setAdvanced(!isAdvanced);
-            // Toggle play/pause
-        } else if (e.getSource() == playButton) {
-            Layers.toggleMovie();
-            // Previous frame
-        } else if (e.getSource() == previousFrameButton) {
-            if (Layers.isMoviePlaying()) {
-                Layers.pauseMovie();
-            }
-            Layers.previousFrame();
-            // Next frame
-        } else if (e.getSource() == nextFrameButton) {
-            if (Layers.isMoviePlaying()) {
-                Layers.pauseMovie();
-            }
-            Layers.nextFrame();
-            // Change animation speed
-        } else if (e.getSource() == ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField()) {
-            try {
-                speedSpinner.commitEdit();
-            } catch (ParseException e1) {
-                e1.printStackTrace();
-            }
-            updateMovieSpeed();
-            // Change animation speed unit
-        } else if (e.getSource() == speedUnitComboBox) {
+            // Change animation speed or unit
+        } else if (source == speedSpinner || source == speedUnitComboBox) {
             updateMovieSpeed();
             // Change animation mode
-        } else if (e.getSource() == animationModeComboBox) {
+        } else if (source == animationModeComboBox) {
             Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
@@ -664,7 +641,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            instance.actionPerformed(new ActionEvent(previousFrameButton, 0, ""));
+            if (Layers.isMoviePlaying())
+                Layers.pauseMovie();
+            Layers.previousFrame();
         }
 
     }
@@ -685,7 +664,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            instance.actionPerformed(new ActionEvent(nextFrameButton, 0, ""));
+            if (Layers.isMoviePlaying())
+                Layers.pauseMovie();
+            Layers.nextFrame();
         }
 
     }
