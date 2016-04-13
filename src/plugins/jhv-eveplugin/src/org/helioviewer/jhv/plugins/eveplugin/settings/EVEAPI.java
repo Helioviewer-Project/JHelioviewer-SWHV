@@ -1,13 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.settings;
 
-/**
- *
- * @author Stephan Pagel
- * */
 public class EVEAPI {
-    /** Date format the EVE API is using. */
-    public final static String API_DATE_FORMAT = "yyyy-MM-dd";
-
     /** URL of the EVE API */
     public final static String API_URL = "http://lasp.colorado.edu/eve/data_access/service/retrieve_data/cgi-bin/retrieve_l2_averages.cgi?";
 
