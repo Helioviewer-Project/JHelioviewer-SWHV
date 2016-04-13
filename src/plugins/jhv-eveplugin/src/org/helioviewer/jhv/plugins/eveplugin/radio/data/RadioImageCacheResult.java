@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -9,11 +8,11 @@ import org.helioviewer.jhv.base.interval.Interval;
 public class RadioImageCacheResult {
 
     private List<DownloadedJPXData> availableData;
-    private List<Interval<Date>> missingInterval;
+    private List<Interval> missingInterval;
     private List<Long> toRemove;
-    private List<Interval<Date>> noDataInterval;
+    private List<Interval> noDataInterval;
 
-    public RadioImageCacheResult(List<DownloadedJPXData> availableData, List<Interval<Date>> missingInterval, List<Long> toRemove, List<Interval<Date>> noDataInterval) {
+    public RadioImageCacheResult(List<DownloadedJPXData> availableData, List<Interval> missingInterval, List<Long> toRemove, List<Interval> noDataInterval) {
         super();
         this.availableData = availableData;
         this.missingInterval = missingInterval;
@@ -23,7 +22,7 @@ public class RadioImageCacheResult {
 
     public RadioImageCacheResult() {
         availableData = new ArrayList<DownloadedJPXData>();
-        missingInterval = new ArrayList<Interval<Date>>();
+        missingInterval = new ArrayList<Interval>();
         toRemove = new ArrayList<Long>();
     }
 
@@ -35,11 +34,11 @@ public class RadioImageCacheResult {
         this.availableData = availableData;
     }
 
-    public List<Interval<Date>> getMissingInterval() {
+    public List<Interval> getMissingInterval() {
         return missingInterval;
     }
 
-    public void setMissingIntervalt(List<Interval<Date>> missingIntervalt) {
+    public void setMissingIntervalt(List<Interval> missingIntervalt) {
         this.missingInterval = missingIntervalt;
     }
 
@@ -51,11 +50,11 @@ public class RadioImageCacheResult {
         this.toRemove = toRemove;
     }
 
-    public List<Interval<Date>> getNoDataInterval() {
+    public List<Interval> getNoDataInterval() {
         return noDataInterval;
     }
 
-    public void setNoDataInterval(List<Interval<Date>> noDataInterval) {
+    public void setNoDataInterval(List<Interval> noDataInterval) {
         this.noDataInterval = noDataInterval;
     }
 

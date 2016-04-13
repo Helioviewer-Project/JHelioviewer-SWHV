@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 import java.awt.Rectangle;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,19 +66,19 @@ public class EVECacheController {
         fireDataAdded(band);
     }
 
-    public List<Interval<Date>> addRequest(Band band, Interval<Date> interval) {
+    public List<Interval> addRequest(Band band, Interval interval) {
         RequestCache rc = getRequestCache(band);
         return rc.adaptRequestCache(interval.start, interval.end);
     }
 
-    public EVEValues getDataInInterval(final Band band, final Interval<Date> interval) {
+    public EVEValues getDataInInterval(final Band band, final Interval interval) {
         if (band == null || interval == null) {
             return null;
         }
         return cache.getValuesInInterval(band, interval, DrawController.getSingletonInstance().getGraphArea());
     }
 
-    public List<Interval<Date>> getMissingDaysInInterval(final Band band, final Interval<Date> interval) {
+    public List<Interval> getMissingDaysInInterval(final Band band, final Interval interval) {
         RequestCache rc = getRequestCache(band);
         return rc.getMissingIntervals(interval);
     }
@@ -98,7 +97,7 @@ public class EVECacheController {
         }
     }
 
-    public EVEValues downloadData(Band band, Interval<Date> interval, Rectangle plotArea) {
+    public EVEValues downloadData(Band band, Interval interval, Rectangle plotArea) {
         if (band == null || interval == null) {
             return null;
         }
@@ -106,7 +105,7 @@ public class EVECacheController {
         return cache.getValuesInInterval(band, interval, plotArea);
     }
 
-    public boolean hasDataInSelectedInterval(Band band, Interval<Date> selectedInterval) {
+    public boolean hasDataInSelectedInterval(Band band, Interval selectedInterval) {
         return cache.hasDataInInterval(band, selectedInterval);
     }
 

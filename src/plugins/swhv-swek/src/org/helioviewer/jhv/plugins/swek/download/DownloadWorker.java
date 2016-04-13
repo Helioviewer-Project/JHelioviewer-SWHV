@@ -35,9 +35,9 @@ public class DownloadWorker implements Runnable {
     private final Date downloadEndDate;
     private final JHVEventContainer eventContainer;
     private final List<SWEKParam> params;
-    private final Interval<Date> requestInterval;
+    private final Interval requestInterval;
 
-    public DownloadWorker(JHVEventType jhvType, Interval<Date> interval, List<SWEKParam> params) {
+    public DownloadWorker(JHVEventType jhvType, Interval interval, List<SWEKParam> params) {
         isStopped = false;
         requestInterval = interval;
         this.jhvType = jhvType;
@@ -115,7 +115,7 @@ public class DownloadWorker implements Runnable {
         return jhvType.getEventType();
     }
 
-    public Interval<Date> getRequestInterval() {
+    public Interval getRequestInterval() {
         return requestInterval;
     }
 

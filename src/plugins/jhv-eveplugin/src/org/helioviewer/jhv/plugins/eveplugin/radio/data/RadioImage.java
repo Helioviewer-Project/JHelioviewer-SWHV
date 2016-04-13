@@ -10,9 +10,9 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
 public class RadioImage {
 
-    private Interval<Date> imageTimeInterval;
+    private Interval imageTimeInterval;
     private FrequencyInterval imageFreqInterval;
-    private Interval<Date> visibleImageTimeInterval;
+    private Interval visibleImageTimeInterval;
     private FrequencyInterval visibleImageFreqInterval;
     private int frameInJPX;
     private ResolutionSet resolutioSet;
@@ -22,7 +22,7 @@ public class RadioImage {
     private boolean isDownloading;
     private Rectangle lastDataSize;
 
-    public RadioImage(long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
+    public RadioImage(long radioImageID, Interval timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
         super();
         imageTimeInterval = timeInterval;
         imageFreqInterval = freqInterval;
@@ -88,11 +88,11 @@ public class RadioImage {
         lastUsedResolutionSetting = resolutionSetting;
     }
 
-    public Interval<Date> getTimeInterval() {
+    public Interval getTimeInterval() {
         return imageTimeInterval;
     }
 
-    public Interval<Date> getVisibleImageTimeInterval() {
+    public Interval getVisibleImageTimeInterval() {
         return visibleImageTimeInterval;
     }
 
@@ -100,7 +100,7 @@ public class RadioImage {
         return visibleImageFreqInterval;
     }
 
-    public void setTimeInterval(Interval<Date> timeInterval) {
+    public void setTimeInterval(Interval timeInterval) {
         imageTimeInterval = timeInterval;
     }
 
@@ -149,7 +149,7 @@ public class RadioImage {
         return currentBest;
     }
 
-    public boolean withinInterval(Interval<Date> intervalToBeIn, FrequencyInterval freqIntervalToBeIn) {
+    public boolean withinInterval(Interval intervalToBeIn, FrequencyInterval freqIntervalToBeIn) {
         return intervalToBeIn.overlapsInclusive(imageTimeInterval) && freqIntervalToBeIn.overlaps(imageFreqInterval);
     }
 
@@ -173,13 +173,13 @@ public class RadioImage {
 
             Date tempStartX = new Date(imageTimeInterval.squeeze(visibleXStart).getTime());
             Date tempEndX = new Date(imageTimeInterval.squeeze(visibleXEnd).getTime());
-            visibleImageTimeInterval = new Interval<Date>(tempStartX, tempEndX);
+            visibleImageTimeInterval = new Interval(tempStartX, tempEndX);
         } else {
-            Interval<Date> tempInterval = new Interval<Date>(visibleXStart, visibleXEnd);
+            Interval tempInterval = new Interval(visibleXStart, visibleXEnd);
             if (tempInterval.containsPointInclusive(imageTimeInterval.start) || tempInterval.containsPointInclusive(imageTimeInterval.end)) {
                 Date tempStartX = new Date(tempInterval.squeeze(imageTimeInterval.start).getTime());
                 Date tempEndX = new Date(tempInterval.squeeze(imageTimeInterval.end).getTime());
-                visibleImageTimeInterval = new Interval<Date>(tempStartX, tempEndX);
+                visibleImageTimeInterval = new Interval(tempStartX, tempEndX);
             } else {
                 visibleImageTimeInterval = null;
             }

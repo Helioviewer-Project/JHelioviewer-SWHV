@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.swek.download;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +117,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         stopDownloadingEventType(eventType, supplier.getSource(), supplier, false);
     }
 
-    public void newRequestForInterval(JHVEventType eventType, Interval<Date> interval) {
+    public void newRequestForInterval(JHVEventType eventType, Interval interval) {
         downloadEventType(eventType, interval);
     }
 
@@ -176,7 +175,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         return params;
     }
 
-    private void downloadEventType(JHVEventType eventType, Interval<Date> interval) {
+    private void downloadEventType(JHVEventType eventType, Interval interval) {
         SWEKEventType swekEventType = eventType.getEventType();
         SWEKSupplier supplier = eventType.getSupplier();
         if (swekEventType != null && supplier != null) {
@@ -194,17 +193,17 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     private void downloadForAllDates(JHVEventType jhvType) {
-        Collection<Interval<Date>> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals(jhvType);
-        for (Interval<Date> interval : allIntervals) {
+        Collection<Interval> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals(jhvType);
+        for (Interval interval : allIntervals) {
             startDownloadEventType(jhvType, interval);
         }
     }
 
-    private void startDownloadEventType(JHVEventType jhvType, Interval<Date> interval) {
+    private void startDownloadEventType(JHVEventType jhvType, Interval interval) {
         SWEKSupplier supplier = jhvType.getSupplier();
         SWEKEventType eventType = jhvType.getEventType();
         List<SWEKParam> params = defineParameters(eventType, supplier);
-        for (Interval<Date> intt : Interval.splitInterval(interval, 7)) {
+        for (Interval intt : Interval.splitInterval(interval, 7)) {
             if (intt.start.getTime() < System.currentTimeMillis() + SIXHOURS) {
                 DownloadWorker dw = new DownloadWorker(jhvType, intt, params);
                 treeModel.setStartLoading(eventType);

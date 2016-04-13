@@ -216,7 +216,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void drawLabels(final Graphics2D g) {
         List<YAxisElement> yAxisElements = drawController.getYAxisElements();
-        Interval<Date> interval = drawController.getSelectedInterval();
+        Interval interval = drawController.getSelectedInterval();
         if (!drawController.getIntervalAvailable()) {
             return;
         }
@@ -370,7 +370,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateRatios() {
-        Interval<Date> interval = drawController.getSelectedInterval();
+        Interval interval = drawController.getSelectedInterval();
         ratioX = !drawController.getIntervalAvailable() ? 0 : graphArea.width / (double) (interval.end.getTime() - interval.start.getTime());
         yRatios = new HashMap<YAxisElement, Double>();
         for (YAxisElement yAxisElement : drawController.getYAxisElements()) {
@@ -384,7 +384,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private boolean updateMovieLineInformation() {
         int newMovieLine = -1;
-        Interval<Date> interval = drawController.getSelectedInterval();
+        Interval interval = drawController.getSelectedInterval();
         if (movieTimestamp == null || !drawController.getIntervalAvailable()) {
             newMovieLine = -1;
         } else {
@@ -401,7 +401,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void setMovieFrameManually(final Point point) {
-        Interval<Date> interval = drawController.getSelectedInterval();
+        Interval interval = drawController.getSelectedInterval();
         if (movieTimestamp == null || !drawController.getIntervalAvailable()) {
             return;
         }
@@ -430,7 +430,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private Date mouseToDate(Point point) {
-        Interval<Date> interval = drawController.getSelectedInterval();
+        Interval interval = drawController.getSelectedInterval();
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
         final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.start.getTime());
         return new Date(millis);
@@ -453,7 +453,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePressedOnMovieFrame = movieFrame.contains(p);
         mousePressedPosition = plotArea.contains(p) ? p : null;
         if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height &&
-            !(eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) != null)) {
+                !(eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) != null)) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }

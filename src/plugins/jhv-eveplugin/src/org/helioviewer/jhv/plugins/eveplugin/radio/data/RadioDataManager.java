@@ -297,7 +297,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         radioImages = new HashMap<Long, RadioImage>();
         lineDataSelectorModel.addLineData(this);
         intervalTooBig();
-        downloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime));
+        downloadRequestAnswered(new Interval(requestedStartTime, requestedEndTime));
     }
 
     public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime) {
@@ -310,7 +310,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
             }
         }
         defineMaxBounds();
-        downloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime));
+        downloadRequestAnswered(new Interval(requestedStartTime, requestedEndTime));
     }
 
     public void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, double ratioX, double ratioY) {
@@ -327,10 +327,10 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         }
     }
 
-    public void newNoData(List<Interval<Date>> noDataList) {
+    public void newNoData(List<Interval> noDataList) {
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging() && noDataList.size() > 0) {
             radioImagePane.setIntervalTooBig(false);
-            for (Interval<Date> noData : noDataList) {
+            for (Interval noData : noDataList) {
                 DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.start, noData.end);
                 noDataConfigList.add(new NoDataConfig(noData, dam, isVisible));
             }
@@ -451,7 +451,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         if (ri != null) {
             ri.setVisibleIntervals(xStart, xEnd, (int) Math.floor(yStart), (int) Math.ceil(yEnd));
             if (ri.getVisibleImageFreqInterval() != null && ri.getVisibleImageTimeInterval() != null) {
-                Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
+                Interval visibleDateInterval = ri.getVisibleImageTimeInterval();
                 // FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
                 if (!visibleDateInterval.start.equals(visibleDateInterval.end)) {
                     JP2ViewCallisto jp2View = jpxData.getView();
@@ -497,7 +497,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                     FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));
 
                     List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
-                    Interval<Date> dateInterval = new Interval<Date>(start, end);
+                    Interval dateInterval = new Interval(start, end);
                     for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
                         ResolutionLevel res = rs.getResolutionLevel(j);
                         ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) res.width, (freqEnd - freqStart) / res.height, j, res.width, res.height, res.discardLayers);
@@ -550,7 +550,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         }
     }
 
-    public void noDataInDownloadInterval(Interval<Date> requestInterval) {
+    public void noDataInDownloadInterval(Interval requestInterval) {
         radioImages = new HashMap<Long, RadioImage>();
         lineDataSelectorModel.addLineData(this);
         downloadRequestAnswered(requestInterval);
@@ -570,7 +570,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         return noDataConfigList;
     }
 
-    private void downloadRequestAnswered(Interval<Date> timeInterval) {
+    private void downloadRequestAnswered(Interval timeInterval) {
         zoomManager.addZoomDataConfig(timeInterval);
         PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
     }

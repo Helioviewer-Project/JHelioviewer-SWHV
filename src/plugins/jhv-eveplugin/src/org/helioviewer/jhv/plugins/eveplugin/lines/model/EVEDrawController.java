@@ -4,7 +4,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -73,7 +72,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     private void addToMap(final Band band) {
-        Interval<Date> interval = drawController.getSelectedInterval();
+        Interval interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
         YAxisElement yAxisElement = drawController.getYAxisElementForUnit(band.getUnitLabel());
         if (yAxisElement == null && drawController.hasAxisAvailable()) {
@@ -127,7 +126,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     private void updateBand(final Band band) {
-        Interval<Date> interval = drawController.getSelectedInterval();
+        Interval interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
         EVEValues data = retrieveData(band, interval, plotArea);
         YAxisElement yAxisElement = yAxisElementMap.get(band);
@@ -171,7 +170,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     private void fireRedrawRequest(final boolean maxRange) {
-        Interval<Date> interval = drawController.getSelectedInterval();
+        Interval interval = drawController.getSelectedInterval();
         for (Map.Entry<YAxisElement, Map<Band, EVEValues>> entry : dataMapPerUnitLabel.entrySet()) {
             YAxisElement yAxisElement = entry.getKey();
             Map<Band, EVEValues> bandMap = entry.getValue();
@@ -216,7 +215,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         drawController.fireRedrawRequest();
     }
 
-    private final EVEValues retrieveData(final Band band, final Interval<Date> interval, Rectangle plotArea) {
+    private final EVEValues retrieveData(final Band band, final Interval interval, Rectangle plotArea) {
         return EVECacheController.getSingletonInstance().downloadData(band, interval, plotArea);
     }
 
@@ -297,7 +296,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
     }
 
-    public EVEValues getValues(Band band, Interval<Date> interval, Rectangle graphArea) {
+    public EVEValues getValues(Band band, Interval interval, Rectangle graphArea) {
         return dataMapPerUnitLabel.get(yAxisElementMap.get(band)).get(band);
     }
 
