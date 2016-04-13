@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
@@ -56,13 +57,8 @@ public class RadioDownloader {
         return nextID;
     }
 
-    public void requestAndOpenRemoteFile(final String startDateString, final String endDateString) {
+    public void requestAndOpenRemoteFile(final Date startDateOuter, final Date endDateOuter) {
         radioDataManager.removeSpectrograms();
-        final Date startDateOuter = parseDate(startDateString);
-        final Date endDateOuter = parseDate(endDateString);
-        if (startDateOuter == null || endDateOuter == null) {
-            return;
-        }
 
         JHVWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker = new JHVWorker<ImageDownloadWorkerResult, Void>() {
 
@@ -72,14 +68,15 @@ public class RadioDownloader {
                     List<Interval> noDataInterval = new ArrayList<Interval>();
                     List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                     boolean intervalTooBig = false;
-                    long duration = calculateFrequencyDuration(startDateString, endDateString);
+
                     Date startDate = startDateOuter;
                     Date endDate = endDateOuter;
+                    long duration = endDate.getTime() - startDate.getTime();
                     Date requestedStartDate = new Date(startDate.getTime());
                     if (duration >= 0 && duration <= MAXIMUM_DAYS) {
                         // case there were not more than three days
                         while (startDate.compareTo(endDate) <= 0) {
-                            JP2ViewCallisto v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                            JP2ViewCallisto v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, null, TimeUtils.apiDateFormat.format(startDate), TimeUtils.apiDateFormat.format(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                             if (v != null) {
                                 long imageID = getNextID();
                                 DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate);
@@ -131,7 +128,6 @@ public class RadioDownloader {
                                 radioDataManager.newNoData(noDataList);
                             }
                         }
-
                     }
                 } catch (InterruptedException e) {
                     Log.error("ImageDownloadWorker execution interrupted: " + e.getMessage());
@@ -152,23 +148,21 @@ public class RadioDownloader {
         for (final Interval interval : intervals) {
             Date startDate = interval.start;
             Date endDate = interval.end;
-            if (endDate != null && startDate != null) {
-                // case there were not more than three days
-                while (startDate.compareTo(endDate) <= 0) {
-                    boolean inRequestCache = true;
-                    if (!requestDateCache.contains(startDate)) {
-                        inRequestCache = false;
-                        requestDateCache.add(startDate);
-                    }
-                    if (!(inRequestCache || cache.containsDate(startDate))) {
-                        toDownloadStartDates.add(startDate);
-                    } else {
-                        if (cache.containsDate(startDate)) {
-                            requestDateCache.remove(startDate);
-                        }
-                    }
-                    startDate = calculateOneDayFurtherAsDate(startDate);
+            // case there were not more than three days
+            while (startDate.compareTo(endDate) <= 0) {
+                boolean inRequestCache = true;
+                if (!requestDateCache.contains(startDate)) {
+                    inRequestCache = false;
+                    requestDateCache.add(startDate);
                 }
+                if (!(inRequestCache || cache.containsDate(startDate))) {
+                    toDownloadStartDates.add(startDate);
+                } else {
+                    if (cache.containsDate(startDate)) {
+                        requestDateCache.remove(startDate);
+                    }
+                }
+                startDate = calculateOneDayFurtherAsDate(startDate);
             }
         }
 
@@ -183,7 +177,7 @@ public class RadioDownloader {
                 for (Date date : datesToDownload) {
                     JP2ViewCallisto v = null;
                     try {
-                        v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, null, createDateString(date), createDateString(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                        v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, null, TimeUtils.apiDateFormat.format(date), TimeUtils.apiDateFormat.format(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                     } catch (IOException e) {
                         Log.error("An error occured while opening the remote file!", e);
                     }
@@ -241,21 +235,6 @@ public class RadioDownloader {
         EVESettings.getExecutorService().execute(imageDownloadWorker);
     }
 
-    private long calculateFrequencyDuration(String startTime, String endTime) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date start;
-        try {
-            start = sdf.parse(startTime);
-            Date end = sdf.parse(endTime);
-            return end.getTime() - start.getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return -1;
-        }
-
-    }
-
     private Date calculateOneDayFurtherAsDate(Date date) {
         return new Date(date.getTime() + 86400000);
     }
@@ -269,12 +248,6 @@ public class RadioDownloader {
             e.printStackTrace();
             return null;
         }
-    }
-
-    private String createDateString(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return sdf.format(date);
     }
 
     /**
