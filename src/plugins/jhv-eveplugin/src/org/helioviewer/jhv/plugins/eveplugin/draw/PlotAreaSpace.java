@@ -80,7 +80,6 @@ public class PlotAreaSpace {
         for (PlotAreaSpaceListener l : listeners) {
             l.availablePlotAreaSpaceChanged(oldScaledMinTime, oldScaledMaxTime, newMinTime, newMaxTime);
         }
-
     }
 
     public Set<ValueSpace> getValueSpaces() {
@@ -102,7 +101,6 @@ public class PlotAreaSpace {
     @Override
     public String toString() {
         return "Scaled min time  : " + scaledMinTime + "\n" + "Scaled max time  : " + scaledMaxTime + "\n" + "\n" + "Selected scaled min time  : " + scaledSelectedMinTime + "\n" + "Selected scaled max time  : " + scaledSelectedMaxTime + "\n";
-
     }
 
     private void firePlotAreaSpaceChanged(boolean forced) {
@@ -122,4 +120,5 @@ public class PlotAreaSpace {
     public void setMinSelectedTimeDiff(double minSelectedTimeDiff) {
         this.minSelectedTimeDiff = minSelectedTimeDiff;
     }
+
 }
