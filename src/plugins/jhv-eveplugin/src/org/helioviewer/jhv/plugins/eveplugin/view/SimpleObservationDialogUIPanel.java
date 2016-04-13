@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -123,26 +121,17 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     private void startRadioDownload() {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-        String isoStart = df.format(selectedInterval.start);
         Calendar end = Calendar.getInstance();
         end.setTime(selectedInterval.end);
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
-        String isoEnd = df.format(end.getTime());
-        RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(isoStart, isoEnd);
+        RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(selectedInterval.start, end.getTime());
     }
 
     @Override
     public boolean loadButtonPressed() {
-        // check if start date is before end date -> if not show message
-        /*
-         * if (!isStartDateBeforeOrEqualEndDate()) {
-         * JOptionPane.showMessageDialog(null, "End date is before start date!",
-         * "", JOptionPane.ERROR_MESSAGE); return false; }
-         */
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
         List<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
         boolean downloadOK = false;
@@ -173,11 +162,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         if (e.getSource() == calendarStartDate) {
             ObservationDialogDateModel.getInstance().setStartDate(calendarStartDate.getDate(), true);
         }
-        /*
-         * if (e.getSource() == calendarEndDate &&
-         * !isStartDateBeforeOrEqualEndDate()) {
-         * calendarStartDate.setDate(calendarStartDate.getDate()); }
-         */
     }
 
     @Override
