@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.Properties;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
@@ -22,7 +22,6 @@ import org.json.JSONObject;
 public class ComesepDownloader extends SWEKDownloader {
 
     private final Properties comesepSourceProperties;
-    private static SimpleDateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public ComesepDownloader() {
         ComesepProperties csp = ComesepProperties.getSingletonInstance();
@@ -76,7 +75,7 @@ public class ComesepDownloader extends SWEKDownloader {
         Pair<String, String>[] assocs = new Pair[len];
         for (int i = 0; i < len; i++) {
             JSONObject asobj = associations.getJSONObject(i);
-            assocs[i] = (new Pair<String, String>(asobj.getString("parent"), asobj.getString("child")));
+            assocs[i] = new Pair<String, String>(asobj.getString("parent"), asobj.getString("child"));
         }
         int ret = JHVDatabase.dump_association2db(assocs);
         if (ret == -1) {
@@ -89,8 +88,8 @@ public class ComesepDownloader extends SWEKDownloader {
     protected String createURL(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(comesepSourceProperties.getProperty("comesepsource.baseurl")).append("?");
         baseURL = appendModel(baseURL, params).append("&");
-        baseURL.append("startdate=").append(utcFormat.format(startDate)).append("&");
-        baseURL.append("enddate=").append(utcFormat.format(endDate)).append("&");
+        baseURL.append("startdate=").append(TimeUtils.utcDateFormat.format(startDate)).append("&");
+        baseURL.append("enddate=").append(TimeUtils.utcDateFormat.format(endDate)).append("&");
         return baseURL.toString();
     }
 

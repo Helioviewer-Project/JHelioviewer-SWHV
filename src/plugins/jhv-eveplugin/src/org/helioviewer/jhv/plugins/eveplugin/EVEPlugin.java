@@ -26,11 +26,6 @@ import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 import org.helioviewer.jhv.threads.JHVWorker;
 
-/**
- *
- *
- * @author Stephan Pagel
- * */
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
