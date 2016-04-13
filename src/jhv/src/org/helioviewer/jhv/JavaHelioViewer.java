@@ -19,8 +19,8 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
-import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 import org.helioviewer.jhv.threads.JHVExecutor;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
 /**
  * This class starts the applications.
@@ -63,9 +63,9 @@ public class JavaHelioViewer {
         LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), CommandLineProcessor.isOptionSet("--use-existing-log-time-stamp"));
 
         // Information log message
-        String argString = "";
+        StringBuilder argString = new StringBuilder();
         for (int i = 0; i < args.length; ++i) {
-            argString += " " + args[i];
+            argString.append(" ").append(args[i]);
         }
         Log.info("JHelioviewer started with command-line options:" + argString);
 

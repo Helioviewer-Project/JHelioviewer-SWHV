@@ -38,9 +38,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * process fails the default XML config file on the default server is used. If
  * this fails too, the system tries to use the last known working configuration
  * if possible.
- * 
+ *
  * @author Andre Dau
- * 
+ *
  */
 public class ResourceLoader {
 
@@ -51,7 +51,7 @@ public class ResourceLoader {
 
     /**
      * Method returns the sole instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static ResourceLoader getSingletonInstance() {
@@ -63,7 +63,7 @@ public class ResourceLoader {
      * First a custom XML config file will be used to load the resources. It
      * this fails a default XML config file will be used. If this fails too the
      * last known configuration will be loaded.
-     * 
+     *
      * @param resourceName
      *            Identifier of the resource package. The XML config file for
      *            this resource package must have the name resourceName.xml
@@ -127,7 +127,7 @@ public class ResourceLoader {
 
     /**
      * Store the given resource configuration in an xml file.
-     * 
+     *
      * @param resourceName
      *            Name of the resource package
      * @param configuration
@@ -156,7 +156,7 @@ public class ResourceLoader {
      * Tries to load a compatible configuration for a specific platform using a
      * resource definition. Resource definitions contain multiple
      * configurations.
-     * 
+     *
      * @param resourceDefinition
      *            The resource definition containing the different
      *            configurations
@@ -180,7 +180,7 @@ public class ResourceLoader {
 
     /**
      * Tries to load all files from a single configuration
-     * 
+     *
      * @param configuration
      *            The configuration to load
      * @param resourceDefinitonFileUri
@@ -205,7 +205,7 @@ public class ResourceLoader {
      * downloaded and then initialized if necessary. Initalization can be action
      * such as loading a library or registering an executable. Initialization
      * parameters are given in the XML config file for each resource file.
-     * 
+     *
      * @param file
      *            The file which should be loaded
      * @param resourceDefinitonFileUri
@@ -233,7 +233,7 @@ public class ResourceLoader {
      * config file. The MD5 hash of the destination file if it already exists is
      * calculated at runtime. The hash is also used to verify the successful
      * download of the file.
-     * 
+     *
      * @param file
      *            The resource definition file
      * @param src
@@ -311,7 +311,7 @@ public class ResourceLoader {
      * Performs file initialization after the file has been downloaded
      * successfully. This can be for example loading the library or registering
      * an executable.
-     * 
+     *
      * @param file
      *            Resource file to initialize
      * @param filePath
@@ -356,7 +356,7 @@ public class ResourceLoader {
     /**
      * Tries to find and load a compatible resource configuration within a
      * resource definition file.
-     * 
+     *
      * @param resourceName
      *            The name of the resource package
      * @param resourceDefiniton
@@ -403,22 +403,22 @@ public class ResourceLoader {
     /**
      * Struct representing a resource file entry in a resource definition XML
      * file
-     * 
+     *
      * @author Andre Dau
-     * 
+     *
      */
     private static class ResourceFile {
-        private URI srcDir;
-        private URI destDir;
-        private String srcName;
-        private String destName;
-        private boolean loadLibrary;
-        private String registerExecutable;
+        private final URI srcDir;
+        private final URI destDir;
+        private final String srcName;
+        private final String destName;
+        private final boolean loadLibrary;
+        private final String registerExecutable;
         private byte[] md5;
 
         /**
          * Constructor
-         * 
+         *
          * @param srcName
          *            Name of the resource file
          * @param srcDir
@@ -456,7 +456,7 @@ public class ResourceLoader {
 
         /**
          * Get the XML representation of the resource file
-         * 
+         *
          * @param indent
          *            The indentation which should be appended before each line.
          * @return The XML representation of this class
@@ -477,13 +477,14 @@ public class ResourceLoader {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String toString() {
             return "[" + srcName + ", " + srcDir + ", " + destName + ", " + destDir + "]";
         }
 
         /**
          * Getter method for the source directory
-         * 
+         *
          * @return source directory
          */
         public URI getSrcDir() {
@@ -492,7 +493,7 @@ public class ResourceLoader {
 
         /**
          * Getter method for the destination directory
-         * 
+         *
          * @return destination directory
          */
         public URI getDestDir() {
@@ -501,7 +502,7 @@ public class ResourceLoader {
 
         /**
          * Getter method for the source file name
-         * 
+         *
          * @return source file name
          */
         public String getSrcName() {
@@ -510,7 +511,7 @@ public class ResourceLoader {
 
         /**
          * Getter method for the destination file name
-         * 
+         *
          * @return destination file name
          */
         public String getDestName() {
@@ -519,7 +520,7 @@ public class ResourceLoader {
 
         /**
          * Getter method for loadLibrary parameter
-         * 
+         *
          * @return true, if the file should be loaded as a native library
          */
         public boolean getLoadLibrary() {
@@ -529,7 +530,7 @@ public class ResourceLoader {
         /**
          * Getter method for name under which the file should be registered as
          * an executable
-         * 
+         *
          * @return name under which the file should be registered as an
          *         executable or null
          */
@@ -539,7 +540,7 @@ public class ResourceLoader {
 
         /**
          * Getter method for the MD5 hash
-         * 
+         *
          * @return MD5 hash or null
          */
         public byte[] getMd5() {
@@ -548,7 +549,7 @@ public class ResourceLoader {
 
         /**
          * Setter method for the MD5 hash
-         * 
+         *
          * @param md5Hash
          *            new md5 hash
          */
@@ -559,7 +560,7 @@ public class ResourceLoader {
 
     /**
      * First line of a xml document specifying the encoding and xml version
-     * 
+     *
      * @return XML header
      */
     private String getXmlHeader() {
@@ -570,19 +571,19 @@ public class ResourceLoader {
      * Struct representing a resource configuration entry in a resource
      * definition XML file. Resource configurations can be compared based on
      * their priority.
-     * 
+     *
      * @author Andre Dau
-     * 
+     *
      */
     private static class ResourceConfiguration implements Comparable<ResourceConfiguration> {
         private int priority;
-        private List<ResourceRequirement> requirements;
-        private List<ResourceFile> files;
-        private String name;
+        private final List<ResourceRequirement> requirements;
+        private final List<ResourceFile> files;
+        private final String name;
 
         /**
          * Constructor
-         * 
+         *
          * @param name
          *            of the resource configuration
          */
@@ -594,7 +595,7 @@ public class ResourceLoader {
 
         /**
          * Get the XML representation of the resource configuration
-         * 
+         *
          * @param indent
          *            The indentation which should be appended before each line.
          * @return The XML representation of this class
@@ -619,7 +620,7 @@ public class ResourceLoader {
 
         /**
          * Set the priority of this conifguration
-         * 
+         *
          * @param priority
          *            Priority
          */
@@ -629,7 +630,7 @@ public class ResourceLoader {
 
         /**
          * Add a requirement to the list
-         * 
+         *
          * @param requirement
          *            The new requirement
          */
@@ -639,7 +640,7 @@ public class ResourceLoader {
 
         /**
          * Add a file to the list
-         * 
+         *
          * @param file
          *            The new file
          */
@@ -649,7 +650,7 @@ public class ResourceLoader {
 
         /**
          * Get the last added requirement
-         * 
+         *
          * @return The last added requirement
          */
         public ResourceRequirement getLastRequirement() {
@@ -658,7 +659,7 @@ public class ResourceLoader {
 
         /**
          * Get the name of the configuration
-         * 
+         *
          * @return The name of the configuration
          */
         public String getName() {
@@ -667,7 +668,7 @@ public class ResourceLoader {
 
         /**
          * Get the file list of the configuration
-         * 
+         *
          * @return File list of the configuration
          */
         public List<ResourceFile> getFiles() {
@@ -677,6 +678,7 @@ public class ResourceLoader {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int compareTo(ResourceConfiguration conf) {
             if (priority < conf.priority) {
                 return -1;
@@ -692,13 +694,13 @@ public class ResourceLoader {
          * requirements. In case the system properties do not contain all
          * properties needed to determine if the requirement is met the method
          * returns false.
-         * 
+         *
          * @param systemProperties
          *            Set of system properties defining the platform environment
          * @return True, if the system does not meet the requirement; false if
          *         the system does meet the requirements or if it cannot be
          *         decided.
-         * 
+         *
          */
         public boolean requirementsNotSatisfied(Properties systemProperties) {
             for (ResourceRequirement requirement : requirements) {
@@ -715,20 +717,20 @@ public class ResourceLoader {
     /**
      * Struct representing a resource definition file . A resource definition
      * can contain several resource configurations for different platforms.
-     * 
+     *
      * @author Andre Dau
-     * 
+     *
      */
     private static class ResourceDefinition extends DefaultHandler {
         private ResourceConfiguration currentConfig;
         private List<ResourceConfiguration> configurations;
         private boolean isValid;
-        private URI locationUri;
+        private final URI locationUri;
 
         /**
          * Constructor. Parses a xml file to generate the resource definition
          * struct.
-         * 
+         *
          * @param definitionFileUri
          *            URI for the reource definition XML file
          * @param xmlSource
@@ -748,7 +750,7 @@ public class ResourceLoader {
          * configurations which are definitely not compatible with the current
          * platform. However a configuration within this list is NOT guaranteed
          * to be compatible with the current platform.
-         * 
+         *
          * @param systemProperties
          *            The system properties defining the current platform
          * @return a list of possibly compatible resource configurations
@@ -766,7 +768,7 @@ public class ResourceLoader {
         /**
          * Returns a list of all configurations defined in this resource
          * definition file.
-         * 
+         *
          * @return A list of all resource configurations in this resource
          *         definition file
          */
@@ -776,7 +778,7 @@ public class ResourceLoader {
 
         /**
          * Returns the location of the resource definition file.
-         * 
+         *
          * @return Location of the resource definition file
          */
         public URI getLocation() {
@@ -786,9 +788,10 @@ public class ResourceLoader {
         /**
          * This method is responsible for parsing the XML resource definition
          * file and building the corresponding resource definition struct.
-         * 
+         *
          * {@inheritDoc}
          */
+        @Override
         public void startElement(String namespaceURI, String localName, String qualifiedName, Attributes atts) throws SAXException {
             try {
                 if (localName.equals("resourceDefinition")) {
@@ -889,9 +892,10 @@ public class ResourceLoader {
          * After parsing the resource definition end tag the configurations are
          * sorted by priority. After parsing a configuration end tag the current
          * configuration is added to the list of all configurations.
-         * 
+         *
          * {@inheritDoc}
          */
+        @Override
         public void endElement(String namespaceURI, String localName, String qualifiedName) throws SAXException {
             if (localName.equals("configuration")) {
                 if (isValid) {
@@ -924,18 +928,18 @@ public class ResourceLoader {
      * to 2.0.0 . Each requirement can have multiple values. These values are
      * alternatives. The system does not satisfy the requirement if it does not
      * satisfy any of the possible values.
-     * 
+     *
      * @author Andre Dau
-     * 
+     *
      */
     private static class ResourceRequirement {
-        private String name;
+        private final String name;
         private REQUIREMENT_TYPES type;
-        private List<String> values;
+        private final List<String> values;
 
         /**
          * Constructor
-         * 
+         *
          * @param name
          *            The name of the requirement (not the value)
          * @param typeString
@@ -959,24 +963,25 @@ public class ResourceLoader {
 
         /**
          * Get the XML representation of the resource requirement
-         * 
+         *
          * @param indent
          *            The indentation which should be appended before each line.
          * @return The XML representation of this class
          */
         public String toXml(String indent) {
             String sep = System.getProperty("line.separator");
-            String res = indent + "<requirement name=\"" + getName() + "\" type=\"" + getType() + "\">" + sep;
+            StringBuilder res = new StringBuilder();
+            res.append(indent).append("<requirement name=\"").append(getName()).append("\" type=\"").append(getType()).append("\">").append(sep);
             for (String val : getValues()) {
-                res += indent + "    <requirementValue value=\"" + val + "\"/>" + sep;
+                res.append(indent).append("    <requirementValue value=\"").append(val).append("\"/>").append(sep);
             }
-            res += indent + "</requirement>" + sep;
-            return res;
+            res.append(indent).append("</requirement>").append(sep);
+            return res.toString();
         }
 
         /**
          * Get the type of the resource requirement
-         * 
+         *
          * @return Type of the resource requirement
          */
         public String getType() {
@@ -993,7 +998,7 @@ public class ResourceLoader {
         /**
          * Add value to the requirement. To satisfy a requirement the system
          * property must satisfy at least one value.
-         * 
+         *
          * @param value
          */
         public void addValue(String value) {
@@ -1001,9 +1006,9 @@ public class ResourceLoader {
         }
 
         /**
-         * 
+         *
          * @return
-         * 
+         *
          *         The name of the requirement
          */
         public String getName() {
@@ -1012,7 +1017,7 @@ public class ResourceLoader {
 
         /**
          * Get all possible values for this requirement
-         * 
+         *
          * @return All valid values for this requirement
          */
         public List<String> getValues() {
@@ -1025,7 +1030,7 @@ public class ResourceLoader {
          * requirement they do not satisfy any of the possible values. If it can
          * not be determined if this requirement is met the function returns
          * false.
-         * 
+         *
          * @param systemProperties
          *            System properties defining the current platform
          * @return True if and only if it is certain that none of the possible
@@ -1060,7 +1065,7 @@ public class ResourceLoader {
          * given a requirement string. A requirement string can start with one
          * of the comparators <, <=, =, >= or > . If no comparator is specified
          * = is assumed.
-         * 
+         *
          * @param systemProperty
          *            The platform specific version string
          * @param requirement

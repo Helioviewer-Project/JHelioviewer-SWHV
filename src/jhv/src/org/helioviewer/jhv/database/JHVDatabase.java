@@ -165,16 +165,17 @@ public class JHVDatabase {
             pstatement.executeUpdate();
 
             String dbName = eventType.getSupplier().getDatabaseName();
-            String createtbl = "CREATE TABLE " + dbName + " (";
+            StringBuilder createtbl = new StringBuilder();
+            createtbl.append("CREATE TABLE ").append(dbName).append(" (");
             HashMap<String, String> fields = eventType.getEventType().getAllDatabaseFields();
 
             for (Map.Entry<String, String> entry : fields.entrySet()) {
-                createtbl += entry.getKey() + " " + entry.getValue() + " DEFAULT NULL,";
+                createtbl.append(entry.getKey()).append(" ").append(entry.getValue()).append(" DEFAULT NULL,");
             }
-            createtbl += "event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );";
+            createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );");
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
-            statement.executeUpdate(createtbl);
+            statement.executeUpdate(createtbl.toString());
             connection.commit();
         } catch (SQLException e) {
             Log.error("Failed to insert event type " + e.getMessage());
@@ -584,10 +585,10 @@ public class JHVDatabase {
             if (typeId != -1) {
                 try {
                     String join = "LEFT JOIN " + type.getSupplier().getDatabaseName() + " AS tp ON tp.event_id=e.id";
-                    String and = "";
+                    StringBuilder and = new StringBuilder();
                     for (SWEKParam p : params) {
                         if (!p.param.equals("provider")) {
-                            and += "AND tp." + p.param + p.operand.getStringRepresentation() + p.value + " ";
+                            and.append("AND tp.").append(p.param).append(p.operand.getStringRepresentation()).append(p.value).append(" ");
                         }
                     }
                     String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e "

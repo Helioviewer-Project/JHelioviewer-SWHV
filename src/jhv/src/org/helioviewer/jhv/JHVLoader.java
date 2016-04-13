@@ -39,10 +39,10 @@ public class JHVLoader {
             kduLibs.add("libkdu_a77R.so");
             kduLibs.add("libkdu_jni.jnilib");
             pathlib = "macosx-universal/";
-        /* obsolete computer
-        } else if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-32")) {
-            kduLibs.add("libkdu_jni-mac-x86-32.jnilib");
-            pathlib = "macosx-universal/"; */
+            /* obsolete computer
+            } else if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-32")) {
+                kduLibs.add("libkdu_jni-mac-x86-32.jnilib");
+                pathlib = "macosx-universal/"; */
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-64")) {
             kduLibs.add("msvcr120.dll");
             kduLibs.add("kdu_v77R.dll");
@@ -98,13 +98,13 @@ public class JHVLoader {
                 final BufferedReader in = new BufferedReader(new FileReader(tmpFile));
 
                 String line = null;
-                String content = "";
+                StringBuilder content = new StringBuilder();
                 while ((line = in.readLine()) != null) {
-                    content += line;
+                    content.append(line);
                 }
                 in.close();
 
-                final StringTokenizer st = new StringTokenizer(content, ";");
+                final StringTokenizer st = new StringTokenizer(content.toString(), ";");
                 while (st.hasMoreElements()) {
                     final File delFile = new File(st.nextToken());
                     delFile.delete();
