@@ -59,9 +59,9 @@ public class FileUtils {
         }
         if (arguments != null) {
             arguments.add(0, exec);
-            String logExec = "";
+            StringBuilder logExec = new StringBuilder();
             for (String argument : arguments) {
-                logExec += " \"" + argument + "\"";
+                logExec.append(" \"").append(argument).append("\"");
             }
             Log.debug(">> FileUtils.invokeExecutable > Execute command: " + logExec);
             return Runtime.getRuntime().exec(arguments.toArray(new String[arguments.size()]));

@@ -17,27 +17,27 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class TextDialog extends JDialog implements ActionListener, ShowableDialog {
 
     public TextDialog(String title, URL textFile) {
         super(ImageViewerGui.getMainFrame(), title, true);
         setResizable(false);
 
-        String text = "";
+        StringBuilder text = new StringBuilder();
         String linebreak = System.getProperty("line.separator");
 
         try {
             Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream(), "UTF-8")));
             while (scanner.hasNext()) {
-                text += scanner.nextLine() + linebreak;
+                text.append(scanner.nextLine()).append(linebreak);
             }
             scanner.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        init(text);
+        init(text.toString());
     }
 
     public TextDialog(String title, String text) {

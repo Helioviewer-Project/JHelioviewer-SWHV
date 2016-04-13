@@ -88,11 +88,11 @@ public class PluginManager {
         // if there is at least one plug-in which could not be loaded throw an
         // exception and add plug-in names to the message of the exception.
         if (list.size() > 0) {
-            String message = "";
+            StringBuilder message = new StringBuilder();
             for (String item : list) {
-                message += item + "\n";
+                message.append(item).append("\n");
             }
-            throw new IOException(message);
+            throw new IOException(message.toString());
         }
     }
 

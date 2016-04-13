@@ -86,6 +86,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             JLabel copyToClipboard = new JLabel("Click here to copy the error message to the clipboard.");
 
             copyToClipboard.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mousePressed(MouseEvent me) {
                     ClipBoardCopier.getSingletonInstance().setString((String) msg);
                     JOptionPane.showMessageDialog(null, "Error message copied to clipboard.");
@@ -139,11 +140,13 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 
     // we do not use the logger here, since it should work even before logging
     // initialization
+    @Override
     public void uncaughtException(Thread t, Throwable e) {
 
-        String stackTrace = e.getClass().getCanonicalName() + "\n";
+        StringBuilder stackTrace = new StringBuilder();
+        stackTrace.append(e.getClass().getCanonicalName()).append("\n");
         for (StackTraceElement el : e.getStackTrace()) {
-            stackTrace = stackTrace + "at " + el + "\n";
+            stackTrace.append("at ").append(el).append("\n");
         }
 
         String msg = "Uncaught Exception detected.\n\nConfiguration:\n";
@@ -190,5 +193,4 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 
         JHVUncaughtExceptionHandler.showErrorDialog("JHelioviewer: Fatal Error", msg);
     }
-
 }

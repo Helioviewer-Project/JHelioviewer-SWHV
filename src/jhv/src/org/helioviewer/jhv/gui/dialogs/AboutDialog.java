@@ -62,15 +62,15 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
         Font font = getFont();
 
         JEditorPane content = new JEditorPane("text/html", "<html><center><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" +
-                                               "<b>" + getVersionString() + "</b><br>" +
-                                               '\u00A9' + "2016 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>" +
-                                               "Part of the ESA/NASA Helioviewer Project<br>" +
-                                               "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>" +
-                                               "JHelioviewer is released under the<br>" +
-                                               "<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>" +
-                                               "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>" +
-                                               "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>" +
-                                               "</font></center></html>");
+                "<b>" + getVersionString() + "</b><br>" +
+                '\u00A9' + "2016 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>" +
+                "Part of the ESA/NASA Helioviewer Project<br>" +
+                "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>" +
+                "JHelioviewer is released under the<br>" +
+                "<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>" +
+                "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>" +
+                "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>" +
+                "</font></center></html>");
         content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         content.setEditable(false);
         content.setOpaque(false);
@@ -81,13 +81,14 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
         boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.PAGE_AXIS));
 
         boxPanel.add(new JSeparator());
-        String text = "<html><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" +
-        "This software uses the <a href=\"http://www.kakadusoftware.com\">Kakadu JPEG2000 Toolkit</a>,<br> " + '\u00A9' + " 2015, NewSouth Innovations Ltd (NSI), <a href=Kakadu.txt>(License)</a><br>" +
-        "<p>This software uses the <a href=\"https://jogamp.org\">JogAmp</a>, the Java high performance libraries for 3D Graphics, Multimedia and Processing,<br>" + '\u00A9' + " JogAmp Community and others<br>" +
-        "<p>This software uses <a href=\"https://commons.apache.org\">Apache Commons</a>,<br>" + '\u00A9' + " 2001-2015, The Apache Software Foundation<br>" +
-        "<p>This software uses <a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> from the Apache Logging Services Project,<br>" + '\u00A9' + " 2010, The Apache Software Foundation, <a href=log4j.txt>(License)</a><br>" +
-        "<p>This software uses <a href=\"http://www.xuggle.com\">Xuggler</a>, licensed under the LGPL.<br>" +
-        "<p>This software uses the <a href=\"http://www.davekoelle.com/alphanum.html\">Alphanum Algorithm</a>, licensed under the LGPLv2.1.<br> Its source code can be downloaded <a href=\"http://jhelioviewer.org/libjhv/external/AlphanumComparator.java\">here</a>.<br>";
+        StringBuilder text = new StringBuilder();
+        text.append("<html><font style=\"font-family: '").append(font.getFamily()).append("'; font-size: ").append(font.getSize()).append(";\">");
+        text.append("This software uses the <a href=\"http://www.kakadusoftware.com\">Kakadu JPEG2000 Toolkit</a>,<br> " + '\u00A9' + " 2015, NewSouth Innovations Ltd (NSI), <a href=Kakadu.txt>(License)</a><br>");
+        text.append("<p>This software uses the <a href=\"https://jogamp.org\">JogAmp</a>, the Java high performance libraries for 3D Graphics, Multimedia and Processing,<br>").append('\u00A9').append(" JogAmp Community and others<br>");
+        text.append("<p>This software uses <a href=\"https://commons.apache.org\">Apache Commons</a>,<br>").append('\u00A9').append(" 2001-2015, The Apache Software Foundation<br>");
+        text.append("<p>This software uses <a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> from the Apache Logging Services Project,<br>" + '\u00A9' + " 2010, The Apache Software Foundation, <a href=log4j.txt>(License)</a><br>");
+        text.append("<p>This software uses <a href=\"http://www.xuggle.com\">Xuggler</a>, licensed under the LGPL.<br>");
+        text.append("<p>This software uses the <a href=\"http://www.davekoelle.com/alphanum.html\">Alphanum Algorithm</a>, licensed under the LGPLv2.1.<br> Its source code can be downloaded <a href=\"http://jhelioviewer.org/libjhv/external/AlphanumComparator.java\">here</a>.<br>");
 
         for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {
             Plugin plugin = pluginContainer.getPlugin();
@@ -102,12 +103,12 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
                 pluginAboutLicense = "No License Text Available.";
             }
 
-            text += "<p>============ Plugin: " + pluginName + " ============<br>";
-            text += pluginAboutLicense;
+            text.append("<p>============ Plugin: ").append(pluginName).append(" ============<br>");
+            text.append(pluginAboutLicense);
 
         }
 
-        JEditorPane license = new JEditorPane("text/html", text);
+        JEditorPane license = new JEditorPane("text/html", text.toString());
 
         license.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         license.setEditable(false);

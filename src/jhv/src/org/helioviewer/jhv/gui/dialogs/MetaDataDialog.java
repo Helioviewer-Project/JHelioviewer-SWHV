@@ -306,10 +306,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             addDataItem("      Helioviewer Header", jhList);
             addDataItem("-------------------------------", jhList);
         } else {
-            String tab = "";
-            for (int i = 0; i < indent; i++) {
-                tab = tab + "\t";
-            }
             addDataItem(nodeName, nodeValue, lastNodeSeen.equals("fits"));
         }
 
