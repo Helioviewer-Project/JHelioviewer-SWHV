@@ -141,7 +141,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
 
     @Override
     public void availableIntervalChanged() {
-        Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
+        Interval availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
         eventContainer.requestForInterval(availableInterval.start, availableInterval.end, EventModel.this);
     }
 
@@ -230,7 +230,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
 
     @Override
     public void cacheUpdated() {
-        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         eventContainer.requestForInterval(selectedInterval.start, selectedInterval.end, this);
         DrawController.getSingletonInstance().fireRedrawRequest();
     }

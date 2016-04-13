@@ -425,7 +425,7 @@ public class JHVDatabase {
                 PreparedStatement dstatement = getPreparedStatement(connection, DELETE_DATERANGE);
                 dstatement.setInt(1, typeId);
                 dstatement.executeUpdate();
-                for (Interval<Date> interval : typedCache.getAllRequestIntervals()) {
+                for (Interval interval : typedCache.getAllRequestIntervals()) {
                     if (typeId != -1) {
                         PreparedStatement pstatement = getPreparedStatement(connection, INSERT_DATERANGE);
                         pstatement.setInt(1, typeId);
@@ -442,19 +442,19 @@ public class JHVDatabase {
 
     }
 
-    public static ArrayList<Interval<Date>> db2daterange(JHVEventType type) {
-        FutureTask<ArrayList<Interval<Date>>> ft = new FutureTask<ArrayList<Interval<Date>>>(new Db2DateRange(type));
+    public static ArrayList<Interval> db2daterange(JHVEventType type) {
+        FutureTask<ArrayList<Interval>> ft = new FutureTask<ArrayList<Interval>>(new Db2DateRange(type));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException e) {
-            return new ArrayList<Interval<Date>>();
+            return new ArrayList<Interval>();
         } catch (ExecutionException e) {
-            return new ArrayList<Interval<Date>>();
+            return new ArrayList<Interval>();
         }
     }
 
-    private static class Db2DateRange implements Callable<ArrayList<Interval<Date>>> {
+    private static class Db2DateRange implements Callable<ArrayList<Interval>> {
 
         private final JHVEventType type;
 
@@ -463,9 +463,9 @@ public class JHVDatabase {
         }
 
         @Override
-        public ArrayList<Interval<Date>> call() {
+        public ArrayList<Interval> call() {
             /* for usage in other thread return full copy! */
-            ArrayList<Interval<Date>> copy = new ArrayList<Interval<Date>>();
+            ArrayList<Interval> copy = new ArrayList<Interval>();
             Connection connection = ConnectionThread.getConnection();
             if (connection == null) {
                 return copy;
@@ -502,7 +502,7 @@ public class JHVDatabase {
                 }
             }
 
-            for (Interval<Date> interval : typedCache.getAllRequestIntervals()) {
+            for (Interval interval : typedCache.getAllRequestIntervals()) {
                 copy.add(new Interval(new Date(interval.start.getTime()), new Date(interval.end.getTime())));
             }
             return copy;

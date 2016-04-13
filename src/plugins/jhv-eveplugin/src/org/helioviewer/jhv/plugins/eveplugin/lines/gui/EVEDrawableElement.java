@@ -26,11 +26,11 @@ public class EVEDrawableElement implements DrawableElement {
     private final List<GraphPolyline> graphPolylines = new ArrayList<EVEDrawableElement.GraphPolyline>();
     private Band[] bands = new Band[0];
     // private EVEValues[] values = null;
-    private Interval<Date> interval;
+    private Interval interval;
     private YAxisElement yAxisElement;
     private long lastMilliWithData;
 
-    public EVEDrawableElement(Interval<Date> interval, Band[] bands, EVEValues[] values, YAxisElement yAxisElement) {
+    public EVEDrawableElement(Interval interval, Band[] bands, EVEValues[] values, YAxisElement yAxisElement) {
         this.interval = interval;
         this.bands = bands;
         // this.values = values;
@@ -39,7 +39,7 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     public EVEDrawableElement() {
-        interval = new Interval<Date>(Calendar.getInstance().getTime(), Calendar.getInstance().getTime());
+        interval = new Interval(Calendar.getInstance().getTime(), Calendar.getInstance().getTime());
         bands = new Band[0];
         // values = new EVEValues[0];
         yAxisElement = new YAxisElement();
@@ -57,7 +57,7 @@ public class EVEDrawableElement implements DrawableElement {
         drawGraphs(g, graphArea);
     }
 
-    private void updateGraphsData(Interval<Date> interval, Rectangle graphArea) {
+    private void updateGraphsData(Interval interval, Rectangle graphArea) {
         double minValue = yAxisElement.getScaledMinValue();
         double maxValue = yAxisElement.getScaledMaxValue();
 
@@ -223,7 +223,7 @@ public class EVEDrawableElement implements DrawableElement {
         }
     }
 
-    public void set(Interval<Date> interval, Band[] bands, YAxisElement yAxisElement) {
+    public void set(Interval interval, Band[] bands, YAxisElement yAxisElement) {
         this.interval = interval;
         this.bands = bands;
         this.yAxisElement = yAxisElement;

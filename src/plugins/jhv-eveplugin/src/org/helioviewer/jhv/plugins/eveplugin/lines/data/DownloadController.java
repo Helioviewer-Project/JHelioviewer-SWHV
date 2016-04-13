@@ -9,7 +9,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +38,7 @@ public class DownloadController {
 
     private static final DownloadController singletonInstance = new DownloadController();
 
-    private final HashMap<Band, ArrayList<Interval<Date>>> downloadMap = new HashMap<Band, ArrayList<Interval<Date>>>();
+    private final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<Band, ArrayList<Interval>>();
     private final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
 
     private final LineDataSelectorModel selectorModel;
@@ -53,24 +52,24 @@ public class DownloadController {
         return singletonInstance;
     }
 
-    public void updateBands(final Interval<Date> interval, final Interval<Date> priorityInterval) {
+    public void updateBands(final Interval interval, final Interval priorityInterval) {
         Set<Band> bands = EVEDrawController.getSingletonInstance().getAllBands();
         for (Band b : bands) {
             updateBand(b, interval, priorityInterval);
         }
     }
 
-    public void updateBand(final Band band, final Interval<Date> queryInterval, final Interval<Date> priorityInterval) {
+    public void updateBand(final Band band, final Interval queryInterval, final Interval priorityInterval) {
         if (band == null || queryInterval == null) {
             return;
         }
 
-        List<Interval<Date>> missingIntervalsNoExtend = EVECacheController.getSingletonInstance().getMissingDaysInInterval(band, queryInterval);
+        List<Interval> missingIntervalsNoExtend = EVECacheController.getSingletonInstance().getMissingDaysInInterval(band, queryInterval);
         if (!missingIntervalsNoExtend.isEmpty()) {
-            Interval<Date> realQueryInterval = extendQueryInterval(queryInterval);
+            Interval realQueryInterval = extendQueryInterval(queryInterval);
 
             // get all intervals within query interval where data is missing
-            ArrayList<Interval<Date>> intervals = getIntervals(band, realQueryInterval);
+            ArrayList<Interval> intervals = getIntervals(band, realQueryInterval);
 
             if (intervals == null) {
                 // there is no interval where data is missing
@@ -86,7 +85,7 @@ public class DownloadController {
             final DownloadThread[] jobs = new DownloadThread[intervals.size()];
 
             int i = 0;
-            for (final Interval<Date> interval : intervals) {
+            for (final Interval interval : intervals) {
                 jobs[i] = new DownloadThread(band, interval);
                 ++i;
             }
@@ -108,26 +107,26 @@ public class DownloadController {
         futureJobs.put(band, fj);
     }
 
-    private Interval<Date> extendQueryInterval(Interval<Date> queryInterval) {
+    private Interval extendQueryInterval(Interval queryInterval) {
         GregorianCalendar cs = new GregorianCalendar();
         cs.setTime(queryInterval.start);
         cs.add(Calendar.DAY_OF_MONTH, -7);
         GregorianCalendar ce = new GregorianCalendar();
         ce.setTime(queryInterval.end);
         ce.add(Calendar.DAY_OF_MONTH, +7);
-        return new Interval<Date>(cs.getTime(), ce.getTime());
+        return new Interval(cs.getTime(), ce.getTime());
     }
 
-    private ArrayList<Interval<Date>> getIntervals(final Band band, final Interval<Date> queryInterval) {
+    private ArrayList<Interval> getIntervals(final Band band, final Interval queryInterval) {
         // get missing data intervals within given interval
-        final List<Interval<Date>> missingIntervals = EVECacheController.getSingletonInstance().addRequest(band, queryInterval);
+        final List<Interval> missingIntervals = EVECacheController.getSingletonInstance().addRequest(band, queryInterval);
         if (missingIntervals.isEmpty()) {
             return null;
         }
 
         // split intervals (if necessary) into smaller intervals
-        final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
-        for (final Interval<Date> i : missingIntervals) {
+        final ArrayList<Interval> intervals = new ArrayList<Interval>();
+        for (final Interval i : missingIntervals) {
             intervals.addAll(Interval.splitInterval(i, EVESettings.DOWNLOADER_MAX_DAYS_PER_BLOCK));
         }
 
@@ -135,7 +134,7 @@ public class DownloadController {
     }
 
     public void stopDownloads(final Band band) {
-        final ArrayList<Interval<Date>> list = downloadMap.get(band);
+        final ArrayList<Interval> list = downloadMap.get(band);
         if (list == null) {
             return;
         }
@@ -151,7 +150,7 @@ public class DownloadController {
     }
 
     public boolean isDownloadActive(final Band band) {
-        final ArrayList<Interval<Date>> list = downloadMap.get(band);
+        final ArrayList<Interval> list = downloadMap.get(band);
         if (list == null) {
             return false;
         }
@@ -171,11 +170,11 @@ public class DownloadController {
         for (int i = 0; i < jobs.length; ++i) {
             // add to download map
             final Band band = jobs[i].getBand();
-            final Interval<Date> interval = jobs[i].getInterval();
+            final Interval interval = jobs[i].getInterval();
 
-            ArrayList<Interval<Date>> list = downloadMap.get(band);
+            ArrayList<Interval> list = downloadMap.get(band);
             if (list == null) {
-                list = new ArrayList<Interval<Date>>();
+                list = new ArrayList<Interval>();
             }
             list.add(interval);
 
@@ -185,13 +184,13 @@ public class DownloadController {
         return futureJobs;
     }
 
-    private void downloadFinished(final Band band, final Interval<Date> interval) {
+    private void downloadFinished(final Band band, final Interval interval) {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 int numberOfDownloads = 0;
 
-                final ArrayList<Interval<Date>> list = downloadMap.get(band);
+                final ArrayList<Interval> list = downloadMap.get(band);
                 if (list != null) {
                     list.remove(interval);
                     numberOfDownloads = list.size();
@@ -207,15 +206,15 @@ public class DownloadController {
 
     private class DownloadThread implements Runnable {
 
-        private final Interval<Date> interval;
+        private final Interval interval;
         private final Band band;
 
-        public DownloadThread(final Band band, final Interval<Date> interval) {
+        public DownloadThread(final Band band, final Interval interval) {
             this.interval = interval;
             this.band = band;
         }
 
-        public Interval<Date> getInterval() {
+        public Interval getInterval() {
             return interval;
         }
 
@@ -284,7 +283,7 @@ public class DownloadController {
             }
         }
 
-        private URL buildRequestURL(final Interval<Date> interval, final BandType type) throws MalformedURLException {
+        private URL buildRequestURL(final Interval interval, final BandType type) throws MalformedURLException {
             final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
 
             return new URL(type.getBaseUrl() + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.start) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.end) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + type.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);

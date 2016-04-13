@@ -22,7 +22,6 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -37,7 +36,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
 @SuppressWarnings("serial")
 public class ChartDrawIntervalPane extends JComponent implements TimingListener, MouseInputListener, LayersListener {
 
-    private Interval<Date> movieInterval;
+    private Interval movieInterval;
 
     private boolean mouseOverInterval = true;
     private boolean mouseOverLeftGraspPoint = false;
@@ -75,8 +74,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         g.setFont(DrawConstants.font);
         drawBackground(g);
 
-        Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
-        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        Interval availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
+        Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         if (availableInterval != null && selectedInterval != null) {
             computeIntervalBorderPositions(availableInterval, selectedInterval);
             drawIntervalBackground(g);
@@ -94,7 +93,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         g.fillRect(leftIntervalBorderPosition - 1, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight() - 3);
     }
 
-    private void computeIntervalBorderPositions(Interval<Date> availableInterval, Interval<Date> selectedInterval) {
+    private void computeIntervalBorderPositions(Interval availableInterval, Interval selectedInterval) {
         final double diffMin = (availableInterval.end.getTime() - availableInterval.start.getTime()) / 60000.0;
 
         long start = selectedInterval.start.getTime() - availableInterval.start.getTime();
@@ -126,7 +125,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         g.fillRect(leftIntervalBorderPosition, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, 1);
     }
 
-    private void drawMovieInterval(Graphics2D g, Interval<Date> availableInterval) {
+    private void drawMovieInterval(Graphics2D g, Interval availableInterval) {
         if (availableInterval == null || movieInterval == null) {
             return;
         }
@@ -186,7 +185,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.GRAPH_RIGHT_SPACE, 2, 5, 5));
     }
 
-    private void drawLabels(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
+    private void drawLabels(Graphics2D g, Interval availableInterval, Interval selectedInterval) {
         if (availableInterval.start == null || availableInterval.end == null || availableInterval.start.getTime() > availableInterval.end.getTime()) {
             return;
         }
@@ -224,7 +223,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         drawLabelsTime(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
     }
 
-    private void drawLabelsTime(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsTime(Graphics2D g, Interval availableInterval, Interval selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final long timeDiff = availableInterval.end.getTime() - availableInterval.start.getTime();
         final double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
@@ -245,7 +244,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void drawLabelsDay(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsDay(Graphics2D g, Interval availableInterval, Interval selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -281,7 +280,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void drawLabelsMonth(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsMonth(Graphics2D g, Interval availableInterval, Interval selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -322,7 +321,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void drawLabelsYear(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsYear(Graphics2D g, Interval availableInterval, Interval selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -353,7 +352,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void drawLabel(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final String tickText, final int availableIntervalWidth, final Date date, final double ratioX) {
+    private void drawLabel(Graphics2D g, Interval availableInterval, Interval selectedInterval, final String tickText, final int availableIntervalWidth, final Date date, final double ratioX) {
         final int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
         final int x = DrawConstants.GRAPH_LEFT_SPACE + (int) ((date.getTime() - availableInterval.start.getTime()) * ratioX);
         if (selectedInterval.containsPointInclusive(date)) {
@@ -598,7 +597,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     @Override
     public void activeLayerChanged(View view) {
         if (view != null) {
-            movieInterval = new Interval<Date>(view.getFirstTime().getDate(), view.getLastTime().getDate());
+            movieInterval = new Interval(view.getFirstTime().getDate(), view.getLastTime().getDate());
             repaint();
         }
     }

@@ -41,7 +41,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     public void installPlugin() {
         DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
         Date d = new Date();
-        DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(d, d));
+        DrawController.getSingletonInstance().setAvailableInterval(new Interval(d, d));
         // Create an instance of eveDrawController and leave it here
         ZoomManager.getSingletonInstance();
         EVEDrawController.getSingletonInstance();

@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.base.math;
 
-import org.helioviewer.jhv.base.interval.Interval;
 
 /**
  * A collection of useful static methods.
@@ -35,24 +34,6 @@ public class MathUtils {
             return _side2;
         else
             return _val;
-    }
-
-    /**
-     * Returns a random integer from the interval. If the interval is 2->4 then
-     * there is a equal chance that the return would be 2,3, or 4.
-     *
-     * @param _interval
-     *            the interval from which to draw the random number
-     * @return a random number within the given interval
-     */
-    public static int randomInt(Interval<Integer> _interval) {
-        // calculate how many integers we might have
-        final int numIntegers = _interval.end - _interval.start + 1;
-        int rand;
-        do {
-            rand = (int) (Math.random() * numIntegers);
-        } while (rand == numIntegers);
-        return rand + _interval.start;
     }
 
     /**

@@ -30,7 +30,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     private final JComboBox zoomComboBox;
     private final JToggleButton periodFromLayersButton;
     private boolean selectedIndexSetByProgram;
-    private Interval<Date> selectedIntervalByZoombox = null;
+    private Interval selectedIntervalByZoombox = null;
     private final DrawController drawController;
 
     private enum ZOOM {
@@ -201,7 +201,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
 
     @Override
     public void selectedIntervalChanged(boolean keepFullValueRange) {
-        Interval<Date> newInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        Interval newInterval = DrawController.getSingletonInstance().getSelectedInterval();
         if (selectedIntervalByZoombox != null && newInterval != null) {
             if (!selectedIntervalByZoombox.equals(newInterval)) {
                 try {
@@ -213,10 +213,10 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         }
     }
 
-    private Interval<Date> zoomTo(final ZOOM zoom, final long value) {
-        Interval<Date> newInterval = new Interval<Date>(null, null);
-        Interval<Date> selectedInterval = drawController.getSelectedInterval();
-        Interval<Date> availableInterval = drawController.getAvailableInterval();
+    private Interval zoomTo(final ZOOM zoom, final long value) {
+        Interval newInterval = new Interval(null, null);
+        Interval selectedInterval = drawController.getSelectedInterval();
+        Interval availableInterval = drawController.getAvailableInterval();
         switch (zoom) {
         case CUSTOM:
             newInterval = selectedInterval;
@@ -245,21 +245,21 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         return drawController.setSelectedInterval(newInterval, true, true);
     }
 
-    private Interval<Date> computeMovieInterval() {
+    private Interval computeMovieInterval() {
         View view = Layers.getActiveView();
         if (view != null && view.isMultiFrame()) {
-            return new Interval<Date>(view.getFirstTime().getDate(), view.getLastTime().getDate());
+            return new Interval(view.getFirstTime().getDate(), view.getLastTime().getDate());
         }
-        return new Interval<Date>(new Date(), new Date());
+        return new Interval(new Date(), new Date());
     }
 
-    private Interval<Date> computeCarringtonInterval(Interval<Date> interval, long value) {
+    private Interval computeCarringtonInterval(Interval interval, long value) {
         return computeZoomForMilliSeconds(interval, value * 2356585920l);
     }
 
-    private Interval<Date> computeZoomForMilliSeconds(final Interval<Date> interval, long differenceMilli) {
+    private Interval computeZoomForMilliSeconds(final Interval interval, long differenceMilli) {
         Date startDate = interval.start;
-        Interval<Date> availableInterval = drawController.getAvailableInterval();
+        Interval availableInterval = drawController.getAvailableInterval();
         GregorianCalendar gce = new GregorianCalendar();
         gce.clear();
         gce.setTime(interval.end);
@@ -276,7 +276,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         final Date availableStartDate = availableInterval.start;
 
         if (startDate == null || availableStartDate == null) {
-            return new Interval<Date>(null, null);
+            return new Interval(null, null);
         }
 
         final GregorianCalendar calendar = new GregorianCalendar();
@@ -292,13 +292,13 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         boolean eInAvailable = availableInterval.containsPointInclusive(endDate);
 
         if (sInAvailable && eInAvailable) {
-            return new Interval<Date>(startDate, endDate);
+            return new Interval(startDate, endDate);
         }
 
-        return new Interval<Date>(startDate, endDate);
+        return new Interval(startDate, endDate);
     }
 
-    private Interval<Date> computeZoomInterval(final Interval<Date> interval, final int calendarField, final long difference) {
+    private Interval computeZoomInterval(final Interval interval, final int calendarField, final long difference) {
         return computeZoomForMilliSeconds(interval, differenceInMilliseconds(calendarField, difference));
     }
 

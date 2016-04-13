@@ -69,7 +69,7 @@ public class RadioDownloader {
             @Override
             protected ImageDownloadWorkerResult backgroundWork() {
                 try {
-                    List<Interval<Date>> noDataInterval = new ArrayList<Interval<Date>>();
+                    List<Interval> noDataInterval = new ArrayList<Interval>();
                     List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                     boolean intervalTooBig = false;
                     long duration = calculateFrequencyDuration(startDateString, endDateString);
@@ -87,14 +87,14 @@ public class RadioDownloader {
                                 // cache.add(newJPXData);
                             } else {
                                 Log.error("Received null view in request and open for date " + startDate + " and " + endDate);
-                                noDataInterval.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
+                                noDataInterval.add(new Interval(startDate, calculateOneDayFurtherAsDate(startDate)));
                             }
                             startDate = calculateOneDayFurtherAsDate(startDate);
                         }
                     } else {
                         intervalTooBig = true;
                     }
-                    Interval<Date> requestInterval = new Interval<Date>(requestedStartDate, endDate);
+                    Interval requestInterval = new Interval(requestedStartDate, endDate);
                     return new ImageDownloadWorkerResult(jpxList, noDataInterval, intervalTooBig, requestInterval, new ArrayList<Date>());
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
@@ -120,8 +120,8 @@ public class RadioDownloader {
                                 if (!result.isIntervalTooBig() && result.getViews().isEmpty()) {
                                     radioDataManager.noDataInDownloadInterval(result.getRequestInterval());
                                 }
-                                List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
-                                for (Interval<Date> noData : result.getNoDataIntervals()) {
+                                List<Interval> noDataList = new ArrayList<Interval>();
+                                for (Interval noData : result.getNoDataIntervals()) {
                                     // if (cache.addNoDataInterval(noData,
                                     // identifier)) {
                                     cache.addNoDataInterval(noData);
@@ -147,9 +147,9 @@ public class RadioDownloader {
         EVESettings.getExecutorService().execute(imageDownloadWorker);
     }
 
-    public void requestAndOpenIntervals(List<Interval<Date>> intervals, final double ratioX, final double ratioY) {
+    public void requestAndOpenIntervals(List<Interval> intervals, final double ratioX, final double ratioY) {
         final List<Date> toDownloadStartDates = new ArrayList<Date>();
-        for (final Interval<Date> interval : intervals) {
+        for (final Interval interval : intervals) {
             Date startDate = interval.start;
             Date endDate = interval.end;
             if (endDate != null && startDate != null) {
@@ -178,7 +178,7 @@ public class RadioDownloader {
 
             @Override
             protected ImageDownloadWorkerResult backgroundWork() {
-                List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
+                List<Interval> noDataList = new ArrayList<Interval>();
                 List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                 for (Date date : datesToDownload) {
                     JP2ViewCallisto v = null;
@@ -192,7 +192,7 @@ public class RadioDownloader {
                         DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, date, calculateOneDayFurtherAsDate(date));
                         jpxList.add(newJPXData);
                     } else {
-                        noDataList.add(new Interval<Date>(date, calculateOneDayFurtherAsDate(date)));
+                        noDataList.add(new Interval(date, calculateOneDayFurtherAsDate(date)));
                     }
                 }
                 return new ImageDownloadWorkerResult(jpxList, noDataList, false, null, datesToDownload);
@@ -211,8 +211,8 @@ public class RadioDownloader {
                                 radioDataManager.newAdditionalDataDownloaded(temp, ratioX, ratioY);
                             }
                         }
-                        List<Interval<Date>> noDataToFire = new ArrayList<Interval<Date>>();
-                        for (Interval<Date> noDataInterval : result.getNoDataIntervals()) {
+                        List<Interval> noDataToFire = new ArrayList<Interval>();
+                        for (Interval noDataInterval : result.getNoDataIntervals()) {
                             if (cache.addNoDataInterval(noDataInterval)) {
                                 noDataToFire.add(noDataInterval);
                             }
@@ -287,11 +287,11 @@ public class RadioDownloader {
         /** the list of downloaded jpx data */
         private final List<DownloadedJPXData> imageInfoViews;
         /** the no data intervals */
-        private final List<Interval<Date>> noDataIntervals;
+        private final List<Interval> noDataIntervals;
         /** the interval too big indicater */
         private final boolean intervalTooBig;
         /** The request interval */
-        private final Interval<Date> requestInterval;
+        private final Interval requestInterval;
         /** The download id */
         private final List<Date> datesToRemoveFromRequestCache;
 
@@ -309,7 +309,7 @@ public class RadioDownloader {
          *            the request interval
          * @param datesToDownload
          */
-        public ImageDownloadWorkerResult(List<DownloadedJPXData> imageInfoViews, List<Interval<Date>> noDataIntervals, boolean intervalTooBig, Interval<Date> requestInterval, List<Date> datesToRemoveFromRequestCache) {
+        public ImageDownloadWorkerResult(List<DownloadedJPXData> imageInfoViews, List<Interval> noDataIntervals, boolean intervalTooBig, Interval requestInterval, List<Date> datesToRemoveFromRequestCache) {
             this.imageInfoViews = imageInfoViews;
             this.intervalTooBig = intervalTooBig;
             this.noDataIntervals = noDataIntervals;
@@ -336,7 +336,7 @@ public class RadioDownloader {
          *
          * @return the list with no data intervals
          */
-        public List<Interval<Date>> getNoDataIntervals() {
+        public List<Interval> getNoDataIntervals() {
             return noDataIntervals;
         }
 
@@ -354,7 +354,7 @@ public class RadioDownloader {
          *
          * @return the request interval
          */
-        public Interval<Date> getRequestInterval() {
+        public Interval getRequestInterval() {
             return requestInterval;
         }
     }

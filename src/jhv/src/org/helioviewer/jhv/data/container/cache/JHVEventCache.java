@@ -206,7 +206,7 @@ public class JHVEventCache {
     public JHVEventCacheResult get(Date startDate, Date endDate, Date extendedStart, Date extendedEnd) {
 
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
-        Map<JHVEventType, List<Interval<Date>>> missingIntervals = new HashMap<JHVEventType, List<Interval<Date>>>();
+        Map<JHVEventType, List<Interval>> missingIntervals = new HashMap<JHVEventType, List<Interval>>();
         for (JHVEventType evt : activeEventTypes) {
             SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
@@ -214,7 +214,7 @@ public class JHVEventCache {
                 SortedMap<SortedDateInterval, JHVRelatedEvents> submap = sortedEvents.subMap(new SortedDateInterval(startDate.getTime() - delta, startDate.getTime() - delta), new SortedDateInterval(endDate.getTime() + delta, endDate.getTime() + delta));
                 eventsResult.put(evt, submap);
             }
-            List<Interval<Date>> missing = downloadedCache.get(evt).getMissingIntervals(new Interval<Date>(startDate, endDate));
+            List<Interval> missing = downloadedCache.get(evt).getMissingIntervals(new Interval(startDate, endDate));
             if (!missing.isEmpty()) {
                 missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
                 missingIntervals.put(evt, missing);
@@ -244,11 +244,11 @@ public class JHVEventCache {
         }
     }
 
-    public Collection<Interval<Date>> getAllRequestIntervals(JHVEventType eventType) {
+    public Collection<Interval> getAllRequestIntervals(JHVEventType eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
     }
 
-    public void removeRequestedIntervals(JHVEventType eventType, Interval<Date> interval) {
+    public void removeRequestedIntervals(JHVEventType eventType, Interval interval) {
         downloadedCache.get(eventType).removeRequestedIntervals(interval);
     }
 

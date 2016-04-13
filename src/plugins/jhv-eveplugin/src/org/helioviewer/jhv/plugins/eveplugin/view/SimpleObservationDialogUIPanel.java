@@ -74,16 +74,16 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     private void updateDrawController() {
-        Interval<Date> interval = defineInterval(getDate());
+        Interval interval = defineInterval(getDate());
         DrawController.getSingletonInstance().setAvailableInterval(interval);
         DrawController.getSingletonInstance().setSelectedInterval(interval, true, false);
     }
 
-    protected Interval<Date> defineInterval(Date date) {
+    protected Interval defineInterval(Date date) {
         JHVDate start = Layers.getStartDate();
         JHVDate end = Layers.getEndDate();
         if (start != null && end != null) {
-            Interval<Date> movieInterval = new Interval<Date>(Layers.getStartDate().getDate(), Layers.getEndDate().getDate());
+            Interval movieInterval = new Interval(Layers.getStartDate().getDate(), Layers.getEndDate().getDate());
 
             if (movieInterval.containsPointInclusive(date)) {
                 return movieInterval;
@@ -119,12 +119,12 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         gcs.add(Calendar.DAY_OF_MONTH, -2);
         Date startDate = gcs.getTime();
 
-        return new Interval<Date>(startDate, endDate);
+        return new Interval(startDate, endDate);
     }
 
     private void startRadioDownload() {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         String isoStart = df.format(selectedInterval.start);
         Calendar end = Calendar.getInstance();
         end.setTime(selectedInterval.end);

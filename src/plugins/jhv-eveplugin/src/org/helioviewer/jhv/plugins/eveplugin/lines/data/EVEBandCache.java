@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 import java.awt.Rectangle;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -32,7 +31,7 @@ public class EVEBandCache {
         cache.add(values, dates);
     }
 
-    public EVEValues getValuesInInterval(final Band band, final Interval<Date> interval, Rectangle plotArea) {
+    public EVEValues getValuesInInterval(final Band band, final Interval interval, Rectangle plotArea) {
         EVECache cache = cacheMap.get(band);
         if (cache == null) {
             return new EVEValues();
@@ -42,7 +41,7 @@ public class EVEBandCache {
 
     }
 
-    public boolean hasDataInInterval(Band band, Interval<Date> selectedInterval) {
+    public boolean hasDataInInterval(Band band, Interval selectedInterval) {
         EVECache cache = cacheMap.get(band);
         if (cache == null) {
             return false;

@@ -32,7 +32,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     private boolean isMaxXInitialized;
 
     private ZoomManager() {
-        // currentInterval = new Interval<Date>(new Date(), new Date());
+        // currentInterval = new Interval(new Date(), new Date());
         isAreaInitialized = false;
         isMinXInitialized = false;
         isMaxXInitialized = false;
@@ -56,10 +56,10 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         yAxisElement = radioDataManager.getYAxisElement();
     }
 
-    public void addZoomDataConfig(Interval<Date> interval) {
+    public void addZoomDataConfig(Interval interval) {
         plotAreaSpace.addPlotAreaSpaceListener(this);
         radioDataManager.getYAxisElement().addValueSpaceListener(this);
-        Interval<Date> currentInterval = drawController.getSelectedInterval();
+        Interval currentInterval = drawController.getSelectedInterval();
         if (currentInterval == null) {
             currentInterval = interval;
         }
@@ -138,7 +138,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
      *             outside the minimum and maximum frequency.
      */
     public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq) {
-        Interval<Date> currentInterval = drawController.getSelectedInterval();
+        Interval currentInterval = drawController.getSelectedInterval();
         if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yAxisElement.getAvailableRange().min && startFreq <= yAxisElement.getAvailableRange().max) && (endFreq >= yAxisElement.getAvailableRange().min && endFreq <= yAxisElement.getAvailableRange().max)) {
             int height = displaySize.height;
             double ratio = displaySize.getWidth() / (currentInterval.end.getTime() - currentInterval.start.getTime());
@@ -169,7 +169,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
 
     @Override
     public void selectedIntervalChanged(boolean keepFullValueRange) {
-        Interval<Date> newInterval = drawController.getSelectedInterval();
+        Interval newInterval = drawController.getSelectedInterval();
         minX = newInterval.start;
         maxX = newInterval.end;
         isMinXInitialized = true;

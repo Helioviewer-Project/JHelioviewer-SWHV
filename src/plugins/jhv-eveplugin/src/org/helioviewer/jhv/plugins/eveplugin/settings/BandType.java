@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.eveplugin.settings;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -21,7 +20,7 @@ public class BandType {
     private String scale = "";
     private boolean isLog = false;
 
-    public URL buildUrl(Interval<Date> interval) {
+    public URL buildUrl(Interval interval) {
         final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
         URL url = null;
         try {

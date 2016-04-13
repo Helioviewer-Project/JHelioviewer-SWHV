@@ -35,7 +35,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
     private TimeIntervalLockModel() {
         drawController = DrawController.getSingletonInstance();
         isLocked = false;
-        // currentAvailableInterval = new Interval<Date>(null, null);
+        // currentAvailableInterval = new Interval(null, null);
         drawController.addTimingListener(this);
         drawController.addDrawControllerListener(this);
         latestMovieTime = new Date();
@@ -103,7 +103,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
     public void drawMovieLineRequest(Date time) {
         double selectedSpaceWidth = plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
 
-        Interval<Date> currentAvailableInterval = drawController.getAvailableInterval();
+        Interval currentAvailableInterval = drawController.getAvailableInterval();
         if (time != null && isLocked && currentAvailableInterval.containsPointInclusive(time) && !latestMovieTime.equals(time)) {
             latestMovieTime = time;
 

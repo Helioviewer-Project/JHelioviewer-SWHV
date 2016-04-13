@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Date;
 
 import org.helioviewer.jhv.base.interval.Interval;
 
@@ -15,7 +14,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 public class NoDataConfig {
 
     /** The interval for which there is no data. */
-    private Interval<Date> dateInterval;
+    private Interval dateInterval;
 
     /** The drawable area map for this no data configuration. */
     private DrawableAreaMap drawableAreaMap;
@@ -36,7 +35,7 @@ public class NoDataConfig {
      * @param visible
      *            Is it visible
      */
-    public NoDataConfig(Interval<Date> dateInterval, DrawableAreaMap drawableAreaMap, boolean visible) {
+    public NoDataConfig(Interval dateInterval, DrawableAreaMap drawableAreaMap, boolean visible) {
         this.dateInterval = dateInterval;
         this.drawableAreaMap = drawableAreaMap;
         this.visible = visible;
@@ -47,7 +46,7 @@ public class NoDataConfig {
      *
      * @return the date interval
      */
-    public Interval<Date> getDateInterval() {
+    public Interval getDateInterval() {
         return dateInterval;
     }
 
@@ -57,7 +56,7 @@ public class NoDataConfig {
      * @param dateInterval
      *            The date interval
      */
-    public void setDateInterval(Interval<Date> dateInterval) {
+    public void setDateInterval(Interval dateInterval) {
         this.dateInterval = dateInterval;
     }
 
