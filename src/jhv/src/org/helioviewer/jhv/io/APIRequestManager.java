@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,6 +19,7 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.EventDispatchQueue;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.fitsview.FITSView;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
@@ -57,14 +57,13 @@ public class APIRequestManager {
      * @throws MalformedURLException
      */
     public static Date getLatestImageDate(String observatory, String instrument, String detector, String measurement, boolean message) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Date date = new Date();
         boolean readDate = false;
         View view = null;
 
         try {
             String server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
-            view = loadImage(server, observatory, instrument, detector, measurement, formatter.format(date), message);
+            view = loadImage(server, observatory, instrument, detector, measurement, TimeUtils.apiDateFormat.format(date), message);
             if (view != null) {
                 date = view.getFirstTime().getDate();
                 readDate = true;
