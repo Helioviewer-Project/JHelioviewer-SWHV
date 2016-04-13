@@ -10,53 +10,27 @@ import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 
-/**
- *
- *
- * @author Stephan Pagel
- * */
 public class EVECacheController {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
-    /** the sole instance of this class */
     private static final EVECacheController singletonInstance = new EVECacheController();
 
-    /***/
     private final LinkedList<EVECacheControllerListener> controllerListeners = new LinkedList<EVECacheControllerListener>();
 
-    /***/
     private final EVEBandCache cache = new EVEBandCache();
 
     private final Map<Band, RequestCache> requestCache = new HashMap<Band, RequestCache>();
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * The private constructor to support the singleton pattern.
-     * */
     private EVECacheController() {
     }
 
-    /**
-     * Method returns the sole instance of this class.
-     *
-     * @return the only instance of this class.
-     * */
     public static EVECacheController getSingletonInstance() {
         return singletonInstance;
     }
 
-    /***/
     public void addControllerListener(final EVECacheControllerListener listener) {
         controllerListeners.add(listener);
     }
 
-    /***/
     public void removeControllerListener(final EVECacheControllerListener listener) {
         controllerListeners.remove(listener);
     }
@@ -101,7 +75,6 @@ public class EVECacheController {
         if (band == null || interval == null) {
             return null;
         }
-
         return cache.getValuesInInterval(band, interval, plotArea);
     }
 

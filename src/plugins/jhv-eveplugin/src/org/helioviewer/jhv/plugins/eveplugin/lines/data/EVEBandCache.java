@@ -5,21 +5,9 @@ import java.util.HashMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
 
-/**
- *
- * @author Stephan Pagel
- * */
 public class EVEBandCache {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
     private final HashMap<Band, EVECache> cacheMap = new HashMap<Band, EVECache>();
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     public void add(Band band, float[] values, long[] dates) {
         EVECache cache = cacheMap.get(band);
@@ -36,9 +24,7 @@ public class EVEBandCache {
         if (cache == null) {
             return new EVEValues();
         }
-
         return cache.getValuesInInterval(interval, plotArea);
-
     }
 
     public boolean hasDataInInterval(Band band, Interval selectedInterval) {

@@ -7,9 +7,6 @@ import java.text.SimpleDateFormat;
 
 import org.helioviewer.jhv.gui.UIGlobals;
 
-/**
- * @author Stephan Pagel
- * */
 public class DrawConstants {
 
     public static final int GRAPH_LEFT_SPACE = 50;

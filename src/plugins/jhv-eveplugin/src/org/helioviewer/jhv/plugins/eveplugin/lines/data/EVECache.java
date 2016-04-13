@@ -7,23 +7,11 @@ import java.util.HashMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
 
-/**
- *
- * @author Stephan Pagel
- * */
 public class EVECache {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
     private final HashMap<Integer, EVEDataOfDay> cacheMap = new HashMap<Integer, EVEDataOfDay>();
-    private static double DISCARD_LOG_LEVEL_LOW = 1e-10;
-    private static double DISCARD_LOG_LEVEL_HIGH = 1e+4;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
+    private static final double DISCARD_LOG_LEVEL_LOW = 1e-10;
+    private static final double DISCARD_LOG_LEVEL_HIGH = 1e+4;
 
     public void add(final float[] values, final long[] dates) {
         GregorianCalendar calendar = new GregorianCalendar();
@@ -53,7 +41,7 @@ public class EVECache {
 
         int numberOfBins;
         long timePerBin;
-        if (space.width < (intervalWidth / 60000)) {
+        if (space.width < intervalWidth / 60000) {
             binStart = intervalStart - (intervalWidth / spaceWidth / 2);
             binEnd = intervalEnd + (intervalWidth / spaceWidth / 2);
             numberOfBins = spaceWidth + 1;

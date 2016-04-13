@@ -53,11 +53,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 
-/**
- *
- * @author Stephan Pagel
- */
-// Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
 
