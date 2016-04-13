@@ -62,9 +62,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
         // axisUnitMap = new HashMap<YAxisElement, String>();
-        Date d = new Date();
 
-        availableInterval = new Interval(d, d);
+        Date d = new Date();
+        availableInterval = new Interval(new Date(d.getTime() - 86400 * 1000), d);
         selectedInterval = availableInterval;
     }
 
@@ -201,7 +201,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
         DownloadController.getSingletonInstance().updateBands(downloadInterval, selectedInterval);
 
-        setSelectedInterval(interval, false, false);
+        setSelectedInterval(selectedInterval, false, false);
     }
 
     public final Interval getAvailableInterval() {
@@ -274,9 +274,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             if (interval.end.after(end)) {
                 end = interval.end;
             }
-
             setAvailableInterval(new Interval(start, end));
-
         }
         TimeIntervalLockModel lockModel = TimeIntervalLockModel.getInstance();
         if (lockModel.isLocked()) {
