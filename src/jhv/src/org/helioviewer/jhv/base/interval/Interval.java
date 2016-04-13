@@ -4,119 +4,46 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 
-/**
- * A generic Interval class, used for any type of ranges. Different types of
- * functions are provided, allowing to use this class for open, closed and
- * half-closed intervals.
- *
- * @author Malte Nuhn
- * @author Stephan Pagel
- *
- */
 public class Interval<TimeFormat extends Comparable<TimeFormat>> implements IntervalComparison<TimeFormat> {
 
-    /**
-     * Start of the interval
-     */
     private TimeFormat start;
 
-    /**
-     * End of the interval
-     */
     private TimeFormat end;
 
-    /**
-     * Copyconstructor. Does not deepcopy the start and end fields of the given
-     * interval.
-     *
-     * @param other
-     *            - the interval that forms the blueprint of the interval to be
-     *            created
-     */
-    public Interval(Interval<TimeFormat> other) {
+    private Interval(Interval<TimeFormat> other) {
         this.start = other.start;
         this.end = other.end;
     }
 
-    /**
-     * Construct a new Interval with the start and end time given. No checks are
-     * performed on the given data.
-     *
-     * @param start
-     *            - Start of the interval
-     * @param end
-     *            - End of the interval
-     */
     public Interval(TimeFormat start, TimeFormat end) {
         this.start = start;
         this.end = end;
     }
 
-    /**
-     * Get the beginning of the interval.
-     *
-     * @return the interval's start timestamp
-     */
     public TimeFormat getStart() {
         return start;
     }
 
-    /**
-     * Get the end of the interval.
-     *
-     * @return the interval's end timestamp
-     */
     public TimeFormat getEnd() {
         return end;
     }
 
-    /**
-     * Set the beginning of the interval.
-     *
-     * @param start
-     */
-    public void setStart(TimeFormat start) {
-        this.start = start;
-    }
-
-    /**
-     * Set the end of the interval.
-     *
-     * @param end
-     */
-    public void setEnd(TimeFormat end) {
-        this.end = end;
-    }
-
-    /**
-     * @see org.helioviewer.jhv.base.interval.IntervalComparison#contains
-     */
     @Override
     public boolean contains(Interval<TimeFormat> other) {
         return this.containsPoint(other.start) && this.containsPoint(other.end);
     }
 
-    /**
-     * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsFully
-     */
     @Override
     public boolean containsFully(Interval<TimeFormat> other) {
         return this.containsPointFully(other.start) && this.containsPointFully(other.end);
     }
 
-    /**
-     * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsInclusive
-     */
     @Override
     public boolean containsInclusive(Interval<TimeFormat> other) {
         return this.containsPointInclusive(other.start) && this.containsPointInclusive(other.end);
     }
 
-    /**
-     * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsPoint
-     */
     @Override
     public boolean containsPoint(TimeFormat time) {
         // start inclusive, end exclusive!
@@ -125,35 +52,23 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         // return (time >= this.start) && (time < this.end);
     }
 
-    /**
-     * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsPointFully
-     */
     @Override
     public boolean containsPointFully(TimeFormat time) {
         assert start.compareTo(end) <= 0;
         return (time.compareTo(this.start) > 0) && (time.compareTo(this.end) < 0);
     }
 
-    /**
-     * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsPointInclusive
-     */
     @Override
     public boolean containsPointInclusive(TimeFormat time) {
         assert start.compareTo(end) <= 0;
         return (time.compareTo(this.start) >= 0) && (time.compareTo(this.end) <= 0);
     }
 
-    /**
-     * @see org.helioviewer.jhv.base.interval.IntervalComparison#overlaps
-     */
     @Override
     public boolean overlaps(Interval<TimeFormat> other) {
         return (this.containsPoint(other.start) || this.containsPoint(other.end)) || (other.containsPoint(this.start) || other.containsPoint(this.end));
     }
 
-    /**
-     * @see org.helioviewer.jhv.base.interval.IntervalComparison#overlapsInclusive
-     */
     @Override
     public boolean overlapsInclusive(Interval<TimeFormat> other) {
         return (this.containsPointInclusive(other.start) || this.containsPointInclusive(other.end)) || (other.containsPointInclusive(this.start) || other.containsPointInclusive(this.end));
@@ -177,70 +92,14 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         return value;
     }
 
-    /**
-     * Returns a String representation of the Interval, e.g. "[X,Y)"
-     */
     @Override
     public String toString() {
         return "[" + start + "," + end + ")";
     }
 
-    /**
-     * Overridden comepareTo method.
-     * <p>
-     * This method compares intervals by their start date, thus, sorting a list
-     * of intervals using this compeareTo method results in a list, where those
-     * intervals that start earliest are in the beginning of the list.
-     *
-     */
     @Override
     public int compareTo(Interval<TimeFormat> other) {
         return this.start.compareTo(other.start);
-    }
-
-    /**
-     * Check whether the interval is degenerated, meaning that start and end
-     * equal; or in other words, that the interval duration is zero.
-     * <p>
-     * No special treatment of null values is performed.
-     *
-     * @return true if the interval is degenerated
-     */
-    public boolean isDegenerated() {
-        return this.start.equals(this.end);
-    }
-
-    /**
-     * Expand this interval as less as possible, but still making sure that the
-     * expression
-     * <p>
-     * <code> this.expand(other).overlapsInclusive(other) == true </code>
-     * <p>
-     * is true. If both intervals do not overlap, no change occurs.
-     * <p>
-     * If the current interval is not valid, the given interval is returned
-     *
-     * @param other
-     *            - the interval to which the current interval should be
-     *            extended to
-     * @return the expanded interval
-     */
-    public Interval<TimeFormat> expand(Interval<TimeFormat> other) {
-        Interval<TimeFormat> result = new Interval<TimeFormat>(this);
-        // copy other if null
-        if (!this.isValid()) {
-            result = new Interval<TimeFormat>(other);
-        } else if (this.overlapsInclusive(other)) {
-            if (other.start.compareTo(this.start) < 0) {
-                result.start = other.start;
-                result.end = this.end;
-            }
-            if (other.end.compareTo(this.end) > 0) {
-                result.start = this.start;
-                result.end = other.end;
-            }
-        }
-        return result;
     }
 
     /**
@@ -269,70 +128,10 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         return result;
     }
 
-    /**
-     * Exclude the given interval from the current interval.
-     * <p>
-     * Since this can result in a non continuous range, multiple intervals may
-     * be returned.
-     * <p>
-     * For each of the returned intervals (every possible value of "i"), the
-     * following statements are true
-     * <li>
-     * <code>this.exclude(other).get(i).overlaps(other) == false</code></li>
-     * <li>
-     * <code>this.exclude(other).get(i).containsPoint(x) == true</code> for all
-     * x with <code> this.containsPoint(x) && ! other.containsPoint(x) </code></li>
-     *
-     * Note: Possibly degenerated Intervals are removed from the result set
-     *
-     * @see Interval#isDegenerated()
-     *
-     * @param other
-     * @return result of the exclusion
-     */
-/*
-    public ArrayList<Interval<TimeFormat>> exclude(Interval<TimeFormat> other) {
-        ArrayList<Interval<TimeFormat>> result = new ArrayList<Interval<TimeFormat>>();
-        if (this.equals(other)) {
-            return result;
-        }
-
-        // this interval is contained in the interval to be excluded: return
-        // empty list
-        if (other.contains(this)) {
-            return result;
-        }
-        // the interval to be excluded is included in this interval: this
-        // results in two smaller intervals
-        if (this.contains(other)) {
-            result.add(new Interval<TimeFormat>(this.start, other.start));
-            result.add(new Interval<TimeFormat>(other.end, this.end));
-            removeDegenerated(result);
-            return result;
-        }
-        // this interval only overlaps the interval to be excluded: make this
-        // interval smaller
-        if (this.overlaps(other)) {
-            if (other.start.compareTo(this.start) < 0) {
-                result.add(new Interval<TimeFormat>(other.end, this.end));
-            } else {
-                result.add(new Interval<TimeFormat>(this.start, other.start));
-            }
-            removeDegenerated(result);
-            return result;
-        }
-
-        result.add(this);
-        removeDegenerated(result);
-        return result;
-    }
-*/
-
     public static ArrayList<Interval<Date>> splitInterval(final Interval<Date> interval, int days) {
         final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
 
         if (interval.getStart() == null || interval.getEnd() == null) {
-            intervals.add(interval);
             return intervals;
         }
 
@@ -347,7 +146,6 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
             final Date newStartDate = calendar.getTime();
 
             if (interval.containsPointInclusive(newStartDate)) {
-                //calendar.add(Calendar.SECOND, -1);
                 intervals.add(new Interval<Date>(startDate, calendar.getTime()));
                 startDate = newStartDate;
             } else {
@@ -359,30 +157,6 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         return intervals;
     }
 
-    /**
-     * Internal method to remove all degenerated Intervals from a noncontinuous
-     * range of intervals.
-     *
-     * @param toClean
-     */
-/*
-    private void removeDegenerated(ArrayList<Interval<TimeFormat>> toClean) {
-        Iterator<Interval<TimeFormat>> intIterator = toClean.iterator();
-        while (intIterator.hasNext()) {
-            Interval<TimeFormat> curInterval = intIterator.next();
-            if (curInterval.isDegenerated()) {
-                intIterator.remove();
-            }
-        }
-    }
-*/
-
-    /**
-     * Overridden equals method.
-     * <p>
-     * Two Intervals are equal, if start and end values are equal.
-     */
-
     @Override
     public boolean equals(Object other) {
         if (other instanceof Interval<?>) {
@@ -392,34 +166,12 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         return false;
     }
 
-    /**
-     * Overridden hashCode method.
-     * <p>
-     * This method makes sure that
-     * <code> intervalA.hashCode() == intervalB.hashCode() </code> holds iff
-     * <code> intervalA.equals(intervalB) </code>
-     * <p>
-     *
-     * @see org.helioviewer.jhv.base.interval.Interval#equals
-     */
-
     @Override
     public int hashCode() {
         return (this.start.toString() + " - " + this.end.toString()).hashCode();
     }
 
-    /**
-     * Check whether the current interval is valid, meaning that
-     * <p>
-     * <li>neither start nor end are null</li>
-     * <li>that start is before or equal to end (using the compareTo method)</li>
-     *
-     * @return true if the interval is valid
-     */
-    public boolean isValid() {
-        if (this.start == null || this.end == null) {
-            return false;
-        }
+    private boolean isValid() {
         if (this.start.compareTo(this.end) > 0) {
             return false;
         }

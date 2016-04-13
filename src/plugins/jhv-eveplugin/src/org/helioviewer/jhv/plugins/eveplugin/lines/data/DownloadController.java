@@ -35,10 +35,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-/**
- *
- * @author Stephan Pagel
- * */
 public class DownloadController {
 
     private static final DownloadController singletonInstance = new DownloadController();
