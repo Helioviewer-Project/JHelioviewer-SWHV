@@ -295,11 +295,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private Interval<Date> makeCompleteDay(final Date start, final Date end) {
-        final Interval<Date> interval = new Interval<Date>(null, null);
         Date endDate = end;
 
         if (start == null || end == null) {
-            return interval;
+            Log.error("this should not happen");
+            Thread.dumpStack();
+            return null;
         }
 
         if (end.getTime() > System.currentTimeMillis()) {
@@ -314,7 +315,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
-        interval.setStart(calendar.getTime());
+        Date s = calendar.getTime();
 
         calendar.clear();
         calendar.setTime(endDate);
@@ -324,7 +325,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.add(Calendar.DAY_OF_MONTH, 1);
 
-        interval.setEnd(calendar.getTime());
+        Date e = calendar.getTime();
+        final Interval<Date> interval = new Interval<Date>(s, e);
 
         return interval;
     }
