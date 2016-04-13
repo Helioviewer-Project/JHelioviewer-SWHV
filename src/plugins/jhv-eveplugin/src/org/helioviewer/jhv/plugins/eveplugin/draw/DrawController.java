@@ -38,7 +38,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private PlotAreaSpace pas;
 
     private final List<TimingListener> tListeners;
-    private boolean keepFullValueRange;
     private Rectangle graphSize;
     // private Rectangle graphArea;
     // private Rectangle plotArea;
@@ -55,7 +54,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         listeners = new ArrayList<DrawControllerListener>();
         yAxisSet = new ArrayList<YAxisElement>();
         tListeners = new ArrayList<TimingListener>();
-        keepFullValueRange = false;
         gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
 
@@ -153,7 +151,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public void setAvailableInterval(final Interval interval) {
         availableInterval = makeCompleteDay(interval.start, interval.end);
-        // Log.debug("New available interval : " + availableInterval);
         fireAvailableIntervalChanged();
 
         // request data if needed
@@ -289,7 +286,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void setSelectedInterval(final Interval newSelectedInterval, boolean useFullValueSpace, boolean willUpdatePlotAreaSpace, boolean resetAvailable) {
-        keepFullValueRange = useFullValueSpace;
         if (newSelectedInterval.start.compareTo(newSelectedInterval.end) <= 0) {
             if (availableInterval.containsInclusive(newSelectedInterval)) {
                 selectedInterval = newSelectedInterval;
@@ -367,7 +363,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if (forced || !(newSelectedEndTime.equals(selectedInterval.end) && newSelectedStartTime.equals(selectedInterval.start))) {
             setSelectedInterval(new Interval(newSelectedStartTime, newSelectedEndTime), false, false, false);
         }
-
     }
 
     @Override
@@ -382,10 +377,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
             setAvailableInterval(new Interval(tempStartDate, tempEndDate));
         }
-    }
-
-    public boolean keepfullValueRange() {
-        return keepFullValueRange;
     }
 
     public PlotAreaSpace getPlotAreaSpace() {
