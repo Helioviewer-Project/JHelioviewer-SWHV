@@ -381,9 +381,9 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     }
 
     private FrequencyInterval defineDataFrequencyInterval(FrequencyInterval freqInterval, Rectangle providedRegion, int resolutionHeight) {
-        double ratio = (freqInterval.getEnd() - freqInterval.getStart()) / resolutionHeight;
+        double ratio = (freqInterval.getEnd() - freqInterval.getStart()) / (double) resolutionHeight;
         double start = freqInterval.getEnd() - providedRegion.getY() * ratio;
-        double end = freqInterval.getEnd() - (providedRegion.getY() + providedRegion.getHeight()) * ratio;
+        double end = start - providedRegion.getHeight() * ratio;
         return new FrequencyInterval((int) start, (int) end);
     }
 

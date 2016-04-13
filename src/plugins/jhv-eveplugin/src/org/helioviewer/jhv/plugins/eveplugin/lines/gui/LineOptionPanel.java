@@ -24,13 +24,9 @@ public class LineOptionPanel extends JPanel {
 
     private static final String[] options = { "Left", "Right" };
 
-    public LineOptionPanel(Band band) {
-        this.band = band;
-        initVisualComponents();
-    }
+    public LineOptionPanel(Band _band) {
+        band = _band;
 
-    private void initVisualComponents() {
-        // setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
