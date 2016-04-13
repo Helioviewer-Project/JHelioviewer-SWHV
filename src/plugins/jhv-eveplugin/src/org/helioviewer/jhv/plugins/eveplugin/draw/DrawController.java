@@ -187,7 +187,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void setAvailableInterval(final Interval interval) {
-        availableInterval = makeCompleteDay(interval);
+        availableInterval = makeCompleteDay(interval.start, interval.end);
         // Log.debug("New available interval : " + availableInterval);
         fireAvailableIntervalChanged();
 
@@ -292,18 +292,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private Interval makeCompleteDay(final Interval interval) {
-        return makeCompleteDay(interval.start, interval.end);
-    }
-
     private Interval makeCompleteDay(final Date start, final Date end) {
         Date endDate = end;
-
-        if (start == null || end == null) {
-            Log.error("this should not happen");
-            Thread.dumpStack();
-            return null;
-        }
 
         if (end.getTime() > System.currentTimeMillis()) {
             endDate = new Date();
@@ -316,7 +306,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-
         Date s = calendar.getTime();
 
         calendar.clear();
@@ -326,11 +315,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.add(Calendar.DAY_OF_MONTH, 1);
-
         Date e = calendar.getTime();
-        final Interval interval = new Interval(s, e);
 
-        return interval;
+        return new Interval(s, e);
     }
 
     public Interval setSelectedInterval(final Interval newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {

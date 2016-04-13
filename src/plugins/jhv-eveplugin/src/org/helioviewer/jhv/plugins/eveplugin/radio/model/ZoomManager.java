@@ -139,7 +139,11 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
      */
     public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq) {
         Interval currentInterval = drawController.getSelectedInterval();
-        if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yAxisElement.getAvailableRange().min && startFreq <= yAxisElement.getAvailableRange().max) && (endFreq >= yAxisElement.getAvailableRange().min && endFreq <= yAxisElement.getAvailableRange().max)) {
+        double min = yAxisElement.getAvailableRange().min;
+        double max = yAxisElement.getAvailableRange().max;
+
+        if (startFreq >= min && startFreq <= max && endFreq >= min && endFreq <= max &&
+            currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate)) {
             int height = displaySize.height;
             double ratio = displaySize.getWidth() / (currentInterval.end.getTime() - currentInterval.start.getTime());
             int width = (int) Math.round((endDate.getTime() - startDate.getTime()) * ratio);
