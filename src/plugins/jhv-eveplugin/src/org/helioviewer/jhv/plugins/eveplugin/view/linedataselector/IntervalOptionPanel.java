@@ -275,11 +275,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         } else if (endDate.after(new Date())) {
             endDate = new Date();
         }
-        final Date availableStartDate = availableInterval.start;
-
-        if (startDate == null || availableStartDate == null) {
-            return new Interval(null, null);
-        }
 
         final GregorianCalendar calendar = new GregorianCalendar();
 
