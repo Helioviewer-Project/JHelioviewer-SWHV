@@ -201,7 +201,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
         DownloadController.getSingletonInstance().updateBands(downloadInterval, selectedInterval);
 
-        setSelectedInterval(selectedInterval, false, false);
+        setSelectedInterval(interval, false, false);
     }
 
     public final Interval<Date> getAvailableInterval() {
@@ -274,8 +274,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             if (interval.end.after(end)) {
                 end = interval.end;
             }
+
             setAvailableInterval(new Interval<Date>(start, end));
-            System.out.println(start + " " + end);
+
         }
         TimeIntervalLockModel lockModel = TimeIntervalLockModel.getInstance();
         if (lockModel.isLocked()) {
@@ -372,7 +373,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             if (willUpdatePlotAreaSpace) {
                 updatePlotAreaSpace();
             }
-
             fireSelectedIntervalChanged(useFullValueSpace);
             fireRedrawRequest();
         } else {
