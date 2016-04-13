@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="../lib/jogl-all.jar"/>
 	<classpathentry kind="lib" path="../lib/kdu_jni.jar"/>
+        <classpathentry kind="lib" path="../lib/commons-lang3-3.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
