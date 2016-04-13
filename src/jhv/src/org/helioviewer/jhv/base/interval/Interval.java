@@ -7,8 +7,8 @@ import java.util.GregorianCalendar;
 
 public class Interval implements Comparable<Interval> {
 
-    public Date start;
-    public Date end;
+    public final Date start;
+    public final Date end;
 
     public Interval(Date _start, Date _end) {
         start = _start;
