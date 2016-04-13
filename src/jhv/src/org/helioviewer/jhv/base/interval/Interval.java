@@ -10,9 +10,9 @@ public class Interval implements Comparable<Interval> {
     public Date start;
     public Date end;
 
-    public Interval(Date start, Date end) {
-        this.start = start;
-        this.end = end;
+    public Interval(Date _start, Date _end) {
+        start = _start;
+        end = _end;
         if (start == null || end == null) {
             Thread.dumpStack();
             System.exit(1);
@@ -20,16 +20,16 @@ public class Interval implements Comparable<Interval> {
     }
 
     public boolean containsInclusive(Interval other) {
-        return this.containsPointInclusive(other.start) && this.containsPointInclusive(other.end);
+        return containsPointInclusive(other.start) && containsPointInclusive(other.end);
     }
 
     public boolean containsPointInclusive(Date time) {
         assert start.compareTo(end) <= 0;
-        return (time.compareTo(this.start) >= 0) && (time.compareTo(this.end) <= 0);
+        return time.compareTo(start) >= 0 && time.compareTo(end) <= 0;
     }
 
     public boolean overlapsInclusive(Interval other) {
-        return (this.containsPointInclusive(other.start) || this.containsPointInclusive(other.end)) || (other.containsPointInclusive(this.start) || other.containsPointInclusive(this.end));
+        return containsPointInclusive(other.start) || containsPointInclusive(other.end) || other.containsPointInclusive(start) || other.containsPointInclusive(end);
     }
 
     /**
@@ -38,7 +38,7 @@ public class Interval implements Comparable<Interval> {
      * interval, the the interval's closest 'edge' is returned.
      */
     public Date squeeze(Date value) {
-        if (this.containsPointInclusive(value)) {
+        if (containsPointInclusive(value)) {
             return value;
         } else if (value.compareTo(start) < 0) {
             return start;
@@ -57,7 +57,7 @@ public class Interval implements Comparable<Interval> {
 
     @Override
     public int compareTo(Interval other) {
-        return this.start.compareTo(other.start);
+        return start.compareTo(other.start);
     }
 
     public static ArrayList<Interval> splitInterval(final Interval interval, int days) {
@@ -89,14 +89,14 @@ public class Interval implements Comparable<Interval> {
     public boolean equals(Object other) {
         if (other instanceof Interval) {
             Interval s = (Interval) other;
-            return (this.start.equals(s.start) && (this.end.equals(s.end)));
+            return start.equals(s.start) && end.equals(s.end);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return (this.start.toString() + " - " + this.end.toString()).hashCode();
+        return (start.toString() + " - " + end.toString()).hashCode();
     }
 
 }
