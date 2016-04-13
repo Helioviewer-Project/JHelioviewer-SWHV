@@ -42,7 +42,6 @@ import org.helioviewer.jhv.io.LoadRemoteTask;
  * In order to select and load image data from the Helioviewer server this class
  * provides the corresponding user interface. The UI will be displayed within
  * the {@link ObservationDialog}.
- *
  * */
 @SuppressWarnings("serial")
 public class ImageDataPanel extends ObservationDialogPanel {
@@ -50,10 +49,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
     private final TimeSelectionPanel timeSelectionPanel = new TimeSelectionPanel();
     private final CadencePanel cadencePanel = new CadencePanel();
     private final InstrumentsPanel instrumentsPanel;
-
-    /**
-     * Used format for the API of the data and time
-     */
 
     protected ImageDataPanel() {
         super();
@@ -178,9 +173,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     // Methods derived from Observation Dialog Panel
 
-    /**
-     * {@inheritDoc}
-     * */
     @Override
     public boolean loadButtonPressed() {
         // Add some data if its nice
@@ -210,8 +202,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * The panel bundles the components to select the start and end time.
-     *
-     * @author Stephan Pagel
      * */
     private static class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
 
@@ -373,8 +363,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * The panel bundles the components to select the cadence.
-     *
-     * @author Stephan Pagel
      * */
     private static class CadencePanel extends JPanel implements ActionListener {
 
@@ -389,11 +377,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         private final JSpinner spinnerCadence = new JSpinner();
         private final JComboBox comboUnit = new JComboBox(timeStepUnitStrings);
 
-        /**
-         * Default constructor.
-         * */
         public CadencePanel() {
-            // set up the visual components (GUI)
             setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
             spinnerCadence.setPreferredSize(new Dimension(50, 25));
@@ -412,9 +396,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
             add(panel);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == comboUnit) {
@@ -455,11 +436,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     /**
      * The panel bundles the components to select the instrument etc.
-     * <p>
      * Reads the available data from org.helioviewer.jhv.io.DataSources
-     *
-     * @author rewritten Helge Dietert
-     * @author original Stephan Pagel
      * */
     private static class InstrumentsPanel extends JPanel {
         /**
@@ -475,14 +452,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          */
         private final JComboBox comboDetectorMeasurement = new JComboBox(new String[] { "Loading..." });
 
-        /**
-         * Default constructor which will setup the components and add listener
-         * to update the available choices
-         *
-         * @param imageDataPanel
-         */
         public InstrumentsPanel(final ImageDataPanel imageDataPanel) {
-            // Setup grid
             setLayout(new GridLayout(4, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
             JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
@@ -699,36 +669,18 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 printMode = newPrintMode;
             }
 
-            /**
-             * Returns the first item.
-             *
-             * @return the fist item
-             */
             public Item getFirstItem() {
                 return firstItem;
             }
 
-            /**
-             * Returns the second item.
-             *
-             * @return the second item
-             */
             public Item getSecondItem() {
                 return secondItem;
             }
 
-            /**
-             * True if it was created as default item
-             *
-             * @return the defaultItem
-             */
             public boolean isDefaultItem() {
                 return firstItem.isDefaultItem() && secondItem.isDefaultItem();
             }
 
-            /**
-             * {@inheritDoc}
-             */
             @Override
             public String toString() {
                 switch (printMode) {
@@ -741,9 +693,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 }
             }
 
-            /**
-             * @return the description
-             */
             public String getDescription() {
                 switch (printMode) {
                 case FIRSTITEM_ONLY:

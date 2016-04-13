@@ -8,10 +8,6 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
-/**
- *
- * @author Stephan Pagel
- * */
 public class Band implements LineDataSelectorElement {
 
     private final BandType bandType;

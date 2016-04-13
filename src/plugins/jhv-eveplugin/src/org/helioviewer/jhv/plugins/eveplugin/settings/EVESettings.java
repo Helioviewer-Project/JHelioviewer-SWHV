@@ -5,11 +5,6 @@ import java.util.concurrent.ExecutorService;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.threads.JHVExecutor;
 
-/**
- *
- *
- * @author Stephan Pagel
- * */
 public class EVESettings {
 
     /**
