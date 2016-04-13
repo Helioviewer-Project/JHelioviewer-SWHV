@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin;
 
 import java.net.URL;
-import java.util.Date;
 import java.util.LinkedList;
 
 import javax.swing.JComponent;
@@ -35,8 +34,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     @Override
     public void installPlugin() {
         DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
-        //Date d = new Date();
-        //DrawController.getSingletonInstance().setAvailableInterval(new Interval(new Date(d.getTime() - 86400 * 1000), d));
+
         // Create an instance of eveDrawController and leave it here
         ZoomManager.getSingletonInstance();
         EVEDrawController.getSingletonInstance();

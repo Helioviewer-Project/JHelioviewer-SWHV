@@ -168,14 +168,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return !allElements.isEmpty();
     }
 
-    public boolean getIntervalAvailable() {
-        if (selectedInterval == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     public void setSelectedRange(Range selectedRange) {
         fireRedrawRequest();
     }
