@@ -115,7 +115,6 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
             double newSelectedScaledStart = scaledMoviePosition - (selectedSpaceWidth / 2);
             double newSelectedScaledEnd = scaledMoviePosition + (selectedSpaceWidth / 2);
             plotAreaSpace.setScaledSelectedTime(newSelectedScaledStart, newSelectedScaledEnd, false);
-
         }
     }
 
