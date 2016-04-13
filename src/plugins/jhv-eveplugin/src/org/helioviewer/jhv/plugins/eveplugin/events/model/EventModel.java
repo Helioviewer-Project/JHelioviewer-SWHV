@@ -85,7 +85,6 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
  */
 public class EventModel implements TimingListener, JHVEventHandler {
 
-    /** Singleton instance of the Event model */
     private static EventModel instance;
 
     /** event plot configurations */
@@ -113,9 +112,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
 
     private JHVRelatedEvents eventUnderMouse;
 
-    /**
-     * Private default constructor.
-     */
     private EventModel() {
         eventContainer = JHVEventContainer.getSingletonInstance();
         // eventPlotConfiguration = new EventTypePlotConfiguration();
@@ -127,11 +123,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
         LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
     }
 
-    /**
-     * Gets the singleton instance of the EventModel.
-     *
-     * @return the singleton instance of the event model
-     */
     public static EventModel getSingletonInstance() {
         if (instance == null) {
             instance = new EventModel();
@@ -158,7 +149,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
         this.events = events;
         if (EventModel.getSingletonInstance().isEventsVisible()) {
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
+            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, true);
         } else {
             Log.debug("event plot configurations not visible");
         }
@@ -182,7 +173,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
     public void setEventsVisible(boolean visible) {
         if (eventsVisible != visible) {
             eventsVisible = visible;
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
+            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, true);
             LineDataSelectorModel.getSingletonInstance().lineDataElementUpdated(eventSelectorElement);
         }
     }
@@ -199,7 +190,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
         if (!eventsActivated) {
             eventsVisible = true;
             eventsActivated = true;
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
+            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, true);
         }
     }
 
