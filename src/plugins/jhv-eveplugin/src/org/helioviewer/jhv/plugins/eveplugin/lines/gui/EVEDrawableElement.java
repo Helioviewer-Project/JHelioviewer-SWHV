@@ -24,7 +24,6 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 public class EVEDrawableElement implements DrawableElement {
 
     private final List<GraphPolyline> graphPolylines = new ArrayList<EVEDrawableElement.GraphPolyline>();
-    private boolean intervalAvailable = false;
     private Band[] bands = new Band[0];
     // private EVEValues[] values = null;
     private Interval<Date> interval;
@@ -36,7 +35,6 @@ public class EVEDrawableElement implements DrawableElement {
         this.bands = bands;
         // this.values = values;
         this.yAxisElement = yAxisElement;
-        intervalAvailable = interval.getStart() != null && interval.getEnd() != null;
         lastMilliWithData = -1;
     }
 
@@ -63,12 +61,12 @@ public class EVEDrawableElement implements DrawableElement {
         double minValue = yAxisElement.getScaledMinValue();
         double maxValue = yAxisElement.getScaledMaxValue();
 
-        double ratioX = !intervalAvailable ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
+        double ratioX = graphArea.width / (double) (interval.end.getTime() - interval.start.getTime());
         double ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
 
         graphPolylines.clear();
 
-        long intervalStartTime = interval.getStart().getTime();
+        long intervalStartTime = interval.start.getTime();
         int dY = graphArea.y + graphArea.height;
 
         for (int i = 0; i < bands.length; ++i) {
@@ -229,7 +227,6 @@ public class EVEDrawableElement implements DrawableElement {
         this.interval = interval;
         this.bands = bands;
         this.yAxisElement = yAxisElement;
-        intervalAvailable = interval.getStart() != null && interval.getEnd() != null;
     }
 
     @Override

@@ -43,16 +43,16 @@ public class MathUtils {
      *
      * @param _interval
      *            the interval from which to draw the random number
-     * @return a random numbe wihtin the given interval
+     * @return a random number within the given interval
      */
     public static int randomInt(Interval<Integer> _interval) {
         // calculate how many integers we might have
-        final int numIntegers = _interval.getEnd() - _interval.getStart() + 1;
+        final int numIntegers = _interval.end - _interval.start + 1;
         int rand;
         do {
             rand = (int) (Math.random() * numIntegers);
         } while (rand == numIntegers);
-        return rand + _interval.getStart();
+        return rand + _interval.start;
     }
 
     /**

@@ -7,9 +7,9 @@ import java.util.GregorianCalendar;
 
 public class Interval<TimeFormat extends Comparable<TimeFormat>> implements IntervalComparison<TimeFormat> {
 
-    private TimeFormat start;
+    public TimeFormat start;
 
-    private TimeFormat end;
+    public TimeFormat end;
 
     private Interval(Interval<TimeFormat> other) {
         this.start = other.start;
@@ -19,14 +19,10 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     public Interval(TimeFormat start, TimeFormat end) {
         this.start = start;
         this.end = end;
-    }
-
-    public TimeFormat getStart() {
-        return start;
-    }
-
-    public TimeFormat getEnd() {
-        return end;
+        if (start == null || end == null) {
+            Thread.dumpStack();
+            System.exit(1);
+        }
     }
 
     @Override
@@ -82,10 +78,10 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     public TimeFormat squeeze(TimeFormat value) {
         if (this.containsPointInclusive(value)) {
             return value;
-        } else if (value.compareTo(this.getStart()) < 0) {
-            return this.getStart();
-        } else if (value.compareTo(this.getEnd()) > 0) {
-            return this.getEnd();
+        } else if (value.compareTo(start) < 0) {
+            return start;
+        } else if (value.compareTo(end) > 0) {
+            return end;
         }
         // this case should never occur
         assert false;
@@ -131,12 +127,8 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     public static ArrayList<Interval<Date>> splitInterval(final Interval<Date> interval, int days) {
         final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
 
-        if (interval.getStart() == null || interval.getEnd() == null) {
-            return intervals;
-        }
-
         final Calendar calendar = new GregorianCalendar();
-        Date startDate = interval.getStart();
+        Date startDate = interval.start;
 
         while (true) {
             calendar.clear();
@@ -149,7 +141,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
                 intervals.add(new Interval<Date>(startDate, calendar.getTime()));
                 startDate = newStartDate;
             } else {
-                intervals.add(new Interval<Date>(startDate, interval.getEnd()));
+                intervals.add(new Interval<Date>(startDate, interval.end));
                 break;
             }
         }

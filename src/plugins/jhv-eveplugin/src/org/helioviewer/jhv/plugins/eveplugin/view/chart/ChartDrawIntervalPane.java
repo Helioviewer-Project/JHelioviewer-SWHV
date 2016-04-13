@@ -33,15 +33,11 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-/**
- *
- * @author Stephan Pagel
- */
 // Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
 public class ChartDrawIntervalPane extends JComponent implements TimingListener, MouseInputListener, LayersListener {
 
-    private Interval<Date> movieInterval = new Interval<Date>(null, null);
+    private Interval<Date> movieInterval;
 
     private boolean mouseOverInterval = true;
     private boolean mouseOverLeftGraspPoint = false;
@@ -99,12 +95,12 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     private void computeIntervalBorderPositions(Interval<Date> availableInterval, Interval<Date> selectedInterval) {
-        final double diffMin = (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime()) / 60000.0;
+        final double diffMin = (availableInterval.end.getTime() - availableInterval.start.getTime()) / 60000.0;
 
-        long start = selectedInterval.getStart().getTime() - availableInterval.getStart().getTime();
+        long start = selectedInterval.start.getTime() - availableInterval.start.getTime();
         start = Math.round(start / 60000.0);
 
-        long end = selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime();
+        long end = selectedInterval.end.getTime() - availableInterval.start.getTime();
         end = Math.round(end / 60000.0);
 
         final int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
@@ -131,25 +127,25 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     private void drawMovieInterval(Graphics2D g, Interval<Date> availableInterval) {
-        if (availableInterval == null || movieInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null || movieInterval.getStart() == null || movieInterval.getEnd() == null) {
+        if (availableInterval == null || movieInterval == null) {
             return;
         }
 
-        if (movieInterval.getEnd().getTime() < availableInterval.getStart().getTime() || movieInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
+        if (movieInterval.end.getTime() < availableInterval.start.getTime() || movieInterval.start.getTime() > availableInterval.end.getTime()) {
             return;
         }
 
         final int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
-        final double ratioX = (double) availableIntervalWidth / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
+        final double ratioX = availableIntervalWidth / (double) (availableInterval.end.getTime() - availableInterval.start.getTime());
 
         int min = DrawConstants.GRAPH_LEFT_SPACE;
-        if (availableInterval.containsPointInclusive(movieInterval.getStart())) {
-            min += (int) ((movieInterval.getStart().getTime() - availableInterval.getStart().getTime()) * ratioX);
+        if (availableInterval.containsPointInclusive(movieInterval.start)) {
+            min += (int) ((movieInterval.start.getTime() - availableInterval.start.getTime()) * ratioX);
         }
 
         int max = DrawConstants.GRAPH_LEFT_SPACE + availableIntervalWidth;
-        if (availableInterval.containsPointInclusive(movieInterval.getEnd())) {
-            max = DrawConstants.GRAPH_LEFT_SPACE + (int) ((movieInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * ratioX);
+        if (availableInterval.containsPointInclusive(movieInterval.end)) {
+            max = DrawConstants.GRAPH_LEFT_SPACE + (int) ((movieInterval.end.getTime() - availableInterval.start.getTime()) * ratioX);
         }
         int offset = 7;
         g.setColor(DrawConstants.MOVIE_INTERVAL_COLOR);
@@ -191,18 +187,18 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     private void drawLabels(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
-        if (availableInterval.getStart() == null || availableInterval.getEnd() == null || availableInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
+        if (availableInterval.start == null || availableInterval.end == null || availableInterval.start.getTime() > availableInterval.end.getTime()) {
             return;
         }
 
         final int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date()), g).getWidth();
         final int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         final int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
-        final double ratioX = availableIntervalWidth / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
+        final double ratioX = availableIntervalWidth / (double) (availableInterval.end.getTime() - availableInterval.start.getTime());
 
         final Calendar calendar = new GregorianCalendar();
         calendar.clear();
-        calendar.setTime(availableInterval.getStart());
+        calendar.setTime(availableInterval.start);
         calendar.add(Calendar.YEAR, 3);
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
             drawLabelsYear(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
@@ -210,7 +206,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
 
         calendar.clear();
-        calendar.setTime(availableInterval.getStart());
+        calendar.setTime(availableInterval.start);
         calendar.add(Calendar.MONTH, 3);
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
             drawLabelsMonth(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
@@ -218,7 +214,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
 
         calendar.clear();
-        calendar.setTime(availableInterval.getStart());
+        calendar.setTime(availableInterval.start);
         calendar.add(Calendar.DAY_OF_YEAR, 3);
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
             drawLabelsDay(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
@@ -229,14 +225,14 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     private void drawLabelsTime(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
-        final long timeDiff = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
+        final long timeDiff = availableInterval.end.getTime() - availableInterval.start.getTime();
         final double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
 
         GregorianCalendar tickGreg = new GregorianCalendar();
         String tickText;
         for (int i = 0; i < maxTicks; ++i) {
-            final Date tickValue = new Date(availableInterval.getStart().getTime() + (long) (i * ratioTime));
+            final Date tickValue = new Date(availableInterval.start.getTime() + (long) (i * ratioTime));
             tickGreg.setTime(tickValue);
             int currentday = tickGreg.get(GregorianCalendar.DAY_OF_MONTH);
             if (day != currentday) {
@@ -253,7 +249,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
-        calendar.setTime(availableInterval.getStart());
+        calendar.setTime(availableInterval.start);
 
         int startYear = calendar.get(Calendar.YEAR);
         int startMonth = calendar.get(Calendar.MONTH);
@@ -270,7 +266,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         startMonth = calendar.get(Calendar.MONTH);
         startDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-        final long diffMillis = availableInterval.getEnd().getTime() - calendar.getTimeInMillis();
+        final long diffMillis = availableInterval.end.getTime() - calendar.getTimeInMillis();
         final int numberOfDays = (int) Math.round(diffMillis / (1000. * 60. * 60. * 24.));
         final int tickCount = Math.min(numberOfDays, maxTicks);
         final double ratioDays = Math.ceil((double) numberOfDays / (double) tickCount);
@@ -289,7 +285,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
-        calendar.setTime(availableInterval.getStart());
+        calendar.setTime(availableInterval.start);
 
         int startYear = calendar.get(Calendar.YEAR);
         int startMonth = calendar.get(Calendar.MONTH);
@@ -305,7 +301,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         startMonth = calendar.get(Calendar.MONTH);
 
         calendar.clear();
-        calendar.setTime(availableInterval.getEnd());
+        calendar.setTime(availableInterval.end);
 
         final int endYear = calendar.get(Calendar.YEAR);
         final int endMonth = calendar.get(Calendar.MONTH);
@@ -330,7 +326,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
-        calendar.setTime(availableInterval.getStart());
+        calendar.setTime(availableInterval.start);
         int startYear = calendar.get(Calendar.YEAR);
 
         calendar.clear();
@@ -341,7 +337,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
 
         calendar.clear();
-        calendar.setTime(availableInterval.getEnd());
+        calendar.setTime(availableInterval.end);
         int endYear = calendar.get(Calendar.YEAR);
 
         final int horizontalTickCount = Math.min(endYear - startYear + 1, maxTicks);
@@ -359,7 +355,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     private void drawLabel(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final String tickText, final int availableIntervalWidth, final Date date, final double ratioX) {
         final int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        final int x = DrawConstants.GRAPH_LEFT_SPACE + (int) ((date.getTime() - availableInterval.getStart().getTime()) * ratioX);
+        final int x = DrawConstants.GRAPH_LEFT_SPACE + (int) ((date.getTime() - availableInterval.start.getTime()) * ratioX);
         if (selectedInterval.containsPointInclusive(date)) {
             g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         } else {
@@ -529,7 +525,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
          * (mouseOverInterval) { moveSelectedInterval(e.getPoint(), true); } }
          * mousePressed = null; mouseOverInterval = false;
          * mouseOverLeftGraspPoint = false; mouseOverRightGraspPoint = false;
-         * 
+         *
          * setCursor(new Cursor(Cursor.DEFAULT_CURSOR)); repaint();
          */
     }

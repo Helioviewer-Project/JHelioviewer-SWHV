@@ -43,8 +43,8 @@ public class EventPanel implements DrawableElement {
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = EventModel.getSingletonInstance().getEvents();
         if (events.size() > 0) {
             final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-            long selectedIntervalStart = selectedInterval.getStart().getTime();
-            long selectedIntervalEnd = selectedInterval.getEnd().getTime();
+            long selectedIntervalStart = selectedInterval.start.getTime();
+            long selectedIntervalEnd = selectedInterval.end.getTime();
 
             int nrEventTypes = events.size();
             int eventTypeNr = 0;

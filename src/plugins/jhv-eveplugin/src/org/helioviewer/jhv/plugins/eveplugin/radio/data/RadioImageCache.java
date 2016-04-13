@@ -129,8 +129,8 @@ public class RadioImageCache {
     }
 
     public boolean addNoDataInterval(Interval<Date> interval) {
-        boolean added = noDataCache.containsKey(interval.getStart());
-        noDataCache.put(interval.getStart(), interval);
+        boolean added = noDataCache.containsKey(interval.start);
+        noDataCache.put(interval.start, interval);
         return !added;
     }
 

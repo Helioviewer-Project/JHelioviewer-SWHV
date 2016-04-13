@@ -258,11 +258,11 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private Interval<Date> computeZoomForMilliSeconds(final Interval<Date> interval, long differenceMilli) {
-        Date startDate = interval.getStart();
+        Date startDate = interval.start;
         Interval<Date> availableInterval = drawController.getAvailableInterval();
         GregorianCalendar gce = new GregorianCalendar();
         gce.clear();
-        gce.setTime(interval.getEnd());
+        gce.setTime(interval.end);
         Date endDate = gce.getTime();
 
         final Date lastdataDate = DrawController.getSingletonInstance().getLastDateWithData();
@@ -273,7 +273,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         } else if (endDate.after(new Date())) {
             endDate = new Date();
         }
-        final Date availableStartDate = availableInterval.getStart();
+        final Date availableStartDate = availableInterval.start;
 
         if (startDate == null || availableStartDate == null) {
             return new Interval<Date>(null, null);

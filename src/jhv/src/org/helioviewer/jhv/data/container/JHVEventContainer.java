@@ -82,7 +82,7 @@ public class JHVEventContainer {
             for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
                 List<Interval<Date>> missingList = result.getMissingIntervals().get(eventType);
                 for (Interval<Date> missing : missingList) {
-                    requestEvents(eventType, missing.getStart(), missing.getEnd());
+                    requestEvents(eventType, missing.start, missing.end);
                 }
             }
         }
@@ -149,7 +149,7 @@ public class JHVEventContainer {
 
     public void intervalsNotDownloaded(JHVEventType eventType, Interval<Date> interval) {
         JHVEventCache.getSingletonInstance().removeRequestedIntervals(eventType, interval);
-        JHVEventCache.getSingletonInstance().get(interval.getStart(), interval.getEnd(), interval.getStart(), interval.getEnd());
+        JHVEventCache.getSingletonInstance().get(interval.start, interval.end, interval.start, interval.end);
     }
 
     public void eventTypeActivated(JHVEventType eventType) {

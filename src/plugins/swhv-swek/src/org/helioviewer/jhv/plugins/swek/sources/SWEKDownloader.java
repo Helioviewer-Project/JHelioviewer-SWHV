@@ -28,7 +28,7 @@ public abstract class SWEKDownloader {
     public boolean extern2db(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
         ArrayList<Interval<Date>> range = JHVDatabase.db2daterange(eventType);
         for (Interval<Date> interval : range) {
-            if (interval.getStart().getTime() <= startDate.getTime() && interval.getEnd().getTime() >= endDate.getTime()) {
+            if (interval.start.getTime() <= startDate.getTime() && interval.end.getTime() >= endDate.getTime()) {
                 return true;
             }
         }
