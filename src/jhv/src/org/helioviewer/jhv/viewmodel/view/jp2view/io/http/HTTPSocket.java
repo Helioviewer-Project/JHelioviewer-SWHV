@@ -103,7 +103,7 @@ public class HTTPSocket extends Socket {
 
             // Sets the content length header if it's a POST
             if (req.getMethod() == HTTPRequest.Method.POST)
-                req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), String.valueOf(msgBody.getBytes().length));
+                req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), String.valueOf(msgBody.getBytes("UTF-8").length));
 
             // Adds the headers
             for (String key : req.getHeaders()) {
@@ -119,7 +119,7 @@ public class HTTPSocket extends Socket {
                 str.append(msgBody);
 
             // Writes the result to the output stream
-            getOutputStream().write(str.toString().getBytes());
+            getOutputStream().write(str.toString().getBytes("UTF-8"));
         } else {
             throw new ProtocolException("Responses sending not yet supported!");
         }
