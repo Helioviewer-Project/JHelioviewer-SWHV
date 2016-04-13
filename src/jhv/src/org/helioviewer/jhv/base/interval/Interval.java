@@ -5,18 +5,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class Interval<TimeFormat extends Comparable<TimeFormat>> implements IntervalComparison<TimeFormat> {
+public class Interval implements Comparable<Interval> {
 
-    public TimeFormat start;
+    public Date start;
 
-    public TimeFormat end;
+    public Date end;
 
-    private Interval(Interval<TimeFormat> other) {
+    private Interval(Interval other) {
         this.start = other.start;
         this.end = other.end;
     }
 
-    public Interval(TimeFormat start, TimeFormat end) {
+    public Interval(Date start, Date end) {
         this.start = start;
         this.end = end;
         if (start == null || end == null) {
@@ -25,48 +25,40 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         }
     }
 
-    @Override
-    public boolean contains(Interval<TimeFormat> other) {
+    public boolean contains(Interval other) {
         return this.containsPoint(other.start) && this.containsPoint(other.end);
     }
 
-    @Override
-    public boolean containsFully(Interval<TimeFormat> other) {
+    public boolean containsFully(Interval other) {
         return this.containsPointFully(other.start) && this.containsPointFully(other.end);
     }
 
-    @Override
-    public boolean containsInclusive(Interval<TimeFormat> other) {
+    public boolean containsInclusive(Interval other) {
         return this.containsPointInclusive(other.start) && this.containsPointInclusive(other.end);
     }
 
-    @Override
-    public boolean containsPoint(TimeFormat time) {
+    public boolean containsPoint(Date time) {
         // start inclusive, end exclusive!
         assert start.compareTo(end) <= 0;
         return (time.compareTo(this.start) >= 0) && (time.compareTo(this.end) < 0);
         // return (time >= this.start) && (time < this.end);
     }
 
-    @Override
-    public boolean containsPointFully(TimeFormat time) {
+    public boolean containsPointFully(Date time) {
         assert start.compareTo(end) <= 0;
         return (time.compareTo(this.start) > 0) && (time.compareTo(this.end) < 0);
     }
 
-    @Override
-    public boolean containsPointInclusive(TimeFormat time) {
+    public boolean containsPointInclusive(Date time) {
         assert start.compareTo(end) <= 0;
         return (time.compareTo(this.start) >= 0) && (time.compareTo(this.end) <= 0);
     }
 
-    @Override
-    public boolean overlaps(Interval<TimeFormat> other) {
+    public boolean overlaps(Interval other) {
         return (this.containsPoint(other.start) || this.containsPoint(other.end)) || (other.containsPoint(this.start) || other.containsPoint(this.end));
     }
 
-    @Override
-    public boolean overlapsInclusive(Interval<TimeFormat> other) {
+    public boolean overlapsInclusive(Interval other) {
         return (this.containsPointInclusive(other.start) || this.containsPointInclusive(other.end)) || (other.containsPointInclusive(this.start) || other.containsPointInclusive(this.end));
     }
 
@@ -75,7 +67,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * still contained in the interval. If the given value is outside the
      * interval, the the interval's closest 'edge' is returned.
      */
-    public TimeFormat squeeze(TimeFormat value) {
+    public Date squeeze(Date value) {
         if (this.containsPointInclusive(value)) {
             return value;
         } else if (value.compareTo(start) < 0) {
@@ -94,7 +86,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     }
 
     @Override
-    public int compareTo(Interval<TimeFormat> other) {
+    public int compareTo(Interval other) {
         return this.start.compareTo(other.start);
     }
 
@@ -109,10 +101,10 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * @return the intersected interval, or in special cases, the given or the
      *         current interval
      * */
-    public Interval<TimeFormat> intersectInterval(Interval<TimeFormat> other) {
-        Interval<TimeFormat> result = new Interval<TimeFormat>(this);
+    public Interval intersectInterval(Interval other) {
+        Interval result = new Interval(this);
         if (!this.isValid()) {
-            result = new Interval<TimeFormat>(other);
+            result = new Interval(other);
         } else if (this.overlaps(other)) {
             if (this.start.compareTo(other.start) < 0) {
                 result.start = other.start;
@@ -124,8 +116,8 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         return result;
     }
 
-    public static ArrayList<Interval<Date>> splitInterval(final Interval<Date> interval, int days) {
-        final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
+    public static ArrayList<Interval> splitInterval(final Interval interval, int days) {
+        final ArrayList<Interval> intervals = new ArrayList<Interval>();
 
         final Calendar calendar = new GregorianCalendar();
         Date startDate = interval.start;
@@ -138,10 +130,10 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
             final Date newStartDate = calendar.getTime();
 
             if (interval.containsPointInclusive(newStartDate)) {
-                intervals.add(new Interval<Date>(startDate, calendar.getTime()));
+                intervals.add(new Interval(startDate, calendar.getTime()));
                 startDate = newStartDate;
             } else {
-                intervals.add(new Interval<Date>(startDate, interval.end));
+                intervals.add(new Interval(startDate, interval.end));
                 break;
             }
         }
@@ -151,8 +143,8 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Interval<?>) {
-            Interval<?> s = (Interval<?>) other;
+        if (other instanceof Interval) {
+            Interval s = (Interval) other;
             return (this.start.equals(s.start) && (this.end.equals(s.end)));
         }
         return false;
