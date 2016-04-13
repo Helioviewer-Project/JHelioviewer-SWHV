@@ -69,11 +69,11 @@ public class EVECacheController {
 
     public List<Interval<Date>> addRequest(Band band, Interval<Date> interval) {
         RequestCache rc = getRequestCache(band);
-        return rc.adaptRequestCache(interval.getStart(), interval.getEnd());
+        return rc.adaptRequestCache(interval.start, interval.end);
     }
 
     public EVEValues getDataInInterval(final Band band, final Interval<Date> interval) {
-        if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null) {
+        if (band == null || interval == null) {
             return null;
         }
         return cache.getValuesInInterval(band, interval, DrawController.getSingletonInstance().getGraphArea());
@@ -99,7 +99,7 @@ public class EVECacheController {
     }
 
     public EVEValues downloadData(Band band, Interval<Date> interval, Rectangle plotArea) {
-        if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null) {
+        if (band == null || interval == null) {
             return null;
         }
 

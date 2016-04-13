@@ -45,12 +45,13 @@ public class EVECache {
     }
 
     public EVEValues getValuesInInterval(final Interval<Date> interval, Rectangle space) {
-        long intervalWidth = interval.getEnd().getTime() - interval.getStart().getTime();
+        long intervalStart = interval.start.getTime();
+        long intervalEnd = interval.end.getTime();
+        long intervalWidth = intervalEnd - intervalStart;
         int spaceWidth = space.width;
         long binStart;
         long binEnd;
-        long intervalStart = interval.getStart().getTime();
-        long intervalEnd = interval.getEnd().getTime();
+
         int numberOfBins;
         long timePerBin;
         if (space.width < (intervalWidth / 60000)) {
@@ -95,9 +96,9 @@ public class EVECache {
 
     public boolean hasDataInInterval(Interval<Date> selectedInterval) {
         GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(selectedInterval.getEnd());
+        calendar.setTime(selectedInterval.end);
         int keyEnd = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        calendar.setTime(selectedInterval.getStart());
+        calendar.setTime(selectedInterval.start);
         int key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
 
         while (key <= keyEnd) {

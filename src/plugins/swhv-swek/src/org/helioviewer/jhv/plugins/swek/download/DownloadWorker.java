@@ -41,8 +41,8 @@ public class DownloadWorker implements Runnable {
         isStopped = false;
         requestInterval = interval;
         this.jhvType = jhvType;
-        downloadStartDate = new Date(interval.getStart().getTime());
-        downloadEndDate = new Date(interval.getEnd().getTime());
+        downloadStartDate = new Date(interval.start.getTime());
+        downloadEndDate = new Date(interval.end.getTime());
         eventContainer = JHVEventContainer.getSingletonInstance();
         this.params = params;
     }

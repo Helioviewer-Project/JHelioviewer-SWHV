@@ -85,7 +85,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      */
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawRequest()
      */
@@ -95,7 +95,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawMovieLineRequest(java.util.Date)
      */
@@ -107,9 +107,9 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
         if (time != null && isLocked && currentAvailableInterval.containsPointInclusive(time) && !latestMovieTime.equals(time)) {
             latestMovieTime = time;
 
-            long movieTimeDiff = time.getTime() - currentAvailableInterval.getStart().getTime();
+            long movieTimeDiff = time.getTime() - currentAvailableInterval.start.getTime();
             double availableIntervalWidthScaled = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
-            long availableIntervalWidthAbs = currentAvailableInterval.getEnd().getTime() - currentAvailableInterval.getStart().getTime();
+            long availableIntervalWidthAbs = currentAvailableInterval.end.getTime() - currentAvailableInterval.start.getTime();
             double scaledPerTime = availableIntervalWidthScaled / availableIntervalWidthAbs;
             double scaledMoviePosition = plotAreaSpace.getScaledMinTime() + movieTimeDiff * scaledPerTime;
             double newSelectedScaledStart = scaledMoviePosition - (selectedSpaceWidth / 2);
@@ -124,7 +124,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      */
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * availableIntervalChanged(org.helioviewer.base.math.Interval)
      */
@@ -135,7 +135,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * selectedIntervalChanged(org.helioviewer.base.math.Interval)
      */

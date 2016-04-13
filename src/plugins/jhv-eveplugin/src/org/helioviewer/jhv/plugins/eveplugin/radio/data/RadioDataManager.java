@@ -156,7 +156,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                     BufferedImage newImage = createBufferedImage(dataSize.width, dataSize.height, byteData);
                     bufferedImages.put(imageID, newImage);
                     radioImagePane.setIntervalTooBig(false);
-                    DrawableAreaMap dam = zoomManager.getDrawableAreaMap(image.getVisibleImageTimeInterval().getStart(), image.getVisibleImageTimeInterval().getEnd(), dataFrequencyInterval.getStart(), dataFrequencyInterval.getEnd(), image.getFreqInterval().getStart(), image.getFreqInterval().getEnd(), dataSize);
+                    DrawableAreaMap dam = zoomManager.getDrawableAreaMap(image.getVisibleImageTimeInterval().start, image.getVisibleImageTimeInterval().end, dataFrequencyInterval.getStart(), dataFrequencyInterval.getEnd(), image.getFreqInterval().getStart(), image.getFreqInterval().getEnd(), dataSize);
                     PlotConfig pc = new PlotConfig(newImage, dam, isVisible, imageID);
                     plotConfigList.put(imageID, pc);
                     fireDrawNewBufferedImage();
@@ -331,7 +331,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging() && noDataList.size() > 0) {
             radioImagePane.setIntervalTooBig(false);
             for (Interval<Date> noData : noDataList) {
-                DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.getStart(), noData.getEnd());
+                DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.start, noData.end);
                 noDataConfigList.add(new NoDataConfig(noData, dam, isVisible));
             }
             fireDrawNewBufferedImage();
@@ -453,7 +453,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
             if (ri.getVisibleImageFreqInterval() != null && ri.getVisibleImageTimeInterval() != null) {
                 Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
                 // FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
-                if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
+                if (!visibleDateInterval.start.equals(visibleDateInterval.end)) {
                     JP2ViewCallisto jp2View = jpxData.getView();
                     if (jp2View != null) {
                         JP2ImageCallisto image = jp2View.getJP2Image();
@@ -615,7 +615,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     private void updateNoDataConfig() {
         for (NoDataConfig ndc : noDataConfigList) {
-            DrawableAreaMap dam = zoomManager.getDrawableAreaMap(ndc.getDateInterval().getStart(), ndc.getDateInterval().getEnd());
+            DrawableAreaMap dam = zoomManager.getDrawableAreaMap(ndc.getDateInterval().start, ndc.getDateInterval().end);
             ndc.setDrawableAreaMap(dam);
         }
         fireDrawNewBufferedImage();

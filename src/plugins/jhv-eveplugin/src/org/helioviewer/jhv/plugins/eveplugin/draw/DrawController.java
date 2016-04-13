@@ -33,8 +33,8 @@ import org.helioviewer.jhv.viewmodel.view.View;
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, PlotAreaSpaceListener {
 
     private static DrawController instance;
-    private Interval<Date> selectedInterval = new Interval<Date>(null, null);
-    private Interval<Date> availableInterval = new Interval<Date>(null, null);
+    private Interval<Date> selectedInterval;
+    private Interval<Date> availableInterval;
 
     private PlotAreaSpace pas;
 
@@ -62,6 +62,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
         // axisUnitMap = new HashMap<YAxisElement, String>();
+        Date d = new Date();
+
+        availableInterval = new Interval<Date>(d, d);
+        selectedInterval = availableInterval;
     }
 
     public static DrawController getSingletonInstance() {
@@ -168,7 +172,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if (selectedInterval == null) {
             return false;
         } else {
-            return selectedInterval.getStart() != null && selectedInterval.getEnd() != null;
+            return selectedInterval.start != null && selectedInterval.end != null;
         }
     }
 
@@ -190,18 +194,14 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         // request data if needed
         final Calendar calendar = new GregorianCalendar();
         calendar.clear();
-        calendar.setTime(availableInterval.getEnd());
+        calendar.setTime(availableInterval.end);
         calendar.add(Calendar.DAY_OF_MONTH, -1);
 
-        final Interval<Date> downloadInterval = new Interval<Date>(availableInterval.getStart(), calendar.getTime());
+        final Interval<Date> downloadInterval = new Interval<Date>(availableInterval.start, calendar.getTime());
 
         DownloadController.getSingletonInstance().updateBands(downloadInterval, selectedInterval);
 
-        // check if selected interval is in available interval and correct it if
-        // needed
         setSelectedInterval(selectedInterval, false, false);
-        // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
-        // interval.getEnd());
     }
 
     public final Interval<Date> getAvailableInterval() {
@@ -263,18 +263,19 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     @Override
     public void layerAdded(View view) {
         Interval<Date> interval = new Interval<Date>(Layers.getStartDate().getDate(), Layers.getEndDate().getDate());
-        if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
+        if (availableInterval == null) {
             availableInterval = interval;
         } else {
-            Date start = availableInterval.getStart();
-            if (interval.getStart().before(start)) {
-                start = interval.getStart();
+            Date start = availableInterval.start;
+            if (interval.start.before(start)) {
+                start = interval.start;
             }
-            Date end = availableInterval.getEnd();
-            if (interval.getEnd().after(end)) {
-                end = interval.getEnd();
+            Date end = availableInterval.end;
+            if (interval.end.after(end)) {
+                end = interval.end;
             }
             setAvailableInterval(new Interval<Date>(start, end));
+            System.out.println(start + " " + end);
         }
         TimeIntervalLockModel lockModel = TimeIntervalLockModel.getInstance();
         if (lockModel.isLocked()) {
@@ -291,7 +292,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private Interval<Date> makeCompleteDay(final Interval<Date> interval) {
-        return makeCompleteDay(interval.getStart(), interval.getEnd());
+        return makeCompleteDay(interval.start, interval.end);
     }
 
     private Interval<Date> makeCompleteDay(final Date start, final Date end) {
@@ -338,26 +339,18 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     private void setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace, boolean willUpdatePlotAreaSpace, boolean resetAvailable) {
         keepFullValueRange = useFullValueSpace;
-        if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
-            selectedInterval = new Interval<Date>(null, null);
-        } else if (newSelectedInterval.getStart() == null || newSelectedInterval.getEnd() == null) {
-            selectedInterval = availableInterval;
-        } else if (newSelectedInterval.getStart().before(newSelectedInterval.getEnd())) {
+        if (newSelectedInterval.start.compareTo(newSelectedInterval.end) <= 0) {
             if (availableInterval.containsInclusive(newSelectedInterval)) {
                 selectedInterval = newSelectedInterval;
                 if (resetAvailable) {
                     setAvailableInterval(newSelectedInterval);
                 }
             } else {
-                Date start = newSelectedInterval.getStart();
-                Date end = newSelectedInterval.getEnd();
+                Date start = newSelectedInterval.start;
+                Date end = newSelectedInterval.end;
 
-                // start = availableInterval.containsPointInclusive(start) ?
-                // start : availableInterval.getStart();
-                // end = availableInterval.containsPointInclusive(end) ? end :
-                // availableInterval.getEnd();
-                Date availableStart = availableInterval.getStart();
-                Date availableEnd = availableInterval.getEnd();
+                Date availableStart = availableInterval.start;
+                Date availableEnd = availableInterval.end;
                 boolean changeAvailableInterval = false;
 
                 if (!availableInterval.containsPointInclusive(start) && !availableInterval.containsPointInclusive(end)) {
@@ -399,14 +392,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void updatePlotAreaSpace() {
-        if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
-            long diffAvailable = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
-            double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
-            double scaledSelectedStart = pas.getScaledMinTime() + (1.0 * (selectedInterval.getStart().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
-            double scaledSelectedEnd = pas.getScaledMinTime() + (1.0 * (selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
-            pas.setMinSelectedTimeDiff(60000.0 / diffAvailable);
-            pas.setScaledSelectedTime(scaledSelectedStart, scaledSelectedEnd, true);
-        }
+        long diffAvailable = availableInterval.end.getTime() - availableInterval.start.getTime();
+        double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
+        double scaledSelectedStart = pas.getScaledMinTime() + (1.0 * (selectedInterval.start.getTime() - availableInterval.start.getTime()) * diffPlotAreaTime / diffAvailable);
+        double scaledSelectedEnd = pas.getScaledMinTime() + (1.0 * (selectedInterval.end.getTime() - availableInterval.start.getTime()) * diffPlotAreaTime / diffAvailable);
+        pas.setMinSelectedTimeDiff(60000.0 / diffAvailable);
+        pas.setScaledSelectedTime(scaledSelectedStart, scaledSelectedEnd, true);
     }
 
     private void fireAvailableIntervalChanged() {
@@ -417,30 +408,27 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void plotAreaSpaceChanged(double scaledMinTime, double scaledMaxTime, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
-            long diffTime = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
-            double scaleDiff = scaledMaxTime - scaledMinTime;
-            double selectedMin = (scaledSelectedMinTime - scaledMinTime) / scaleDiff;
-            double selectedMax = (scaledSelectedMaxTime - scaledMinTime) / scaleDiff;
-            Date newSelectedStartTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMin));
-            Date newSelectedEndTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMax));
-            // Log.info("plotareachanged starttime: " + newSelectedStartTime
-            // + " endtime: " + newSelectedEndTime);
-            if (forced || !(newSelectedEndTime.equals(selectedInterval.getEnd()) && newSelectedStartTime.equals(selectedInterval.getStart()))) {
-                setSelectedInterval(new Interval<Date>(newSelectedStartTime, newSelectedEndTime), false, false, false);
-            }
+        long diffTime = availableInterval.end.getTime() - availableInterval.start.getTime();
+        double scaleDiff = scaledMaxTime - scaledMinTime;
+        double selectedMin = (scaledSelectedMinTime - scaledMinTime) / scaleDiff;
+        double selectedMax = (scaledSelectedMaxTime - scaledMinTime) / scaleDiff;
+        Date newSelectedStartTime = new Date(availableInterval.start.getTime() + Math.round(diffTime * selectedMin));
+        Date newSelectedEndTime = new Date(availableInterval.start.getTime() + Math.round(diffTime * selectedMax));
+        if (forced || !(newSelectedEndTime.equals(selectedInterval.end) && newSelectedStartTime.equals(selectedInterval.start))) {
+            setSelectedInterval(new Interval<Date>(newSelectedStartTime, newSelectedEndTime), false, false, false);
         }
+
     }
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
-        if (availableInterval.getStart() != null && availableInterval.getEnd() != null && (oldMinTime > newMinTime || oldMaxTime < newMaxTime)) {
-            double timeRatio = (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime()) / (oldMaxTime - oldMinTime);
+        if (oldMinTime > newMinTime || oldMaxTime < newMaxTime) {
+            double timeRatio = (availableInterval.end.getTime() - availableInterval.start.getTime()) / (oldMaxTime - oldMinTime);
             double startDifference = oldMinTime - newMinTime;
             double endDifference = newMaxTime - oldMaxTime;
 
-            Date tempStartDate = new Date(availableInterval.getStart().getTime() - Math.round(startDifference * timeRatio));
-            Date tempEndDate = new Date(availableInterval.getEnd().getTime() + Math.round(endDifference * timeRatio));
+            Date tempStartDate = new Date(availableInterval.start.getTime() - Math.round(startDifference * timeRatio));
+            Date tempEndDate = new Date(availableInterval.end.getTime() + Math.round(endDifference * timeRatio));
 
             setAvailableInterval(new Interval<Date>(tempStartDate, tempEndDate));
         }

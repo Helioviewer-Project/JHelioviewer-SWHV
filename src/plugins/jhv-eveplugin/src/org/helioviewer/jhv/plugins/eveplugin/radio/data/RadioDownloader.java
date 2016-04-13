@@ -108,13 +108,13 @@ public class RadioDownloader {
                     ImageDownloadWorkerResult result = get();
                     if (result != null) {
                         if (result.isIntervalTooBig()) {
-                            radioDataManager.intervalTooBig(result.getRequestInterval().getStart(), result.getRequestInterval().getEnd());
+                            radioDataManager.intervalTooBig(result.getRequestInterval().start, result.getRequestInterval().end);
                         } else {
                             if (!result.getViews().isEmpty()) {
                                 for (DownloadedJPXData dJPXD : result.getViews()) {
                                     cache.add(dJPXD);
                                 }
-                                radioDataManager.newJPXFilesDownloaded(result.getViews(), result.getRequestInterval().getStart(), result.getRequestInterval().getEnd());
+                                radioDataManager.newJPXFilesDownloaded(result.getViews(), result.getRequestInterval().start, result.getRequestInterval().end);
                             }
                             if (!result.getNoDataIntervals().isEmpty()) {
                                 if (!result.isIntervalTooBig() && result.getViews().isEmpty()) {
@@ -150,8 +150,8 @@ public class RadioDownloader {
     public void requestAndOpenIntervals(List<Interval<Date>> intervals, final double ratioX, final double ratioY) {
         final List<Date> toDownloadStartDates = new ArrayList<Date>();
         for (final Interval<Date> interval : intervals) {
-            Date startDate = interval.getStart();
-            Date endDate = interval.getEnd();
+            Date startDate = interval.start;
+            Date endDate = interval.end;
             if (endDate != null && startDate != null) {
                 // case there were not more than three days
                 while (startDate.compareTo(endDate) <= 0) {

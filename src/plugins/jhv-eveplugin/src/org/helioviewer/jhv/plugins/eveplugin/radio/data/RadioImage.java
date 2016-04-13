@@ -169,49 +169,19 @@ public class RadioImage {
      *            The end frequency of the visible interval
      */
     public void setVisibleIntervals(Date visibleXStart, Date visibleXEnd, int visibleYStart, int visibleYEnd) {
-        // Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        // Log.trace("Image interval : ");
-        // Log.trace("Start x : " + imageTimeInterval.getStart() +
-        // " in milliseconds : " + imageTimeInterval.getStart().getTime());
-        // Log.trace("End x : " + imageTimeInterval.getEnd() +
-        // " in milliseconds : " + imageTimeInterval.getEnd().getTime());
-        // Log.trace("Requested interval : ");
-        // Log.trace("Start x : " + visibleXStart + " in milliseconds : " +
-        // visibleXStart.getTime());
-        // Log.trace("End x : " + visibleXEnd + " in milliseconds : " +
-        // visibleXEnd.getTime());
         if (imageTimeInterval.containsPointInclusive(visibleXStart) || imageTimeInterval.containsPointInclusive(visibleXEnd)) {
-            // the case the requested interval lies completely or partially in
-            // the image interval
+
             Date tempStartX = new Date(imageTimeInterval.squeeze(visibleXStart).getTime());
             Date tempEndX = new Date(imageTimeInterval.squeeze(visibleXEnd).getTime());
             visibleImageTimeInterval = new Interval<Date>(tempStartX, tempEndX);
-            // Log.trace("Resulting visible time interval start : " +
-            // visibleImageTimeInterval.getStart() + " in milliseconds : "
-            // + visibleImageTimeInterval.getStart().getTime());
-            // Log.trace("Resulting visible time interval end : " +
-            // visibleImageTimeInterval.getEnd() + " in milliseconds : "
-            // + visibleImageTimeInterval.getEnd().getTime());
-            // Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         } else {
             Interval<Date> tempInterval = new Interval<Date>(visibleXStart, visibleXEnd);
-            if (tempInterval.containsPointInclusive(imageTimeInterval.getStart()) || tempInterval.containsPointInclusive(imageTimeInterval.getEnd())) {
-                // case image interval completely in requested interval
-                Date tempStartX = new Date(tempInterval.squeeze(imageTimeInterval.getStart()).getTime());
-                Date tempEndX = new Date(tempInterval.squeeze(imageTimeInterval.getEnd()).getTime());
+            if (tempInterval.containsPointInclusive(imageTimeInterval.start) || tempInterval.containsPointInclusive(imageTimeInterval.end)) {
+                Date tempStartX = new Date(tempInterval.squeeze(imageTimeInterval.start).getTime());
+                Date tempEndX = new Date(tempInterval.squeeze(imageTimeInterval.end).getTime());
                 visibleImageTimeInterval = new Interval<Date>(tempStartX, tempEndX);
-                // Log.trace("Resulting visible time interval start : " +
-                // visibleImageTimeInterval.getStart() + " in milliseconds : "
-                // + visibleImageTimeInterval.getStart().getTime());
-                // Log.trace("Resulting visible time interval end : " +
-                // visibleImageTimeInterval.getEnd() + " in milliseconds : "
-                // + visibleImageTimeInterval.getEnd().getTime());
-                // Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             } else {
-                // Other cases: image completely outside the requested interval
                 visibleImageTimeInterval = null;
-                // Log.trace("No resulting visible.");
-                // Log.trace("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             }
 
         }
@@ -237,16 +207,14 @@ public class RadioImage {
         if (visibleImageFreqInterval != null && visibleImageTimeInterval != null) {
             int maxImageWidth = resolutioSet.getResolutionLevel(0).width;
             int maxImageHeight = resolutioSet.getResolutionLevel(0).height;
-            long imageTimesize = imageTimeInterval.getEnd().getTime() - imageTimeInterval.getStart().getTime();
+            long imageTimesize = imageTimeInterval.end.getTime() - imageTimeInterval.start.getTime();
             int imageFrequencySize = imageFreqInterval.getEnd() - imageFreqInterval.getStart();
             double timePerPix = 1.0 * imageTimesize / maxImageWidth;
             double freqPerPix = 1.0 * imageFrequencySize / maxImageHeight;
 
-            int x0 = (int) Math.round((visibleImageTimeInterval.getStart().getTime() - imageTimeInterval.getStart().getTime()) / timePerPix);
-            // int y0 =
-            // (int)Math.round((visibleImageFreqInterval.getStart()-imageFreqInterval.getStart())/freqPerPix);
+            int x0 = (int) Math.round((visibleImageTimeInterval.start.getTime() - imageTimeInterval.start.getTime()) / timePerPix);
             int y0 = (int) Math.round((imageFreqInterval.getEnd() - visibleImageFreqInterval.getEnd()) / freqPerPix);
-            int width = (int) Math.round((visibleImageTimeInterval.getEnd().getTime() - visibleImageTimeInterval.getStart().getTime()) / timePerPix);
+            int width = (int) Math.round((visibleImageTimeInterval.end.getTime() - visibleImageTimeInterval.start.getTime()) / timePerPix);
             int height = (int) Math.round((visibleImageFreqInterval.getEnd() - visibleImageFreqInterval.getStart()) / freqPerPix);
             return new Rectangle(x0, y0, width, height);
         } else {

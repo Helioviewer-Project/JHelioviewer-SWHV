@@ -429,8 +429,8 @@ public class JHVDatabase {
                     if (typeId != -1) {
                         PreparedStatement pstatement = getPreparedStatement(connection, INSERT_DATERANGE);
                         pstatement.setInt(1, typeId);
-                        pstatement.setLong(2, interval.getStart().getTime());
-                        pstatement.setLong(3, interval.getEnd().getTime());
+                        pstatement.setLong(2, interval.start.getTime());
+                        pstatement.setLong(3, interval.end.getTime());
                         pstatement.executeUpdate();
                     }
                 }
@@ -503,7 +503,7 @@ public class JHVDatabase {
             }
 
             for (Interval<Date> interval : typedCache.getAllRequestIntervals()) {
-                copy.add(new Interval(new Date(interval.getStart().getTime()), new Date(interval.getEnd().getTime())));
+                copy.add(new Interval(new Date(interval.start.getTime()), new Date(interval.end.getTime())));
             }
             return copy;
         }

@@ -64,8 +64,8 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
             currentInterval = interval;
         }
         if (interval != null) {
-            minX = currentInterval.getStart();
-            maxX = currentInterval.getEnd();
+            minX = currentInterval.start;
+            maxX = currentInterval.end;
             requestData();
         }
     }
@@ -141,7 +141,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         Interval<Date> currentInterval = drawController.getSelectedInterval();
         if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yAxisElement.getAvailableRange().min && startFreq <= yAxisElement.getAvailableRange().max) && (endFreq >= yAxisElement.getAvailableRange().min && endFreq <= yAxisElement.getAvailableRange().max)) {
             int height = displaySize.height;
-            double ratio = displaySize.getWidth() / (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
+            double ratio = displaySize.getWidth() / (currentInterval.end.getTime() - currentInterval.start.getTime());
             int width = (int) Math.round((endDate.getTime() - startDate.getTime()) * ratio);
             return new Rectangle(width, height);
         } else {
@@ -170,8 +170,8 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     @Override
     public void selectedIntervalChanged(boolean keepFullValueRange) {
         Interval<Date> newInterval = drawController.getSelectedInterval();
-        minX = newInterval.getStart();
-        maxX = newInterval.getEnd();
+        minX = newInterval.start;
+        maxX = newInterval.end;
         isMinXInitialized = true;
         isMaxXInitialized = true;
         requestData();

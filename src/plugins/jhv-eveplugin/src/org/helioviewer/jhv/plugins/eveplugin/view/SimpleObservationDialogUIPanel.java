@@ -10,8 +10,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -127,9 +125,9 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     private void startRadioDownload() {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-        String isoStart = df.format(selectedInterval.getStart());
+        String isoStart = df.format(selectedInterval.start);
         Calendar end = Calendar.getInstance();
-        end.setTime(selectedInterval.getEnd());
+        end.setTime(selectedInterval.end);
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);

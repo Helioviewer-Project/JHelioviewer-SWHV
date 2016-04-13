@@ -61,7 +61,7 @@ public class DownloadController {
     }
 
     public void updateBand(final Band band, final Interval<Date> queryInterval, final Interval<Date> priorityInterval) {
-        if (band == null || queryInterval == null || queryInterval.getStart() == null || queryInterval.getEnd() == null) {
+        if (band == null || queryInterval == null) {
             return;
         }
 
@@ -110,10 +110,10 @@ public class DownloadController {
 
     private Interval<Date> extendQueryInterval(Interval<Date> queryInterval) {
         GregorianCalendar cs = new GregorianCalendar();
-        cs.setTime(queryInterval.getStart());
+        cs.setTime(queryInterval.start);
         cs.add(Calendar.DAY_OF_MONTH, -7);
         GregorianCalendar ce = new GregorianCalendar();
-        ce.setTime(queryInterval.getEnd());
+        ce.setTime(queryInterval.end);
         ce.add(Calendar.DAY_OF_MONTH, +7);
         return new Interval<Date>(cs.getTime(), ce.getTime());
     }
@@ -226,7 +226,7 @@ public class DownloadController {
         @Override
         public void run() {
             try {
-                if (interval.getStart() != null && interval.getEnd() != null) {
+                if (interval.start != null && interval.end != null) {
                     requestData();
                 }
             } finally {
@@ -287,7 +287,7 @@ public class DownloadController {
         private URL buildRequestURL(final Interval<Date> interval, final BandType type) throws MalformedURLException {
             final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
 
-            return new URL(type.getBaseUrl() + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.getStart()) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.getEnd()) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + type.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
+            return new URL(type.getBaseUrl() + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.start) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.end) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + type.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
         }
 
         private void addDataToCache(final Band band, final float[] values, final long[] dates) {
