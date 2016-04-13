@@ -8,13 +8,7 @@ import java.util.GregorianCalendar;
 public class Interval implements Comparable<Interval> {
 
     public Date start;
-
     public Date end;
-
-    private Interval(Interval other) {
-        this.start = other.start;
-        this.end = other.end;
-    }
 
     public Interval(Date start, Date end) {
         this.start = start;
@@ -25,37 +19,13 @@ public class Interval implements Comparable<Interval> {
         }
     }
 
-    public boolean contains(Interval other) {
-        return this.containsPoint(other.start) && this.containsPoint(other.end);
-    }
-
-    public boolean containsFully(Interval other) {
-        return this.containsPointFully(other.start) && this.containsPointFully(other.end);
-    }
-
     public boolean containsInclusive(Interval other) {
         return this.containsPointInclusive(other.start) && this.containsPointInclusive(other.end);
-    }
-
-    public boolean containsPoint(Date time) {
-        // start inclusive, end exclusive!
-        assert start.compareTo(end) <= 0;
-        return (time.compareTo(this.start) >= 0) && (time.compareTo(this.end) < 0);
-        // return (time >= this.start) && (time < this.end);
-    }
-
-    public boolean containsPointFully(Date time) {
-        assert start.compareTo(end) <= 0;
-        return (time.compareTo(this.start) > 0) && (time.compareTo(this.end) < 0);
     }
 
     public boolean containsPointInclusive(Date time) {
         assert start.compareTo(end) <= 0;
         return (time.compareTo(this.start) >= 0) && (time.compareTo(this.end) <= 0);
-    }
-
-    public boolean overlaps(Interval other) {
-        return (this.containsPoint(other.start) || this.containsPoint(other.end)) || (other.containsPoint(this.start) || other.containsPoint(this.end));
     }
 
     public boolean overlapsInclusive(Interval other) {
@@ -88,32 +58,6 @@ public class Interval implements Comparable<Interval> {
     @Override
     public int compareTo(Interval other) {
         return this.start.compareTo(other.start);
-    }
-
-    /**
-     * Returns the intersection of this and the given interval.
-     * <p>
-     * If both intervals do not overlap the current interval will be returned.
-     * If the current interval is not valid, the given interval is returned.
-     *
-     * @param other
-     *            the interval to get the intersection with current one
-     * @return the intersected interval, or in special cases, the given or the
-     *         current interval
-     * */
-    public Interval intersectInterval(Interval other) {
-        Interval result = new Interval(this);
-        if (!this.isValid()) {
-            result = new Interval(other);
-        } else if (this.overlaps(other)) {
-            if (this.start.compareTo(other.start) < 0) {
-                result.start = other.start;
-            }
-            if (this.end.compareTo(other.end) > 0) {
-                result.end = other.end;
-            }
-        }
-        return result;
     }
 
     public static ArrayList<Interval> splitInterval(final Interval interval, int days) {
@@ -153,13 +97,6 @@ public class Interval implements Comparable<Interval> {
     @Override
     public int hashCode() {
         return (this.start.toString() + " - " + this.end.toString()).hashCode();
-    }
-
-    private boolean isValid() {
-        if (this.start.compareTo(this.end) > 0) {
-            return false;
-        }
-        return true;
     }
 
 }
