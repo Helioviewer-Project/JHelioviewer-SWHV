@@ -2,7 +2,6 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -120,9 +119,9 @@ public class JHVRelatedEvents {
         }
     }
 
-    public JHVEvent getClosestTo(Date timestamp) {
+    public JHVEvent getClosestTo(long timestamp) {
         for (JHVEvent event : events) {
-            if (event.start <= timestamp.getTime() && event.end >= timestamp.getTime()) {
+            if (event.start <= timestamp && event.end >= timestamp) {
                 return event;
             }
         }

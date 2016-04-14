@@ -411,7 +411,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Point p = e.getPoint();
 
         if (event != null) {
-            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(mouseToDate(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE))));
+            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(mouseToTimestamp(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE))));
             dialog.setLocation(e.getLocationOnScreen());
             dialog.validate();
             dialog.pack();
@@ -421,11 +421,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private Date mouseToDate(Point point) {
+    private long mouseToTimestamp(Point point) {
         Interval interval = drawController.getSelectedInterval();
-        final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
-        final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.start);
-        return new Date(millis);
+        int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
+        return (long) ((x - graphArea.x) / ratioX) + interval.start;
     }
 
     @Override

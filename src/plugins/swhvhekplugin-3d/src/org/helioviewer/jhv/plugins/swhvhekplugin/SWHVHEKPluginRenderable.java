@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +90,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private static final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
-    private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, Date timestamp) {
+    private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         Map<String, JHVEventParameter> params = evt.getAllEventParameters();
         double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(params);
         double angularWidth = Math.toRadians(angularWidthDegree);
@@ -100,7 +99,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double speed = SWHVHEKData.readCMESpeed(params);
         double factor = Sun.RadiusMeter;
         double distSunBegin = 2.4;
-        double distSun = distSunBegin + speed * (timestamp.getTime() - evt.start) / factor;
+        double distSun = distSunBegin + speed * (timestamp - evt.start) / factor;
         int lineResolution = 2;
         int angularResolution = (int) (angularWidthDegree / 4);
 
@@ -259,14 +258,14 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, Date timestamp, GridScale scale, Viewport vp) {
+    private void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale, Viewport vp) {
         Map<String, JHVEventParameter> params = evt.getAllEventParameters();
         double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(params);
         double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(params) - 90;
         double speed = SWHVHEKData.readCMESpeed(params);
         double factor = Sun.RadiusMeter;
         double distSunBegin = 2.4;
-        double distSun = distSunBegin + speed * (timestamp.getTime() - evt.start) / factor;
+        double distSun = distSunBegin + speed * (timestamp - evt.start) / factor;
 
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
