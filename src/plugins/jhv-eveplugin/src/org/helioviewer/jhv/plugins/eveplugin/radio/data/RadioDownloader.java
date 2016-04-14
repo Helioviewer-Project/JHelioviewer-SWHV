@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,7 +53,7 @@ public class RadioDownloader {
         return nextID;
     }
 
-    public void requestAndOpenRemoteFile(final Date startDateOuter, final Date endDateOuter) {
+    public void requestAndOpenRemoteFile(final long startDateOuter, final long endDateOuter) {
         radioDataManager.removeSpectrograms();
 
         JHVWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker = new JHVWorker<ImageDownloadWorkerResult, Void>() {
@@ -66,10 +65,9 @@ public class RadioDownloader {
                     List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                     boolean intervalTooBig = false;
 
-                    long startDate = startDateOuter.getTime();
-                    long endDate = endDateOuter.getTime();
+                    long startDate = startDateOuter;
+                    long endDate = endDateOuter;
                     long duration = endDate - startDate;
-                    Date requestedStartDate = new Date(startDate);
                     if (duration >= 0 && duration <= MAXIMUM_DAYS) {
                         // case there were not more than three days
                         while (startDate <= endDate) {
@@ -80,15 +78,15 @@ public class RadioDownloader {
                                 jpxList.add(newJPXData);
                                 // cache.add(newJPXData);
                             } else {
-                                Log.error("Received null view in request and open for date " + startDate + " and " + endDate);
-                                noDataInterval.add(new Interval(startDate, calculateOneDayFurtherAsDate(startDate)));
+                                Log.error("Received null view in request and open for date " + TimeUtils.apiDateFormat.format(startDate) + " and " + TimeUtils.apiDateFormat.format(startDate));
+                                noDataInterval.add(new Interval(startDate, startDate + TimeUtils.DAY_IN_MILLIS));
                             }
-                            startDate = calculateOneDayFurtherAsDate(startDate);
+                            startDate += TimeUtils.DAY_IN_MILLIS;
                         }
                     } else {
                         intervalTooBig = true;
                     }
-                    Interval requestInterval = new Interval(requestedStartDate.getTime(), endDate);
+                    Interval requestInterval = new Interval(startDateOuter, endDate);
                     return new ImageDownloadWorkerResult(jpxList, noDataInterval, intervalTooBig, requestInterval, new ArrayList<Long>());
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
@@ -116,11 +114,8 @@ public class RadioDownloader {
                                 }
                                 List<Interval> noDataList = new ArrayList<Interval>();
                                 for (Interval noData : result.getNoDataIntervals()) {
-                                    // if (cache.addNoDataInterval(noData,
-                                    // identifier)) {
                                     cache.addNoDataInterval(noData);
                                     noDataList.add(noData);
-                                    // }
                                 }
                                 radioDataManager.newNoData(noDataList);
                             }
@@ -159,7 +154,7 @@ public class RadioDownloader {
                         requestDateCache.remove(startDate);
                     }
                 }
-                startDate = calculateOneDayFurtherAsDate(startDate);
+                startDate += TimeUtils.DAY_IN_MILLIS;
             }
         }
 
@@ -180,10 +175,10 @@ public class RadioDownloader {
                     }
                     if (v != null) {
                         long imageID = getNextID();
-                        DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, date, calculateOneDayFurtherAsDate(date));
+                        DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, date, date + TimeUtils.DAY_IN_MILLIS);
                         jpxList.add(newJPXData);
                     } else {
-                        noDataList.add(new Interval(date, calculateOneDayFurtherAsDate(date)));
+                        noDataList.add(new Interval(date, date + TimeUtils.DAY_IN_MILLIS));
                     }
                 }
                 return new ImageDownloadWorkerResult(jpxList, noDataList, false, null, datesToDownload);
@@ -230,10 +225,6 @@ public class RadioDownloader {
 
         imageDownloadWorker.setThreadName("EVE--RadioDownloader2");
         EVESettings.getExecutorService().execute(imageDownloadWorker);
-    }
-
-    private long calculateOneDayFurtherAsDate(long date) {
-        return date + 86400000;
     }
 
     /**
