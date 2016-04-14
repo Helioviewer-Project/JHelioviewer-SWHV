@@ -23,7 +23,6 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
-import org.helioviewer.jhv.plugins.eveplugin.settings.EVEAPI;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.threads.JHVThread;
@@ -274,7 +273,9 @@ public class DownloadController {
         }
 
         private URL buildRequestURL(final Interval interval, final BandType type) throws MalformedURLException {
-            return new URL(type.getBaseUrl() + EVEAPI.API_URL_PARAMETER_STARTDATE + TimeUtils.dateFormat.format(interval.start) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + TimeUtils.dateFormat.format(interval.end) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + type.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
+            String urlf = type.getBaseUrl() + "start_date=%s&end_date=%s&timeline=%s&data_format=json";
+            String url = String.format(urlf, TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
+            return new URL(url);
         }
 
         private void addDataToCache(final Band band, final float[] values, final long[] dates) {

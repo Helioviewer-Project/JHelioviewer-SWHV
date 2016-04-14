@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 
 public class EVECacheController {
 
@@ -43,13 +42,6 @@ public class EVECacheController {
     public List<Interval> addRequest(Band band, Interval interval) {
         RequestCache rc = getRequestCache(band);
         return rc.adaptRequestCache(interval.start, interval.end);
-    }
-
-    public EVEValues getDataInInterval(final Band band, final Interval interval) {
-        if (band == null || interval == null) {
-            return null;
-        }
-        return cache.getValuesInInterval(band, interval, DrawController.getSingletonInstance().getGraphArea());
     }
 
     public List<Interval> getMissingDaysInInterval(final Band band, final Interval interval) {
