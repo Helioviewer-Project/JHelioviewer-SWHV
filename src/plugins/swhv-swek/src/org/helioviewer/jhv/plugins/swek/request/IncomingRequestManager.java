@@ -46,10 +46,10 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     @Override
     public ArrayList<JHVEvent> getOtherRelations(JHVEvent event) {
         SWEKEventType evt = event.getJHVEventType().getEventType();
-        ArrayList<JsonEvent> jsonEvents = new ArrayList<JsonEvent>();
         ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
 
         for (SWEKRelatedEvents re : evt.getSwekRelatedEvents()) {
+            ArrayList<JsonEvent> jsonEvents = new ArrayList<JsonEvent>();
             if (re.getEvent() == evt) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
                 for (SWEKRelatedOn swon : relon) {
