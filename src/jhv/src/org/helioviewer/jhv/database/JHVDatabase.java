@@ -161,7 +161,6 @@ public class JHVDatabase {
             pstatement.setString(1, eventType.getEventType().getEventName());
             pstatement.setString(2, eventType.getSupplier().getSupplierKey());
             pstatement.executeUpdate();
-            pstatement.close();
             String dbName = eventType.getSupplier().getDatabaseName();
             StringBuilder createtbl = new StringBuilder();
             createtbl.append("CREATE TABLE ").append(dbName).append(" (");
