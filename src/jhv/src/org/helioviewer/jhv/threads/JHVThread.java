@@ -37,7 +37,7 @@ public class JHVThread {
 
     public static class ConnectionThread extends Thread {
         private static Connection connection;
-        private static final int CURRENT_VERSION_SCHEMA = 3;
+        private static final int CURRENT_VERSION_SCHEMA = 4;
         public static final HashMap<JHVEventType, RequestCache> downloadedCache = new HashMap<JHVEventType, RequestCache>();
 
         public ConnectionThread(Runnable r, String name) {
@@ -85,8 +85,7 @@ public class JHVThread {
 
                     if (!fexist) {
                         createSchema();
-                    }
-                    else {
+                    } else {
                         String sqlt = "SELECT version, hash from version LIMIT 1";
                         int found_version = -1;
                         int found_hash = -1;
@@ -111,12 +110,13 @@ public class JHVThread {
                     connection = null;
                 }
             }
-            if (connection != null)
+            if (connection != null) {
                 try {
                     connection.setAutoCommit(false);
                 } catch (SQLException e) {
                     Log.error("Could not set autocommit off");
                 }
+            }
             return connection;
         }
     }
