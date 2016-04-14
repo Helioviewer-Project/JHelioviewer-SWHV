@@ -1,24 +1,18 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class EVEDataOfDay {
 
-    private static final int MINUTES_PER_DAY = 1440;
-
-    private final float[] values = new float[MINUTES_PER_DAY];
-    private final long[] dates = new long[MINUTES_PER_DAY];
+    private final float[] values = new float[EVECache.CHUNKED_SIZE];
+    private final long[] dates = new long[EVECache.CHUNKED_SIZE];
     private boolean hasData = false;
 
-    public EVEDataOfDay(final int year, final int month, final int dayOfMonth) {
-        GregorianCalendar calendar = new GregorianCalendar(year, month, dayOfMonth);
-
+    public EVEDataOfDay(final long key) {
         Arrays.fill(values, Float.NaN);
+        long startdate = key * EVECache.MILLIS_PER_CHUNK;
         for (int i = 0; i < values.length; i++) {
-            dates[i] = calendar.getTime().getTime();
-            calendar.add(Calendar.MINUTE, 1);
+            dates[i] = startdate + i * EVECache.MILLIS_PER_TICK;
         }
     }
 
