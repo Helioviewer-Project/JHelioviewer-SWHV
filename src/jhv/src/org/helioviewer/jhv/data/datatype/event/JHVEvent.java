@@ -9,15 +9,14 @@ public class JHVEvent {
 
     public final long start;
     public final long end;
+
     private final String eventName;
     private final String eventDisplayName;
+
     private Map<String, JHVEventParameter> allParameters;
     private Map<String, JHVEventParameter> allVisibleParameters;
-    private Map<String, JHVEventParameter> allVisibleNotNullParameters;
-    private Map<String, JHVEventParameter> allVisibleNullParameters;
     private Map<String, JHVEventParameter> allNonVisibleParameters;
-    private Map<String, JHVEventParameter> allNonVisibleNotNullParameters;
-    private Map<String, JHVEventParameter> allNonVisibleNullParameters;
+
     private final JHVEventType eventType;
     private JHVPositionInformation positionInformation = JHVPositionInformation.NULLINFO;
     private Position.Q earthPosition = null;
@@ -36,11 +35,7 @@ public class JHVEvent {
     private void initLists() {
         allParameters = new HashMap<String, JHVEventParameter>();
         allVisibleParameters = new HashMap<String, JHVEventParameter>();
-        allVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
-        allVisibleNullParameters = new HashMap<String, JHVEventParameter>();
         allNonVisibleParameters = new HashMap<String, JHVEventParameter>();
-        allNonVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
-        allNonVisibleNullParameters = new HashMap<String, JHVEventParameter>();
     }
 
     public Map<String, JHVEventParameter> getAllEventParameters() {
@@ -51,24 +46,8 @@ public class JHVEvent {
         return allVisibleParameters;
     }
 
-    public Map<String, JHVEventParameter> getVisibleNotNullEventParameters() {
-        return allVisibleNotNullParameters;
-    }
-
-    public Map<String, JHVEventParameter> getVisibleNullEventParameters() {
-        return allVisibleNullParameters;
-    }
-
     public Map<String, JHVEventParameter> getNonVisibleEventParameters() {
         return allNonVisibleParameters;
-    }
-
-    public Map<String, JHVEventParameter> getNonVisibleNotNullEventParameters() {
-        return allNonVisibleNotNullParameters;
-    }
-
-    public Map<String, JHVEventParameter> getNonVisibleNullEventParameters() {
-        return allNonVisibleNullParameters;
     }
 
     public String getName() {
@@ -112,18 +91,8 @@ public class JHVEvent {
         if (configured) {
             if (visible) {
                 allVisibleParameters.put(name, parameter);
-                if (parameter.getParameterValue() == null || (parameter.getParameterValue().trim().length() == 0)) {
-                    allVisibleNullParameters.put(name, parameter);
-                } else {
-                    allVisibleNotNullParameters.put(name, parameter);
-                }
             } else {
                 allNonVisibleParameters.put(name, parameter);
-                if (parameter.getParameterValue() == null || (parameter.getParameterValue().trim().length() == 0)) {
-                    allNonVisibleNullParameters.put(name, parameter);
-                } else {
-                    allNonVisibleNotNullParameters.put(name, parameter);
-                }
             }
         }
     }
@@ -144,16 +113,17 @@ public class JHVEvent {
         boolean visible = false;
         boolean configured = false;
         String displayName;
+
         SWEKParameter p = eventType.getEventType().getParameter(keyString);
         if (p == null) {
             p = eventType.getSupplier().getSource().getParameter(keyString);
         }
+
         if (p != null) {
             configured = true;
             visible = p.isDefaultVisible();
             displayName = p.getParameterDisplayName();
-        }
-        else {
+        } else {
             displayName = keyString.replaceAll("_", " ").trim();
         }
 

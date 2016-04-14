@@ -363,7 +363,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, Point pt) {
         JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
-        Map<String, JHVEventParameter> params = evt.getVisibleNotNullEventParameters();
+        Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
         ArrayList<String> txts = new ArrayList<String>();
 
         for (JHVEventParameter p : params.values()) {
