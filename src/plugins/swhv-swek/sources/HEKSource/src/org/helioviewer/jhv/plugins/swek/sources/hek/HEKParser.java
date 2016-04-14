@@ -71,8 +71,13 @@ public class HEKParser implements SWEKParser {
                         hgsX = Double.valueOf(value);
                     } else if (keyString.equals("hgs_y")) {
                         hgsY = Double.valueOf(value);
+                    } else if (keyString.equals("rasterscan") ||
+                              keyString.startsWith("hgc_") || keyString.startsWith("hgs_") || keyString.startsWith("hpc_") || keyString.startsWith("hrc_")) {
+                        // nothing, delete
                     } else {
-                        currentEvent.addParameter(originalKeyString, value);
+                        value = value.trim();
+                        if (value.length() != 0)
+                            currentEvent.addParameter(originalKeyString, value);
                     }
                 }
             }
