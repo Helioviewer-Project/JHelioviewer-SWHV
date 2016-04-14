@@ -474,7 +474,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mouseDragPosition = null;
     }
 
-    public void mouseHelper(double distanceY) {
+    private void mouseHelper(double distanceY) {
         Set<ValueSpace> valueSpaces = plotAreaSpace.getValueSpaces();
         for (ValueSpace vs : valueSpaces) {
             vs.shiftDownPixels(distanceY, graphArea.height);

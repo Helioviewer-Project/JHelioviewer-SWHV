@@ -4,8 +4,8 @@ public class RequestConfig {
 
     public final long xStart;
     public final long xEnd;
-    public final double yStart;
-    public final double yEnd;
+    private final double yStart;
+    private final double yEnd;
     public final double xRatio;
     public final double yRatio;
 

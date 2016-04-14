@@ -754,11 +754,9 @@ public class JHVDatabase {
 
     private static ArrayList<JsonEvent> getEventJSON(ResultSet rs) {
         ArrayList<JsonEvent> eventList = new ArrayList<JsonEvent>();
-        boolean next;
         try {
-            next = rs.next();
-
-            while (!rs.isClosed() && next) {
+            boolean next = rs.next();
+            while (next) {
                 int id = rs.getInt(1);
                 long start = rs.getLong(2);
                 long end = rs.getLong(3);

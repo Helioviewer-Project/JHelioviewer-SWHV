@@ -12,7 +12,7 @@ public class JHVDate implements Comparable<JHVDate> {
      * No arguments may be negative or an exception will be thrown.
      * NOTE: Month argument is zero based... i.e. January corresponds to 0
      */
-    public JHVDate(int _year, int _month, int _day, int _hour, int _minute, int _second) {
+    private JHVDate(int _year, int _month, int _day, int _hour, int _minute, int _second) {
         if ((_year | _month | _day | _hour | _minute | _second) < 0)
             throw new IllegalArgumentException("Arguments cannot be negative!");
 

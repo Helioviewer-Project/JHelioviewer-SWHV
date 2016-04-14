@@ -99,7 +99,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
         double selectedSpaceWidth = plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
 
         Interval currentAvailableInterval = drawController.getAvailableInterval();
-        if (time != Long.MIN_VALUE && isLocked && currentAvailableInterval.containsPointInclusive(time) && latestMovieTime != time) {
+        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && currentAvailableInterval.containsPointInclusive(time)) {
             latestMovieTime = time;
 
             long movieTimeDiff = time - currentAvailableInterval.start;

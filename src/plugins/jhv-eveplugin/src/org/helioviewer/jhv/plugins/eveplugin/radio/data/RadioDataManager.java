@@ -178,7 +178,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      * @param drd
      *            The download request data that should be removed
      */
-    public void removeRadioData() {
+    private void removeRadioData() {
         if (radioImages != null) {
             lineDataSelectorModel.removeLineData(this);
             for (long imageID : radioImages.keySet()) {
@@ -246,7 +246,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      * @param plotIdentifier
      *            The identifier of the plot for which new data is requested
      */
-    public void requestForData(long xStart, long xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
+    private void requestForData(long xStart, long xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
         if (!requestForDataBusy && !requestBuffer.hasData()) {
             requestForDataBusy = true;
             requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));

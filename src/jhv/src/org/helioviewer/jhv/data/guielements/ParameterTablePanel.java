@@ -37,24 +37,12 @@ import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 @SuppressWarnings("serial")
 public class ParameterTablePanel extends JPanel {
 
-    /** the table */
-    private final JTable table;
-    /** the model for the table */
-    private final ParameterTableModel parameterModel;
-
-    private final TableRowSorter<ParameterTableModel> sorter;
-
-    /**
-     * Creates a table panel for the given parameters.
-     *
-     * @param parameters
-     *            the parameters
-     */
     public ParameterTablePanel(Collection<JHVEventParameter> parameters) {
         super();
         setLayout(new BorderLayout());
-        parameterModel = new ParameterTableModel(parameters);
-        table = new JTable(parameterModel);
+
+        ParameterTableModel parameterModel = new ParameterTableModel(parameters);
+        JTable table = new JTable(parameterModel);
             /* {
              * @Override public boolean getScrollableTracksViewportWidth() {
              * return getPreferredSize().width < getParent().getWidth(); }
@@ -67,9 +55,10 @@ public class ParameterTablePanel extends JPanel {
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.setPreferredScrollableViewportSize(new Dimension(table.getWidth(), 150));
         // table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
-        table.setRowSorter(sorter);
+
+        TableRowSorter<ParameterTableModel> sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
         sorter.toggleSortOrder(0);
+        table.setRowSorter(sorter);
 
         WrappedTextCellRenderer renderer = new WrappedTextCellRenderer();
         table.setDefaultRenderer(String.class, renderer);

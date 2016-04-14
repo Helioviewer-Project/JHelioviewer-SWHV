@@ -52,7 +52,7 @@ public abstract class SWEKDownloader {
         }
     }
 
-    public boolean parseStream(InputStream stream, JHVEventType type) {
+    private boolean parseStream(InputStream stream, JHVEventType type) {
         if (stream == null) {
             Log.error("Download input stream was null. Probably HEK is down.");
             return false;
