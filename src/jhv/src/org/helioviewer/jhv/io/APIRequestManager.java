@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -56,16 +55,16 @@ public class APIRequestManager {
      * @throws IOException
      * @throws MalformedURLException
      */
-    public static Date getLatestImageDate(String observatory, String instrument, String detector, String measurement, boolean message) {
-        Date date = new Date();
+    public static long getLatestImageDate(String observatory, String instrument, String detector, String measurement, boolean message) {
+        long timestamp = System.currentTimeMillis();
         boolean readDate = false;
         View view = null;
 
         try {
             String server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
-            view = loadImage(server, observatory, instrument, detector, measurement, TimeUtils.apiDateFormat.format(date), message);
+            view = loadImage(server, observatory, instrument, detector, measurement, TimeUtils.apiDateFormat.format(timestamp), message);
             if (view != null) {
-                date = view.getFirstTime().getDate();
+                timestamp = view.getFirstTime().milli;
                 readDate = true;
 
                 EventQueue.invokeLater(new Runnable() {
@@ -91,9 +90,9 @@ public class APIRequestManager {
         }
 
         if (readDate) {
-            return date;
+            return timestamp;
         } else {
-            return new Date(System.currentTimeMillis() - 48 * 60 * 60 * 1000);
+            return System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS;
         }
     }
 
