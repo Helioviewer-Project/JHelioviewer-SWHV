@@ -218,12 +218,12 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         public int compare(T l1, T l2) {
             JHVDate startDate = Layers.getStartDate();
             long start;
-            if (Layers.getStartDate() != null)
+            if (startDate != null)
                 start = startDate.milli;
             else
                 start = System.currentTimeMillis();
-            long d1 = l1.getDownloadEndDate().getTime() - start;
-            long d2 = l2.getDownloadEndDate().getTime() - start;
+            long d1 = l1.getRequestInterval().end - start;
+            long d2 = l2.getRequestInterval().end - start;
             return d1 < d2 ? 1 : -1;
         }
     }
