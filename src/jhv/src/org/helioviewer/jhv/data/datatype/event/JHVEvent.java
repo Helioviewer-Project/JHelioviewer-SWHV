@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.data.datatype.event;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,8 +7,8 @@ import org.helioviewer.jhv.base.astronomy.Position;
 
 public class JHVEvent {
 
-    private final Date startDate;
-    private final Date endDate;
+    public final long start;
+    public final long end;
     private final String eventName;
     private final String eventDisplayName;
     private Map<String, JHVEventParameter> allParameters;
@@ -24,13 +23,13 @@ public class JHVEvent {
     private Position.Q earthPosition = null;
     private Integer id;
 
-    public JHVEvent(String _eventName, String _eventDisplayName, JHVEventType _eventType, int _id, Date _start, Date _end) {
+    public JHVEvent(String _eventName, String _eventDisplayName, JHVEventType _eventType, int _id, long _start, long _end) {
         initLists();
         eventName = _eventName;
         eventDisplayName = _eventDisplayName;
         eventType = _eventType;
-        startDate = _start;
-        endDate = _end;
+        start = _start;
+        end = _end;
         id = _id;
     }
 
@@ -42,14 +41,6 @@ public class JHVEvent {
         allNonVisibleParameters = new HashMap<String, JHVEventParameter>();
         allNonVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
         allNonVisibleNullParameters = new HashMap<String, JHVEventParameter>();
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
     }
 
     public Map<String, JHVEventParameter> getAllEventParameters() {

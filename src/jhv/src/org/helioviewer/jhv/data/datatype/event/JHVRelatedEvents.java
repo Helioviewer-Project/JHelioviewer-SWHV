@@ -42,13 +42,12 @@ public class JHVRelatedEvents {
             eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
         eventsMap.get(eventType).remove(interval);
-        long time = evt.getStartDate().getTime();
-        if (time < interval.start) {
-            interval.start = time;
+        if (evt.start < interval.start) {
+            interval.start = evt.start;
         }
-        time = evt.getEndDate().getTime();
-        if (time > interval.end) {
-            interval.end = time;
+
+        if (evt.end > interval.end) {
+            interval.end = evt.end;
         }
         events.add(evt);
         eventsMap.get(eventType).put(interval, this);
@@ -123,7 +122,7 @@ public class JHVRelatedEvents {
 
     public JHVEvent getClosestTo(Date timestamp) {
         for (JHVEvent event : events) {
-            if (event.getStartDate().getTime() <= timestamp.getTime() && event.getEndDate().getTime() >= timestamp.getTime()) {
+            if (event.start <= timestamp.getTime() && event.end >= timestamp.getTime()) {
                 return event;
             }
         }
@@ -187,11 +186,11 @@ public class JHVRelatedEvents {
         interval.start = Long.MAX_VALUE;
         interval.end = Long.MIN_VALUE;
         for (JHVEvent evt : events) {
-            long time = evt.getStartDate().getTime();
+            long time = evt.start;
             if (time < interval.start) {
                 interval.start = time;
             }
-            time = evt.getEndDate().getTime();
+            time = evt.end;
             if (time > interval.end) {
                 interval.end = time;
             }

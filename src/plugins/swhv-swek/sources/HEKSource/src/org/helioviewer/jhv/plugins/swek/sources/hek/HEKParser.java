@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
@@ -32,7 +31,7 @@ public class HEKParser implements SWEKParser {
     public JHVEvent parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
         JSONObject result = new JSONObject(json);
         String name = type.getEventType().getEventName();
-        final JHVEvent currentEvent = new JHVEvent(name, name, type, id, new Date(start), new Date(end));
+        final JHVEvent currentEvent = new JHVEvent(name, name, type, id, start, end);
         boolean success = parseResult(result, currentEvent);
 
         if (!success) {
@@ -252,7 +251,7 @@ public class HEKParser implements SWEKParser {
                 }
             }
 
-            Position.L p = Sun.getEarth(new JHVDate(currentEvent.getStartDate().getTime()));
+            Position.L p = Sun.getEarth(new JHVDate(currentEvent.start));
             if (currentEvent.getName().equals("Coronal Mass Ejection")) // reduce memory usage
                 currentEvent.addEarthPosition(new Position.Q(p.time, p.rad, new Quat(p.lat, p.lon)));
 

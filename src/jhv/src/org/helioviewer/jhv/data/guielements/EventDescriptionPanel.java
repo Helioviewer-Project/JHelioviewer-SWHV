@@ -27,6 +27,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 public class EventDescriptionPanel extends JPanel implements MouseListener {
 
     private final JHVRelatedEvents revent;
+
     // private final JHVEvent event;
 
     public EventDescriptionPanel(JHVRelatedEvents revent, JHVEvent event) {
@@ -40,12 +41,12 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
         textType.setFont(labelIcon.getFont());
         textType.setMargin(new Insets(0, 0, 0, 0));
 
-        JTextArea textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getStartDate()));
+        JTextArea textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.start));
         textStartTime.setBackground(getBackground());
         textStartTime.setFont(labelIcon.getFont());
         textStartTime.setMargin(new Insets(0, 0, 0, 0));
 
-        JTextArea textEndTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getEndDate()));
+        JTextArea textEndTime = new JTextArea(TimeUtils.utcDateFormat.format(event.end));
         textEndTime.setBackground(getBackground());
         textEndTime.setFont(labelIcon.getFont());
         textEndTime.setMargin(new Insets(0, 0, 0, 0));

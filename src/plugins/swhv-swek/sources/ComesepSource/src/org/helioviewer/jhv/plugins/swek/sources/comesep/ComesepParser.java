@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
-import java.util.Date;
 import java.util.Iterator;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -41,7 +40,7 @@ public class ComesepParser implements SWEKParser {
         JSONObject result = new JSONObject(json);
         String name = type.getEventType().getEventName();
 
-        final JHVEvent currentEvent = new JHVEvent(name, name, type, id, new Date(start), new Date(end));
+        final JHVEvent currentEvent = new JHVEvent(name, name, type, id, start, end);
         boolean success = parseResult(result, currentEvent);
         if (!success) {
             return null;
