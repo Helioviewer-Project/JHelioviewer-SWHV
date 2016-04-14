@@ -72,7 +72,7 @@ public class JHVDatabase {
     private static final String INSERT_DATERANGE = "INSERT INTO date_range(type_id,  start, end) VALUES(?,?,?)";
     private static final String SELECT_DATERANGE = "SELECT start, end FROM date_range where type_id=? order by start, end ";
     private static final String SELECT_LAST_EVENT = "SELECT end FROM events WHERE type_id=? order by end DESC LIMIT 1";
-    private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link " + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id " + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id ";
+    private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link " + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id " + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id " + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
 
     private static HashMap<Object, PreparedStatement> statements = new HashMap<Object, PreparedStatement>();
 
