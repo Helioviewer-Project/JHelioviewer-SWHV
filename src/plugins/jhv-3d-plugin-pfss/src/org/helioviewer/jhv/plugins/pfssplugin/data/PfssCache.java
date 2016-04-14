@@ -22,7 +22,7 @@ public class PfssCache {
         }
     }
 
-    public void bubbleSort() {
+    private void bubbleSort() {
         boolean swapped = true;
         int j = 0;
         PfssData tmp;
@@ -62,7 +62,7 @@ public class PfssCache {
         }
     }
 
-    public int binarySearch(long timestamp) {
+    private int binarySearch(long timestamp) {
         int low = 0;
         int high = numberOfElementsInCache - 1;
 

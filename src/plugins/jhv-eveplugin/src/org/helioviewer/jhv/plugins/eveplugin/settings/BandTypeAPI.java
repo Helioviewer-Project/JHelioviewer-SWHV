@@ -160,7 +160,7 @@ public class BandTypeAPI {
         }
     }
 
-    public void updateDatasets() {
+    private void updateDatasets() {
         try {
             String jsonString = readJSON();
             JSONObject jsonmain = new JSONObject(jsonString);

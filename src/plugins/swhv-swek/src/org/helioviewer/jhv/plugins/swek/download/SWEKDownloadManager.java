@@ -65,7 +65,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         return instance;
     }
 
-    public void stopDownloadingEventType(SWEKEventType eventType, boolean keepActive) {
+    private void stopDownloadingEventType(SWEKEventType eventType, boolean keepActive) {
         if (dwMap.containsKey(eventType)) {
             ArrayList<DownloadWorker> dwMapList = dwMap.get(eventType);
             for (DownloadWorker dw : dwMapList) {
@@ -80,7 +80,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         }
     }
 
-    public void stopDownloadingEventType(SWEKEventType eventType, SWEKSource source, SWEKSupplier supplier, boolean keepActive) {
+    private void stopDownloadingEventType(SWEKEventType eventType, SWEKSource source, SWEKSupplier supplier, boolean keepActive) {
         if (dwMap.containsKey(eventType)) {
             ArrayList<DownloadWorker> dwMapOnDate = dwMap.get(eventType);
             for (DownloadWorker dw : dwMapOnDate) {
