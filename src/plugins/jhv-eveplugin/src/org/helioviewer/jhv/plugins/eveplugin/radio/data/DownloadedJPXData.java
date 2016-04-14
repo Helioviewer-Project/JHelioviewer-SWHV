@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 
 import java.awt.Rectangle;
-import java.util.Date;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
@@ -15,11 +14,11 @@ public class DownloadedJPXData implements ImageDataHandler {
 
     private JP2ViewCallisto view;
     private final long imageID;
-    private final Date startDate;
-    private final Date endDate;
+    private final long startDate;
+    private final long endDate;
     private final RadioDataManager radioDataManager;
 
-    public DownloadedJPXData(JP2ViewCallisto _view, long _imageID, Date _startDate, Date _endDate) {
+    public DownloadedJPXData(JP2ViewCallisto _view, long _imageID, long _startDate, long _endDate) {
         super();
         radioDataManager = RadioDataManager.getSingletonInstance();
 
@@ -39,11 +38,11 @@ public class DownloadedJPXData implements ImageDataHandler {
         return imageID;
     }
 
-    public Date getStartDate() {
+    public long getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 

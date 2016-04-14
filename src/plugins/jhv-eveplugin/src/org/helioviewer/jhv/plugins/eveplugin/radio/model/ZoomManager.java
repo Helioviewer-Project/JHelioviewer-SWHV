@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
 import java.awt.Rectangle;
-import java.util.Date;
 
 import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -223,7 +222,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         if (isAreaInitialized && isMinXInitialized && isMaxXInitialized) {
             double xRatio = 1.0 * (maxX - minX) / displaySize.getWidth();
             double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
-            radioDataManager.requestData(new Date(minX), new Date(maxX), yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
+            radioDataManager.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
         }
     }
 
