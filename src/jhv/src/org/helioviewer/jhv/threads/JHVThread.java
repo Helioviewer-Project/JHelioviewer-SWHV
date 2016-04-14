@@ -37,7 +37,7 @@ public class JHVThread {
 
     public static class ConnectionThread extends Thread {
         private static Connection connection;
-        private static final int CURRENT_VERSION_SCHEMA = 4;
+        private static final int CURRENT_VERSION_SCHEMA = 5;
         public static final HashMap<JHVEventType, RequestCache> downloadedCache = new HashMap<JHVEventType, RequestCache>();
 
         public ConnectionThread(Runnable r, String name) {
@@ -50,7 +50,7 @@ public class JHVThread {
                 Statement statement = connection.createStatement();
                 statement.setQueryTimeout(30);
                 statement.executeUpdate("CREATE TABLE if not exists event_type (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING , supplier STRING, UNIQUE(name, supplier) ON CONFLICT IGNORE)");
-                statement.executeUpdate("CREATE TABLE if not exists events (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER, uid STRING , start BIGINTEGER , end BIGINTEGER , data BLOB, FOREIGN KEY(type_id) REFERENCES event_type(id), UNIQUE(uid) ON CONFLICT FAIL)");
+                statement.executeUpdate("CREATE TABLE if not exists events (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER, uid STRING , start BIGINTEGER, end BIGINTEGER, archiv BIGINTEGER , data BLOB, FOREIGN KEY(type_id) REFERENCES event_type(id), UNIQUE(uid) ON CONFLICT FAIL)");
                 statement.executeUpdate("CREATE INDEX if not exists evt_uid ON events (uid);");
                 statement.executeUpdate("CREATE INDEX if not exists evt_end ON events (end);");
                 statement.executeUpdate("CREATE INDEX if not exists evt_start ON events (start);");
