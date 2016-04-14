@@ -426,6 +426,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
             case 4:
                 value = -1;
                 break;
+            default:
+                value = -1;
+                break;
             }
 
             return value;

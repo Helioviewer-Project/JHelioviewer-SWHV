@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -108,13 +106,7 @@ public class DownloadController {
     }
 
     private Interval extendQueryInterval(Interval queryInterval) {
-        GregorianCalendar cs = new GregorianCalendar();
-        cs.setTime(queryInterval.start);
-        cs.add(Calendar.DAY_OF_MONTH, -7);
-        GregorianCalendar ce = new GregorianCalendar();
-        ce.setTime(queryInterval.end);
-        ce.add(Calendar.DAY_OF_MONTH, +7);
-        return new Interval(cs.getTime(), ce.getTime());
+        return new Interval(queryInterval.start - 7 * TimeUtils.DAY_IN_MILLIS, queryInterval.end + 7 * TimeUtils.DAY_IN_MILLIS);
     }
 
     private ArrayList<Interval> getIntervals(final Band band, final Interval queryInterval) {
@@ -236,6 +228,7 @@ public class DownloadController {
 
             try {
                 url = buildRequestURL(interval, band.getBandType());
+                System.out.println(url);
             } catch (final MalformedURLException e) {
                 Log.error("Error Creating the EVE URL.", e);
             }

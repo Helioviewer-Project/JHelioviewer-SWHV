@@ -224,18 +224,18 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             }
         }
 
-        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(interval.start.getTime())), g);
+        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(interval.start)), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         final int tickTextHeight = (int) tickTextBounds.getHeight();
         final int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        final long tickDifferenceHorizontal = (interval.end.getTime() - interval.start.getTime()) / (horizontalTickCount - 1);
+        final long tickDifferenceHorizontal = (interval.end - interval.start) / (horizontalTickCount - 1);
 
         GregorianCalendar tickGreg = new GregorianCalendar();
         GregorianCalendar previousGreg = new GregorianCalendar();
 
         Date previousDate = null;
         for (int i = 0; i < horizontalTickCount; ++i) {
-            final Date tickValue = new Date(interval.start.getTime() + i * tickDifferenceHorizontal);
+            final Date tickValue = new Date(interval.start + i * tickDifferenceHorizontal);
             final int x = graphArea.x + (int) (i * tickDifferenceHorizontal * ratioX);
             final String tickText;
             if (previousDate == null) {
@@ -363,7 +363,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void updateRatios() {
         Interval interval = drawController.getSelectedInterval();
-        ratioX = graphArea.width / (double) (interval.end.getTime() - interval.start.getTime());
+        ratioX = graphArea.width / (double) (interval.end - interval.start);
         yRatios = new HashMap<YAxisElement, Double>();
         for (YAxisElement yAxisElement : drawController.getYAxisElements()) {
             double minValue = yAxisElement.getScaledMinValue();
@@ -380,7 +380,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (movieTimestamp == null) {
             newMovieLine = -1;
         } else {
-            newMovieLine = (int) ((movieTimestamp.getTime() - interval.start.getTime()) * ratioX) + graphArea.x;
+            newMovieLine = (int) ((movieTimestamp.getTime() - interval.start) * ratioX) + graphArea.x;
             if (newMovieLine < graphArea.x || newMovieLine > (graphArea.x + graphArea.width)) {
                 newMovieLine = -1;
             }
@@ -398,7 +398,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
-        final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.start.getTime());
+        final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.start);
 
         Layers.setTime(new JHVDate(millis));
     }
@@ -424,7 +424,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Date mouseToDate(Point point) {
         Interval interval = drawController.getSelectedInterval();
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
-        final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.start.getTime());
+        final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.start);
         return new Date(millis);
     }
 

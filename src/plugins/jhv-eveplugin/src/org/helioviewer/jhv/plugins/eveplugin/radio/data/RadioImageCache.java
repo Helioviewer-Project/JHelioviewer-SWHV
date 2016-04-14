@@ -104,7 +104,7 @@ public class RadioImageCache {
         List<Interval> noDataInterval = new ArrayList<Interval>();
         while (localStart.compareTo(end) <= 0) {
             if (!startDates.containsKey(localStart) && !noDataCache.containsKey(localStart)) {
-                intervalList.add(new Interval(localStart, new Date(localStart.getTime() + stepsize)));
+                intervalList.add(new Interval(localStart.getTime(), localStart.getTime() + stepsize));
             } else {
                 if (startDates.containsKey(localStart)) {
                     DownloadedJPXData tempData = startDates.get(localStart);
@@ -124,13 +124,13 @@ public class RadioImageCache {
         return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove), noDataInterval);
     }
 
-    public boolean containsDate(Date date) {
+    public boolean containsDate(Long date) {
         return startDates.containsKey(date);
     }
 
     public boolean addNoDataInterval(Interval interval) {
         boolean added = noDataCache.containsKey(interval.start);
-        noDataCache.put(interval.start, interval);
+        noDataCache.put(new Date(interval.start), interval);
         return !added;
     }
 

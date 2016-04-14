@@ -155,6 +155,8 @@ public class GLSLSolarShader extends GLSLShader {
         case 4:
             gl.glUniform4fv(id, 1, val, 0);
             break;
+        default:
+            break;
         }
     }
 

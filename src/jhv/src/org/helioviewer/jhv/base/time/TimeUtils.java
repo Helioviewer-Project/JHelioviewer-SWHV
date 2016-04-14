@@ -2,7 +2,6 @@ package org.helioviewer.jhv.base.time;
 
 import java.util.Calendar;
 import java.util.Date;
-
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -12,6 +11,8 @@ public class TimeUtils {
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     private static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    public static final int DAY_IN_MILLIS = 86400000;
 
     public static final FastDateFormat utcDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss", UTC);
     public static final FastDateFormat sqlDateFormat = FastDateFormat.getInstance(SQL_DATE_FORMAT, UTC);

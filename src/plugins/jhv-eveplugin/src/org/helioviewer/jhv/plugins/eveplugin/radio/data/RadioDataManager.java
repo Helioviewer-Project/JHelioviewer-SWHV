@@ -253,7 +253,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
             requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));
             while (requestBuffer.hasData()) {
                 RequestConfig requestConfig = requestBuffer.getData();
-                handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd);
+                handleRequestConfig(requestConfig, xStart.getTime(), xEnd.getTime(), yStart, yEnd);
             }
             requestForDataBusy = false;
         } else {
@@ -293,14 +293,14 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         }
     }
 
-    public void intervalTooBig(Date requestedStartTime, Date requestedEndTime) {
+    public void intervalTooBig(long requestedStartTime, long requestedEndTime) {
         radioImages = new HashMap<Long, RadioImage>();
         lineDataSelectorModel.addLineData(this);
         intervalTooBig();
         downloadRequestAnswered(new Interval(requestedStartTime, requestedEndTime));
     }
 
-    public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime) {
+    public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, long requestedStartTime, long requestedEndTime) {
         radioImages = new HashMap<Long, RadioImage>();
         isDownloading = true;
         lineDataSelectorModel.addLineData(this);
@@ -401,7 +401,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      * @param yEnd
      *            The end value of the currently visible frequency interval
      */
-    private void handleRequestConfig(RequestConfig requestConfig, Date xStart, Date xEnd, double yStart, double yEnd) {
+    private void handleRequestConfig(RequestConfig requestConfig, long xStart, long xEnd, double yStart, double yEnd) {
         if (requestConfig.getxEnd().getTime() - requestConfig.getxStart().getTime() > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
             intervalTooBig();
         } else {
@@ -446,14 +446,13 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      *            The download request data
      *
      */
-    private void handleAvailableData(DownloadedJPXData jpxData, Date xStart, Date xEnd, double yStart, double yEnd) {
+    private void handleAvailableData(DownloadedJPXData jpxData, long xStart, long xEnd, double yStart, double yEnd) {
         RadioImage ri = radioImages.get(jpxData.getImageID());
         if (ri != null) {
             ri.setVisibleIntervals(xStart, xEnd, (int) Math.floor(yStart), (int) Math.ceil(yEnd));
             if (ri.getVisibleImageFreqInterval() != null && ri.getVisibleImageTimeInterval() != null) {
                 Interval visibleDateInterval = ri.getVisibleImageTimeInterval();
-                // FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
-                if (!visibleDateInterval.start.equals(visibleDateInterval.end)) {
+                if (visibleDateInterval.start != visibleDateInterval.end) {
                     JP2ViewCallisto jp2View = jpxData.getView();
                     if (jp2View != null) {
                         JP2ImageCallisto image = jp2View.getJP2Image();
@@ -497,7 +496,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                     FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));
 
                     List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
-                    Interval dateInterval = new Interval(start, end);
+                    Interval dateInterval = new Interval(start.getTime(), end.getTime());
                     for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
                         ResolutionLevel res = rs.getResolutionLevel(j);
                         ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) res.width, (freqEnd - freqStart) / res.height, j, res.width, res.height, res.discardLayers);

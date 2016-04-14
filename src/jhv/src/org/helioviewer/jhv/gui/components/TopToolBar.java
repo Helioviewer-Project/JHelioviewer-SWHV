@@ -349,6 +349,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
         case ICONONLY:
             button.setText(null);
             break;
+        default:
+            break;
         }
 
         add(button);

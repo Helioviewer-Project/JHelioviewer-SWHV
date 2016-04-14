@@ -41,8 +41,8 @@ public class DownloadWorker implements Runnable {
         isStopped = false;
         requestInterval = interval;
         this.jhvType = jhvType;
-        downloadStartDate = new Date(interval.start.getTime());
-        downloadEndDate = new Date(interval.end.getTime());
+        downloadStartDate = new Date(interval.start);
+        downloadEndDate = new Date(interval.end);
         eventContainer = JHVEventContainer.getSingletonInstance();
         this.params = params;
     }
@@ -100,7 +100,7 @@ public class DownloadWorker implements Runnable {
                     SWEKDownloadManager.getSingletonInstance().workerFinished(DownloadWorker.this);
                 }
             });
-            JHVDatabase.addDaterange2db(downloadStartDate, downloadEndDate, jhvType);
+            JHVDatabase.addDaterange2db(downloadStartDate.getTime(), downloadEndDate.getTime(), jhvType);
         }
     }
 

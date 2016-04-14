@@ -2,7 +2,6 @@ package org.helioviewer.jhv.base.cache;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,15 +10,15 @@ import org.helioviewer.jhv.base.interval.Interval;
 
 public class RequestCache {
 
-    private final Map<Date, Interval> requestedAndDownloadedCache;
-    private final Map<Date, Interval> requestedCache;
+    private final Map<Long, Interval> requestedAndDownloadedCache;
+    private final Map<Long, Interval> requestedCache;
 
     public RequestCache() {
-        requestedAndDownloadedCache = new TreeMap<Date, Interval>();
-        requestedCache = new TreeMap<Date, Interval>();
+        requestedAndDownloadedCache = new TreeMap<Long, Interval>();
+        requestedCache = new TreeMap<Long, Interval>();
     }
 
-    public List<Interval> adaptRequestCache(Date startDate, Date endDate) {
+    public List<Interval> adaptRequestCache(long startDate, long endDate) {
         ArrayList<Interval> missingIntervals = new ArrayList<Interval>();
         if (requestedAndDownloadedCache.isEmpty()) {
             missingIntervals.add(new Interval(startDate, endDate));
@@ -32,22 +31,22 @@ public class RequestCache {
         return missingIntervals;
     }
 
-    private void updateRequestCache(final Date startDate, final Date endDate) {
-        List<Date> intervalsToRemove = new ArrayList<Date>();
-        Date addStart = startDate;
-        Date addEnd = endDate;
+    private void updateRequestCache(final long startDate, final long endDate) {
+        List<Long> intervalsToRemove = new ArrayList<Long>();
+        long addStart = startDate;
+        long addEnd = endDate;
 
         Interval previousInterval = null;
         boolean startFound = false;
         boolean endFound = false;
 
-        for (Map.Entry<Date, Interval> entry : requestedAndDownloadedCache.entrySet()) {
-            Date iStartDate = entry.getKey();
+        for (Map.Entry<Long, Interval> entry : requestedAndDownloadedCache.entrySet()) {
+            long iStartDate = entry.getKey();
             Interval rcInterval = entry.getValue();
 
             // define start
             if (!startFound) {
-                if (startDate.before(iStartDate)) {
+                if (startDate < iStartDate) {
                     if (previousInterval == null) {
                         startFound = true;
                         previousInterval = rcInterval;
@@ -61,7 +60,7 @@ public class RequestCache {
                                 endFound = true;
                                 break;
                             } else {
-                                if (endDate.before(iStartDate)) {
+                                if (endDate < iStartDate) {
                                     addEnd = endDate;
                                     break;
                                 } else {
@@ -73,7 +72,7 @@ public class RequestCache {
                         } else {
                             addStart = startDate;
                             startFound = true;
-                            if (endDate.before(iStartDate)) {
+                            if (endDate < iStartDate) {
                                 addEnd = endDate;
                                 endFound = true;
                                 break;
@@ -86,7 +85,7 @@ public class RequestCache {
                 }
             } else {
                 // define end
-                if (endDate.before(previousInterval.start)) {
+                if (endDate < previousInterval.start) {
                     endFound = true;
                     break;
                 } else {
@@ -116,20 +115,20 @@ public class RequestCache {
             }
         }
         if (!endFound) {
-            if (endDate.before(previousInterval.start)) {
+            if (endDate < previousInterval.start) {
                 endFound = true;
             } else {
                 if (previousInterval.containsPointInclusive(endDate)) {
                     intervalsToRemove.add(previousInterval.start);
                     addEnd = previousInterval.end;
                 } else {
-                    if (!startDate.after(previousInterval.end)) {
+                    if (startDate <= previousInterval.end) {
                         intervalsToRemove.add(previousInterval.start);
                     }
                 }
             }
         }
-        for (Date toRemove : intervalsToRemove) {
+        for (Long toRemove : intervalsToRemove) {
             requestedAndDownloadedCache.remove(toRemove);
             requestedCache.remove(toRemove);
         }
@@ -140,18 +139,18 @@ public class RequestCache {
 
     public void removeRequestedIntervals(Interval remInterval) {
         List<Interval> intervalsToAdd = new ArrayList<Interval>();
-        List<Date> intervalsToRemove = new ArrayList<Date>();
-        Date start = remInterval.start;
+        List<Long> intervalsToRemove = new ArrayList<Long>();
+        long start = remInterval.start;
 
-        for (Map.Entry<Date, Interval> entry : requestedAndDownloadedCache.entrySet()) {
-            Date isDate = entry.getKey();
+        for (Map.Entry<Long, Interval> entry : requestedAndDownloadedCache.entrySet()) {
+            Long isDate = entry.getKey();
             Interval rcInterval = entry.getValue();
 
-            if (start.before(rcInterval.start) || start.equals(rcInterval.start)) {
-                if (remInterval.end.after(rcInterval.start)) {
+            if (start <= rcInterval.start) {
+                if (remInterval.end > rcInterval.start) {
                     intervalsToRemove.add(isDate);
-                    if (remInterval.end.before(rcInterval.end) || remInterval.end.equals(rcInterval.end)) {
-                        if (!start.equals(rcInterval.start)) {
+                    if (remInterval.end <= rcInterval.end) {
+                        if (start != rcInterval.start) {
                             intervalsToAdd.add(new Interval(remInterval.end, rcInterval.end));
                         }
                         break;
@@ -160,9 +159,9 @@ public class RequestCache {
                     }
                 }
             } else {
-                if (rcInterval.end.after(start)) {
+                if (rcInterval.end > start) {
                     intervalsToRemove.add(isDate);
-                    if (remInterval.end.before(rcInterval.end)) {
+                    if (remInterval.end < rcInterval.end) {
                         intervalsToAdd.add(new Interval(rcInterval.start, start));
                         intervalsToAdd.add(new Interval(remInterval.end, rcInterval.end));
                         break;
@@ -174,7 +173,7 @@ public class RequestCache {
             }
         }
 
-        for (Date date : intervalsToRemove) {
+        for (Long date : intervalsToRemove) {
             requestedAndDownloadedCache.remove(date);
             requestedCache.remove(date);
         }
@@ -190,24 +189,24 @@ public class RequestCache {
 
     public ArrayList<Interval> getMissingIntervals(Interval interval) {
         ArrayList<Interval> missingIntervals = new ArrayList<Interval>();
-        Date startDate = interval.start;
-        Date endDate = interval.end;
-        Date currentStartDate = interval.start;
+        long startDate = interval.start;
+        long endDate = interval.end;
+        long currentStartDate = interval.start;
         boolean endDateUsed = false;
         if (requestedAndDownloadedCache.isEmpty()) {
             missingIntervals.add(new Interval(startDate, endDate));
         } else {
             Interval previousInterval = null;
 
-            for (Map.Entry<Date, Interval> entry : requestedAndDownloadedCache.entrySet()) {
-                Date iStartDate = entry.getKey();
+            for (Map.Entry<Long, Interval> entry : requestedAndDownloadedCache.entrySet()) {
+                long iStartDate = entry.getKey();
                 Interval rcInterval = entry.getValue();
 
-                if (currentStartDate.before(iStartDate)) {
+                if (currentStartDate < iStartDate) {
                     if (previousInterval == null) {
                         // No previous interval check if endate is also before
                         // startdate
-                        if (endDate.before(iStartDate)) {
+                        if (endDate < iStartDate) {
                             // complete new interval
                             missingIntervals.add(new Interval(startDate, endDate));
                             previousInterval = rcInterval;
@@ -237,7 +236,7 @@ public class RequestCache {
                                 // 1))
                                 break;
                             } else {
-                                if (endDate.before(iStartDate)) {
+                                if (endDate < iStartDate) {
                                     missingIntervals.add(new Interval(previousInterval.end, endDate));
                                     endDateUsed = true;
                                     break;
@@ -259,9 +258,9 @@ public class RequestCache {
                             // date}, continue with interval: {current start
                             // time, end time}
                             if (!previousInterval.containsPointInclusive(endDate)) {
-                                if (endDate.compareTo(iStartDate) <= 0) {
+                                if (endDate - iStartDate <= 0) {
                                     // 1)
-                                    if (currentStartDate.after(previousInterval.end)) {
+                                    if (currentStartDate > previousInterval.end) {
                                         missingIntervals.add(new Interval(currentStartDate, endDate));
                                     } else {
                                         missingIntervals.add(new Interval(previousInterval.end, endDate));
@@ -287,12 +286,12 @@ public class RequestCache {
             }
             // check if current start date is after or equal previous (last
             // interval) start date
-            if (!endDateUsed && (currentStartDate.after(previousInterval.start) || currentStartDate.equals(previousInterval.start))) {
+            if (!endDateUsed && (currentStartDate >= previousInterval.start)) {
                 // Check if start date is after end date of previous (last)
                 // interval
                 // 1) true: missing interval : {currentStartDate, endDate}
                 // 2) false: check end date
-                if (currentStartDate.after(previousInterval.end) || currentStartDate.equals(previousInterval.end)) {
+                if (currentStartDate >= previousInterval.end) {
                     // 1)
                     missingIntervals.add(new Interval(currentStartDate, endDate));
                 } else {
@@ -300,7 +299,7 @@ public class RequestCache {
                     // 1) endDate after previous end date: missing interval =
                     // {previousenddate, endDate}
                     // 2) internal interval do nothing
-                    if (endDate.after(previousInterval.end)) {
+                    if (endDate > previousInterval.end) {
                         missingIntervals.add(new Interval(previousInterval.end, endDate));
                     }
                 }

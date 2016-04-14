@@ -2,7 +2,6 @@ package org.helioviewer.jhv.data.container;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,27 +67,18 @@ public class JHVEventContainer {
      * @param handler
      *            the handler
      */
-    public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
-        // Log.debug("Request for interval : [" + startDate + "," + endDate +
-        // "]");
-        // Logger.getLogger(JHVEventContainer.class.getName()).info("handler : "
-        // + handler);
-        if (startDate != null && endDate != null) {
-            long deltaT = Math.max((long) ((endDate.getTime() - startDate.getTime()) * factor), 1000 * 60 * 60 * 24 * 5);
-            Date newStartDate = new Date(startDate.getTime() - deltaT);
-            Date newEndDate = new Date(endDate.getTime() + deltaT);
-            // Log.debug("new Interval : [" + newStartDate + "," + newEndDate +
-            // "]");
-            eventHandlerCache.add(handler);
-            JHVEventCacheResult result = eventCache.get(startDate, endDate, newStartDate, newEndDate);
-            Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = result.getAvailableEvents();
-            // AssociationsPrinter.print(events);
-            handler.newEventsReceived(events);
-            for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
-                List<Interval> missingList = result.getMissingIntervals().get(eventType);
-                for (Interval missing : missingList) {
-                    requestEvents(eventType, missing.start, missing.end);
-                }
+    public void requestForInterval(final long startDate, final long endDate, final JHVEventHandler handler) {
+        long deltaT = Math.max((long) ((endDate - startDate) * factor), 1000 * 60 * 60 * 24 * 5);
+        long newStartDate = startDate - deltaT;
+        long newEndDate = endDate + deltaT;
+        eventHandlerCache.add(handler);
+        JHVEventCacheResult result = eventCache.get(startDate, endDate, newStartDate, newEndDate);
+        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = result.getAvailableEvents();
+        handler.newEventsReceived(events);
+        for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
+            List<Interval> missingList = result.getMissingIntervals().get(eventType);
+            for (Interval missing : missingList) {
+                requestEvents(eventType, missing.start, missing.end);
             }
         }
     }
@@ -125,7 +115,7 @@ public class JHVEventContainer {
      * @param endDate
      *            the end of the interval
      */
-    private void requestEvents(JHVEventType eventType, Date startDate, Date endDate) {
+    private void requestEvents(JHVEventType eventType, long startDate, long endDate) {
         incomingRequestManager.handleRequestForInterval(eventType, startDate, endDate);
     }
 

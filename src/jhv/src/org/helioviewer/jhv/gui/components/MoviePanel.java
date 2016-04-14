@@ -17,7 +17,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.text.ParseException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -742,7 +741,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         protected void scrollDueToClickInTrack(int dir) {
-            slider.setValue(this.valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
+            if (trackListener instanceof TimeTrackListener)
+                slider.setValue(this.valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
         }
 
         /**
@@ -765,6 +765,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void paintTrack(Graphics g) {
+            if (!(g instanceof Graphics2D))
+                return;
             Graphics2D g2d = (Graphics2D) g;
             g2d.setStroke(thickStroke);
 

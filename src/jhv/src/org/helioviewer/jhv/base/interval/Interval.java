@@ -1,31 +1,25 @@
 package org.helioviewer.jhv.base.interval;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 public class Interval implements Comparable<Interval> {
+    private static long MILLISECSPERDAY = 86400 * 1000;
 
-    public final Date start;
-    public final Date end;
+    public final long start;
+    public final long end;
 
-    public Interval(Date _start, Date _end) {
+    public Interval(long _start, long _end) {
         start = _start;
         end = _end;
-        if (start == null || end == null) {
-            Thread.dumpStack();
-            System.exit(1);
-        }
     }
 
     public boolean containsInclusive(Interval other) {
         return containsPointInclusive(other.start) && containsPointInclusive(other.end);
     }
 
-    public boolean containsPointInclusive(Date time) {
-        assert start.compareTo(end) <= 0;
-        return time.compareTo(start) >= 0 && time.compareTo(end) <= 0;
+    public boolean containsPointInclusive(long time) {
+        assert start <= end;
+        return time >= start && time <= end;
     }
 
     public boolean overlapsInclusive(Interval other) {
@@ -37,17 +31,13 @@ public class Interval implements Comparable<Interval> {
      * still contained in the interval. If the given value is outside the
      * interval, the the interval's closest 'edge' is returned.
      */
-    public Date squeeze(Date value) {
+    public long squeeze(long value) {
         if (containsPointInclusive(value)) {
             return value;
-        } else if (value.compareTo(start) < 0) {
+        } else if (value <= start) {
             return start;
-        } else if (value.compareTo(end) > 0) {
-            return end;
         }
-        // this case should never occur
-        assert false;
-        return value;
+        return end;
     }
 
     @Override
@@ -57,24 +47,19 @@ public class Interval implements Comparable<Interval> {
 
     @Override
     public int compareTo(Interval other) {
-        return start.compareTo(other.start);
+        return (int) ((start - other.start) % 1);
+
     }
 
     public static ArrayList<Interval> splitInterval(final Interval interval, int days) {
         final ArrayList<Interval> intervals = new ArrayList<Interval>();
-
-        final Calendar calendar = new GregorianCalendar();
-        Date startDate = interval.start;
+        long startDate = interval.start;
 
         while (true) {
-            calendar.clear();
-            calendar.setTime(startDate);
-            calendar.add(Calendar.DAY_OF_MONTH, days);
-
-            final Date newStartDate = calendar.getTime();
+            final long newStartDate = startDate + MILLISECSPERDAY * days;
 
             if (interval.containsPointInclusive(newStartDate)) {
-                intervals.add(new Interval(startDate, calendar.getTime()));
+                intervals.add(new Interval(startDate, newStartDate));
                 startDate = newStartDate;
             } else {
                 intervals.add(new Interval(startDate, interval.end));
@@ -89,14 +74,16 @@ public class Interval implements Comparable<Interval> {
     public boolean equals(Object other) {
         if (other instanceof Interval) {
             Interval s = (Interval) other;
-            return start.equals(s.start) && end.equals(s.end);
+            return start == s.start && end == s.end;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return (start.toString() + " - " + end.toString()).hashCode();
+        int result = (int) (start ^ (start >>> 32));
+        result = 31 * result + (int) (end ^ (end >>> 32));
+        return result;
     }
 
 }

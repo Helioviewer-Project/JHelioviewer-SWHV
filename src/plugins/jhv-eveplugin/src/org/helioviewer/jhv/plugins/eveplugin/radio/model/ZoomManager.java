@@ -26,8 +26,8 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     private boolean isAreaInitialized;
     private Rectangle displaySize;
 
-    private Date minX;
-    private Date maxX;
+    private long minX;
+    private long maxX;
     private boolean isMinXInitialized;
     private boolean isMaxXInitialized;
 
@@ -70,7 +70,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         }
     }
 
-    public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int visualStartFrequency, int visualEndFrequency, int imageStartFrequency, int imageEndFrequency, Rectangle area) {
+    public DrawableAreaMap getDrawableAreaMap(long startDate, long endDate, int visualStartFrequency, int visualEndFrequency, int imageStartFrequency, int imageEndFrequency, Rectangle area) {
         int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
         int sourceY0 = 0;
         int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
@@ -105,7 +105,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
      *            The plot identifier of the request
      * @return Drawable area map with the correct coordinates
      */
-    public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate) {
+    public DrawableAreaMap getDrawableAreaMap(long startDate, long endDate) {
         int destX0 = defineXInDestinationArea(startDate);
         int destY0 = 0;
         int destX1 = defineXInDestinationArea(endDate);
@@ -137,16 +137,16 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
      *             interval or the given start frequency or end frequency fall
      *             outside the minimum and maximum frequency.
      */
-    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq) {
+    public Rectangle getAvailableSpaceForInterval(long startDate, long endDate, int startFreq, int endFreq) {
         Interval currentInterval = drawController.getSelectedInterval();
         double min = yAxisElement.getAvailableRange().min;
         double max = yAxisElement.getAvailableRange().max;
 
         if (startFreq >= min && startFreq <= max && endFreq >= min && endFreq <= max &&
-            currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate)) {
+                currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate)) {
             int height = displaySize.height;
-            double ratio = displaySize.getWidth() / (currentInterval.end.getTime() - currentInterval.start.getTime());
-            int width = (int) Math.round((endDate.getTime() - startDate.getTime()) * ratio);
+            double ratio = displaySize.getWidth() / (currentInterval.end - currentInterval.start);
+            int width = (int) Math.round((endDate - startDate) * ratio);
             return new Rectangle(width, height);
         } else {
             return new Rectangle(0, 0);
@@ -157,13 +157,13 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         return displaySize.height - (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height));
     }
 
-    private int defineXInDestinationArea(Date dateToFind) {
-        return displaySize.x + (int) Math.floor((dateToFind.getTime() - minX.getTime()) / (1.0 * (maxX.getTime() - minX.getTime()) / displaySize.width));
+    private int defineXInDestinationArea(long dateToFind) {
+        return displaySize.x + (int) Math.floor((dateToFind - minX) / (1.0 * (maxX - minX) / displaySize.width));
     }
 
-    private int defineXInSourceArea(Date dateToFind, Date startDateArea, Date endDateArea, Rectangle area) {
-        long timediff = dateToFind.getTime() - startDateArea.getTime();
-        long timeOfArea = endDateArea.getTime() - startDateArea.getTime();
+    private int defineXInSourceArea(long dateToFind, long startDateArea, long endDateArea, Rectangle area) {
+        long timediff = dateToFind - startDateArea;
+        long timeOfArea = endDateArea - startDateArea;
         return (int) Math.floor(timediff / (1.0 * (timeOfArea) / area.width));
     }
 
@@ -221,9 +221,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
 
     private void requestData() {
         if (isAreaInitialized && isMinXInitialized && isMaxXInitialized) {
-            double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
+            double xRatio = 1.0 * (maxX - minX) / displaySize.getWidth();
             double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
-            radioDataManager.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
+            radioDataManager.requestData(new Date(minX), new Date(maxX), yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
         }
     }
 
