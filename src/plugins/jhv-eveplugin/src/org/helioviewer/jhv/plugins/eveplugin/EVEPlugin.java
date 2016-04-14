@@ -5,7 +5,6 @@ import java.util.LinkedList;
 
 import javax.swing.JComponent;
 
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;

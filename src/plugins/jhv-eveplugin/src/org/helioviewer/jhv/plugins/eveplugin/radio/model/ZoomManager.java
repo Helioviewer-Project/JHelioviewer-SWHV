@@ -31,7 +31,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     private boolean isMaxXInitialized;
 
     private ZoomManager() {
-        // currentInterval = new Interval(new Date(), new Date());
         isAreaInitialized = false;
         isMinXInitialized = false;
         isMaxXInitialized = false;

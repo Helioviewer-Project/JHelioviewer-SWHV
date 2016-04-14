@@ -1,12 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.settings;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
-
-import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class BandType {
 
@@ -20,16 +14,6 @@ public class BandType {
     private double max;
     private String scale = "";
     private boolean isLog = false;
-
-    public URL buildUrl(Interval interval) {
-        URL url = null;
-        try {
-            url = new URL(baseUrl + EVEAPI.API_URL_PARAMETER_STARTDATE + TimeUtils.dateFormat.format(interval.start) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + TimeUtils.dateFormat.format(interval.end) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + this.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
-        } catch (MalformedURLException e) {
-            Log.error("Something is wrong with the EVEAPI url", e);
-        }
-        return url;
-    }
 
     @Override
     public String toString() {
