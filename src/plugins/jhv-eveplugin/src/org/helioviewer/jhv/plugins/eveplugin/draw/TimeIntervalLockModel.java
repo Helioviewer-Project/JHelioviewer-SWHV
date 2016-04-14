@@ -92,7 +92,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      * (non-Javadoc)
      *
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
-     * drawMovieLineRequest(java.util.Date)
+     * drawMovieLineRequest(long time)
      */
     @Override
     public void drawMovieLineRequest(long time) {

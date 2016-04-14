@@ -8,7 +8,7 @@ import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
 
-public class SetupTimeTask extends JHVWorker<Date, Void> {
+public class SetupTimeTask extends JHVWorker<Long, Void> {
 
     private final String observatory;
     private final String instrument;
@@ -25,7 +25,7 @@ public class SetupTimeTask extends JHVWorker<Date, Void> {
     }
 
     @Override
-    protected Date backgroundWork() {
+    protected Long backgroundWork() {
         return APIRequestManager.getLatestImageDate(observatory, instrument, detector, measurement, true);
     }
 
@@ -34,7 +34,7 @@ public class SetupTimeTask extends JHVWorker<Date, Void> {
         try {
             ImageDataPanel idp = ObservationDialog.getInstance().getObservationImagePane();
 
-            Date endDate = get();
+            Date endDate = new Date(get());
             GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTime(endDate);
 
