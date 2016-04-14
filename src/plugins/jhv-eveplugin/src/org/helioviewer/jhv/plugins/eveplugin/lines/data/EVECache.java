@@ -1,33 +1,37 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 import java.awt.Rectangle;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class EVECache {
 
-    private final HashMap<Integer, EVEDataOfDay> cacheMap = new HashMap<Integer, EVEDataOfDay>();
+    private final HashMap<Long, EVEDataOfDay> cacheMap = new HashMap<Long, EVEDataOfDay>();
     private static final double DISCARD_LOG_LEVEL_LOW = 1e-10;
     private static final double DISCARD_LOG_LEVEL_HIGH = 1e+4;
+    private static final int DAYS_PER_CHUNK = 10;
+    static final int MILLIS_PER_TICK = 60000;
+    static final int CHUNKED_SIZE = TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK;
+    static final long MILLIS_PER_CHUNK = TimeUtils.DAY_IN_MILLIS * DAYS_PER_CHUNK;
+
+    private static long date2key(long date) {
+        return date / MILLIS_PER_CHUNK;
+    }
 
     public void add(final float[] values, final long[] dates) {
-        GregorianCalendar calendar = new GregorianCalendar();
 
         for (int i = 0; i < values.length; i++) {
-            calendar.setTimeInMillis(dates[i]);
-            int key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
+            long key = date2key(dates[i]);
 
             EVEDataOfDay cache = cacheMap.get(key);
             if (cache == null) {
-                cache = new EVEDataOfDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                cache = new EVEDataOfDay(key);
                 cacheMap.put(key, cache);
             }
             if (values[i] > DISCARD_LOG_LEVEL_LOW && values[i] < DISCARD_LOG_LEVEL_HIGH) {
-                cache.setValue(calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE), values[i], dates[i]);
+                cache.setValue((int) ((dates[i] % (MILLIS_PER_CHUNK)) / MILLIS_PER_TICK), values[i], dates[i]);
             }
         }
     }
@@ -42,60 +46,46 @@ public class EVECache {
 
         int numberOfBins;
         long timePerBin;
-        if (space.width < intervalWidth / 60000) {
+        if (space.width < intervalWidth / MILLIS_PER_TICK) {
             binStart = intervalStart - (intervalWidth / spaceWidth / 2);
             binEnd = intervalEnd + (intervalWidth / spaceWidth / 2);
             numberOfBins = spaceWidth + 1;
             timePerBin = intervalWidth / spaceWidth;
         } else {
-            numberOfBins = (int) intervalWidth / 60000 + 1;
+            numberOfBins = (int) (intervalWidth / MILLIS_PER_TICK) + 1;
             timePerBin = intervalWidth / numberOfBins;
             binStart = intervalStart - timePerBin / 2;
             binEnd = intervalEnd + timePerBin / 2;
-
         }
 
         final EVEValues result = new EVEValues(binStart, binEnd, intervalStart, numberOfBins, timePerBin);
 
-        GregorianCalendar calendar = new GregorianCalendar();
-
-        calendar.setTimeInMillis(binEnd);
-        int keyEnd = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        calendar.setTimeInMillis(binStart);
-        int key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
+        long keyEnd = date2key(binEnd);
+        long key = date2key(binStart);
 
         while (key <= keyEnd) {
             EVEDataOfDay cache = cacheMap.get(key);
-            if (cache == null) {
-                cache = new EVEDataOfDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            if (cache != null) {
+                cache.fillResult(result);
             }
 
-            // final Pair<long[], double[]> pair =
-            // cache.getValuesInInterval(interval);
-            // result.addValues(pair.a, pair.b);
-            cache.fillResult(result);
-
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
-            key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
+            key++;
         }
 
         return result;
     }
 
     public boolean hasDataInInterval(Interval selectedInterval) {
-        GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date(selectedInterval.end));
-        int keyEnd = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        calendar.setTime(new Date(selectedInterval.start));
-        int key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
+        long keyEnd = date2key(selectedInterval.end);
+        long key = date2key(selectedInterval.start);
 
         while (key <= keyEnd) {
             EVEDataOfDay cache = cacheMap.get(key);
+
             if (cache != null && cache.hasData()) {
                 return true;
             }
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
-            key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
+            key++;
         }
         return false;
     }
