@@ -25,7 +25,6 @@ import javax.swing.table.TableRowSorter;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.guielements.model.EmptyRowFilter;
 import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 
 /**
@@ -42,8 +41,6 @@ public class ParameterTablePanel extends JPanel {
     private final JTable table;
     /** the model for the table */
     private final ParameterTableModel parameterModel;
-    /** checkbox indicating null value should be visible */
-    private final JCheckBox nullValue;
 
     private final TableRowSorter<ParameterTableModel> sorter;
 
@@ -79,25 +76,7 @@ public class ParameterTablePanel extends JPanel {
         table.addMouseMotionListener(renderer);
         table.addMouseListener(renderer);
 
-        nullValue = new JCheckBox("Show Empty Parameters");
-        JPanel nullValuePanel = new JPanel();
-        nullValuePanel.add(nullValue);
-
-        final RowFilter<ParameterTableModel, Integer> rf = new EmptyRowFilter();
-        sorter.setRowFilter(rf);
-
-        nullValue.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (nullValue.isSelected()) {
-                    sorter.setRowFilter(null);
-                } else {
-                    sorter.setRowFilter(rf);
-                }
-            }
-        });
         add(new JScrollPane(table), BorderLayout.CENTER);
-        add(nullValuePanel, BorderLayout.PAGE_END);
     }
 
     private static class WrappedTextCellRenderer extends JTextPane implements TableCellRenderer, MouseListener, MouseMotionListener {
