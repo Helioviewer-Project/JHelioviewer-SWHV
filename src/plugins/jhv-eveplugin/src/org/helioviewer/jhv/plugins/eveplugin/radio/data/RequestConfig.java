@@ -10,7 +10,6 @@ public class RequestConfig {
     public final double yRatio;
 
     public RequestConfig(long xStart, long xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
-        super();
         this.xStart = xStart;
         this.xEnd = xEnd;
         this.yStart = yStart;
@@ -18,4 +17,5 @@ public class RequestConfig {
         this.xRatio = xRatio;
         this.yRatio = yRatio;
     }
+
 }

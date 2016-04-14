@@ -489,17 +489,17 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                     hvMetaData.parseXML(image.getXML(i));
                     double freqStart = hvMetaData.tryGetDouble("STARTFRQ");
                     double freqEnd = hvMetaData.tryGetDouble("END-FREQ");
-                    Date start = JHVDate.parseDateTime(hvMetaData.get("DATE-OBS")).getDate();
-                    Date end = JHVDate.parseDateTime(hvMetaData.get("DATE-END")).getDate();
+                    long start = JHVDate.parseDateTime(hvMetaData.get("DATE-OBS")).milli;
+                    long end = JHVDate.parseDateTime(hvMetaData.get("DATE-END")).milli;
                     hvMetaData.destroyXML();
 
                     FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));
 
                     List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
-                    Interval dateInterval = new Interval(start.getTime(), end.getTime());
+                    Interval dateInterval = new Interval(start, end);
                     for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
                         ResolutionLevel res = rs.getResolutionLevel(j);
-                        ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) res.width, (freqEnd - freqStart) / res.height, j, res.width, res.height, res.discardLayers);
+                        ResolutionSetting tempResSet = new ResolutionSetting((end - start) / (double) res.width, (freqEnd - freqStart) / res.height, j, res.width, res.height, res.discardLayers);
                         resolutionSettings.add(tempResSet);
                     }
 

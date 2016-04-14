@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import org.helioviewer.jhv.base.interval.Interval;
