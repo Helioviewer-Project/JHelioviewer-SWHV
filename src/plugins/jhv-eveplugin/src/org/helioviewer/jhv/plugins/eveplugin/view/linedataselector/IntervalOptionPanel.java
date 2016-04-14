@@ -4,7 +4,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
-import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -264,11 +263,10 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         Interval availableInterval = drawController.getAvailableInterval();
         long endDate = interval.end;
         long now = System.currentTimeMillis();
-        final Date lastdataDate = DrawController.getSingletonInstance().getLastDateWithData();
-        if (lastdataDate != null) {
-            long lastdataDateTime = lastdataDate.getTime();
-            if (endDate > lastdataDateTime) {
-                endDate = lastdataDateTime;
+        final long lastdataDate = DrawController.getSingletonInstance().getLastDateWithData();
+        if (lastdataDate != -1) {
+            if (endDate > lastdataDate) {
+                endDate = lastdataDate;
             }
         } else if (endDate > now) {
             endDate = now;

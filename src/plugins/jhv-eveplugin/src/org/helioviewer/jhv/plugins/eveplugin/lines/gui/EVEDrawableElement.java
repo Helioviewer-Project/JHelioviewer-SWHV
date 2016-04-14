@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -244,12 +243,8 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     @Override
-    public Date getLastDateWithData() {
-        if (lastMilliWithData >= 0) {
-            return new Date(lastMilliWithData);
-        } else {
-            return null;
-        }
+    public long getLastDateWithData() {
+        return lastMilliWithData;
     }
 
 }
