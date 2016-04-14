@@ -40,21 +40,23 @@ public class JHVEventCache {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof SortedDateInterval)
+            if (o instanceof SortedDateInterval) {
                 return compareTo((SortedDateInterval) o) == 0;
+            }
             return false;
         }
 
         @Override
         public int compareTo(SortedDateInterval o2) {
-            if (start < o2.start)
+            if (start < o2.start) {
                 return -1;
-            else if (start == o2.start && end < o2.end)
+            } else if (start == o2.start && end < o2.end) {
                 return -1;
-            else if (start == o2.start && end == o2.end && o2.id < id)
+            } else if (start == o2.start && end == o2.end && o2.id < id) {
                 return -1;
-            else if (start == o2.start && end == o2.end && o2.id == id)
+            } else if (start == o2.start && end == o2.end && o2.id == id) {
                 return 0;
+            }
             return 1;
         }
     }
@@ -101,6 +103,10 @@ public class JHVEventCache {
         checkAssociation(false, event);
     }
 
+    public JHVRelatedEvents getRelatedEvents(int id) {
+        return relEvents.get(id);
+    }
+
     private void checkAssociation(boolean isLeft, JHVEvent event) {
         Map<Integer, ArrayList<JHVAssociation>> assoList = isLeft ? assoLeft : assoRight;
         Map<Integer, ArrayList<JHVAssociation>> assoOther = isLeft ? assoRight : assoLeft;
@@ -130,8 +136,7 @@ public class JHVEventCache {
                         if (assoOther.get(founduid).isEmpty()) {
                             assoOther.remove(founduid);
                         }
-                    }
-                    else {
+                    } else {
                         createNewRelatedEvent(event);
                     }
                 }
@@ -139,8 +144,7 @@ public class JHVEventCache {
             if (assoList.get(uid).isEmpty()) {
                 assoList.remove(uid);
             }
-        }
-        else {
+        } else {
             createNewRelatedEvent(event);
         }
     }
@@ -154,8 +158,9 @@ public class JHVEventCache {
     }
 
     private void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
-        if (current == found)
+        if (current == found) {
             return;
+        }
         current.merge(found, events);
         for (JHVEvent foundev : found.getEvents()) {
             Integer key = foundev.getUniqueID();
@@ -183,8 +188,7 @@ public class JHVEventCache {
                 merge(ll, rr);
                 ll.addAssociation(association);
             }
-        }
-        else {
+        } else {
             boolean alreadyin = false;
             if (assoLeft.containsKey(association.left)) {
                 ArrayList<JHVAssociation> res = assoLeft.get(association.left);
