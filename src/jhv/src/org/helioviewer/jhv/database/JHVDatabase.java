@@ -720,7 +720,7 @@ public class JHVDatabase {
                     String table_left_name = type_left.getSupplier().getDatabaseName();
                     String table_right_name = type_right.getSupplier().getDatabaseName();
 
-                    String sqlt = "SELECT tl.event_id, tr.event_id FROM " + table_left_name + " AS tl," + table_right_name + " AS tr" + " WHERE tl." + param_left + "=tr." + param_right + " AND tl.event_id!=tr.event_id" + " tl.event_id=? OR tl.right_id=?";
+                    String sqlt = "SELECT tl.event_id, tr.event_id FROM " + table_left_name + " AS tl," + table_right_name + " AS tr" + " WHERE tl." + param_left + "=tr." + param_right + " AND tl.event_id!=tr.event_id AND (tl.event_id=? OR tr.event_id=?)";
                     PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
                     pstatement.setLong(1, event_id);
                     pstatement.setLong(2, event_id);
@@ -738,7 +738,7 @@ public class JHVDatabase {
                         }
                     }
                     rs.close();
-                    String query = "SELECT distinct id, start, end, data, name, supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList.toString() + ");";
+                    String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.name, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList.toString() + ") AND events.id != " + event_id + ";";
                     Statement statement = connection.createStatement();
                     rs = statement.executeQuery(query);
                     return getEventJSON(rs);
