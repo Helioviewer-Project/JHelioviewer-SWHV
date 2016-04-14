@@ -333,7 +333,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         calendar.setTime(new Date(availableInterval.end));
         int endYear = calendar.get(Calendar.YEAR);
 
-        final int horizontalTickCount = Math.min(Math.max(endYear - startYear + 1, 1), maxTicks);
+        final int horizontalTickCount = Math.min(Math.max(endYear - startYear + 1, 2), maxTicks);
         final int yearDifference = (endYear - startYear) / (horizontalTickCount - 1);
 
         for (int i = 0; i < horizontalTickCount; ++i) {
