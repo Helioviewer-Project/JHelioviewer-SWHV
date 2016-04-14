@@ -271,7 +271,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         return new DataCollapsiblePanel(relation, new JScrollPane(allPrecedingEvents), false, model);
     }
 
-    private JPanel createEventPanel(JHVRelatedEvents rEvents, final JHVEvent event) {
+    private JPanel createEventPanel(final JHVRelatedEvents rEvents, final JHVEvent event) {
         JPanel eventAndButtonPanel = new JPanel();
 
         JButton detailsButton = new JButton("Details");
@@ -279,7 +279,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
             @Override
             public void actionPerformed(ActionEvent e) {
                 incrementNrOfWindows();
-                SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvent, event);
+                SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvents, event);
                 dialog.addWindowListener(SWEKEventInformationDialog.this);
                 dialog.validate();
                 dialog.pack();
