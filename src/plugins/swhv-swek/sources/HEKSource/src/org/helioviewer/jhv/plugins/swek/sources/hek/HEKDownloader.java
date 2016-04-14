@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +101,7 @@ public class HEKDownloader extends SWEKDownloader {
     }
 
     @Override
-    protected String createURL(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
+    protected String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(HEKSourceProperties.getSingletonInstance().getHEKSourceProperties().getProperty("heksource.baseurl")).append("?");
         baseURL.append("cmd=search&");
         baseURL.append("type=column&");
@@ -113,11 +112,11 @@ public class HEKDownloader extends SWEKDownloader {
         baseURL.append("y1=").append(eventType.getSpatialRegion().y1).append("&");
         baseURL.append("y2=").append(eventType.getSpatialRegion().y2).append("&");
         baseURL.append("cosec=2&");
-        baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.utcDateFormat.format(endDate)).append("&");
+        baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.utcDateFormat.format(end)).append("&");
         baseURL = appendParams(baseURL, params);
-        baseURL.append("event_starttime=").append(TimeUtils.utcDateFormat.format(startDate)).append("&");
-        long max = Math.max(System.currentTimeMillis(), endDate.getTime());
-        baseURL.append("event_endtime=").append(TimeUtils.utcDateFormat.format(new Date(max))).append("&");
+        baseURL.append("event_starttime=").append(TimeUtils.utcDateFormat.format(start)).append("&");
+        long max = Math.max(System.currentTimeMillis(), end);
+        baseURL.append("event_endtime=").append(TimeUtils.utcDateFormat.format(max)).append("&");
         baseURL.append("page=").append(page);
         return baseURL.toString();
     }
@@ -139,4 +138,5 @@ public class HEKDownloader extends SWEKDownloader {
         }
         return baseURL;
     }
+
 }

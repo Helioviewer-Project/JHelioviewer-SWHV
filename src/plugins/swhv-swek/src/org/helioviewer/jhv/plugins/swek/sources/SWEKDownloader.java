@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -23,12 +22,13 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 public abstract class SWEKDownloader {
+
     protected boolean overmax = true;
 
-    public boolean extern2db(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
+    public boolean extern2db(JHVEventType eventType, long start, long end, List<SWEKParam> params) {
         ArrayList<Interval> range = JHVDatabase.db2daterange(eventType);
         for (Interval interval : range) {
-            if (interval.start <= startDate.getTime() && interval.end >= endDate.getTime()) {
+            if (interval.start <= start && interval.end >= end) {
                 return true;
             }
         }
@@ -37,7 +37,7 @@ public abstract class SWEKDownloader {
             int page = 0;
             boolean succes = true;
             while (overmax && succes) {
-                String urlString = createURL(eventType.getEventType(), startDate, endDate, params, page);
+                String urlString = createURL(eventType.getEventType(), start, end, params, page);
                 DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
                 succes = parseStream(ds.getInput(), eventType);
                 page++;
@@ -89,5 +89,6 @@ public abstract class SWEKDownloader {
 
     protected abstract boolean parseAssociations(JSONObject eventJSON);
 
-    protected abstract String createURL(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page);
+    protected abstract String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page);
+
 }
