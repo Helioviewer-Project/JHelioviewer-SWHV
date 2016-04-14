@@ -228,7 +228,6 @@ public class DownloadController {
 
             try {
                 url = buildRequestURL(interval, band.getBandType());
-                System.out.println(url);
             } catch (final MalformedURLException e) {
                 Log.error("Error Creating the EVE URL.", e);
             }
