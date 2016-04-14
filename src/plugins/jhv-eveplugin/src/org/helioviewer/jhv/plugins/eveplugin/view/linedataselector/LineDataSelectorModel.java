@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.event.TableModelEvent;
@@ -194,7 +193,7 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
     }
 
     @Override
-    public void drawMovieLineRequest(Date time) {
+    public void drawMovieLineRequest(long time) {
     }
 
 }

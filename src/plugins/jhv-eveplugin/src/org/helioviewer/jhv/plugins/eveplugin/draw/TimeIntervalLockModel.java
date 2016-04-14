@@ -3,8 +3,6 @@
  */
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-import java.util.Date;
-
 import org.helioviewer.jhv.base.interval.Interval;
 
 /**
@@ -25,7 +23,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
     private static TimeIntervalLockModel instance;
 
     /** Holds the previous movie time */
-    private Date latestMovieTime;
+    private long latestMovieTime;
 
     private final PlotAreaSpace plotAreaSpace;
 
@@ -38,7 +36,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
         // currentAvailableInterval = new Interval(null, null);
         drawController.addTimingListener(this);
         drawController.addDrawControllerListener(this);
-        latestMovieTime = new Date();
+        latestMovieTime = Long.MIN_VALUE;
         plotAreaSpace = drawController.getPlotAreaSpace();
     }
 
@@ -74,7 +72,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
     public void setLocked(boolean isLocked) {
         this.isLocked = isLocked;
         if (isLocked) {
-            if (latestMovieTime != null) {
+            if (latestMovieTime != Long.MIN_VALUE) {
                 drawMovieLineRequest(latestMovieTime);
             }
         }
@@ -100,14 +98,14 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      * drawMovieLineRequest(java.util.Date)
      */
     @Override
-    public void drawMovieLineRequest(Date time) {
+    public void drawMovieLineRequest(long time) {
         double selectedSpaceWidth = plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
 
         Interval currentAvailableInterval = drawController.getAvailableInterval();
-        if (time != null && isLocked && currentAvailableInterval.containsPointInclusive(time.getTime()) && !latestMovieTime.equals(time)) {
+        if (time != Long.MIN_VALUE && isLocked && currentAvailableInterval.containsPointInclusive(time) && latestMovieTime != time) {
             latestMovieTime = time;
 
-            long movieTimeDiff = time.getTime() - currentAvailableInterval.start;
+            long movieTimeDiff = time - currentAvailableInterval.start;
             double availableIntervalWidthScaled = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
             long availableIntervalWidthAbs = currentAvailableInterval.end - currentAvailableInterval.start;
             double scaledPerTime = availableIntervalWidthScaled / availableIntervalWidthAbs;

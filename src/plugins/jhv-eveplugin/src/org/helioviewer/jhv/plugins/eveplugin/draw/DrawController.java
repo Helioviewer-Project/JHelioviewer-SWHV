@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -188,7 +187,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fireRedrawRequest();
     }
 
-    private void fireRedrawRequestMovieFrameChanged(final Date time) {
+    private void fireRedrawRequestMovieFrameChanged(final long time) {
         for (DrawControllerListener l : listeners) {
             l.drawMovieLineRequest(time);
         }
@@ -196,7 +195,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void timeChanged(JHVDate date) {
-        fireRedrawRequestMovieFrameChanged(date.getDate());
+        fireRedrawRequestMovieFrameChanged(date.milli);
     }
 
     public long getLastDateWithData() {
@@ -243,7 +242,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     @Override
     public void activeLayerChanged(View view) {
         if (view == null) {
-            fireRedrawRequestMovieFrameChanged(null);
+            fireRedrawRequestMovieFrameChanged(Long.MIN_VALUE);
         }
     }
 
