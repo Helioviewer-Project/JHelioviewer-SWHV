@@ -8,7 +8,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class EVECache {
 
-    private final HashMap<Long, EVEDataOfDay> cacheMap = new HashMap<Long, EVEDataOfDay>();
+    private final HashMap<Long, EVEDataOfChunk> cacheMap = new HashMap<Long, EVEDataOfChunk>();
     private static final double DISCARD_LOG_LEVEL_LOW = 1e-10;
     private static final double DISCARD_LOG_LEVEL_HIGH = 1e+4;
     private static final int DAYS_PER_CHUNK = 10;
@@ -25,9 +25,9 @@ public class EVECache {
         for (int i = 0; i < values.length; i++) {
             long key = date2key(dates[i]);
 
-            EVEDataOfDay cache = cacheMap.get(key);
+            EVEDataOfChunk cache = cacheMap.get(key);
             if (cache == null) {
-                cache = new EVEDataOfDay(key);
+                cache = new EVEDataOfChunk(key);
                 cacheMap.put(key, cache);
             }
             if (values[i] > DISCARD_LOG_LEVEL_LOW && values[i] < DISCARD_LOG_LEVEL_HIGH) {
@@ -64,7 +64,7 @@ public class EVECache {
         long key = date2key(binStart);
 
         while (key <= keyEnd) {
-            EVEDataOfDay cache = cacheMap.get(key);
+            EVEDataOfChunk cache = cacheMap.get(key);
             if (cache != null) {
                 cache.fillResult(result);
             }
@@ -80,7 +80,7 @@ public class EVECache {
         long key = date2key(selectedInterval.start);
 
         while (key <= keyEnd) {
-            EVEDataOfDay cache = cacheMap.get(key);
+            EVEDataOfChunk cache = cacheMap.get(key);
 
             if (cache != null && cache.hasData()) {
                 return true;
