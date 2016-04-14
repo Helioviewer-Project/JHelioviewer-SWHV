@@ -100,7 +100,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double speed = SWHVHEKData.readCMESpeed(params);
         double factor = Sun.RadiusMeter;
         double distSunBegin = 2.4;
-        double distSun = distSunBegin + speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
+        double distSun = distSunBegin + speed * (timestamp.getTime() - evt.start) / factor;
         int lineResolution = 2;
         int angularResolution = (int) (angularWidthDegree / 4);
 
@@ -266,7 +266,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double speed = SWHVHEKData.readCMESpeed(params);
         double factor = Sun.RadiusMeter;
         double distSunBegin = 2.4;
-        double distSun = distSunBegin + speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
+        double distSun = distSunBegin + speed * (timestamp.getTime() - evt.start) / factor;
 
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);

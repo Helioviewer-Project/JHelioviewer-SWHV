@@ -154,7 +154,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                     double principalAngle = Math.toRadians(SWHVHEKData.readCMEPrincipalAngleDegree(params));
                     double speed = SWHVHEKData.readCMESpeed(params);
                     double distSun = 2.4;
-                    distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
+                    distSun += speed * (currentTime.getTime() - evt.start) / Sun.RadiusMeter;
 
                     Position.Q p = evt.getEarthPosition();
                     hitpoint = p.orientation.rotateInverseVector(getHitPointPlane(e, vp));
@@ -184,7 +184,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                         double principalAngle = SWHVHEKData.readCMEPrincipalAngleDegree(params) - 90;
                         double speed = SWHVHEKData.readCMESpeed(params);
                         double distSun = 2.4;
-                        distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
+                        distSun += speed * (currentTime.getTime() - evt.start) / Sun.RadiusMeter;
                         GridScale scale = GridScale.current;
                         tf = new Vec2(scale.getXValueInv(principalAngle), scale.getYValueInv(distSun));
                         mousepos = scale.mouseToGridInv(e.getPoint(), vp, camera);
