@@ -39,6 +39,7 @@ public class ComesepDownloader extends SWEKDownloader {
                 String uid = result.getString("alertid");
                 long start;
                 long end;
+                long archiv;
 
                 start = result.getLong("atearliest") * 1000;
                 end = result.getLong("atlatest") * 1000;
@@ -46,7 +47,7 @@ public class ComesepDownloader extends SWEKDownloader {
                     long cactusLiftOff = result.getLong("liftoffduration_value");
                     end = end + cactusLiftOff * 60000;
                 }
-
+                archiv = start;
                 byte[] compressedJson;
                 try {
                     compressedJson = JHVDatabase.compress(result.toString());
@@ -54,7 +55,7 @@ public class ComesepDownloader extends SWEKDownloader {
                     Log.error("compression error");
                     return false;
                 }
-                event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, uid, new ArrayList<JHVDatabaseParam>()));
+                event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, archiv, uid, new ArrayList<JHVDatabaseParam>()));
             }
             int id = JHVDatabase.dump_event2db(event2db_list, type);
             if (id == -1) {

@@ -40,14 +40,16 @@ public class JHVDatabase {
         final byte[] compressedJson;
         final long start;
         final long end;
+        final long archiv;
         final String uid;
         final ArrayList<JHVDatabaseParam> paramList;
 
-        public Event2Db(byte[] _compressedJson, long _start, long _end, String _uid, ArrayList<JHVDatabaseParam> _paramList) {
+        public Event2Db(byte[] _compressedJson, long _start, long _end, long _archiv, String _uid, ArrayList<JHVDatabaseParam> _paramList) {
             compressedJson = _compressedJson;
             start = _start;
             end = _end;
             uid = _uid;
+            archiv = _archiv;
             paramList = _paramList;
         }
 
@@ -60,7 +62,7 @@ public class JHVDatabase {
     public static int config_hash;
 
     private static final String INSERT_EVENT = "INSERT INTO events(uid) VALUES(?)";
-    private static final String INSERT_FULL_EVENT = "INSERT INTO events(type_id, uid,  start, end, data) VALUES(?,?,?,?,?)";
+    private static final String INSERT_FULL_EVENT = "INSERT INTO events(type_id, uid, start, end, archiv, data) VALUES(?,?,?,?,?,?)";
     private static final String SELECT_EVENT_TYPE = "SELECT id FROM event_type WHERE name=? AND supplier=?";
     private static final String INSERT_EVENT_TYPE = "INSERT INTO event_type(name, supplier) VALUES(?,?)";
     private static final String INSERT_LINK = "INSERT INTO event_link(left_id, right_id) VALUES(?,?)";
@@ -339,7 +341,8 @@ public class JHVDatabase {
                                 pstatement.setString(2, event2db.uid);
                                 pstatement.setLong(3, event2db.start);
                                 pstatement.setLong(4, event2db.end);
-                                pstatement.setBinaryStream(5, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
+                                pstatement.setLong(5, event2db.archiv);
+                                pstatement.setBinaryStream(6, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
                                 pstatement.executeUpdate();
                             }
                             {

@@ -36,10 +36,13 @@ public class HEKDownloader extends SWEKDownloader {
             String uid = result.getString("kb_archivid");
             long start;
             long end;
+            long archiv;
             ArrayList<JHVDatabaseParam> paramList = new ArrayList<JHVDatabaseParam>();
             try {
                 start = TimeUtils.utcDateFormat.parse(result.getString("event_starttime")).getTime();
                 end = TimeUtils.utcDateFormat.parse(result.getString("event_endtime")).getTime();
+                archiv = TimeUtils.utcDateFormat.parse(result.getString("kb_archivdate")).getTime();
+
                 HashMap<String, String> dbFields = type.getEventType().getAllDatabaseFields();
                 for (Map.Entry<String, String> entry : dbFields.entrySet()) {
                     String dbType = entry.getValue();
@@ -71,7 +74,7 @@ public class HEKDownloader extends SWEKDownloader {
                 Log.error("compression error");
                 return false;
             }
-            event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, uid, paramList));
+            event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, archiv, uid, paramList));
 
         }
         int id = JHVDatabase.dump_event2db(event2db_list, type);
