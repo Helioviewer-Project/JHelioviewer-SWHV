@@ -127,7 +127,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
-        RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(new Date(selectedInterval.start), end.getTime());
+        RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(selectedInterval.start, end.getTimeInMillis());
     }
 
     @Override
