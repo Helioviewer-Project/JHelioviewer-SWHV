@@ -247,13 +247,13 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      * @param plotIdentifier
      *            The identifier of the plot for which new data is requested
      */
-    public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
+    public void requestForData(long xStart, long xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
         if (!requestForDataBusy && !requestBuffer.hasData()) {
             requestForDataBusy = true;
             requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));
             while (requestBuffer.hasData()) {
                 RequestConfig requestConfig = requestBuffer.getData();
-                handleRequestConfig(requestConfig, xStart.getTime(), xEnd.getTime(), yStart, yEnd);
+                handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd);
             }
             requestForDataBusy = false;
         } else {
@@ -402,7 +402,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      *            The end value of the currently visible frequency interval
      */
     private void handleRequestConfig(RequestConfig requestConfig, long xStart, long xEnd, double yStart, double yEnd) {
-        if (requestConfig.getxEnd().getTime() - requestConfig.getxStart().getTime() > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
+        if (requestConfig.getxEnd() - requestConfig.getxStart() > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
             intervalTooBig();
         } else {
             RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.getxStart(), requestConfig.getxEnd(), 24L * 60 * 60 * 1000);
@@ -585,7 +585,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      */
 
     @Override
-    public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
+    public void requestData(long xStart, long xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
         if (radioImages != null && isVisible) {
             requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio);
             updateNoDataConfig();

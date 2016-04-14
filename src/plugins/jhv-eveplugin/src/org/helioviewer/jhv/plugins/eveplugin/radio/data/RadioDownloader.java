@@ -76,7 +76,7 @@ public class RadioDownloader {
                             JP2ViewCallisto v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, null, TimeUtils.apiDateFormat.format(startDate), TimeUtils.apiDateFormat.format(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                             if (v != null) {
                                 long imageID = getNextID();
-                                DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, new Date(startDate), new Date(endDate));
+                                DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate);
                                 jpxList.add(newJPXData);
                                 // cache.add(newJPXData);
                             } else {
@@ -180,7 +180,7 @@ public class RadioDownloader {
                     }
                     if (v != null) {
                         long imageID = getNextID();
-                        DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, new Date(date), new Date(calculateOneDayFurtherAsDate(date)));
+                        DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, date, calculateOneDayFurtherAsDate(date));
                         jpxList.add(newJPXData);
                     } else {
                         noDataList.add(new Interval(date, calculateOneDayFurtherAsDate(date)));

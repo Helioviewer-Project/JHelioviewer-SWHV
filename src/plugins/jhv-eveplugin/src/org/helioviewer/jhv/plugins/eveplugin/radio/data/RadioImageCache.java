@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,16 +20,16 @@ public class RadioImageCache {
     private final Map<Long, DownloadedJPXData> dataCache;
     private final NavigableMap<Long, DownloadedJPXData> useCache;
     private final Map<DownloadedJPXData, Long> reverseUseCache;
-    private final Map<Date, DownloadedJPXData> startDates;
-    private final Map<Date, Interval> noDataCache;
+    private final Map<Long, DownloadedJPXData> startDates;
+    private final Map<Long, Interval> noDataCache;
     private final Set<Long> idsToRemove;
 
     private RadioImageCache() {
         cacheCounter = 0;
         dataCache = new HashMap<Long, DownloadedJPXData>();
         useCache = new TreeMap<Long, DownloadedJPXData>();
-        startDates = new HashMap<Date, DownloadedJPXData>();
-        noDataCache = new HashMap<Date, Interval>();
+        startDates = new HashMap<Long, DownloadedJPXData>();
+        noDataCache = new HashMap<Long, Interval>();
         reverseUseCache = new HashMap<DownloadedJPXData, Long>();
         idsToRemove = new HashSet<Long>();
     }
@@ -80,7 +79,7 @@ public class RadioImageCache {
         }
     }
 
-    private Date findStartDate(Date start, long stepsize) {
+    private long findStartDate(long start, long stepsize) {
         long divider = 1L;
         if (stepsize < 1000L) {
             divider = 1000L;
@@ -91,20 +90,20 @@ public class RadioImageCache {
         } else {
             divider = 24L * 60 * 60 * 1000;
         }
-        return new Date(start.getTime() - start.getTime() % divider);
+        return (start - start % divider);
     }
 
-    public RadioImageCacheResult getRadioImageCacheResultForInterval(Date start, Date end, long stepsize) {
-        Date localStart = findStartDate(start, stepsize);
+    public RadioImageCacheResult getRadioImageCacheResultForInterval(long start, long end, long stepsize) {
+        long localStart = findStartDate(start, stepsize);
         List<Interval> intervalList = new ArrayList<Interval>();
         List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
         List<Long> toRemove = new ArrayList<Long>(dataCache.keySet());
         toRemove.addAll(idsToRemove);
         idsToRemove.clear();
         List<Interval> noDataInterval = new ArrayList<Interval>();
-        while (localStart.compareTo(end) <= 0) {
+        while (localStart <= end) {
             if (!startDates.containsKey(localStart) && !noDataCache.containsKey(localStart)) {
-                intervalList.add(new Interval(localStart.getTime(), localStart.getTime() + stepsize));
+                intervalList.add(new Interval(localStart, localStart + stepsize));
             } else {
                 if (startDates.containsKey(localStart)) {
                     DownloadedJPXData tempData = startDates.get(localStart);
@@ -119,7 +118,7 @@ public class RadioImageCache {
             if (noDataCache.containsKey(localStart)) {
                 noDataInterval.add(noDataCache.get(localStart));
             }
-            localStart = new Date(localStart.getTime() + stepsize);
+            localStart = localStart + stepsize;
         }
         return new RadioImageCacheResult(dataList, intervalList, new ArrayList<Long>(toRemove), noDataInterval);
     }
@@ -130,7 +129,7 @@ public class RadioImageCache {
 
     public boolean addNoDataInterval(Interval interval) {
         boolean added = noDataCache.containsKey(interval.start);
-        noDataCache.put(new Date(interval.start), interval);
+        noDataCache.put(interval.start, interval);
         return !added;
     }
 
