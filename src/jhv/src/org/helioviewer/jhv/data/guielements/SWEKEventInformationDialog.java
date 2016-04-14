@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -16,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.jhv.data.container.JHVEventContainer;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
@@ -252,45 +255,58 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
         for (final JHVEvent event : relations) {
-            if (event != null) {
-                JPanel eventAndButtonPanel = new JPanel();
+            allPrecedingEvents.add(createEventPanel(rEvents, event));
+        }
+        return new DataCollapsiblePanel(relation, new JScrollPane(allPrecedingEvents), false, model);
+    }
 
-                JButton detailsButton = new JButton("Details");
-                detailsButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (event != null) {
-                            incrementNrOfWindows();
-                            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvent, event);
-                            dialog.addWindowListener(SWEKEventInformationDialog.this);
-                            dialog.validate();
-                            dialog.pack();
-                            dialog.setVisible(true);
-                        }
-                    }
-                });
-
-                eventAndButtonPanel.setLayout(new GridBagLayout());
-                GridBagConstraints c = new GridBagConstraints();
-                c.gridx = 0;
-                c.gridy = 0;
-                c.fill = GridBagConstraints.BOTH;
-                c.anchor = GridBagConstraints.CENTER;
-                c.weightx = 1;
-                c.weighty = 1;
-                eventAndButtonPanel.add(new EventDescriptionPanel(rEvents, event), c);
-
-                c.gridy = 1;
-                c.fill = GridBagConstraints.NONE;
-                c.weightx = 0;
-                c.weighty = 0;
-                c.anchor = GridBagConstraints.EAST;
-
-                eventAndButtonPanel.add(detailsButton, c);
-                allPrecedingEvents.add(eventAndButtonPanel);
+    private DataCollapsiblePanel createOtherRelatedEventsCollapsiblePane(String relation, ArrayList<JHVRelatedEvents> rEvents) {
+        JPanel allPrecedingEvents = new JPanel();
+        allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
+        for (final JHVRelatedEvents rEvent : rEvents) {
+            if (rEvent.getEvents().size() > 0) {
+                allPrecedingEvents.add(createEventPanel(rEvent, rEvent.getEvents().get(0)));
             }
         }
         return new DataCollapsiblePanel(relation, new JScrollPane(allPrecedingEvents), false, model);
+    }
+
+    private JPanel createEventPanel(JHVRelatedEvents rEvents, final JHVEvent event) {
+        JPanel eventAndButtonPanel = new JPanel();
+
+        JButton detailsButton = new JButton("Details");
+        detailsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                incrementNrOfWindows();
+                SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvent, event);
+                dialog.addWindowListener(SWEKEventInformationDialog.this);
+                dialog.validate();
+                dialog.pack();
+                dialog.setVisible(true);
+
+            }
+        });
+
+        eventAndButtonPanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.BOTH;
+        c.anchor = GridBagConstraints.CENTER;
+        c.weightx = 1;
+        c.weighty = 1;
+        eventAndButtonPanel.add(new EventDescriptionPanel(rEvents, event), c);
+
+        c.gridy = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
+        c.weighty = 0;
+        c.anchor = GridBagConstraints.EAST;
+
+        eventAndButtonPanel.add(detailsButton, c);
+        return eventAndButtonPanel;
+
     }
 
     private void incrementNrOfWindows() {
@@ -340,21 +356,29 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     }
 
     private void startOtherRelatedEventsSwingWorker() {
-        SwingWorker<ArrayList<JHVEvent>, Void> worker = new SwingWorker<ArrayList<JHVEvent>, Void>() {
+        SwingWorker<ArrayList<JHVRelatedEvents>, Void> worker = new SwingWorker<ArrayList<JHVRelatedEvents>, Void>() {
             @Override
-            public ArrayList<JHVEvent> doInBackground() {
-                return JHVEventContainer.getSingletonInstance().getOtherRelations(event);
+            public ArrayList<JHVRelatedEvents> doInBackground() {
+                ArrayList<JHVEvent> jhvEvents = JHVEventContainer.getSingletonInstance().getOtherRelations(event);
+                Set<JHVRelatedEvents> rEventsSet = new HashSet<JHVRelatedEvents>();
+                JHVEventCache cache = JHVEventCache.getSingletonInstance();
+                for (JHVEvent jhvEvent : jhvEvents) {
+                    rEventsSet.add(cache.getRelatedEvents(jhvEvent.getUniqueID()));
+                }
+                ArrayList<JHVRelatedEvents> rEvents = new ArrayList<JHVRelatedEvents>();
+                rEvents.addAll(rEventsSet);
+                return rEvents;
             }
 
             @Override
             public void done() {
-                ArrayList<JHVEvent> assocs;
+                ArrayList<JHVRelatedEvents> assocs;
                 try {
                     assocs = get();
                     // otherRelatedEvents = assocs;
                     // otherRelatedEventsLoaded = true;
                     if (!assocs.isEmpty()) {
-                        otherRelatedEventsPanel = createRelatedEventsCollapsiblePane("Other Related Events", rEvent, assocs);
+                        otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", assocs);
                         SWEKEventInformationDialog.this.repack();
                         SWEKEventInformationDialog.this.repaint();
                     }
