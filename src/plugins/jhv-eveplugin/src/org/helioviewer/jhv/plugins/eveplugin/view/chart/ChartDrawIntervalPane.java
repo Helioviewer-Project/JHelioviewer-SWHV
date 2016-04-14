@@ -22,6 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -185,10 +186,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.GRAPH_RIGHT_SPACE, 2, 5, 5));
     }
 
-    private static long THREEYEARS = 86400 * 1000 * 365 * 3;
-    private static long THREEMONTHS = 86400 * 1000 * 30 * 3;
-    private static long THREEDAYS = 86400 * 1000 * 30 * 3;
-
     private void drawLabels(Graphics2D g, Interval availableInterval, Interval selectedInterval) {
         if (availableInterval.start > availableInterval.end) {
             return;
@@ -199,17 +196,17 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
         final double ratioX = availableIntervalWidth / (double) (availableInterval.end - availableInterval.start);
 
-        if (availableInterval.containsPointInclusive(availableInterval.start + THREEYEARS)) {
+        if (availableInterval.containsPointInclusive(availableInterval.start + TimeUtils.DAY_IN_MILLIS * 366 * 3)) {
             drawLabelsYear(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
 
-        if (availableInterval.containsPointInclusive(availableInterval.start + THREEMONTHS)) {
+        if (availableInterval.containsPointInclusive(availableInterval.start + TimeUtils.DAY_IN_MILLIS * 31 * 3)) {
             drawLabelsMonth(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
 
-        if (availableInterval.containsPointInclusive(availableInterval.start + THREEDAYS)) {
+        if (availableInterval.containsPointInclusive(availableInterval.start + TimeUtils.DAY_IN_MILLIS * 3)) {
             drawLabelsDay(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
@@ -333,10 +330,10 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         calendar.setTime(new Date(availableInterval.end));
         int endYear = calendar.get(Calendar.YEAR);
 
-        final int horizontalTickCount = Math.min(Math.max(endYear - startYear + 1, 2), maxTicks);
-        final int yearDifference = (endYear - startYear) / (horizontalTickCount - 1);
+        final int hticks = Math.min(Math.max(endYear - startYear + 1, 2), maxTicks);
+        final int yearDifference = (endYear - startYear) / (hticks - 1);
 
-        for (int i = 0; i < horizontalTickCount; ++i) {
+        for (int i = 0; i < hticks; ++i) {
             calendar.clear();
             calendar.set(startYear + i * yearDifference, 0, 1);
 
@@ -511,16 +508,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     @Override
     public void mouseExited(MouseEvent e) {
-        /*
-         * eveState.setMouseTimeIntervalDragging(false); if (mousePressed !=
-         * null) { if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint) {
-         * resizeSelectedInterval(e.getPoint(), true); } else if
-         * (mouseOverInterval) { moveSelectedInterval(e.getPoint(), true); } }
-         * mousePressed = null; mouseOverInterval = false;
-         * mouseOverLeftGraspPoint = false; mouseOverRightGraspPoint = false;
-         *
-         * setCursor(new Cursor(Cursor.DEFAULT_CURSOR)); repaint();
-         */
     }
 
     @Override
@@ -537,7 +524,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
         eveState.setMouseTimeIntervalDragging(false);
         if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint) {
-            // Log.info(" Mouse released ");
             resizeSelectedInterval(p, true);
         } else if (mouseOverInterval) {
             moveSelectedInterval(p, true);
