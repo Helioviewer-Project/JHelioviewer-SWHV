@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.data.container;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -67,13 +69,16 @@ public class JHVEventContainer {
      *            the handler
      */
     public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
-        // Log.debug("Request for interval : [" + startDate + "," + endDate + "]");
-        // Logger.getLogger(JHVEventContainer.class.getName()).info("handler : " + handler);
+        // Log.debug("Request for interval : [" + startDate + "," + endDate +
+        // "]");
+        // Logger.getLogger(JHVEventContainer.class.getName()).info("handler : "
+        // + handler);
         if (startDate != null && endDate != null) {
             long deltaT = Math.max((long) ((endDate.getTime() - startDate.getTime()) * factor), 1000 * 60 * 60 * 24 * 5);
             Date newStartDate = new Date(startDate.getTime() - deltaT);
             Date newEndDate = new Date(endDate.getTime() + deltaT);
-            // Log.debug("new Interval : [" + newStartDate + "," + newEndDate + "]");
+            // Log.debug("new Interval : [" + newStartDate + "," + newEndDate +
+            // "]");
             eventHandlerCache.add(handler);
             JHVEventCacheResult result = eventCache.get(startDate, endDate, newStartDate, newEndDate);
             Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = result.getAvailableEvents();
@@ -158,8 +163,9 @@ public class JHVEventContainer {
     }
 
     public static void highlight(JHVRelatedEvents event) {
-        if (event == lastHighlighted)
+        if (event == lastHighlighted) {
             return;
+        }
         if (event != null) {
             event.highlight(true);
 
@@ -178,4 +184,7 @@ public class JHVEventContainer {
         eventCache.reset(eventType);
     }
 
+    public ArrayList<JHVEvent> getOtherRelations(JHVEvent event) {
+        return incomingRequestManager.getOtherRelations(event);
+    }
 }
