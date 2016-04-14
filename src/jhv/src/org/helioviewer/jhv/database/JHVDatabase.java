@@ -29,7 +29,9 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
+import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
@@ -70,10 +72,7 @@ public class JHVDatabase {
     private static final String INSERT_DATERANGE = "INSERT INTO date_range(type_id,  start, end) VALUES(?,?,?)";
     private static final String SELECT_DATERANGE = "SELECT start, end FROM date_range where type_id=? order by start, end ";
     private static final String SELECT_LAST_EVENT = "SELECT end FROM events WHERE type_id=? order by end DESC LIMIT 1";
-    private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link "
-            + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
-            + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id "
-            + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
+    private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link " + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id " + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id ";
 
     private static HashMap<Object, PreparedStatement> statements = new HashMap<Object, PreparedStatement>();
 
@@ -145,14 +144,14 @@ public class JHVDatabase {
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_TYPE);
             pstatement.setString(1, event.getEventType().getEventName());
-            pstatement.setString(2, event.getSupplier().getSupplierName());
+            pstatement.setString(2, event.getSupplier().getSupplierKey());
             ResultSet rs = pstatement.executeQuery();
             if (rs.next()) {
                 typeId = rs.getInt(1);
             }
             rs.close();
         } catch (SQLException e) {
-            Log.error("Could not fetch event type " + event.getEventType().getEventName() + event.getSupplier().getSupplierName() + e.getMessage());
+            Log.error("Could not fetch event type " + event.getEventType().getEventName() + event.getSupplier().getSupplierKey() + e.getMessage());
         }
         return typeId;
     }
@@ -161,7 +160,7 @@ public class JHVDatabase {
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, INSERT_EVENT_TYPE);
             pstatement.setString(1, eventType.getEventType().getEventName());
-            pstatement.setString(2, eventType.getSupplier().getSupplierName());
+            pstatement.setString(2, eventType.getSupplier().getSupplierKey());
             pstatement.executeUpdate();
 
             String dbName = eventType.getSupplier().getDatabaseName();
@@ -241,8 +240,9 @@ public class JHVDatabase {
         @Override
         public Integer call() {
             Connection connection = ConnectionThread.getConnection();
-            if (connection == null)
+            if (connection == null) {
                 return -1;
+            }
             int len = assocs.length;
             int i = 0;
             int errorcode = 0;
@@ -279,8 +279,9 @@ public class JHVDatabase {
     private static int getEventId(String uid) {
         int generatedKey = -1;
         Connection connection = ConnectionThread.getConnection();
-        if (connection == null)
+        if (connection == null) {
             return generatedKey;
+        }
 
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_ID_FROM_UID);
@@ -322,11 +323,11 @@ public class JHVDatabase {
         @Override
         public Integer call() {
             Connection connection = ConnectionThread.getConnection();
-            if (connection == null)
+            if (connection == null) {
                 return -1;
+            }
             int errorcode = 0;
-            try
-            {
+            try {
                 int typeId = getEventTypeId(connection, type);
                 for (Event2Db event2db : event2db_list) {
                     if (typeId != -1) {
@@ -413,13 +414,15 @@ public class JHVDatabase {
         @Override
         public void run() {
             Connection connection = ConnectionThread.getConnection();
-            if (connection == null)
+            if (connection == null) {
                 return;
+            }
 
             HashMap<JHVEventType, RequestCache> dCache = ConnectionThread.downloadedCache;
             RequestCache typedCache = dCache.get(type);
-            if (typedCache == null)
+            if (typedCache == null) {
                 return;
+            }
             typedCache.adaptRequestCache(start, end);
             int typeId = getEventTypeId(connection, type);
             try {
@@ -578,8 +581,9 @@ public class JHVDatabase {
         public ArrayList<JsonEvent> call() {
             Connection connection = ConnectionThread.getConnection();
             ArrayList<JsonEvent> eventList = new ArrayList<JsonEvent>();
-            if (connection == null)
+            if (connection == null) {
                 return eventList;
+            }
 
             int typeId = getEventTypeId(connection, type);
             if (typeId != -1) {
@@ -591,10 +595,7 @@ public class JHVDatabase {
                             and.append("AND tp.").append(p.param).append(p.operand.getStringRepresentation()).append(p.value).append(" ");
                         }
                     }
-                    String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e "
-                            + join
-                            + " WHERE e.start BETWEEN ? AND ? and e.type_id=? "
-                            + and + " order by e.start, e.end ";
+                    String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e " + join + " WHERE e.start BETWEEN ? AND ? and e.type_id=? " + and + " order by e.start, e.end ";
                     PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
                     pstatement.setLong(1, start);
                     pstatement.setLong(2, end);
@@ -646,8 +647,9 @@ public class JHVDatabase {
         public ArrayList<JHVAssociation> call() {
             Connection connection = ConnectionThread.getConnection();
             ArrayList<JHVAssociation> assocList = new ArrayList<JHVAssociation>();
-            if (connection == null)
+            if (connection == null) {
                 return assocList;
+            }
 
             int typeId = getEventTypeId(connection, type);
             if (typeId != -1) {
@@ -674,19 +676,19 @@ public class JHVDatabase {
         }
     }
 
-    public static ArrayList<JHVAssociation> relations2Program(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
-        FutureTask<ArrayList<JHVAssociation>> ft = new FutureTask<ArrayList<JHVAssociation>>(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
+    public static ArrayList<JsonEvent> relations2Program(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
+        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<ArrayList<JsonEvent>>(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException e) {
-            return new ArrayList<JHVAssociation>();
+            return new ArrayList<JsonEvent>();
         } catch (ExecutionException e) {
-            return new ArrayList<JHVAssociation>();
+            return new ArrayList<JsonEvent>();
         }
     }
 
-    private static class Relations2Program implements Callable<ArrayList<JHVAssociation>> {
+    private static class Relations2Program implements Callable<ArrayList<JsonEvent>> {
         private final JHVEventType type_left;
         private final JHVEventType type_right;
         private final String param_left;
@@ -703,11 +705,12 @@ public class JHVDatabase {
         }
 
         @Override
-        public ArrayList<JHVAssociation> call() {
+        public ArrayList<JsonEvent> call() {
             Connection connection = ConnectionThread.getConnection();
-            ArrayList<JHVAssociation> assocList = new ArrayList<JHVAssociation>();
-            if (connection == null)
-                return assocList;
+            ArrayList<JsonEvent> assocList = new ArrayList<JsonEvent>();
+            if (connection == null) {
+                return new ArrayList<JsonEvent>();
+            }
 
             int type_left_id = getEventTypeId(connection, type_left);
             int type_right_id = getEventTypeId(connection, type_right);
@@ -717,29 +720,57 @@ public class JHVDatabase {
                     String table_left_name = type_left.getSupplier().getDatabaseName();
                     String table_right_name = type_right.getSupplier().getDatabaseName();
 
-                    String sqlt = "SELECT tl.event_id, tr.event_id FROM "
-                            + table_left_name + " AS tl," + table_right_name + " AS tr"
-                            + " WHERE tl." + param_left + "=tr." + param_right
-                            + " AND tl.event_id!=tr.event_id"
-                            + " tl.event_id=? OR tl.right_id=?";
+                    String sqlt = "SELECT tl.event_id, tr.event_id FROM " + table_left_name + " AS tl," + table_right_name + " AS tr" + " WHERE tl." + param_left + "=tr." + param_right + " AND tl.event_id!=tr.event_id" + " tl.event_id=? OR tl.right_id=?";
                     PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
                     pstatement.setLong(1, event_id);
                     pstatement.setLong(2, event_id);
                     ResultSet rs = pstatement.executeQuery();
                     boolean next = rs.next();
+
+                    StringBuilder idList = new StringBuilder();
                     while (next) {
-                        int left = rs.getInt(1);
-                        int right = rs.getInt(2);
-                        assocList.add(new JHVAssociation(left, right));
+                        idList.append(rs.getInt(1));
+                        idList.append(",");
+                        idList.append(rs.getInt(2));
                         next = rs.next();
+                        if (next) {
+                            idList.append(",");
+                        }
                     }
                     rs.close();
+                    String query = "SELECT distinct id, start, end, data, name, supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList.toString() + ");";
+                    Statement statement = connection.createStatement();
+                    rs = statement.executeQuery(query);
+                    return getEventJSON(rs);
                 } catch (SQLException e) {
                     Log.error("Could not fetch associations " + e.getMessage());
-                    return assocList;
+                    return new ArrayList<JsonEvent>();
                 }
             }
-            return assocList;
+            return new ArrayList<JsonEvent>();
         }
     }
+
+    private static ArrayList<JsonEvent> getEventJSON(ResultSet rs) {
+        ArrayList<JsonEvent> eventList = new ArrayList<JsonEvent>();
+        boolean next;
+        try {
+            next = rs.next();
+
+            while (!rs.isClosed() && next) {
+                int id = rs.getInt(1);
+                long start = rs.getLong(2);
+                long end = rs.getLong(3);
+                byte[] json = rs.getBytes(4);
+                eventList.add(new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end));
+                next = rs.next();
+            }
+            rs.close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return eventList;
+    }
+
 }

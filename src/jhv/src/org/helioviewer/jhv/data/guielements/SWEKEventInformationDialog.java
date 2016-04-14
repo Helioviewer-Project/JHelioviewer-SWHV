@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.data.guielements;
 
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -7,17 +8,28 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingWorker;
 
+import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParser;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedEvents;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedOn;
+import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
 import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
+import org.helioviewer.jhv.database.JHVDatabase;
+import org.helioviewer.jhv.database.JHVDatabase.JsonEvent;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
@@ -58,13 +70,18 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
     private final DataCollapsiblePanelModel model;
 
+    private ArrayList<JHVEvent> otherRelatedEvents;
+    private boolean otherRelatedEventsLoaded;
+
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent event) {
         super(ImageViewerGui.getMainFrame(), revent.getJHVEventType().getEventType().getEventName());
         this.event = event;
         rEvent = revent;
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
+        otherRelatedEventsLoaded = false;
         initDialog(revent);
+        startOtherRelatedEventsSwingWorker();
     }
 
     /*
@@ -182,14 +199,9 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     }
 
     /*
-    private boolean notNullRelationShip(Map<String, JHVEventRelation> precedingEvents) {
-        for (JHVEventRelation r : precedingEvents.values()) {
-            if (r.getTheEvent() != null) {
-                return true;
-            }
-        }
-        return false;
-    }
+     * private boolean notNullRelationShip(Map<String, JHVEventRelation>
+     * precedingEvents) { for (JHVEventRelation r : precedingEvents.values()) {
+     * if (r.getTheEvent() != null) { return true; } } return false; }
      */
 
     private void setCollapsiblePanels() {
@@ -311,7 +323,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     @Override
     public void repack() {
         int newExpandedPanels = nrOfExpandedPanels();
-        // if (!(newExpandedPanels == 0 || (newExpandedPanels == 1 && expandedPanels == 0))) {
+        // if (!(newExpandedPanels == 0 || (newExpandedPanels == 1 &&
+        // expandedPanels == 0))) {
         // setPreferredSize(new Dimension(getWidth(), getHeight()));
         // }
         allTablePanel.removeAll();
@@ -345,4 +358,74 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         return newExpandedPanels;
     }
 
+    private void startOtherRelatedEventsSwingWorker() {
+        SwingWorker<ArrayList<JHVEvent>, Void> worker = new SwingWorker<ArrayList<JHVEvent>, Void>() {
+            @Override
+            public ArrayList<JHVEvent> doInBackground() {
+                SWEKEventType evt = event.getJHVEventType().getEventType();
+                ArrayList<JsonEvent> jsonEvents = new ArrayList<JsonEvent>();
+                ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
+
+                for (SWEKRelatedEvents re : evt.getSwekRelatedEvents()) {
+                    if (re.getEvent() == evt) {
+                        List<SWEKRelatedOn> relon = re.getRelatedOnList();
+                        for (SWEKRelatedOn swon : relon) {
+                            String f = swon.getParameterFrom().getParameterName().toLowerCase();
+                            String w = swon.getParameterWith().getParameterName().toLowerCase();
+                            SWEKEventType reType = re.getRelatedWith();
+                            for (SWEKSupplier supplier : reType.getSuppliers()) {
+                                JHVEventType othert = JHVEventType.getJHVEventType(reType, supplier);
+                                jsonEvents.addAll(JHVDatabase.relations2Program(event.getUniqueID(), event.getJHVEventType(), othert, f, w));
+                            }
+                        }
+                    }
+                    if (re.getRelatedWith() == evt) {
+                        List<SWEKRelatedOn> relon = re.getRelatedOnList();
+                        for (SWEKRelatedOn swon : relon) {
+                            String f = swon.getParameterFrom().getParameterName().toLowerCase();
+                            String w = swon.getParameterWith().getParameterName().toLowerCase();
+                            SWEKEventType reType = re.getEvent();
+                            for (SWEKSupplier supplier : reType.getSuppliers()) {
+                                JHVEventType fromt = JHVEventType.getJHVEventType(reType, supplier);
+                                jsonEvents.addAll(JHVDatabase.relations2Program(event.getUniqueID(), fromt, event.getJHVEventType(), f, w));
+                            }
+                        }
+                    }
+                    for (JsonEvent jsonEvent : jsonEvents) {
+                        nEvents.add(parseJSON(jsonEvent));
+
+                    }
+                }
+                return nEvents;
+
+            }
+
+            private JHVEvent parseJSON(JsonEvent jsonEvent) {
+                SWEKParser parser = SWEKSourceManager.getSingletonInstance().getParser(jsonEvent.type.getSupplier());
+                final JHVEvent ev = parser.parseEventJSON(JHVDatabase.decompress(jsonEvent.json), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end);
+                EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        JHVEventCache.getSingletonInstance().add(ev);
+
+                    }
+                });
+            }
+
+            @Override
+            public void done() {
+                ArrayList<JHVEvent> assocs;
+                try {
+                    assocs = get();
+                    otherRelatedEvents = assocs;
+                    otherRelatedEventsLoaded = true;
+                    SWEKEventInformationDialog.this.repack();
+                } catch (InterruptedException ignore) {
+                } catch (java.util.concurrent.ExecutionException e) {
+                }
+
+            }
+        };
+        worker.execute();
+    }
 }
