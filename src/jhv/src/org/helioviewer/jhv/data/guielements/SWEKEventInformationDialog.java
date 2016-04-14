@@ -61,7 +61,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     private final DataCollapsiblePanelModel model;
 
     private ArrayList<JHVEvent> otherRelatedEvents;
-    private boolean otherRelatedEventsLoaded;
+    private final boolean otherRelatedEventsLoaded;
 
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent event) {
         super(ImageViewerGui.getMainFrame(), revent.getJHVEventType().getEventType().getEventName());
@@ -177,15 +177,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         if (!nextEvents.isEmpty()) {
             followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", rEvent, nextEvents);
         }
-
-        /*
-         * Map<String, JHVEventRelation> relatedEvents =
-         * event.getEventRelationShip().getRelatedEventsByRule(); if
-         * (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
-         * otherRelatedEventsPanel =
-         * createRelatedEventsCollapsiblePane("Other Related Events",
-         * relatedEvents); }
-         */
     }
 
     /*
@@ -360,9 +351,13 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
                 ArrayList<JHVEvent> assocs;
                 try {
                     assocs = get();
-                    otherRelatedEvents = assocs;
-                    otherRelatedEventsLoaded = true;
-                    SWEKEventInformationDialog.this.repack();
+                    // otherRelatedEvents = assocs;
+                    // otherRelatedEventsLoaded = true;
+                    if (!assocs.isEmpty()) {
+                        otherRelatedEventsPanel = createRelatedEventsCollapsiblePane("Other Related Events", rEvent, assocs);
+                        SWEKEventInformationDialog.this.repack();
+                        SWEKEventInformationDialog.this.repaint();
+                    }
                 } catch (InterruptedException ignore) {
                 } catch (java.util.concurrent.ExecutionException e) {
                 }
