@@ -120,6 +120,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
         if (elements != null && !keepYAxisElement) {
             elements.remove(element);
+            if (elements.isEmpty()) {
+                drawableElements.remove(element.getDrawableElementType().getLevel());
+            }
             createYAxisSet();
         }
         if (redraw) {
