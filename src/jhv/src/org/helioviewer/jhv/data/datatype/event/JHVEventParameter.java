@@ -7,13 +7,13 @@ import org.helioviewer.jhv.base.Regex;
 
 public class JHVEventParameter {
     /** The name of the parameter */
-    private String parameterName;
+    private final String parameterName;
 
     /** How the parameter is displayed */
-    private String parameterDisplayName;
+    private final String parameterDisplayName;
 
     /** The value of the parameter */
-    private String parameterValue;
+    private final String parameterValue;
 
     /**
      * Creates a JHVEvent parameter with a parameter name, parameter display
@@ -42,16 +42,6 @@ public class JHVEventParameter {
     }
 
     /**
-     * Sets the parameter name.
-     *
-     * @param parameterName
-     *            the name of the parameter
-     */
-    public void setParameterName(String parameterName) {
-        this.parameterName = parameterName;
-    }
-
-    /**
      * Gets the parameter display name.
      *
      * @return the parameter display name
@@ -61,32 +51,12 @@ public class JHVEventParameter {
     }
 
     /**
-     * Sets the parameter display name.
-     *
-     * @param parameterDisplayName
-     *            the display name of the parameter
-     */
-    public void setParameterDisplayName(String parameterDisplayName) {
-        this.parameterDisplayName = parameterDisplayName;
-    }
-
-    /**
      * Gets the value of the parameter.
      *
      * @return the value of the parameter
      */
     public String getParameterValue() {
         return parameterValue;
-    }
-
-    /**
-     * Sets the value of the parameter.
-     *
-     * @param parameterValue
-     *            the value of the parameter
-     */
-    public void setParameterValue(String parameterValue) {
-        this.parameterValue = parameterValue;
     }
 
     /**
