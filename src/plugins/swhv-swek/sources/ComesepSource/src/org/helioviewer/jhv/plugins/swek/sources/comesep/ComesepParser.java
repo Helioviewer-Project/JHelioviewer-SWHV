@@ -50,4 +50,5 @@ public class ComesepParser implements SWEKParser {
 
         return currentEvent;
     }
+
 }
