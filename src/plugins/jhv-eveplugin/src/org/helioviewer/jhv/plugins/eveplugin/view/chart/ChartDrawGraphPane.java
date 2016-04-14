@@ -58,7 +58,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private final DrawController drawController;
     private Map<YAxisElement, Double> yRatios;
-    private Date movieTimestamp = null;
+    private long movieTimestamp = Long.MIN_VALUE;
     private int movieLinePosition = -1;
     private Point mousePressedPosition = null;
     private Point mouseDragPosition = null;
@@ -377,10 +377,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean updateMovieLineInformation() {
         int newMovieLine = -1;
         Interval interval = drawController.getSelectedInterval();
-        if (movieTimestamp == null) {
+        if (movieTimestamp == Long.MIN_VALUE) {
             newMovieLine = -1;
         } else {
-            newMovieLine = (int) ((movieTimestamp.getTime() - interval.start) * ratioX) + graphArea.x;
+            newMovieLine = (int) ((movieTimestamp - interval.start) * ratioX) + graphArea.x;
             if (newMovieLine < graphArea.x || newMovieLine > (graphArea.x + graphArea.width)) {
                 newMovieLine = -1;
             }
@@ -394,7 +394,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void setMovieFrameManually(final Point point) {
         Interval interval = drawController.getSelectedInterval();
-        if (movieTimestamp == null) {
+        if (movieTimestamp == Long.MIN_VALUE) {
             return;
         }
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
@@ -572,8 +572,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void drawMovieLineRequest(Date time) {
-        if (movieTimestamp == null || !movieTimestamp.equals(time)) {
+    public void drawMovieLineRequest(long time) {
+        if (movieTimestamp == Long.MIN_VALUE || movieTimestamp != time) {
             movieTimestamp = time;
             if (!TimeIntervalLockModel.getInstance().isLocked()) {
                 if (updateMovieLineInformation()) {
@@ -582,8 +582,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
             }
         }
-        if (time == null) {
-            movieTimestamp = null;
+        if (time == Long.MIN_VALUE) {
+            movieTimestamp = Long.MIN_VALUE;
             if (updateMovieLineInformation()) {
                 updateGraph();
             }
