@@ -402,12 +402,12 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      *            The end value of the currently visible frequency interval
      */
     private void handleRequestConfig(RequestConfig requestConfig, long xStart, long xEnd, double yStart, double yEnd) {
-        if (requestConfig.getxEnd() - requestConfig.getxStart() > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
+        if (requestConfig.xEnd - requestConfig.xStart > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
             intervalTooBig();
         } else {
-            RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.getxStart(), requestConfig.getxEnd(), 24L * 60 * 60 * 1000);
+            RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.xStart, requestConfig.xEnd, 24L * 60 * 60 * 1000);
             if (radioImages != null) {
-                downloader.requestAndOpenIntervals(result.getMissingInterval(), requestConfig.getxRatio(), requestConfig.getyRatio());
+                downloader.requestAndOpenIntervals(result.getMissingInterval(), requestConfig.xRatio, requestConfig.yRatio);
             } else {
                 Log.trace("drd is null");
             }
