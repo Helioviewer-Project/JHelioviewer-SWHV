@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.filters.lut;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,7 +17,7 @@ import org.helioviewer.jhv.base.logging.Log;
 /**
  * Representing a single color lookup. Each lookup has a name assigned and gives
  * access to lookup the values
- * 
+ *
  * @author Helge Dietert
  */
 public class LUT {
@@ -27,7 +28,7 @@ public class LUT {
 
     /**
      * Returns the name of the lut
-     * 
+     *
      * @return Name
      */
     public String getName() {
@@ -38,6 +39,7 @@ public class LUT {
      * LUT for 8 bit
      */
     private final int[] lut8;
+
     /**
      * LUT for 16 bit
      */
@@ -46,7 +48,7 @@ public class LUT {
     /**
      * Creates a lookup table with the given table, use e.g. for int[]
      * org.helioviewer.viewmodel.view.jp2view.JP2View.getBuiltInLUT()
-     * 
+     *
      * @param name
      *            Name of the lookup
      * @param lookup8
@@ -63,10 +65,10 @@ public class LUT {
     /**
      * Fills the output array with values based on the given input data using
      * the given lookup table.
-     * 
+     *
      * The output data must have the same size as the input data to call this
      * function.
-     * 
+     *
      * @param byteBuf
      *            Input data
      * @param intBuf
@@ -74,28 +76,28 @@ public class LUT {
      * @param invert
      *            If true, the color table is inverted, false otherwise
      */
-/*
-    public void lookup8(byte[] byteBuf, int[] intBuf, boolean invert) {
-        if (invert) {
-            int offset = lut8.length - 1;
-            for (int i = 0; i < byteBuf.length; ++i) {
-                intBuf[i] = lut8[offset - (byteBuf[i] & 0xff)];
-            }
-        } else {
-            for (int i = 0; i < byteBuf.length; ++i) {
-                intBuf[i] = lut8[byteBuf[i] & 0xff];
+    /*
+        public void lookup8(byte[] byteBuf, int[] intBuf, boolean invert) {
+            if (invert) {
+                int offset = lut8.length - 1;
+                for (int i = 0; i < byteBuf.length; ++i) {
+                    intBuf[i] = lut8[offset - (byteBuf[i] & 0xff)];
+                }
+            } else {
+                for (int i = 0; i < byteBuf.length; ++i) {
+                    intBuf[i] = lut8[byteBuf[i] & 0xff];
+                }
             }
         }
-    }
-*/
+    */
 
     /**
      * Fills the output array with values based on the given input data using
      * the given lookup table.
-     * 
+     *
      * The output data must have the same size as the input data to call this
      * function.
-     * 
+     *
      * @param shortBuf
      *            Input data
      * @param intBuf
@@ -103,22 +105,22 @@ public class LUT {
      * @param invert
      *            If true, the color table is inverted, false otherwise
      */
-/*    public void lookup16(short[] shortBuf, int[] intBuf, boolean invert) {
-        if (invert) {
-            int offset = lut16.length - 1;
-            for (int i = 0; i < shortBuf.length; ++i) {
-                intBuf[i] = lut16[offset - (shortBuf[i] & 0xFFFF)];
-            }
-        } else {
-            for (int i = 0; i < shortBuf.length; ++i) {
-                intBuf[i] = lut16[(shortBuf[i] & 0xFFFF)];
+    /*    public void lookup16(short[] shortBuf, int[] intBuf, boolean invert) {
+            if (invert) {
+                int offset = lut16.length - 1;
+                for (int i = 0; i < shortBuf.length; ++i) {
+                    intBuf[i] = lut16[offset - (shortBuf[i] & 0xFFFF)];
+                }
+            } else {
+                for (int i = 0; i < shortBuf.length; ++i) {
+                    intBuf[i] = lut16[(shortBuf[i] & 0xFFFF)];
+                }
             }
         }
-    }
-*/
+    */
     /**
      * Gives back LUT for 8bit
-     * 
+     *
      * @return table
      */
     public int[] getLut8() {
@@ -127,16 +129,16 @@ public class LUT {
 
     /**
      * Gives back LUT for 16bit
-     * 
+     *
      * @return table
      */
-/*    public int[] getLut16() {
-        return lut16;
-    }
-*/
+    /*    public int[] getLut16() {
+            return lut16;
+        }
+    */
     /**
      * Reads in a gimp gradient file as a gradient filter
-     * 
+     *
      * @param file
      * @return Created LUT
      * @throws GradientError
@@ -153,14 +155,16 @@ public class LUT {
             fr = new FileInputStream(file);
             l = readGimpGradientStream(fr);
         } finally {
-            fr.close();
+            if (fr != null) {
+                fr.close();
+            }
         }
         return l;
     }
 
     /**
      * Reads in a gimp gradient file from a input stream as a gradient filter
-     * 
+     *
      * @param is
      *            Input stream to read from
      * @return Created LUT
@@ -236,7 +240,7 @@ public class LUT {
     /**
      * Shortcut to create the old standard gradients. Better way is to use
      * readGimpGradient properly
-     * 
+     *
      * @param name
      *            Name to identify
      * @param lookup8
@@ -252,34 +256,34 @@ public class LUT {
     /**
      * Reads in the existing 16bit LUT. In general a gimp gradient file is much
      * more common and should be used for additions
-     * 
+     *
      * @param name
      * @return 16bit lookup table
      */
-/*
-    private static int[] internal16Readin(String name) {
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(FileUtils.getResourceInputStream("/luts/" + name)));
-            String strLine;
+    /*
+        private static int[] internal16Readin(String name) {
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(FileUtils.getResourceInputStream("/luts/" + name)));
+                String strLine;
 
-            int[] intArray = new int[65536];
-            int counter = 0;
-            while ((strLine = br.readLine()) != null) {
-                String[] array = strLine.split(" ");
-                for (int i = 0; i < array.length; i++) {
-                    if (array[i].equals(" ") || array[i].equals("")) {
-                    } else {
-                        intArray[counter] = Integer.parseInt(array[i]);
-                        counter++;
+                int[] intArray = new int[65536];
+                int counter = 0;
+                while ((strLine = br.readLine()) != null) {
+                    String[] array = strLine.split(" ");
+                    for (int i = 0; i < array.length; i++) {
+                        if (array[i].equals(" ") || array[i].equals("")) {
+                        } else {
+                            intArray[counter] = Integer.parseInt(array[i]);
+                            counter++;
+                        }
                     }
                 }
+                br.close();
+                return intArray;
+            } catch (Exception e) {
+                Log.error("Error open internal color table " + name, e);
+                return null;
             }
-            br.close();
-            return intArray;
-        } catch (Exception e) {
-            Log.error("Error open internal color table " + name, e);
-            return null;
         }
-    }
-*/
+    */
 }

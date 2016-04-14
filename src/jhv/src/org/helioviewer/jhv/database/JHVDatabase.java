@@ -38,11 +38,11 @@ import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 public class JHVDatabase {
 
     public static class Event2Db {
-        byte[] compressedJson;
-        long start;
-        long end;
-        String uid;
-        ArrayList<JHVDatabaseParam> paramList;
+        final byte[] compressedJson;
+        final long start;
+        final long end;
+        final String uid;
+        final ArrayList<JHVDatabaseParam> paramList;
 
         public Event2Db(byte[] _compressedJson, long _start, long _end, String _uid, ArrayList<JHVDatabaseParam> _paramList) {
             compressedJson = _compressedJson;
@@ -162,7 +162,7 @@ public class JHVDatabase {
             pstatement.setString(1, eventType.getEventType().getEventName());
             pstatement.setString(2, eventType.getSupplier().getSupplierKey());
             pstatement.executeUpdate();
-
+            pstatement.close();
             String dbName = eventType.getSupplier().getDatabaseName();
             StringBuilder createtbl = new StringBuilder();
             createtbl.append("CREATE TABLE ").append(dbName).append(" (");
@@ -175,6 +175,7 @@ public class JHVDatabase {
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
             statement.executeUpdate(createtbl.toString());
+            statement.close();
             connection.commit();
         } catch (SQLException e) {
             Log.error("Failed to insert event type " + e.getMessage());
@@ -547,12 +548,11 @@ public class JHVDatabase {
     }
 
     public static class JsonEvent {
-
-        public int id;
-        public byte[] json;
-        public JHVEventType type;
-        public long start;
-        public long end;
+        final public int id;
+        final public byte[] json;
+        final public JHVEventType type;
+        final public long start;
+        final public long end;
 
         public JsonEvent(byte[] _json, JHVEventType _type, int _id, long _start, long _end) {
             start = _start;
