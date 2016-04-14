@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 import java.awt.Rectangle;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -32,8 +33,8 @@ public class EVECache {
     }
 
     public EVEValues getValuesInInterval(final Interval interval, Rectangle space) {
-        long intervalStart = interval.start.getTime();
-        long intervalEnd = interval.end.getTime();
+        long intervalStart = interval.start;
+        long intervalEnd = interval.end;
         long intervalWidth = intervalEnd - intervalStart;
         int spaceWidth = space.width;
         long binStart;
@@ -83,9 +84,9 @@ public class EVECache {
 
     public boolean hasDataInInterval(Interval selectedInterval) {
         GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(selectedInterval.end);
+        calendar.setTime(new Date(selectedInterval.end));
         int keyEnd = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        calendar.setTime(selectedInterval.start);
+        calendar.setTime(new Date(selectedInterval.start));
         int key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
 
         while (key <= keyEnd) {

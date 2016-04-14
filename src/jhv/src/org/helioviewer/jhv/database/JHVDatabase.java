@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -397,16 +396,16 @@ public class JHVDatabase {
         }
     }
 
-    public static void addDaterange2db(Date start, Date end, JHVEventType type) {
+    public static void addDaterange2db(long start, long end, JHVEventType type) {
         executor.execute(new AddDateRange2db(start, end, type));
     }
 
     private static class AddDateRange2db implements Runnable {
         private final JHVEventType type;
-        private final Date start;
-        private final Date end;
+        private final long start;
+        private final long end;
 
-        public AddDateRange2db(Date _start, Date _end, JHVEventType _type) {
+        public AddDateRange2db(long _start, long _end, JHVEventType _type) {
             start = _start;
             end = _end;
             type = _type;
@@ -434,8 +433,8 @@ public class JHVDatabase {
                     if (typeId != -1) {
                         PreparedStatement pstatement = getPreparedStatement(connection, INSERT_DATERANGE);
                         pstatement.setInt(1, typeId);
-                        pstatement.setLong(2, interval.start.getTime());
-                        pstatement.setLong(3, interval.end.getTime());
+                        pstatement.setLong(2, interval.start);
+                        pstatement.setLong(3, interval.end);
                         pstatement.executeUpdate();
                     }
                 }
@@ -496,8 +495,8 @@ public class JHVDatabase {
                         pstatement.setInt(1, typeId);
                         ResultSet rs = pstatement.executeQuery();
                         while (rs.next()) {
-                            Date beginDate = new Date(Math.min(invalidationDate, rs.getLong(1)));
-                            Date endDate = new Date(Math.min(invalidationDate, rs.getLong(2)));
+                            long beginDate = Math.min(invalidationDate, rs.getLong(1));
+                            long endDate = Math.min(invalidationDate, rs.getLong(2));
                             typedCache.adaptRequestCache(beginDate, endDate);
                         }
                         rs.close();
@@ -508,7 +507,7 @@ public class JHVDatabase {
             }
 
             for (Interval interval : typedCache.getAllRequestIntervals()) {
-                copy.add(new Interval(new Date(interval.start.getTime()), new Date(interval.end.getTime())));
+                copy.add(new Interval(interval.start, interval.end));
             }
             return copy;
         }

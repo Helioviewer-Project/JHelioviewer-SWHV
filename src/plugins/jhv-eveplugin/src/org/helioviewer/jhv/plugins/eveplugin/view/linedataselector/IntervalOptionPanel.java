@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -250,9 +249,10 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     private Interval computeMovieInterval() {
         View view = Layers.getActiveView();
         if (view != null && view.isMultiFrame()) {
-            return new Interval(view.getFirstTime().getDate(), view.getLastTime().getDate());
+            return new Interval(view.getFirstTime().milli, view.getLastTime().milli);
         }
-        return new Interval(new Date(), new Date());
+        long now = System.currentTimeMillis();
+        return new Interval(now, now);
     }
 
     private Interval computeCarringtonInterval(Interval interval, long value) {
@@ -260,30 +260,21 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private Interval computeZoomForMilliSeconds(final Interval interval, long differenceMilli) {
-        Date startDate = interval.start;
+        long startDate = interval.start;
         Interval availableInterval = drawController.getAvailableInterval();
-        GregorianCalendar gce = new GregorianCalendar();
-        gce.clear();
-        gce.setTime(interval.end);
-        Date endDate = gce.getTime();
-
+        long endDate = interval.end;
+        long now = System.currentTimeMillis();
         final Date lastdataDate = DrawController.getSingletonInstance().getLastDateWithData();
         if (lastdataDate != null) {
-            if (endDate.after(lastdataDate)) {
-                endDate = lastdataDate;
+            long lastdataDateTime = lastdataDate.getTime();
+            if (endDate > lastdataDateTime) {
+                endDate = lastdataDateTime;
             }
-        } else if (endDate.after(new Date())) {
-            endDate = new Date();
+        } else if (endDate > now) {
+            endDate = now;
         }
 
-        final GregorianCalendar calendar = new GregorianCalendar();
-
-        // add difference to start date -> when calculated end date is within
-        // available interval it is the result
-        calendar.clear();
-        calendar.setTime(new Date(endDate.getTime() - differenceMilli));
-
-        startDate = calendar.getTime();
+        startDate = endDate - differenceMilli;
 
         boolean sInAvailable = availableInterval.containsPointInclusive(startDate);
         boolean eInAvailable = availableInterval.containsPointInclusive(endDate);

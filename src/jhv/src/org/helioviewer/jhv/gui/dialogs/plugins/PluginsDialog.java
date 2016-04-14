@@ -166,7 +166,10 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
             case 2:
                 emptyLabel.setText("No plug-ins disabled");
                 break;
+            default:
+                break;
             }
+
             listLayout.show(listContainerPane, "empty");
         }
     }

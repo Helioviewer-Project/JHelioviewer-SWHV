@@ -81,9 +81,9 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         JHVDate start = Layers.getStartDate();
         JHVDate end = Layers.getEndDate();
         if (start != null && end != null) {
-            Interval movieInterval = new Interval(Layers.getStartDate().getDate(), Layers.getEndDate().getDate());
+            Interval movieInterval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
 
-            if (movieInterval.containsPointInclusive(date)) {
+            if (movieInterval.containsPointInclusive(date.getTime())) {
                 return movieInterval;
             }
         }
@@ -117,17 +117,17 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         gcs.add(Calendar.DAY_OF_MONTH, -2);
         Date startDate = gcs.getTime();
 
-        return new Interval(startDate, endDate);
+        return new Interval(startDate.getTime(), endDate.getTime());
     }
 
     private void startRadioDownload() {
         Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         Calendar end = Calendar.getInstance();
-        end.setTime(selectedInterval.end);
+        end.setTime(new Date(selectedInterval.end));
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
-        RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(selectedInterval.start, end.getTime());
+        RadioDownloader.getSingletonInstance().requestAndOpenRemoteFile(new Date(selectedInterval.start), end.getTime());
     }
 
     @Override

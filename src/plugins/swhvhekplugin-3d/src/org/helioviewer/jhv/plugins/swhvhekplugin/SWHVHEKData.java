@@ -65,8 +65,8 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
             }
         }
 
-        if (request) {
-            JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, SWHVHEKData.this);
+        if (request && endDate != null && beginDate != null) {
+            JHVEventContainer.getSingletonInstance().requestForInterval(beginDate.getTime(), endDate.getTime(), SWHVHEKData.this);
         }
     }
 
@@ -105,7 +105,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         long ts = currentDate.getTime();
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<JHVRelatedEvents>();
         if (beginDate != null && endDate != null) {
-            JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
+            JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate.getTime(), endDate.getTime(), beginDate.getTime(), endDate.getTime());
             Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> data = result.getAvailableEvents();
             if (data != null) {
                 for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {

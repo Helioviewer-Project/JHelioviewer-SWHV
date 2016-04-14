@@ -2,7 +2,6 @@ package org.helioviewer.jhv.data.container.cache;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -207,7 +206,7 @@ public class JHVEventCache {
 
     }
 
-    public JHVEventCacheResult get(Date startDate, Date endDate, Date extendedStart, Date extendedEnd) {
+    public JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
 
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         Map<JHVEventType, List<Interval>> missingIntervals = new HashMap<JHVEventType, List<Interval>>();
@@ -215,7 +214,7 @@ public class JHVEventCache {
             SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
                 long delta = 1000 * 60 * 60 * 24;
-                SortedMap<SortedDateInterval, JHVRelatedEvents> submap = sortedEvents.subMap(new SortedDateInterval(startDate.getTime() - delta, startDate.getTime() - delta), new SortedDateInterval(endDate.getTime() + delta, endDate.getTime() + delta));
+                SortedMap<SortedDateInterval, JHVRelatedEvents> submap = sortedEvents.subMap(new SortedDateInterval(startDate - delta, startDate - delta), new SortedDateInterval(endDate + delta, endDate + delta));
                 eventsResult.put(evt, submap);
             }
             List<Interval> missing = downloadedCache.get(evt).getMissingIntervals(new Interval(startDate, endDate));

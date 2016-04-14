@@ -25,7 +25,7 @@ public class RadioDownloader {
     private static RadioDownloader instance;
     // private final List<RadioDownloaderListener> listeners;
     private final RadioImageCache cache;
-    private final Set<Date> requestDateCache;
+    private final Set<Long> requestDateCache;
     private JHVWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker;
     private final RadioDataManager radioDataManager;
 
@@ -36,7 +36,7 @@ public class RadioDownloader {
     private RadioDownloader() {
         // listeners = new ArrayList<RadioDownloaderListener>();
         cache = RadioImageCache.getInstance();
-        requestDateCache = new HashSet<Date>();
+        requestDateCache = new HashSet<Long>();
         radioDataManager = RadioDataManager.getSingletonInstance();
     }
 
@@ -66,17 +66,17 @@ public class RadioDownloader {
                     List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                     boolean intervalTooBig = false;
 
-                    Date startDate = startDateOuter;
-                    Date endDate = endDateOuter;
-                    long duration = endDate.getTime() - startDate.getTime();
-                    Date requestedStartDate = new Date(startDate.getTime());
+                    long startDate = startDateOuter.getTime();
+                    long endDate = endDateOuter.getTime();
+                    long duration = endDate - startDate;
+                    Date requestedStartDate = new Date(startDate);
                     if (duration >= 0 && duration <= MAXIMUM_DAYS) {
                         // case there were not more than three days
-                        while (startDate.compareTo(endDate) <= 0) {
+                        while (startDate <= endDate) {
                             JP2ViewCallisto v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, null, TimeUtils.apiDateFormat.format(startDate), TimeUtils.apiDateFormat.format(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                             if (v != null) {
                                 long imageID = getNextID();
-                                DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate);
+                                DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, new Date(startDate), new Date(endDate));
                                 jpxList.add(newJPXData);
                                 // cache.add(newJPXData);
                             } else {
@@ -88,8 +88,8 @@ public class RadioDownloader {
                     } else {
                         intervalTooBig = true;
                     }
-                    Interval requestInterval = new Interval(requestedStartDate, endDate);
-                    return new ImageDownloadWorkerResult(jpxList, noDataInterval, intervalTooBig, requestInterval, new ArrayList<Date>());
+                    Interval requestInterval = new Interval(requestedStartDate.getTime(), endDate);
+                    return new ImageDownloadWorkerResult(jpxList, noDataInterval, intervalTooBig, requestInterval, new ArrayList<Long>());
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     return null;
@@ -141,12 +141,12 @@ public class RadioDownloader {
     }
 
     public void requestAndOpenIntervals(List<Interval> intervals, final double ratioX, final double ratioY) {
-        final List<Date> toDownloadStartDates = new ArrayList<Date>();
+        final List<Long> toDownloadStartDates = new ArrayList<Long>();
         for (final Interval interval : intervals) {
-            Date startDate = interval.start;
-            Date endDate = interval.end;
+            long startDate = interval.start;
+            long endDate = interval.end;
             // case there were not more than three days
-            while (startDate.compareTo(endDate) <= 0) {
+            while (startDate <= endDate) {
                 boolean inRequestCache = true;
                 if (!requestDateCache.contains(startDate)) {
                     inRequestCache = false;
@@ -165,13 +165,13 @@ public class RadioDownloader {
 
         imageDownloadWorker = new JHVWorker<ImageDownloadWorkerResult, Void>() {
 
-            private List<Date> datesToDownload;
+            private List<Long> datesToDownload;
 
             @Override
             protected ImageDownloadWorkerResult backgroundWork() {
                 List<Interval> noDataList = new ArrayList<Interval>();
                 List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
-                for (Date date : datesToDownload) {
+                for (long date : datesToDownload) {
                     JP2ViewCallisto v = null;
                     try {
                         v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, null, TimeUtils.apiDateFormat.format(date), TimeUtils.apiDateFormat.format(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
@@ -180,7 +180,7 @@ public class RadioDownloader {
                     }
                     if (v != null) {
                         long imageID = getNextID();
-                        DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, date, calculateOneDayFurtherAsDate(date));
+                        DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, new Date(date), new Date(calculateOneDayFurtherAsDate(date)));
                         jpxList.add(newJPXData);
                     } else {
                         noDataList.add(new Interval(date, calculateOneDayFurtherAsDate(date)));
@@ -209,7 +209,7 @@ public class RadioDownloader {
                             }
                         }
                         radioDataManager.newNoData(noDataToFire);
-                        for (Date date : result.getDatesToRemoveFromRequestCache()) {
+                        for (long date : result.getDatesToRemoveFromRequestCache()) {
                             requestDateCache.remove(date);
                         }
                     }
@@ -222,7 +222,7 @@ public class RadioDownloader {
                 }
             }
 
-            public JHVWorker<ImageDownloadWorkerResult, Void> init(List<Date> toDownload) {
+            public JHVWorker<ImageDownloadWorkerResult, Void> init(List<Long> toDownload) {
                 datesToDownload = toDownload;
                 return this;
             }
@@ -232,8 +232,8 @@ public class RadioDownloader {
         EVESettings.getExecutorService().execute(imageDownloadWorker);
     }
 
-    private Date calculateOneDayFurtherAsDate(Date date) {
-        return new Date(date.getTime() + 86400000);
+    private long calculateOneDayFurtherAsDate(long date) {
+        return date + 86400000;
     }
 
     /**
@@ -252,7 +252,7 @@ public class RadioDownloader {
         /** The request interval */
         private final Interval requestInterval;
         /** The download id */
-        private final List<Date> datesToRemoveFromRequestCache;
+        private final List<Long> datesToRemoveFromRequestCache;
 
         /**
          * Creates an image downloader result for the given image info views, no
@@ -268,7 +268,7 @@ public class RadioDownloader {
          *            the request interval
          * @param datesToDownload
          */
-        public ImageDownloadWorkerResult(List<DownloadedJPXData> imageInfoViews, List<Interval> noDataIntervals, boolean intervalTooBig, Interval requestInterval, List<Date> datesToRemoveFromRequestCache) {
+        public ImageDownloadWorkerResult(List<DownloadedJPXData> imageInfoViews, List<Interval> noDataIntervals, boolean intervalTooBig, Interval requestInterval, List<Long> datesToRemoveFromRequestCache) {
             this.imageInfoViews = imageInfoViews;
             this.intervalTooBig = intervalTooBig;
             this.noDataIntervals = noDataIntervals;
@@ -277,7 +277,7 @@ public class RadioDownloader {
             this.datesToRemoveFromRequestCache = datesToRemoveFromRequestCache;
         }
 
-        public List<Date> getDatesToRemoveFromRequestCache() {
+        public List<Long> getDatesToRemoveFromRequestCache() {
             return datesToRemoveFromRequestCache;
         }
 

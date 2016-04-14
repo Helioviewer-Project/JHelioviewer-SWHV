@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.swek.request;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -38,7 +37,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     }
 
     @Override
-    public void handleRequestForInterval(JHVEventType eventType, Date startDate, Date endDate) {
+    public void handleRequestForInterval(JHVEventType eventType, long startDate, long endDate) {
         Interval interval = new Interval(startDate, endDate);
         SWEKDownloadManager.getSingletonInstance().newRequestForInterval(eventType, interval);
     }

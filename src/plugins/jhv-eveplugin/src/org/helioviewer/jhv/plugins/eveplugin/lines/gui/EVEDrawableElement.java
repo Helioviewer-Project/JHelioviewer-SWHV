@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,7 +38,7 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     public EVEDrawableElement() {
-        interval = new Interval(Calendar.getInstance().getTime(), Calendar.getInstance().getTime());
+        interval = new Interval(0, 0);
         bands = new Band[0];
         // values = new EVEValues[0];
         yAxisElement = new YAxisElement();
@@ -61,12 +60,12 @@ public class EVEDrawableElement implements DrawableElement {
         double minValue = yAxisElement.getScaledMinValue();
         double maxValue = yAxisElement.getScaledMaxValue();
 
-        double ratioX = graphArea.width / (double) (interval.end.getTime() - interval.start.getTime());
+        double ratioX = graphArea.width / (double) (interval.end - interval.start);
         double ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
 
         graphPolylines.clear();
 
-        long intervalStartTime = interval.start.getTime();
+        long intervalStartTime = interval.start;
         int dY = graphArea.y + graphArea.height;
 
         for (int i = 0; i < bands.length; ++i) {

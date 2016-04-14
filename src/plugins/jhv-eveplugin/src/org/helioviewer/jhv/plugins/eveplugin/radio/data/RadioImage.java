@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 
 import java.awt.Rectangle;
-import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -168,17 +167,17 @@ public class RadioImage {
      * @param visibleYEnd
      *            The end frequency of the visible interval
      */
-    public void setVisibleIntervals(Date visibleXStart, Date visibleXEnd, int visibleYStart, int visibleYEnd) {
+    public void setVisibleIntervals(long visibleXStart, long visibleXEnd, int visibleYStart, int visibleYEnd) {
         if (imageTimeInterval.containsPointInclusive(visibleXStart) || imageTimeInterval.containsPointInclusive(visibleXEnd)) {
 
-            Date tempStartX = new Date(imageTimeInterval.squeeze(visibleXStart).getTime());
-            Date tempEndX = new Date(imageTimeInterval.squeeze(visibleXEnd).getTime());
+            long tempStartX = imageTimeInterval.squeeze(visibleXStart);
+            long tempEndX = imageTimeInterval.squeeze(visibleXEnd);
             visibleImageTimeInterval = new Interval(tempStartX, tempEndX);
         } else {
             Interval tempInterval = new Interval(visibleXStart, visibleXEnd);
             if (tempInterval.containsPointInclusive(imageTimeInterval.start) || tempInterval.containsPointInclusive(imageTimeInterval.end)) {
-                Date tempStartX = new Date(tempInterval.squeeze(imageTimeInterval.start).getTime());
-                Date tempEndX = new Date(tempInterval.squeeze(imageTimeInterval.end).getTime());
+                long tempStartX = tempInterval.squeeze(imageTimeInterval.start);
+                long tempEndX = tempInterval.squeeze(imageTimeInterval.end);
                 visibleImageTimeInterval = new Interval(tempStartX, tempEndX);
             } else {
                 visibleImageTimeInterval = null;
@@ -207,14 +206,14 @@ public class RadioImage {
         if (visibleImageFreqInterval != null && visibleImageTimeInterval != null) {
             int maxImageWidth = resolutioSet.getResolutionLevel(0).width;
             int maxImageHeight = resolutioSet.getResolutionLevel(0).height;
-            long imageTimesize = imageTimeInterval.end.getTime() - imageTimeInterval.start.getTime();
+            long imageTimesize = imageTimeInterval.end - imageTimeInterval.start;
             int imageFrequencySize = imageFreqInterval.getEnd() - imageFreqInterval.getStart();
             double timePerPix = 1.0 * imageTimesize / maxImageWidth;
             double freqPerPix = 1.0 * imageFrequencySize / maxImageHeight;
 
-            int x0 = (int) Math.round((visibleImageTimeInterval.start.getTime() - imageTimeInterval.start.getTime()) / timePerPix);
+            int x0 = (int) Math.round((visibleImageTimeInterval.start - imageTimeInterval.start) / timePerPix);
             int y0 = (int) Math.round((imageFreqInterval.getEnd() - visibleImageFreqInterval.getEnd()) / freqPerPix);
-            int width = (int) Math.round((visibleImageTimeInterval.end.getTime() - visibleImageTimeInterval.start.getTime()) / timePerPix);
+            int width = (int) Math.round((visibleImageTimeInterval.end - visibleImageTimeInterval.start) / timePerPix);
             int height = (int) Math.round((visibleImageFreqInterval.getEnd() - visibleImageFreqInterval.getStart()) / freqPerPix);
             return new Rectangle(x0, y0, width, height);
         } else {
