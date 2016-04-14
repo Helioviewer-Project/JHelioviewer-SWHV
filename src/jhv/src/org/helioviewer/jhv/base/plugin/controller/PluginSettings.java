@@ -111,8 +111,10 @@ public class PluginSettings {
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
             }
-            pluginsRootNode = xmlDocument.createElement(NODES_PLUGINS);
-            xmlDocument.appendChild(pluginsRootNode);
+            if (xmlDocument != null) {
+                pluginsRootNode = xmlDocument.createElement(NODES_PLUGINS);
+                xmlDocument.appendChild(pluginsRootNode);
+            }
         }
     }
 

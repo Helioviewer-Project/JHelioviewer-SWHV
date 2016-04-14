@@ -94,7 +94,7 @@ public class JHVGlobals {
                 System.setProperty("jhv.version", version);
                 System.setProperty("jhv.revision", revision);
             } catch (IOException e) {
-                Log.error(">> JHVGlobals.determineVersionAndRevision() > Error while reading version and revision from manifest in jar file: " + jarFile.getName(), e);
+                Log.error(">> JHVGlobals.determineVersionAndRevision() > Error while reading version and revision from manifest in jar file: " + jarPath, e);
             } finally {
                 if (jarFile != null) {
                     try {
