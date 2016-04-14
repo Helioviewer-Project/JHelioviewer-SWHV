@@ -49,7 +49,7 @@ public class TimeTextField extends JTextField {
              */
             @Override
             public void focusLost(FocusEvent arg0) {
-                validateInput();
+                setText(getFormattedInput());
             }
         });
     }
@@ -100,23 +100,6 @@ public class TimeTextField extends JTextField {
                 }
             }
         }
-    }
-
-    /**
-     * Validates the fields and resets its if necessary
-     */
-    private void validateInput() {
-        setText(getFormattedInput());
-    }
-
-    /**
-     * Sets the time to the time given in the date
-     *
-     * @param time
-     *            new time to set
-     */
-    public void setValue(Date time) {
-        setText(TimeUtils.timeDateFormat.format(time));
     }
 
 }
