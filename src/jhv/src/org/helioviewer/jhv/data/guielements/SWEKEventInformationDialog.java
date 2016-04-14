@@ -28,18 +28,8 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 /**
  * Popup displaying informations about a HEK event.
  *
- * <p>
  * This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
  * which is not possible for other swing components.
- *
- * <p>
- * For further informations about solar events, see
- * {@link org.helioviewer.jhv.solarevents}.
- *
- * @author Markus Langenberg
- * @author Malte Nuhn
- * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
- *
  */
 @SuppressWarnings("serial")
 public class SWEKEventInformationDialog extends JDialog implements WindowListener, DataCollapsiblePanelModelListener {
@@ -47,7 +37,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     private JPanel allTablePanel;
 
     private DataCollapsiblePanel standardParameters;
-    // private DataCollapsiblePanel advancedParameters;
     private DataCollapsiblePanel allParameters;
     private DataCollapsiblePanel precedingEventsPanel;
     private DataCollapsiblePanel followingEventsPanel;
@@ -77,13 +66,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         startOtherRelatedEventsSwingWorker();
     }
 
-    /*
-     * public SWEKEventInformationDialog(JHVEvent event,
-     * SWEKEventInformationDialog parent, boolean modal) { super(parent,
-     * event.getJHVEventType().getEventType().getEventName(), modal); model =
-     * new DataCollapsiblePanelModel(); model.addListener(this);
-     * initDialog(event); }
-     */
     @Override
     public void windowOpened(WindowEvent e) {
     }
@@ -140,7 +122,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         allTablePanelConstraint.weightx = 1;
         allTablePanelConstraint.weighty = 1;
         allTablePanelConstraint.fill = GridBagConstraints.BOTH;
-        // add(new JScrollPane(allTablePanel), allTablePanelConstraint);
+
         add(allTablePanel, allTablePanelConstraint);
     }
 
@@ -150,8 +132,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
      */
     private void initAllTablePanel() {
         allTablePanel = new JPanel();
-        // allTablePanel.setLayout(new BoxLayout(allTablePanel,
-        // BoxLayout.Y_AXIS));
         allTablePanel.setLayout(new GridBagLayout());
     }
 
@@ -162,11 +142,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters().values());
         expandedPanels = 1;
         standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, true, model);
-
-        // ParameterTablePanel advancedParameterPanel = new
-        // ParameterTablePanel(event.getNonVisibleEventParameters().values());
-        // advancedParameters = new DataCollapsiblePanel("Advanced Parameters",
-        // advancedParameterPanel, false, model);
 
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters().values());
         allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
@@ -182,12 +157,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         }
     }
 
-    /*
-     * private boolean notNullRelationShip(Map<String, JHVEventRelation>
-     * precedingEvents) { for (JHVEventRelation r : precedingEvents.values()) {
-     * if (r.getTheEvent() != null) { return true; } } return false; }
-     */
-
     private void setCollapsiblePanels() {
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
@@ -201,11 +170,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
             gc.weighty = 0;
         }
         allTablePanel.add(standardParameters, gc);
-
-        /*
-         * gc.gridy = 1; if (advancedParameters.isExpanded()) { gc.weighty = 1;
-         * } else { gc.weighty = 0; } allTablePanel.add(advancedParameters, gc);
-         */
 
         gc.gridy = 1;
         if (allParameters.isExpanded()) {
@@ -320,14 +284,9 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     @Override
     public void repack() {
         int newExpandedPanels = nrOfExpandedPanels();
-        // if (!(newExpandedPanels == 0 || (newExpandedPanels == 1 &&
-        // expandedPanels == 0))) {
-        // setPreferredSize(new Dimension(getWidth(), getHeight()));
-        // }
         allTablePanel.removeAll();
         setCollapsiblePanels();
-        // invalidate();
-        // validate();
+
         pack();
         expandedPanels = newExpandedPanels;
     }
@@ -340,9 +299,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         if (standardParameters.isExpanded()) {
             newExpandedPanels++;
         }
-        /*
-         * if (advancedParameters.isExpanded()) { newExpandedPanels++; }
-         */
+
         if ((followingEventsPanel != null && followingEventsPanel.isExpanded())) {
             newExpandedPanels++;
         }
@@ -375,8 +332,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
                 ArrayList<JHVRelatedEvents> assocs;
                 try {
                     assocs = get();
-                    // otherRelatedEvents = assocs;
-                    // otherRelatedEventsLoaded = true;
                     if (!assocs.isEmpty()) {
                         otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", assocs);
                         SWEKEventInformationDialog.this.repack();
@@ -390,4 +345,5 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         };
         worker.execute();
     }
+
 }
