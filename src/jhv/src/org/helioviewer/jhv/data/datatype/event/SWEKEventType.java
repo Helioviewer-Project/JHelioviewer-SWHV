@@ -46,6 +46,7 @@ public class SWEKEventType {
 
     private final boolean containsParameterFilter;
     private HashMap<String, String> databaseFields;
+    private static HashMap<String, SWEKEventType> swekEventTypes = new HashMap<String, SWEKEventType>();
 
     /**
      * Creates an event type for the given event name, suppliers list, parameter
@@ -72,9 +73,8 @@ public class SWEKEventType {
      *            the color of the event type
      * @param list
      */
-    public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, Long requestIntervalExtension,
-            boolean standardSelected, SWEKParameter groupOn, String coordinateSystem, ImageIcon eventIcon, Color color, SWEKSpatialRegion spatialRegion) {
-        this.eventName = eventName;
+    public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, Long requestIntervalExtension, boolean standardSelected, SWEKParameter groupOn, String coordinateSystem, ImageIcon eventIcon, Color color, SWEKSpatialRegion spatialRegion) {
+        this.eventName = eventName.intern();
         this.suppliers = suppliers;
         this.parameterList = parameterList;
         this.requestIntervalExtension = requestIntervalExtension;
@@ -85,11 +85,17 @@ public class SWEKEventType {
         this.color = color;
         containsParameterFilter = checkFilters(parameterList);
         this.spatialRegion = spatialRegion;
+        swekEventTypes.put(this.eventName, this);
+    }
+
+    public static SWEKEventType getEventType(String name) {
+        return swekEventTypes.get(name);
     }
 
     public HashMap<String, String> getAllDatabaseFields() {
-        if (databaseFields == null)
+        if (databaseFields == null) {
             createAllDatabaseFields();
+        }
         return databaseFields;
     }
 
@@ -97,8 +103,9 @@ public class SWEKEventType {
         HashMap<String, String> fields = new HashMap<String, String>();
         for (SWEKParameter p : getParameterList()) {
             SWEKParameterFilter pf = p.getParameterFilter();
-            if (pf != null)
+            if (pf != null) {
                 fields.put(p.getParameterName().intern(), pf.getDbType());
+            }
         }
         for (SWEKRelatedEvents re : getSwekRelatedEvents()) {
             if (re.getEvent() == this) {

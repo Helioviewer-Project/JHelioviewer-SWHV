@@ -59,7 +59,7 @@ public class DownloadWorker implements Runnable {
             SWEKDownloader downloader = sourceManager.getDownloader(swekSource);
             success = downloader.extern2db(jhvType, downloadStartDate, downloadEndDate, params);
             if (success) {
-                SWEKParser parser = sourceManager.getParser(swekSource);
+
                 final ArrayList<JHVAssociation> associationList = JHVDatabase.associations2Program(downloadStartDate.getTime(), downloadEndDate.getTime(), jhvType);
                 EventQueue.invokeLater(new Runnable() {
                     @Override
@@ -70,6 +70,7 @@ public class DownloadWorker implements Runnable {
 
                     }
                 });
+                SWEKParser parser = sourceManager.getParser(swekSource);
                 ArrayList<JsonEvent> eventList = JHVDatabase.events2Program(downloadStartDate.getTime(), downloadEndDate.getTime(), jhvType, params);
                 for (JsonEvent event : eventList) {
                     final JHVEvent ev = parser.parseEventJSON(JHVDatabase.decompress(event.json), event.type, event.id, event.start, event.end);

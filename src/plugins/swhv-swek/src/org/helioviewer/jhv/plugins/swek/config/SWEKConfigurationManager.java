@@ -329,11 +329,7 @@ public class SWEKConfigurationManager {
      */
     private boolean parseJSONConfig(JSONObject configJSON) {
         try {
-            configuration = new SWEKConfiguration(parseVersion(configJSON),
-                    parseManuallyChanged(configJSON),
-                    parseSources(configJSON),
-                    parseEventTypes(configJSON),
-                    parseRelatedEvents(configJSON));
+            configuration = new SWEKConfiguration(parseVersion(configJSON), parseManuallyChanged(configJSON), parseSources(configJSON), parseEventTypes(configJSON), parseRelatedEvents(configJSON));
             configuration.getRelatedEvents();
             SWEKEventType.setSwekRelatedEvents(configuration.getRelatedEvents());
             return true;
@@ -537,16 +533,7 @@ public class SWEKConfigurationManager {
      * @throws JSONException
      */
     private SWEKEventType parseEventType(JSONObject object) throws JSONException {
-        return new SWEKEventType(parseEventName(object),
-                parseSuppliers(object),
-                parseParameterList(object),
-                parseRequestIntervalExtension(object),
-                parseStandardSelected(object),
-                parseGroupOn(object),
-                parseCoordinateSystem(object),
-                parseEventIcon(object),
-                parseColor(object),
-                parseSpatialRegion(object));
+        return new SWEKEventType(parseEventName(object), parseSuppliers(object), parseParameterList(object), parseRequestIntervalExtension(object), parseStandardSelected(object), parseGroupOn(object), parseCoordinateSystem(object), parseEventIcon(object), parseColor(object), parseSpatialRegion(object));
     }
 
     /**
@@ -677,10 +664,7 @@ public class SWEKConfigurationManager {
      *             if the supplier could not be parsed
      */
     private SWEKSupplier parseSupplier(JSONObject object) throws JSONException {
-        return SWEKSupplier.getSupplier(parseSupplierName(object),
-                parseSupplierDisplayName(object),
-                parseSupplierSource(object),
-                parseDbName(object));
+        return new SWEKSupplier(parseSupplierName(object), parseSupplierDisplayName(object), parseSupplierSource(object), parseDbName(object));
     }
 
     /**
@@ -810,13 +794,7 @@ public class SWEKConfigurationManager {
     private SWEKParameterFilter parseParameterFilter(JSONObject jsonObject) throws JSONException {
         JSONObject filterobject = jsonObject.optJSONObject("filter");
         if (filterobject != null) {
-            return new SWEKParameterFilter(parseFilterType(filterobject),
-                    parseMin(filterobject),
-                    parseMax(filterobject),
-                    parseStartValue(filterobject),
-                    parseStepSize(filterobject),
-                    parseUnits(filterobject),
-                    parseDbType(filterobject));
+            return new SWEKParameterFilter(parseFilterType(filterobject), parseMin(filterobject), parseMax(filterobject), parseStartValue(filterobject), parseStepSize(filterobject), parseUnits(filterobject), parseDbType(filterobject));
         }
         return null;
     }
@@ -951,10 +929,11 @@ public class SWEKConfigurationManager {
      *             if the "group on" could not be parsed from the json.
      */
     private SWEKParameter parseGroupOn(JSONObject object) throws JSONException {
-        if (!object.isNull("group_on"))
+        if (!object.isNull("group_on")) {
             return parameters.get(object.getString("group_on"));
-        else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -982,11 +961,7 @@ public class SWEKConfigurationManager {
     private SWEKSpatialRegion parseSpatialRegion(JSONObject object) throws JSONException {
         JSONObject jsonObject = object.getJSONObject("spatial_region");
 
-        return new SWEKSpatialRegion(
-                parseX1(jsonObject),
-                parseY1(jsonObject),
-                parseX2(jsonObject),
-                parseY2(jsonObject));
+        return new SWEKSpatialRegion(parseX1(jsonObject), parseY1(jsonObject), parseX2(jsonObject), parseY2(jsonObject));
     }
 
     /**
