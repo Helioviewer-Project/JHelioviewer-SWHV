@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.events.model;
 
 import java.awt.Point;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
@@ -195,27 +194,14 @@ public class EventModel implements TimingListener, JHVEventHandler {
     }
 
     public JHVRelatedEvents getEventAtPosition(Point point) {
-        // TODO find solution for this problem...
-        /*
-         * if (eventPlotConfiguration != null) { return
-         * eventPlotConfiguration.getEventOnLocation(point); } else { return
-         * null; }
-         */
         return null;
     }
 
-    public Date getLastDateWithData() {
-        return null; // lastDateWithData;
+    public long getLastDateWithData() {
+        return -1;
     }
 
     public boolean hasElementsToDraw() {
-        /*
-         * boolean tempPrevZero = prevNoPlotConfig; if
-         * (eventPlotConfiguration.getEventPlotConfigurations().isEmpty()) {
-         * prevNoPlotConfig = true; } return !tempPrevZero ||
-         * !eventPlotConfiguration.getEventPlotConfigurations().isEmpty();
-         */
-        // TODO find better solution for this
         return true;
     }
 

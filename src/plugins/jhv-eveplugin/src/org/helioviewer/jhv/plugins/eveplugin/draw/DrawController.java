@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +34,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Interval selectedInterval;
     private Interval availableInterval;
 
-    private PlotAreaSpace pas;
+    private final PlotAreaSpace pas;
 
     private final List<TimingListener> tListeners;
     private Rectangle graphSize;
@@ -200,14 +199,13 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fireRedrawRequestMovieFrameChanged(date.getDate());
     }
 
-    public Date getLastDateWithData() {
-        Date lastDate = null;
+    public long getLastDateWithData() {
+        long lastDate = Long.MAX_VALUE;
         for (Set<DrawableElement> des : drawableElements.values()) {
             for (DrawableElement de : des) {
-                if (de.getLastDateWithData() != null) {
-                    if (lastDate == null || de.getLastDateWithData().before(lastDate)) {
-                        lastDate = de.getLastDateWithData();
-                    }
+                long temp = de.getLastDateWithData();
+                if (temp < lastDate) {
+                    lastDate = temp;
                 }
             }
         }

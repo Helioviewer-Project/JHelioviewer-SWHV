@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.ImageObserver;
 import java.util.Collection;
-import java.util.Date;
 
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
@@ -86,8 +85,8 @@ public class RadioImagePane implements ImageObserver, DrawableElement {
     }
 
     @Override
-    public Date getLastDateWithData() {
-        return null;
+    public long getLastDateWithData() {
+        return -1;
     }
 
 }

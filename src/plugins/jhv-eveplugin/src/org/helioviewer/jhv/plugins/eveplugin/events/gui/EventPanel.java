@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -133,7 +132,7 @@ public class EventPanel implements DrawableElement {
     }
 
     @Override
-    public Date getLastDateWithData() {
+    public long getLastDateWithData() {
         return EventModel.getSingletonInstance().getLastDateWithData();
     }
 
