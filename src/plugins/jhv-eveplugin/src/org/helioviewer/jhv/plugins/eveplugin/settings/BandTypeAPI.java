@@ -126,13 +126,12 @@ public class BandTypeAPI {
                     bandtypes[i].setGroup(group);
                 }
             }
-        } catch (JSONException e1) {
-            Log.error("JSON parsing error", e1);
+        } catch (JSONException e) {
+            Log.error("JSON parsing error", e);
         }
     }
 
     private void updateBandGroups(JSONArray jsonGroupArray) {
-        BandType[] bandtypes = new BandType[jsonGroupArray.length()];
         try {
             for (int i = 0; i < jsonGroupArray.length(); i++) {
                 BandGroup group = new BandGroup();
@@ -145,8 +144,8 @@ public class BandTypeAPI {
                     orderedGroups.add(group);
                 }
             }
-        } catch (JSONException e1) {
-            Log.error("JSON parsing error", e1);
+        } catch (JSONException e) {
+            Log.error("JSON parsing error", e);
         }
     }
 
