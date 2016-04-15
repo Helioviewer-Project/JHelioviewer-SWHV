@@ -54,7 +54,6 @@ public class DownloadWorker implements Runnable {
             SWEKDownloader downloader = sourceManager.getDownloader(swekSource);
             success = downloader.extern2db(jhvType, requestInterval.start, requestInterval.end, params);
             if (success) {
-
                 final ArrayList<JHVAssociation> associationList = JHVDatabase.associations2Program(requestInterval.start, requestInterval.end, jhvType);
                 EventQueue.invokeLater(new Runnable() {
                     @Override
@@ -80,6 +79,7 @@ public class DownloadWorker implements Runnable {
                 }
             }
         }
+
         if (isStopped || !success) {
             EventQueue.invokeLater(new Runnable() {
                 @Override
@@ -109,11 +109,6 @@ public class DownloadWorker implements Runnable {
 
     public Interval getRequestInterval() {
         return requestInterval;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) requestInterval.start;
     }
 
 }

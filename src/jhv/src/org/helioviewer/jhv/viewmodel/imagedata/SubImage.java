@@ -33,6 +33,12 @@ public class SubImage {
     }
 
     @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
+    }
+
+    @Override
     public String toString() {
         return "[x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + "]";
     }
