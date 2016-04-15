@@ -192,7 +192,6 @@ public class LogSettings {
         try {
             if (settingsInputStream != null) {
                 settingsInputStream.close();
-                settingsInputStream = null;
             }
         } catch (IOException e) {
             logger.error("Could not close FileInputStream for " + logSettingsPath, e);
@@ -200,7 +199,6 @@ public class LogSettings {
         try {
             if (defaultSettingsInputStream != null) {
                 defaultSettingsInputStream.close();
-                defaultSettingsInputStream = null;
             }
         } catch (IOException e) {
             logger.error("Could not close FileInputStream for " + defaultLogSettingsPath, e);
