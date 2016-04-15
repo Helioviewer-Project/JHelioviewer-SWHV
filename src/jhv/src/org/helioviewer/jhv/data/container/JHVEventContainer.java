@@ -176,9 +176,6 @@ public class JHVEventContainer {
 
     public ArrayList<JHVEvent> getOtherRelations(JHVEvent event) {
         ArrayList<JHVEvent> events = incomingRequestManager.getOtherRelations(event);
-        for (JHVEvent ev : events) {
-            eventCache.add(ev);
-        }
         return events;
     }
 }
