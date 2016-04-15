@@ -739,10 +739,11 @@ public class JHVDatabase {
                     }
                     rs.close();
                     String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.name, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList.toString() + ") AND events.id != " + event_id + ";";
+
                     Statement statement = connection.createStatement();
-                    rs = statement.executeQuery(query);
+                    ArrayList<JsonEvent> ret = getEventJSON(statement.executeQuery(query));
                     statement.close();
-                    return getEventJSON(rs);
+                    return ret;
                 } catch (SQLException e) {
                     Log.error("Could not fetch associations " + e.getMessage());
                     return new ArrayList<JsonEvent>();
