@@ -86,6 +86,10 @@ public class PfssNewDataLoader implements Runnable {
                 } catch (ParseException e) {
                     Log.warn("Could not parse date time during pfss loading");
                 }
+
+                if (urls == null)
+                    return;
+
                 for (Pair<String, Long> pair : urls) {
                     Long dd = pair.b;
                     String url = pair.a;
