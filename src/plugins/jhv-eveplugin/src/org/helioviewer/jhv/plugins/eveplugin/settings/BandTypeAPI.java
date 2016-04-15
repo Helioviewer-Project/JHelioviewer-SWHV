@@ -24,7 +24,7 @@ import org.json.JSONObject;
 public class BandTypeAPI {
 
     private static BandTypeAPI singletonInstance;
-    private BandType[] bandtypes;
+
     private final HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
     private final List<BandGroup> orderedGroups = new ArrayList<BandGroup>();
 
@@ -85,7 +85,7 @@ public class BandTypeAPI {
     }
 
     private void updateBandTypes(JSONArray jsonObjectArray) {
-        bandtypes = new BandType[jsonObjectArray.length()];
+        BandType[] bandtypes = new BandType[jsonObjectArray.length()];
         try {
             for (int i = 0; i < jsonObjectArray.length(); i++) {
                 bandtypes[i] = new BandType();
@@ -131,7 +131,7 @@ public class BandTypeAPI {
     }
 
     private void updateBandGroups(JSONArray jsonGroupArray) {
-        bandtypes = new BandType[jsonGroupArray.length()];
+        BandType[] bandtypes = new BandType[jsonGroupArray.length()];
         try {
             for (int i = 0; i < jsonGroupArray.length(); i++) {
                 BandGroup group = new BandGroup();
