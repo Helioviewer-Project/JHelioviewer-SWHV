@@ -49,11 +49,11 @@ public class CameraHelper {
         gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
-    public static double computeNormalizedX(Viewport vp, double screenX) {
+    private static double computeNormalizedX(Viewport vp, double screenX) {
         return 2. * ((screenX - vp.x) / vp.width - 0.5);
     }
 
-    public static double computeNormalizedY(Viewport vp, double screenY) {
+    private static double computeNormalizedY(Viewport vp, double screenY) {
         return -2. * ((screenY - vp.yAWT) / vp.height - 0.5);
     }
 

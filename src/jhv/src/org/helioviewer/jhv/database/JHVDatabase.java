@@ -708,7 +708,6 @@ public class JHVDatabase {
         @Override
         public ArrayList<JsonEvent> call() {
             Connection connection = ConnectionThread.getConnection();
-            ArrayList<JsonEvent> assocList = new ArrayList<JsonEvent>();
             if (connection == null) {
                 return new ArrayList<JsonEvent>();
             }

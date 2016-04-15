@@ -122,7 +122,7 @@ public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
         setSmall();
     }
 
-    public void createGridChoiceBox(RenderableGrid renderableGrid) {
+    private void createGridChoiceBox(RenderableGrid renderableGrid) {
         gridChoiceBox = new JComboBox(RenderableGrid.GridChoiceType.values());
         gridChoiceBox.setToolTipText("Choose grid options");
         gridChoiceBox.setSelectedItem(RenderableGrid.GridChoiceType.VIEWPOINT);
@@ -135,9 +135,8 @@ public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
         });
     }
 
-    public void createGridResolutionX(RenderableGrid renderableGrid) {
-        gridResolutionXSpinner = new JSpinner();
-        gridResolutionXSpinner.setModel(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLonstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
+    private void createGridResolutionX(RenderableGrid renderableGrid) {
+        gridResolutionXSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLonstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionXSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -148,9 +147,8 @@ public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
         WheelSupport.installMouseWheelSupport(gridResolutionXSpinner);
     }
 
-    public void createGridResolutionY(RenderableGrid renderableGrid) {
-        gridResolutionYSpinner = new JSpinner();
-        gridResolutionYSpinner.setModel(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLatstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
+    private void createGridResolutionY(RenderableGrid renderableGrid) {
+        gridResolutionYSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLatstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionYSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
