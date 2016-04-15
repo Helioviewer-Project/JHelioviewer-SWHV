@@ -84,12 +84,11 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             yAxisElementMap.put(band, yAxisElement);
             addToBandsPerYAxis(yAxisElement, band);
             EVEValues data = retrieveData(band, interval, plotArea);
+
             if (!dataMapPerUnitLabel.containsKey(yAxisElement)) {
                 dataMapPerUnitLabel.put(yAxisElement, new HashMap<Band, EVEValues>());
             }
-            if (data != null) {
-                dataMapPerUnitLabel.get(yAxisElement).put(band, data);
-            }
+            dataMapPerUnitLabel.get(yAxisElement).put(band, data);
         } else {
             Log.debug("band could not be added. No Yaxis Available ");
         }
