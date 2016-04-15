@@ -11,13 +11,14 @@ import javax.swing.UIManager;
 
 @SuppressWarnings("serial")
 public class CollapsiblePaneButton extends JToggleButton {
+
     public CollapsiblePaneButton(String title) {
         super(title);
         setContentAreaFilled(false);
         setFocusPainted(false); // used for demonstration
     }
 
-    public Color brighter(Color c, double FACTOR) {
+    private Color brighter(Color c, double FACTOR) {
         int r = c.getRed();
         int g = c.getGreen();
         int b = c.getBlue();
@@ -37,7 +38,7 @@ public class CollapsiblePaneButton extends JToggleButton {
         return new Color(Math.min((int) (r / FACTOR), 255), Math.min((int) (g / FACTOR), 255), Math.min((int) (b / FACTOR), 255), alpha);
     }
 
-    public Color darker(Color c, double FACTOR) {
+    private Color darker(Color c, double FACTOR) {
         return new Color(Math.max((int) (c.getRed() * FACTOR), 0), Math.max((int) (c.getGreen() * FACTOR), 0), Math.max((int) (c.getBlue() * FACTOR), 0), c.getAlpha());
     }
 
@@ -48,7 +49,7 @@ public class CollapsiblePaneButton extends JToggleButton {
         Color bright = brighter(color, 0.85);
         Color dark = darker(color, 0.9);
 
-        if (!this.isSelected()) {
+        if (!isSelected()) {
             g2.setPaint(new GradientPaint(new Point(0, 0), dark, new Point(0, getHeight()), color));
             g2.fillRect(0, 0, getWidth(), getHeight() / 2);
             g2.setPaint(new GradientPaint(new Point(0, 0), color, new Point(0, getHeight()), dark));
@@ -63,4 +64,5 @@ public class CollapsiblePaneButton extends JToggleButton {
 
         super.paintComponent(g);
     }
+
 }

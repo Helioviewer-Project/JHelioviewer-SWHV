@@ -14,8 +14,6 @@ import javax.swing.JPanel;
  *
  * This panel hides the use of the {@link CollapsiblePane} and allows accessing
  * the children of the {@link CollapsiblePane} directly.
- *
- * @author Markus Langenberg
  */
 @SuppressWarnings("serial")
 public class SideContentPane extends JComponent {
@@ -55,7 +53,7 @@ public class SideContentPane extends JComponent {
      * @param startExpanded
      *            if true, the component will be visible right from the start
      */
-    public void add(String title, Component component, int index, boolean startExpanded) {
+    private void add(String title, Component component, int index, boolean startExpanded) {
         remove(dummy);
         CollapsiblePane newPane = new CollapsiblePane(title, component, startExpanded);
         map.put(component, newPane);
@@ -90,7 +88,7 @@ public class SideContentPane extends JComponent {
      * @param component
      *            Component to expand
      */
-    public void expand(Component component) {
+    private void expand(Component component) {
         if (map.containsKey(component)) {
             map.get(component).expand();
         } else {
@@ -108,7 +106,7 @@ public class SideContentPane extends JComponent {
      * @param c
      *            Pattern, which members should be expanded
      */
-    public <T extends Component> void expand(Class<T> c) {
+    private <T extends Component> void expand(Class<T> c) {
         for (Component member : map.keySet()) {
             if (c.isInstance(member)) {
                 expand(member);
@@ -126,7 +124,7 @@ public class SideContentPane extends JComponent {
      * @param component
      *            Component to collapse
      */
-    public void collapse(Component component) {
+    private void collapse(Component component) {
         if (map.containsKey(component)) {
             map.get(component).collapse();
         } else {
@@ -144,7 +142,7 @@ public class SideContentPane extends JComponent {
      * @param c
      *            Pattern, which members should be collapsed
      */
-    public <T extends Component> void collapse(Class<T> c) {
+    private <T extends Component> void collapse(Class<T> c) {
         for (Component member : map.keySet()) {
             if (c.isInstance(member)) {
                 collapse(member);
@@ -159,7 +157,7 @@ public class SideContentPane extends JComponent {
      * @param c
      *            Pattern, which members should be removed
      */
-    public <T extends Component> void remove(Class<T> c) {
+    private <T extends Component> void remove(Class<T> c) {
         // go through map to find all effected collapsible panes
         Object[] components = map.keySet().toArray();
         for (int i = 0; i < components.length; i++) {

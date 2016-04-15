@@ -42,6 +42,9 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 
     private static final JHVUncaughtExceptionHandler handler = new JHVUncaughtExceptionHandler();
 
+    private JHVUncaughtExceptionHandler() {
+    }
+
     public static JHVUncaughtExceptionHandler getSingletonInstance() {
         return handler;
     }
@@ -66,7 +69,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
      * @param msg
      *            Object to display in the main area of the dialog.
      */
-    public static void showErrorDialog(final String title, final Object msg) {
+    private static void showErrorDialog(final String title, final Object msg) {
         ArrayList<Object> objects = new ArrayList<Object>();
 
         JLabel fatal = new JLabel("Fatal error detected.");
@@ -135,14 +138,10 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
         }
     }
 
-    private JHVUncaughtExceptionHandler() {
-    }
-
     // we do not use the logger here, since it should work even before logging
     // initialization
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-
         StringBuilder stackTrace = new StringBuilder();
         stackTrace.append(e.getClass().getCanonicalName()).append("\n");
         for (StackTraceElement el : e.getStackTrace()) {
@@ -191,6 +190,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             System.err.println(stackTrace);
         }
 
-        JHVUncaughtExceptionHandler.showErrorDialog("JHelioviewer: Fatal Error", msg);
+        showErrorDialog("JHelioviewer: Fatal Error", msg);
     }
+
 }
