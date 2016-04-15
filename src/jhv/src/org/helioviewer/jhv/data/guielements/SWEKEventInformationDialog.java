@@ -42,8 +42,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     private DataCollapsiblePanel followingEventsPanel;
     private DataCollapsiblePanel otherRelatedEventsPanel;
 
-    private int expandedPanels;
-
     private EventDescriptionPanel eventDescriptionPanel;
 
     private final JHVEvent event;
@@ -52,16 +50,12 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
     private final DataCollapsiblePanelModel model;
 
-    private ArrayList<JHVEvent> otherRelatedEvents;
-    private final boolean otherRelatedEventsLoaded;
-
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent event) {
         super(ImageViewerGui.getMainFrame(), revent.getJHVEventType().getEventType().getEventName());
         this.event = event;
         rEvent = revent;
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
-        otherRelatedEventsLoaded = false;
         initDialog(revent);
         startOtherRelatedEventsSwingWorker();
     }
@@ -140,7 +134,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
      */
     private void initParameterCollapsiblePanels() {
         ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters().values());
-        expandedPanels = 1;
         standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, true, model);
 
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters().values());
@@ -283,33 +276,10 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
     @Override
     public void repack() {
-        int newExpandedPanels = nrOfExpandedPanels();
         allTablePanel.removeAll();
         setCollapsiblePanels();
 
         pack();
-        expandedPanels = newExpandedPanels;
-    }
-
-    private int nrOfExpandedPanels() {
-        int newExpandedPanels = 0;
-        if (allParameters.isExpanded()) {
-            newExpandedPanels++;
-        }
-        if (standardParameters.isExpanded()) {
-            newExpandedPanels++;
-        }
-
-        if ((followingEventsPanel != null && followingEventsPanel.isExpanded())) {
-            newExpandedPanels++;
-        }
-        if ((precedingEventsPanel != null && precedingEventsPanel.isExpanded())) {
-            newExpandedPanels++;
-        }
-        if ((otherRelatedEventsPanel != null && otherRelatedEventsPanel.isExpanded())) {
-            newExpandedPanels++;
-        }
-        return newExpandedPanels;
     }
 
     private void startOtherRelatedEventsSwingWorker() {
