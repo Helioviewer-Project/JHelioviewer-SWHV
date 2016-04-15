@@ -313,25 +313,31 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     }
 
     private void startOtherRelatedEventsSwingWorker() {
-        SwingWorker<ArrayList<JHVRelatedEvents>, Void> worker = new SwingWorker<ArrayList<JHVRelatedEvents>, Void>() {
+        SwingWorker<ArrayList<JHVEvent>, Void> worker = new SwingWorker<ArrayList<JHVEvent>, Void>() {
             @Override
-            public ArrayList<JHVRelatedEvents> doInBackground() {
+            public ArrayList<JHVEvent> doInBackground() {
                 ArrayList<JHVEvent> jhvEvents = JHVEventContainer.getSingletonInstance().getOtherRelations(event);
-                Set<JHVRelatedEvents> rEventsSet = new HashSet<JHVRelatedEvents>();
-                JHVEventCache cache = JHVEventCache.getSingletonInstance();
-                for (JHVEvent jhvEvent : jhvEvents) {
-                    rEventsSet.add(cache.getRelatedEvents(jhvEvent.getUniqueID()));
-                }
-                ArrayList<JHVRelatedEvents> rEvents = new ArrayList<JHVRelatedEvents>();
-                rEvents.addAll(rEventsSet);
-                return rEvents;
+
+                return jhvEvents;
             }
 
             @Override
             public void done() {
-                ArrayList<JHVRelatedEvents> assocs;
                 try {
-                    assocs = get();
+                    ArrayList<JHVEvent> events = get();
+                    JHVEventCache cache = JHVEventCache.getSingletonInstance();
+                    for (JHVEvent ev : events) {
+                        cache.add(ev);
+                    }
+                    Set<JHVRelatedEvents> rEventsSet = new HashSet<JHVRelatedEvents>();
+                    for (JHVEvent jhvEvent : events) {
+                        rEventsSet.add(cache.getRelatedEvents(jhvEvent.getUniqueID()));
+                    }
+                    ArrayList<JHVRelatedEvents> rEvents = new ArrayList<JHVRelatedEvents>();
+                    rEvents.addAll(rEventsSet);
+
+                    ArrayList<JHVRelatedEvents> assocs;
+
                     if (!assocs.isEmpty()) {
                         otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", assocs);
                         SWEKEventInformationDialog.this.repack();
