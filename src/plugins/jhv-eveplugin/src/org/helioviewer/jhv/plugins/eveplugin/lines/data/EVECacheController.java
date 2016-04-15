@@ -64,9 +64,6 @@ public class EVECacheController {
     }
 
     public EVEValues downloadData(Band band, Interval interval, Rectangle plotArea) {
-        if (band == null || interval == null) {
-            return null;
-        }
         return cache.getValuesInInterval(band, interval, plotArea);
     }
 
