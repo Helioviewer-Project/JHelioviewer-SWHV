@@ -46,6 +46,12 @@ public class JHVEventCache {
         }
 
         @Override
+        public int hashCode() {
+            assert false : "hashCode not designed";
+            return 42;
+        }
+
+        @Override
         public int compareTo(SortedDateInterval o2) {
             if (start < o2.start) {
                 return -1;

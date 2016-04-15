@@ -113,6 +113,12 @@ public class ResolutionSet {
         }
 
         @Override
+        public int hashCode() {
+            assert false : "hashCode not designed";
+            return 42;
+        }
+
+        @Override
         public String toString() {
             return "[[Discard=" + discardLayers + "][ScaleLevel=" + scaleLevel + "][ScaleFactor=" + factorX + "," + factorY + "][ZoomDims=" + width + "," + height + "]]";
         }

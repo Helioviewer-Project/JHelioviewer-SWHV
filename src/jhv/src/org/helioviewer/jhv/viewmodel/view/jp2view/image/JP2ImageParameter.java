@@ -43,11 +43,6 @@ public class JP2ImageParameter {
     }
 
     @Override
-    public String toString() {
-        return "ImageViewParams[ " + jp2Image + " " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + compositionLayer + "] " + factor + "]";
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o instanceof JP2ImageParameter) {
             JP2ImageParameter p = (JP2ImageParameter) o;
@@ -56,6 +51,17 @@ public class JP2ImageParameter {
                    subImage.equals(p.subImage) && resolution.equals(p.resolution);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
+    }
+
+    @Override
+    public String toString() {
+        return "ImageViewParams[ " + jp2Image + " " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + compositionLayer + "] " + factor + "]";
     }
 
 }
