@@ -28,10 +28,8 @@ public class BandTypeAPI {
     private final HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
     private final List<BandGroup> orderedGroups = new ArrayList<BandGroup>();
 
-    private boolean isUpdated = false;
-
     private final Properties defaultProperties = new Properties();
-    private String baseUrl;
+    private final String baseUrl;
 
     public static BandTypeAPI getSingletonInstance() {
         if (singletonInstance == null) {
@@ -41,10 +39,9 @@ public class BandTypeAPI {
     }
 
     private BandTypeAPI() {
-        super();
-        this.loadSettings();
-        this.setBaseUrl(defaultProperties.getProperty("plugin.eve.dataseturl"));
-        this.updateDatasets();
+        loadSettings();
+        baseUrl = defaultProperties.getProperty("plugin.eve.dataseturl");
+        updateDatasets();
     }
 
     private void loadSettings() {
@@ -58,14 +55,6 @@ public class BandTypeAPI {
 
     private String getDatasetUrl() {
         return this.baseUrl + "/datasets/index.php";
-    }
-
-    public String getUrl() {
-        return baseUrl;
-    }
-
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
     }
 
     private String readJSON() {
@@ -171,35 +160,13 @@ public class BandTypeAPI {
         } catch (JSONException e1) {
             Log.error("JSON parsing error", e1);
         }
-        isUpdated = true;
-    }
-
-    public BandType[] getDatasets() {
-        if (bandtypes == null) {
-            this.updateDatasets();
-        }
-        return bandtypes;
-    }
-
-    public BandType[] getBandTypes() {
-        return bandtypes;
     }
 
     public BandType[] getBandTypes(BandGroup group) {
         return group.bandtypes.toArray(new BandType[group.bandtypes.size()]);
     }
 
-    public BandGroup[] getGroups() {
-        if (!isUpdated) {
-            updateDatasets();
-        }
-        return groups.values().toArray(new BandGroup[groups.size()]);
-    }
-
     public List<BandGroup> getOrderedGroups() {
-        if (!isUpdated) {
-            updateDatasets();
-        }
         return orderedGroups;
     }
 
