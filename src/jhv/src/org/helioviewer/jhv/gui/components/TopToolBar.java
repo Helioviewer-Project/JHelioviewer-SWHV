@@ -38,11 +38,7 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 /**
  * Toolbar containing the most common actions.
  *
- * <p>
  * The toolbar provides a context menu to change its appearance.
- *
- * @author Markus Langenberg
- * @author Andre Dau
  */
 @SuppressWarnings("serial")
 public class TopToolBar extends JToolBar implements MouseListener {
@@ -110,39 +106,24 @@ public class TopToolBar extends JToolBar implements MouseListener {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseClicked(MouseEvent e) {
         maybeShowPopup(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseEntered(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseExited(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mousePressed(MouseEvent e) {
         maybeShowPopup(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseReleased(MouseEvent e) {
     }
@@ -321,7 +302,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         addButton(new JButton(new SDOCutOutAction(false, true)));
         addSeparator();
-
     }
 
     /**
@@ -333,7 +313,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
      * @param button
      *            Button to add
      */
-    public void addButton(AbstractButton button) {
+    private void addButton(AbstractButton button) {
         // button.setMargin(buttonMargin);
         button.setVerticalTextPosition(SwingConstants.BOTTOM);
         button.setHorizontalTextPosition(SwingConstants.CENTER);

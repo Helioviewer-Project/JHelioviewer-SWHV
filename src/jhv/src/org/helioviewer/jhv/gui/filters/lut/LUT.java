@@ -148,7 +148,7 @@ public class LUT {
      * @throws FileNotFoundException
      *             From opening the file
      */
-    public static LUT readGimpGradientFile(File file) throws Exception, IOException {
+    private static LUT readGimpGradientFile(File file) throws Exception, IOException {
         FileInputStream fr = null;
         LUT l;
         try {
@@ -173,7 +173,7 @@ public class LUT {
      * @throws IOException
      *             From opening the file
      */
-    public static LUT readGimpGradientStream(InputStream is) throws Exception, IOException {
+    private static LUT readGimpGradientStream(InputStream is) throws Exception, IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         GimpGradient gg = new GimpGradient(in);
         int[] lut8 = new int[256];

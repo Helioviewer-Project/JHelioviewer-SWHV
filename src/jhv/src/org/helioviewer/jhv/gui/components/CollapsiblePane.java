@@ -18,11 +18,8 @@ import org.helioviewer.jhv.gui.UIGlobals;
 /**
  * Panel managing a collapsible area.
  *
- * <p>
  * This panel consists of a toggle button and one arbitrary component. Clicking
  * the toggle button will toggle the visibility of the component.
- *
- * @author Markus Langenberg
  */
 @SuppressWarnings("serial")
 public class CollapsiblePane extends JComponent implements ActionListener {
@@ -34,17 +31,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
     private final JPanel component;
     protected JPanel topButtonsPanel;
 
-    /**
-     * Default constructor.
-     *
-     * @param title
-     *            Text on the toggle button
-     * @param component
-     *            Component to manage
-     * @param startExpanded
-     *            if true, the component will be visible right from the start
-     */
-    public CollapsiblePane(String title, Component component, boolean startExpanded) {
+    public CollapsiblePane(String title, Component managed, boolean startExpanded) {
         setLayout(new BorderLayout());
 
         toggleButton = new CollapsiblePaneButton(title);
@@ -60,51 +47,32 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         toggleButton.setPreferredSize(new Dimension(0, UIGlobals.UIFontSmallBold.getSize() + 4));
         toggleButton.addActionListener(this);
 
-        this.component = new JPanel(new BorderLayout());
-        this.component.add(component);
-        this.component.setVisible(startExpanded);
-        add(this.component, BorderLayout.CENTER);
-        setButtons();
-    }
+        component = new JPanel(new BorderLayout());
+        component.add(managed);
+        component.setVisible(startExpanded);
+        add(component, BorderLayout.CENTER);
 
-    public void setButtons() {
-        topButtonsPanel = new JPanel();
-        topButtonsPanel.setLayout(new BorderLayout());
+        topButtonsPanel = new JPanel(new BorderLayout());
         topButtonsPanel.add(toggleButton, BorderLayout.NORTH);
         add(topButtonsPanel, BorderLayout.PAGE_START);
     }
 
-    /**
-     * Sets the text on the toggle button
-     *
-     * @param title
-     *            Text on the toggle button
-     * */
     public void setTitle(final String title) {
         toggleButton.setText(title);
     }
 
-    /**
-     * Expands the pane.
-     */
     public void expand() {
         toggleButton.setSelected(true);
         component.setVisible(true);
         toggleButton.setIcon(expandedIcon);
     }
 
-    /**
-     * Collapses the pane.
-     */
     public void collapse() {
         toggleButton.setSelected(false);
         component.setVisible(false);
         toggleButton.setIcon(collapsedIcon);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (component.isVisible()) {
