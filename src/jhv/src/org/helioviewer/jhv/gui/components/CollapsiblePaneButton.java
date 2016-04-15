@@ -12,10 +12,18 @@ import javax.swing.UIManager;
 @SuppressWarnings("serial")
 public class CollapsiblePaneButton extends JToggleButton {
 
+    private final Color color;
+    private final Color bright;
+    private final Color dark;
+
     public CollapsiblePaneButton(String title) {
         super(title);
         setContentAreaFilled(false);
         setFocusPainted(false); // used for demonstration
+
+        color = UIManager.getColor("Panel.background");
+        bright = brighter(color, 0.85);
+        dark = darker(color, 0.9);
     }
 
     private Color brighter(Color c, double FACTOR) {
@@ -45,20 +53,19 @@ public class CollapsiblePaneButton extends JToggleButton {
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
-        Color color = UIManager.getColor("Panel.background");
-        Color bright = brighter(color, 0.85);
-        Color dark = darker(color, 0.9);
+        int w = getWidth();
+        int h = getHeight();
 
         if (!isSelected()) {
-            g2.setPaint(new GradientPaint(new Point(0, 0), dark, new Point(0, getHeight()), color));
-            g2.fillRect(0, 0, getWidth(), getHeight() / 2);
-            g2.setPaint(new GradientPaint(new Point(0, 0), color, new Point(0, getHeight()), dark));
-            g2.fillRect(0, getHeight() / 2, getWidth(), getHeight() / 2);
+            g2.setPaint(new GradientPaint(new Point(0, 0), dark, new Point(0, h), color));
+            g2.fillRect(0, 0, w, h / 2);
+            g2.setPaint(new GradientPaint(new Point(0, 0), color, new Point(0, h), dark));
+            g2.fillRect(0, h / 2, w, h / 2);
         } else {
-            g2.setPaint(new GradientPaint(new Point(0, 0), dark, new Point(0, getHeight()), bright));
-            g2.fillRect(0, 0, getWidth(), getHeight() / 2);
-            g2.setPaint(new GradientPaint(new Point(0, 0), bright, new Point(0, getHeight()), dark));
-            g2.fillRect(0, getHeight() / 2, getWidth(), getHeight() / 2);
+            g2.setPaint(new GradientPaint(new Point(0, 0), dark, new Point(0, h), bright));
+            g2.fillRect(0, 0, w, h / 2);
+            g2.setPaint(new GradientPaint(new Point(0, 0), bright, new Point(0, h), dark));
+            g2.fillRect(0, h / 2, w, h / 2);
         }
         g2.dispose();
 
