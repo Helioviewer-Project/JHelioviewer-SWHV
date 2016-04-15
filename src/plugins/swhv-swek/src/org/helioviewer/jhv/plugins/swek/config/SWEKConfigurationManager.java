@@ -156,6 +156,7 @@ public class SWEKConfigurationManager {
             while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
+            br.close();
 
             JSONObject configJSON = new JSONObject(sb.toString());
             return parseManuallyChanged(configJSON);
@@ -307,6 +308,8 @@ public class SWEKConfigurationManager {
             while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
+            br.close();
+
             String cf = sb.toString();
             JHVDatabase.config_hash = Arrays.hashCode(cf.toCharArray());
 
