@@ -203,7 +203,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         for (Set<DrawableElement> des : drawableElements.values()) {
             for (DrawableElement de : des) {
                 long temp = de.getLastDateWithData();
-                if (temp < lastDate) {
+                if (temp != -1 && temp < lastDate) {
                     lastDate = temp;
                 }
             }
