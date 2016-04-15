@@ -36,7 +36,7 @@ public class JHVRelatedEvents {
         return events;
     }
 
-    public void add(JHVEvent evt, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    private void add(JHVEvent evt, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         if (!eventsMap.containsKey(eventType)) {
             eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }

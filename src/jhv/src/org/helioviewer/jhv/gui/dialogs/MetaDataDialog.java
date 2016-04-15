@@ -56,9 +56,6 @@ import org.w3c.dom.NodeList;
 
 /**
  * Dialog that is used to display meta data for an image.
- *
- * @author Alen Agheksanterian
- * @author Stephan Pagel
  */
 @SuppressWarnings("serial")
 public class MetaDataDialog extends JDialog implements ActionListener, ShowableDialog {
@@ -87,9 +84,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     private boolean metaDataOK;
     private String outFileName;
 
-    /**
-     * The private constructor that sets the fields and the dialog.
-     */
     public MetaDataDialog(View view) {
         super(ImageViewerGui.getMainFrame(), "Image Information");
 
@@ -140,9 +134,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
-    public void prepareList(JList l) {
+    private void prepareList(JList l) {
         l.setFont(UIGlobals.UIFontMono);
-
         l.setCellRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -155,21 +148,12 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         });
     }
 
-    public void prepareTable(JTable t) {
+    private void prepareTable(JTable t) {
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(t.getModel());
         t.setRowSorter(sorter);
-        //JTextField tf = new JTextField();
-        //t.setRowSelectionAllowed(true);
-        //t.setColumnSelectionAllowed(true);
-        //t.setCellSelectionEnabled(true);
     }
 
-    /**
-     * Resets the list.
-     */
-    public void resetData() {
-        // update the listBox
-        // set the status of export button
+    private void resetData() {
         if (!metaDataOK) {
             exportFitsButton.setEnabled(false);
         } else {
@@ -177,11 +161,11 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }
     }
 
-    public void addDataItem(String key, String value) {
+    private void addDataItem(String key, String value) {
         basicList.add(basicList.getSize(), key + ": " + value + "\n");
     }
 
-    public void addDataItem(String key, DefaultListModel model) {
+    private void addDataItem(String key, DefaultListModel model) {
         model.add(model.getSize(), key + "\n");
     }
 
@@ -192,9 +176,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             jhList.add(jhList.getSize(), nodeName + ": " + nodeValue + "\n");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showDialog() {
         if (!metaDataOK)
@@ -215,9 +196,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         dispose();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent _a) {
         if (_a.getSource() == closeButton) {
@@ -379,7 +357,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }
 
         // The source is the fits header
-
         // The destination for output
         StreamResult result = new StreamResult(fos);
 

@@ -44,7 +44,7 @@ public class RenderableMiniviewOptionsPanel extends ComponentUtils.SmallPanel {
         setSmall();
     }
 
-    public void createXSpinner() {
+    private void createXSpinner() {
         int min = 5, max = 15;
 
         xSpinner = new JSpinner();

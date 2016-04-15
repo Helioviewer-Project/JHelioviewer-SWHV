@@ -440,7 +440,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return null;
     }
 
-    public List<YAxisElement> getAllYAxisElementsForUnit(String unit) {
+    private List<YAxisElement> getAllYAxisElementsForUnit(String unit) {
         List<YAxisElement> all = new ArrayList<YAxisElement>();
         for (YAxisElement el : yAxisSet) {
             if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {

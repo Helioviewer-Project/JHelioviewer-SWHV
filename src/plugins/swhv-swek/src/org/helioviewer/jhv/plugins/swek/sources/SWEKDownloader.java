@@ -66,12 +66,11 @@ public abstract class SWEKDownloader {
                 overmax = eventJSON.getBoolean("overmax");
             else
                 overmax = false;
-            boolean success = parseEvents(eventJSON, type);
-            if (!success)
+
+            if (!parseEvents(eventJSON, type))
                 return false;
 
-            success = parseAssociations(eventJSON);
-            return success;
+            return parseAssociations(eventJSON);
         } catch (IOException e) {
             overmax = false;
             Log.error("Could not read the inputstream. " + e);
