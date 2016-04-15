@@ -52,6 +52,7 @@ public class HEKSourceProperties {
         InputStream defaultPropStream = HEKSourceProperties.class.getResourceAsStream("/heksource.properties");
         try {
             hekSourceProperties.load(defaultPropStream);
+            defaultPropStream.close();
         } catch (IOException ex) {
             System.out.println("Could not load the hek settings." + ex);
         }

@@ -52,8 +52,10 @@ public class ComesepProperties {
         InputStream defaultPropStream = ComesepProperties.class.getResourceAsStream("/comesepsource.properties");
         try {
             comesepProperties.load(defaultPropStream);
+            defaultPropStream.close();
         } catch (IOException ex) {
             System.out.println("Could not load the comesep settings." + ex);
         }
     }
+
 }
