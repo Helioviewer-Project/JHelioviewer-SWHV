@@ -175,7 +175,7 @@ public class JHVEventContainer {
     }
 
     public ArrayList<JHVEvent> getOtherRelations(JHVEvent event) {
-        ArrayList<JHVEvent> events = incomingRequestManager.getOtherRelations(event);
-        return events;
+        return incomingRequestManager.getOtherRelations(event);
     }
+
 }
