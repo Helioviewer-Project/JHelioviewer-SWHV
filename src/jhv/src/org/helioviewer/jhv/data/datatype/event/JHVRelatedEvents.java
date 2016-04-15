@@ -14,6 +14,7 @@ import org.helioviewer.jhv.data.container.cache.JHVCacheColors;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 
 public class JHVRelatedEvents {
+
     private final ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
     private final SortedDateInterval interval = new SortedDateInterval(Long.MAX_VALUE, Long.MIN_VALUE);
     private final ArrayList<JHVAssociation> associations = new ArrayList<JHVAssociation>();
@@ -25,7 +26,6 @@ public class JHVRelatedEvents {
     private final JHVEventType eventType;
 
     public JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
-        super();
         color = JHVCacheColors.getNextColor();
         eventType = event.getJHVEventType();
         this.add(event, eventsMap);
@@ -196,4 +196,5 @@ public class JHVRelatedEvents {
         }
         eventsMap.get(eventType).put(interval, this);
     }
+
 }
