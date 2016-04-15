@@ -4,8 +4,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,8 +13,8 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingWorker;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -24,6 +22,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
 import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.threads.JHVWorker;
 
 /**
  * Popup displaying informations about a HEK event.
@@ -32,7 +31,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  * which is not possible for other swing components.
  */
 @SuppressWarnings("serial")
-public class SWEKEventInformationDialog extends JDialog implements WindowListener, DataCollapsiblePanelModelListener {
+public class SWEKEventInformationDialog extends JDialog implements DataCollapsiblePanelModelListener {
 
     private JPanel allTablePanel;
 
@@ -46,7 +45,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
     private final JHVEvent event;
     private final JHVRelatedEvents rEvent;
-    private Integer nrOfWindowsOpened;
 
     private final DataCollapsiblePanelModel model;
 
@@ -56,41 +54,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         rEvent = revent;
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
-        initDialog(revent);
-        startOtherRelatedEventsSwingWorker();
-    }
 
-    @Override
-    public void windowOpened(WindowEvent e) {
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e) {
-    }
-
-    @Override
-    public void windowClosed(WindowEvent e) {
-        decrementNrOfWindows();
-    }
-
-    @Override
-    public void windowIconified(WindowEvent e) {
-    }
-
-    @Override
-    public void windowDeiconified(WindowEvent e) {
-    }
-
-    @Override
-    public void windowActivated(WindowEvent e) {
-    }
-
-    @Override
-    public void windowDeactivated(WindowEvent e) {
-    }
-
-    private void initDialog(JHVRelatedEvents revent) {
-        nrOfWindowsOpened = 0;
         eventDescriptionPanel = new EventDescriptionPanel(revent, event);
 
         initAllTablePanel();
@@ -118,20 +82,14 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         allTablePanelConstraint.fill = GridBagConstraints.BOTH;
 
         add(allTablePanel, allTablePanelConstraint);
+
+        startOtherRelatedEventsWorker();
     }
 
-    /**
-     * initialize the allTablePanel
-     *
-     */
     private void initAllTablePanel() {
-        allTablePanel = new JPanel();
-        allTablePanel.setLayout(new GridBagLayout());
+        allTablePanel = new JPanel(new GridBagLayout());
     }
 
-    /**
-     * initialize collapsible panels
-     */
     private void initParameterCollapsiblePanels() {
         ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters().values());
         standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, true, model);
@@ -229,23 +187,19 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     }
 
     private JPanel createEventPanel(final JHVRelatedEvents rEvents, final JHVEvent event) {
-        JPanel eventAndButtonPanel = new JPanel();
-
         JButton detailsButton = new JButton("Details");
         detailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                incrementNrOfWindows();
                 SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvents, event);
-                dialog.addWindowListener(SWEKEventInformationDialog.this);
                 dialog.validate();
                 dialog.pack();
                 dialog.setVisible(true);
-
             }
         });
 
-        eventAndButtonPanel.setLayout(new GridBagLayout());
+        JPanel eventAndButtonPanel = new JPanel(new GridBagLayout());
+
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -260,35 +214,23 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         c.weightx = 0;
         c.weighty = 0;
         c.anchor = GridBagConstraints.EAST;
-
         eventAndButtonPanel.add(detailsButton, c);
+
         return eventAndButtonPanel;
-
-    }
-
-    private void incrementNrOfWindows() {
-        nrOfWindowsOpened++;
-    }
-
-    private void decrementNrOfWindows() {
-        nrOfWindowsOpened--;
     }
 
     @Override
     public void repack() {
         allTablePanel.removeAll();
         setCollapsiblePanels();
-
         pack();
     }
 
-    private void startOtherRelatedEventsSwingWorker() {
-        SwingWorker<ArrayList<JHVEvent>, Void> worker = new SwingWorker<ArrayList<JHVEvent>, Void>() {
+    private void startOtherRelatedEventsWorker() {
+        JHVWorker<ArrayList<JHVEvent>, Void> worker = new JHVWorker<ArrayList<JHVEvent>, Void>() {
             @Override
-            public ArrayList<JHVEvent> doInBackground() {
-                ArrayList<JHVEvent> jhvEvents = JHVEventContainer.getSingletonInstance().getOtherRelations(event);
-
-                return jhvEvents;
+            public ArrayList<JHVEvent> backgroundWork() {
+                return JHVEventContainer.getSingletonInstance().getOtherRelations(event);
             }
 
             @Override
@@ -317,7 +259,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
             }
         };
-        worker.execute();
+        JHVGlobals.getExecutorService().execute(worker);
     }
 
 }
