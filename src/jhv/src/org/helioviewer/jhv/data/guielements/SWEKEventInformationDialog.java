@@ -336,10 +336,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
                     ArrayList<JHVRelatedEvents> rEvents = new ArrayList<JHVRelatedEvents>();
                     rEvents.addAll(rEventsSet);
 
-                    ArrayList<JHVRelatedEvents> assocs;
-
-                    if (!assocs.isEmpty()) {
-                        otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", assocs);
+                    if (!rEvents.isEmpty()) {
+                        otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", rEvents);
                         SWEKEventInformationDialog.this.repack();
                         SWEKEventInformationDialog.this.repaint();
                     }
