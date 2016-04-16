@@ -15,7 +15,6 @@ public class JHVEvent {
 
     private final Map<String, JHVEventParameter> allParameters = new HashMap<String, JHVEventParameter>();
     private final Map<String, JHVEventParameter> allVisibleParameters = new HashMap<String, JHVEventParameter>();
-    private final Map<String, JHVEventParameter> allNonVisibleParameters = new HashMap<String, JHVEventParameter>();
 
     private final JHVEventType eventType;
     private JHVPositionInformation positionInformation = JHVPositionInformation.NULLINFO;
@@ -37,10 +36,6 @@ public class JHVEvent {
 
     public Map<String, JHVEventParameter> getVisibleEventParameters() {
         return allVisibleParameters;
-    }
-
-    public Map<String, JHVEventParameter> getNonVisibleEventParameters() {
-        return allNonVisibleParameters;
     }
 
     public String getName() {
@@ -81,12 +76,8 @@ public class JHVEvent {
         String name = parameter.getParameterName();
 
         allParameters.put(name, parameter);
-        if (configured) {
-            if (visible) {
-                allVisibleParameters.put(name, parameter);
-            } else {
-                allNonVisibleParameters.put(name, parameter);
-            }
+        if (configured && visible) {
+            allVisibleParameters.put(name, parameter);
         }
     }
 

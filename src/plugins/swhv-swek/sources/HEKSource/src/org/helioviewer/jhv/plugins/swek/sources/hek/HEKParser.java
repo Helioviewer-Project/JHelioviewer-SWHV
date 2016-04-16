@@ -71,7 +71,7 @@ public class HEKParser implements SWEKParser {
                         hgsX = Double.valueOf(value);
                     } else if (keyString.equals("hgs_y")) {
                         hgsY = Double.valueOf(value);
-                    } else if (keyString.equals("rasterscan") ||
+                    } else if (keyString.equals("rasterscan") || keyString.equals("bound_chaincode") ||
                               keyString.startsWith("hgc_") || keyString.startsWith("hgs_") || keyString.startsWith("hpc_") || keyString.startsWith("hrc_")) {
                         // nothing, delete
                     } else {
