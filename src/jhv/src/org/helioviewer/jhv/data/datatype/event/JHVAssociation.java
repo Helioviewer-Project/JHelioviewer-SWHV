@@ -1,11 +1,13 @@
 package org.helioviewer.jhv.data.datatype.event;
 
 public class JHVAssociation {
-    public Integer left;
-    public Integer right;
 
-    public JHVAssociation(Integer _left, Integer _right) {
+    public final int left;
+    public final int right;
+
+    public JHVAssociation(int _left, int _right) {
         left = _left;
         right = _right;
     }
+
 }

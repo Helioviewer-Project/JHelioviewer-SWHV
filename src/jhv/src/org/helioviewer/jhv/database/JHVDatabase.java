@@ -662,9 +662,7 @@ public class JHVDatabase {
                     ResultSet rs = pstatement.executeQuery();
                     boolean next = rs.next();
                     while (next) {
-                        int left = rs.getInt(1);
-                        int right = rs.getInt(2);
-                        assocList.add(new JHVAssociation(left, right));
+                        assocList.add(new JHVAssociation(rs.getInt(1), rs.getInt(2)));
                         next = rs.next();
                     }
                     rs.close();
