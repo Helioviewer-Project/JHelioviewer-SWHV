@@ -144,7 +144,7 @@ public class JHVRelatedEvents {
     public ArrayList<JHVEvent> getNextEvents(JHVEvent event) {
         ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
         for (JHVAssociation assoc : associations) {
-            if (assoc.left.equals(event.getUniqueID())) {
+            if (assoc.left == event.getUniqueID()) {
                 JHVEvent newEvt = findEvent(assoc.right);
                 if (newEvt != null) {
                     nEvents.add(newEvt);
@@ -157,7 +157,7 @@ public class JHVRelatedEvents {
     public ArrayList<JHVEvent> getPreviousEvents(JHVEvent event) {
         ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
         for (JHVAssociation assoc : associations) {
-            if (assoc.right.equals(event.getUniqueID())) {
+            if (assoc.right == event.getUniqueID()) {
                 JHVEvent newEvt = findEvent(assoc.left);
                 if (newEvt != null) {
                     nEvents.add(newEvt);

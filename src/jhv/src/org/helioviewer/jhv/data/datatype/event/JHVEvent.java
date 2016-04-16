@@ -22,8 +22,8 @@ public class JHVEvent {
     private Integer id;
 
     public JHVEvent(String _eventName, String _eventDisplayName, JHVEventType _eventType, int _id, long _start, long _end) {
-        eventName = _eventName;
-        eventDisplayName = _eventDisplayName;
+        eventName = _eventName.intern();
+        eventDisplayName = _eventDisplayName.intern();
         eventType = _eventType;
         start = _start;
         end = _end;

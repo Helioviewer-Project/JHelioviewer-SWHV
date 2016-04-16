@@ -198,7 +198,7 @@ public class JHVEventCache {
             if (assoLeft.containsKey(association.left)) {
                 ArrayList<JHVAssociation> res = assoLeft.get(association.left);
                 for (JHVAssociation el : res) {
-                    if (el.right.equals(association.right)) {
+                    if (el.right == association.right) {
                         alreadyin = true;
                         break;
                     }
@@ -213,7 +213,6 @@ public class JHVEventCache {
     }
 
     public JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
-
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         Map<JHVEventType, List<Interval>> missingIntervals = new HashMap<JHVEventType, List<Interval>>();
         for (JHVEventType evt : activeEventTypes) {
