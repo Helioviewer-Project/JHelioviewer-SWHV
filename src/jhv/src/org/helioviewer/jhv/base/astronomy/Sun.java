@@ -10,12 +10,12 @@ public class Sun {
 
     public static final double MassEarth = 5.97237e24;
     public static final double MassSun = 1.98855e30;
-    //https://en.wikipedia.org/wiki/Lagrangian_point#L1
+    // https://en.wikipedia.org/wiki/Lagrangian_point#L1
     public static final double L1Factor = 1 - Math.cbrt(MassEarth / MassSun / 3);
 
     public static final double Radius = 1;
     public static final double Radius2 = Radius * Radius;
-    public static final double RadiusMeter = 6.96e8;
+    public static final double RadiusMeter = 695700000; // photospheric, IAU 2015 Resolution B3
 
     public static final double MeanEarthDistanceMeter = 149597870700.;
     public static final double MeanEarthDistance = (MeanEarthDistanceMeter / RadiusMeter);
@@ -24,7 +24,6 @@ public class Sun {
     public static final Position.Q EpochEarthQ;
 
     static {
-        prevEarth = new Position.L(new JHVDate(0), 0, 0, 0);
         EpochEarthL = getEarth(TimeUtils.Epoch);
         EpochEarthQ = new Position.Q(EpochEarthL.time, EpochEarthL.rad, new Quat(EpochEarthL.lat, EpochEarthL.lon));
     }
@@ -37,14 +36,8 @@ public class Sun {
         return (JulianDay.DJM0 - epoch + mjd) / 36525.;
     }
 
-    private static Position.L prevEarth;
-
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
     public static Position.L getEarth(JHVDate time) {
-        if (time.milli == prevEarth.time.milli) {
-            return prevEarth;
-        }
-
         double mjd = milli2mjd(time.milli);
         double t = mjd2jcy(mjd, 2415020.);
 
@@ -82,10 +75,7 @@ public class Sun {
 
         // convert distance to solar radii
         // change L0 Carrington longitude sign to increase towards West, like Stonyhurst
-        Position.L Earth = new Position.L(time, dist * Sun.MeanEarthDistance, -he_lon, he_lat);
-        prevEarth = Earth;
-
-        return Earth;
+        return new Position.L(time, dist * Sun.MeanEarthDistance, -he_lon, he_lat);
     }
 
     private static double sunRot(double mjd) {
