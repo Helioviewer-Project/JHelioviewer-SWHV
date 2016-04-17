@@ -171,8 +171,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                         break;
                     }
                 }
-            }
-            else {
+            } else {
                 Vec2 tf = null;
                 Vec2 mousepos = null;
                 if (evt.getName().equals("Coronal Mass Ejection")) {
