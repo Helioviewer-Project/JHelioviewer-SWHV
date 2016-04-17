@@ -455,7 +455,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
         } else {
-            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            setCursor(Cursor.getDefaultCursor());
         }
 
         if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
@@ -513,14 +513,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePosition = new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE);
 
         if (movieLinePosition >= 0 && frame.contains(p)) {
-            setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+            setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
         } else if (EventModel.getSingletonInstance().getEventUnderMouse() != null) {
-            setCursor(new Cursor(Cursor.HAND_CURSOR));
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             mouseOverEvent = true;
         } else if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
         } else {
-            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            setCursor(Cursor.getDefaultCursor());
         }
         if (mouseOverEvent && (eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) == null)) {
             mouseOverEvent = false;

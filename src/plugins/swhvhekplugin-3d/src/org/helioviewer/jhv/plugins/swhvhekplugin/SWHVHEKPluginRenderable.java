@@ -199,7 +199,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 }
             }
             gl.glEnd();
-
             oldBoundaryPoint3d = point;
         }
     }
