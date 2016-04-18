@@ -44,8 +44,8 @@ import org.json.JSONTokener;
 public class DataSources {
 
     public static final Map<String, String> ROBsettings;
-    public static final Map<String, String> IASsettings;
-    public static final Map<String, String> GSFCsettings;
+    private static final Map<String, String> IASsettings;
+    private static final Map<String, String> GSFCsettings;
 
     static {
         ROBsettings = new HashMap<String, String>();
