@@ -2,16 +2,15 @@ package org.helioviewer.jhv.data.container;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
-import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -19,14 +18,12 @@ import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 
 public class JHVEventContainer {
 
-    /** Singleton instance */
     private static JHVEventContainer singletonInstance;
 
     /** the event cache */
     private final JHVEventCache eventCache;
 
-    /** the event handler cache */
-    private final JHVEventHandlerCache eventHandlerCache;
+    private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<JHVEventHandler>();
 
     private JHVEventContainerRequestHandler incomingRequestManager;
 
@@ -34,19 +31,10 @@ public class JHVEventContainer {
 
     private static JHVRelatedEvents lastHighlighted = null;
 
-    /**
-     * Private constructor.
-     */
     private JHVEventContainer() {
-        eventHandlerCache = JHVEventHandlerCache.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
     }
 
-    /**
-     * Gets the singleton instance of the JHVEventContainer
-     *
-     * @return the singleton instance
-     */
     public static JHVEventContainer getSingletonInstance() {
         if (singletonInstance == null) {
             singletonInstance = new JHVEventContainer();
@@ -71,7 +59,8 @@ public class JHVEventContainer {
         long deltaT = Math.max((long) ((endDate - startDate) * factor), 1000 * 60 * 60 * 24 * 5);
         long newStartDate = startDate - deltaT;
         long newEndDate = endDate + deltaT;
-        eventHandlerCache.add(handler);
+        cacheEventHandlers.add(handler);
+
         JHVEventCacheResult result = eventCache.get(startDate, endDate, newStartDate, newEndDate);
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = result.getAvailableEvents();
         handler.newEventsReceived(events);
@@ -127,8 +116,7 @@ public class JHVEventContainer {
      *            the date for which the cache was changed.
      */
     private void fireEventCacheChanged() {
-        Set<JHVEventHandler> handlers = eventHandlerCache.getAllJHVEventHandlers();
-        for (JHVEventHandler handler : handlers) {
+        for (JHVEventHandler handler : cacheEventHandlers) {
             handler.cacheUpdated();
         }
     }
