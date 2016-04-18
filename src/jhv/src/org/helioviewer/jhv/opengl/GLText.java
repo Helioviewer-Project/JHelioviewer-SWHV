@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import org.helioviewer.jhv.display.Viewport;
@@ -65,9 +64,9 @@ public class GLText {
         double boundW = 0;
         int ct = 0;
         for (String txt : txts) {
-            Rectangle2D bound = renderer.getBounds(txt);
-            if (boundW < bound.getWidth())
-                boundW = bound.getWidth();
+            double w = renderer.getBounds(txt).getWidth();
+            if (boundW < w)
+                boundW = w;
             ct++;
         }
 
