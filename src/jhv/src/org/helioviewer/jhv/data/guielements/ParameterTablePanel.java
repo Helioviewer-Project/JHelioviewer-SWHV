@@ -43,11 +43,7 @@ public class ParameterTablePanel extends JPanel {
 
         ParameterTableModel parameterModel = new ParameterTableModel(parameters);
         JTable table = new JTable(parameterModel);
-            /* {
-             * @Override public boolean getScrollableTracksViewportWidth() {
-             * return getPreferredSize().width < getParent().getWidth(); }
-             * };
-             */
+
         table.setAutoCreateRowSorter(true);
         table.getColumnModel().getColumn(0).setResizable(false);
         table.getColumnModel().getColumn(0).setMaxWidth(180);
@@ -101,8 +97,6 @@ public class ParameterTablePanel extends JPanel {
         private boolean isValueURL(Object value) {
             if (value instanceof String) {
                 String strValue = (String) value;
-                strValue = strValue.trim();
-                strValue = strValue.toLowerCase();
                 return Regex.WEB_URL.matcher(strValue).matches();
             } else {
                 return false;
