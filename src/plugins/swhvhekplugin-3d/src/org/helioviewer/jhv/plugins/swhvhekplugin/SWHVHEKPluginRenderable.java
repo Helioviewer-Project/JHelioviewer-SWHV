@@ -393,7 +393,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                     }
                 }
             }
-            SWHVHEKSettings.resetCactusColor();
         }
     }
 
@@ -415,7 +414,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                     }
                 }
             }
-            SWHVHEKSettings.resetCactusColor();
         }
     }
 
