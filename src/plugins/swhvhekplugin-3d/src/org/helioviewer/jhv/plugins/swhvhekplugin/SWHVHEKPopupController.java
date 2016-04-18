@@ -39,11 +39,11 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     private static Component component;
     private static Camera camera;
 
-    protected static JHVRelatedEvents mouseOverJHVEvent = null;
-    protected static Point mouseOverPosition = null;
     private static Cursor lastCursor;
 
-    protected long currentTime;
+    static JHVRelatedEvents mouseOverJHVEvent = null;
+    static Point mouseOverPosition = null;
+    long currentTime;
 
     @Override
     public void setComponent(Component _component) {

@@ -23,7 +23,7 @@ public enum HTTPHeaderKey {
         str = _str;
     }
 
-    /** Over ridden toString returns the HTTP/1.1 compatible header */
+    @Override
     public String toString() {
         return str;
     }
