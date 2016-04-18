@@ -179,8 +179,9 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
         for (final JHVRelatedEvents rEvent : rEvents) {
-            if (rEvent.getEvents().size() > 0) {
-                allPrecedingEvents.add(createEventPanel(rEvent, rEvent.getEvents().get(0)));
+            ArrayList<JHVEvent> evs = rEvent.getEvents();
+            if (evs.size() > 0) {
+                allPrecedingEvents.add(createEventPanel(rEvent, evs.get(0)));
             }
         }
         return new DataCollapsiblePanel(relation, new JScrollPane(allPrecedingEvents), false, model);

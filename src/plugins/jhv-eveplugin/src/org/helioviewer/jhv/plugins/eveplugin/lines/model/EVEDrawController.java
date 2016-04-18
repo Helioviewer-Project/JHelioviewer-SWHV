@@ -48,11 +48,11 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private final LineDataSelectorModel selectorModel;
 
     private EVEDrawController() {
+        drawController = DrawController.getSingletonInstance();
+        drawController.addTimingListener(this);
 
-        DrawController.getSingletonInstance().addTimingListener(this);
         EVECacheController.getSingletonInstance().addControllerListener(this);
         selectorModel = LineDataSelectorModel.getSingletonInstance();
-        drawController = DrawController.getSingletonInstance();
         eveDrawableElementMap = new HashMap<YAxisElement, EVEDrawableElement>();
         bandTypes = new HashSet<BandType>();
         yAxisElementMap = new HashMap<Band, YAxisElement>();
@@ -238,7 +238,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             bandTypes.add(bandType);
             Band band = new Band(bandType);
             band.setDataColor(BandColors.getNextColor());
-            DownloadController.getSingletonInstance().updateBand(band, DrawController.getSingletonInstance().getAvailableInterval(), DrawController.getSingletonInstance().getSelectedInterval());
+            DownloadController.getSingletonInstance().updateBand(band, drawController.getAvailableInterval(), drawController.getSelectedInterval());
             addToMap(band);
             selectorModel.addLineData(band);
         }
@@ -304,7 +304,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     public boolean hasDataInSelectedInterval(Band band) {
-        return EVECacheController.getSingletonInstance().hasDataInSelectedInterval(band, DrawController.getSingletonInstance().getSelectedInterval());
+        return EVECacheController.getSingletonInstance().hasDataInSelectedInterval(band, drawController.getSelectedInterval());
     }
 
     public void changeAxis(Band band) {
@@ -361,7 +361,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     public boolean canChangeAxis(Band band) {
-        return DrawController.getSingletonInstance().canChangeAxis(band.getUnitLabel()) && yAxisElementMap.size() > 1 && (drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxisElement.YAxisLocation.RIGHT || (drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxisElement.YAxisLocation.LEFT && bandsPerYAxis.get(yAxisElementMap.get(band)).size() > 1));
+        return drawController.canChangeAxis(band.getUnitLabel()) && yAxisElementMap.size() > 1 && (drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxisElement.YAxisLocation.RIGHT || (drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxisElement.YAxisLocation.LEFT && bandsPerYAxis.get(yAxisElementMap.get(band)).size() > 1));
     }
 
     public int getAxisLocation(Band band) {
@@ -374,10 +374,8 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     private class SelectedIntervalTimerTask implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-
             if (selectedIntervalChanged) {
                 selectedIntervalChanged = false;
                 updateBands();

@@ -88,6 +88,7 @@ public class SideContentPane extends JComponent {
      * @param component
      *            Component to expand
      */
+/*
     private void expand(Component component) {
         if (map.containsKey(component)) {
             map.get(component).expand();
@@ -99,7 +100,7 @@ public class SideContentPane extends JComponent {
             }
         }
     }
-
+*/
     /**
      * Expands all children of {@link CollapsiblePane}s of the given class.
      *
@@ -126,6 +127,7 @@ public class SideContentPane extends JComponent {
      * @param component
      *            Component to collapse
      */
+/*
     private void collapse(Component component) {
         if (map.containsKey(component)) {
             map.get(component).collapse();
@@ -137,7 +139,7 @@ public class SideContentPane extends JComponent {
             }
         }
     }
-
+*/
     /**
      * Collapses all children of {@link CollapsiblePane}s of the given class.
      *
