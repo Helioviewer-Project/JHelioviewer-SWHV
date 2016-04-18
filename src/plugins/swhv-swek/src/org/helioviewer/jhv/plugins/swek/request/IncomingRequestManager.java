@@ -37,8 +37,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     }
 
     @Override
-    public void handleRequestForInterval(JHVEventType eventType, long startDate, long endDate) {
-        Interval interval = new Interval(startDate, endDate);
+    public void handleRequestForInterval(JHVEventType eventType, Interval interval) {
         SWEKDownloadManager.getSingletonInstance().newRequestForInterval(eventType, interval);
     }
 

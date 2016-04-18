@@ -67,7 +67,7 @@ public class JHVEventContainer {
         for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
             List<Interval> missingList = result.getMissingIntervals().get(eventType);
             for (Interval missing : missingList) {
-                requestEvents(eventType, missing.start, missing.end);
+                requestEvents(eventType, missing);
             }
         }
     }
@@ -104,8 +104,8 @@ public class JHVEventContainer {
      * @param endDate
      *            the end of the interval
      */
-    private void requestEvents(JHVEventType eventType, long startDate, long endDate) {
-        incomingRequestManager.handleRequestForInterval(eventType, startDate, endDate);
+    private void requestEvents(JHVEventType eventType, Interval interval) {
+        incomingRequestManager.handleRequestForInterval(eventType, interval);
     }
 
     /**
