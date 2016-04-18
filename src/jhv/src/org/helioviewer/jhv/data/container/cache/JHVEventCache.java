@@ -48,7 +48,7 @@ public class JHVEventCache {
         @Override
         public int hashCode() {
             assert false : "hashCode not designed";
-        return 42;
+            return 42;
         }
 
         @Override
@@ -158,24 +158,6 @@ public class JHVEventCache {
         } else {
             this.assocs.add(association);
         }
-    }
-
-    public void printRevent(int id) {
-        if (relEvents.get(id) == null) {
-            System.out.println("Revent " + id + " is null");
-            return;
-        }
-        System.out.print("Revent \nids :");
-        for (JHVEvent ev : relEvents.get(id).getEvents()) {
-            System.out.print(ev.getUniqueID());
-        }
-        ;
-        System.out.print("\n");
-        for (JHVAssociation assoc : relEvents.get(id).getAssociations()) {
-            System.out.print("(" + assoc.left + " " + assoc.right + ")");
-        }
-        ;
-        System.out.print("\n");
     }
 
     public JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
