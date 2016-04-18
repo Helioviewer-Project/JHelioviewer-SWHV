@@ -107,10 +107,7 @@ public class HTTPSocket extends Socket {
 
             // Adds the headers
             for (String key : req.getHeaders()) {
-                str.append(key);
-                str.append(": ");
-                str.append(req.getHeader(key));
-                str.append(CRLF);
+                str.append(key).append(": ").append(req.getHeader(key)).append(CRLF);
             }
             str.append(CRLF);
 

@@ -303,7 +303,7 @@ public class Layers {
                 if (md instanceof HelioviewerMetaData) {
                     HelioviewerMetaData hmd = (HelioviewerMetaData) md;
                     if (hmd.getObservatory().contains("SDO") && hmd.getInstrument().contains("AIA"))
-                        str.append("," + hmd.getMeasurement());
+                        str.append(",").append(hmd.getMeasurement());
                 }
             }
         }
