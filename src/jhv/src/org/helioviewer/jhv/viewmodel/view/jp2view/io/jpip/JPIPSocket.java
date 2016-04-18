@@ -8,6 +8,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStreamAlt;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPResponse;
@@ -44,11 +45,6 @@ public class JPIPSocket extends HTTPSocket {
     private long replyDataTm = 0;
 
     private static final String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
-
-    /** Default constructor. */
-    public JPIPSocket() {
-        super();
-    }
 
     /**
      * Connects to the specified URI. The second parameter only serves to
@@ -176,14 +172,14 @@ public class JPIPSocket extends HTTPSocket {
             str.append(queryStr);
         }
         str.append(" ");
-        str.append(versionText);
-        str.append(CRLF);
+        str.append(HTTPConstants.versionText);
+        str.append(HTTPConstants.CRLF);
 
         // Adds the headers
         for (String key : _req.getHeaders()) {
-            str.append(key).append(": ").append(_req.getHeader(key)).append(CRLF);
+            str.append(key).append(": ").append(_req.getHeader(key)).append(HTTPConstants.CRLF);
         }
-        str.append(CRLF);
+        str.append(HTTPConstants.CRLF);
 
         // Adds the message body if necessary
         if (_req.getMethod() == HTTPRequest.Method.POST)

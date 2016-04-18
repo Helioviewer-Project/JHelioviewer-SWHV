@@ -31,24 +31,7 @@ public class HTTPSocket extends Socket {
     private String lastUsedHost = null;
 
     /** The default port for the HTTP socket */
-    static public final int PORT = 80;
-
-    /** The maximum HTTP version supported */
-    static public final double version = 1.1;
-
-    /** The version in standard formated text */
-    static public final String versionText = "HTTP/" + Double.toString(version);
-
-    /** The array of bytes that contains the CRLF codes */
-    static public final byte CRLFBytes[] = { 13, 10 };
-
-    /** The string representation of the CRLF codes */
-    static public final String CRLF = new String(CRLFBytes);
-
-    /** Default constructor */
-    public HTTPSocket() {
-        super();
-    }
+    public static final int PORT = 80;
 
     /**
      * Connects to the specified host via the supplied URI.
@@ -98,8 +81,8 @@ public class HTTPSocket extends Socket {
             str.append(" ");
             str.append(req.getURI());
             str.append(" ");
-            str.append(versionText);
-            str.append(CRLF);
+            str.append(HTTPConstants.versionText);
+            str.append(HTTPConstants.CRLF);
 
             // Sets the content length header if it's a POST
             if (req.getMethod() == HTTPRequest.Method.POST)
@@ -107,9 +90,9 @@ public class HTTPSocket extends Socket {
 
             // Adds the headers
             for (String key : req.getHeaders()) {
-                str.append(key).append(": ").append(req.getHeader(key)).append(CRLF);
+                str.append(key).append(": ").append(req.getHeader(key)).append(HTTPConstants.CRLF);
             }
-            str.append(CRLF);
+            str.append(HTTPConstants.CRLF);
 
             // Adds the message body if it's a POST
             if (req.getMethod() == HTTPRequest.Method.POST)
@@ -154,7 +137,7 @@ public class HTTPSocket extends Socket {
             } catch (NumberFormatException ex) {
                 throw new ProtocolException("Invalid HTTP version format");
             }
-            if ((ver < 1) || (ver > version))
+            if (ver < 1 || ver > HTTPConstants.version)
                 throw new ProtocolException("HTTP version not supported");
 
             // Parses status code

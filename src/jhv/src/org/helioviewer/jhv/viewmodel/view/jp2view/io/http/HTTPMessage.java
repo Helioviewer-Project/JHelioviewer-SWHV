@@ -17,18 +17,6 @@ import java.util.Set;
  */
 public abstract class HTTPMessage {
 
-    /** The maximum HTTP version supported */
-    static public final double version = 1.1;
-
-    /** The version in standard formated text */
-    static public final String versionText = "HTTP/" + Double.toString(version);
-
-    /** The array of bytes that contains the CRLF codes */
-    static public final byte CRLFBytes[] = { 13, 10 };
-
-    /** The string representation of the CRLF codes */
-    static public final String CRLF = new String(CRLFBytes);
-
     /** A hash table with the headers of the message */
     protected Hashtable<String, String> headers = new Hashtable<String, String>();
 
