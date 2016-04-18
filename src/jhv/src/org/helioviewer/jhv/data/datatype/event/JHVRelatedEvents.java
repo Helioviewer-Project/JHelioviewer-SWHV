@@ -28,22 +28,13 @@ public class JHVRelatedEvents {
         eventType = event.getJHVEventType();
         color = JHVCacheColors.getNextColor();
         highlighted = false;
-        this.add(event, eventsMap);
-    }
 
-    private void add(JHVEvent evt, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         if (!eventsMap.containsKey(eventType)) {
             eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
-        eventsMap.get(eventType).remove(interval);
-        if (evt.start < interval.start) {
-            interval.start = evt.start;
-        }
-
-        if (evt.end > interval.end) {
-            interval.end = evt.end;
-        }
-        events.add(evt);
+        interval.start = event.start;
+        interval.end = event.end;
+        events.add(event);
         eventsMap.get(eventType).put(interval, this);
     }
 
@@ -72,7 +63,7 @@ public class JHVRelatedEvents {
             eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
         eventsMap.get(eventType).remove(interval);
-        eventsMap.get(found.getJHVEventType()).remove(found.getInterval());
+        eventsMap.get(eventType).remove(found.getInterval());
 
         interval.start = Math.min(interval.start, found.getStart());
         interval.end = Math.max(interval.end, found.getEnd());
