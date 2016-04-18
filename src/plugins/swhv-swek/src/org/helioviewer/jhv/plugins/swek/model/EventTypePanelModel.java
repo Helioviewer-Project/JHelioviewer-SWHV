@@ -26,7 +26,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     private final SWEKTreeModelEventType eventType;
 
     /** Holds the TreeModelListeners */
-    private final List<TreeModelListener> listeners;
+    // private final List<TreeModelListener> listeners;
 
     /** Holds the EventPanelModelListeners */
     private final List<EventTypePanelModelListener> panelModelListeners;
@@ -42,9 +42,32 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     public EventTypePanelModel(SWEKTreeModelEventType eventType) {
         this.eventType = eventType;
-        listeners = new ArrayList<TreeModelListener>();
+        // listeners = new ArrayList<TreeModelListener>();
         treeModelInstance = SWEKTreeModel.getSingletonInstance();
         panelModelListeners = new ArrayList<EventTypePanelModelListener>();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see javax.swing.tree.TreeModel#addTreeModelListener(javax.swing.event.
+     * TreeModelListener)
+     */
+    @Override
+    public void addTreeModelListener(TreeModelListener l) {
+        // listeners.add(l);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * javax.swing.tree.TreeModel#removeTreeModelListener(javax.swing.event.
+     * TreeModelListener)
+     */
+    @Override
+    public void removeTreeModelListener(TreeModelListener l) {
+        // listeners.remove(l);
     }
 
     /**
@@ -105,17 +128,6 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
                 fireNewEventTypeAndSourceInActive(eventType.getSwekEventType(), supplier.getSwekSupplier());
             }
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.swing.tree.TreeModel#addTreeModelListener(javax.swing.event.
-     * TreeModelListener)
-     */
-    @Override
-    public void addTreeModelListener(TreeModelListener l) {
-        listeners.add(l);
     }
 
     /*
@@ -182,18 +194,6 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
         } else {
             return true;
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * javax.swing.tree.TreeModel#removeTreeModelListener(javax.swing.event.
-     * TreeModelListener)
-     */
-    @Override
-    public void removeTreeModelListener(TreeModelListener l) {
-        listeners.remove(l);
     }
 
     /*
