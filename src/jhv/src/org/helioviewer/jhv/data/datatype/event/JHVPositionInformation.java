@@ -11,8 +11,7 @@ public class JHVPositionInformation {
     private final Vec3 centralPoint;
     public static JHVPositionInformation NULLINFO = new JHVPositionInformation(null, null, null);
 
-    public JHVPositionInformation(List<Vec3> boundBox, List<Vec3> boundCC,
-            Vec3 centralPoint) {
+    public JHVPositionInformation(List<Vec3> boundBox, List<Vec3> boundCC, Vec3 centralPoint) {
         this.boundBox = boundBox;
         this.centralPoint = centralPoint;
         this.boundCC = boundCC;
