@@ -48,7 +48,7 @@ public class JHVEventCache {
         @Override
         public int hashCode() {
             assert false : "hashCode not designed";
-            return 42;
+        return 42;
         }
 
         @Override
@@ -74,8 +74,7 @@ public class JHVEventCache {
 
     private final Map<JHVEventType, RequestCache> downloadedCache;
 
-    private final Map<Integer, ArrayList<JHVAssociation>> assoLeft = new HashMap<Integer, ArrayList<JHVAssociation>>();
-    private final Map<Integer, ArrayList<JHVAssociation>> assoRight = new HashMap<Integer, ArrayList<JHVAssociation>>();
+    private final ArrayList<JHVAssociation> assocs = new ArrayList<JHVAssociation>();
 
     /**
      * private default constructor
@@ -102,62 +101,36 @@ public class JHVEventCache {
         Integer id = event.getUniqueID();
         if (relEvents.containsKey(id)) {
             relEvents.get(id).swapEvent(event, events);
-            return;
         }
-        checkAssociation(true, event);
-        checkAssociation(false, event);
+        else {
+            createNewRelatedEvent(event);
+        }
+        checkAssociation(event);
     }
 
     public JHVRelatedEvents getRelatedEvents(int id) {
         return relEvents.get(id);
     }
 
-    private void checkAssociation(boolean isLeft, JHVEvent event) {
-        Map<Integer, ArrayList<JHVAssociation>> assoList = isLeft ? assoLeft : assoRight;
-        Map<Integer, ArrayList<JHVAssociation>> assoOther = isLeft ? assoRight : assoLeft;
-
-        Integer uid = event.getUniqueID();
-        if (assoList.containsKey(uid)) {
-            for (Iterator<JHVAssociation> iterator = assoList.get(uid).iterator(); iterator.hasNext();) {
-                JHVAssociation tocheck = iterator.next();
-                Integer founduid = isLeft ? tocheck.right : tocheck.left;
-
-                JHVRelatedEvents found = relEvents.get(founduid);
-                if (found != null) {
-                    if (relEvents.containsKey(uid)) {
-                        JHVRelatedEvents revent = relEvents.get(uid);
-                        merge(revent, relEvents.get(founduid));
-                        revent.addAssociation(tocheck);
-
-                        iterator.remove();
-                        for (Iterator<JHVAssociation> it = assoOther.get(founduid).iterator(); it.hasNext();) {
-                            JHVAssociation checkrem = it.next();
-                            Integer side = isLeft ? checkrem.left : checkrem.right;
-                            if (side.equals(uid)) {
-                                it.remove();
-                                break;
-                            }
-                        }
-                        if (assoOther.get(founduid).isEmpty()) {
-                            assoOther.remove(founduid);
-                        }
-                    } else {
-                        createNewRelatedEvent(event);
-                    }
-                }
+    private void checkAssociation(JHVEvent event) {
+        int uid = event.getUniqueID();
+        JHVRelatedEvents rEvent = relEvents.get(uid);
+        for (Iterator<JHVAssociation> iterator = this.assocs.iterator(); iterator.hasNext();) {
+            JHVAssociation tocheck = iterator.next();
+            if (tocheck.left == uid && relEvents.containsKey(tocheck.right)) {
+                merge(rEvent, relEvents.get(tocheck.right));
+                rEvent.addAssociation(tocheck);
+                iterator.remove();
             }
-            if (assoList.get(uid).isEmpty()) {
-                assoList.remove(uid);
+            if (tocheck.right == uid && relEvents.containsKey(tocheck.left)) {
+                merge(rEvent, relEvents.get(tocheck.left));
+                rEvent.addAssociation(tocheck);
+                iterator.remove();
             }
-        } else {
-            createNewRelatedEvent(event);
         }
     }
 
     private void createNewRelatedEvent(JHVEvent event) {
-        if (relEvents.containsKey(event.getUniqueID())) {
-            return;
-        }
         JHVRelatedEvents revent = new JHVRelatedEvents(event, events);
         relEvents.put(event.getUniqueID(), revent);
     }
@@ -174,17 +147,6 @@ public class JHVEventCache {
         }
     }
 
-    private void addAssociation(boolean isLeft, JHVAssociation association) {
-        Integer key = isLeft ? association.left : association.right;
-        Map<Integer, ArrayList<JHVAssociation>> assoMap = isLeft ? assoLeft : assoRight;
-        ArrayList<JHVAssociation> assocs = assoMap.get(key);
-        if (assocs == null) {
-            assocs = new ArrayList<JHVAssociation>();
-            assoMap.put(key, assocs);
-        }
-        assocs.add(association);
-    }
-
     public void add(JHVAssociation association) {
         if (relEvents.containsKey(association.left) && relEvents.containsKey(association.right)) {
             JHVRelatedEvents ll = relEvents.get(association.left);
@@ -194,22 +156,26 @@ public class JHVEventCache {
                 ll.addAssociation(association);
             }
         } else {
-            boolean alreadyin = false;
-            if (assoLeft.containsKey(association.left)) {
-                ArrayList<JHVAssociation> res = assoLeft.get(association.left);
-                for (JHVAssociation el : res) {
-                    if (el.right == association.right) {
-                        alreadyin = true;
-                        break;
-                    }
-                }
-            }
-            if (!alreadyin) {
-                addAssociation(true, association);
-                addAssociation(false, association);
-            }
+            this.assocs.add(association);
         }
+    }
 
+    public void printRevent(int id) {
+        if (relEvents.get(id) == null) {
+            System.out.println("Revent " + id + " is null");
+            return;
+        }
+        System.out.print("Revent \nids :");
+        for (JHVEvent ev : relEvents.get(id).getEvents()) {
+            System.out.print(ev.getUniqueID());
+        }
+        ;
+        System.out.print("\n");
+        for (JHVAssociation assoc : relEvents.get(id).getAssociations()) {
+            System.out.print("(" + assoc.left + " " + assoc.right + ")");
+        }
+        ;
+        System.out.print("\n");
     }
 
     public JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
