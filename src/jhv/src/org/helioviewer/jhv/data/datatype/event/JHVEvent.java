@@ -62,16 +62,7 @@ public class JHVEvent {
         this.id = id;
     }
 
-    /**
-     * Adds a parameter to the event.
-     *
-     * @param parameter
-     *            the parameter to add
-     * @param visible
-     *            is the parameter visible
-     * @param configured
-     *            was the event in the configuration file
-     */
+    // configured = was the event in the configuration file
     public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured) {
         String name = parameter.getParameterName();
 

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -15,25 +14,21 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval
 
 public class JHVRelatedEvents {
 
+    private static final HashSet<JHVEventHighlightListener> listeners = new HashSet<JHVEventHighlightListener>();
+
     private final ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
     private final SortedDateInterval interval = new SortedDateInterval(Long.MAX_VALUE, Long.MIN_VALUE);
     private final ArrayList<JHVAssociation> associations = new ArrayList<JHVAssociation>();
 
-    private final Color color;
-
-    protected boolean highlighted;
-    protected final static Set<JHVEventHighlightListener> listeners = new HashSet<JHVEventHighlightListener>();
     private final JHVEventType eventType;
+    private final Color color;
+    private boolean highlighted;
 
     public JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
-        color = JHVCacheColors.getNextColor();
         eventType = event.getJHVEventType();
-        this.add(event, eventsMap);
+        color = JHVCacheColors.getNextColor();
         highlighted = false;
-    }
-
-    public ArrayList<JHVEvent> getEvents() {
-        return events;
+        this.add(event, eventsMap);
     }
 
     private void add(JHVEvent evt, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
@@ -50,6 +45,10 @@ public class JHVRelatedEvents {
         }
         events.add(evt);
         eventsMap.get(eventType).put(interval, this);
+    }
+
+    public ArrayList<JHVEvent> getEvents() {
+        return events;
     }
 
     public long getEnd() {
@@ -121,7 +120,7 @@ public class JHVRelatedEvents {
 
     public JHVEvent getClosestTo(long timestamp) {
         for (JHVEvent event : events) {
-            if (event.start <= timestamp && event.end >= timestamp) {
+            if (event.start <= timestamp && timestamp <= event.end) {
                 return event;
             }
         }
