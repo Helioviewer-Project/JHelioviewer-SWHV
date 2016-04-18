@@ -35,8 +35,8 @@ public class SDOCutOutAction extends AbstractAction
             String start = startdate.toString();
             String startTime = start.substring(11, 16);
             String startDate = start.substring(0, 10);
-            url.append("startDate=" + startDate);
-            url.append("&startTime=" + startTime);
+            url.append("startDate=").append(startDate);
+            url.append("&startTime=").append(startTime);
         }
 
         JHVDate enddate = Layers.getEndDate();
@@ -44,15 +44,12 @@ public class SDOCutOutAction extends AbstractAction
             String end = enddate.toString();
             String endDate = end.substring(0, 10);
             String endTime = end.substring(11, 16);
-            url.append("&stopDate=" + endDate);
-            url.append("&stopTime=" + endTime);
+            url.append("&stopDate=").append(endDate);
+            url.append("&stopTime=").append(endTime);
         }
 
-        url.append("&wavelengths=");
-        url.append(Layers.getSDOCutoutString());
-
-        url.append("&cadence=" + ObservationDialog.getInstance().getObservationImagePane().getCadence());
-        url.append("&cadenceUnits=s");
+        url.append("&wavelengths=").append(Layers.getSDOCutoutString());
+        url.append("&cadence=").append(ObservationDialog.getInstance().getObservationImagePane().getCadence()).append("&cadenceUnits=s");
 
         ImageData imd = Layers.getActiveView().getImageLayer().getImageData();
         if (imd != null) {
@@ -65,17 +62,13 @@ public class SDOCutOutAction extends AbstractAction
             double arc_w = arcsec_in_image / fullregion.width;
             double arc_h = arcsec_in_image / fullregion.height;
 
-            url.append("&width=" + format_double(region.width * arc_w));
-            url.append("&height=" + format_double(region.height * arc_h));
-            url.append("&xCen=" + format_double(centr_x * arc_w - AIA_CDELT / 2.));
-            url.append("&yCen=" + format_double(-centr_y * arc_h + AIA_CDELT / 2.));
+            url.append(String.format("&width=%.1f", region.width * arc_w));
+            url.append(String.format("&height=%.1f", region.height * arc_h));
+            url.append(String.format("&xCen=%.1f", centr_x * arc_w - AIA_CDELT / 2.));
+            url.append(String.format("&yCen=%.1f", -centr_y * arc_h + AIA_CDELT / 2.));
         }
 
         JHVGlobals.openURL(url.toString());
-    }
-
-    private String format_double(double x) {
-        return String.format("%.1f", x);
     }
 
 }

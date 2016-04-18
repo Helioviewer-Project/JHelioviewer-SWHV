@@ -181,10 +181,7 @@ public class JPIPSocket extends HTTPSocket {
 
         // Adds the headers
         for (String key : _req.getHeaders()) {
-            str.append(key);
-            str.append(": ");
-            str.append(_req.getHeader(key));
-            str.append(CRLF);
+            str.append(key).append(": ").append(_req.getHeader(key)).append(CRLF);
         }
         str.append(CRLF);
 
