@@ -106,6 +106,7 @@ public class SideContentPane extends JComponent {
      * @param c
      *            Pattern, which members should be expanded
      */
+/*
     private <T extends Component> void expand(Class<T> c) {
         for (Component member : map.keySet()) {
             if (c.isInstance(member)) {
@@ -113,6 +114,7 @@ public class SideContentPane extends JComponent {
             }
         }
     }
+*/
 
     /**
      * Collapses the given component.
@@ -142,6 +144,7 @@ public class SideContentPane extends JComponent {
      * @param c
      *            Pattern, which members should be collapsed
      */
+/*
     private <T extends Component> void collapse(Class<T> c) {
         for (Component member : map.keySet()) {
             if (c.isInstance(member)) {
@@ -149,6 +152,7 @@ public class SideContentPane extends JComponent {
             }
         }
     }
+*/
 
     /**
      * Removes all CollapsiblePanes which includes an instance of the given
@@ -157,6 +161,7 @@ public class SideContentPane extends JComponent {
      * @param c
      *            Pattern, which members should be removed
      */
+/*
     private <T extends Component> void remove(Class<T> c) {
         // go through map to find all effected collapsible panes
         Object[] components = map.keySet().toArray();
@@ -172,6 +177,7 @@ public class SideContentPane extends JComponent {
                 remove(member);
         }
     }
+*/
 
     /**
      * {@inheritDoc}
