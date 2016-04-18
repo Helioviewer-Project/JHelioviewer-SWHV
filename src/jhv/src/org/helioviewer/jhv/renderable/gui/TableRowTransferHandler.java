@@ -22,7 +22,7 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 /**
  * Handles drag & drop row reordering
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class TableRowTransferHandler extends TransferHandler {
 
     private final DataFlavor integerObjectFlavor = new ActivationDataFlavor(Integer.class, "Integer Row Index");
@@ -83,7 +83,7 @@ public class TableRowTransferHandler extends TransferHandler {
         int max = grid.getModel().getRowCount();
         if (index < 0 || index > max)
             index = max;
-        target.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        target.setCursor(Cursor.getDefaultCursor());
         try {
             Object obj = info.getTransferable().getTransferData(integerObjectFlavor);
             Integer rowFrom = (Integer) obj;
@@ -103,7 +103,7 @@ public class TableRowTransferHandler extends TransferHandler {
     @Override
     protected void exportDone(JComponent c, Transferable t, int act) {
         if (act == TransferHandler.MOVE || act == TransferHandler.NONE) {
-            grid.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            grid.setCursor(Cursor.getDefaultCursor());
         }
         Displayer.display();
     }

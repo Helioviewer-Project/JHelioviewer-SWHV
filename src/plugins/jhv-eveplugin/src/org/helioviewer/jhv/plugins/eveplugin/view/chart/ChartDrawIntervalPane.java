@@ -561,9 +561,9 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         // reset cursor if it does not point to the interval area
         if (!mouseOverInterval) {
             if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
-                setCursor(new Cursor(Cursor.HAND_CURSOR));
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             } else {
-                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                setCursor(Cursor.getDefaultCursor());
             }
         }
     }

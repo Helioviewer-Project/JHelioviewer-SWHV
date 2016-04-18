@@ -222,7 +222,7 @@ public class RenderableContainerPanel extends JPanel {
                 if (grid.getValueAt(row, 0) instanceof RenderableImageLayer) {
                     grid.setCursor(UIGlobals.openHandCursor);
                 } else {
-                    grid.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    grid.setCursor(Cursor.getDefaultCursor());
                 }
             }
         });
