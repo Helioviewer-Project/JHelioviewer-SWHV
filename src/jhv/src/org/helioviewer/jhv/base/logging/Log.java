@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
  * 
  */
 public class Log {
+
     private static final Logger log = LogSettings.getSingletonInstance().getRootLogger();
 
     public static void log(Level logLevel, Object message, Throwable error) {
@@ -27,7 +28,7 @@ public class Log {
         } else if (logLevel.equals(Level.FATAL)) {
             Log.fatal(message, error);
         } else {
-            Log.error(">> Log.log(" + logLevel.toString() + ", " + message + ", " + error.toString() + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
+            Log.error(">> Log.log(" + logLevel + ", " + message + ", " + error + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
         }
     }
 
@@ -45,7 +46,7 @@ public class Log {
         } else if (logLevel.equals(Level.FATAL)) {
             Log.fatal(message);
         } else {
-            Log.error(">> Log.log(" + logLevel.toString() + ", " + message + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
+            Log.error(">> Log.log(" + logLevel + ", " + message + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
         }
     }
 

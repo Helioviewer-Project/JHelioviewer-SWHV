@@ -9,10 +9,10 @@ import com.jogamp.opengl.glu.GLU;
 
 public class GLInfo {
 
-    public static int maxTextureSize;
-
     public static int[] pixelScale = new int[] { 1, 1 };
     static float[] pixelScaleFloat = new float[] { 1f, 1f };
+
+    static int maxTextureSize;
 
     public static void update(GL2 gl) {
         String version = gl.glGetString(GL2.GL_VERSION);
