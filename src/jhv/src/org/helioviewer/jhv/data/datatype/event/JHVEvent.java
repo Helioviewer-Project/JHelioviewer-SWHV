@@ -11,19 +11,17 @@ public class JHVEvent {
     public final long end;
 
     private final String eventName;
-    private final String eventDisplayName;
 
     private final Map<String, JHVEventParameter> allParameters = new HashMap<String, JHVEventParameter>();
     private final Map<String, JHVEventParameter> allVisibleParameters = new HashMap<String, JHVEventParameter>();
 
     private final JHVEventType eventType;
-    private JHVPositionInformation positionInformation = JHVPositionInformation.NULLINFO;
+    private JHVPositionInformation positionInformation = null;
     private Position.Q earthPosition = null;
     private Integer id;
 
-    public JHVEvent(String _eventName, String _eventDisplayName, JHVEventType _eventType, int _id, long _start, long _end) {
-        eventName = _eventName.intern();
-        eventDisplayName = _eventDisplayName.intern();
+    public JHVEvent(String _eventName, JHVEventType _eventType, int _id, long _start, long _end) {
+        eventName = _eventName;
         eventType = _eventType;
         start = _start;
         end = _end;
@@ -40,10 +38,6 @@ public class JHVEvent {
 
     public String getName() {
         return eventName;
-    }
-
-    public String getDisplayName() {
-        return eventDisplayName;
     }
 
     public JHVEventType getJHVEventType() {

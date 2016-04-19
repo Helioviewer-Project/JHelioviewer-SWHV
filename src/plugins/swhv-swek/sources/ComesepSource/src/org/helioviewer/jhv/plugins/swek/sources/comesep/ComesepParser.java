@@ -42,12 +42,10 @@ public class ComesepParser implements SWEKParser {
         JSONObject result = new JSONObject(json);
         String name = type.getEventType().getEventName();
 
-        final JHVEvent currentEvent = new JHVEvent(name, name, type, id, start, end);
-        boolean success = parseResult(result, currentEvent);
-        if (!success) {
+        JHVEvent currentEvent = new JHVEvent(name, type, id, start, end);
+        if (!parseResult(result, currentEvent)) {
             return null;
         }
-
         return currentEvent;
     }
 

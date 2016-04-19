@@ -31,10 +31,9 @@ public class HEKParser implements SWEKParser {
     public JHVEvent parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
         JSONObject result = new JSONObject(json);
         String name = type.getEventType().getEventName();
-        final JHVEvent currentEvent = new JHVEvent(name, name, type, id, start, end);
-        boolean success = parseResult(result, currentEvent);
 
-        if (!success) {
+        JHVEvent currentEvent = new JHVEvent(name, type, id, start, end);
+        if (!parseResult(result, currentEvent)) {
             return null;
         }
         return currentEvent;
@@ -276,8 +275,6 @@ public class HEKParser implements SWEKParser {
             }
 
             currentEvent.addJHVPositionInformation(new JHVPositionInformation(jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
-        } else {
-            currentEvent.addJHVPositionInformation(JHVPositionInformation.NULLINFO);
         }
     }
 

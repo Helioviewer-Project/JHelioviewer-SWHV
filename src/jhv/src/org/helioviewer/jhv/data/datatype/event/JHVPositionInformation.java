@@ -6,8 +6,6 @@ import org.helioviewer.jhv.base.math.Vec3;
 
 public class JHVPositionInformation {
 
-    public static final JHVPositionInformation NULLINFO = new JHVPositionInformation(null, null, null);
-
     private final List<Vec3> boundBox;
     private final List<Vec3> boundCC;
     private final Vec3 centralPoint;

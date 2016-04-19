@@ -145,6 +145,9 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         for (JHVRelatedEvents evtr : eventsToDraw) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositioningInformation();
+            if (pi == null)
+                continue;
+
             if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
                     Map<String, JHVEventParameter> params = evt.getAllEventParameters();
