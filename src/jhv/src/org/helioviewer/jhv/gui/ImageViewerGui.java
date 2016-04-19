@@ -54,7 +54,7 @@ public class ImageViewerGui {
     public static final int SPLIT_DIVIDER_SIZE = 3;
 
     private static JFrame mainFrame;
-    public static JSplitPane midSplitPane;
+    private static JSplitPane midSplitPane;
     private static JScrollPane leftScrollPane;
 
     private static SideContentPane leftPane;

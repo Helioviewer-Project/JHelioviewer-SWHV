@@ -61,13 +61,13 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         toggleButton.setText(title);
     }
 
-    public void expand() {
+    private void expand() {
         toggleButton.setSelected(true);
         component.setVisible(true);
         toggleButton.setIcon(expandedIcon);
     }
 
-    public void collapse() {
+    private void collapse() {
         toggleButton.setSelected(false);
         component.setVisible(false);
         toggleButton.setIcon(collapsedIcon);

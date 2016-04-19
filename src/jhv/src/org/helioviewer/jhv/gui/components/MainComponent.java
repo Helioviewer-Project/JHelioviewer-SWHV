@@ -153,7 +153,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
     }
 
-    public static void renderFullFloatScene(Camera camera, GL2 gl) {
+    private static void renderFullFloatScene(Camera camera, GL2 gl) {
         Viewport vp = Displayer.fullViewport;
         gl.glViewport(vp.x, vp.y, vp.width, vp.height);
         ImageViewerGui.getRenderableContainer().renderFullFloat(camera, vp, gl);
