@@ -63,9 +63,6 @@ public class HEKDownloader extends SWEKDownloader {
                 return false;
             }
 
-            if (end - start < 0 || end - start > 3 * 24 * 60 * 60 * 1000) {
-                return false;
-            }
             byte[] compressedJson;
             try {
                 compressedJson = JHVDatabase.compress(result.toString());
