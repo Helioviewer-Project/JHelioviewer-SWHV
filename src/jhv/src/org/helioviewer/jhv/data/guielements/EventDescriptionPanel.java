@@ -28,15 +28,12 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
 
     private final JHVRelatedEvents revent;
 
-    // private final JHVEvent event;
-
     public EventDescriptionPanel(JHVRelatedEvents revent, JHVEvent event) {
         this.revent = revent;
-        // this.event = event;
 
         JLabel labelIcon = new JLabel(revent.getIcon());
 
-        JTextArea textType = new JTextArea(event.getJHVEventType().getEventType().getEventName());
+        JTextArea textType = new JTextArea(event.getName());
         textType.setBackground(this.getBackground());
         textType.setFont(labelIcon.getFont());
         textType.setMargin(new Insets(0, 0, 0, 0));
@@ -55,7 +52,7 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
         setLayout(new GridBagLayout());
 
         JLabel colorLabel = new JLabel();
-        colorLabel.setBackground(revent.getColor());//.getEventRelationShip().getRelationshipColor());
+        colorLabel.setBackground(revent.getColor());
         colorLabel.setOpaque(true);
 
         GridBagConstraints iconLabelConstraint = new GridBagConstraints();

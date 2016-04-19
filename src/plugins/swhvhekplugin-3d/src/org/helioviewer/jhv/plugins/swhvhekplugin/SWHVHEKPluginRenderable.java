@@ -126,8 +126,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, p.orientation);
 
         if (optionsPanel.icons) {
-            String type = evt.getJHVEventType().getEventType().getEventName();
-            bindTexture(gl, type, evtr.getIcon());
+            bindTexture(gl, evt.getName(), evtr.getIcon());
 
             double sz = ICON_SIZE;
             if (evtr.isHighlighted()) {
@@ -212,8 +211,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            String type = evt.getJHVEventType().getEventType().getEventName();
-            bindTexture(gl, type, evtr.getIcon());
+            bindTexture(gl, evt.getName(), evtr.getIcon());
             Color color = evtr.getColor();
             gl.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 0.6f);
             if (evtr.isHighlighted()) {
@@ -253,8 +251,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         if (pt != null) {
             pt = camera.getViewpoint().orientation.rotateVector(pt);
             Vec2 tf = scale.transform(pt);
-            String type = evt.getJHVEventType().getEventType().getEventName();
-            bindTexture(gl, type, evtr.getIcon());
+            bindTexture(gl, evt.getName(), evtr.getIcon());
             if (evtr.isHighlighted()) {
                 drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
             } else {
@@ -311,8 +308,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glEnd();
 
         if (optionsPanel.icons) {
-            String type = evt.getJHVEventType().getEventType().getEventName();
-            bindTexture(gl, type, evtr.getIcon());
+            bindTexture(gl, evt.getName(), evtr.getIcon());
             if (evtr.isHighlighted()) {
                 drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
             } else {
@@ -387,7 +383,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             List<JHVRelatedEvents> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.getJHVEventType().getEventType().getEventName().equals("Coronal Mass Ejection")) {
+                if (evt.getName().equals("Coronal Mass Ejection")) {
                     drawCactusArc(gl, evtr, evt, controller.currentTime);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
