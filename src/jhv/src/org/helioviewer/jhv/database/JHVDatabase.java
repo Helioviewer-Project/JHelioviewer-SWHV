@@ -249,13 +249,14 @@ public class JHVDatabase {
             int errorcode = 0;
             while (i < len && errorcode == 0) {
                 Pair<String, String> assoc = assocs[i];
-                Integer[] ids = new Integer[] { getIdFromUID(connection, assoc.a), getIdFromUID(connection, assoc.b) };
+                int id0 = getIdFromUID(connection, assoc.a);
+                int id1 = getIdFromUID(connection, assoc.b);
 
-                if (ids[0] != -1 && ids[1] != -1) {
+                if (id0 != -1 && id1 != -1) {
                     try {
                         PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
-                        pstatement.setInt(1, ids[0]);
-                        pstatement.setInt(2, ids[1]);
+                        pstatement.setInt(1, id0);
+                        pstatement.setInt(2, id1);
                         pstatement.executeUpdate();
                     } catch (SQLException e) {
                         Log.error("Failed to insert event type " + e.getMessage());
@@ -470,11 +471,9 @@ public class JHVDatabase {
 
         @Override
         public ArrayList<Interval> call() {
-            /* for usage in other thread return full copy! */
-            ArrayList<Interval> copy = new ArrayList<Interval>();
             Connection connection = ConnectionThread.getConnection();
             if (connection == null) {
-                return copy;
+                return new ArrayList<Interval>();
             }
 
             HashMap<JHVEventType, RequestCache> dCache = ConnectionThread.downloadedCache;
@@ -508,10 +507,8 @@ public class JHVDatabase {
                 }
             }
 
-            for (Interval interval : typedCache.getAllRequestIntervals()) {
-                copy.add(new Interval(interval.start, interval.end));
-            }
-            return copy;
+            /* for usage in other thread return full copy! */
+            return new ArrayList<Interval>(typedCache.getAllRequestIntervals());
         }
     }
 
@@ -602,14 +599,12 @@ public class JHVDatabase {
                     pstatement.setLong(2, end);
                     pstatement.setInt(3, typeId);
                     ResultSet rs = pstatement.executeQuery();
-                    boolean next = rs.next();
-                    while (next) {
+                    while (rs.next()) {
                         int id = rs.getInt(1);
                         long start = rs.getLong(2);
                         long end = rs.getLong(3);
                         byte[] json = rs.getBytes(4);
                         eventList.add(new JsonEvent(json, type, id, start, end));
-                        next = rs.next();
                     }
                     rs.close();
                 } catch (SQLException e) {
@@ -660,10 +655,8 @@ public class JHVDatabase {
                     pstatement.setLong(2, end);
                     pstatement.setInt(3, typeId);
                     ResultSet rs = pstatement.executeQuery();
-                    boolean next = rs.next();
-                    while (next) {
+                    while (rs.next()) {
                         assocList.add(new JHVAssociation(rs.getInt(1), rs.getInt(2)));
-                        next = rs.next();
                     }
                     rs.close();
                 } catch (SQLException e) {
@@ -754,14 +747,12 @@ public class JHVDatabase {
     private static ArrayList<JsonEvent> getEventJSON(ResultSet rs) {
         ArrayList<JsonEvent> eventList = new ArrayList<JsonEvent>();
         try {
-            boolean next = rs.next();
-            while (next) {
+            while (rs.next()) {
                 int id = rs.getInt(1);
                 long start = rs.getLong(2);
                 long end = rs.getLong(3);
                 byte[] json = rs.getBytes(4);
                 eventList.add(new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end));
-                next = rs.next();
             }
             rs.close();
         } catch (SQLException e) {
