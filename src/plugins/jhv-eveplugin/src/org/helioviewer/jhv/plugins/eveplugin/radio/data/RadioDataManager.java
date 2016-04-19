@@ -180,7 +180,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      */
     private void removeRadioData() {
         if (radioImages != null) {
-            lineDataSelectorModel.removeLineData(this);
+
             for (long imageID : radioImages.keySet()) {
                 cache.remove(imageID);
                 bufferedImages.remove(imageID);
@@ -190,6 +190,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
             plotConfigList = new HashMap<Long, PlotConfig>();
             zoomManager.removeZoomManagerDataConfig();
             drawController.removeDrawableElement(radioImagePane);
+            lineDataSelectorModel.removeLineData(this);
             radioImages = null;
             PlotAreaSpace.getSingletonInstance().resetSelectedValueAndTimeInterval();
         }
