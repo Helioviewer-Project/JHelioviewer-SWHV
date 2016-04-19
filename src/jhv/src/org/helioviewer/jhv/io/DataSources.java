@@ -90,7 +90,7 @@ public class DataSources {
         }
     }
 
-    public static final HashSet<String> SupportedObservatories = new HashSet<String>();
+    private static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
     public static class Item implements Comparable<Item> {
 

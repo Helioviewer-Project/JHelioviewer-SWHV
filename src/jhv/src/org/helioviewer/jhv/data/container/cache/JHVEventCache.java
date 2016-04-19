@@ -22,11 +22,11 @@ import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 
 public class JHVEventCache {
 
-    /** singleton instance of JHVevent cache */
     private static JHVEventCache instance;
 
     /** The events received for a certain date */
     public static class SortedDateInterval implements Comparable<SortedDateInterval> {
+
         public long start;
         public long end;
         private final int id;
@@ -49,7 +49,7 @@ public class JHVEventCache {
         @Override
         public int hashCode() {
             assert false : "hashCode not designed";
-        return 42;
+            return 42;
         }
 
         @Override
@@ -65,6 +65,7 @@ public class JHVEventCache {
             }
             return 1;
         }
+
     }
 
     private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
@@ -77,20 +78,12 @@ public class JHVEventCache {
 
     private final ArrayList<JHVAssociation> assocs = new ArrayList<JHVAssociation>();
 
-    /**
-     * private default constructor
-     */
     private JHVEventCache() {
         events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         activeEventTypes = new HashSet<JHVEventType>();
         downloadedCache = new HashMap<JHVEventType, RequestCache>();
     }
 
-    /**
-     * Gets the singleton instance of the JHV event cache.
-     *
-     * @return singleton instance of the cache.
-     */
     public static JHVEventCache getSingletonInstance() {
         if (instance == null) {
             instance = new JHVEventCache();
@@ -102,8 +95,7 @@ public class JHVEventCache {
         Integer id = event.getUniqueID();
         if (relEvents.containsKey(id)) {
             relEvents.get(id).swapEvent(event, events);
-        }
-        else {
+        } else {
             createNewRelatedEvent(event);
         }
         checkAssociation(event);
@@ -193,9 +185,10 @@ public class JHVEventCache {
         RequestCache cache = new RequestCache();
         downloadedCache.put(eventType, cache);
         events.remove(eventType);
-        Iterator it = relEvents.entrySet().iterator();
+
+        Iterator<Map.Entry<Integer, JHVRelatedEvents>> it = relEvents.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<Integer, JHVRelatedEvents> pair = (Map.Entry) it.next();
+            Map.Entry<Integer, JHVRelatedEvents> pair = it.next();
             if (pair.getValue().getJHVEventType() == eventType) {
                 it.remove();
             }
