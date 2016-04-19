@@ -160,6 +160,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositioningInformation();
+        if (pi == null)
+            return;
 
         List<Vec3> points = pi.getBoundCC();
         if (points == null || points.isEmpty()) {
@@ -205,8 +207,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositioningInformation();
-        Vec3 pt = pi.centralPoint();
+        if (pi == null)
+            return;
 
+        Vec3 pt = pi.centralPoint();
         if (pt != null) {
             String type = evt.getJHVEventType().getEventType().getEventName();
             bindTexture(gl, type, evtr.getIcon());
@@ -242,8 +246,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
         JHVPositionInformation pi = evt.getPositioningInformation();
-        Vec3 pt = pi.centralPoint();
+        if (pi == null)
+            return;
 
+        Vec3 pt = pi.centralPoint();
         if (pt != null) {
             pt = camera.getViewpoint().orientation.rotateVector(pt);
             Vec2 tf = scale.transform(pt);
