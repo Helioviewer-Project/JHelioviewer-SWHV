@@ -13,7 +13,7 @@ public class EVECache {
     private static final double DISCARD_LOG_LEVEL_HIGH = 1e+4;
     private static final int DAYS_PER_CHUNK = 10;
     static final int MILLIS_PER_TICK = 60000;
-    static final int CHUNKED_SIZE = TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK;
+    static final int CHUNKED_SIZE = (int) (TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK);
     static final long MILLIS_PER_CHUNK = TimeUtils.DAY_IN_MILLIS * DAYS_PER_CHUNK;
 
     private static long date2key(long date) {

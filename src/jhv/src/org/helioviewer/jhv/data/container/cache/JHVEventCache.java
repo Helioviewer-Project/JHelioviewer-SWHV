@@ -12,6 +12,7 @@ import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -48,7 +49,7 @@ public class JHVEventCache {
         @Override
         public int hashCode() {
             assert false : "hashCode not designed";
-            return 42;
+        return 42;
         }
 
         @Override
@@ -163,10 +164,11 @@ public class JHVEventCache {
     public JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         Map<JHVEventType, List<Interval>> missingIntervals = new HashMap<JHVEventType, List<Interval>>();
+
         for (JHVEventType evt : activeEventTypes) {
             SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
-                long delta = 1000 * 60 * 60 * 24;
+                long delta = TimeUtils.DAY_IN_MILLIS * 30L;
                 SortedMap<SortedDateInterval, JHVRelatedEvents> submap = sortedEvents.subMap(new SortedDateInterval(startDate - delta, startDate - delta), new SortedDateInterval(endDate + delta, endDate + delta));
                 eventsResult.put(evt, submap);
             }
