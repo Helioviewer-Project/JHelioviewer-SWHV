@@ -20,9 +20,9 @@ public class JHVEvent {
     private Position.Q earthPosition = null;
     private Integer id;
 
-    public JHVEvent(String _eventName, JHVEventType _eventType, int _id, long _start, long _end) {
-        eventName = _eventName;
+    public JHVEvent(JHVEventType _eventType, int _id, long _start, long _end) {
         eventType = _eventType;
+        eventName = _eventType.getEventType().getEventName();
         start = _start;
         end = _end;
         id = _id;
