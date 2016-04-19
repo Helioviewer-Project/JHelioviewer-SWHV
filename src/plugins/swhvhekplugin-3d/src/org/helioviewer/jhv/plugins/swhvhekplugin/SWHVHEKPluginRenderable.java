@@ -106,7 +106,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
-        Position.Q p = evt.getEarthPosition();
+        Position.Q p = evt.getPositionInformation().getEarthPosition();
         Color color = evtr.getColor();
 
         gl.glColor3f(0, 0, 0);
@@ -159,7 +159,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
-        JHVPositionInformation pi = evt.getPositioningInformation();
+        JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
@@ -206,7 +206,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
-        JHVPositionInformation pi = evt.getPositioningInformation();
+        JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
@@ -245,7 +245,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
-        JHVPositionInformation pi = evt.getPositioningInformation();
+        JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
 

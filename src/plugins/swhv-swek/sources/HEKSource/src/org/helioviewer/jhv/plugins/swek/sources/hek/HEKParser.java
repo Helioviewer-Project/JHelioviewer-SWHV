@@ -254,8 +254,6 @@ public class HEKParser implements SWEKParser {
             }
 
             Position.L p = Sun.getEarth(new JHVDate(currentEvent.start));
-            if (currentEvent.getName().equals("Coronal Mass Ejection")) // reduce memory usage
-                currentEvent.addEarthPosition(new Position.Q(p.time, p.rad, new Quat(p.lat, p.lon)));
 
             ArrayList<Vec3> jhvBoundedBox = new ArrayList<Vec3>(localHGSBoundedBox.size());
             for (Vec3 el : localHGSBoundedBox) {
@@ -272,7 +270,8 @@ public class HEKParser implements SWEKParser {
                 jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, p);
             }
 
-            currentEvent.addJHVPositionInformation(new JHVPositionInformation(jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
+            currentEvent.addPositionInformation(new JHVPositionInformation(jhvCentralPoint, jhvBoundedBox, jhvBoundCC,
+                                                currentEvent.getName().equals("Coronal Mass Ejection") ? new Position.Q(p.time, p.rad, new Quat(p.lat, p.lon)) : null)); // reduce memory usage
         }
     }
 

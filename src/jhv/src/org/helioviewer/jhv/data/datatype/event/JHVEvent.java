@@ -3,8 +3,6 @@ package org.helioviewer.jhv.data.datatype.event;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.helioviewer.jhv.base.astronomy.Position;
-
 public class JHVEvent {
 
     public final long start;
@@ -17,7 +15,6 @@ public class JHVEvent {
 
     private final JHVEventType eventType;
     private JHVPositionInformation positionInformation = null;
-    private Position.Q earthPosition = null;
     private Integer id;
 
     public JHVEvent(JHVEventType _eventType, int _id, long _start, long _end) {
@@ -44,8 +41,12 @@ public class JHVEvent {
         return eventType;
     }
 
-    public JHVPositionInformation getPositioningInformation() {
+    public JHVPositionInformation getPositionInformation() {
         return positionInformation;
+    }
+
+    public void addPositionInformation(JHVPositionInformation positionInformation) {
+        this.positionInformation = positionInformation;
     }
 
     public Integer getUniqueID() {
@@ -59,23 +60,10 @@ public class JHVEvent {
     // configured = was the event in the configuration file
     public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured) {
         String name = parameter.getParameterName();
-
         allParameters.put(name, parameter);
         if (configured && visible) {
             allVisibleParameters.put(name, parameter);
         }
-    }
-
-    public void addJHVPositionInformation(JHVPositionInformation positionInformation) {
-        this.positionInformation = positionInformation;
-    }
-
-    public void addEarthPosition(Position.Q p) {
-        earthPosition = p;
-    }
-
-    public Position.Q getEarthPosition() {
-        return earthPosition;
     }
 
     public void addParameter(String keyString, String value) {
