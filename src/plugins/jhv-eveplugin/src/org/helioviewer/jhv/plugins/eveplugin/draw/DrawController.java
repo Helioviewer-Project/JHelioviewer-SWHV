@@ -31,8 +31,8 @@ import org.helioviewer.jhv.viewmodel.view.View;
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
 
     private static DrawController instance;
-    private Interval selectedInterval;
-    private Interval availableInterval;
+    public Axis selectedAxis;
+    public Axis availableAxis;
 
     private final List<TimingListener> tListeners;
     private Rectangle graphSize;
@@ -54,36 +54,13 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         graphSize = new Rectangle();
 
         long d = System.currentTimeMillis();
-        availableInterval = new Interval(d - TimeUtils.DAY_IN_MILLIS, d);
-        selectedInterval = availableInterval;
+        availableAxis = new Axis(d - TimeUtils.DAY_IN_MILLIS, d);
+        selectedAxis = new Axis(availableAxis.min, availableAxis.max);
 
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         valueSpaces = new HashSet<ValueSpace>();
         isLocked = false;
         latestMovieTime = Long.MIN_VALUE;
-    }
-
-    public int calculateXLocation(long timestamp) {
-        return (int) ((timestamp - selectedInterval.start) * getRatioX()) + getPlotArea().x;
-    }
-
-    public double getRatioX() {
-        return getPlotArea().width / (double) (selectedInterval.end - selectedInterval.start);
-    }
-
-    public void moveTime(double scaledDistance) {
-        long diffTime = selectedInterval.end - selectedInterval.start;
-        long newStart = (long) Math.floor(selectedInterval.start + scaledDistance * diffTime);
-        long newEnd = (long) Math.floor(selectedInterval.end + scaledDistance * diffTime);
-        setSelectedInterval(new Interval(newStart, newEnd), false, false);
-    }
-
-    public void zoomTime(int x, int w, int x0, double factor) {
-        final double ratio = (x - x0) / (double) w;
-        long diffTime = selectedInterval.end - selectedInterval.start;
-        long newStart = (long) Math.floor(selectedInterval.start - factor / w * diffTime * ratio);
-        long newEnd = (long) Math.floor(selectedInterval.end + factor / w * diffTime * (1. - ratio));
-        setSelectedInterval(new Interval(newStart, newEnd), false, false);
     }
 
     public static DrawController getSingletonInstance() {
@@ -172,15 +149,18 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private void setAvailableInterval(final Interval interval) {
-        availableInterval = makeCompleteDay(interval.start, interval.end);
+    private void setAvailableInterval(final long start, final long end) {
+        Interval availableInterval = makeCompleteDay(start, end);
+        availableAxis.min = availableInterval.start;
+        availableAxis.max = availableInterval.end;
         fireAvailableIntervalChanged();
         final Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
-        DownloadController.getSingletonInstance().updateBands(downloadInterval, selectedInterval);
+
+        DownloadController.getSingletonInstance().updateBands(downloadInterval, getSelectedInterval());
     }
 
     public final Interval getAvailableInterval() {
-        return availableInterval;
+        return new Interval((long) availableAxis.min, (long) availableAxis.max);
     }
 
     @Override
@@ -213,9 +193,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void centraliseSelected(long time) {
-        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && availableInterval.containsPointInclusive(time)) {
+        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && availableAxis.min <= time && availableAxis.max >= time) {
             latestMovieTime = time;
-            long selectedIntervalDiff = selectedInterval.end - selectedInterval.start;
+            long selectedIntervalDiff = (long) (selectedAxis.max - selectedAxis.min);
             setSelectedInterval(new Interval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff))), false, false);
         }
     }
@@ -269,6 +249,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return new Interval(new_start, new_end);
     }
 
+    public void setSelectedInterval(boolean useFullValueSpace, boolean resetAvailable) {
+        setSelectedInterval(new Interval((long) selectedAxis.min, (long) selectedAxis.max), useFullValueSpace, resetAvailable);
+    }
+
     public void setSelectedInterval(final Interval _newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
         if (_newSelectedInterval.start <= _newSelectedInterval.end) {
             long now = (new Date()).getTime();
@@ -277,33 +261,27 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                 long intervalLength = _newSelectedInterval.end - _newSelectedInterval.start;
                 newSelectedInterval = new Interval(now - intervalLength, now);
             }
-            if (availableInterval == null) {
-                setAvailableInterval(newSelectedInterval);
-                selectedInterval = newSelectedInterval;
-                fireSelectedIntervalChanged(useFullValueSpace);
-                fireRedrawRequest();
-                return;
-            }
-
             long start = newSelectedInterval.start;
             long end = newSelectedInterval.end;
 
-            long availableStart = availableInterval.start;
-            long availableEnd = availableInterval.end;
+            long availableStart = (long) availableAxis.min;
+            long availableEnd = (long) availableAxis.max;
 
-            if (!availableInterval.containsPointInclusive(start) || !availableInterval.containsPointInclusive(end)) {
+            if (!(availableAxis.min <= start && availableAxis.max >= start) || !(availableAxis.min <= end && availableAxis.max >= end)) {
                 availableStart = Math.min(start, availableStart);
                 availableEnd = Math.max(end, availableEnd);
-                setAvailableInterval(new Interval(availableStart, availableEnd));
+                setAvailableInterval(availableStart, availableEnd);
             }
 
             if (start == end) {
-                selectedInterval = new Interval(availableStart, availableEnd);
+                selectedAxis.min = availableStart;
+                selectedAxis.max = availableEnd;
             } else {
-                selectedInterval = new Interval(start, end);
+                selectedAxis.min = start;
+                selectedAxis.max = end;
             }
             if (resetAvailable) {
-                setAvailableInterval(selectedInterval);
+                setAvailableInterval((long) selectedAxis.min, (long) selectedAxis.max);
             }
             fireSelectedIntervalChanged(useFullValueSpace);
             fireRedrawRequest();
@@ -314,7 +292,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public Interval getSelectedInterval() {
-        return selectedInterval;
+        return new Interval((long) selectedAxis.min, (long) selectedAxis.max);
     }
 
     private void fireSelectedIntervalChanged(boolean keepFullValueRange) {

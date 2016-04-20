@@ -362,10 +362,11 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
             final double intervalWidthPixel = rightIntervalBorderPosition - leftIntervalBorderPosition;
             if (mousePressed.x > newMousePosition.x) {
-                drawController.moveTime(-diffPixel / intervalWidthPixel);
+                drawController.selectedAxis.move(-diffPixel / intervalWidthPixel);
             } else {
-                drawController.moveTime(diffPixel / intervalWidthPixel);
+                drawController.selectedAxis.move(diffPixel / intervalWidthPixel);
             }
+            drawController.setSelectedInterval(false, false);
             mousePressed = newMousePosition;
         }
     }
@@ -403,7 +404,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
         double middle = leftIntervalBorderPosition + 0.5 * intervalWidthPixel;
         double distance = point.getX() - middle;
-        drawController.moveTime(distance);
+        drawController.selectedAxis.move(distance);
+        drawController.setSelectedInterval(false, false);
     }
 
     @Override
