@@ -360,7 +360,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private void moveSelectedInterval(final Point newMousePosition, boolean forced) {
         if (mousePressed != null) {
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
-            final double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
+            final double intervalWidthPixel = rightIntervalBorderPosition - leftIntervalBorderPosition;
             if (mousePressed.x > newMousePosition.x) {
                 drawController.moveTime(-diffPixel / intervalWidthPixel);
             } else {
