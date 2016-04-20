@@ -42,12 +42,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private final List<DrawControllerListener> listeners;
 
-    private double scaledMinTime;
-    private double scaledMaxTime;
-    private double scaledSelectedMinTime;
-    private double scaledSelectedMaxTime;
-    private double minSelectedTimeDiff;
-
     private final Set<ValueSpace> valueSpaces;
 
     private DrawController() {
@@ -63,11 +57,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         selectedInterval = availableInterval;
 
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        scaledMinTime = 0.0;
-        scaledMaxTime = 1.0;
-        scaledSelectedMinTime = 0.0;
-        scaledSelectedMaxTime = 1.0;
-        minSelectedTimeDiff = 0;
         valueSpaces = new HashSet<ValueSpace>();
         isLocked = false;
         latestMovieTime = Long.MIN_VALUE;
@@ -462,81 +451,13 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return YAxisLocation.LEFT;
     }
 
-    public double getScaledMinTime() {
-        return scaledMinTime;
-    }
-
-    public double getScaledMaxTime() {
-        return scaledMaxTime;
-    }
-
-    public double getScaledSelectedMinTime() {
-        return scaledSelectedMinTime;
-    }
-
-    public double getScaledSelectedMaxTime() {
-        return scaledSelectedMaxTime;
-    }
-
-    public void setScaledSelectedTime(double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        if ((forced || !(this.scaledSelectedMinTime == scaledSelectedMinTime && this.scaledSelectedMaxTime == scaledSelectedMaxTime)) && (scaledSelectedMaxTime - scaledSelectedMinTime) > minSelectedTimeDiff) {
-            this.scaledSelectedMinTime = scaledSelectedMinTime;
-            this.scaledSelectedMaxTime = scaledSelectedMaxTime;
-            if (this.scaledSelectedMinTime < scaledMinTime || this.scaledSelectedMaxTime > scaledMaxTime) {
-                double oldScaledMinTime = scaledMinTime;
-                double oldScaledMaxTime = scaledMaxTime;
-                scaledMinTime = Math.min(this.scaledSelectedMinTime, scaledMinTime);
-                scaledMaxTime = Math.max(this.scaledSelectedMaxTime, scaledMaxTime);
-                fireAvailableAreaSpaceChanged(oldScaledMinTime, oldScaledMaxTime, scaledMinTime, scaledMaxTime);
-            }
-            firePlotAreaSpaceChanged(forced);
-        }
-    }
-
-    private void fireAvailableAreaSpaceChanged(double oldScaledMinTime, double oldScaledMaxTime, double newMinTime, double newMaxTime) {
-        if (oldScaledMinTime > newMinTime || oldScaledMaxTime < newMaxTime) {
-            double timeRatio = (availableInterval.end - availableInterval.start) / (oldScaledMaxTime - oldScaledMinTime);
-            double startDifference = oldScaledMinTime - newMinTime;
-            double endDifference = newMaxTime - oldScaledMaxTime;
-
-            long tempStartDate = availableInterval.start - Math.round(startDifference * timeRatio);
-            long tempEndDate = availableInterval.end + Math.round(endDifference * timeRatio);
-
-            setAvailableInterval(new Interval(tempStartDate, tempEndDate));
-        }
-
-    }
-
     public Set<ValueSpace> getValueSpaces() {
         return valueSpaces;
     }
 
-    public boolean minMaxTimeIntervalContainsTime(double value) {
-        return value >= scaledMinTime && value <= scaledMaxTime;
-    }
-
     public void resetSelectedValueAndTimeInterval() {
-        scaledSelectedMinTime = scaledMinTime;
-        scaledSelectedMaxTime = scaledMaxTime;
         for (ValueSpace vs : valueSpaces) {
             vs.resetScaledSelectedRange();
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Scaled min time  : " + scaledMinTime + "\n" + "Scaled max time  : " + scaledMaxTime + "\n" + "\n" + "Selected scaled min time  : " + scaledSelectedMinTime + "\n" + "Selected scaled max time  : " + scaledSelectedMaxTime + "\n";
-    }
-
-    private void firePlotAreaSpaceChanged(boolean forced) {
-        long diffTime = availableInterval.end - availableInterval.start;
-        double scaleDiff = scaledMaxTime - scaledMinTime;
-        double selectedMin = (scaledSelectedMinTime - scaledMinTime) / scaleDiff;
-        double selectedMax = (scaledSelectedMaxTime - scaledMinTime) / scaleDiff;
-        long newSelectedStartTime = availableInterval.start + Math.round(diffTime * selectedMin);
-        long newSelectedEndTime = availableInterval.start + Math.round(diffTime * selectedMax);
-        if (forced || !(newSelectedEndTime == selectedInterval.end) && newSelectedStartTime == selectedInterval.start) {
-            setSelectedInterval(new Interval(newSelectedStartTime, newSelectedEndTime), false, false);
         }
     }
 
@@ -546,10 +467,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public void removeValueSpace(ValueSpace valueSpace) {
         valueSpaces.remove(valueSpace);
-    }
-
-    public void setMinSelectedTimeDiff(double minSelectedTimeDiff) {
-        this.minSelectedTimeDiff = minSelectedTimeDiff;
     }
 
     /** Is the time interval locked */
