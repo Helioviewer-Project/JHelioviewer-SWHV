@@ -15,6 +15,7 @@ public class JHV_Kdu_message extends Kdu_message {
         this.raiseException = raiseException;
     }
 
+    @Override
     public void Flush(boolean endOfMessage) throws KduException {
         if (endOfMessage && raiseException)
             throw new KduException("Kakadu message error");

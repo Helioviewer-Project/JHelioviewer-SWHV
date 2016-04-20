@@ -71,7 +71,7 @@ class J2KReader implements Runnable {
     private long lastResponseTime = -1;
 
     /** The current length in bytes to use for requests */
-    private int JpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
+    private int jpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
 
     private final ImageCacheStatus cacheStatusRef;
 
@@ -161,7 +161,7 @@ class J2KReader implements Runnable {
 
         long tdat = replyDataTime - replyTextTime;
 
-        if (((receivedBytes - JpipRequestLen) < (JpipRequestLen >> 1)) && (receivedBytes > (JpipRequestLen >> 1))) {
+        if (((receivedBytes - jpipRequestLen) < (jpipRequestLen >> 1)) && (receivedBytes > (jpipRequestLen >> 1))) {
             if (tdat > 10000)
                 adjust = -1;
             else if (lastResponseTime > 0) {
@@ -181,12 +181,12 @@ class J2KReader implements Runnable {
             }
         }
 
-        JpipRequestLen += (JpipRequestLen >> 2) * adjust;
+        jpipRequestLen += (jpipRequestLen >> 2) * adjust;
 
-        if (JpipRequestLen > JPIPConstants.MAX_REQUEST_LEN)
-            JpipRequestLen = JPIPConstants.MAX_REQUEST_LEN;
-        if (JpipRequestLen < JPIPConstants.MIN_REQUEST_LEN)
-            JpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
+        if (jpipRequestLen > JPIPConstants.MAX_REQUEST_LEN)
+            jpipRequestLen = JPIPConstants.MAX_REQUEST_LEN;
+        if (jpipRequestLen < JPIPConstants.MIN_REQUEST_LEN)
+            jpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
 
         lastResponseTime = replyDataTime;
     }
@@ -377,7 +377,7 @@ class J2KReader implements Runnable {
                                 }
 
                                 // update requested package size
-                                stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), String.valueOf(JpipRequestLen));
+                                stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), String.valueOf(jpipRequestLen));
 
                                 req.setQuery(stepQuerys[current_step]);
                                 // Log.debug(stepQuerys[current_step].toString());
