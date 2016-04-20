@@ -42,7 +42,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private int leftIntervalBorderPosition = -10;
     private int rightIntervalBorderPosition = -10;
 
-    // private final PlotAreaSpace plotAreaSpace;
     private final DrawController drawController;
     private final EVEState eveState;
 
@@ -54,7 +53,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         Layers.addLayersListener(this);
         drawController = DrawController.getSingletonInstance();
         drawController.addTimingListener(this);
-        // plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         eveState = EVEState.getSingletonInstance();
     }
 

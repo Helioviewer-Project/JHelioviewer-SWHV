@@ -33,13 +33,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Interval selectedInterval;
     private Interval availableInterval;
 
-    // private final PlotAreaSpace pas;
-
     private final List<TimingListener> tListeners;
     private Rectangle graphSize;
-    // private Rectangle graphArea;
-    // private Rectangle plotArea;
-    // private Rectangle leftAxisArea;
     private final List<GraphDimensionListener> gdListeners;
 
     private List<YAxisElement> yAxisSet;
