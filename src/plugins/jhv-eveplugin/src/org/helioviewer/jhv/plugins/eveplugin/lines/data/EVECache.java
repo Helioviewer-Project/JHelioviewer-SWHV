@@ -21,7 +21,6 @@ public class EVECache {
     }
 
     public void add(final float[] values, final long[] dates) {
-
         for (int i = 0; i < values.length; i++) {
             long key = date2key(dates[i]);
 
@@ -68,7 +67,6 @@ public class EVECache {
             if (cache != null) {
                 cache.fillResult(result);
             }
-
             key++;
         }
 
@@ -81,7 +79,6 @@ public class EVECache {
 
         while (key <= keyEnd) {
             EVEDataOfChunk cache = cacheMap.get(key);
-
             if (cache != null && cache.hasData()) {
                 return true;
             }
