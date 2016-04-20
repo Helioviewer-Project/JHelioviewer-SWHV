@@ -92,7 +92,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         long diffTime = selectedInterval.end - selectedInterval.start;
         long newStart = (long) Math.floor(selectedInterval.start - factor * diffTime * ratioLeft);
         long newEnd = (long) Math.floor(selectedInterval.end + factor * diffTime * (1. - ratioLeft));
-        Log.debug(factor + " " + ratioLeft + " " + newStart + " " + newEnd);
         setSelectedInterval(new Interval(newStart, newEnd), false, false);
     }
 
