@@ -22,7 +22,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener, TimingListener, LineDataSelectorModelListener {
+public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener, TimingListener {
 
     private final JComboBox zoomComboBox;
     private final JToggleButton periodFromLayersButton;
@@ -37,12 +37,10 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     public IntervalOptionPanel() {
         drawController = DrawController.getSingletonInstance();
         drawController.addTimingListener(this);
-        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
 
         zoomComboBox = new JComboBox(new DefaultComboBoxModel());
         fillZoomComboBox();
         zoomComboBox.addActionListener(this);
-        zoomComboBox.setEnabled(false);
 
         periodFromLayersButton = new JToggleButton(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
         periodFromLayersButton.setToolTipText("Synchronize movie and time series display");
@@ -81,30 +79,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
                 }
             }
         }
-    }
-
-    @Override
-    public void downloadStartded(LineDataSelectorElement element) {
-    }
-
-    @Override
-    public void downloadFinished(LineDataSelectorElement element) {
-    }
-
-    @Override
-    public void lineDataAdded(LineDataSelectorElement element) {
-        zoomComboBox.setEnabled(true);
-    }
-
-    @Override
-    public void lineDataRemoved(LineDataSelectorElement element) {
-        if (LineDataSelectorModel.getSingletonInstance().getNumberOfAvailableLineData() == 0) {
-            zoomComboBox.setEnabled(false);
-        }
-    }
-
-    @Override
-    public void lineDataUpdated(LineDataSelectorElement element) {
     }
 
     private void addCarringtonRotationToModel(final DefaultComboBoxModel model, final int numberOfRotations) {
