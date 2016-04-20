@@ -6,13 +6,12 @@ import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
 
-public class ZoomManager implements TimingListener, GraphDimensionListener, PlotAreaSpaceListener, ValueSpaceListener {
+public class ZoomManager implements TimingListener, GraphDimensionListener, ValueSpaceListener {
 
     private static ZoomManager instance;
     private DrawController drawController;
@@ -40,7 +39,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     }
 
     public void addZoomDataConfig(Interval interval) {
-        drawController.addPlotAreaSpaceListener(this);
         radioDataManager.getYAxisElement().addValueSpaceListener(this);
         if (interval != null) {
             requestData();
@@ -161,7 +159,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
      *            be removed
      */
     public void removeZoomManagerDataConfig() {
-        drawController.removePlotAreaSpaceListener(this);
     }
 
     @Override
@@ -172,16 +169,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     @Override
     public void valueSpaceChanged(Range availableRange, Range selectedRange) {
         requestData();
-    }
-
-    @Override
-    public void plotAreaSpaceChanged(double scaledMinTime, double scaledMaxTime, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        requestData();
-
-    }
-
-    @Override
-    public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
     }
 
     private void requestData() {

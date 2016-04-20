@@ -53,8 +53,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private double scaledSelectedMaxTime;
     private double minSelectedTimeDiff;
 
-    private final List<PlotAreaSpaceListener> pasListeners;
-
     private final Set<ValueSpace> valueSpaces;
 
     private DrawController() {
@@ -70,11 +68,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         selectedInterval = availableInterval;
 
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        // pas = PlotAreaSpace.getSingletonInstance();
-        pasListeners = new ArrayList<PlotAreaSpaceListener>();
-
-        // addPlotAreaSpaceListener(this);
-
         scaledMinTime = 0.0;
         scaledMaxTime = 1.0;
         scaledSelectedMinTime = 0.0;
@@ -466,14 +459,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return YAxisLocation.LEFT;
     }
 
-    public void addPlotAreaSpaceListener(PlotAreaSpaceListener listener) {
-        pasListeners.add(listener);
-    }
-
-    public void removePlotAreaSpaceListener(PlotAreaSpaceListener listener) {
-        pasListeners.remove(listener);
-    }
-
     public double getScaledMinTime() {
         return scaledMinTime;
     }
@@ -516,9 +501,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
             setAvailableInterval(new Interval(tempStartDate, tempEndDate));
         }
-        for (PlotAreaSpaceListener l : pasListeners) {
-            l.availablePlotAreaSpaceChanged(oldScaledMinTime, oldScaledMaxTime, newMinTime, newMaxTime);
-        }
+
     }
 
     public Set<ValueSpace> getValueSpaces() {
@@ -551,9 +534,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         long newSelectedEndTime = availableInterval.start + Math.round(diffTime * selectedMax);
         if (forced || !(newSelectedEndTime == selectedInterval.end) && newSelectedStartTime == selectedInterval.start) {
             setSelectedInterval(new Interval(newSelectedStartTime, newSelectedEndTime), false, false, false);
-        }
-        for (PlotAreaSpaceListener l : pasListeners) {
-            l.plotAreaSpaceChanged(scaledMinTime, scaledMaxTime, scaledSelectedMinTime, scaledSelectedMaxTime, forced);
         }
     }
 

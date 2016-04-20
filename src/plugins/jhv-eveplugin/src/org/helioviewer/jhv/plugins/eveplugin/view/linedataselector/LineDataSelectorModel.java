@@ -8,10 +8,9 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
 
-public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener, DrawControllerListener {
+public class LineDataSelectorModel implements TableModel, DrawControllerListener {
 
     private final List<LineDataSelectorModelListener> listeners;
     private final List<LineDataSelectorElement> elements;
@@ -179,15 +178,6 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinTime, double scaledMaxTime, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        fireListeners();
-    }
-
-    @Override
-    public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
-    }
-
-    @Override
     public void drawRequest() {
         fireListeners();
     }
@@ -195,5 +185,4 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
     @Override
     public void drawMovieLineRequest(long time) {
     }
-
 }

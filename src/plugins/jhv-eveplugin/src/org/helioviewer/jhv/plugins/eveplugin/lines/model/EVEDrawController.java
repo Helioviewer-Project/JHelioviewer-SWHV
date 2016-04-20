@@ -16,7 +16,6 @@ import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
@@ -31,7 +30,7 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.gui.EVEDrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
-public class EVEDrawController implements TimingListener, EVECacheControllerListener, PlotAreaSpaceListener, ValueSpaceListener {
+public class EVEDrawController implements TimingListener, EVECacheControllerListener, ValueSpaceListener {
 
     private final Map<YAxisElement, Map<Band, EVEValues>> dataMapPerUnitLabel = new HashMap<YAxisElement, Map<Band, EVEValues>>();
     private final DrawController drawController;
@@ -56,8 +55,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         bandTypes = new HashSet<BandType>();
         yAxisElementMap = new HashMap<Band, YAxisElement>();
         bandsPerYAxis = new HashMap<YAxisElement, List<Band>>();
-        // plotAreaSpace = PlotAreaSpace.getSingletonInstance();
-        // plotAreaSpace.addPlotAreaSpaceListener(this);
         selectedIntervalChanged = false;
         selectedIntervalChangedTimer = new Timer(300, new SelectedIntervalTimerTask());
         selectedIntervalChangedTimer.start();
@@ -282,15 +279,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     @Override
     public void dataAdded(final Band band) {
         selectedIntervalChanged = true;
-    }
-
-    @Override
-    public void plotAreaSpaceChanged(double scaledMinTime, double scaledMaxTime, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        fireRedrawRequest(false);
-    }
-
-    @Override
-    public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
     }
 
     public EVEValues getValues(Band band, Interval interval, Rectangle graphArea) {
