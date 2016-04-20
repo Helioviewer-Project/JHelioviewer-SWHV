@@ -168,7 +168,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     private void fireRedrawRequest(final boolean maxRange) {
-        Interval interval = drawController.getSelectedInterval();
         for (Map.Entry<YAxisElement, Map<Band, EVEValues>> entry : dataMapPerUnitLabel.entrySet()) {
             YAxisElement yAxisElement = entry.getKey();
             Map<Band, EVEValues> bandMap = entry.getValue();
@@ -202,7 +201,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             yAxisElement.set(unitLabel, isLog);
 
             EVEDrawableElement eveDrawableElement = eveDrawableElementMap.get(yAxisElement);
-            eveDrawableElement.set(interval, bands, yAxisElement);
+            eveDrawableElement.set(bands, yAxisElement);
 
             if (bands.length > 0) {
                 drawController.updateDrawableElement(eveDrawableElement, false);
