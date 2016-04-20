@@ -38,7 +38,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private final Map<YAxisElement, EVEDrawableElement> eveDrawableElementMap;
     private final Map<Band, YAxisElement> yAxisElementMap;
     private final Map<YAxisElement, List<Band>> bandsPerYAxis;
-    // private final PlotAreaSpace plotAreaSpace;
+
     private static EVEDrawController instance;
     private final Timer selectedIntervalChangedTimer;
     private boolean selectedIntervalChanged;

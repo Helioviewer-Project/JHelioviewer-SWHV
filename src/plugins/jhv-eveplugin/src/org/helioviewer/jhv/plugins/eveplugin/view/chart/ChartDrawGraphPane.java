@@ -66,7 +66,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private double ratioX = 0;
     private BufferedImage screenImage = null;
     private int twoYAxis = 0;
-    // private final PlotAreaSpace plotAreaSpace;
     private final EventModel eventModel;
     private Rectangle leftAxisArea;
 
@@ -91,7 +90,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addComponentListener(this);
         yRatios = new HashMap<YAxisElement, Double>();
         drawController.addDrawControllerListener(this);
-        // plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         eventModel = EventModel.getSingletonInstance();
         timer = new Timer("ChartDrawGraphPane redraw timer");
         timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 20));
