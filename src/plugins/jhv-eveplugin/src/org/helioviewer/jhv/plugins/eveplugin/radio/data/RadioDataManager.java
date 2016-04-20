@@ -20,7 +20,6 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioImagePane;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioOptionsPanel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
@@ -185,14 +184,14 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                 cache.remove(imageID);
                 bufferedImages.remove(imageID);
             }
-            PlotAreaSpace.getSingletonInstance().removeValueSpace(yAxisElement);
+            drawController.removeValueSpace(yAxisElement);
             noDataConfigList = new ArrayList<NoDataConfig>();
             plotConfigList = new HashMap<Long, PlotConfig>();
             zoomManager.removeZoomManagerDataConfig();
             drawController.removeDrawableElement(radioImagePane);
             lineDataSelectorModel.removeLineData(this);
             radioImages = null;
-            PlotAreaSpace.getSingletonInstance().resetSelectedValueAndTimeInterval();
+            drawController.resetSelectedValueAndTimeInterval();
         }
     }
 
@@ -571,7 +570,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     private void downloadRequestAnswered(Interval timeInterval) {
         zoomManager.addZoomDataConfig(timeInterval);
-        PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
+        drawController.addValueSpace(yAxisElement);
     }
 
     private void intervalTooBig() {

@@ -16,7 +16,6 @@ import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
@@ -40,7 +39,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private final Map<YAxisElement, EVEDrawableElement> eveDrawableElementMap;
     private final Map<Band, YAxisElement> yAxisElementMap;
     private final Map<YAxisElement, List<Band>> bandsPerYAxis;
-    private final PlotAreaSpace plotAreaSpace;
+    // private final PlotAreaSpace plotAreaSpace;
     private static EVEDrawController instance;
     private final Timer selectedIntervalChangedTimer;
     private boolean selectedIntervalChanged;
@@ -57,8 +56,8 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         bandTypes = new HashSet<BandType>();
         yAxisElementMap = new HashMap<Band, YAxisElement>();
         bandsPerYAxis = new HashMap<YAxisElement, List<Band>>();
-        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
-        plotAreaSpace.addPlotAreaSpaceListener(this);
+        // plotAreaSpace = PlotAreaSpace.getSingletonInstance();
+        // plotAreaSpace.addPlotAreaSpaceListener(this);
         selectedIntervalChanged = false;
         selectedIntervalChangedTimer = new Timer(300, new SelectedIntervalTimerTask());
         selectedIntervalChangedTimer.start();
@@ -80,7 +79,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             yAxisElement.addValueSpaceListener(this);
         }
         if (yAxisElement != null) {
-            plotAreaSpace.addValueSpace(yAxisElement);
+            drawController.addValueSpace(yAxisElement);
             yAxisElementMap.put(band, yAxisElement);
             addToBandsPerYAxis(yAxisElement, band);
             EVEValues data = retrieveData(band, interval, plotArea);
@@ -115,7 +114,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                     EVEDrawableElement removed = eveDrawableElementMap.remove(yAxisElement);
                     yAxisElementMap.remove(band);
                     bandsPerYAxis.remove(yAxisElement);
-                    plotAreaSpace.removeValueSpace(yAxisElement);
+                    drawController.removeValueSpace(yAxisElement);
                     drawController.removeDrawableElement(removed);
                 }
                 resetAvailableRange();
@@ -312,7 +311,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         if (((bandsPerYAxis.size() == 1 && bandsPerYAxis.get(currentYAxisElement).size() > 1) || bandsPerYAxis.size() == 2) && drawController.canChangeAxis(band.getUnitLabel())) {
             YAxisElement otherYAxisElement = getOtherAxisElement(currentYAxisElement);
             if (otherYAxisElement != null) {
-                plotAreaSpace.addValueSpace(otherYAxisElement);
+                drawController.addValueSpace(otherYAxisElement);
                 yAxisElementMap.put(band, otherYAxisElement);
                 List<Band> bandsPerList = new ArrayList<Band>();
                 if (bandsPerYAxis.containsKey(otherYAxisElement)) {

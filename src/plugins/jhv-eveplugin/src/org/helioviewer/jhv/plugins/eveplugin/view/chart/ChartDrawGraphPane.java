@@ -47,7 +47,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableType;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
@@ -68,7 +67,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private double ratioX = 0;
     private BufferedImage screenImage = null;
     private int twoYAxis = 0;
-    private final PlotAreaSpace plotAreaSpace;
+    // private final PlotAreaSpace plotAreaSpace;
     private final EventModel eventModel;
     private Rectangle leftAxisArea;
 
@@ -93,7 +92,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addComponentListener(this);
         yRatios = new HashMap<YAxisElement, Double>();
         drawController.addDrawControllerListener(this);
-        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
+        // plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         eventModel = EventModel.getSingletonInstance();
         timer = new Timer("ChartDrawGraphPane redraw timer");
         timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 20));
@@ -443,8 +442,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         mousePressedOnMovieFrame = movieFrame.contains(p);
         mousePressedPosition = plotArea.contains(p) ? p : null;
-        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height &&
-                !(eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) != null)) {
+        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height && !(eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) != null)) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }
@@ -461,12 +459,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
             double distanceX = mousePressedPosition.x - p.x;
             double distanceY = p.y - mousePressedPosition.y;
-            double ratioTime = graphArea.width / (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            double startTime = plotAreaSpace.getScaledSelectedMinTime() + distanceX / ratioTime;
+            double ratioTime = graphArea.width / (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
+            double startTime = drawController.getScaledSelectedMinTime() + distanceX / ratioTime;
 
             double endTime = startTime + graphArea.width / ratioTime;
 
-            plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
+            drawController.setScaledSelectedTime(startTime, endTime, true);
             mouseHelper(distanceY);
         }
 
@@ -475,7 +473,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void mouseHelper(double distanceY) {
-        Set<ValueSpace> valueSpaces = plotAreaSpace.getValueSpaces();
+        Set<ValueSpace> valueSpaces = drawController.getValueSpaces();
         for (ValueSpace vs : valueSpaces) {
             vs.shiftDownPixels(distanceY, graphArea.height);
         }
@@ -495,11 +493,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(UIGlobals.closedHandCursor);
             double distanceX = mousePressedPosition.x - p.x;
             double distanceY = p.y - mousePressedPosition.y;
-            double ratioTime = graphArea.width / (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            double startTime = plotAreaSpace.getScaledSelectedMinTime() + distanceX / ratioTime;
+            double ratioTime = graphArea.width / (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
+            double startTime = drawController.getScaledSelectedMinTime() + distanceX / ratioTime;
             double endTime = startTime + graphArea.width / ratioTime;
 
-            plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
+            drawController.setScaledSelectedTime(startTime, endTime, true);
             mouseHelper(distanceY);
         }
         mousePressedPosition = p;
@@ -594,7 +592,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mouseWheelMoved(MouseWheelEvent e) {
         int scrollValue = e.getWheelRotation();
         double zoomTimeFactor = 10;
-        Set<ValueSpace> valueSpaces = plotAreaSpace.getValueSpaces();
+        Set<ValueSpace> valueSpaces = drawController.getValueSpaces();
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int scrollDistance = e.getScrollAmount();
             final int mouseX = e.getX();
@@ -605,20 +603,20 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             if (inGraphArea || inXAxisOrAboveGraph) {
                 final double ratioXLeft = (mouseX - graphArea.x) / (double) graphArea.width;
                 final double ratioXRight = 1. - ratioXLeft;
-                double startTime = plotAreaSpace.getScaledSelectedMinTime();
-                double endTime = plotAreaSpace.getScaledSelectedMaxTime();
+                double startTime = drawController.getScaledSelectedMinTime();
+                double endTime = drawController.getScaledSelectedMaxTime();
                 if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
-                    double ratioTime = (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime()) / graphArea.width;
-                    startTime = plotAreaSpace.getScaledSelectedMinTime() - scrollValue * zoomTimeFactor * scrollDistance * ratioXLeft * ratioTime;
-                    endTime = plotAreaSpace.getScaledSelectedMaxTime() + scrollValue * zoomTimeFactor * scrollDistance * ratioXRight * ratioTime;
-                    endTime = Math.min(endTime, plotAreaSpace.getScaledMaxTime());
+                    double ratioTime = (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime()) / graphArea.width;
+                    startTime = drawController.getScaledSelectedMinTime() - scrollValue * zoomTimeFactor * scrollDistance * ratioXLeft * ratioTime;
+                    endTime = drawController.getScaledSelectedMaxTime() + scrollValue * zoomTimeFactor * scrollDistance * ratioXRight * ratioTime;
+                    endTime = Math.min(endTime, drawController.getScaledMaxTime());
                 } else if (e.isShiftDown()) {
-                    double ratioTime = (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime()) / graphArea.width;
-                    startTime = plotAreaSpace.getScaledSelectedMinTime() + scrollValue * zoomTimeFactor * scrollDistance * ratioTime;
-                    endTime = plotAreaSpace.getScaledSelectedMaxTime() + scrollValue * zoomTimeFactor * scrollDistance * ratioTime;
+                    double ratioTime = (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime()) / graphArea.width;
+                    startTime = drawController.getScaledSelectedMinTime() + scrollValue * zoomTimeFactor * scrollDistance * ratioTime;
+                    endTime = drawController.getScaledSelectedMaxTime() + scrollValue * zoomTimeFactor * scrollDistance * ratioTime;
                 }
 
-                plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
+                drawController.setScaledSelectedTime(startTime, endTime, true);
             }
             if (inGraphArea || inYAxis) {
                 for (ValueSpace vs : valueSpaces) {
