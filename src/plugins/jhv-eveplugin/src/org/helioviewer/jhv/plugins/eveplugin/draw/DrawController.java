@@ -78,10 +78,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         setSelectedInterval(new Interval(newStart, newEnd), false, false);
     }
 
-    public void zoomTime(double factor, double ratioLeft) {
+    public void zoomTime(int x, int w, int x0, double factor) {
+        final double ratio = (x - x0) / (double) w;
         long diffTime = selectedInterval.end - selectedInterval.start;
-        long newStart = (long) Math.floor(selectedInterval.start - factor * diffTime * ratioLeft);
-        long newEnd = (long) Math.floor(selectedInterval.end + factor * diffTime * (1. - ratioLeft));
+        long newStart = (long) Math.floor(selectedInterval.start - factor / w * diffTime * ratio);
+        long newEnd = (long) Math.floor(selectedInterval.end + factor / w * diffTime * (1. - ratio));
         setSelectedInterval(new Interval(newStart, newEnd), false, false);
     }
 
@@ -171,7 +172,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    public void setAvailableInterval(final Interval interval) {
+    private void setAvailableInterval(final Interval interval) {
         availableInterval = makeCompleteDay(interval.start, interval.end);
         fireAvailableIntervalChanged();
         final Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);

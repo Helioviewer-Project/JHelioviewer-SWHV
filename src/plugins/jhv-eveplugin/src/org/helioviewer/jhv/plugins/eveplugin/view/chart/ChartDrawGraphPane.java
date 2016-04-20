@@ -590,9 +590,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             boolean inXAxisOrAboveGraph = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && (mouseY <= graphArea.y || mouseY >= graphArea.y + graphArea.height));
             boolean inYAxis = (mouseX < graphArea.x || mouseX > graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
             if (inGraphArea || inXAxisOrAboveGraph) {
-                final double ratioXLeft = (mouseX - graphArea.x) / (double) graphArea.width;
                 if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
-                    drawController.zoomTime(zoomTimeFactor * scrollDistance / graphArea.width, ratioXLeft);
+                    drawController.zoomTime(mouseX, graphArea.width, graphArea.x, zoomTimeFactor * scrollDistance);
                 } else if (e.isShiftDown()) {
                     drawController.moveTime(zoomTimeFactor * scrollDistance / graphArea.width);
                 }
