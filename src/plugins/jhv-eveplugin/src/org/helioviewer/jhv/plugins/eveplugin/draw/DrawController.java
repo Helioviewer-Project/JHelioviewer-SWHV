@@ -69,7 +69,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         scaledSelectedMaxTime = 1.0;
         minSelectedTimeDiff = 0;
         valueSpaces = new HashSet<ValueSpace>();
-
+        isLocked = false;
+        latestMovieTime = Long.MIN_VALUE;
     }
 
     public int calculateXLocation(long timestamp) {
@@ -219,13 +220,23 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void fireRedrawRequestMovieFrameChanged(final long time) {
+
         for (DrawControllerListener l : listeners) {
             l.drawMovieLineRequest(time);
         }
     }
 
+    private void centraliseSelected(long time) {
+        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && availableInterval.containsPointInclusive(time)) {
+            latestMovieTime = time;
+            long selectedIntervalDiff = selectedInterval.end - selectedInterval.start;
+            setSelectedInterval(new Interval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff))), false, false);
+        }
+    }
+
     @Override
     public void timeChanged(JHVDate date) {
+        centraliseSelected(date.milli);
         fireRedrawRequestMovieFrameChanged(date.milli);
     }
 
@@ -263,10 +274,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             }
             setAvailableInterval(new Interval(start, end));
         }
-        TimeIntervalLockModel lockModel = TimeIntervalLockModel.getInstance();
-        if (lockModel.isLocked()) {
+        if (isLocked()) {
             setSelectedInterval(interval, true, false);
-            lockModel.setLocked(true);
+            setLocked(true);
         }
     }
 
@@ -349,6 +359,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void fireAvailableIntervalChanged() {
+        centraliseSelected(latestMovieTime);
         for (TimingListener listener : tListeners) {
             listener.availableIntervalChanged();
         }
@@ -551,4 +562,37 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         this.minSelectedTimeDiff = minSelectedTimeDiff;
     }
 
+    /** Is the time interval locked */
+    private boolean isLocked;
+
+    /** Holds the previous movie time */
+    private long latestMovieTime;
+
+    // private final PlotAreaSpace plotAreaSpace;
+
+    /**
+     * Is the time interval locked
+     *
+     * @return true if the interval is locked, false if the interval is not
+     *         locked
+     */
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    /**
+     * Sets the locked state of the time interval.
+     *
+     * @param isLocked
+     *            true if the interval is locked, false if the interval is not
+     *            locked
+     */
+    public void setLocked(boolean isLocked) {
+        this.isLocked = isLocked;
+        if (isLocked) {
+            if (latestMovieTime != Long.MIN_VALUE) {
+                centraliseSelected(latestMovieTime);
+            }
+        }
+    }
 }

@@ -47,7 +47,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableType;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
@@ -114,7 +113,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
             drawMovieLine(g);
         }
-        if (reschedule && !TimeIntervalLockModel.getInstance().isLocked()) {
+        if (reschedule && !drawController.isLocked()) {
             reschedule = false;
             updateGraph();
         }
@@ -564,7 +563,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void drawMovieLineRequest(long time) {
         if (movieTimestamp == Long.MIN_VALUE || movieTimestamp != time) {
             movieTimestamp = time;
-            if (!TimeIntervalLockModel.getInstance().isLocked()) {
+            if (!drawController.isLocked()) {
                 if (updateMovieLineInformation()) {
                     movieLineRequest = true;
                     updateGraph();

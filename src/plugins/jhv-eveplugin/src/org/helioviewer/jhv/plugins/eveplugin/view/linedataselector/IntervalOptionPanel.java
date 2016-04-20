@@ -18,7 +18,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -61,7 +60,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == periodFromLayersButton) {
-            TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
+            drawController.setLocked(periodFromLayersButton.isSelected());
             if (periodFromLayersButton.isSelected()) {
                 periodFromLayersButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_LINK));
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
