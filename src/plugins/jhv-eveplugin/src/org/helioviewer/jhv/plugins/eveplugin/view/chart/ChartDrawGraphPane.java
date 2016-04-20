@@ -596,7 +596,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 } else if (e.isShiftDown()) {
                     drawController.moveTime(zoomTimeFactor * scrollDistance / graphArea.width);
                 }
-
             }
             if (inGraphArea || inYAxis) {
                 for (ValueSpace vs : valueSpaces) {
