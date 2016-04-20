@@ -349,15 +349,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private void updatePlotAreaSpace() {
-        long diffAvailable = availableInterval.end - availableInterval.start;
-        double diffPlotAreaTime = getScaledMaxTime() - getScaledMinTime();
-        double scaledSelectedStart = getScaledMinTime() + (1.0 * (selectedInterval.start - availableInterval.start) * diffPlotAreaTime / diffAvailable);
-        double scaledSelectedEnd = getScaledMinTime() + (1.0 * (selectedInterval.end - availableInterval.start) * diffPlotAreaTime / diffAvailable);
-        setMinSelectedTimeDiff(60000.0 / diffAvailable);
-        setScaledSelectedTime(scaledSelectedStart, scaledSelectedEnd, true);
-    }
-
     private void fireAvailableIntervalChanged() {
         centraliseSelected(latestMovieTime);
         for (TimingListener listener : tListeners) {
