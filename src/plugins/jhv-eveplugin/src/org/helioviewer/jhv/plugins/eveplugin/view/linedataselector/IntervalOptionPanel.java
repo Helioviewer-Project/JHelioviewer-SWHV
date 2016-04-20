@@ -74,7 +74,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
             selectedIntervalByZoombox = null;
 
             if (item != null && !selectedIndexSetByProgram) {
-                selectedIntervalByZoombox = zoomTo(item.getZoom(), item.getNumber());
+                zoomTo(item.getZoom(), item.getNumber());
+                selectedIntervalByZoombox = drawController.getSelectedInterval();
             } else {
                 if (selectedIndexSetByProgram) {
                     selectedIndexSetByProgram = false;
@@ -211,7 +212,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         }
     }
 
-    private Interval zoomTo(final ZOOM zoom, final long value) {
+    private void zoomTo(final ZOOM zoom, final long value) {
         Interval selectedInterval = drawController.getSelectedInterval();
         Interval availableInterval = drawController.getAvailableInterval();
 
@@ -242,7 +243,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         default:
             newInterval = selectedInterval;
         }
-        return drawController.setSelectedInterval(newInterval, true, true);
+        drawController.setSelectedInterval(newInterval, true, true);
     }
 
     private Interval computeMovieInterval() {

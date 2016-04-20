@@ -80,6 +80,21 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return getPlotArea().width / (double) (selectedInterval.end - selectedInterval.start);
     }
 
+    public void moveTime(double scaledDistance) {
+        long diffTime = selectedInterval.end - selectedInterval.start;
+        long newStart = (long) Math.floor(selectedInterval.start + scaledDistance * diffTime);
+        long newEnd = (long) Math.floor(selectedInterval.end + scaledDistance * diffTime);
+        setSelectedInterval(new Interval(newStart, newEnd), false, false);
+    }
+
+    public void zoomTime(double factor, double ratioLeft) {
+        long diffTime = selectedInterval.end - selectedInterval.start;
+        long newStart = (long) Math.floor(selectedInterval.start - factor * diffTime * ratioLeft);
+        long newEnd = (long) Math.floor(selectedInterval.end + factor * diffTime * (1. - ratioLeft));
+        Log.debug(factor + " " + ratioLeft + " " + newStart + " " + newEnd);
+        setSelectedInterval(new Interval(newStart, newEnd), false, false);
+    }
+
     public static DrawController getSingletonInstance() {
         if (instance == null) {
             instance = new DrawController();
@@ -275,12 +290,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return new Interval(new_start, new_end);
     }
 
-    public Interval setSelectedInterval(final Interval newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
-        setSelectedInterval(newSelectedInterval, useFullValueSpace, true, resetAvailable);
-        return selectedInterval;
-    }
-
-    private void setSelectedInterval(final Interval newSelectedInterval, boolean useFullValueSpace, boolean willUpdatePlotAreaSpace, boolean resetAvailable) {
+    public void setSelectedInterval(final Interval newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
         if (newSelectedInterval.start <= newSelectedInterval.end) {
             if (availableInterval.containsInclusive(newSelectedInterval)) {
                 selectedInterval = newSelectedInterval;
@@ -311,9 +321,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                 }
             }
 
-            if (willUpdatePlotAreaSpace) {
-                updatePlotAreaSpace();
-            }
             fireSelectedIntervalChanged(useFullValueSpace);
             fireRedrawRequest();
         } else {
@@ -528,7 +535,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         long newSelectedStartTime = availableInterval.start + Math.round(diffTime * selectedMin);
         long newSelectedEndTime = availableInterval.start + Math.round(diffTime * selectedMax);
         if (forced || !(newSelectedEndTime == selectedInterval.end) && newSelectedStartTime == selectedInterval.start) {
-            setSelectedInterval(new Interval(newSelectedStartTime, newSelectedEndTime), false, false, false);
+            setSelectedInterval(new Interval(newSelectedStartTime, newSelectedEndTime), false, false);
         }
     }
 
