@@ -12,7 +12,6 @@ import java.util.SortedMap;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -28,6 +27,7 @@ import org.helioviewer.jhv.plugins.eveplugin.events.model.EventPlotConfiguration
 public class EventPanel implements DrawableElement {
 
     private static final float dash1[] = { 10f };
+    private final DrawController drawController = DrawController.getSingletonInstance();
 
     @Override
     public DrawableElementType getDrawableElementType() {
@@ -36,14 +36,12 @@ public class EventPanel implements DrawableElement {
 
     @Override
     public void draw(Graphics2D g, Graphics2D leftAxis, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
-        if (!EventModel.getSingletonInstance().isEventsVisible())
+        if (!EventModel.getSingletonInstance().isEventsVisible()) {
             return;
+        }
 
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = EventModel.getSingletonInstance().getEvents();
         if (events.size() > 0) {
-            final Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-            long selectedIntervalStart = selectedInterval.start;
-            long selectedIntervalEnd = selectedInterval.end;
 
             int nrEventTypes = events.size();
             int eventTypeNr = 0;
@@ -78,8 +76,8 @@ public class EventPanel implements DrawableElement {
                     int eventPosition = i;
                     nrLines = endDates.size();
 
-                    int x0 = (int) (graphArea.width * defineScaledValue(event.getStart(), selectedIntervalStart, selectedIntervalEnd));
-                    int x1 = (int) (graphArea.width * defineScaledValue(event.getEnd(), selectedIntervalStart, selectedIntervalEnd));
+                    int x0 = drawController.calculateXLocation(event.getStart());
+                    int x1 = drawController.calculateXLocation(event.getEnd());
                     JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition, event.isHighlighted());
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
@@ -111,10 +109,6 @@ public class EventPanel implements DrawableElement {
                 JHVEventContainer.highlight(highlightedEvent);
             }
         }
-    }
-
-    private double defineScaledValue(long date, long start, long end) {
-        return (1.0 * (date - start)) / (end - start);
     }
 
     @Override
