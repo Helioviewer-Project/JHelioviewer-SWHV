@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
@@ -24,20 +25,21 @@ public class EVEDrawableElement implements DrawableElement {
     private final List<GraphPolyline> graphPolylines = new ArrayList<EVEDrawableElement.GraphPolyline>();
     private Band[] bands = new Band[0];
     // private EVEValues[] values = null;
-    private Interval interval;
     private YAxisElement yAxisElement;
     private long lastMilliWithData;
+    private final DrawController drawController;
 
     public EVEDrawableElement(Interval interval, Band[] bands, EVEValues[] values, YAxisElement yAxisElement) {
-        this.interval = interval;
+        drawController = DrawController.getSingletonInstance();
         this.bands = bands;
         // this.values = values;
         this.yAxisElement = yAxisElement;
         lastMilliWithData = -1;
+
     }
 
     public EVEDrawableElement() {
-        interval = new Interval(0, 0);
+        drawController = DrawController.getSingletonInstance();
         bands = new Band[0];
         // values = new EVEValues[0];
         yAxisElement = new YAxisElement();
@@ -51,25 +53,23 @@ public class EVEDrawableElement implements DrawableElement {
 
     @Override
     public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
-        updateGraphsData(interval, graphArea);
+        updateGraphsData(graphArea);
         drawGraphs(g, graphArea);
     }
 
-    private void updateGraphsData(Interval interval, Rectangle graphArea) {
+    private void updateGraphsData(Rectangle graphArea) {
         double minValue = yAxisElement.getScaledMinValue();
         double maxValue = yAxisElement.getScaledMaxValue();
 
-        double ratioX = graphArea.width / (double) (interval.end - interval.start);
         double ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
 
         graphPolylines.clear();
 
-        long intervalStartTime = interval.start;
         int dY = graphArea.y + graphArea.height;
 
         for (int i = 0; i < bands.length; ++i) {
             if (bands[i].isVisible()) {
-                EVEValues values = EVEDrawController.getSingletonInstance().getValues(bands[i], interval, graphArea);
+                EVEValues values = EVEDrawController.getSingletonInstance().getValues(bands[i], drawController.getSelectedInterval(), graphArea);
                 // Log.debug(values.dates.length);
                 int num = values.getNumberOfValues();
                 final ArrayList<Point> pointList = new ArrayList<Point>();
@@ -90,7 +90,7 @@ public class EVEDrawableElement implements DrawableElement {
 
                     if (value < 10e-32) {
                         if (counter > 1) {
-                            graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX, graphArea.getWidth()));
+                            graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, graphArea.getWidth()));
                         }
                         pointList.clear();
                         counter = 0;
@@ -98,7 +98,7 @@ public class EVEDrawableElement implements DrawableElement {
                     }
 
                     long date = values.dates[j];
-                    int x = (int) ((date - intervalStartTime) * ratioX) + graphArea.x;
+                    int x = drawController.calculateXLocation(date);
                     int y = dY;
                     y -= computeY(yAxisElement.scale(value), ratioY, minValue);
 
@@ -111,7 +111,7 @@ public class EVEDrawableElement implements DrawableElement {
                     counter++;
                 }
                 if (counter > 0) {
-                    graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX, graphArea.getWidth()));
+                    graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, graphArea.getWidth()));
                 }
             }
 
@@ -160,7 +160,7 @@ public class EVEDrawableElement implements DrawableElement {
         // Methods
         // //////////////////////////////////////////////////////////////////////////
 
-        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels, double ratioX, double graphWidth) {
+        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels, double graphWidth) {
             xPoints = new ArrayList<ArrayList<Integer>>();
             yPoints = new ArrayList<ArrayList<Integer>>();
             xPointsArray = new ArrayList<int[]>();
@@ -186,6 +186,7 @@ public class EVEDrawableElement implements DrawableElement {
                  * Log.debug("distance between previous and folowing x : " // +
                  * ((point.x - previousX) / ratioX)); } }
                  */
+                double ratioX = DrawController.getSingletonInstance().getRatioX();
                 if (previousX == null || (point.x - previousX) / ratioX > Math.max(1 / ratioX, 120000)) {
                     xPoints.add(new ArrayList<Integer>());
                     yPoints.add(new ArrayList<Integer>());
@@ -221,8 +222,7 @@ public class EVEDrawableElement implements DrawableElement {
         }
     }
 
-    public void set(Interval interval, Band[] bands, YAxisElement yAxisElement) {
-        this.interval = interval;
+    public void set(Band[] bands, YAxisElement yAxisElement) {
         this.bands = bands;
         this.yAxisElement = yAxisElement;
     }

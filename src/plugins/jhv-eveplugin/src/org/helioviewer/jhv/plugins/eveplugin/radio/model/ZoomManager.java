@@ -24,10 +24,8 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     private boolean isAreaInitialized;
     private Rectangle displaySize;
 
-    private long minX;
-    private long maxX;
-    private boolean isMinXInitialized;
-    private boolean isMaxXInitialized;
+    private final boolean isMinXInitialized;
+    private final boolean isMaxXInitialized;
 
     private ZoomManager() {
         isAreaInitialized = false;
@@ -56,13 +54,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     public void addZoomDataConfig(Interval interval) {
         drawController.addPlotAreaSpaceListener(this);
         radioDataManager.getYAxisElement().addValueSpaceListener(this);
-        Interval currentInterval = drawController.getSelectedInterval();
-        if (currentInterval == null) {
-            currentInterval = interval;
-        }
         if (interval != null) {
-            minX = currentInterval.start;
-            maxX = currentInterval.end;
             requestData();
         }
     }
@@ -79,9 +71,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
             sourceX1 = sourceX0 + 1;
         }
 
-        int destX0 = defineXInDestinationArea(startDate);
+        int destX0 = drawController.calculateXLocation(startDate);
         int destY0 = defineYInDestinationArea(visualStartFrequency, yAxisElement);
-        int destX1 = defineXInDestinationArea(endDate);
+        int destX1 = drawController.calculateXLocation(endDate);
         int destY1 = defineYInDestinationArea(visualEndFrequency, yAxisElement);
         return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1);
     }
@@ -103,9 +95,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
      * @return Drawable area map with the correct coordinates
      */
     public DrawableAreaMap getDrawableAreaMap(long startDate, long endDate) {
-        int destX0 = defineXInDestinationArea(startDate);
+        int destX0 = drawController.calculateXLocation(startDate);
         int destY0 = 0;
-        int destX1 = defineXInDestinationArea(endDate);
+        int destX1 = drawController.calculateXLocation(endDate);
         int destY1 = displaySize.height;
         return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1);
     }
@@ -153,10 +145,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         return displaySize.height - (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height));
     }
 
-    private int defineXInDestinationArea(long dateToFind) {
-        return displaySize.x + (int) Math.floor((dateToFind - minX) / (1.0 * (maxX - minX) / displaySize.width));
-    }
-
     private int defineXInSourceArea(long dateToFind, long startDateArea, long endDateArea, Rectangle area) {
         long timediff = dateToFind - startDateArea;
         long timeOfArea = endDateArea - startDateArea;
@@ -169,11 +157,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
 
     @Override
     public void selectedIntervalChanged(boolean keepFullValueRange) {
-        Interval newInterval = drawController.getSelectedInterval();
-        minX = newInterval.start;
-        maxX = newInterval.end;
-        isMinXInitialized = true;
-        isMaxXInitialized = true;
         requestData();
     }
 
@@ -216,11 +199,12 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     }
 
     private void requestData() {
-        if (isAreaInitialized && isMinXInitialized && isMaxXInitialized) {
-            double xRatio = 1.0 * (maxX - minX) / displaySize.getWidth();
-            double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
-            radioDataManager.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
-        }
+        // if (isAreaInitialized && isMinXInitialized && isMaxXInitialized) {
+        double xRatio = drawController.getRatioX();
+        double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
+        Interval selectedInterval = drawController.getSelectedInterval();
+        radioDataManager.requestData(selectedInterval.start, selectedInterval.end, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
+        // }
     }
 
 }
