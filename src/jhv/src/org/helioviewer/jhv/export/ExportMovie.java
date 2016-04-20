@@ -40,7 +40,9 @@ public class ExportMovie implements FrameListener {
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Export Movie"), new ThreadPoolExecutor.DiscardPolicy());
-    public static BufferedImage EVEImage;
+
+    public static BufferedImage EVEImage = null;
+    public static int EVEMovieLinePosition = -1;
 
     public void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
@@ -90,11 +92,11 @@ public class ExportMovie implements FrameListener {
         BufferedImage screenshot = grabber.renderFrame(gl);
         try {
             if (mode == RecordMode.SHOT) {
-                ImageIO.write(ExportUtils.pasteCanvases(screenshot, EVEImage, exportHeight), "png", new File(imagePath));
+                ImageIO.write(ExportUtils.pasteCanvases(screenshot, EVEImage, EVEMovieLinePosition, exportHeight), "png", new File(imagePath));
                 stop();
             } else {
                 try {
-                    executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, exportHeight));
+                    executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition, exportHeight));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -191,20 +193,22 @@ public class ExportMovie implements FrameListener {
 
         private final MovieExporter movieExporter;
         private final BufferedImage mainImage;
-        private final BufferedImage eve;
+        private final BufferedImage eveImage;
+        private final int movieLinePosition;
         private final int height;
 
-        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eve, int _height) {
+        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition, int _height) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
-            eve = _eve;
+            eveImage = _eveImage;
+            movieLinePosition = _movieLinePosition;
             height = _height;
         }
 
         @Override
         public void run() {
             try {
-                movieExporter.encode(ExportUtils.pasteCanvases(mainImage, eve, height));
+                movieExporter.encode(ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, height));
             } catch (Exception e) {
                 e.printStackTrace();
             }

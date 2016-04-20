@@ -145,6 +145,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 GraphicsConfiguration config = device.getDefaultConfiguration();
 
                 screenImage = config.createCompatibleImage(width, height, Transparency.OPAQUE);
+                ExportMovie.EVEImage = screenImage;
+
                 lastWidth = width;
                 lastHeight = height;
             }
@@ -171,7 +173,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             gleftAxisPart.dispose();
             g.dispose();
         }
-        ExportMovie.EVEImage = screenImage;
         this.repaint();
         movieLineRequest = false;
         forceRedrawGraph = false;
@@ -385,6 +386,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
         if (newMovieLine != movieLinePosition) {
             movieLinePosition = newMovieLine;
+            ExportMovie.EVEMovieLinePosition = movieLinePosition;
             return true;
         }
         return false;
