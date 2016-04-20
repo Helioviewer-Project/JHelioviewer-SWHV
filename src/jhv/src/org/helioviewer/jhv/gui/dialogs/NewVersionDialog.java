@@ -10,8 +10,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -20,50 +20,39 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
-/**
- * Dialog to show that a new version is available
- *
- * @author Helge Dietert
- */
 @SuppressWarnings("serial")
 public class NewVersionDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
-    /**
-     * New setting for check.update.next
-     */
+
+    // setting for check.update.next
     private int nextCheck = 0;
-    /**
-     * Suspended startups when clicked remindMeLater
-     */
+
+    // suspended startups when clicked remindMeLater
     private static final int suspendedStarts = 5;
 
-    private JEditorPane messagePane;
+    private final JTextPane messagePane = new JTextPane();
 
     public NewVersionDialog(boolean verbose) {
         super(ImageViewerGui.getMainFrame(), false);
         setLayout(new BorderLayout());
         setResizable(false);
+        setTitle("New Version Available");
 
-        messagePane = new JEditorPane("text/html", "");
-
-        messagePane.setEditable(false);
+        messagePane.setContentType("text/html");
         messagePane.setOpaque(false);
+        messagePane.setEditable(false);
         messagePane.addHyperlinkListener(this);
-        messagePane.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        messagePane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        messagePane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(messagePane, BorderLayout.CENTER);
 
         JPanel closeButtonContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        final JButton downloadButton = new JButton("Download");
-        closeButtonContainer.add(downloadButton);
-        downloadButton.addActionListener(this);
-        downloadButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                JHVGlobals.openURL(JHVGlobals.downloadURL);
-            }
-        });
+        JButton closeButton = new JButton("Close");
+        closeButtonContainer.add(closeButton);
+        closeButton.addActionListener(this);
 
         if (!verbose) {
-            final JButton laterButton = new JButton("Remind me later");
+            JButton laterButton = new JButton("Remind me later");
             closeButtonContainer.add(laterButton);
             laterButton.addActionListener(this);
             laterButton.addActionListener(new ActionListener() {
@@ -73,11 +62,18 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
             });
         }
 
-        final JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(this);
-        closeButtonContainer.add(closeButton);
+        JButton downloadButton = new JButton("Download");
+        closeButtonContainer.add(downloadButton);
+        downloadButton.addActionListener(this);
+        downloadButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                JHVGlobals.openURL(JHVGlobals.downloadURL);
+            }
+        });
+
         add(closeButtonContainer, BorderLayout.SOUTH);
 
+        getRootPane().setDefaultButton(downloadButton);
         getRootPane().registerKeyboardAction(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -86,27 +82,13 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
-    /**
-     * Creates a dialog with the given parameters
-     *
-     * @param newVersion
-     *            new version which is available
-     * @param message
-     *            Message for this new version
-     * @param verbose
-     *            If false show suspension buttons
-     */
-    public void init(String newVersion, String message) {
-        setTitle("JHelioviewer " + newVersion + " is now available");
+    public void init(String message) {
         messagePane.setText(message);
     }
 
     public void init() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void showDialog() {
         pack();
         setSize(getPreferredSize());
@@ -114,25 +96,16 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
         setVisible(true);
     }
 
-    /**
-     * Closes the dialog.
-     */
     public void actionPerformed(ActionEvent a) {
         dispose();
     }
 
-    /**
-     * Opens a browser or email client after clicking on a hyperlink.
-     */
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             JHVGlobals.openURL(e.getURL().toString());
         }
     }
 
-    /**
-     * New proposed setting for udpate.check.next
-     */
     public int getNextCheck() {
         return nextCheck;
     }
