@@ -43,13 +43,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Bram.Bourgognie@oma.be
- *
- */
 public class SWEKConfigurationManager {
 
-    /** Singleton instance */
     private static SWEKConfigurationManager singletonInstance;
 
     /** Config loaded */
@@ -75,9 +70,6 @@ public class SWEKConfigurationManager {
     /** The properties of the swek plugin */
     private final Properties swekProperties;
 
-    /**
-     * private constructor
-     */
     private SWEKConfigurationManager() {
         configLoaded = false;
         sources = new HashMap<String, SWEKSource>();
@@ -87,11 +79,6 @@ public class SWEKConfigurationManager {
         orderedEventTypes = new ArrayList<SWEKEventType>();
     }
 
-    /**
-     * Gives access to the singleton instance
-     *
-     * @return the singleton instance
-     */
     public static SWEKConfigurationManager getSingletonInstance() {
         if (singletonInstance == null) {
             singletonInstance = new SWEKConfigurationManager();
@@ -151,7 +138,7 @@ public class SWEKConfigurationManager {
             Log.debug("configURL: " + configFileURL);
             InputStream configIs = configFileURL.openStream();
             StringBuilder sb = new StringBuilder();
-            BufferedReader br = new BufferedReader(new InputStreamReader(configIs));
+            BufferedReader br = new BufferedReader(new InputStreamReader(configIs, "UTF-8"));
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line);

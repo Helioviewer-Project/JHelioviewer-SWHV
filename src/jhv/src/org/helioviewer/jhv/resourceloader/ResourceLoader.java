@@ -139,7 +139,7 @@ public class ResourceLoader {
         String xml = getXmlHeader() + System.getProperty("line.separator") + "<resourceDefinition>" + System.getProperty("line.separator") + configuration.toXml("    ") + "</resourceDefinition>" + System.getProperty("line.separator");
         Writer writer = null;
         try {
-            writer = new OutputStreamWriter(new UploadStream(backupDir.resolve(resourceName + ".xml")).getOutput());
+            writer = new OutputStreamWriter(new UploadStream(backupDir.resolve(resourceName + ".xml")).getOutput(), "UTF-8");
             writer.write(xml);
         } catch (Throwable t) {
             Log.error(">> ResourceLoader.updateLastConfig(" + configuration.getName() + ", " + backupDir + ") > Could not save current configuration", t);
