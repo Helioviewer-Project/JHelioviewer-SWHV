@@ -357,7 +357,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void moveSelectedInterval(final Point newMousePosition, boolean forced) {
+    private void moveSelectedInterval(final Point newMousePosition) {
         if (mousePressed != null) {
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
             final double intervalWidthPixel = rightIntervalBorderPosition - leftIntervalBorderPosition;
@@ -390,7 +390,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         if ((e.getModifiers() & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
             if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
                 mousePressed = new Point(leftIntervalBorderPosition + (rightIntervalBorderPosition - leftIntervalBorderPosition) / 2, 0);
-                moveSelectedInterval(p, true);
+                moveSelectedInterval(p);
                 mousePressed = null;
             }
         } else if ((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK) {
@@ -436,7 +436,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
         eveState.setMouseTimeIntervalDragging(false);
         if (mouseOverInterval) {
-            moveSelectedInterval(p, true);
+            moveSelectedInterval(p);
             setCursor(UIGlobals.openHandCursor);
         }
         mousePressed = null;
@@ -450,7 +450,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     public void mouseDragged(MouseEvent e) {
         eveState.setMouseTimeIntervalDragging(true);
         if (mouseOverInterval) {
-            moveSelectedInterval(e.getPoint(), false);
+            moveSelectedInterval(e.getPoint());
         }
     }
 
