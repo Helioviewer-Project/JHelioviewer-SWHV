@@ -174,14 +174,9 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     @Override
     public void selectedIntervalChanged(boolean keepFullValueRange) {
         Interval newInterval = DrawController.getSingletonInstance().getSelectedInterval();
-        if (selectedIntervalByZoombox != null && newInterval != null) {
-            if (!selectedIntervalByZoombox.equals(newInterval)) {
-                try {
-                    selectedIndexSetByProgram = true;
-                    zoomComboBox.setSelectedIndex(0);
-                } catch (final IllegalArgumentException ex) {
-                }
-            }
+        if (newInterval.equals(selectedIntervalByZoombox)) {
+            selectedIndexSetByProgram = true;
+            zoomComboBox.setSelectedIndex(0);
         }
     }
 

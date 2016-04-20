@@ -72,16 +72,15 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
         Interval availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
         Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-        if (availableInterval != null && selectedInterval != null) {
-            computeIntervalBorderPositions(availableInterval, selectedInterval);
-            drawIntervalBackground(g);
-            drawInterval(g);
-            drawMovieInterval(g, availableInterval);
-            drawLabels(g, availableInterval, selectedInterval);
-            drawBorders(g);
-            drawIntervalGraspPoints(g);
-            drawIntervalHBar(g);
-        }
+
+        computeIntervalBorderPositions(availableInterval, selectedInterval);
+        drawIntervalBackground(g);
+        drawInterval(g);
+        drawMovieInterval(g, availableInterval);
+        drawLabels(g, availableInterval, selectedInterval);
+        drawBorders(g);
+        drawIntervalGraspPoints(g);
+        drawIntervalHBar(g);
     }
 
     private void drawIntervalBackground(Graphics2D g) {
