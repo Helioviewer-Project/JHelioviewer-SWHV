@@ -27,7 +27,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, PlotAreaSpaceListener {
+public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
 
     private static DrawController instance;
     private Interval selectedInterval;
@@ -71,9 +71,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         // pas = PlotAreaSpace.getSingletonInstance();
-        // pas.addPlotAreaSpaceListener(this);
-
         pasListeners = new ArrayList<PlotAreaSpaceListener>();
+
+        // addPlotAreaSpaceListener(this);
 
         scaledMinTime = 0.0;
         scaledMaxTime = 1.0;
@@ -351,33 +351,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    @Override
-    public void plotAreaSpaceChanged(double scaledMinTime, double scaledMaxTime, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        long diffTime = availableInterval.end - availableInterval.start;
-        double scaleDiff = scaledMaxTime - scaledMinTime;
-        double selectedMin = (scaledSelectedMinTime - scaledMinTime) / scaleDiff;
-        double selectedMax = (scaledSelectedMaxTime - scaledMinTime) / scaleDiff;
-        long newSelectedStartTime = availableInterval.start + Math.round(diffTime * selectedMin);
-        long newSelectedEndTime = availableInterval.start + Math.round(diffTime * selectedMax);
-        if (forced || !(newSelectedEndTime == selectedInterval.end) && newSelectedStartTime == selectedInterval.start) {
-            setSelectedInterval(new Interval(newSelectedStartTime, newSelectedEndTime), false, false, false);
-        }
-    }
-
-    @Override
-    public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
-        if (oldMinTime > newMinTime || oldMaxTime < newMaxTime) {
-            double timeRatio = (availableInterval.end - availableInterval.start) / (oldMaxTime - oldMinTime);
-            double startDifference = oldMinTime - newMinTime;
-            double endDifference = newMaxTime - oldMaxTime;
-
-            long tempStartDate = availableInterval.start - Math.round(startDifference * timeRatio);
-            long tempEndDate = availableInterval.end + Math.round(endDifference * timeRatio);
-
-            setAvailableInterval(new Interval(tempStartDate, tempEndDate));
-        }
-    }
-
     /*
      * public PlotAreaSpace getPlotAreaSpace() { return pas; }
      */
@@ -525,6 +498,16 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void fireAvailableAreaSpaceChanged(double oldScaledMinTime, double oldScaledMaxTime, double newMinTime, double newMaxTime) {
+        if (oldScaledMinTime > newMinTime || oldScaledMaxTime < newMaxTime) {
+            double timeRatio = (availableInterval.end - availableInterval.start) / (oldScaledMaxTime - oldScaledMinTime);
+            double startDifference = oldScaledMinTime - newMinTime;
+            double endDifference = newMaxTime - oldScaledMaxTime;
+
+            long tempStartDate = availableInterval.start - Math.round(startDifference * timeRatio);
+            long tempEndDate = availableInterval.end + Math.round(endDifference * timeRatio);
+
+            setAvailableInterval(new Interval(tempStartDate, tempEndDate));
+        }
         for (PlotAreaSpaceListener l : pasListeners) {
             l.availablePlotAreaSpaceChanged(oldScaledMinTime, oldScaledMaxTime, newMinTime, newMaxTime);
         }
@@ -552,6 +535,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void firePlotAreaSpaceChanged(boolean forced) {
+        long diffTime = availableInterval.end - availableInterval.start;
+        double scaleDiff = scaledMaxTime - scaledMinTime;
+        double selectedMin = (scaledSelectedMinTime - scaledMinTime) / scaleDiff;
+        double selectedMax = (scaledSelectedMaxTime - scaledMinTime) / scaleDiff;
+        long newSelectedStartTime = availableInterval.start + Math.round(diffTime * selectedMin);
+        long newSelectedEndTime = availableInterval.start + Math.round(diffTime * selectedMax);
+        if (forced || !(newSelectedEndTime == selectedInterval.end) && newSelectedStartTime == selectedInterval.start) {
+            setSelectedInterval(new Interval(newSelectedStartTime, newSelectedEndTime), false, false, false);
+        }
         for (PlotAreaSpaceListener l : pasListeners) {
             l.plotAreaSpaceChanged(scaledMinTime, scaledMaxTime, scaledSelectedMinTime, scaledSelectedMaxTime, forced);
         }
