@@ -360,14 +360,11 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private void moveSelectedInterval(final Point newMousePosition, boolean forced) {
         if (mousePressed != null) {
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
-            final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
-            final double movedUnits = diffPixel / availableIntervalSpace;
-            final double intervalWidthPixel = (1. * leftIntervalBorderPosition / rightIntervalBorderPosition);
+            final double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
             if (mousePressed.x > newMousePosition.x) {
-                drawController.moveTime(-movedUnits / intervalWidthPixel);
-
+                drawController.moveTime(-diffPixel / intervalWidthPixel);
             } else {
-                drawController.moveTime(-movedUnits / intervalWidthPixel);
+                drawController.moveTime(diffPixel / intervalWidthPixel);
             }
             mousePressed = newMousePosition;
         }
@@ -403,32 +400,10 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     private void jumpSelectedInterval(Point point) {
-        final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
-        final double position = (point.getX() - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace;
-        double middlePosition = drawController.getScaledSelectedMinTime() + drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime();
-        double start;
-        double end;
-        if (position <= middlePosition) {
-            // jump to left
-            start = drawController.getScaledSelectedMinTime() - (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
-            end = drawController.getScaledSelectedMaxTime() - (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
-            if (start < drawController.getScaledMinTime()) {
-                end += (drawController.getScaledMinTime() - start);
-                start = drawController.getScaledMinTime();
-            }
-        } else {
-            // jump to right
-            start = drawController.getScaledSelectedMinTime() + (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
-            end = drawController.getScaledSelectedMaxTime() + (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
-            if (end > drawController.getScaledMaxTime()) {
-                start -= (end - drawController.getScaledMaxTime());
-                end = drawController.getScaledMaxTime();
-            }
-        }
-
-        if (drawController.minMaxTimeIntervalContainsTime(start)) {
-            drawController.setScaledSelectedTime(start, end, true);
-        }
+        final double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
+        double middle = leftIntervalBorderPosition + 0.5 * intervalWidthPixel;
+        double distance = point.getX() - middle;
+        drawController.moveTime(distance);
     }
 
     @Override
