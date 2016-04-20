@@ -35,8 +35,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private Interval movieInterval;
 
     private boolean mouseOverInterval = true;
-    private boolean mouseOverLeftGraspPoint = false;
-    private boolean mouseOverRightGraspPoint = false;
+    // private boolean mouseOverLeftGraspPoint = false;
+    // private boolean mouseOverRightGraspPoint = false;
     private Point mousePressed = null;
 
     private int leftIntervalBorderPosition = -10;
@@ -362,54 +362,14 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
             final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
             final double movedUnits = diffPixel / availableIntervalSpace;
-
+            final double intervalWidthPixel = (1. * leftIntervalBorderPosition / rightIntervalBorderPosition);
             if (mousePressed.x > newMousePosition.x) {
-                double diffUnits = drawController.getScaledMaxTime() - drawController.getScaledMinTime();
-                double start = drawController.getScaledSelectedMinTime() - movedUnits * diffUnits;
-                double end = drawController.getScaledSelectedMaxTime() - movedUnits * diffUnits;
-                if (start < drawController.getScaledMinTime()) {
-                    end += (drawController.getScaledMinTime() - start);
-                    start = drawController.getScaledMinTime();
-                }
-                drawController.setScaledSelectedTime(start, end, forced);
-                mousePressed = newMousePosition;
+                drawController.moveTime(-movedUnits / intervalWidthPixel);
+
             } else {
-                double diffUnits = drawController.getScaledMaxTime() - drawController.getScaledMinTime();
-                double start = drawController.getScaledSelectedMinTime() + movedUnits * diffUnits;
-                double end = drawController.getScaledSelectedMaxTime() + movedUnits * diffUnits;
-                if (end > drawController.getScaledMaxTime()) {
-                    start -= (end - drawController.getScaledMaxTime());
-                    end = drawController.getScaledMaxTime();
-                }
-                if (drawController.minMaxTimeIntervalContainsTime(end)) {
-                    drawController.setScaledSelectedTime(start, end, forced);
-                }
-
-                mousePressed = newMousePosition;
+                drawController.moveTime(-movedUnits / intervalWidthPixel);
             }
-        }
-    }
-
-    private void resizeSelectedInterval(final Point newMousePosition, boolean forced) {
-        int useThisX = newMousePosition.x;
-        if (mouseOverLeftGraspPoint) {
-            if (newMousePosition.x >= rightIntervalBorderPosition) {
-                useThisX = rightIntervalBorderPosition;
-            }
-            final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
-            final double diffUnits = drawController.getScaledMaxTime() - drawController.getScaledMinTime();
-            final double timestamp = drawController.getScaledMinTime() + ((useThisX - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
-
-            drawController.setScaledSelectedTime(Math.max(timestamp, drawController.getScaledMinTime()), drawController.getScaledSelectedMaxTime(), forced);
-        } else if (mouseOverRightGraspPoint) {
-            if (newMousePosition.x <= leftIntervalBorderPosition) {
-                useThisX = leftIntervalBorderPosition;
-            }
-            final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
-            final double diffUnits = drawController.getScaledMaxTime() - drawController.getScaledMinTime();
-            final double timestamp = drawController.getScaledMinTime() + (1.0 * (useThisX - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
-
-            drawController.setScaledSelectedTime(drawController.getScaledSelectedMinTime(), Math.min(timestamp, drawController.getScaledMaxTime()), forced);
+            mousePressed = newMousePosition;
         }
     }
 
@@ -490,7 +450,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     @Override
     public void mousePressed(MouseEvent e) {
         mousePressed = e.getPoint();
-        if (mouseOverInterval && !mouseOverLeftGraspPoint && !mouseOverRightGraspPoint) {
+        if (mouseOverInterval) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }
@@ -500,9 +460,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         Point p = e.getPoint();
 
         eveState.setMouseTimeIntervalDragging(false);
-        if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint) {
-            resizeSelectedInterval(p, true);
-        } else if (mouseOverInterval) {
+        if (mouseOverInterval) {
             moveSelectedInterval(p, true);
             setCursor(UIGlobals.openHandCursor);
         }
@@ -526,8 +484,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         Point p = e.getPoint();
 
         mouseOverInterval = false;
-        mouseOverLeftGraspPoint = false;
-        mouseOverRightGraspPoint = false;
 
         // is mouse cursor above selected interval?
         if (p.x >= leftIntervalBorderPosition && p.x <= rightIntervalBorderPosition) {
