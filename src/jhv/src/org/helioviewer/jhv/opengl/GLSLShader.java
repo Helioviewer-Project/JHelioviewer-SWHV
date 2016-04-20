@@ -3,8 +3,10 @@ package org.helioviewer.jhv.opengl;
 import java.io.InputStream;
 
 import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.logging.Log;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLException;
 
 public class GLSLShader {
 
@@ -85,13 +87,13 @@ public class GLSLShader {
         gl.glGetShaderiv(iID, GL2.GL_COMPILE_STATUS, params, 0);
 
         if (params[0] != 1) {
-            System.err.println("compile status: " + params[0]);
+            Log.error("compile status: " + params[0]);
             gl.glGetShaderiv(iID, GL2.GL_INFO_LOG_LENGTH, params, 0);
-            System.err.println("log length: " + params[0]);
+            Log.error("log length: " + params[0]);
             byte[] abInfoLog = new byte[params[0]];
             gl.glGetShaderInfoLog(iID, params[0], params, 0, abInfoLog, 0);
-            System.err.println(new String(abInfoLog));
-            System.exit(-1);
+            Log.error(new String(abInfoLog));
+            throw new GLException("Cannot compile vertex shader : " + new String(abInfoLog));
         }
         vertexID = iID;
     }
@@ -115,16 +117,15 @@ public class GLSLShader {
         gl.glGetShaderiv(iID, GL2.GL_COMPILE_STATUS, params, 0);
 
         if (params[0] != 1) {
-            System.err.println("compile status: " + params[0]);
+            Log.error("compile status: " + params[0]);
             gl.glGetShaderiv(iID, GL2.GL_INFO_LOG_LENGTH, params, 0);
-            System.err.println("log length: " + params[0]);
+            Log.error("log length: " + params[0]);
             byte[] abInfoLog = new byte[params[0]];
             gl.glGetShaderInfoLog(iID, params[0], params, 0, abInfoLog, 0);
-            System.err.println(new String(abInfoLog));
-            System.exit(-1);
+            Log.error(new String(abInfoLog));
+            throw new GLException("Cannot compile fragment shader : " + new String(abInfoLog));
         }
         fragmentID = iID;
-
     }
 
     private final void initializeProgram(GL2 gl, boolean cleanUp) {
@@ -138,12 +139,13 @@ public class GLSLShader {
         int[] params = new int[] { 0 };
         gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
-            System.err.println("link status: " + params[0]);
+            Log.error("link status: " + params[0]);
             gl.glGetProgramiv(progID, GL2.GL_INFO_LOG_LENGTH, params, 0);
-            System.err.println("log length: " + params[0]);
+            Log.error("log length: " + params[0]);
             byte[] abInfoLog = new byte[params[0]];
             gl.glGetProgramInfoLog(progID, params[0], params, 0, abInfoLog, 0);
-            System.err.println(new String(abInfoLog));
+            Log.error(new String(abInfoLog));
+            throw new GLException("Cannot link shaders : " + new String(abInfoLog));
         }
 
         gl.glValidateProgram(progID);
