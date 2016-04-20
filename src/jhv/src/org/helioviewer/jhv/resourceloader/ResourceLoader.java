@@ -44,16 +44,13 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class ResourceLoader {
 
+    private static final String xmlHead = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
+
     public static final ResourceLoader instance = new ResourceLoader();
 
     private ResourceLoader() {
     }
 
-    /**
-     * Method returns the sole instance of this class.
-     *
-     * @return the only instance of this class.
-     * */
     public static ResourceLoader getSingletonInstance() {
         return instance;
     }
@@ -136,7 +133,7 @@ public class ResourceLoader {
      *            The directory in which to store the configuration
      */
     private void updateLastConfig(String resourceName, ResourceConfiguration configuration, URI backupDir) {
-        String xml = getXmlHeader() + System.getProperty("line.separator") + "<resourceDefinition>" + System.getProperty("line.separator") + configuration.toXml("    ") + "</resourceDefinition>" + System.getProperty("line.separator");
+        String xml = xmlHead + System.getProperty("line.separator") + "<resourceDefinition>" + System.getProperty("line.separator") + configuration.toXml("    ") + "</resourceDefinition>" + System.getProperty("line.separator");
         Writer writer = null;
         try {
             writer = new OutputStreamWriter(new UploadStream(backupDir.resolve(resourceName + ".xml")).getOutput(), "UTF-8");
@@ -556,15 +553,6 @@ public class ResourceLoader {
         public void setMd5(byte[] md5Hash) {
             md5 = md5Hash;
         }
-    }
-
-    /**
-     * First line of a xml document specifying the encoding and xml version
-     *
-     * @return XML header
-     */
-    private String getXmlHeader() {
-        return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
     }
 
     /**

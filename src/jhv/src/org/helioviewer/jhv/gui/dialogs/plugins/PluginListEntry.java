@@ -116,8 +116,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
     }
 
     private String getDescriptionText() {
-        final String pluginDesc = plugin.getDescription() == null ? "" : plugin.getDescription();
-        return pluginDesc;
+        return plugin.getDescription() == null ? "" : plugin.getDescription();
     }
 
     /**
