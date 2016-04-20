@@ -1,5 +1,6 @@
 package org.helioviewer.jhv;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -87,40 +88,39 @@ public class JHVUpdate implements Runnable {
                 Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(0));
             }
         }
-        Log.trace("Start checking for updates");
-        String runningVersion = JHVGlobals.getJhvVersion() + "." + JHVGlobals.getJhvRevision();
-        if (runningVersion == null) {
-            Log.error("Could not retrieve version information");
-            if (verbose) {
-                Message.warn("Unknown running version", "Version information is not included");
-            }
-            return;
-        }
+
         try {
+            Log.trace("Start checking for updates");
             URL updateURL = new URL(JHVGlobals.downloadURL + "VERSION");
-            BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(updateURL, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout()).getInput()));
-            String version = in.readLine();
+            BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(updateURL, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout()).getInput(), "UTF-8"));
+            final String version = in.readLine();
             if (version == null || version.equals("")) {
                 throw new IOException("JHVUpdate: Empty version string");
             }
-
-            if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
-                String message = in.readLine();
-                Log.info("Found newer version " + version);
-
-                NewVersionDialog dialog = new NewVersionDialog(verbose);
-                dialog.init(version, message);
-                dialog.showDialog();
-                if (!verbose) {
-                    Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(dialog.getNextCheck()));
-                    Settings.getSingletonInstance().save();
-                }
-            } else {
-                Log.info("Running the newest version of JHelioviewer");
-                if (verbose)
-                    JOptionPane.showMessageDialog(null, "You are running the latest JHelioviewer version (" + runningVersion + ")");
-            }
+            // String message = in.readLine(); - extra
             in.close();
+
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    String runningVersion = JHVGlobals.getJhvVersion() + "." + JHVGlobals.getJhvRevision();
+                    if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
+                        Log.info("Found newer version " + version);
+
+                        NewVersionDialog dialog = new NewVersionDialog(verbose);
+                        dialog.init("JHelioviewer " + version + " is now available (you have " + runningVersion + ").");
+                        dialog.showDialog();
+                        if (!verbose) {
+                            Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(dialog.getNextCheck()));
+                            Settings.getSingletonInstance().save();
+                        }
+                    } else {
+                        Log.info("Running the newest version of JHelioviewer");
+                        if (verbose)
+                            JOptionPane.showMessageDialog(null, "You are running the latest JHelioviewer version (" + runningVersion + ")");
+                    }
+                }
+            });
         } catch (IOException e) {
             Log.error("Error retrieving update server", e);
             if (verbose)
