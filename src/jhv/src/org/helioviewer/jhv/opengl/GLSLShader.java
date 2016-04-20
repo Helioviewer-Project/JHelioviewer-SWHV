@@ -58,11 +58,11 @@ public class GLSLShader {
         int[] params = new int[] { 0 };
         gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
-            System.err.println("Error: setTextureUnit needs program to be linked.");
+            Log.error("Error: setTextureUnit needs program to be linked");
         }
         int id = gl.glGetUniformLocation(progID, texname);
         if (id == -1) {
-            System.err.println("Warning: Invalid texture " + texname);
+            Log.error("Warning: Invalid texture " + texname);
             return;
         }
         gl.glUniform1i(id, texunit);
@@ -74,26 +74,25 @@ public class GLSLShader {
         String[] akProgramText = new String[1];
         akProgramText[0] = vertexText;
 
-        int[] params = new int[] { 0 };
-
         int[] aiLength = new int[1];
         aiLength[0] = akProgramText[0].length();
         int iCount = 1;
 
         gl.glShaderSource(iID, iCount, akProgramText, aiLength, 0);
-
         gl.glCompileShader(iID);
 
+        int[] params = new int[] { 0 };
         gl.glGetShaderiv(iID, GL2.GL_COMPILE_STATUS, params, 0);
-
         if (params[0] != 1) {
-            Log.error("compile status: " + params[0]);
+            Log.error("vertex compile status: " + params[0]);
             gl.glGetShaderiv(iID, GL2.GL_INFO_LOG_LENGTH, params, 0);
-            Log.error("log length: " + params[0]);
+
             byte[] abInfoLog = new byte[params[0]];
             gl.glGetShaderInfoLog(iID, params[0], params, 0, abInfoLog, 0);
-            Log.error(new String(abInfoLog));
-            throw new GLException("Cannot compile vertex shader : " + new String(abInfoLog));
+
+            String log = new String(abInfoLog);
+            Log.error(log);
+            throw new GLException("Cannot compile vertex shader : " + log);
         }
         vertexID = iID;
     }
@@ -104,26 +103,25 @@ public class GLSLShader {
         String[] akProgramText = new String[1];
         akProgramText[0] = fragmentText;
 
-        int[] params = new int[] { 0 };
-
         int[] aiLength = new int[1];
         aiLength[0] = akProgramText[0].length();
         int iCount = 1;
 
         gl.glShaderSource(iID, iCount, akProgramText, aiLength, 0);
-
         gl.glCompileShader(iID);
 
+        int[] params = new int[] { 0 };
         gl.glGetShaderiv(iID, GL2.GL_COMPILE_STATUS, params, 0);
-
         if (params[0] != 1) {
-            Log.error("compile status: " + params[0]);
+            Log.error("fragment compile status: " + params[0]);
             gl.glGetShaderiv(iID, GL2.GL_INFO_LOG_LENGTH, params, 0);
-            Log.error("log length: " + params[0]);
+
             byte[] abInfoLog = new byte[params[0]];
             gl.glGetShaderInfoLog(iID, params[0], params, 0, abInfoLog, 0);
-            Log.error(new String(abInfoLog));
-            throw new GLException("Cannot compile fragment shader : " + new String(abInfoLog));
+
+            String log = new String(abInfoLog);
+            Log.error(log);
+            throw new GLException("Cannot compile fragment shader : " + log);
         }
         fragmentID = iID;
     }
@@ -136,16 +134,19 @@ public class GLSLShader {
         gl.glBindAttribLocation(progID, 0, "position");
         gl.glBindAttribLocation(progID, 1, "vertexUV");
         gl.glLinkProgram(progID);
+
         int[] params = new int[] { 0 };
         gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
             Log.error("link status: " + params[0]);
             gl.glGetProgramiv(progID, GL2.GL_INFO_LOG_LENGTH, params, 0);
-            Log.error("log length: " + params[0]);
+
             byte[] abInfoLog = new byte[params[0]];
             gl.glGetProgramInfoLog(progID, params[0], params, 0, abInfoLog, 0);
-            Log.error(new String(abInfoLog));
-            throw new GLException("Cannot link shaders : " + new String(abInfoLog));
+
+            String log = new String(abInfoLog);
+            Log.error(log);
+            throw new GLException("Cannot link shaders : " + log);
         }
 
         gl.glValidateProgram(progID);
