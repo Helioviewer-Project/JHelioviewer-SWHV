@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -173,12 +174,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     public void setAvailableInterval(final Interval interval) {
         availableInterval = makeCompleteDay(interval.start, interval.end);
         fireAvailableIntervalChanged();
-
         final Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
-
         DownloadController.getSingletonInstance().updateBands(downloadInterval, selectedInterval);
-
-        setSelectedInterval(selectedInterval, false, false);
     }
 
     public final Interval getAvailableInterval() {
@@ -248,24 +245,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void layerAdded(View view) {
-        Interval interval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
-        if (availableInterval == null) {
-            availableInterval = interval;
-        } else {
-            long start = availableInterval.start;
-            if (interval.start < start) {
-                start = interval.start;
-            }
-            long end = availableInterval.end;
-            if (interval.end > end) {
-                end = interval.end;
-            }
-            setAvailableInterval(new Interval(start, end));
-        }
-        if (isLocked()) {
-            setSelectedInterval(interval, true, false);
-            setLocked(true);
-        }
+        setSelectedInterval(new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli), false, false);
     }
 
     @Override
@@ -288,37 +268,42 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return new Interval(new_start, new_end);
     }
 
-    public void setSelectedInterval(final Interval newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
-        if (newSelectedInterval.start <= newSelectedInterval.end) {
-            if (availableInterval.containsInclusive(newSelectedInterval)) {
+    public void setSelectedInterval(final Interval _newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
+        if (_newSelectedInterval.start <= _newSelectedInterval.end) {
+            long now = (new Date()).getTime();
+            Interval newSelectedInterval = _newSelectedInterval;
+            if (newSelectedInterval.end > now) {
+                long intervalLength = _newSelectedInterval.end - _newSelectedInterval.start;
+                newSelectedInterval = new Interval(now - intervalLength, now);
+            }
+            if (availableInterval == null) {
+                setAvailableInterval(newSelectedInterval);
                 selectedInterval = newSelectedInterval;
-                if (resetAvailable) {
-                    setAvailableInterval(newSelectedInterval);
-                }
-            } else {
-                long start = newSelectedInterval.start;
-                long end = newSelectedInterval.end;
-
-                long availableStart = availableInterval.start;
-                long availableEnd = availableInterval.end;
-                boolean changeAvailableInterval = false;
-
-                if (!availableInterval.containsPointInclusive(start) && !availableInterval.containsPointInclusive(end)) {
-                    changeAvailableInterval = true;
-                    availableStart = start;
-                    availableEnd = end;
-                }
-
-                if (start == end) {
-                    selectedInterval = new Interval(availableStart, availableEnd);
-                } else {
-                    selectedInterval = new Interval(start, end);
-                }
-                if (changeAvailableInterval) {
-                    setAvailableInterval(new Interval(availableStart, availableEnd));
-                }
+                fireSelectedIntervalChanged(useFullValueSpace);
+                fireRedrawRequest();
+                return;
             }
 
+            long start = newSelectedInterval.start;
+            long end = newSelectedInterval.end;
+
+            long availableStart = availableInterval.start;
+            long availableEnd = availableInterval.end;
+
+            if (!availableInterval.containsPointInclusive(start) || !availableInterval.containsPointInclusive(end)) {
+                availableStart = Math.min(start, availableStart);
+                availableEnd = Math.max(end, availableEnd);
+                setAvailableInterval(new Interval(availableStart, availableEnd));
+            }
+
+            if (start == end) {
+                selectedInterval = new Interval(availableStart, availableEnd);
+            } else {
+                selectedInterval = new Interval(start, end);
+            }
+            if (resetAvailable) {
+                setAvailableInterval(selectedInterval);
+            }
             fireSelectedIntervalChanged(useFullValueSpace);
             fireRedrawRequest();
         } else {
