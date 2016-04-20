@@ -33,7 +33,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
         drawController = DrawController.getSingletonInstance();
         drawController.addTimingListener(this);
         drawController.addGraphDimensionListener(this);
-        // plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         radioDataManager = RadioDataManager.getSingletonInstance();
         yAxisElement = radioDataManager.getYAxisElement();
     }

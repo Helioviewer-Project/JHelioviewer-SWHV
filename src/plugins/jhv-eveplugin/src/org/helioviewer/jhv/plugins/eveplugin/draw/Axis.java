@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 public class Axis {
+
     public double min;
     public double max;
 

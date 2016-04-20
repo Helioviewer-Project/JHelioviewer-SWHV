@@ -308,10 +308,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    /*
-     * public PlotAreaSpace getPlotAreaSpace() { return pas; }
-     */
-
     public void setGraphInformation(Rectangle graphSize) {
         this.graphSize = graphSize;
         fireGraphDimensionsChanged();
@@ -439,8 +435,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     /** Holds the previous movie time */
     private long latestMovieTime;
 
-    // private final PlotAreaSpace plotAreaSpace;
-
     /**
      * Is the time interval locked
      *
@@ -466,4 +460,5 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             }
         }
     }
+
 }
