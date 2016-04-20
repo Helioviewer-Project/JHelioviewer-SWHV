@@ -22,7 +22,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
     /** Holds the previous movie time */
     private long latestMovieTime;
 
-    private final PlotAreaSpace plotAreaSpace;
+    // private final PlotAreaSpace plotAreaSpace;
 
     /**
      * Private constructor
@@ -34,7 +34,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
         drawController.addTimingListener(this);
         drawController.addDrawControllerListener(this);
         latestMovieTime = Long.MIN_VALUE;
-        plotAreaSpace = drawController.getPlotAreaSpace();
+        // plotAreaSpace = drawController.getPlotAreaSpace();
     }
 
     /**
@@ -101,15 +101,14 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
             latestMovieTime = time;
 
             long movieTimeDiff = time - currentAvailableInterval.start;
-            double availableIntervalWidthScaled = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
+            double availableIntervalWidthScaled = drawController.getScaledMaxTime() - drawController.getScaledMinTime();
             long availableIntervalWidthAbs = currentAvailableInterval.end - currentAvailableInterval.start;
             double scaledPerTime = availableIntervalWidthScaled / availableIntervalWidthAbs;
-            double scaledMoviePosition = plotAreaSpace.getScaledMinTime() + movieTimeDiff * scaledPerTime;
-
-            double halfSelectedSpaceWidth = 0.5 * (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
+            double halfSelectedSpaceWidth = 0.5 * (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
+            double scaledMoviePosition = drawController.getScaledMinTime() + movieTimeDiff * scaledPerTime;
             double newSelectedScaledStart = scaledMoviePosition - halfSelectedSpaceWidth;
             double newSelectedScaledEnd = scaledMoviePosition + halfSelectedSpaceWidth;
-            plotAreaSpace.setScaledSelectedTime(newSelectedScaledStart, newSelectedScaledEnd, false);
+            drawController.setScaledSelectedTime(newSelectedScaledStart, newSelectedScaledEnd, false);
         }
     }
 

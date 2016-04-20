@@ -6,7 +6,6 @@ import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
@@ -17,7 +16,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
 
     private static ZoomManager instance;
     private DrawController drawController;
-    private PlotAreaSpace plotAreaSpace;
+    // private PlotAreaSpace plotAreaSpace;
     private YAxisElement yAxisElement;
     private RadioDataManager radioDataManager;
 
@@ -49,13 +48,13 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         drawController = DrawController.getSingletonInstance();
         drawController.addTimingListener(this);
         drawController.addGraphDimensionListener(this);
-        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
+        // plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         radioDataManager = RadioDataManager.getSingletonInstance();
         yAxisElement = radioDataManager.getYAxisElement();
     }
 
     public void addZoomDataConfig(Interval interval) {
-        plotAreaSpace.addPlotAreaSpaceListener(this);
+        drawController.addPlotAreaSpaceListener(this);
         radioDataManager.getYAxisElement().addValueSpaceListener(this);
         Interval currentInterval = drawController.getSelectedInterval();
         if (currentInterval == null) {
@@ -140,8 +139,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         double min = yAxisElement.getAvailableRange().min;
         double max = yAxisElement.getAvailableRange().max;
 
-        if (startFreq >= min && startFreq <= max && endFreq >= min && endFreq <= max &&
-                currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate)) {
+        if (startFreq >= min && startFreq <= max && endFreq >= min && endFreq <= max && currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate)) {
             int height = displaySize.height;
             double ratio = displaySize.getWidth() / (currentInterval.end - currentInterval.start);
             int width = (int) Math.round((endDate - startDate) * ratio);
@@ -189,7 +187,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
      *            be removed
      */
     public void removeZoomManagerDataConfig() {
-        PlotAreaSpace.getSingletonInstance().removePlotAreaSpaceListener(this);
+        drawController.removePlotAreaSpaceListener(this);
     }
 
     @Override

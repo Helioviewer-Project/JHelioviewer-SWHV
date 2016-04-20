@@ -33,7 +33,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Interval selectedInterval;
     private Interval availableInterval;
 
-    private final PlotAreaSpace pas;
+    // private final PlotAreaSpace pas;
 
     private final List<TimingListener> tListeners;
     private Rectangle graphSize;
@@ -46,6 +46,16 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private final List<DrawControllerListener> listeners;
+
+    private double scaledMinTime;
+    private double scaledMaxTime;
+    private double scaledSelectedMinTime;
+    private double scaledSelectedMaxTime;
+    private double minSelectedTimeDiff;
+
+    private final List<PlotAreaSpaceListener> pasListeners;
+
+    private final Set<ValueSpace> valueSpaces;
 
     private DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
@@ -60,8 +70,18 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         selectedInterval = availableInterval;
 
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        pas = PlotAreaSpace.getSingletonInstance();
-        pas.addPlotAreaSpaceListener(this);
+        // pas = PlotAreaSpace.getSingletonInstance();
+        // pas.addPlotAreaSpaceListener(this);
+
+        pasListeners = new ArrayList<PlotAreaSpaceListener>();
+
+        scaledMinTime = 0.0;
+        scaledMaxTime = 1.0;
+        scaledSelectedMinTime = 0.0;
+        scaledSelectedMaxTime = 1.0;
+        minSelectedTimeDiff = 0;
+        valueSpaces = new HashSet<ValueSpace>();
+
     }
 
     public static DrawController getSingletonInstance() {
@@ -249,8 +269,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Interval makeCompleteDay(final long start, final long end) {
         long endDate = end;
         long now = System.currentTimeMillis();
-        if (end > now)
+        if (end > now) {
             endDate = now;
+        }
 
         long new_start = start - start % TimeUtils.DAY_IN_MILLIS;
         long new_end = endDate - endDate % TimeUtils.DAY_IN_MILLIS + TimeUtils.DAY_IN_MILLIS;
@@ -317,11 +338,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     private void updatePlotAreaSpace() {
         long diffAvailable = availableInterval.end - availableInterval.start;
-        double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
-        double scaledSelectedStart = pas.getScaledMinTime() + (1.0 * (selectedInterval.start - availableInterval.start) * diffPlotAreaTime / diffAvailable);
-        double scaledSelectedEnd = pas.getScaledMinTime() + (1.0 * (selectedInterval.end - availableInterval.start) * diffPlotAreaTime / diffAvailable);
-        pas.setMinSelectedTimeDiff(60000.0 / diffAvailable);
-        pas.setScaledSelectedTime(scaledSelectedStart, scaledSelectedEnd, true);
+        double diffPlotAreaTime = getScaledMaxTime() - getScaledMinTime();
+        double scaledSelectedStart = getScaledMinTime() + (1.0 * (selectedInterval.start - availableInterval.start) * diffPlotAreaTime / diffAvailable);
+        double scaledSelectedEnd = getScaledMinTime() + (1.0 * (selectedInterval.end - availableInterval.start) * diffPlotAreaTime / diffAvailable);
+        setMinSelectedTimeDiff(60000.0 / diffAvailable);
+        setScaledSelectedTime(scaledSelectedStart, scaledSelectedEnd, true);
     }
 
     private void fireAvailableIntervalChanged() {
@@ -357,9 +378,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    public PlotAreaSpace getPlotAreaSpace() {
-        return pas;
-    }
+    /*
+     * public PlotAreaSpace getPlotAreaSpace() { return pas; }
+     */
 
     public void setGraphInformation(Rectangle graphSize) {
         this.graphSize = graphSize;
@@ -462,6 +483,90 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             return YAxisElement.YAxisLocation.RIGHT;
         }
         return YAxisLocation.LEFT;
+    }
+
+    public void addPlotAreaSpaceListener(PlotAreaSpaceListener listener) {
+        pasListeners.add(listener);
+    }
+
+    public void removePlotAreaSpaceListener(PlotAreaSpaceListener listener) {
+        pasListeners.remove(listener);
+    }
+
+    public double getScaledMinTime() {
+        return scaledMinTime;
+    }
+
+    public double getScaledMaxTime() {
+        return scaledMaxTime;
+    }
+
+    public double getScaledSelectedMinTime() {
+        return scaledSelectedMinTime;
+    }
+
+    public double getScaledSelectedMaxTime() {
+        return scaledSelectedMaxTime;
+    }
+
+    public void setScaledSelectedTime(double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
+        if ((forced || !(this.scaledSelectedMinTime == scaledSelectedMinTime && this.scaledSelectedMaxTime == scaledSelectedMaxTime)) && (scaledSelectedMaxTime - scaledSelectedMinTime) > minSelectedTimeDiff) {
+            this.scaledSelectedMinTime = scaledSelectedMinTime;
+            this.scaledSelectedMaxTime = scaledSelectedMaxTime;
+            if (this.scaledSelectedMinTime < scaledMinTime || this.scaledSelectedMaxTime > scaledMaxTime) {
+                double oldScaledMinTime = scaledMinTime;
+                double oldScaledMaxTime = scaledMaxTime;
+                scaledMinTime = Math.min(this.scaledSelectedMinTime, scaledMinTime);
+                scaledMaxTime = Math.max(this.scaledSelectedMaxTime, scaledMaxTime);
+                fireAvailableAreaSpaceChanged(oldScaledMinTime, oldScaledMaxTime, scaledMinTime, scaledMaxTime);
+            }
+            firePlotAreaSpaceChanged(forced);
+        }
+    }
+
+    private void fireAvailableAreaSpaceChanged(double oldScaledMinTime, double oldScaledMaxTime, double newMinTime, double newMaxTime) {
+        for (PlotAreaSpaceListener l : pasListeners) {
+            l.availablePlotAreaSpaceChanged(oldScaledMinTime, oldScaledMaxTime, newMinTime, newMaxTime);
+        }
+    }
+
+    public Set<ValueSpace> getValueSpaces() {
+        return valueSpaces;
+    }
+
+    public boolean minMaxTimeIntervalContainsTime(double value) {
+        return value >= scaledMinTime && value <= scaledMaxTime;
+    }
+
+    public void resetSelectedValueAndTimeInterval() {
+        scaledSelectedMinTime = scaledMinTime;
+        scaledSelectedMaxTime = scaledMaxTime;
+        for (ValueSpace vs : valueSpaces) {
+            vs.resetScaledSelectedRange();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Scaled min time  : " + scaledMinTime + "\n" + "Scaled max time  : " + scaledMaxTime + "\n" + "\n" + "Selected scaled min time  : " + scaledSelectedMinTime + "\n" + "Selected scaled max time  : " + scaledSelectedMaxTime + "\n";
+    }
+
+    private void firePlotAreaSpaceChanged(boolean forced) {
+        for (PlotAreaSpaceListener l : pasListeners) {
+            l.plotAreaSpaceChanged(scaledMinTime, scaledMaxTime, scaledSelectedMinTime, scaledSelectedMaxTime, forced);
+        }
+    }
+
+    public void addValueSpace(ValueSpace valueSpace) {
+        valueSpaces.add(valueSpace);
+    }
+
+    public void removeValueSpace(ValueSpace valueSpace) {
+        valueSpaces.remove(valueSpace);
+    }
+
+    public void setMinSelectedTimeDiff(double minSelectedTimeDiff) {
+        this.minSelectedTimeDiff = minSelectedTimeDiff;
     }
 
 }

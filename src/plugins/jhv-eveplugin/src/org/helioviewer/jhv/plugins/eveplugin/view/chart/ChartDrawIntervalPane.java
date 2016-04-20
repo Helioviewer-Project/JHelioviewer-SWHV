@@ -10,13 +10,9 @@ import java.awt.RenderingHints;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
@@ -29,7 +25,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -47,7 +42,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private int leftIntervalBorderPosition = -10;
     private int rightIntervalBorderPosition = -10;
 
-    private final PlotAreaSpace plotAreaSpace;
+    // private final PlotAreaSpace plotAreaSpace;
+    private final DrawController drawController;
     private final EVEState eveState;
 
     public ChartDrawIntervalPane() {
@@ -56,8 +52,9 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         addMouseListener(this);
         addMouseMotionListener(this);
         Layers.addLayersListener(this);
-        DrawController.getSingletonInstance().addTimingListener(this);
-        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
+        drawController = DrawController.getSingletonInstance();
+        drawController.addTimingListener(this);
+        // plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         eveState = EVEState.getSingletonInstance();
     }
 
@@ -369,39 +366,25 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             final double movedUnits = diffPixel / availableIntervalSpace;
 
             if (mousePressed.x > newMousePosition.x) {
-                List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
-                Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
-                Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
-                double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
-                double start = plotAreaSpace.getScaledSelectedMinTime() - movedUnits * diffUnits;
-                double end = plotAreaSpace.getScaledSelectedMaxTime() - movedUnits * diffUnits;
-                pasList.add(plotAreaSpace);
-                if (start < plotAreaSpace.getScaledMinTime()) {
-                    end += (plotAreaSpace.getScaledMinTime() - start);
-                    start = plotAreaSpace.getScaledMinTime();
+                double diffUnits = drawController.getScaledMaxTime() - drawController.getScaledMinTime();
+                double start = drawController.getScaledSelectedMinTime() - movedUnits * diffUnits;
+                double end = drawController.getScaledSelectedMaxTime() - movedUnits * diffUnits;
+                if (start < drawController.getScaledMinTime()) {
+                    end += (drawController.getScaledMinTime() - start);
+                    start = drawController.getScaledMinTime();
                 }
-                minList.put(plotAreaSpace, start);
-                maxList.put(plotAreaSpace, end);
-                for (PlotAreaSpace pas : pasList) {
-                    if (pas.minMaxTimeIntervalContainsTime(minList.get(pas))) {
-                        pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas), forced);
-                    }
-                }
+                drawController.setScaledSelectedTime(start, end, forced);
                 mousePressed = newMousePosition;
             } else {
-                Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
-                Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
-                double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
-                double start = plotAreaSpace.getScaledSelectedMinTime() + movedUnits * diffUnits;
-                double end = plotAreaSpace.getScaledSelectedMaxTime() + movedUnits * diffUnits;
-                if (end > plotAreaSpace.getScaledMaxTime()) {
-                    start -= (end - plotAreaSpace.getScaledMaxTime());
-                    end = plotAreaSpace.getScaledMaxTime();
+                double diffUnits = drawController.getScaledMaxTime() - drawController.getScaledMinTime();
+                double start = drawController.getScaledSelectedMinTime() + movedUnits * diffUnits;
+                double end = drawController.getScaledSelectedMaxTime() + movedUnits * diffUnits;
+                if (end > drawController.getScaledMaxTime()) {
+                    start -= (end - drawController.getScaledMaxTime());
+                    end = drawController.getScaledMaxTime();
                 }
-                minList.put(plotAreaSpace, start);
-                maxList.put(plotAreaSpace, end);
-                if (plotAreaSpace.minMaxTimeIntervalContainsTime(maxList.get(plotAreaSpace))) {
-                    plotAreaSpace.setScaledSelectedTime(minList.get(plotAreaSpace), maxList.get(plotAreaSpace), forced);
+                if (drawController.minMaxTimeIntervalContainsTime(end)) {
+                    drawController.setScaledSelectedTime(start, end, forced);
                 }
 
                 mousePressed = newMousePosition;
@@ -416,19 +399,19 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
                 useThisX = rightIntervalBorderPosition;
             }
             final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
-            final double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
-            final double timestamp = plotAreaSpace.getScaledMinTime() + ((useThisX - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
+            final double diffUnits = drawController.getScaledMaxTime() - drawController.getScaledMinTime();
+            final double timestamp = drawController.getScaledMinTime() + ((useThisX - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
 
-            plotAreaSpace.setScaledSelectedTime(Math.max(timestamp, plotAreaSpace.getScaledMinTime()), plotAreaSpace.getScaledSelectedMaxTime(), forced);
+            drawController.setScaledSelectedTime(Math.max(timestamp, drawController.getScaledMinTime()), drawController.getScaledSelectedMaxTime(), forced);
         } else if (mouseOverRightGraspPoint) {
             if (newMousePosition.x <= leftIntervalBorderPosition) {
                 useThisX = leftIntervalBorderPosition;
             }
             final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
-            final double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
-            final double timestamp = plotAreaSpace.getScaledMinTime() + (1.0 * (useThisX - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
+            final double diffUnits = drawController.getScaledMaxTime() - drawController.getScaledMinTime();
+            final double timestamp = drawController.getScaledMinTime() + (1.0 * (useThisX - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
 
-            plotAreaSpace.setScaledSelectedTime(plotAreaSpace.getScaledSelectedMinTime(), Math.min(timestamp, plotAreaSpace.getScaledMaxTime()), forced);
+            drawController.setScaledSelectedTime(drawController.getScaledSelectedMinTime(), Math.min(timestamp, drawController.getScaledMaxTime()), forced);
         }
     }
 
@@ -464,33 +447,29 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private void jumpSelectedInterval(Point point) {
         final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
         final double position = (point.getX() - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace;
-        Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
-        Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
-        double middlePosition = plotAreaSpace.getScaledSelectedMinTime() + plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
+        double middlePosition = drawController.getScaledSelectedMinTime() + drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime();
+        double start;
+        double end;
         if (position <= middlePosition) {
             // jump to left
-            double start = plotAreaSpace.getScaledSelectedMinTime() - (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            double end = plotAreaSpace.getScaledSelectedMaxTime() - (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            if (start < plotAreaSpace.getScaledMinTime()) {
-                end += (plotAreaSpace.getScaledMinTime() - start);
-                start = plotAreaSpace.getScaledMinTime();
+            start = drawController.getScaledSelectedMinTime() - (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
+            end = drawController.getScaledSelectedMaxTime() - (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
+            if (start < drawController.getScaledMinTime()) {
+                end += (drawController.getScaledMinTime() - start);
+                start = drawController.getScaledMinTime();
             }
-            minList.put(plotAreaSpace, start);
-            maxList.put(plotAreaSpace, end);
         } else {
             // jump to right
-            double start = plotAreaSpace.getScaledSelectedMinTime() + (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            double end = plotAreaSpace.getScaledSelectedMaxTime() + (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            if (end > plotAreaSpace.getScaledMaxTime()) {
-                start -= (end - plotAreaSpace.getScaledMaxTime());
-                end = plotAreaSpace.getScaledMaxTime();
+            start = drawController.getScaledSelectedMinTime() + (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
+            end = drawController.getScaledSelectedMaxTime() + (drawController.getScaledSelectedMaxTime() - drawController.getScaledSelectedMinTime());
+            if (end > drawController.getScaledMaxTime()) {
+                start -= (end - drawController.getScaledMaxTime());
+                end = drawController.getScaledMaxTime();
             }
-            minList.put(plotAreaSpace, start);
-            maxList.put(plotAreaSpace, end);
         }
 
-        if (plotAreaSpace.minMaxTimeIntervalContainsTime(minList.get(plotAreaSpace))) {
-            plotAreaSpace.setScaledSelectedTime(minList.get(plotAreaSpace), maxList.get(plotAreaSpace), true);
+        if (drawController.minMaxTimeIntervalContainsTime(start)) {
+            drawController.setScaledSelectedTime(start, end, true);
         }
     }
 
