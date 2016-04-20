@@ -84,6 +84,14 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     }
 
+    public int calculateXLocation(long timestamp) {
+        return (int) ((timestamp - selectedInterval.start) * getRatioX()) + getPlotArea().x;
+    }
+
+    public double getRatioX() {
+        return getPlotArea().width / (double) (selectedInterval.end - selectedInterval.start);
+    }
+
     public static DrawController getSingletonInstance() {
         if (instance == null) {
             instance = new DrawController();
