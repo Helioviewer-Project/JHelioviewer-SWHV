@@ -29,9 +29,11 @@ public class ExportUtils {
         if (ExportMovie.EVEMovieLinePosition != -1) {
             g2.setColor(Color.BLACK);
 
-            double scale = (ret.getHeight() - im1.getHeight()) / (double) im2.getHeight();
+            double scaleY = (ret.getHeight() - im1.getHeight()) / (double) im2.getHeight();
+            double scaleX = ret.getWidth() / (double) im2.getWidth();
+
             AffineTransform at = AffineTransform.getTranslateInstance(0, im1.getHeight());
-            at.concatenate(AffineTransform.getScaleInstance(scale, scale));
+            at.concatenate(AffineTransform.getScaleInstance(scaleX, scaleY));
             g2.setTransform(at);
             g2.drawLine(movieLinePosition * GLInfo.pixelScale[0], 0, movieLinePosition * GLInfo.pixelScale[0], im2.getHeight());
         }
