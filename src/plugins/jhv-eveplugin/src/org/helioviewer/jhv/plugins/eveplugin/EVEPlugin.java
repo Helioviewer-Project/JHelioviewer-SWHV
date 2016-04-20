@@ -11,7 +11,6 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
@@ -38,8 +37,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         ZoomManager.getSingletonInstance();
         EVEDrawController.getSingletonInstance();
         RadioDataManager.getSingletonInstance();
-        // Avoid concurrent modification error
-        TimeIntervalLockModel.getInstance();
         pluginPanes.add(plotOne);
 
         ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
