@@ -303,7 +303,7 @@ public class FileUtils {
     }
 
     public static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is);
+        java.util.Scanner s = new java.util.Scanner(is, "UTF-8");
         s.useDelimiter("\\A");
         String next = s.hasNext() ? s.next() : "";
         s.close();

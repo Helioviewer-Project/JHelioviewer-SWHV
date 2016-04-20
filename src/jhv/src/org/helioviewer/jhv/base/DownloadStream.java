@@ -132,7 +132,7 @@ public class DownloadStream {
             // Write post data if necessary
             if (output != null) {
                 connection.setDoOutput(true);
-                OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+                OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
                 out.write(output);
                 out.close();
             }
@@ -166,7 +166,7 @@ public class DownloadStream {
             // Write post data if necessary
             if (output != null) {
                 connection.setDoOutput(true);
-                OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+                OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
                 out.write(output);
                 out.close();
             }

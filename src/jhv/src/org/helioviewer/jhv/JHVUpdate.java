@@ -38,7 +38,7 @@ public class JHVUpdate implements Runnable {
      * Also it determines whether the properties update.check.* are used to
      * suspend the checks.
      */
-    private boolean verbose;
+    private final boolean verbose;
 
     /**
      * Verbose whether a dialog box should be popped up.
@@ -55,14 +55,6 @@ public class JHVUpdate implements Runnable {
      * Checks for update in a new thread
      */
     public void check() {
-        Thread t = new Thread(this, "JHV Update Checker");
-        t.start();
-    }
-
-    /**
-     * Checks for update in a new thread, when called from the menu
-     */
-    public void checkMenu() {
         Thread t = new Thread(this, "JHV Update Checker");
         t.start();
     }

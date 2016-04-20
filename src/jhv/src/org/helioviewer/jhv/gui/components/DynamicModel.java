@@ -39,7 +39,6 @@ public class DynamicModel implements TreeModel {
      *             IOException
      */
     public DynamicModel(String root) throws BadLocationException, IOException {
-
         if (root == null) {
             return;
         }
@@ -70,7 +69,7 @@ public class DynamicModel implements TreeModel {
 
         URL url = new URL(urlString);
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout()).getInput()));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout()).getInput(), "UTF-8"));
 
         HTMLEditorKit editorKit = new HTMLEditorKit();
         HTMLDocument htmlDoc = new HTMLDocument();
@@ -177,11 +176,9 @@ public class DynamicModel implements TreeModel {
     }
 
     public void addTreeModelListener(TreeModelListener listener) {
-
     }
 
     public void removeTreeModelListener(TreeModelListener listener) {
-
     }
 
     /**
