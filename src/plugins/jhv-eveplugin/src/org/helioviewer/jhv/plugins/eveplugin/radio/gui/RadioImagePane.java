@@ -36,8 +36,6 @@ public class RadioImagePane implements ImageObserver, DrawableElement {
 
     @Override
     public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
-        // Log.trace("redraw radio image pane for plot : " + plotIdentifier);
-        // Thread.dumpStack();
         Collection<NoDataConfig> noDataConfigs = RadioDataManager.getSingletonInstance().getNoDataConfigurations();
         Collection<PlotConfig> configs = RadioDataManager.getSingletonInstance().getPlotConfigurations();
         if (!intervalTooBig) {
