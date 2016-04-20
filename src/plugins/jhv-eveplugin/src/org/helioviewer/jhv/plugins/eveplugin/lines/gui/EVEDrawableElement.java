@@ -98,7 +98,7 @@ public class EVEDrawableElement implements DrawableElement {
                     }
 
                     long date = values.dates[j];
-                    int x = drawController.calculateXLocation(date);
+                    int x = drawController.selectedAxis.calculateLocation(date, graphArea.width, graphArea.x);
                     int y = dY;
                     y -= computeY(yAxisElement.scale(value), ratioY, minValue);
 
@@ -153,7 +153,7 @@ public class EVEDrawableElement implements DrawableElement {
         public final ArrayList<int[]> yPointsArray;
         public final int[] warnLevels;
         public final String[] warnLabels;
-
+        private final DrawController drawController = DrawController.getSingletonInstance();
         public final Color color;
 
         // //////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ public class EVEDrawableElement implements DrawableElement {
                  * Log.debug("distance between previous and folowing x : " // +
                  * ((point.x - previousX) / ratioX)); } }
                  */
-                double ratioX = DrawController.getSingletonInstance().getRatioX();
+                double ratioX = drawController.selectedAxis.getRatio(drawController.getGraphArea().width);
                 if (previousX == null || (point.x - previousX) / ratioX > Math.max(1 / ratioX, 120000)) {
                     xPoints.add(new ArrayList<Integer>());
                     yPoints.add(new ArrayList<Integer>());

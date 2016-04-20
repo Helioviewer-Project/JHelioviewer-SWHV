@@ -57,9 +57,10 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
             sourceX1 = sourceX0 + 1;
         }
 
-        int destX0 = drawController.calculateXLocation(startDate);
+        Rectangle graphArea = drawController.getGraphArea();
+        int destX0 = drawController.selectedAxis.calculateLocation(startDate, graphArea.width, graphArea.x);
         int destY0 = defineYInDestinationArea(visualStartFrequency, yAxisElement);
-        int destX1 = drawController.calculateXLocation(endDate);
+        int destX1 = drawController.selectedAxis.calculateLocation(endDate, graphArea.width, graphArea.x);
         int destY1 = defineYInDestinationArea(visualEndFrequency, yAxisElement);
         return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1);
     }
@@ -81,11 +82,11 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
      * @return Drawable area map with the correct coordinates
      */
     public DrawableAreaMap getDrawableAreaMap(long startDate, long endDate) {
-        Rectangle displaySize = drawController.getPlotArea();
-        int destX0 = drawController.calculateXLocation(startDate);
+        Rectangle graphArea = drawController.getGraphArea();
+        int destX0 = drawController.selectedAxis.calculateLocation(startDate, graphArea.width, graphArea.x);
         int destY0 = 0;
-        int destX1 = drawController.calculateXLocation(endDate);
-        int destY1 = displaySize.height;
+        int destX1 = drawController.selectedAxis.calculateLocation(endDate, graphArea.width, graphArea.x);
+        int destY1 = graphArea.height;
         return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1);
     }
 
@@ -172,8 +173,8 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
     }
 
     private void requestData() {
-        Rectangle displaySize = drawController.getPlotArea();
-        double xRatio = drawController.getRatioX();
+        Rectangle displaySize = drawController.getGraphArea();
+        double xRatio = drawController.selectedAxis.getRatio(displaySize.width);
         double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
         Interval selectedInterval = drawController.getSelectedInterval();
         radioDataManager.requestData(selectedInterval.start, selectedInterval.end, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
