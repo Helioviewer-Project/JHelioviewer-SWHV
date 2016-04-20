@@ -190,7 +190,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         removeRenderable(renderables.get(row));
     }
 
-    public void fireInsert(int idx) {
+    private void fireInsert(int idx) {
         TableModelEvent e = new TableModelEvent(this, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);

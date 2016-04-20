@@ -30,13 +30,6 @@ public class List extends JScrollPane {
 
     public List() {
         super(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        initVisualComponents();
-    }
-
-    /**
-     * Initialize the visual parts of the component.
-     */
-    private void initVisualComponents() {
         setViewportView(contentPane);
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         contentPane.setBackground(Color.WHITE);
@@ -176,7 +169,7 @@ public class List extends JScrollPane {
     /**
      * Informs all registered listeners that the list has changed.
      * */
-    public void fireListChanged() {
+    private void fireListChanged() {
         for (final ListEntryChangeListener listener : listeners) {
             listener.listChanged();
         }

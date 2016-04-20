@@ -581,26 +581,26 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    private static AbstractAction PlayPause = null;
-    private static AbstractAction PreviousFrame = null;
-    private static AbstractAction NextFrame = null;
+    private static AbstractAction playPauseAction = null;
+    private static AbstractAction previousFrameAction = null;
+    private static AbstractAction nextFrameAction = null;
 
     public static AbstractAction getPlayPauseAction() {
-        if (PlayPause == null)
-            PlayPause = new PlayPauseAction();
-        return PlayPause;
+        if (playPauseAction == null)
+            playPauseAction = new PlayPauseAction();
+        return playPauseAction;
     }
 
     public static AbstractAction getPreviousFrameAction() {
-        if (PreviousFrame == null)
-            PreviousFrame = new PreviousFrameAction();
-        return PreviousFrame;
+        if (previousFrameAction == null)
+            previousFrameAction = new PreviousFrameAction();
+        return previousFrameAction;
     }
 
     public static AbstractAction getNextFrameAction() {
-        if (NextFrame == null)
-            NextFrame = new NextFrameAction();
-        return NextFrame;
+        if (nextFrameAction == null)
+            nextFrameAction = new NextFrameAction();
+        return nextFrameAction;
     }
 
     /**

@@ -39,7 +39,7 @@ public class LogSettings {
     /**
      * Log levels sorted from ALL to OFF
      */
-    public static final Level[] LEVELS = { Level.ALL, Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR, Level.FATAL, Level.OFF };
+    private static final Level[] LEVELS = { Level.ALL, Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR, Level.FATAL, Level.OFF };
 
     /**
      * Identifier for the file appender
