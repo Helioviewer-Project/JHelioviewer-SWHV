@@ -580,11 +580,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        int scrollValue = e.getWheelRotation();
-        double zoomTimeFactor = 10;
-        Set<ValueSpace> valueSpaces = drawController.getValueSpaces();
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-            int scrollDistance = e.getScrollAmount();
+            int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
+            double zoomTimeFactor = 10;
+            Set<ValueSpace> valueSpaces = drawController.getValueSpaces();
             final int mouseX = e.getX();
             final int mouseY = e.getY();
             boolean inGraphArea = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
@@ -593,16 +592,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             if (inGraphArea || inXAxisOrAboveGraph) {
                 final double ratioXLeft = (mouseX - graphArea.x) / (double) graphArea.width;
                 if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
-                    drawController.zoomTime(scrollValue * zoomTimeFactor * scrollDistance / graphArea.getWidth(), ratioXLeft);
+                    drawController.zoomTime(zoomTimeFactor * scrollDistance / graphArea.width, ratioXLeft);
                 } else if (e.isShiftDown()) {
-                    drawController.moveTime(scrollValue * zoomTimeFactor * scrollDistance / graphArea.width);
+                    drawController.moveTime(zoomTimeFactor * scrollDistance / graphArea.width);
                 }
 
             }
             if (inGraphArea || inYAxis) {
                 for (ValueSpace vs : valueSpaces) {
                     if (((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) || inYAxis) {
-                        vs.zoomSelectedRange(scrollValue, getHeight() - mouseY - graphArea.y, graphArea.height);
+                        vs.zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
                     }
                 }
             }
