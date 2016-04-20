@@ -22,26 +22,15 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 
 public class EVEDrawableElement implements DrawableElement {
 
-    private final List<GraphPolyline> graphPolylines = new ArrayList<EVEDrawableElement.GraphPolyline>();
+    private final List<GraphPolyline> graphPolylines = new ArrayList<GraphPolyline>();
     private Band[] bands = new Band[0];
-    // private EVEValues[] values = null;
     private YAxisElement yAxisElement;
     private long lastMilliWithData;
     private final DrawController drawController;
 
-    public EVEDrawableElement(Interval interval, Band[] bands, EVEValues[] values, YAxisElement yAxisElement) {
-        drawController = DrawController.getSingletonInstance();
-        this.bands = bands;
-        // this.values = values;
-        this.yAxisElement = yAxisElement;
-        lastMilliWithData = -1;
-
-    }
-
     public EVEDrawableElement() {
         drawController = DrawController.getSingletonInstance();
         bands = new Band[0];
-        // values = new EVEValues[0];
         yAxisElement = new YAxisElement();
         lastMilliWithData = -1;
     }
@@ -137,15 +126,9 @@ public class EVEDrawableElement implements DrawableElement {
         }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Graph Polyline
-    // //////////////////////////////////////////////////////////////////////////////
 
-    private static class GraphPolyline {
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Definitions
-        // //////////////////////////////////////////////////////////////////////////
+    private class GraphPolyline {
 
         public final ArrayList<ArrayList<Integer>> xPoints;
         public final ArrayList<ArrayList<Integer>> yPoints;
@@ -153,12 +136,7 @@ public class EVEDrawableElement implements DrawableElement {
         public final ArrayList<int[]> yPointsArray;
         public final int[] warnLevels;
         public final String[] warnLabels;
-        private final DrawController drawController = DrawController.getSingletonInstance();
         public final Color color;
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Methods
-        // //////////////////////////////////////////////////////////////////////////
 
         public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels, double graphWidth) {
             xPoints = new ArrayList<ArrayList<Integer>>();
