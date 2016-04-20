@@ -16,22 +16,10 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
 
     private static ZoomManager instance;
     private DrawController drawController;
-    // private PlotAreaSpace plotAreaSpace;
     private YAxisElement yAxisElement;
     private RadioDataManager radioDataManager;
 
-    // private ZoomDataConfig zoomDataConfig;
-    private boolean isAreaInitialized;
-    private Rectangle displaySize;
-
-    private final boolean isMinXInitialized;
-    private final boolean isMaxXInitialized;
-
     private ZoomManager() {
-        isAreaInitialized = false;
-        isMinXInitialized = false;
-        isMaxXInitialized = false;
-        displaySize = new Rectangle();
     }
 
     public static ZoomManager getSingletonInstance() {
@@ -95,6 +83,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
      * @return Drawable area map with the correct coordinates
      */
     public DrawableAreaMap getDrawableAreaMap(long startDate, long endDate) {
+        Rectangle displaySize = drawController.getPlotArea();
         int destX0 = drawController.calculateXLocation(startDate);
         int destY0 = 0;
         int destX1 = drawController.calculateXLocation(endDate);
@@ -132,6 +121,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         double max = yAxisElement.getAvailableRange().max;
 
         if (startFreq >= min && startFreq <= max && endFreq >= min && endFreq <= max && currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate)) {
+            Rectangle displaySize = drawController.getPlotArea();
             int height = displaySize.height;
             double ratio = displaySize.getWidth() / (currentInterval.end - currentInterval.start);
             int width = (int) Math.round((endDate - startDate) * ratio);
@@ -142,6 +132,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     }
 
     private int defineYInDestinationArea(int frequencyToFind, YAxisElement yAxisElement) {
+        Rectangle displaySize = drawController.getPlotArea();
         return displaySize.height - (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height));
     }
 
@@ -175,12 +166,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
 
     @Override
     public void graphDimensionChanged() {
-        Rectangle newDisplaySize = drawController.getPlotArea();
-        if (!displaySize.equals(newDisplaySize)) {
-            displaySize = newDisplaySize;
-            isAreaInitialized = true;
-            requestData();
-        }
+        requestData();
     }
 
     @Override
@@ -199,12 +185,11 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     }
 
     private void requestData() {
-        // if (isAreaInitialized && isMinXInitialized && isMaxXInitialized) {
+        Rectangle displaySize = drawController.getPlotArea();
         double xRatio = drawController.getRatioX();
         double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
         Interval selectedInterval = drawController.getSelectedInterval();
         radioDataManager.requestData(selectedInterval.start, selectedInterval.end, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
-        // }
     }
 
 }
