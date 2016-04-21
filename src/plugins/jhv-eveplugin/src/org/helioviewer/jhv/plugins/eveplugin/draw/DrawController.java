@@ -207,7 +207,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return false;
     }
 
-    public YAxis getYAxesForUnit(String unit) {
+    public YAxis getYAxisForUnit(String unit) {
         for (YAxis el : yAxes) {
             if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {
                 return el;

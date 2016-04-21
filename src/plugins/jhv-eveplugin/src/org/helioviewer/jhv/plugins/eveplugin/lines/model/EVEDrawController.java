@@ -37,7 +37,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private final DrawController drawController;
     private final Set<BandType> bandTypes;
     private final Map<YAxis, EVEDrawableElement> eveDrawableElementMap;
-    private final Map<Band, YAxis> yAxisElementMap;
+    private final Map<Band, YAxis> yAxisMap;
     private final Map<YAxis, List<Band>> bandsPerYAxis;
 
     private static EVEDrawController instance;
@@ -54,7 +54,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         selectorModel = LineDataSelectorModel.getSingletonInstance();
         eveDrawableElementMap = new HashMap<YAxis, EVEDrawableElement>();
         bandTypes = new HashSet<BandType>();
-        yAxisElementMap = new HashMap<Band, YAxis>();
+        yAxisMap = new HashMap<Band, YAxis>();
         bandsPerYAxis = new HashMap<YAxis, List<Band>>();
         selectedIntervalChanged = false;
         selectedIntervalChangedTimer = new Timer(300, new SelectedIntervalTimerTask());
@@ -71,21 +71,21 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private void addToMap(final Band band) {
         Interval interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
-        YAxis yAxisElement = drawController.getYAxesForUnit(band.getUnitLabel());
-        if (yAxisElement == null && drawController.hasAxisAvailable()) {
-            yAxisElement = new YAxis();
-            yAxisElement.addValueSpaceListener(this);
+        YAxis yAxis = drawController.getYAxisForUnit(band.getUnitLabel());
+        if (yAxis == null && drawController.hasAxisAvailable()) {
+            yAxis = new YAxis();
+            yAxis.addValueSpaceListener(this);
         }
-        if (yAxisElement != null) {
+        if (yAxis != null) {
             // drawController.addValueSpace(yAxisElement);
-            yAxisElementMap.put(band, yAxisElement);
-            addToBandsPerYAxis(yAxisElement, band);
+            yAxisMap.put(band, yAxis);
+            addToBandsPerYAxis(yAxis, band);
             EVEValues data = retrieveData(band, interval, plotArea);
 
-            if (!dataMapPerUnitLabel.containsKey(yAxisElement)) {
-                dataMapPerUnitLabel.put(yAxisElement, new HashMap<Band, EVEValues>());
+            if (!dataMapPerUnitLabel.containsKey(yAxis)) {
+                dataMapPerUnitLabel.put(yAxis, new HashMap<Band, EVEValues>());
             }
-            dataMapPerUnitLabel.get(yAxisElement).put(band, data);
+            dataMapPerUnitLabel.get(yAxis).put(band, data);
         } else {
             Log.debug("band could not be added. No Yaxis Available ");
         }
@@ -102,7 +102,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     private void removeFromMap(final Band band) {
-        YAxis yAxisElement = yAxisElementMap.get(band);
+        YAxis yAxisElement = yAxisMap.get(band);
         if (dataMapPerUnitLabel.containsKey(yAxisElement)) {
             if (dataMapPerUnitLabel.get(yAxisElement).containsKey(band)) {
                 dataMapPerUnitLabel.get(yAxisElement).remove(band);
@@ -110,7 +110,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                 bands.remove(band);
                 if (bands.isEmpty()) {
                     EVEDrawableElement removed = eveDrawableElementMap.remove(yAxisElement);
-                    yAxisElementMap.remove(band);
+                    yAxisMap.remove(band);
                     bandsPerYAxis.remove(yAxisElement);
                     drawController.removeDrawableElement(removed);
                 }
@@ -124,7 +124,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         Interval interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
         EVEValues data = retrieveData(band, interval, plotArea);
-        YAxis yAxisElement = yAxisElementMap.get(band);
+        YAxis yAxisElement = yAxisMap.get(band);
         if (!dataMapPerUnitLabel.containsKey(yAxisElement)) {
             dataMapPerUnitLabel.put(yAxisElement, new HashMap<Band, EVEValues>());
         }
@@ -281,7 +281,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     public EVEValues getValues(Band band, Interval interval, Rectangle graphArea) {
-        return dataMapPerUnitLabel.get(yAxisElementMap.get(band)).get(band);
+        return dataMapPerUnitLabel.get(yAxisMap.get(band)).get(band);
     }
 
     public void bandColorChanged(Band band) {
@@ -293,11 +293,11 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     public void changeAxis(Band band) {
-        YAxis currentYAxisElement = yAxisElementMap.get(band);
+        YAxis currentYAxisElement = yAxisMap.get(band);
         if (((bandsPerYAxis.size() == 1 && bandsPerYAxis.get(currentYAxisElement).size() > 1) || bandsPerYAxis.size() == 2) && drawController.canChangeAxis(band.getUnitLabel())) {
             YAxis otherYAxisElement = getOtherAxisElement(currentYAxisElement);
             if (otherYAxisElement != null) {
-                yAxisElementMap.put(band, otherYAxisElement);
+                yAxisMap.put(band, otherYAxisElement);
                 List<Band> bandsPerList = new ArrayList<Band>();
                 if (bandsPerYAxis.containsKey(otherYAxisElement)) {
                     bandsPerList = bandsPerYAxis.get(otherYAxisElement);
@@ -345,11 +345,11 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     public boolean canChangeAxis(Band band) {
-        return drawController.canChangeAxis(band.getUnitLabel()) && yAxisElementMap.size() > 1 && (drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxis.YAxisLocation.RIGHT || (drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxis.YAxisLocation.LEFT && bandsPerYAxis.get(yAxisElementMap.get(band)).size() > 1));
+        return drawController.canChangeAxis(band.getUnitLabel()) && yAxisMap.size() > 1 && (drawController.getYAxisLocation(yAxisMap.get(band)) == YAxis.YAxisLocation.RIGHT || (drawController.getYAxisLocation(yAxisMap.get(band)) == YAxis.YAxisLocation.LEFT && bandsPerYAxis.get(yAxisMap.get(band)).size() > 1));
     }
 
     public int getAxisLocation(Band band) {
-        return drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxis.YAxisLocation.LEFT ? 0 : 1;
+        return drawController.getYAxisLocation(yAxisMap.get(band)) == YAxis.YAxisLocation.LEFT ? 0 : 1;
     }
 
     @Override
@@ -369,7 +369,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     public Set<Band> getAllBands() {
-        return yAxisElementMap.keySet();
+        return yAxisMap.keySet();
     }
 
     public boolean containsBandType(BandType value) {
