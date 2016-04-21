@@ -247,7 +247,7 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        if (grid.getSelectedRow() == -1 && lastSelectedIndex > -1) {
+        if (lastSelectedIndex > -1 && grid.getSelectedRow() == -1) {
             if (tableModel.getRowCount() > lastSelectedIndex) {
                 grid.setRowSelectionInterval(lastSelectedIndex, lastSelectedIndex);
             } else {
