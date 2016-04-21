@@ -17,10 +17,9 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventPlotConfiguration;
@@ -28,7 +27,6 @@ import org.helioviewer.jhv.plugins.eveplugin.events.model.EventPlotConfiguration
 public class EventPanel implements DrawableElement {
 
     private static final float dash1[] = { 10f };
-    private final DrawController drawController = EVEPlugin.dc;
 
     @Override
     public DrawableElementType getDrawableElementType() {
@@ -36,7 +34,7 @@ public class EventPanel implements DrawableElement {
     }
 
     @Override
-    public void draw(Graphics2D g, Graphics2D leftAxis, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
+    public void draw(Graphics2D g, Graphics2D leftAxis, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
         if (!EventModel.getSingletonInstance().isEventsVisible()) {
             return;
         }
@@ -77,8 +75,8 @@ public class EventPanel implements DrawableElement {
                     int eventPosition = i;
                     nrLines = endDates.size();
 
-                    int x0 = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
-                    int x1 = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
+                    int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
+                    int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
                     JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition, event.isHighlighted());
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
