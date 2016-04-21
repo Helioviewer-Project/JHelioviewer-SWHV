@@ -153,6 +153,21 @@ public class DownloadController implements TimingListener {
         return list.size() > 0;
     }
 
+    @Override
+    public void availableIntervalChanged() {
+        Interval availableInterval = drawController.getAvailableInterval();
+        final Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
+
+        DownloadController.getSingletonInstance().updateBands(downloadInterval, drawController.getSelectedInterval());
+
+    }
+
+    @Override
+    public void selectedIntervalChanged(boolean keepFullValueRange) {
+        // TODO Auto-generated method stub
+
+    }
+
     private void fireDownloadStarted(final Band band) {
         selectorModel.downloadStarted(band);
     }
@@ -291,21 +306,6 @@ public class DownloadController implements TimingListener {
                 }
             });
         }
-    }
-
-    @Override
-    public void availableIntervalChanged() {
-        Interval availableInterval = drawController.getAvailableInterval();
-        final Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
-
-        DownloadController.getSingletonInstance().updateBands(downloadInterval, drawController.getSelectedInterval());
-
-    }
-
-    @Override
-    public void selectedIntervalChanged(boolean keepFullValueRange) {
-        // TODO Auto-generated method stub
-
     }
 
 }

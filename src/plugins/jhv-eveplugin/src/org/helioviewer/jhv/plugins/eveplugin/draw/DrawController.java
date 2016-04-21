@@ -32,17 +32,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private static DrawController instance;
     public Axis selectedAxis;
     public Axis availableAxis;
-
     private final List<TimingListener> tListeners;
-    private Rectangle graphSize;
     private final List<GraphDimensionListener> gdListeners;
-
-    private List<YAxisElement> yAxisSet;
-
-    private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private final List<DrawControllerListener> listeners;
-
+    private Rectangle graphSize;
+    private List<YAxisElement> yAxisSet;
+    private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private final Set<ValueSpace> valueSpaces;
+    private boolean isLocked;
+    private long latestMovieTime;
 
     private DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
@@ -94,38 +92,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private void addDrawableElement(DrawableElement element, boolean redraw) {
-        Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
-        if (elements == null) {
-            elements = new HashSet<DrawableElement>();
-            drawableElements.put(element.getDrawableElementType().getLevel(), elements);
-        }
-        elements.add(element);
-
-        if (element.getYAxisElement() != null) {
-            if (!yAxisSet.contains(element.getYAxisElement())) {
-                yAxisSet.add(element.getYAxisElement());
-            }
-        }
-        if (redraw) {
-            fireRedrawRequest();
-        }
-    }
-
-    private void removeDrawableElement(DrawableElement element, boolean redraw, boolean keepYAxisElement) {
-        Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
-        if (elements != null && !keepYAxisElement) {
-            elements.remove(element);
-            if (elements.isEmpty()) {
-                drawableElements.remove(element.getDrawableElementType().getLevel());
-            }
-            createYAxisSet();
-        }
-        if (redraw) {
-            fireRedrawRequest();
-        }
-    }
-
     public void removeDrawableElement(DrawableElement element) {
         removeDrawableElement(element, true, false);
     }
@@ -142,107 +108,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fireRedrawRequest();
     }
 
-    public void fireRedrawRequest() {
-        for (DrawControllerListener l : listeners) {
-            l.drawRequest();
-        }
-    }
-
-    private void setAvailableInterval(final long start, final long end) {
-        Interval availableInterval = makeCompleteDay(start, end);
-        availableAxis.min = availableInterval.start;
-        availableAxis.max = availableInterval.end;
-        fireAvailableIntervalChanged();
-    }
-
     public final Interval getAvailableInterval() {
         return new Interval((long) availableAxis.min, (long) availableAxis.max);
-    }
-
-    @Override
-    public void downloadStartded(LineDataSelectorElement element) {
-    }
-
-    @Override
-    public void downloadFinished(LineDataSelectorElement element) {
-    }
-
-    @Override
-    public void lineDataAdded(LineDataSelectorElement element) {
-    }
-
-    @Override
-    public void lineDataRemoved(LineDataSelectorElement element) {
-        fireRedrawRequest();
-    }
-
-    @Override
-    public void lineDataUpdated(LineDataSelectorElement element) {
-        fireRedrawRequest();
-    }
-
-    private void fireRedrawRequestMovieFrameChanged(final long time) {
-
-        for (DrawControllerListener l : listeners) {
-            l.drawMovieLineRequest(time);
-        }
-    }
-
-    private void centraliseSelected(long time) {
-        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && availableAxis.min <= time && availableAxis.max >= time) {
-            latestMovieTime = time;
-            long selectedIntervalDiff = (long) (selectedAxis.max - selectedAxis.min);
-            setSelectedInterval(new Interval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff))), false, false);
-        }
-    }
-
-    @Override
-    public void timeChanged(JHVDate date) {
-        centraliseSelected(date.milli);
-        fireRedrawRequestMovieFrameChanged(date.milli);
-    }
-
-    public long getLastDateWithData() {
-        long lastDate = Long.MAX_VALUE;
-        for (Set<DrawableElement> des : drawableElements.values()) {
-            for (DrawableElement de : des) {
-                long temp = de.getLastDateWithData();
-                if (temp != -1 && temp < lastDate) {
-                    lastDate = temp;
-                }
-            }
-        }
-        return lastDate;
-    }
-
-    @Override
-    public void eventHightChanged(JHVRelatedEvents event) {
-        fireRedrawRequest();
-    }
-
-    @Override
-    public void layerAdded(View view) {
-        setSelectedInterval(new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli), false, false);
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
-        if (view == null) {
-            fireRedrawRequestMovieFrameChanged(Long.MIN_VALUE);
-        }
-    }
-
-    private Interval makeCompleteDay(final long start, final long end) {
-        long endDate = end;
-        long now = System.currentTimeMillis();
-        if (end > now) {
-            endDate = now;
-        }
-
-        long new_start = start - start % TimeUtils.DAY_IN_MILLIS;
-        long new_end = endDate - endDate % TimeUtils.DAY_IN_MILLIS + TimeUtils.DAY_IN_MILLIS;
-
-        return new Interval(new_start, new_end);
     }
 
     public void setSelectedInterval(boolean useFullValueSpace, boolean resetAvailable) {
@@ -291,6 +158,222 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return new Interval((long) selectedAxis.min, (long) selectedAxis.max);
     }
 
+    public long getLastDateWithData() {
+        long lastDate = Long.MAX_VALUE;
+        for (Set<DrawableElement> des : drawableElements.values()) {
+            for (DrawableElement de : des) {
+                long temp = de.getLastDateWithData();
+                if (temp != -1 && temp < lastDate) {
+                    lastDate = temp;
+                }
+            }
+        }
+        return lastDate;
+    }
+
+    public void setGraphInformation(Rectangle graphSize) {
+        this.graphSize = graphSize;
+        fireGraphDimensionsChanged();
+        fireRedrawRequest();
+    }
+
+    public Rectangle getPlotArea() {
+        return new Rectangle(0, 0, getGraphWidth(), getGraphHeight());
+    }
+
+    public Rectangle getGraphArea() {
+        return new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, getGraphWidth(), getGraphHeight());
+    }
+
+    public Rectangle getLeftAxisArea() {
+        return new Rectangle(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, getGraphHeight() - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE));
+    }
+
+    public boolean hasAxisAvailable() {
+        return yAxisSet.size() < 2;
+    }
+
+    public boolean canBePutOnAxis(String unit) {
+        for (YAxisElement el : yAxisSet) {
+            if (el.getLabel().toLowerCase().equals(unit.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public YAxisElement getYAxisElementForUnit(String unit) {
+        for (YAxisElement el : yAxisSet) {
+            if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {
+                return el;
+            }
+        }
+        return null;
+    }
+
+    public boolean canChangeAxis(String unitLabel) {
+        return getAllYAxisElementsForUnit(unitLabel).size() == 2 || yAxisSet.size() < 2;
+    }
+
+    public YAxisElement.YAxisLocation getYAxisLocation(YAxisElement yAxisElement) {
+        switch (yAxisSet.indexOf(yAxisElement)) {
+        case 0:
+            return YAxisElement.YAxisLocation.LEFT;
+        case 1:
+            return YAxisElement.YAxisLocation.RIGHT;
+        }
+        return YAxisLocation.LEFT;
+    }
+
+    public Set<ValueSpace> getValueSpaces() {
+        return valueSpaces;
+    }
+
+    public void resetSelectedValueAndTimeInterval() {
+        for (ValueSpace vs : valueSpaces) {
+            vs.resetScaledSelectedRange();
+        }
+    }
+
+    public void addValueSpace(ValueSpace valueSpace) {
+        valueSpaces.add(valueSpace);
+    }
+
+    public void removeValueSpace(ValueSpace valueSpace) {
+        valueSpaces.remove(valueSpace);
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean isLocked) {
+        this.isLocked = isLocked;
+        if (isLocked) {
+            if (latestMovieTime != Long.MIN_VALUE) {
+                centraliseSelected(latestMovieTime);
+            }
+        }
+    }
+
+    @Override
+    public void downloadStartded(LineDataSelectorElement element) {
+    }
+
+    @Override
+    public void downloadFinished(LineDataSelectorElement element) {
+    }
+
+    @Override
+    public void lineDataAdded(LineDataSelectorElement element) {
+    }
+
+    @Override
+    public void lineDataRemoved(LineDataSelectorElement element) {
+        fireRedrawRequest();
+    }
+
+    @Override
+    public void lineDataUpdated(LineDataSelectorElement element) {
+        fireRedrawRequest();
+    }
+
+    @Override
+    public void timeChanged(JHVDate date) {
+        centraliseSelected(date.milli);
+        fireRedrawRequestMovieFrameChanged(date.milli);
+    }
+
+    @Override
+    public void eventHightChanged(JHVRelatedEvents event) {
+        fireRedrawRequest();
+    }
+
+    @Override
+    public void layerAdded(View view) {
+        setSelectedInterval(new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli), false, false);
+    }
+
+    @Override
+    public void activeLayerChanged(View view) {
+        if (view == null) {
+            fireRedrawRequestMovieFrameChanged(Long.MIN_VALUE);
+        }
+    }
+
+    private void fireRedrawRequest() {
+        for (DrawControllerListener l : listeners) {
+            l.drawRequest();
+        }
+    }
+
+    private void addDrawableElement(DrawableElement element, boolean redraw) {
+        Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
+        if (elements == null) {
+            elements = new HashSet<DrawableElement>();
+            drawableElements.put(element.getDrawableElementType().getLevel(), elements);
+        }
+        elements.add(element);
+
+        if (element.getYAxisElement() != null) {
+            if (!yAxisSet.contains(element.getYAxisElement())) {
+                yAxisSet.add(element.getYAxisElement());
+            }
+        }
+        if (redraw) {
+            fireRedrawRequest();
+        }
+    }
+
+    private void removeDrawableElement(DrawableElement element, boolean redraw, boolean keepYAxisElement) {
+        Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
+        if (elements != null && !keepYAxisElement) {
+            elements.remove(element);
+            if (elements.isEmpty()) {
+                drawableElements.remove(element.getDrawableElementType().getLevel());
+            }
+            createYAxisSet();
+        }
+        if (redraw) {
+            fireRedrawRequest();
+        }
+    }
+
+    private void setAvailableInterval(final long start, final long end) {
+        Interval availableInterval = makeCompleteDay(start, end);
+        availableAxis.min = availableInterval.start;
+        availableAxis.max = availableInterval.end;
+        fireAvailableIntervalChanged();
+    }
+
+    private void fireRedrawRequestMovieFrameChanged(final long time) {
+
+        for (DrawControllerListener l : listeners) {
+            l.drawMovieLineRequest(time);
+        }
+    }
+
+    private void centraliseSelected(long time) {
+        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && availableAxis.min <= time && availableAxis.max >= time) {
+            latestMovieTime = time;
+            long selectedIntervalDiff = (long) (selectedAxis.max - selectedAxis.min);
+            setSelectedInterval(new Interval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff))), false, false);
+        }
+    }
+
+    private Interval makeCompleteDay(final long start, final long end) {
+        long endDate = end;
+        long now = System.currentTimeMillis();
+        if (end > now) {
+            endDate = now;
+        }
+
+        long new_start = start - start % TimeUtils.DAY_IN_MILLIS;
+        long new_end = endDate - endDate % TimeUtils.DAY_IN_MILLIS + TimeUtils.DAY_IN_MILLIS;
+
+        return new Interval(new_start, new_end);
+    }
+
     private void fireSelectedIntervalChanged(boolean keepFullValueRange) {
         for (TimingListener listener : tListeners) {
             listener.selectedIntervalChanged(keepFullValueRange);
@@ -304,28 +387,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    public void setGraphInformation(Rectangle graphSize) {
-        this.graphSize = graphSize;
-        fireGraphDimensionsChanged();
-        fireRedrawRequest();
-    }
-
     private void fireGraphDimensionsChanged() {
         for (GraphDimensionListener l : gdListeners) {
             l.graphDimensionChanged();
         }
-    }
-
-    public Rectangle getPlotArea() {
-        return new Rectangle(0, 0, getGraphWidth(), getGraphHeight());
-    }
-
-    public Rectangle getGraphArea() {
-        return new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, getGraphWidth(), getGraphHeight());
-    }
-
-    public Rectangle getLeftAxisArea() {
-        return new Rectangle(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, getGraphHeight() - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE));
     }
 
     private int getGraphHeight() {
@@ -361,28 +426,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         yAxisSet = newYAxisList;
     }
 
-    public boolean hasAxisAvailable() {
-        return yAxisSet.size() < 2;
-    }
-
-    public boolean canBePutOnAxis(String unit) {
-        for (YAxisElement el : yAxisSet) {
-            if (el.getLabel().toLowerCase().equals(unit.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public YAxisElement getYAxisElementForUnit(String unit) {
-        for (YAxisElement el : yAxisSet) {
-            if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {
-                return el;
-            }
-        }
-        return null;
-    }
-
     private List<YAxisElement> getAllYAxisElementsForUnit(String unit) {
         List<YAxisElement> all = new ArrayList<YAxisElement>();
         for (YAxisElement el : yAxisSet) {
@@ -391,70 +434,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             }
         }
         return all;
-    }
-
-    public boolean canChangeAxis(String unitLabel) {
-        return getAllYAxisElementsForUnit(unitLabel).size() == 2 || yAxisSet.size() < 2;
-    }
-
-    public YAxisElement.YAxisLocation getYAxisLocation(YAxisElement yAxisElement) {
-        switch (yAxisSet.indexOf(yAxisElement)) {
-        case 0:
-            return YAxisElement.YAxisLocation.LEFT;
-        case 1:
-            return YAxisElement.YAxisLocation.RIGHT;
-        }
-        return YAxisLocation.LEFT;
-    }
-
-    public Set<ValueSpace> getValueSpaces() {
-        return valueSpaces;
-    }
-
-    public void resetSelectedValueAndTimeInterval() {
-        for (ValueSpace vs : valueSpaces) {
-            vs.resetScaledSelectedRange();
-        }
-    }
-
-    public void addValueSpace(ValueSpace valueSpace) {
-        valueSpaces.add(valueSpace);
-    }
-
-    public void removeValueSpace(ValueSpace valueSpace) {
-        valueSpaces.remove(valueSpace);
-    }
-
-    /** Is the time interval locked */
-    private boolean isLocked;
-
-    /** Holds the previous movie time */
-    private long latestMovieTime;
-
-    /**
-     * Is the time interval locked
-     *
-     * @return true if the interval is locked, false if the interval is not
-     *         locked
-     */
-    public boolean isLocked() {
-        return isLocked;
-    }
-
-    /**
-     * Sets the locked state of the time interval.
-     *
-     * @param isLocked
-     *            true if the interval is locked, false if the interval is not
-     *            locked
-     */
-    public void setLocked(boolean isLocked) {
-        this.isLocked = isLocked;
-        if (isLocked) {
-            if (latestMovieTime != Long.MIN_VALUE) {
-                centraliseSelected(latestMovieTime);
-            }
-        }
     }
 
 }
