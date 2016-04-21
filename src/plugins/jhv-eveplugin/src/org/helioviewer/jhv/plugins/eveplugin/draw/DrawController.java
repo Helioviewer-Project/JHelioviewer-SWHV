@@ -223,10 +223,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return YAxisLocation.LEFT;
     }
 
-    public Set<ValueSpace> getValueSpaces() {
-        return valueSpaces;
-    }
-
     public void resetSelectedValueAndTimeInterval() {
         for (ValueSpace vs : valueSpaces) {
             vs.resetScaledSelectedRange();
@@ -354,7 +350,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private void centraliseSelected(long time) {
         if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && availableAxis.min <= time && availableAxis.max >= time) {
             latestMovieTime = time;
-            long selectedIntervalDiff = (long) (selectedAxis.max - selectedAxis.min);
+            long selectedIntervalDiff = selectedAxis.max - selectedAxis.min;
             setSelectedInterval(new Interval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff))), false, false);
         }
     }

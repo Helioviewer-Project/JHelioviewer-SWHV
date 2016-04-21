@@ -47,7 +47,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableType;
-import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 
@@ -469,9 +468,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void mouseHelper(double distanceY) {
-        Set<ValueSpace> valueSpaces = drawController.getValueSpaces();
-        for (ValueSpace vs : valueSpaces) {
-            vs.shiftDownPixels(distanceY, graphArea.height);
+        List<YAxisElement> yAxes = drawController.getYAxisElements();
+        for (YAxisElement yAxis : yAxes) {
+            yAxis.shiftDownPixels(distanceY, graphArea.height);
         }
     }
 
@@ -586,7 +585,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
             double zoomTimeFactor = 10;
-            Set<ValueSpace> valueSpaces = drawController.getValueSpaces();
+            List<YAxisElement> yAxisElements = drawController.getYAxisElements();
             final int mouseX = e.getX();
             final int mouseY = e.getY();
             boolean inGraphArea = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
@@ -602,9 +601,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
             }
             if (inGraphArea || inYAxis) {
-                for (ValueSpace vs : valueSpaces) {
+                for (YAxisElement yAxis : yAxisElements) {
                     if (((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) || inYAxis) {
-                        vs.zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
+                        yAxis.zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
                     }
                 }
             }
