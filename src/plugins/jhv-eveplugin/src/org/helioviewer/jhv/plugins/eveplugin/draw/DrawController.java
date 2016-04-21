@@ -42,10 +42,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Rectangle graphArea;
     private Rectangle plotArea;
     private Rectangle leftAxisArea;
+    protected final Set<ValueSpaceListener> rangeListeners;
 
     public DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
+        rangeListeners = new HashSet<ValueSpaceListener>();
         yAxes = new ArrayList<YAxis>();
         tListeners = new ArrayList<TimingListener>();
         gdListeners = new ArrayList<GraphDimensionListener>();
@@ -74,6 +76,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public void addTimingListener(TimingListener listener) {
         tListeners.add(listener);
+    }
+
+    public void addValueSpaceListener(ValueSpaceListener valueSpaceListener) {
+        rangeListeners.add(valueSpaceListener);
     }
 
     public void updateDrawableElement(DrawableElement drawableElement, boolean needsFire) {
@@ -249,6 +255,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
+    public void rangeChanged() {
+        for (ValueSpaceListener vsl : rangeListeners) {
+            vsl.valueSpaceChanged();
+        }
+    }
+
     @Override
     public void downloadStartded(LineDataSelectorElement element) {
     }
@@ -418,5 +430,4 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
         return all;
     }
-
 }

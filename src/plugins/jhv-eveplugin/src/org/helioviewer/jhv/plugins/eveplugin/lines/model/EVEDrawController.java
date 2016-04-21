@@ -74,7 +74,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         YAxis yAxis = drawController.getYAxisForUnit(band.getUnitLabel());
         if (yAxis == null && drawController.hasAxisAvailable()) {
             yAxis = new YAxis();
-            yAxis.addValueSpaceListener(this);
+            EVEPlugin.dc.addValueSpaceListener(this);
         }
         if (yAxis != null) {
             yAxisMap.put(band, yAxis);
@@ -337,7 +337,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                 }
             }
             YAxis other = new YAxis();
-            other.addValueSpaceListener(this);
+            EVEPlugin.dc.addValueSpaceListener(this);
             return other;
         }
         return null;
@@ -352,7 +352,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     @Override
-    public void valueSpaceChanged(Range availableRange, Range selectedRange) {
+    public void valueSpaceChanged() {
         fireRedrawRequest(false);
     }
 

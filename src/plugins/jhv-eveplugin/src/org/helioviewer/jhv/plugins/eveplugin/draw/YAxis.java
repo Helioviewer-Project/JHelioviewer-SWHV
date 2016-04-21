@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.helioviewer.jhv.base.Range;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 
 /**
  * This class describes an Y-axis.
@@ -27,7 +25,6 @@ public class YAxis {
     private YAxisLocation location;
     private YAxisScale scale;
     protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
-    protected final Set<ValueSpaceListener> listeners;
 
     /**
      * Creates a Y-axis element with a selected value range, an available value
@@ -51,7 +48,6 @@ public class YAxis {
         this.availableRange = availableRange;
         this.label = label;
         setIsLogScale(isLogScale);
-        listeners = new HashSet<ValueSpaceListener>();
     }
 
     /**
@@ -65,7 +61,6 @@ public class YAxis {
         availableRange = new Range();
         label = "";
         setIsLogScale(true);
-        listeners = new HashSet<ValueSpaceListener>();
     }
 
     /**
@@ -205,9 +200,7 @@ public class YAxis {
     }
 
     protected void fireSelectedRangeChanged() {
-        for (ValueSpaceListener vsl : listeners) {
-            vsl.valueSpaceChanged(availableRange, selectedRange);
-        }
+        EVEPlugin.dc.rangeChanged();
     }
 
     public void reset() {
@@ -274,10 +267,6 @@ public class YAxis {
     public void resetScaledSelectedRange() {
         Range availableRange = getAvailableRange();
         setSelectedRange(new Range(availableRange));
-    }
-
-    public void addValueSpaceListener(ValueSpaceListener valueSpaceListener) {
-        listeners.add(valueSpaceListener);
     }
 
     private static class YAxisLogScale implements YAxisScale {
