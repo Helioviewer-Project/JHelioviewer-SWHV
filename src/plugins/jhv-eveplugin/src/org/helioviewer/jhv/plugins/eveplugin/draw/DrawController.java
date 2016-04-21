@@ -22,7 +22,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement.YAxisLocation;
-import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
@@ -154,9 +153,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         availableAxis.min = availableInterval.start;
         availableAxis.max = availableInterval.end;
         fireAvailableIntervalChanged();
-        final Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
-
-        DownloadController.getSingletonInstance().updateBands(downloadInterval, getSelectedInterval());
     }
 
     public final Interval getAvailableInterval() {
