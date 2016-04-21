@@ -174,7 +174,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
     private void requestData() {
         Rectangle displaySize = drawController.getGraphArea();
         double xRatio = drawController.selectedAxis.getRatio(displaySize.width);
-        double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
+        double yRatio = (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
         Interval selectedInterval = drawController.getSelectedInterval();
         radioDataManager.requestData(selectedInterval.start, selectedInterval.end, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
     }

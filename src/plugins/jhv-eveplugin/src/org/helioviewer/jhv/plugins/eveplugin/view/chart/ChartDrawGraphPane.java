@@ -457,8 +457,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
             double distanceX = mousePressedPosition.x - p.x;
+            drawController.selectedAxis.move(graphArea.x, graphArea.width, distanceX);
+
             double distanceY = p.y - mousePressedPosition.y;
-            drawController.selectedAxis.move(distanceX / graphArea.width);
             drawController.setSelectedInterval(false, false);
             mouseHelper(distanceY);
         }
@@ -488,7 +489,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(UIGlobals.closedHandCursor);
             double distanceX = mousePressedPosition.x - p.x;
             double distanceY = p.y - mousePressedPosition.y;
-            drawController.selectedAxis.move(distanceX / graphArea.width);
+            drawController.selectedAxis.move(graphArea.x, graphArea.width, distanceX);
             drawController.setSelectedInterval(false, false);
             mouseHelper(distanceY);
         }
@@ -593,10 +594,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             boolean inYAxis = (mouseX < graphArea.x || mouseX > graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
             if (inGraphArea || inXAxisOrAboveGraph) {
                 if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
-                    drawController.selectedAxis.zoom(mouseX, graphArea.width, graphArea.x, zoomTimeFactor * scrollDistance);
+                    drawController.selectedAxis.zoom(graphArea.x, graphArea.width, mouseX, zoomTimeFactor * scrollDistance);
                     drawController.setSelectedInterval(false, false);
                 } else if (e.isShiftDown()) {
-                    drawController.selectedAxis.move(zoomTimeFactor * scrollDistance / graphArea.width);
+                    drawController.selectedAxis.move(graphArea.x, graphArea.width, zoomTimeFactor * scrollDistance);
                     drawController.setSelectedInterval(false, false);
                 }
             }
