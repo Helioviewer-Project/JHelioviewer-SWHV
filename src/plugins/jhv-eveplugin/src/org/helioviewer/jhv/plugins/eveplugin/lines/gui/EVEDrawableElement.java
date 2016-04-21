@@ -60,7 +60,6 @@ public class EVEDrawableElement implements DrawableElement {
         for (int i = 0; i < bands.length; ++i) {
             if (bands[i].isVisible()) {
                 EVEValues values = EVEDrawController.getSingletonInstance().getValues(bands[i], drawController.getSelectedInterval(), graphArea);
-                // Log.debug(values.dates.length);
                 int num = values.getNumberOfValues();
                 final ArrayList<Point> pointList = new ArrayList<Point>();
                 final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
@@ -122,12 +121,9 @@ public class EVEDrawableElement implements DrawableElement {
             for (int j = 0; j < line.warnLevels.length; j++) {
                 g.drawLine(graphArea.x, line.warnLevels[j], graphArea.x + graphArea.width, line.warnLevels[j]);
                 g.drawString(line.warnLabels[j], graphArea.x, line.warnLevels[j] - 2);
-                // TODO draw label under line if it will be cut off.
             }
         }
     }
-
-    // Graph Polyline
 
     private class GraphPolyline {
 
