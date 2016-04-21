@@ -80,7 +80,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     private final DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
-    private final RadioYAxis yAxisElement;
+    private final RadioYAxis yAxis;
     private final RadioImagePane radioImagePane;
     private Map<Long, PlotConfig> plotConfigList;
     /** Map containing per download id a list of no data configurations */
@@ -100,11 +100,11 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         zoomManager = ZoomManager.getSingletonInstance();
         drawController = EVEPlugin.dc;
         bufferedImages = new HashMap<Long, BufferedImage>();
-        yAxisElement = new RadioYAxis();
-        yAxisElement.setLabel("MHz");
-        yAxisElement.setIsLogScale(false);
+        yAxis = new RadioYAxis();
+        yAxis.setLabel("MHz");
+        yAxis.setIsLogScale(false);
         radioImagePane = new RadioImagePane();
-        radioImagePane.setYAxis(yAxisElement);
+        radioImagePane.setYAxis(yAxis);
         plotConfigList = new HashMap<Long, PlotConfig>();
         noDataConfigList = new ArrayList<NoDataConfig>();
         isVisible = true;
@@ -376,7 +376,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                 maxFrequencyInterval = new FrequencyInterval(0, 0);
             }
         }
-        yAxisElement.setAvailableRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
+        yAxis.setAvailableRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
     }
 
     private FrequencyInterval defineDataFrequencyInterval(FrequencyInterval freqInterval, Rectangle providedRegion, int resolutionHeight) {
@@ -591,7 +591,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     }
 
     private void fireDrawNewBufferedImage() {
-        radioImagePane.setYAxis(yAxisElement);
+        radioImagePane.setYAxis(yAxis);
         drawController.updateDrawableElement(radioImagePane, true);
     }
 
@@ -645,8 +645,8 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         }
     }
 
-    public RadioYAxis getYAxisElement() {
-        return yAxisElement;
+    public RadioYAxis getYAxis() {
+        return yAxis;
     }
 
     @Override

@@ -77,7 +77,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             yAxis.addValueSpaceListener(this);
         }
         if (yAxis != null) {
-            // drawController.addValueSpace(yAxisElement);
             yAxisMap.put(band, yAxis);
             addToBandsPerYAxis(yAxis, band);
             EVEValues data = retrieveData(band, interval, plotArea);
@@ -92,26 +91,26 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         fireRedrawRequest(true);
     }
 
-    private void addToBandsPerYAxis(YAxis yAxisElement, Band band) {
+    private void addToBandsPerYAxis(YAxis yAxis, Band band) {
         List<Band> bands = new ArrayList<Band>();
-        if (bandsPerYAxis.containsKey(yAxisElement)) {
-            bands = bandsPerYAxis.get(yAxisElement);
+        if (bandsPerYAxis.containsKey(yAxis)) {
+            bands = bandsPerYAxis.get(yAxis);
         }
         bands.add(band);
-        bandsPerYAxis.put(yAxisElement, bands);
+        bandsPerYAxis.put(yAxis, bands);
     }
 
     private void removeFromMap(final Band band) {
-        YAxis yAxisElement = yAxisMap.get(band);
-        if (dataMapPerUnitLabel.containsKey(yAxisElement)) {
-            if (dataMapPerUnitLabel.get(yAxisElement).containsKey(band)) {
-                dataMapPerUnitLabel.get(yAxisElement).remove(band);
-                List<Band> bands = bandsPerYAxis.get(yAxisElement);
+        YAxis yAxis = yAxisMap.get(band);
+        if (dataMapPerUnitLabel.containsKey(yAxis)) {
+            if (dataMapPerUnitLabel.get(yAxis).containsKey(band)) {
+                dataMapPerUnitLabel.get(yAxis).remove(band);
+                List<Band> bands = bandsPerYAxis.get(yAxis);
                 bands.remove(band);
                 if (bands.isEmpty()) {
-                    EVEDrawableElement removed = eveDrawableElementMap.remove(yAxisElement);
+                    EVEDrawableElement removed = eveDrawableElementMap.remove(yAxis);
                     yAxisMap.remove(band);
-                    bandsPerYAxis.remove(yAxisElement);
+                    bandsPerYAxis.remove(yAxis);
                     drawController.removeDrawableElement(removed);
                 }
                 resetAvailableRange();
@@ -124,12 +123,12 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         Interval interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
         EVEValues data = retrieveData(band, interval, plotArea);
-        YAxis yAxisElement = yAxisMap.get(band);
-        if (!dataMapPerUnitLabel.containsKey(yAxisElement)) {
-            dataMapPerUnitLabel.put(yAxisElement, new HashMap<Band, EVEValues>());
+        YAxis yAxis = yAxisMap.get(band);
+        if (!dataMapPerUnitLabel.containsKey(yAxis)) {
+            dataMapPerUnitLabel.put(yAxis, new HashMap<Band, EVEValues>());
         }
-        Range newAvailableRange = new Range(yAxisElement.getAvailableRange());
-        for (EVEValues v : dataMapPerUnitLabel.get(yAxisElement).values()) {
+        Range newAvailableRange = new Range(yAxis.getAvailableRange());
+        for (EVEValues v : dataMapPerUnitLabel.get(yAxis).values()) {
             if (v != null) {
                 newAvailableRange.setMin(v.getMinimumValue());
                 newAvailableRange.setMax(v.getMaximumValue());
@@ -141,15 +140,15 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         double avMax = newAvailableRange.max;
         if (avMin == avMax) {
             if (avMin == 0) {
-                yAxisElement.getAvailableRange().setMin(-1.0);
-                yAxisElement.getAvailableRange().setMax(1.0);
+                yAxis.getAvailableRange().setMin(-1.0);
+                yAxis.getAvailableRange().setMax(1.0);
             } else {
-                yAxisElement.getAvailableRange().setMin(avMin - avMin / 10);
-                yAxisElement.getAvailableRange().setMax(avMax + avMax / 10);
+                yAxis.getAvailableRange().setMin(avMin - avMin / 10);
+                yAxis.getAvailableRange().setMax(avMax + avMax / 10);
             }
         }
-        yAxisElement.setAvailableRange(newAvailableRange);
-        dataMapPerUnitLabel.get(yAxisElement).put(band, data);
+        yAxis.setAvailableRange(newAvailableRange);
+        dataMapPerUnitLabel.get(yAxis).put(band, data);
     }
 
     private void updateBands() {
@@ -166,7 +165,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
 
     private void fireRedrawRequest(final boolean maxRange) {
         for (Map.Entry<YAxis, Map<Band, EVEValues>> entry : dataMapPerUnitLabel.entrySet()) {
-            YAxis yAxisElement = entry.getKey();
+            YAxis yAxis = entry.getKey();
             Map<Band, EVEValues> bandMap = entry.getValue();
 
             final Band[] bands = bandMap.keySet().toArray(new Band[0]);
@@ -178,8 +177,8 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                 isLog = bands[0].getBandType().isLogScale();
             }
 
-            if (!eveDrawableElementMap.containsKey(yAxisElement)) {
-                eveDrawableElementMap.put(yAxisElement, new EVEDrawableElement());
+            if (!eveDrawableElementMap.containsKey(yAxis)) {
+                eveDrawableElementMap.put(yAxis, new EVEDrawableElement());
             }
 
             Range newAvailableRange = new Range();
@@ -191,14 +190,14 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                 newAvailableRange.setMin(newAvailableRange.min - newAvailableRange.min / 10);
                 newAvailableRange.setMax(newAvailableRange.max + newAvailableRange.max / 10);
             }
-            yAxisElement.setAvailableRange(new Range(newAvailableRange));
+            yAxis.setAvailableRange(new Range(newAvailableRange));
             if (maxRange) {
-                yAxisElement.setSelectedRange(new Range(newAvailableRange));
+                yAxis.setSelectedRange(new Range(newAvailableRange));
             }
-            yAxisElement.set(unitLabel, isLog);
+            yAxis.set(unitLabel, isLog);
 
-            EVEDrawableElement eveDrawableElement = eveDrawableElementMap.get(yAxisElement);
-            eveDrawableElement.set(bands, yAxisElement);
+            EVEDrawableElement eveDrawableElement = eveDrawableElementMap.get(yAxis);
+            eveDrawableElement.set(bands, yAxis);
 
             if (bands.length > 0) {
                 drawController.updateDrawableElement(eveDrawableElement, true);
@@ -293,26 +292,26 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     public void changeAxis(Band band) {
-        YAxis currentYAxisElement = yAxisMap.get(band);
-        if (((bandsPerYAxis.size() == 1 && bandsPerYAxis.get(currentYAxisElement).size() > 1) || bandsPerYAxis.size() == 2) && drawController.canChangeAxis(band.getUnitLabel())) {
-            YAxis otherYAxisElement = getOtherAxisElement(currentYAxisElement);
-            if (otherYAxisElement != null) {
-                yAxisMap.put(band, otherYAxisElement);
+        YAxis currentYAxis = yAxisMap.get(band);
+        if (((bandsPerYAxis.size() == 1 && bandsPerYAxis.get(currentYAxis).size() > 1) || bandsPerYAxis.size() == 2) && drawController.canChangeAxis(band.getUnitLabel())) {
+            YAxis otherYAxis = getOtherAxisElement(currentYAxis);
+            if (otherYAxis != null) {
+                yAxisMap.put(band, otherYAxis);
                 List<Band> bandsPerList = new ArrayList<Band>();
-                if (bandsPerYAxis.containsKey(otherYAxisElement)) {
-                    bandsPerList = bandsPerYAxis.get(otherYAxisElement);
+                if (bandsPerYAxis.containsKey(otherYAxis)) {
+                    bandsPerList = bandsPerYAxis.get(otherYAxis);
                 }
                 bandsPerList.add(band);
-                bandsPerYAxis.put(otherYAxisElement, bandsPerList);
-                bandsPerYAxis.get(currentYAxisElement).remove(band);
+                bandsPerYAxis.put(otherYAxis, bandsPerList);
+                bandsPerYAxis.get(currentYAxis).remove(band);
                 Map<Band, EVEValues> valuesPerBand = new HashMap<Band, EVEValues>();
-                if (!dataMapPerUnitLabel.containsKey(otherYAxisElement)) {
-                    dataMapPerUnitLabel.put(otherYAxisElement, valuesPerBand);
+                if (!dataMapPerUnitLabel.containsKey(otherYAxis)) {
+                    dataMapPerUnitLabel.put(otherYAxis, valuesPerBand);
                 }
-                dataMapPerUnitLabel.get(otherYAxisElement).put(band, dataMapPerUnitLabel.get(currentYAxisElement).get(band));
-                dataMapPerUnitLabel.get(currentYAxisElement).remove(band);
-                if (!eveDrawableElementMap.containsKey(otherYAxisElement)) {
-                    eveDrawableElementMap.put(otherYAxisElement, new EVEDrawableElement());
+                dataMapPerUnitLabel.get(otherYAxis).put(band, dataMapPerUnitLabel.get(currentYAxis).get(band));
+                dataMapPerUnitLabel.get(currentYAxis).remove(band);
+                if (!eveDrawableElementMap.containsKey(otherYAxis)) {
+                    eveDrawableElementMap.put(otherYAxis, new EVEDrawableElement());
                 }
                 resetAvailableRange();
                 updateBand(band);
@@ -322,17 +321,17 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     private void resetAvailableRange() {
-        for (YAxis yAxisElement : dataMapPerUnitLabel.keySet()) {
-            yAxisElement.reset();
+        for (YAxis yAxis : dataMapPerUnitLabel.keySet()) {
+            yAxis.reset();
         }
     }
 
-    private YAxis getOtherAxisElement(YAxis currentYAxisElement) {
-        if (drawController.canChangeAxis(currentYAxisElement.getOriginalLabel())) {
-            Set<YAxis> allYAxisElements = bandsPerYAxis.keySet();
-            if (allYAxisElements.size() == 2) {
-                for (YAxis el : allYAxisElements) {
-                    if (!el.equals(currentYAxisElement)) {
+    private YAxis getOtherAxisElement(YAxis currentYAxis) {
+        if (drawController.canChangeAxis(currentYAxis.getOriginalLabel())) {
+            Set<YAxis> allYAxes = bandsPerYAxis.keySet();
+            if (allYAxes.size() == 2) {
+                for (YAxis el : allYAxes) {
+                    if (!el.equals(currentYAxis)) {
                         return el;
                     }
                 }
