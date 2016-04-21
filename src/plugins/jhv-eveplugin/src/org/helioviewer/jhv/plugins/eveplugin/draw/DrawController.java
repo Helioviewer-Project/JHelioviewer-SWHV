@@ -99,6 +99,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return fullValueRange;
     }
 
+    public void useFullValueRange(boolean b) {
+        fullValueRange = b;
+    }
+
     public List<YAxis> getYAxes() {
         return yAxes;
     }
@@ -116,10 +120,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void setSelectedInterval() {
-        setSelectedInterval(selectedAxis.min, selectedAxis.max, false, false);
+        setSelectedInterval(selectedAxis.min, selectedAxis.max);
     }
 
-    public void setSelectedInterval(long newStart, long newEnd, boolean useFullRange, boolean resetAvailable) {
+    public void setSelectedInterval(long newStart, long newEnd) {
         if (newStart <= newEnd) {
             long now = (new Date()).getTime();
             selectedAxis.min = newStart;
@@ -143,10 +147,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                 setAvailableInterval(availableStart, availableEnd);
             }
 
-            if (resetAvailable) {
-                setAvailableInterval(selectedAxis.min, selectedAxis.max);
-            }
-            fullValueRange = useFullRange;
+            fullValueRange = false;
             fireSelectedIntervalChanged();
             fireRedrawRequest();
         } else {
@@ -297,7 +298,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void layerAdded(View view) {
-        setSelectedInterval(Layers.getStartDate().milli, Layers.getEndDate().milli, false, false);
+        setSelectedInterval(Layers.getStartDate().milli, Layers.getEndDate().milli);
     }
 
     @Override
@@ -364,7 +365,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && availableAxis.min <= time && availableAxis.max >= time) {
             latestMovieTime = time;
             long selectedIntervalDiff = selectedAxis.max - selectedAxis.min;
-            setSelectedInterval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)), false, false);
+            setSelectedInterval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)));
         }
     }
 
@@ -431,4 +432,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
         return all;
     }
+
+    public void resetAvailableTime() {
+        setAvailableInterval(selectedAxis.min, selectedAxis.max);
+    }
+
 }
