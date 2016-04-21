@@ -229,10 +229,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    public void addValueSpace(ValueSpace valueSpace) {
-        valueSpaces.add(valueSpace);
-    }
-
     public void removeValueSpace(ValueSpace valueSpace) {
         valueSpaces.remove(valueSpace);
     }
