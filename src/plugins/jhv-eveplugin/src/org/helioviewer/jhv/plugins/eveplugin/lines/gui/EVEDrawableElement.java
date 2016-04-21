@@ -87,7 +87,7 @@ public class EVEDrawableElement implements DrawableElement {
                     }
 
                     long date = values.dates[j];
-                    int x = drawController.selectedAxis.calculateLocation(graphArea.x, graphArea.width, date);
+                    int x = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, date);
                     int y = dY;
                     y -= computeY(yAxisElement.scale(value), ratioY, minValue);
 
@@ -162,7 +162,7 @@ public class EVEDrawableElement implements DrawableElement {
                 Rectangle graphArea = drawController.getGraphArea();
                 double timediff = 0;
                 if (previousX != null)
-                    timediff = drawController.selectedAxis.calculateLocation(graphArea.x, graphArea.width, point.x) - drawController.selectedAxis.calculateLocation(graphArea.x, graphArea.width, previousX);
+                    timediff = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, point.x) - drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, previousX);
                 if (previousX == null || timediff > 2 * TimeUtils.MINUTE_IN_MILLIS) {
                     xPoints.add(new ArrayList<Integer>());
                     yPoints.add(new ArrayList<Integer>());

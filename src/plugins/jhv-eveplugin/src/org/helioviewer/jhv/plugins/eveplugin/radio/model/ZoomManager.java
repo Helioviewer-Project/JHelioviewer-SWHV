@@ -57,9 +57,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
         }
 
         Rectangle plotArea = drawController.getPlotArea();
-        int destX0 = drawController.selectedAxis.calculateLocation(plotArea.x, plotArea.width, startDate);
+        int destX0 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, startDate);
         int destY0 = defineYInDestinationArea(visualStartFrequency, yAxisElement);
-        int destX1 = drawController.selectedAxis.calculateLocation(plotArea.x, plotArea.width, endDate);
+        int destX1 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, endDate);
         int destY1 = defineYInDestinationArea(visualEndFrequency, yAxisElement);
         return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1);
     }
@@ -82,9 +82,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
      */
     public DrawableAreaMap getDrawableAreaMap(long startDate, long endDate) {
         Rectangle plotArea = drawController.getPlotArea();
-        int destX0 = drawController.selectedAxis.calculateLocation(plotArea.x, plotArea.width, startDate);
+        int destX0 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, startDate);
         int destY0 = 0;
-        int destX1 = drawController.selectedAxis.calculateLocation(plotArea.x, plotArea.width, endDate);
+        int destX1 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, endDate);
         int destY1 = plotArea.height;
         return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1);
     }
