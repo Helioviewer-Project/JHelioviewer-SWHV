@@ -224,8 +224,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void resetSelectedValueAndTimeInterval() {
-        for (ValueSpace vs : valueSpaces) {
-            vs.resetScaledSelectedRange();
+        for (YAxisElement yAxis : yAxisSet) {
+            yAxis.resetScaledSelectedRange();
         }
     }
 
