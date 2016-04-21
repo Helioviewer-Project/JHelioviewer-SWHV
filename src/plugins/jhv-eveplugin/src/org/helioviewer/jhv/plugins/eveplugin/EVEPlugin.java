@@ -13,7 +13,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
@@ -33,8 +32,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     public void installPlugin() {
         dc.addTimingListener(EventModel.getSingletonInstance());
 
-        // Create an instance of eveDrawController and leave it here
-        ZoomManager.getSingletonInstance();
         RadioDataManager.getSingletonInstance();
         pluginPanes.add(plotOne);
 
