@@ -16,7 +16,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
 
     private static ZoomManager instance;
     private DrawController drawController;
-    private YAxis yAxisElement;
+    private YAxis yAxis;
     private RadioDataManager radioDataManager;
 
     private ZoomManager() {
@@ -35,11 +35,11 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
         drawController.addTimingListener(this);
         drawController.addGraphDimensionListener(this);
         radioDataManager = RadioDataManager.getSingletonInstance();
-        yAxisElement = radioDataManager.getYAxisElement();
+        yAxis = radioDataManager.getYAxis();
     }
 
     public void addZoomDataConfig(Interval interval) {
-        radioDataManager.getYAxisElement().addValueSpaceListener(this);
+        radioDataManager.getYAxis().addValueSpaceListener(this);
         if (interval != null) {
             requestData();
         }
@@ -59,9 +59,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
 
         Rectangle plotArea = drawController.getPlotArea();
         int destX0 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, startDate);
-        int destY0 = defineYInDestinationArea(visualStartFrequency, yAxisElement);
+        int destY0 = defineYInDestinationArea(visualStartFrequency, yAxis);
         int destX1 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, endDate);
-        int destY1 = defineYInDestinationArea(visualEndFrequency, yAxisElement);
+        int destY1 = defineYInDestinationArea(visualEndFrequency, yAxis);
         return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1);
     }
 
@@ -90,9 +90,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
         return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1);
     }
 
-    private int defineYInDestinationArea(int frequencyToFind, YAxis yAxisElement) {
+    private int defineYInDestinationArea(int frequencyToFind, YAxis _yAxis) {
         Rectangle displaySize = drawController.getPlotArea();
-        return displaySize.height - (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height));
+        return displaySize.height - (int) Math.floor((frequencyToFind - _yAxis.getSelectedRange().min) / (1.0 * (_yAxis.getSelectedRange().max - _yAxis.getSelectedRange().min) / displaySize.height));
     }
 
     private int defineXInSourceArea(long dateToFind, long startDateArea, long endDateArea, Rectangle area) {
@@ -135,9 +135,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
     private void requestData() {
         Rectangle displaySize = drawController.getGraphArea();
         double xRatio = drawController.selectedAxis.getRatio(displaySize.width);
-        double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
+        double yRatio = 1.0 * (yAxis.getSelectedRange().max - yAxis.getSelectedRange().min) / displaySize.getHeight();
         Interval selectedInterval = drawController.getSelectedInterval();
-        radioDataManager.requestData(selectedInterval.start, selectedInterval.end, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
+        radioDataManager.requestData(selectedInterval.start, selectedInterval.end, yAxis.getSelectedRange().min, yAxis.getSelectedRange().max, xRatio, yRatio);
     }
 
 }

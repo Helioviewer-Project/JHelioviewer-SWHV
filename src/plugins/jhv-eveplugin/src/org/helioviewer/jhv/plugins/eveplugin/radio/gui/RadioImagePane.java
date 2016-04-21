@@ -17,7 +17,7 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.PlotConfig;
 
 public class RadioImagePane implements ImageObserver, DrawableElement {
 
-    private YAxis yAxisElement;
+    private YAxis yAxis;
     private boolean intervalTooBig;
 
     public RadioImagePane() {
@@ -63,14 +63,14 @@ public class RadioImagePane implements ImageObserver, DrawableElement {
     }
 
     @Override
-    public void setYAxis(YAxis yAxisElement) {
-        this.yAxisElement = yAxisElement;
+    public void setYAxis(YAxis _yAxis) {
+        yAxis = _yAxis;
 
     }
 
     @Override
     public YAxis getYAxis() {
-        return yAxisElement;
+        return yAxis;
     }
 
     @Override

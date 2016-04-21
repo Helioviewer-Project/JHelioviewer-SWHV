@@ -132,10 +132,10 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     @Override
     public boolean loadButtonPressed() {
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
-        List<YAxis> yAxisElements = EVEPlugin.dc.getYAxes();
+        List<YAxis> yAxes = EVEPlugin.dc.getYAxes();
         boolean downloadOK = false;
-        if (yAxisElements.size() >= 2) {
-            for (YAxis el : yAxisElements) {
+        if (yAxes.size() >= 2) {
+            for (YAxis el : yAxes) {
                 if (el.getOriginalLabel().equals("MHz")) {
                     downloadOK = true;
                     break;
