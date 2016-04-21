@@ -41,6 +41,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private boolean isLocked;
     private long latestMovieTime;
+    private Rectangle graphArea;
+    private Rectangle plotArea;
+    private Rectangle leftAxisArea;
 
     private DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
@@ -169,20 +172,37 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public void setGraphInformation(Rectangle graphSize) {
         this.graphSize = graphSize;
+        createGraphArea();
         fireGraphDimensionsChanged();
         fireRedrawRequest();
     }
 
-    public Rectangle getPlotArea() {
-        return new Rectangle(0, 0, getGraphWidth(), getGraphHeight());
+    private void createGraphArea() {
+
+        int height = graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE);
+
+        int twoYAxis = 0;
+        if (getYAxisElements().size() >= 2) {
+            twoYAxis = 1;
+        }
+        int width = graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + twoYAxis * DrawConstants.TWO_AXIS_GRAPH_RIGHT);
+
+        graphArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, width, height);
+        plotArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, width, height);
+        leftAxisArea = new Rectangle(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE));
+
     }
 
     public Rectangle getGraphArea() {
-        return new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, getGraphWidth(), getGraphHeight());
+        return graphArea;
+    }
+
+    public Rectangle getPlotArea() {
+        return plotArea;
     }
 
     public Rectangle getLeftAxisArea() {
-        return new Rectangle(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, getGraphHeight() - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE));
+        return leftAxisArea;
     }
 
     public boolean hasAxisAvailable() {
@@ -302,6 +322,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if (element.getYAxisElement() != null) {
             if (!yAxisSet.contains(element.getYAxisElement())) {
                 yAxisSet.add(element.getYAxisElement());
+                createGraphArea();
             }
         }
         if (redraw) {
@@ -377,18 +398,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private int getGraphHeight() {
-        return graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE);
-    }
-
-    private int getGraphWidth() {
-        int twoYAxis = 0;
-        if (getYAxisElements().size() >= 2) {
-            twoYAxis = 1;
-        }
-        return graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + twoYAxis * DrawConstants.TWO_AXIS_GRAPH_RIGHT);
-    }
-
     private void createYAxisSet() {
         YAxis[] tempArray = new YAxis[2];
         for (Set<DrawableElement> elementsSet : drawableElements.values()) {
@@ -408,6 +417,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
 
         yAxisSet = newYAxisList;
+        createGraphArea();
     }
 
     private List<YAxis> getAllYAxisElementsForUnit(String unit) {
