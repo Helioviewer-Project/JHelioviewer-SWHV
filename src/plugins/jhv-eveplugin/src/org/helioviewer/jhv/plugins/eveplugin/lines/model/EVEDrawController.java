@@ -111,7 +111,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                     EVEDrawableElement removed = eveDrawableElementMap.remove(yAxisElement);
                     yAxisElementMap.remove(band);
                     bandsPerYAxis.remove(yAxisElement);
-                    drawController.removeValueSpace(yAxisElement);
                     drawController.removeDrawableElement(removed);
                 }
                 resetAvailableRange();
