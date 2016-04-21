@@ -18,7 +18,7 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.RangeListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis.YAxisLocation;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
@@ -31,7 +31,7 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.gui.EVEDrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
-public class EVEDrawController implements TimingListener, EVECacheControllerListener, ValueSpaceListener {
+public class EVEDrawController implements TimingListener, EVECacheControllerListener, RangeListener {
 
     private final Map<YAxis, Map<Band, EVEValues>> dataMapPerUnitLabel = new HashMap<YAxis, Map<Band, EVEValues>>();
     private final DrawController drawController;
@@ -74,7 +74,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         YAxis yAxis = drawController.getYAxisForUnit(band.getUnitLabel());
         if (yAxis == null && drawController.hasAxisAvailable()) {
             yAxis = new YAxis();
-            EVEPlugin.dc.addValueSpaceListener(this);
+            EVEPlugin.dc.addRangeListener(this);
         }
         if (yAxis != null) {
             yAxisMap.put(band, yAxis);
@@ -337,7 +337,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                 }
             }
             YAxis other = new YAxis();
-            EVEPlugin.dc.addValueSpaceListener(this);
+            EVEPlugin.dc.addRangeListener(this);
             return other;
         }
         return null;
@@ -352,7 +352,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     @Override
-    public void valueSpaceChanged() {
+    public void rangeChanged() {
         fireRedrawRequest(false);
     }
 

@@ -42,12 +42,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Rectangle graphArea;
     private Rectangle plotArea;
     private Rectangle leftAxisArea;
-    protected final Set<ValueSpaceListener> rangeListeners;
+    protected final Set<RangeListener> rangeListeners;
 
     public DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
-        rangeListeners = new HashSet<ValueSpaceListener>();
+        rangeListeners = new HashSet<RangeListener>();
         yAxes = new ArrayList<YAxis>();
         tListeners = new ArrayList<TimingListener>();
         gdListeners = new ArrayList<GraphDimensionListener>();
@@ -78,8 +78,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         tListeners.add(listener);
     }
 
-    public void addValueSpaceListener(ValueSpaceListener valueSpaceListener) {
-        rangeListeners.add(valueSpaceListener);
+    public void addRangeListener(RangeListener rangeListener) {
+        rangeListeners.add(rangeListener);
     }
 
     public void updateDrawableElement(DrawableElement drawableElement, boolean needsFire) {
@@ -109,11 +109,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return new Interval(availableAxis.min, availableAxis.max);
     }
 
-    public void setSelectedInterval(boolean useFullValueSpace, boolean resetAvailable) {
-        setSelectedInterval(selectedAxis.min, selectedAxis.max, useFullValueSpace, resetAvailable);
+    public void setSelectedInterval(boolean useFullRange, boolean resetAvailable) {
+        setSelectedInterval(selectedAxis.min, selectedAxis.max, useFullRange, resetAvailable);
     }
 
-    public void setSelectedInterval(long newStart, long newEnd, boolean useFullValueSpace, boolean resetAvailable) {
+    public void setSelectedInterval(long newStart, long newEnd, boolean useFullRange, boolean resetAvailable) {
         if (newStart <= newEnd) {
             long now = (new Date()).getTime();
             selectedAxis.min = newStart;
@@ -140,7 +140,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             if (resetAvailable) {
                 setAvailableInterval(selectedAxis.min, selectedAxis.max);
             }
-            fireSelectedIntervalChanged(useFullValueSpace);
+            fireSelectedIntervalChanged(useFullRange);
             fireRedrawRequest();
         } else {
             Log.debug("Start was after end. Set by: ");
@@ -256,8 +256,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void rangeChanged() {
-        for (ValueSpaceListener vsl : rangeListeners) {
-            vsl.valueSpaceChanged();
+        for (RangeListener rl : rangeListeners) {
+            rl.rangeChanged();
         }
     }
 

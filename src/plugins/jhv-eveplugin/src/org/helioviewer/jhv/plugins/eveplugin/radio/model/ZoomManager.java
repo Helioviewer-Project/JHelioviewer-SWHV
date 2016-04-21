@@ -7,11 +7,11 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.RangeListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
 
-public class ZoomManager implements TimingListener, GraphDimensionListener, ValueSpaceListener {
+public class ZoomManager implements TimingListener, GraphDimensionListener, RangeListener {
 
     private static ZoomManager instance;
     private DrawController drawController;
@@ -38,7 +38,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
     }
 
     public void addZoomDataConfig(Interval interval) {
-        EVEPlugin.dc.addValueSpaceListener(this);
+        EVEPlugin.dc.addRangeListener(this);
         if (interval != null) {
             requestData();
         }
@@ -127,7 +127,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
     }
 
     @Override
-    public void valueSpaceChanged() {
+    public void rangeChanged() {
         requestData();
     }
 
