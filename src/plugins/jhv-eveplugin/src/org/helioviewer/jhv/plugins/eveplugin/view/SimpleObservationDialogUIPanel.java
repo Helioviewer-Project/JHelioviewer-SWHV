@@ -73,7 +73,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     private void updateDrawController() {
         Interval interval = defineInterval(getDate());
-        DrawController.getSingletonInstance().setSelectedInterval(interval, true, false);
+        DrawController.getSingletonInstance().setSelectedInterval(interval.start, interval.end, true, false);
     }
 
     protected Interval defineInterval(Date date) {

@@ -115,20 +115,20 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void setSelectedInterval(boolean useFullValueSpace, boolean resetAvailable) {
-        setSelectedInterval(new Interval(selectedAxis.min, selectedAxis.max), useFullValueSpace, resetAvailable);
+        setSelectedInterval(selectedAxis.min, selectedAxis.max, useFullValueSpace, resetAvailable);
     }
 
-    public void setSelectedInterval(final Interval newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
-        if (newSelectedInterval.start <= newSelectedInterval.end) {
+    public void setSelectedInterval(long newStart, long newEnd, boolean useFullValueSpace, boolean resetAvailable) {
+        if (newStart <= newEnd) {
             long now = (new Date()).getTime();
-            selectedAxis.min = newSelectedInterval.start;
-            selectedAxis.max = newSelectedInterval.end;
-            long intervalLength = newSelectedInterval.end - newSelectedInterval.start;
+            selectedAxis.min = newStart;
+            selectedAxis.max = newEnd;
+            long intervalLength = newEnd - newStart;
             if (intervalLength == 0) {
                 selectedAxis.max = selectedAxis.min + 1000;
                 intervalLength = 1000;
             }
-            if (newSelectedInterval.end > now) {
+            if (newEnd > now) {
                 selectedAxis.min = now - intervalLength;
                 selectedAxis.max = now;
             }
@@ -295,7 +295,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void layerAdded(View view) {
-        setSelectedInterval(new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli), false, false);
+        setSelectedInterval(Layers.getStartDate().milli, Layers.getEndDate().milli, false, false);
     }
 
     @Override
@@ -362,7 +362,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && availableAxis.min <= time && availableAxis.max >= time) {
             latestMovieTime = time;
             long selectedIntervalDiff = selectedAxis.max - selectedAxis.min;
-            setSelectedInterval(new Interval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff))), false, false);
+            setSelectedInterval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)), false, false);
         }
     }
 

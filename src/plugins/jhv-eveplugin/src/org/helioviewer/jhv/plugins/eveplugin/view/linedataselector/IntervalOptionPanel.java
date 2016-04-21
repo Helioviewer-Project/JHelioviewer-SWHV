@@ -211,7 +211,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         default:
             newInterval = selectedInterval;
         }
-        drawController.setSelectedInterval(newInterval, true, true);
+        drawController.setSelectedInterval(newInterval.start, newInterval.end, true, true);
     }
 
     private Interval computeMovieInterval() {
