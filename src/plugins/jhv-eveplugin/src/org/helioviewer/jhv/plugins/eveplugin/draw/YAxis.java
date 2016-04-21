@@ -24,6 +24,9 @@ public class YAxis {
     private YAxisScale scale;
     protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
 
+    private final static float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
+    private final static float UNSCALED_MAX_BOUND = Float.MAX_VALUE;
+
     public YAxis(Range selectedRange, String label, boolean isLogScale) {
         this.selectedRange = selectedRange;
         this.label = label;
@@ -115,13 +118,13 @@ public class YAxis {
         double shift = distanceY * ratioValue;
         double startValue = scaledMin + shift;
         double endValue = scaledMax + shift;
-        if (startValue < scale(Float.MIN_VALUE)) {
+        if (startValue < scale(UNSCALED_MIN_BOUND)) {
             double oldStart = startValue;
-            startValue = scale(Float.MIN_VALUE);
+            startValue = scale(UNSCALED_MIN_BOUND);
             endValue = startValue + (endValue - oldStart);
-        } else if (endValue > scale(Float.MAX_VALUE)) {
+        } else if (endValue > scale(UNSCALED_MAX_BOUND)) {
             double oldEnd = endValue;
-            endValue = Math.log10(Float.MAX_VALUE);
+            endValue = scale(UNSCALED_MAX_BOUND);
             startValue = endValue - (oldEnd - startValue);
         }
         selectedRange.min = invScale(startValue);
@@ -136,8 +139,8 @@ public class YAxis {
         double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
         double newScaledMin = (1 + delta) * scaledMin - delta * scaled;
         double newScaledMax = (1 + delta) * scaledMax - delta * scaled;
-        newScaledMin = Math.max(scale(Float.MIN_VALUE), newScaledMin);
-        newScaledMax = Math.min(scale(Float.MAX_VALUE), newScaledMax);
+        newScaledMin = Math.max(scale(UNSCALED_MIN_BOUND), newScaledMin);
+        newScaledMax = Math.min(scale(UNSCALED_MAX_BOUND), newScaledMax);
 
         if (newScaledMax - newScaledMin > 0.04) {
             selectedRange.min = invScale(newScaledMin);
