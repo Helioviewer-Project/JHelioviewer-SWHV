@@ -18,6 +18,7 @@ import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioImagePane;
@@ -97,7 +98,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     private RadioDataManager() {
         ColorLookupModel.getInstance().addFilterModelListener(this);
         zoomManager = ZoomManager.getSingletonInstance();
-        drawController = DrawController.getSingletonInstance();
+        drawController = EVEPlugin.dc;
         bufferedImages = new HashMap<Long, BufferedImage>();
         yAxisElement = new RadioYAxis();
         yAxisElement.setLabel("MHz");

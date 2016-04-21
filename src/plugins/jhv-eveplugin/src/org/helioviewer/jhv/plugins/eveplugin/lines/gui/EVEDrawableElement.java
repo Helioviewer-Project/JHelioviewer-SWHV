@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
@@ -29,7 +30,7 @@ public class EVEDrawableElement implements DrawableElement {
     private final DrawController drawController;
 
     public EVEDrawableElement() {
-        drawController = DrawController.getSingletonInstance();
+        drawController = EVEPlugin.dc;
         bands = new Band[0];
         yAxis = new YAxis();
         lastMilliWithData = -1;

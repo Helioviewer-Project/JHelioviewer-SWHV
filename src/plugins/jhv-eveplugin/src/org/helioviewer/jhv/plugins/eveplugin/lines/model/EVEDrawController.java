@@ -15,6 +15,7 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
@@ -46,7 +47,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private final LineDataSelectorModel selectorModel;
 
     private EVEDrawController() {
-        drawController = DrawController.getSingletonInstance();
+        drawController = EVEPlugin.dc;
         drawController.addTimingListener(this);
 
         EVECacheController.getSingletonInstance().addControllerListener(this);

@@ -12,7 +12,6 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
-import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
@@ -28,14 +27,14 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
     private final PlotPanel plotOne = new PlotPanel();
     private final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
+    public final static DrawController dc = new DrawController();
 
     @Override
     public void installPlugin() {
-        DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
+        dc.addTimingListener(EventModel.getSingletonInstance());
 
         // Create an instance of eveDrawController and leave it here
         ZoomManager.getSingletonInstance();
-        EVEDrawController.getSingletonInstance();
         RadioDataManager.getSingletonInstance();
         pluginPanes.add(plotOne);
 
@@ -46,8 +45,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
         EventModel.getSingletonInstance().activateEvents();
 
-        Layers.addLayersListener(DrawController.getSingletonInstance());
-        Layers.addTimeListener(DrawController.getSingletonInstance());
+        Layers.addLayersListener(dc);
+        Layers.addTimeListener(dc);
 
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
@@ -72,8 +71,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void uninstallPlugin() {
-        Layers.removeTimeListener(DrawController.getSingletonInstance());
-        Layers.removeLayersListener(DrawController.getSingletonInstance());
+        Layers.removeTimeListener(dc);
+        Layers.removeLayersListener(dc);
 
         ObservationDialog.getInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
         ObservationDialog.getInstance().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());

@@ -16,7 +16,6 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
@@ -29,7 +28,6 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
 
-    private static DrawController instance;
     public TimeAxis selectedAxis;
     public TimeAxis availableAxis;
 
@@ -45,7 +43,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Rectangle plotArea;
     private Rectangle leftAxisArea;
 
-    private DrawController() {
+    public DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
         yAxes = new ArrayList<YAxis>();
@@ -60,15 +58,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         isLocked = false;
         latestMovieTime = Long.MIN_VALUE;
-    }
-
-    public static DrawController getSingletonInstance() {
-        if (instance == null) {
-            instance = new DrawController();
-            JHVRelatedEvents.addHighlightListener(instance);
-            JHVRelatedEvents.addHighlightListener(Displayer.getSingletonInstance());
-        }
-        return instance;
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
