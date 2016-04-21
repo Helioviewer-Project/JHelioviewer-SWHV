@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.NoDataConfig;
@@ -35,7 +36,7 @@ public class RadioImagePane implements ImageObserver, DrawableElement {
     }
 
     @Override
-    public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
+    public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
         Collection<NoDataConfig> noDataConfigs = RadioDataManager.getSingletonInstance().getNoDataConfigurations();
         Collection<PlotConfig> configs = RadioDataManager.getSingletonInstance().getPlotConfigurations();
         if (!intervalTooBig) {

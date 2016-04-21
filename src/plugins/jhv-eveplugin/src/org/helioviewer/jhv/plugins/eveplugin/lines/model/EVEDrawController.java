@@ -279,7 +279,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         selectedIntervalChanged = true;
     }
 
-    public EVEValues getValues(Band band, Interval interval, Rectangle graphArea) {
+    public EVEValues getValues(Band band, Rectangle graphArea) {
         return dataMapPerUnitLabel.get(yAxisMap.get(band)).get(band);
     }
 

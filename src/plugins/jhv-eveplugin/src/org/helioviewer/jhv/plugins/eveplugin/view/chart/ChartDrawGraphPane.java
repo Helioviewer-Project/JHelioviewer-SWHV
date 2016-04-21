@@ -189,7 +189,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             Set<DrawableElement> del = drawableElements.get(dt);
             if (del != null) {
                 for (DrawableElement de : del) {
-                    de.draw(chartg, leftAxisG, plotArea, leftAxisArea, mousePosition);
+                    de.draw(chartg, leftAxisG, plotArea, leftAxisArea, drawController.selectedAxis, mousePosition);
                 }
             }
         }

@@ -7,7 +7,7 @@ import java.awt.Rectangle;
 public interface DrawableElement {
     public abstract DrawableElementType getDrawableElementType();
 
-    public abstract void draw(Graphics2D graphG, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition);
+    public abstract void draw(Graphics2D graphG, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition);
 
     public abstract void setYAxis(YAxis yAxis);
 
