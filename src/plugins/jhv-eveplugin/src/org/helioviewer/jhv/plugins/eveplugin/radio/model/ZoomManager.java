@@ -89,46 +89,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
         return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1);
     }
 
-    /**
-     * Calculates the available space in the screen size for the requested time
-     * interval and frequency interval. The frequency gets the complete height,
-     * the time gets the portion of the width of the screen corresponding with
-     * the portion of the complete time interval it takes.
-     *
-     *
-     * @param startDate
-     *            The start date of the requested time interval
-     * @param endDate
-     *            The end date of the requested time interval
-     * @param startFreq
-     *            The start frequency of the requested frequency interval
-     * @param endFreq
-     *            The end frequency of the requested frequency interval
-     * @param downloadId
-     *            The download id that requests the space
-     * @return A rectangle with the dimensions of the available space for the
-     *         requested intervals
-     * @throws IllegalArgumentException
-     *             If the given start date or end date fall outside the current
-     *             interval or the given start frequency or end frequency fall
-     *             outside the minimum and maximum frequency.
-     */
-    public Rectangle getAvailableSpaceForInterval(long startDate, long endDate, int startFreq, int endFreq) {
-        Interval currentInterval = drawController.getSelectedInterval();
-        double min = yAxisElement.getAvailableRange().min;
-        double max = yAxisElement.getAvailableRange().max;
-
-        if (startFreq >= min && startFreq <= max && endFreq >= min && endFreq <= max && currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate)) {
-            Rectangle displaySize = drawController.getPlotArea();
-            int height = displaySize.height;
-            double ratio = displaySize.getWidth() / (currentInterval.end - currentInterval.start);
-            int width = (int) Math.round((endDate - startDate) * ratio);
-            return new Rectangle(width, height);
-        } else {
-            return new Rectangle(0, 0);
-        }
-    }
-
     private int defineYInDestinationArea(int frequencyToFind, YAxisElement yAxisElement) {
         Rectangle displaySize = drawController.getPlotArea();
         return displaySize.height - (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height));
@@ -174,7 +134,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
     private void requestData() {
         Rectangle displaySize = drawController.getGraphArea();
         double xRatio = drawController.selectedAxis.getRatio(displaySize.width);
-        double yRatio = (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
+        double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
         Interval selectedInterval = drawController.getSelectedInterval();
         radioDataManager.requestData(selectedInterval.start, selectedInterval.end, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
     }
