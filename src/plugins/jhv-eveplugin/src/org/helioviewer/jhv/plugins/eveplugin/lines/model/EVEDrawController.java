@@ -127,27 +127,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         if (!dataMapPerUnitLabel.containsKey(yAxis)) {
             dataMapPerUnitLabel.put(yAxis, new HashMap<Band, EVEValues>());
         }
-        Range newAvailableRange = new Range(yAxis.getAvailableRange());
-        for (EVEValues v : dataMapPerUnitLabel.get(yAxis).values()) {
-            if (v != null) {
-                newAvailableRange.setMin(v.getMinimumValue());
-                newAvailableRange.setMax(v.getMaximumValue());
-            }
-        }
-        newAvailableRange.setMin(data.getMinimumValue());
-        newAvailableRange.setMax(data.getMaximumValue());
-        double avMin = newAvailableRange.min;
-        double avMax = newAvailableRange.max;
-        if (avMin == avMax) {
-            if (avMin == 0) {
-                yAxis.getAvailableRange().setMin(-1.0);
-                yAxis.getAvailableRange().setMax(1.0);
-            } else {
-                yAxis.getAvailableRange().setMin(avMin - avMin / 10);
-                yAxis.getAvailableRange().setMax(avMax + avMax / 10);
-            }
-        }
-        yAxis.setAvailableRange(newAvailableRange);
         dataMapPerUnitLabel.get(yAxis).put(band, data);
     }
 
@@ -190,7 +169,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                 newAvailableRange.setMin(newAvailableRange.min - newAvailableRange.min / 10);
                 newAvailableRange.setMax(newAvailableRange.max + newAvailableRange.max / 10);
             }
-            yAxis.setAvailableRange(new Range(newAvailableRange));
             if (maxRange) {
                 yAxis.setSelectedRange(new Range(newAvailableRange));
             }
