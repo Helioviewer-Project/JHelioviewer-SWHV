@@ -125,8 +125,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             selectedAxis.max = newEnd;
             long intervalLength = newEnd - newStart;
             if (intervalLength == 0) {
-                selectedAxis.max = selectedAxis.min + 1000;
-                intervalLength = 1000;
+                selectedAxis.max = selectedAxis.min + TimeUtils.MINUTE_IN_MILLIS;
+                intervalLength = TimeUtils.MINUTE_IN_MILLIS;
             }
             if (newEnd > now) {
                 selectedAxis.min = now - intervalLength;
