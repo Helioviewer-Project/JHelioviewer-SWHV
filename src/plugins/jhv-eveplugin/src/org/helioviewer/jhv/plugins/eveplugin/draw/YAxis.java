@@ -8,7 +8,7 @@ import org.helioviewer.jhv.base.Range;
  * @author Bram.Bourgoignie@oma.be
  */
 
-public class YAxisElement extends AbstractValueSpace {
+public class YAxis extends AbstractValueSpace {
 
     public enum YAxisLocation {
         LEFT, RIGHT;
@@ -42,7 +42,7 @@ public class YAxisElement extends AbstractValueSpace {
      * @param color
      *            The color of this this y-axis element
      */
-    public YAxisElement(Range selectedRange, Range availableRange, String label, boolean isLogScale, long activationTime) {
+    public YAxis(Range selectedRange, Range availableRange, String label, boolean isLogScale, long activationTime) {
         this.selectedRange = selectedRange;
         this.availableRange = availableRange;
         this.label = label;
@@ -55,7 +55,7 @@ public class YAxisElement extends AbstractValueSpace {
      * color.
      *
      */
-    public YAxisElement() {
+    public YAxis() {
         selectedRange = new Range();
         availableRange = new Range();
         label = "";

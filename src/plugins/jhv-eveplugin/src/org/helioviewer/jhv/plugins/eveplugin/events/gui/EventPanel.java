@@ -20,7 +20,7 @@ import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventPlotConfiguration;
 
@@ -112,11 +112,11 @@ public class EventPanel implements DrawableElement {
     }
 
     @Override
-    public void setYAxisElement(YAxisElement yAxisElement) {
+    public void setYAxisElement(YAxis yAxisElement) {
     }
 
     @Override
-    public YAxisElement getYAxisElement() {
+    public YAxis getYAxisElement() {
         return null;
     }
 

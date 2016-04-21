@@ -8,14 +8,14 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
 
 public class ZoomManager implements TimingListener, GraphDimensionListener, ValueSpaceListener {
 
     private static ZoomManager instance;
     private DrawController drawController;
-    private YAxisElement yAxisElement;
+    private YAxis yAxisElement;
     private RadioDataManager radioDataManager;
 
     private ZoomManager() {
@@ -89,7 +89,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
         return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1);
     }
 
-    private int defineYInDestinationArea(int frequencyToFind, YAxisElement yAxisElement) {
+    private int defineYInDestinationArea(int frequencyToFind, YAxis yAxisElement) {
         Rectangle displaySize = drawController.getPlotArea();
         return displaySize.height - (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height));
     }

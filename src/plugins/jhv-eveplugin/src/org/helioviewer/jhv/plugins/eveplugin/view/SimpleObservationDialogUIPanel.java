@@ -24,7 +24,7 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -132,10 +132,10 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     @Override
     public boolean loadButtonPressed() {
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
-        List<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
+        List<YAxis> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
         boolean downloadOK = false;
         if (yAxisElements.size() >= 2) {
-            for (YAxisElement el : yAxisElements) {
+            for (YAxis el : yAxisElements) {
                 if (el.getOriginalLabel().equals("MHz")) {
                     downloadOK = true;
                     break;
