@@ -76,7 +76,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             yAxisElement.addValueSpaceListener(this);
         }
         if (yAxisElement != null) {
-            drawController.addValueSpace(yAxisElement);
+            // drawController.addValueSpace(yAxisElement);
             yAxisElementMap.put(band, yAxisElement);
             addToBandsPerYAxis(yAxisElement, band);
             EVEValues data = retrieveData(band, interval, plotArea);
@@ -297,7 +297,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         if (((bandsPerYAxis.size() == 1 && bandsPerYAxis.get(currentYAxisElement).size() > 1) || bandsPerYAxis.size() == 2) && drawController.canChangeAxis(band.getUnitLabel())) {
             YAxisElement otherYAxisElement = getOtherAxisElement(currentYAxisElement);
             if (otherYAxisElement != null) {
-                drawController.addValueSpace(otherYAxisElement);
                 yAxisElementMap.put(band, otherYAxisElement);
                 List<Band> bandsPerList = new ArrayList<Band>();
                 if (bandsPerYAxis.containsKey(otherYAxisElement)) {
