@@ -13,10 +13,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
  */
 public class RadioYAxis extends YAxis {
 
-    public RadioYAxis() {
-        super();
-    }
-
     /**
      * Creates a radio y-axis element based on the given selected range,
      * available range, label, minimum value, maximum value, a color and a plot
@@ -29,18 +25,8 @@ public class RadioYAxis extends YAxis {
      * @param label
      *            The label corresponding with the radio y-axis element
      */
-    public RadioYAxis(Range selectedRange, Range availableRange, String label, long activationTime) {
-        super(selectedRange, label, false, activationTime);
-    }
-
-    @Override
-    public double getMinValue() {
-        return selectedRange.max;
-    }
-
-    @Override
-    public double getMaxValue() {
-        return selectedRange.min;
+    public RadioYAxis(String label, boolean isLogScale) {
+        super(new Range(), label, isLogScale);
     }
 
     @Override

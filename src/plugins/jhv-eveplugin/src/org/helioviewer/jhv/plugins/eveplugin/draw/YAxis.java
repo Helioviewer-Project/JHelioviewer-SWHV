@@ -24,7 +24,7 @@ public class YAxis {
     private YAxisScale scale;
     protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
 
-    public YAxis(Range selectedRange, String label, boolean isLogScale, long activationTime) {
+    public YAxis(Range selectedRange, String label, boolean isLogScale) {
         this.selectedRange = selectedRange;
         this.label = label;
         setIsLogScale(isLogScale);
@@ -66,16 +66,16 @@ public class YAxis {
         return selectedRange.min;
     }
 
+    public double getMaxValue() {
+        return selectedRange.max;
+    }
+
     public double getScaledMinValue() {
         return scale(selectedRange.min);
     }
 
     public double getScaledMaxValue() {
         return scale(selectedRange.max);
-    }
-
-    public double getMaxValue() {
-        return selectedRange.max;
     }
 
     public void set(String label, boolean isLogScale) {
@@ -115,11 +115,11 @@ public class YAxis {
         double shift = distanceY * ratioValue;
         double startValue = scaledMin + shift;
         double endValue = scaledMax + shift;
-        if (startValue < Math.log10(Float.MIN_VALUE)) {
+        if (startValue < scale(Float.MIN_VALUE)) {
             double oldStart = startValue;
-            startValue = Math.log10(Float.MIN_VALUE);
+            startValue = scale(Float.MIN_VALUE);
             endValue = startValue + (endValue - oldStart);
-        } else if (endValue > Math.log10(Float.MAX_VALUE)) {
+        } else if (endValue > scale(Float.MAX_VALUE)) {
             double oldEnd = endValue;
             endValue = Math.log10(Float.MAX_VALUE);
             startValue = endValue - (oldEnd - startValue);
@@ -136,8 +136,8 @@ public class YAxis {
         double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
         double newScaledMin = (1 + delta) * scaledMin - delta * scaled;
         double newScaledMax = (1 + delta) * scaledMax - delta * scaled;
-        newScaledMin = Math.max(Math.log10(Float.MIN_VALUE), newScaledMin);
-        newScaledMax = Math.min(Math.log10(Float.MAX_VALUE), newScaledMax);
+        newScaledMin = Math.max(scale(Float.MIN_VALUE), newScaledMin);
+        newScaledMax = Math.min(scale(Float.MAX_VALUE), newScaledMax);
 
         if (newScaledMax - newScaledMin > 0.04) {
             selectedRange.min = invScale(newScaledMin);
