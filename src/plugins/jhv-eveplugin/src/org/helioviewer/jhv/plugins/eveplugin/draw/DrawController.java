@@ -43,6 +43,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Rectangle plotArea;
     private Rectangle leftAxisArea;
     protected final Set<RangeListener> rangeListeners;
+    private boolean fullValueRange;
 
     public DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
@@ -60,6 +61,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         isLocked = false;
         latestMovieTime = Long.MIN_VALUE;
+        fullValueRange = false;
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
@@ -91,6 +93,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public void removeDrawableElement(DrawableElement element) {
         removeDrawableElement(element, true, false);
+    }
+
+    public boolean isFullValueRange() {
+        return fullValueRange;
     }
 
     public List<YAxis> getYAxes() {
@@ -140,7 +146,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             if (resetAvailable) {
                 setAvailableInterval(selectedAxis.min, selectedAxis.max);
             }
-            fireSelectedIntervalChanged(useFullRange);
+            fullValueRange = useFullRange;
+            fireSelectedIntervalChanged();
             fireRedrawRequest();
         } else {
             Log.debug("Start was after end. Set by: ");
@@ -374,9 +381,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return new Interval(new_start, new_end);
     }
 
-    private void fireSelectedIntervalChanged(boolean keepFullValueRange) {
+    private void fireSelectedIntervalChanged() {
         for (TimingListener listener : tListeners) {
-            listener.selectedIntervalChanged(keepFullValueRange);
+            listener.selectedIntervalChanged();
         }
     }
 

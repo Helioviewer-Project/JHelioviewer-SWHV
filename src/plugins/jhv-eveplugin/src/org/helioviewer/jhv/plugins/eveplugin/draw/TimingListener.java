@@ -4,6 +4,6 @@ public interface TimingListener {
 
     public void availableIntervalChanged();
 
-    public void selectedIntervalChanged(boolean keepFullValueRange);
+    public void selectedIntervalChanged();
 
 }

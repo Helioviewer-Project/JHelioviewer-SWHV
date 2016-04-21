@@ -173,7 +173,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     @Override
-    public void selectedIntervalChanged(boolean keepFullValueRange) {
+    public void selectedIntervalChanged() {
         Interval newInterval = EVEPlugin.dc.getSelectedInterval();
         if (newInterval.equals(selectedIntervalByZoombox)) {
             selectedIndexSetByProgram = true;
