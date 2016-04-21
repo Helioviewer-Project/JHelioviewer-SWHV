@@ -137,7 +137,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         // final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
 
-        List<YAxis> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
+        List<YAxis> yAxisElements = DrawController.getSingletonInstance().getYAxes();
         if (yAxisElements.size() >= 2) {
             boolean present = false;
             for (YAxis el : yAxisElements) {

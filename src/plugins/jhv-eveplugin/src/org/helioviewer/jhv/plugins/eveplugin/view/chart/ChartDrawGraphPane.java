@@ -206,7 +206,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawLabels(final Graphics2D g) {
-        List<YAxis> yAxisElements = drawController.getYAxisElements();
+        List<YAxis> yAxisElements = drawController.getYAxes();
         Interval interval = drawController.getSelectedInterval();
         int counter = 0;
 
@@ -361,7 +361,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Interval interval = drawController.getSelectedInterval();
         ratioX = graphArea.width / (double) (interval.end - interval.start);
         yRatios = new HashMap<YAxis, Double>();
-        for (YAxis yAxisElement : drawController.getYAxisElements()) {
+        for (YAxis yAxisElement : drawController.getYAxes()) {
             double minValue = yAxisElement.getScaledMinValue();
             double maxValue = yAxisElement.getScaledMaxValue();
 
@@ -468,7 +468,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void mouseHelper(double distanceY) {
-        List<YAxis> yAxes = drawController.getYAxisElements();
+        List<YAxis> yAxes = drawController.getYAxes();
         for (YAxis yAxis : yAxes) {
             yAxis.shiftDownPixels(distanceY, graphArea.height);
         }
@@ -547,7 +547,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     // Graph Polyline
 
     private void setTwoAxisInformation() {
-        if (drawController.getYAxisElements().size() >= 2) {
+        if (drawController.getYAxes().size() >= 2) {
             twoYAxis = 1;
         } else {
             twoYAxis = 0;
@@ -585,7 +585,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
             double zoomTimeFactor = 10;
-            List<YAxis> yAxisElements = drawController.getYAxisElements();
+            List<YAxis> yAxisElements = drawController.getYAxes();
             final int mouseX = e.getX();
             final int mouseY = e.getY();
             boolean inGraphArea = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
