@@ -27,7 +27,7 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModelListene
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.DrawableAreaMap;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.PlotConfig;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioYAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioYAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomDataConfigListener;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
@@ -79,7 +79,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     private final DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
-    private final RadioYAxisElement yAxisElement;
+    private final RadioYAxis yAxisElement;
     private final RadioImagePane radioImagePane;
     private Map<Long, PlotConfig> plotConfigList;
     /** Map containing per download id a list of no data configurations */
@@ -99,7 +99,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         zoomManager = ZoomManager.getSingletonInstance();
         drawController = DrawController.getSingletonInstance();
         bufferedImages = new HashMap<Long, BufferedImage>();
-        yAxisElement = new RadioYAxisElement();
+        yAxisElement = new RadioYAxis();
         yAxisElement.setLabel("MHz");
         yAxisElement.setIsLogScale(false);
         radioImagePane = new RadioImagePane();
@@ -644,7 +644,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         }
     }
 
-    public RadioYAxisElement getYAxisElement() {
+    public RadioYAxis getYAxisElement() {
         return yAxisElement;
     }
 

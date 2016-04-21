@@ -11,9 +11,9 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
  * @author Bram.Bourgoignie@oma.be
  *
  */
-public class RadioYAxisElement extends YAxis {
+public class RadioYAxis extends YAxis {
 
-    public RadioYAxisElement() {
+    public RadioYAxis() {
         super();
     }
 
@@ -29,7 +29,7 @@ public class RadioYAxisElement extends YAxis {
      * @param label
      *            The label corresponding with the radio y-axis element
      */
-    public RadioYAxisElement(Range selectedRange, Range availableRange, String label, long activationTime) {
+    public RadioYAxis(Range selectedRange, Range availableRange, String label, long activationTime) {
         super(selectedRange, availableRange, label, false, activationTime);
     }
 
