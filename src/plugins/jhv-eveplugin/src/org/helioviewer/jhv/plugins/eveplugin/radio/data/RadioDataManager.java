@@ -570,7 +570,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     private void downloadRequestAnswered(Interval timeInterval) {
         zoomManager.addZoomDataConfig(timeInterval);
-        drawController.addValueSpace(yAxisElement);
     }
 
     private void intervalTooBig() {
