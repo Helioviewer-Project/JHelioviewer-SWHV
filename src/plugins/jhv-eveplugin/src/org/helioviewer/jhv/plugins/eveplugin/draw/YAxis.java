@@ -1,5 +1,8 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.helioviewer.jhv.base.Range;
 
 /**
@@ -8,7 +11,7 @@ import org.helioviewer.jhv.base.Range;
  * @author Bram.Bourgoignie@oma.be
  */
 
-public class YAxis extends AbstractValueSpace {
+public class YAxis {
 
     public enum YAxisLocation {
         LEFT, RIGHT;
@@ -24,6 +27,7 @@ public class YAxis extends AbstractValueSpace {
     private YAxisLocation location;
     private YAxisScale scale;
     protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
+    protected final Set<ValueSpaceListener> listeners;
 
     /**
      * Creates a Y-axis element with a selected value range, an available value
@@ -47,6 +51,7 @@ public class YAxis extends AbstractValueSpace {
         this.availableRange = availableRange;
         this.label = label;
         setIsLogScale(isLogScale);
+        listeners = new HashSet<ValueSpaceListener>();
     }
 
     /**
@@ -60,6 +65,7 @@ public class YAxis extends AbstractValueSpace {
         availableRange = new Range();
         label = "";
         setIsLogScale(true);
+        listeners = new HashSet<ValueSpaceListener>();
     }
 
     /**
@@ -67,7 +73,6 @@ public class YAxis extends AbstractValueSpace {
      *
      * @return The selected range
      */
-    @Override
     public Range getSelectedRange() {
         return selectedRange;
     }
@@ -78,7 +83,6 @@ public class YAxis extends AbstractValueSpace {
      * @param selectedRange
      *            The selected range
      */
-    @Override
     public void setSelectedRange(Range selectedRange) {
         this.selectedRange = selectedRange;
         fireSelectedRangeChanged();
@@ -89,7 +93,6 @@ public class YAxis extends AbstractValueSpace {
      *
      * @return The available range
      */
-    @Override
     public Range getAvailableRange() {
         return availableRange;
     }
@@ -212,7 +215,6 @@ public class YAxis extends AbstractValueSpace {
         selectedRange = new Range();
     }
 
-    @Override
     public void shiftDownPixels(double distanceY, int height) {
         double scaledMin = scale(selectedRange.min);
         double scaledMax = scale(selectedRange.max);
@@ -235,7 +237,6 @@ public class YAxis extends AbstractValueSpace {
         fireSelectedRangeChanged();
     }
 
-    @Override
     public void zoomSelectedRange(double scrollValue, double relativeY, double height) {
         double scaledMin = scale(selectedRange.min);
         double scaledMax = scale(selectedRange.max);
@@ -254,12 +255,10 @@ public class YAxis extends AbstractValueSpace {
         }
     }
 
-    @Override
     public double scale(double maxValue) {
         return scale.scale(maxValue);
     }
 
-    @Override
     public double invScale(double maxValue) {
         return scale.invScale(maxValue);
     }
@@ -270,6 +269,15 @@ public class YAxis extends AbstractValueSpace {
         public abstract double invScale(double val);
 
         public abstract String getLabel();
+    }
+
+    public void resetScaledSelectedRange() {
+        Range availableRange = getAvailableRange();
+        setSelectedRange(new Range(availableRange));
+    }
+
+    public void addValueSpaceListener(ValueSpaceListener valueSpaceListener) {
+        listeners.add(valueSpaceListener);
     }
 
     private static class YAxisLogScale implements YAxisScale {
