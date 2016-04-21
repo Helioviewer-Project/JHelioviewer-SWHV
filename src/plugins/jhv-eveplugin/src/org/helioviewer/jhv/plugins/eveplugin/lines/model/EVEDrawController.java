@@ -201,12 +201,11 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             eveDrawableElement.set(bands, yAxisElement);
 
             if (bands.length > 0) {
-                drawController.updateDrawableElement(eveDrawableElement, false);
+                drawController.updateDrawableElement(eveDrawableElement, true);
             } else {
                 drawController.removeDrawableElement(eveDrawableElement);
             }
         }
-        drawController.fireRedrawRequest();
     }
 
     private final EVEValues retrieveData(final Band band, final Interval interval, Rectangle plotArea) {
