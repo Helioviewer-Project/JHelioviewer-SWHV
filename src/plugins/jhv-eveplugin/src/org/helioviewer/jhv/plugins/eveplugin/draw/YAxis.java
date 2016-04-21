@@ -22,7 +22,7 @@ public class YAxis extends AbstractValueSpace {
     private String label;
 
     private YAxisLocation location;
-    private YAxisElementScale scale;
+    private YAxisScale scale;
     protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
 
     /**
@@ -187,9 +187,9 @@ public class YAxis extends AbstractValueSpace {
 
     public void setIsLogScale(boolean isLogScale) {
         if (isLogScale) {
-            scale = new YAxisElementLogScale(label);
+            scale = new YAxisLogScale(label);
         } else {
-            scale = new YAxisElementIdentityScale(label);
+            scale = new YAxisIdentityScale(label);
         }
     }
 
@@ -264,7 +264,7 @@ public class YAxis extends AbstractValueSpace {
         return scale.invScale(maxValue);
     }
 
-    private static interface YAxisElementScale {
+    private static interface YAxisScale {
         public abstract double scale(double val);
 
         public abstract double invScale(double val);
@@ -272,11 +272,11 @@ public class YAxis extends AbstractValueSpace {
         public abstract String getLabel();
     }
 
-    private static class YAxisElementLogScale implements YAxisElementScale {
+    private static class YAxisLogScale implements YAxisScale {
 
         private final String label;
 
-        public YAxisElementLogScale(String _label) {
+        public YAxisLogScale(String _label) {
             label = "log(" + _label.replace("^2", "\u00B2") + ")";
         }
 
@@ -296,11 +296,11 @@ public class YAxis extends AbstractValueSpace {
         }
     }
 
-    private static class YAxisElementIdentityScale implements YAxisElementScale {
+    private static class YAxisIdentityScale implements YAxisScale {
 
         private final String label;
 
-        public YAxisElementIdentityScale(String _label) {
+        public YAxisIdentityScale(String _label) {
             label = _label.replace("^2", "\u00B2");
         }
 

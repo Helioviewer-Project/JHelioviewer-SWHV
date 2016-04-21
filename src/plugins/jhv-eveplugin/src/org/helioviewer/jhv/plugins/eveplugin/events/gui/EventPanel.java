@@ -112,7 +112,7 @@ public class EventPanel implements DrawableElement {
     }
 
     @Override
-    public void setYAxis(YAxis yAxisElement) {
+    public void setYAxis(YAxis yAxis) {
     }
 
     @Override
