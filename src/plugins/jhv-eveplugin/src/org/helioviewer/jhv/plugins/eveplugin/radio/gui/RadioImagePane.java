@@ -63,13 +63,13 @@ public class RadioImagePane implements ImageObserver, DrawableElement {
     }
 
     @Override
-    public void setYAxisElement(YAxis yAxisElement) {
+    public void setYAxis(YAxis yAxisElement) {
         this.yAxisElement = yAxisElement;
 
     }
 
     @Override
-    public YAxis getYAxisElement() {
+    public YAxis getYAxis() {
         return yAxisElement;
     }
 

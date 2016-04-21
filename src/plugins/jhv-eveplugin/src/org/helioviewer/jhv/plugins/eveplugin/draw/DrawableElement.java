@@ -9,9 +9,9 @@ public interface DrawableElement {
 
     public abstract void draw(Graphics2D graphG, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition);
 
-    public abstract void setYAxisElement(YAxis yAxisElement);
+    public abstract void setYAxis(YAxis yAxis);
 
-    public abstract YAxis getYAxisElement();
+    public abstract YAxis getYAxis();
 
     public abstract boolean hasElementsToDraw();
 

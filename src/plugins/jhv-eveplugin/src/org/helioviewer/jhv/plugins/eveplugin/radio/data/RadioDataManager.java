@@ -103,7 +103,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         yAxisElement.setLabel("MHz");
         yAxisElement.setIsLogScale(false);
         radioImagePane = new RadioImagePane();
-        radioImagePane.setYAxisElement(yAxisElement);
+        radioImagePane.setYAxis(yAxisElement);
         plotConfigList = new HashMap<Long, PlotConfig>();
         noDataConfigList = new ArrayList<NoDataConfig>();
         isVisible = true;
@@ -590,7 +590,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     }
 
     private void fireDrawNewBufferedImage() {
-        radioImagePane.setYAxisElement(yAxisElement);
+        radioImagePane.setYAxis(yAxisElement);
         drawController.updateDrawableElement(radioImagePane, true);
     }
 
