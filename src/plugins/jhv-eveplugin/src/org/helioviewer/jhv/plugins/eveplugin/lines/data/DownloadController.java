@@ -54,7 +54,7 @@ public class DownloadController implements TimingListener {
         return singletonInstance;
     }
 
-    public void updateBands(final Interval interval, final Interval priorityInterval) {
+    private void updateBands(final Interval interval, final Interval priorityInterval) {
         Set<Band> bands = EVEDrawController.getSingletonInstance().getAllBands();
         for (Band b : bands) {
             updateBand(b, interval, priorityInterval);
@@ -159,13 +159,10 @@ public class DownloadController implements TimingListener {
         final Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
 
         DownloadController.getSingletonInstance().updateBands(downloadInterval, drawController.getSelectedInterval());
-
     }
 
     @Override
     public void selectedIntervalChanged(boolean keepFullValueRange) {
-        // TODO Auto-generated method stub
-
     }
 
     private void fireDownloadStarted(final Band band) {

@@ -30,7 +30,7 @@ public class TimeAxis {
 
     public void zoom(int x0, int w, int x, double factor) {
         double multiplier = (max - min) * factor / w;
-        final double ratio = (x - x0) / (double) w;
+        double ratio = (x - x0) / (double) w;
         min = (long) (min - multiplier * ratio);
         max = (long) (max + multiplier * (1. - ratio));
     }
