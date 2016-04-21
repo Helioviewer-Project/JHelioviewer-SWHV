@@ -109,8 +109,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return new Interval(availableAxis.min, availableAxis.max);
     }
 
-    public void setSelectedInterval(boolean useFullRange, boolean resetAvailable) {
-        setSelectedInterval(selectedAxis.min, selectedAxis.max, useFullRange, resetAvailable);
+    public void setSelectedInterval() {
+        setSelectedInterval(selectedAxis.min, selectedAxis.max, false, false);
     }
 
     public void setSelectedInterval(long newStart, long newEnd, boolean useFullRange, boolean resetAvailable) {

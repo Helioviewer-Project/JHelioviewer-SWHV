@@ -460,7 +460,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawController.selectedAxis.move(graphArea.x, graphArea.width, distanceX);
 
             double distanceY = p.y - mousePressedPosition.y;
-            drawController.setSelectedInterval(false, false);
+            drawController.setSelectedInterval();
             mouseHelper(distanceY);
         }
 
@@ -490,7 +490,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             double distanceX = mousePressedPosition.x - p.x;
             double distanceY = p.y - mousePressedPosition.y;
             drawController.selectedAxis.move(graphArea.x, graphArea.width, distanceX);
-            drawController.setSelectedInterval(false, false);
+            drawController.setSelectedInterval();
             mouseHelper(distanceY);
         }
         mousePressedPosition = p;
@@ -595,10 +595,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             if (inGraphArea || inXAxisOrAboveGraph) {
                 if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
                     drawController.selectedAxis.zoom(graphArea.x, graphArea.width, mouseX, zoomTimeFactor * scrollDistance);
-                    drawController.setSelectedInterval(false, false);
+                    drawController.setSelectedInterval();
                 } else if (e.isShiftDown()) {
                     drawController.selectedAxis.move(graphArea.x, graphArea.width, zoomTimeFactor * scrollDistance);
-                    drawController.setSelectedInterval(false, false);
+                    drawController.setSelectedInterval();
                 }
             }
             if (inGraphArea || inYAxis) {
