@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
@@ -87,7 +87,7 @@ public class EVEDrawableElement implements DrawableElement {
                     }
 
                     long date = values.dates[j];
-                    int x = drawController.selectedAxis.calculateLocation(date, graphArea.width, graphArea.x);
+                    int x = drawController.selectedAxis.calculateLocation(graphArea.x, graphArea.width, date);
                     int y = dY;
                     y -= computeY(yAxisElement.scale(value), ratioY, minValue);
 
@@ -159,13 +159,11 @@ public class EVEDrawableElement implements DrawableElement {
             int index = 0;
             while (index < len) {
                 Point point = points.get(index);
-                /*
-                 * if (previousX != null) { if ((point.x - previousX) != 0) { //
-                 * Log.debug("distance between previous and folowing x : " // +
-                 * ((point.x - previousX) / ratioX)); } }
-                 */
-                double ratioX = drawController.selectedAxis.getRatio(drawController.getGraphArea().width);
-                if (previousX == null || (point.x - previousX) / ratioX > Math.max(1 / ratioX, 120000)) {
+                Rectangle graphArea = drawController.getGraphArea();
+                double timediff = 0;
+                if (previousX != null)
+                    timediff = drawController.selectedAxis.calculateLocation(graphArea.x, graphArea.width, point.x) - drawController.selectedAxis.calculateLocation(graphArea.x, graphArea.width, previousX);
+                if (previousX == null || timediff > 2 * TimeUtils.MINUTE_IN_MILLIS) {
                     xPoints.add(new ArrayList<Integer>());
                     yPoints.add(new ArrayList<Integer>());
                     counter++;
