@@ -191,7 +191,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
             drawController.removeDrawableElement(radioImagePane);
             lineDataSelectorModel.removeLineData(this);
             radioImages = null;
-            drawController.resetSelectedValueAndTimeInterval();
         }
     }
 
@@ -376,7 +375,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                 maxFrequencyInterval = new FrequencyInterval(0, 0);
             }
         }
-        yAxis.setAvailableRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
+        yAxis.setSelectedRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
     }
 
     private FrequencyInterval defineDataFrequencyInterval(FrequencyInterval freqInterval, Rectangle providedRegion, int resolutionHeight) {

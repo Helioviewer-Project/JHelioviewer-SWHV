@@ -212,13 +212,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int counter = 0;
 
         for (YAxis yAxis : yAxes) {
-            if (!(yAxis.getAvailableRange().max == Double.MIN_VALUE && yAxis.getAvailableRange().min == Double.MAX_VALUE)) {
-                drawVerticalLabels(g, yAxis, counter == 0 ? 0 : 1);
-                if (counter > 1) {
-                    break;
-                }
-                counter++;
+            drawVerticalLabels(g, yAxis, counter == 0 ? 0 : 1);
+            if (counter > 1) {
+                break;
             }
+            counter++;
         }
 
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(interval.start)), g);

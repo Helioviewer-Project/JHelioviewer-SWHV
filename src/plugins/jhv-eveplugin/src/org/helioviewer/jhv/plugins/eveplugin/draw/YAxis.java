@@ -17,8 +17,6 @@ public class YAxis {
 
     /** The current selected range */
     protected Range selectedRange;
-    /** The current available range */
-    protected Range availableRange;
     /** The label of the y-axis */
     private String label;
 
@@ -26,39 +24,14 @@ public class YAxis {
     private YAxisScale scale;
     protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
 
-    /**
-     * Creates a Y-axis element with a selected value range, an available value
-     * range, a label, a minimum value, a maximum value and a color.
-     *
-     * @param selectedRange
-     *            The current selected value range
-     * @param availableRange
-     *            The current available value range
-     * @param label
-     *            The label of the y axis element
-     * @param minValue
-     *            The minimum value of this y-axis element
-     * @param maxValue
-     *            The maximum value of this y-axis element
-     * @param color
-     *            The color of this this y-axis element
-     */
-    public YAxis(Range selectedRange, Range availableRange, String label, boolean isLogScale, long activationTime) {
+    public YAxis(Range selectedRange, String label, boolean isLogScale, long activationTime) {
         this.selectedRange = selectedRange;
-        this.availableRange = availableRange;
         this.label = label;
         setIsLogScale(isLogScale);
     }
 
-    /**
-     * Creates a default Y-axis element with a selected range (0,0), available
-     * range (0,0), empty label, minimum and maximum value of 0.0 and a black
-     * color.
-     *
-     */
     public YAxis() {
         selectedRange = new Range();
-        availableRange = new Range();
         label = "";
         setIsLogScale(true);
     }
@@ -72,60 +45,10 @@ public class YAxis {
         return selectedRange;
     }
 
-    /**
-     * Sets the selected range.
-     *
-     * @param selectedRange
-     *            The selected range
-     */
     public void setSelectedRange(Range selectedRange) {
         this.selectedRange = selectedRange;
         fireSelectedRangeChanged();
     }
-
-    /**
-     * Gets the available range.
-     *
-     * @return The available range
-     */
-    public Range getAvailableRange() {
-        return availableRange;
-    }
-
-    /**
-     * Sets the available range.
-     *
-     * @param availableRange
-     *            The available range
-     */
-    public void setAvailableRange(Range newAvailableRange) {
-        Range dummyRange = new Range();
-        if (availableRange.min != dummyRange.min && availableRange.max != dummyRange.max) {
-            if (availableRange.min != newAvailableRange.min || availableRange.max != newAvailableRange.max) {
-                availableRange.setMax(newAvailableRange.max);
-                availableRange.setMin(newAvailableRange.min);
-                availableRange.setMax(selectedRange.max);
-                availableRange.setMin(selectedRange.min);
-                checkSelectedRange();
-            }
-        } else {
-            availableRange.setMax(newAvailableRange.max);
-            availableRange.setMin(newAvailableRange.min);
-            selectedRange = new Range(newAvailableRange);
-        }
-    }
-
-    private void checkSelectedRange() {
-        if (selectedRange.min < availableRange.min || selectedRange.max > availableRange.max || selectedRange.min > selectedRange.max) {
-            selectedRange = new Range(availableRange);
-        }
-    }
-
-    /**
-     * Gets the label.
-     *
-     * @return The label
-     */
 
     public String getLabel() {
         return scale.getLabel();
@@ -135,21 +58,10 @@ public class YAxis {
         return label;
     }
 
-    /**
-     * Sets the label.
-     *
-     * @param label
-     *            The label
-     */
     public void setLabel(String label) {
         this.label = label;
     }
 
-    /**
-     * Gets the minimum value.
-     *
-     * @return The minimum value
-     */
     public double getMinValue() {
         return selectedRange.min;
     }
@@ -162,22 +74,10 @@ public class YAxis {
         return scale(selectedRange.max);
     }
 
-    /**
-     * Gets the maximum value.
-     *
-     * @return The maximum value
-     */
     public double getMaxValue() {
         return selectedRange.max;
     }
 
-    /**
-     * Sets the available range, selected range, label minimum value, maximum
-     * value and color of the y-axis element.
-     *
-     * @param label
-     *            The label
-     */
     public void set(String label, boolean isLogScale) {
         this.label = label;
         setIsLogScale(isLogScale);
@@ -204,7 +104,6 @@ public class YAxis {
     }
 
     public void reset() {
-        availableRange = new Range();
         selectedRange = new Range();
     }
 
@@ -239,8 +138,7 @@ public class YAxis {
         double newScaledMax = (1 + delta) * scaledMax - delta * scaled;
         newScaledMin = Math.max(Math.log10(Float.MIN_VALUE), newScaledMin);
         newScaledMax = Math.min(Math.log10(Float.MAX_VALUE), newScaledMax);
-        // newScaledMin = Math.max(scale(availableRange.min), newScaledMin);
-        // newScaledMax = Math.min(scale(availableRange.max), newScaledMax);
+
         if (newScaledMax - newScaledMin > 0.04) {
             selectedRange.min = invScale(newScaledMin);
             selectedRange.max = invScale(newScaledMax);
@@ -262,11 +160,6 @@ public class YAxis {
         public abstract double invScale(double val);
 
         public abstract String getLabel();
-    }
-
-    public void resetScaledSelectedRange() {
-        Range availableRange = getAvailableRange();
-        setSelectedRange(new Range(availableRange));
     }
 
     private static class YAxisLogScale implements YAxisScale {

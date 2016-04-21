@@ -236,12 +236,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return YAxisLocation.LEFT;
     }
 
-    public void resetSelectedValueAndTimeInterval() {
-        for (YAxis yAxis : yAxes) {
-            yAxis.resetScaledSelectedRange();
-        }
-    }
-
     public boolean isLocked() {
         return isLocked;
     }

@@ -30,7 +30,7 @@ public class RadioYAxis extends YAxis {
      *            The label corresponding with the radio y-axis element
      */
     public RadioYAxis(Range selectedRange, Range availableRange, String label, long activationTime) {
-        super(selectedRange, availableRange, label, false, activationTime);
+        super(selectedRange, label, false, activationTime);
     }
 
     @Override
@@ -45,20 +45,7 @@ public class RadioYAxis extends YAxis {
 
     @Override
     public void setSelectedRange(Range newScaledSelectedRange) {
-        double diffScaledAvailable = availableRange.max - availableRange.min;
-        double diffAvail = availableRange.max - availableRange.min;
-
-        double ratio = diffAvail / diffScaledAvailable;
-
-        double diffScSelStartScAvaiStart = newScaledSelectedRange.min - availableRange.min;
-        double diffscSelEndScAvailStart = newScaledSelectedRange.max - availableRange.min;
-
-        double selectedEnd = availableRange.max - diffScSelStartScAvaiStart * ratio;
-        double selectedStart = availableRange.max - diffscSelEndScAvailStart * ratio;
-
-        selectedRange = new Range(selectedStart, selectedEnd);
-
-        selectedRange = new Range(newScaledSelectedRange);
+        selectedRange = newScaledSelectedRange;
         fireSelectedRangeChanged();
     }
 
@@ -85,8 +72,6 @@ public class RadioYAxis extends YAxis {
         double newScaledMin = ((1 + delta) * scaledMin - delta * scaled);
         double newScaledMax = ((1 + delta) * scaledMax - delta * scaled);
 
-        newScaledMin = Math.max(scale(availableRange.min), newScaledMin);
-        newScaledMax = Math.min(scale(availableRange.max), newScaledMax);
         selectedRange.min = invScale(newScaledMin);
         selectedRange.max = invScale(newScaledMax);
         fireSelectedRangeChanged();
