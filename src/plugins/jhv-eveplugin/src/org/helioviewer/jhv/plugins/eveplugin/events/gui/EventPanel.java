@@ -76,8 +76,8 @@ public class EventPanel implements DrawableElement {
                     int eventPosition = i;
                     nrLines = endDates.size();
 
-                    int x0 = drawController.selectedAxis.calculateLocation(graphArea.x, graphArea.width, event.getStart());
-                    int x1 = drawController.selectedAxis.calculateLocation(graphArea.x, graphArea.width, event.getEnd());
+                    int x0 = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
+                    int x1 = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
                     JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition, event.isHighlighted());
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);

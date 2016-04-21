@@ -14,8 +14,12 @@ public class TimeAxis {
         return size / (max - min);
     }
 
-    public int calculateLocation(int x0, int w, long val) {
+    public int value2pixel(int x0, int w, long val) {
         return (int) ((double) w * (val - min) / (max - min) + x0);
+    }
+
+    public long pixel2value(int x0, int w, int x) {
+        return (long) (min + (max - min) * (x - x0) / (double) w);
     }
 
     public void move(int x0, int w, double pixelDistance) {
