@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -359,11 +360,11 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private void moveSelectedInterval(final Point newMousePosition) {
         if (mousePressed != null) {
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
-            final double intervalWidthPixel = rightIntervalBorderPosition - leftIntervalBorderPosition;
+            final int intervalWidthPixel = rightIntervalBorderPosition - leftIntervalBorderPosition;
             if (mousePressed.x > newMousePosition.x) {
-                drawController.selectedAxis.move(-diffPixel / intervalWidthPixel);
+                drawController.selectedAxis.move(0, intervalWidthPixel, -diffPixel);
             } else {
-                drawController.selectedAxis.move(diffPixel / intervalWidthPixel);
+                drawController.selectedAxis.move(0, intervalWidthPixel, diffPixel);
             }
             drawController.setSelectedInterval(false, false);
             mousePressed = newMousePosition;
@@ -403,7 +404,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
         double middle = leftIntervalBorderPosition + 0.5 * intervalWidthPixel;
         double distance = point.getX() - middle;
-        drawController.selectedAxis.move(distance);
+        Rectangle graphArea = drawController.getGraphArea();
+        drawController.selectedAxis.move(graphArea.x, graphArea.width, distance);
         drawController.setSelectedInterval(false, false);
     }
 

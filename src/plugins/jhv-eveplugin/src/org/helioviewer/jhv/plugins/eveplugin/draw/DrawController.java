@@ -30,8 +30,9 @@ import org.helioviewer.jhv.viewmodel.view.View;
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
 
     private static DrawController instance;
-    public Axis selectedAxis;
-    public Axis availableAxis;
+    public TimeAxis selectedAxis;
+    public TimeAxis availableAxis;
+
     private final List<TimingListener> tListeners;
     private final List<GraphDimensionListener> gdListeners;
     private final List<DrawControllerListener> listeners;
@@ -51,8 +52,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         graphSize = new Rectangle();
 
         long d = System.currentTimeMillis();
-        availableAxis = new Axis(d - TimeUtils.DAY_IN_MILLIS, d);
-        selectedAxis = new Axis(availableAxis.min, availableAxis.max);
+        availableAxis = new TimeAxis(d - TimeUtils.DAY_IN_MILLIS, d);
+        selectedAxis = new TimeAxis(availableAxis.min, availableAxis.max);
 
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         valueSpaces = new HashSet<ValueSpace>();
@@ -109,42 +110,39 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public final Interval getAvailableInterval() {
-        return new Interval((long) availableAxis.min, (long) availableAxis.max);
+        return new Interval(availableAxis.min, availableAxis.max);
     }
 
     public void setSelectedInterval(boolean useFullValueSpace, boolean resetAvailable) {
-        setSelectedInterval(new Interval((long) selectedAxis.min, (long) selectedAxis.max), useFullValueSpace, resetAvailable);
+        setSelectedInterval(new Interval(selectedAxis.min, selectedAxis.max), useFullValueSpace, resetAvailable);
     }
 
-    public void setSelectedInterval(final Interval _newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
-        if (_newSelectedInterval.start <= _newSelectedInterval.end) {
+    public void setSelectedInterval(final Interval newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
+        if (newSelectedInterval.start <= newSelectedInterval.end) {
             long now = (new Date()).getTime();
-            Interval newSelectedInterval = _newSelectedInterval;
-            if (newSelectedInterval.end > now) {
-                long intervalLength = _newSelectedInterval.end - _newSelectedInterval.start;
-                newSelectedInterval = new Interval(now - intervalLength, now);
+            selectedAxis.min = newSelectedInterval.start;
+            selectedAxis.max = newSelectedInterval.end;
+            long intervalLength = newSelectedInterval.end - newSelectedInterval.start;
+            if (intervalLength == 0) {
+                selectedAxis.max = selectedAxis.min + 1000;
+                intervalLength = 1000;
             }
-            long start = newSelectedInterval.start;
-            long end = newSelectedInterval.end;
+            if (newSelectedInterval.end > now) {
+                selectedAxis.min = now - intervalLength;
+                selectedAxis.max = now;
+            }
 
-            long availableStart = (long) availableAxis.min;
-            long availableEnd = (long) availableAxis.max;
+            long availableStart = availableAxis.min;
+            long availableEnd = availableAxis.max;
 
-            if (!(availableAxis.min <= start && availableAxis.max >= start) || !(availableAxis.min <= end && availableAxis.max >= end)) {
-                availableStart = Math.min(start, availableStart);
-                availableEnd = Math.max(end, availableEnd);
+            if ((selectedAxis.min <= availableAxis.min || selectedAxis.max >= availableAxis.max)) {
+                availableStart = Math.min(selectedAxis.min, availableStart);
+                availableEnd = Math.max(selectedAxis.max, availableEnd);
                 setAvailableInterval(availableStart, availableEnd);
             }
 
-            if (start == end) {
-                selectedAxis.min = availableStart;
-                selectedAxis.max = availableEnd;
-            } else {
-                selectedAxis.min = start;
-                selectedAxis.max = end;
-            }
             if (resetAvailable) {
-                setAvailableInterval((long) selectedAxis.min, (long) selectedAxis.max);
+                setAvailableInterval(selectedAxis.min, selectedAxis.max);
             }
             fireSelectedIntervalChanged(useFullValueSpace);
             fireRedrawRequest();
@@ -155,7 +153,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public Interval getSelectedInterval() {
-        return new Interval((long) selectedAxis.min, (long) selectedAxis.max);
+        return new Interval(selectedAxis.min, selectedAxis.max);
     }
 
     public long getLastDateWithData() {
