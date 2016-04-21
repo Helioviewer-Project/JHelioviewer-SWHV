@@ -21,6 +21,9 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.RangeListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioImagePane;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioOptionsPanel;
@@ -30,8 +33,6 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.DrawableAreaMap;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.PlotConfig;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomDataConfigListener;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -52,7 +53,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.Resolution
  * @author Bram.Bourgoignie@oma.be
  *
  */
-public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfigListener, LineDataSelectorElement {
+public class RadioDataManager implements ColorLookupModelListener, LineDataSelectorElement, TimingListener, GraphDimensionListener, RangeListener {
 
     /** The singleton instance of the class. */
     private static RadioDataManager instance;
@@ -68,9 +69,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     /** Instance of the radio image cache */
     private RadioImageCache cache;
-
-    /** Instance of the zoom manager */
-    private ZoomManager zoomManager;
 
     /** Instance of eve state */
     private EVEState eveState;
@@ -97,8 +95,10 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      */
     private RadioDataManager() {
         ColorLookupModel.getInstance().addFilterModelListener(this);
-        zoomManager = ZoomManager.getSingletonInstance();
         drawController = EVEPlugin.dc;
+        drawController.addGraphDimensionListener(instance);
+        drawController.addGraphDimensionListener(instance);
+        drawController.addTimingListener(instance);
         bufferedImages = new HashMap<Long, BufferedImage>();
         yAxis = new YAxis(new Range(), "Mhz", false);
         radioImagePane = new RadioImagePane();
@@ -126,7 +126,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
         cache = RadioImageCache.getInstance();
         requestBuffer = new RequestForDataBuffer();
-        zoomManager = ZoomManager.getSingletonInstance();
         eveState = EVEState.getSingletonInstance();
         requestForDataBusy = false;
         downloader = RadioDownloader.getSingletonInstance();
@@ -153,7 +152,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                     BufferedImage newImage = createBufferedImage(dataSize.width, dataSize.height, byteData);
                     bufferedImages.put(imageID, newImage);
                     radioImagePane.setIntervalTooBig(false);
-                    DrawableAreaMap dam = zoomManager.getDrawableAreaMap(image.getVisibleImageTimeInterval().start, image.getVisibleImageTimeInterval().end, dataFrequencyInterval.getStart(), dataFrequencyInterval.getEnd(), image.getFreqInterval().getStart(), image.getFreqInterval().getEnd(), dataSize);
+                    DrawableAreaMap dam = getDrawableAreaMap(image.getVisibleImageTimeInterval().start, image.getVisibleImageTimeInterval().end, dataFrequencyInterval.getStart(), dataFrequencyInterval.getEnd(), image.getFreqInterval().getStart(), image.getFreqInterval().getEnd(), dataSize);
                     PlotConfig pc = new PlotConfig(newImage, dam, isVisible, imageID);
                     plotConfigList.put(imageID, pc);
                     fireDrawNewBufferedImage();
@@ -185,7 +184,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
             }
             noDataConfigList = new ArrayList<NoDataConfig>();
             plotConfigList = new HashMap<Long, PlotConfig>();
-            zoomManager.removeZoomManagerDataConfig();
             drawController.removeDrawableElement(radioImagePane);
             lineDataSelectorModel.removeLineData(this);
             radioImages = null;
@@ -327,7 +325,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging() && noDataList.size() > 0) {
             radioImagePane.setIntervalTooBig(false);
             for (Interval noData : noDataList) {
-                DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.start, noData.end);
+                DrawableAreaMap dam = getDrawableAreaMap(noData.start, noData.end);
                 noDataConfigList.add(new NoDataConfig(noData, dam, isVisible));
             }
             fireDrawNewBufferedImage();
@@ -336,6 +334,33 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     public void removeSpectrograms() {
         removeRadioData();
+    }
+
+    @Override
+    public void availableIntervalChanged() {
+    }
+
+    @Override
+    public void selectedIntervalChanged() {
+        requestData();
+    }
+
+    @Override
+    public void graphDimensionChanged() {
+        requestData();
+    }
+
+    @Override
+    public void rangeChanged() {
+        requestData();
+    }
+
+    private void requestData() {
+        Rectangle displaySize = drawController.getGraphArea();
+        double xRatio = drawController.selectedAxis.getRatio(displaySize.width);
+        double yRatio = 1.0 * (yAxis.getSelectedRange().max - yAxis.getSelectedRange().min) / displaySize.getHeight();
+        Interval selectedInterval = drawController.getSelectedInterval();
+        requestData(selectedInterval.start, selectedInterval.end, yAxis.getSelectedRange().min, yAxis.getSelectedRange().max, xRatio, yRatio);
     }
 
     /**
@@ -566,7 +591,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     }
 
     private void downloadRequestAnswered(Interval timeInterval) {
-        zoomManager.addZoomDataConfig(timeInterval);
+        requestData();
     }
 
     private void intervalTooBig() {
@@ -575,12 +600,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         drawController.updateDrawableElement(radioImagePane, true);
     }
 
-    /*
-     * ZoomDataConfigListener
-     */
-
-    @Override
-    public void requestData(long xStart, long xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
+    private void requestData(long xStart, long xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
         if (radioImages != null && isVisible) {
             requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio);
             updateNoDataConfig();
@@ -609,7 +629,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     private void updateNoDataConfig() {
         for (NoDataConfig ndc : noDataConfigList) {
-            DrawableAreaMap dam = zoomManager.getDrawableAreaMap(ndc.getDateInterval().start, ndc.getDateInterval().end);
+            DrawableAreaMap dam = getDrawableAreaMap(ndc.getDateInterval().start, ndc.getDateInterval().end);
             ndc.setDrawableAreaMap(dam);
         }
         fireDrawNewBufferedImage();
@@ -692,4 +712,45 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     public boolean isDeletable() {
         return true;
     }
+
+    private DrawableAreaMap getDrawableAreaMap(long startDate, long endDate, int visualStartFrequency, int visualEndFrequency, int imageStartFrequency, int imageEndFrequency, Rectangle area) {
+        int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
+        int sourceY0 = 0;
+        int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
+        int sourceY1 = area.height;
+        if (sourceY0 == sourceY1) {
+            sourceY1 = sourceY0 + 1;
+        }
+        if (sourceX0 == sourceX1) {
+            sourceX1 = sourceX0 + 1;
+        }
+
+        Rectangle plotArea = drawController.getPlotArea();
+        int destX0 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, startDate);
+        int destY0 = defineYInDestinationArea(visualStartFrequency, yAxis);
+        int destX1 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, endDate);
+        int destY1 = defineYInDestinationArea(visualEndFrequency, yAxis);
+        return new DrawableAreaMap(sourceX0, sourceY0, sourceX1, sourceY1, destX0, destY0, destX1, destY1);
+    }
+
+    public DrawableAreaMap getDrawableAreaMap(long startDate, long endDate) {
+        Rectangle plotArea = drawController.getPlotArea();
+        int destX0 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, startDate);
+        int destY0 = 0;
+        int destX1 = drawController.selectedAxis.value2pixel(plotArea.x, plotArea.width, endDate);
+        int destY1 = plotArea.height;
+        return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1);
+    }
+
+    private int defineYInDestinationArea(int frequencyToFind, YAxis _yAxis) {
+        Rectangle displaySize = drawController.getPlotArea();
+        return displaySize.height - (int) Math.floor((frequencyToFind - _yAxis.getSelectedRange().min) / (1.0 * (_yAxis.getSelectedRange().max - _yAxis.getSelectedRange().min) / displaySize.height));
+    }
+
+    private int defineXInSourceArea(long dateToFind, long startDateArea, long endDateArea, Rectangle area) {
+        long timediff = dateToFind - startDateArea;
+        long timeOfArea = endDateArea - startDateArea;
+        return (int) Math.floor(timediff / (1.0 * (timeOfArea) / area.width));
+    }
+
 }
