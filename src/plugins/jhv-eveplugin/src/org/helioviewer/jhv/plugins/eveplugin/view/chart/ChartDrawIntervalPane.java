@@ -367,7 +367,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
             } else {
                 drawController.selectedAxis.move(0, intervalWidthPixel, diffPixel);
             }
-            drawController.setSelectedInterval(false, false);
+            drawController.setSelectedInterval();
             mousePressed = newMousePosition;
         }
     }
@@ -396,7 +396,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         double distance = point.getX() - middle;
         Rectangle graphArea = drawController.getGraphArea();
         drawController.selectedAxis.move(graphArea.x, graphArea.width, distance);
-        drawController.setSelectedInterval(false, false);
+        drawController.setSelectedInterval();
     }
 
     @Override
