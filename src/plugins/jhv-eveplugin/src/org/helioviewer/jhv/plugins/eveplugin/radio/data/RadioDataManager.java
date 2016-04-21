@@ -184,7 +184,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                 cache.remove(imageID);
                 bufferedImages.remove(imageID);
             }
-            drawController.removeValueSpace(yAxisElement);
             noDataConfigList = new ArrayList<NoDataConfig>();
             plotConfigList = new HashMap<Long, PlotConfig>();
             zoomManager.removeZoomManagerDataConfig();
