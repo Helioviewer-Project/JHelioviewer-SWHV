@@ -21,6 +21,7 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
@@ -43,7 +44,7 @@ public class DownloadController implements TimingListener {
     private final LineDataSelectorModel selectorModel;
     public static final ExecutorService downloadPool = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("EVE Download"), new ThreadPoolExecutor.AbortPolicy());
 
-    private final DrawController drawController = DrawController.getSingletonInstance();
+    private final DrawController drawController = EVEPlugin.dc;
 
     private DownloadController() {
         selectorModel = LineDataSelectorModel.getSingletonInstance();

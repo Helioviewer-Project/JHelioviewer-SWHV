@@ -24,6 +24,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
@@ -52,7 +53,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         addMouseListener(this);
         addMouseMotionListener(this);
         Layers.addLayersListener(this);
-        drawController = DrawController.getSingletonInstance();
+        drawController = EVEPlugin.dc;
         drawController.addTimingListener(this);
         eveState = EVEState.getSingletonInstance();
     }
@@ -71,8 +72,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         g.setFont(DrawConstants.font);
         drawBackground(g);
 
-        Interval availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
-        Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        Interval availableInterval = drawController.getAvailableInterval();
+        Interval selectedInterval = drawController.getSelectedInterval();
 
         computeIntervalBorderPositions(availableInterval, selectedInterval);
         drawIntervalBackground(g);

@@ -17,6 +17,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -35,7 +36,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     };
 
     public IntervalOptionPanel() {
-        drawController = DrawController.getSingletonInstance();
+        drawController = EVEPlugin.dc;
         drawController.addTimingListener(this);
 
         zoomComboBox = new JComboBox(new DefaultComboBoxModel());
@@ -173,7 +174,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
 
     @Override
     public void selectedIntervalChanged(boolean keepFullValueRange) {
-        Interval newInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        Interval newInterval = EVEPlugin.dc.getSelectedInterval();
         if (newInterval.equals(selectedIntervalByZoombox)) {
             selectedIndexSetByProgram = true;
             zoomComboBox.setSelectedIndex(0);
@@ -232,7 +233,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         Interval availableInterval = drawController.getAvailableInterval();
         long endDate = interval.end;
         long now = System.currentTimeMillis();
-        final long lastdataDate = DrawController.getSingletonInstance().getLastDateWithData();
+        final long lastdataDate = EVEPlugin.dc.getLastDateWithData();
         if (lastdataDate != -1) {
             if (endDate > lastdataDate) {
                 endDate = lastdataDate;

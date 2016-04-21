@@ -23,7 +23,7 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -73,7 +73,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     private void updateDrawController() {
         Interval interval = defineInterval(getDate());
-        DrawController.getSingletonInstance().setSelectedInterval(interval.start, interval.end, true, false);
+        EVEPlugin.dc.setSelectedInterval(interval.start, interval.end, true, false);
     }
 
     protected Interval defineInterval(Date date) {
@@ -120,7 +120,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     private void startRadioDownload() {
-        Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        Interval selectedInterval = EVEPlugin.dc.getSelectedInterval();
         Calendar end = Calendar.getInstance();
         end.setTime(new Date(selectedInterval.end));
         end.set(Calendar.HOUR_OF_DAY, 23);
@@ -132,7 +132,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     @Override
     public boolean loadButtonPressed() {
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
-        List<YAxis> yAxisElements = DrawController.getSingletonInstance().getYAxes();
+        List<YAxis> yAxisElements = EVEPlugin.dc.getYAxes();
         boolean downloadOK = false;
         if (yAxisElements.size() >= 2) {
             for (YAxis el : yAxisElements) {

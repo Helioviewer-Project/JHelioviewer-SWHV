@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandGroup;
@@ -130,14 +130,14 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     private void updateDrawController() {
         Interval interval = defineInterval(getDate());
-        DrawController.getSingletonInstance().setSelectedInterval(interval.start, interval.end, true, false);
+        EVEPlugin.dc.setSelectedInterval(interval.start, interval.end, true, false);
     }
 
     private boolean updateBandController() {
         // final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
 
-        List<YAxis> yAxisElements = DrawController.getSingletonInstance().getYAxes();
+        List<YAxis> yAxisElements = EVEPlugin.dc.getYAxes();
         if (yAxisElements.size() >= 2) {
             boolean present = false;
             for (YAxis el : yAxisElements) {

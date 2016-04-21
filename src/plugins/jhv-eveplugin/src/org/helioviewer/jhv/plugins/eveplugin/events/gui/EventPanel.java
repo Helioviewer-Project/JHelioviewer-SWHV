@@ -17,6 +17,7 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
@@ -27,7 +28,7 @@ import org.helioviewer.jhv.plugins.eveplugin.events.model.EventPlotConfiguration
 public class EventPanel implements DrawableElement {
 
     private static final float dash1[] = { 10f };
-    private final DrawController drawController = DrawController.getSingletonInstance();
+    private final DrawController drawController = EVEPlugin.dc;
 
     @Override
     public DrawableElementType getDrawableElementType() {

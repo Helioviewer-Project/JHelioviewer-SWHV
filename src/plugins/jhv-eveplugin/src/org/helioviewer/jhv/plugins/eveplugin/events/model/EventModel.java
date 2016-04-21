@@ -12,7 +12,7 @@ import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventPanel;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventsSelectorElement;
@@ -55,7 +55,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
 
     @Override
     public void availableIntervalChanged() {
-        Interval availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
+        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
         eventContainer.requestForInterval(availableInterval.start, availableInterval.end, EventModel.this);
     }
 
@@ -67,7 +67,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
         this.events = events;
         if (EventModel.getSingletonInstance().isEventsVisible()) {
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, true);
+            EVEPlugin.dc.updateDrawableElement(eventPanel, true);
         } else {
             Log.debug("event plot configurations not visible");
         }
@@ -84,7 +84,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
     public void setEventsVisible(boolean visible) {
         if (eventsVisible != visible) {
             eventsVisible = visible;
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, true);
+            EVEPlugin.dc.updateDrawableElement(eventPanel, true);
             LineDataSelectorModel.getSingletonInstance().lineDataElementUpdated(eventSelectorElement);
         }
     }
@@ -93,7 +93,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
         if (eventsActivated) {
             eventsVisible = false;
             eventsActivated = false;
-            DrawController.getSingletonInstance().removeDrawableElement(eventPanel);
+            EVEPlugin.dc.removeDrawableElement(eventPanel);
         }
     }
 
@@ -101,7 +101,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
         if (!eventsActivated) {
             eventsVisible = true;
             eventsActivated = true;
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel, true);
+            EVEPlugin.dc.updateDrawableElement(eventPanel, true);
         }
     }
 
@@ -119,9 +119,9 @@ public class EventModel implements TimingListener, JHVEventHandler {
 
     @Override
     public void cacheUpdated() {
-        Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        Interval selectedInterval = EVEPlugin.dc.getSelectedInterval();
         eventContainer.requestForInterval(selectedInterval.start, selectedInterval.end, this);
-        DrawController.getSingletonInstance().updateDrawableElement(eventPanel, true);
+        EVEPlugin.dc.updateDrawableElement(eventPanel, true);
     }
 
     public JHVRelatedEvents getEventUnderMouse() {

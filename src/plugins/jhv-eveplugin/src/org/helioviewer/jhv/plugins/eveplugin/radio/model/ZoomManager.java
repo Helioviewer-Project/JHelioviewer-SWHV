@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 
 import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
@@ -30,7 +31,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
     }
 
     private void init() {
-        drawController = DrawController.getSingletonInstance();
+        drawController = EVEPlugin.dc;
         drawController.addTimingListener(this);
         drawController.addGraphDimensionListener(this);
         radioDataManager = RadioDataManager.getSingletonInstance();

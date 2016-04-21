@@ -43,6 +43,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
@@ -81,7 +82,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     public ChartDrawGraphPane() {
         updateRequestReceived = false;
-        drawController = DrawController.getSingletonInstance();
+        drawController = EVEPlugin.dc;
         initVisualComponents();
         addMouseListener(this);
         addMouseMotionListener(this);
