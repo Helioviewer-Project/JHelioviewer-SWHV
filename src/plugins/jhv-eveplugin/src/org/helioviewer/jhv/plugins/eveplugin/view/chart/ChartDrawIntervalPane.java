@@ -27,12 +27,12 @@ import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 // Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
-public class ChartDrawIntervalPane extends JComponent implements TimingListener, MouseInputListener, LayersListener {
+public class ChartDrawIntervalPane extends JComponent implements DrawControllerListener, MouseInputListener, LayersListener {
 
     private Interval movieInterval;
 
@@ -54,7 +54,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         addMouseMotionListener(this);
         Layers.addLayersListener(this);
         drawController = EVEPlugin.dc;
-        drawController.addTimingListener(this);
+        drawController.addDrawControllerListener(this);
         eveState = EVEState.getSingletonInstance();
     }
 
@@ -372,17 +372,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    // Zoom Controller Listener
-
-    @Override
-    public void availableIntervalChanged() {
-    }
-
-    @Override
-    public void selectedIntervalChanged(boolean keepFullValueRange) {
-        repaint();
-    }
-
     // Mouse Listener
 
     @Override
@@ -492,6 +481,17 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             movieInterval = new Interval(view.getFirstTime().milli, view.getLastTime().milli);
             repaint();
         }
+    }
+
+    @Override
+    public void drawRequest() {
+        repaint();
+
+    }
+
+    @Override
+    public void drawMovieLineRequest(long time) {
+        repaint();
     }
 
 }
