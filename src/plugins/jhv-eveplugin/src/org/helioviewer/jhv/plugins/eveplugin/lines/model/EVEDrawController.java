@@ -17,8 +17,8 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.RangeListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis.YAxisLocation;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
@@ -136,10 +136,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                 updateBand(band);
             }
         }
-    }
-
-    public void setSelectedRangeMaximal() {
-        fireRedrawRequest(true);
     }
 
     private void fireRedrawRequest(final boolean maxRange) {
