@@ -456,9 +456,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
             double distanceX = mousePressedPosition.x - p.x;
             drawController.selectedAxis.move(graphArea.x, graphArea.width, distanceX);
+            drawController.setSelectedInterval();
 
             double distanceY = p.y - mousePressedPosition.y;
-            drawController.setSelectedInterval();
             mouseHelper(distanceY);
         }
 
