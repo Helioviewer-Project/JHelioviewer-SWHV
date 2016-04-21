@@ -121,7 +121,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
     public void cacheUpdated() {
         Interval selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         eventContainer.requestForInterval(selectedInterval.start, selectedInterval.end, this);
-        DrawController.getSingletonInstance().fireRedrawRequest();
+        DrawController.getSingletonInstance().updateDrawableElement(eventPanel, true);
     }
 
     public JHVRelatedEvents getEventUnderMouse() {
