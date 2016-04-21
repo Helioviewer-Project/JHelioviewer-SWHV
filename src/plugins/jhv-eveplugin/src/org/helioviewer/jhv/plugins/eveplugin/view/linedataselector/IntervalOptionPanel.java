@@ -18,7 +18,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -29,15 +28,13 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     private final JToggleButton periodFromLayersButton;
     private boolean selectedIndexSetByProgram;
     private Interval selectedIntervalByZoombox = null;
-    private final DrawController drawController;
 
     private enum ZOOM {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
     };
 
     public IntervalOptionPanel() {
-        drawController = EVEPlugin.dc;
-        drawController.addTimingListener(this);
+        EVEPlugin.dc.addTimingListener(this);
 
         zoomComboBox = new JComboBox(new DefaultComboBoxModel());
         fillZoomComboBox();
@@ -59,7 +56,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == periodFromLayersButton) {
-            drawController.setLocked(periodFromLayersButton.isSelected());
+            EVEPlugin.dc.setLocked(periodFromLayersButton.isSelected());
             if (periodFromLayersButton.isSelected()) {
                 periodFromLayersButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_LINK));
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -68,12 +65,12 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
             }
         } else if (e.getSource().equals(zoomComboBox)) {
-            final ZoomComboboxItem item = (ZoomComboboxItem) zoomComboBox.getSelectedItem();
+            ZoomComboboxItem item = (ZoomComboboxItem) zoomComboBox.getSelectedItem();
             selectedIntervalByZoombox = null;
 
             if (item != null && !selectedIndexSetByProgram) {
-                zoomTo(item.getZoom(), item.getNumber());
-                selectedIntervalByZoombox = drawController.getSelectedInterval();
+                zoomTo(item.zoom, item.number);
+                selectedIntervalByZoombox = EVEPlugin.dc.getSelectedInterval();
             } else {
                 if (selectedIndexSetByProgram) {
                     selectedIndexSetByProgram = false;
@@ -82,7 +79,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         }
     }
 
-    private void addCarringtonRotationToModel(final DefaultComboBoxModel model, final int numberOfRotations) {
+    private void addCarringtonRotationToModel(DefaultComboBoxModel model, int numberOfRotations) {
         model.addElement(new ZoomComboboxItem(ZOOM.Carrington, numberOfRotations));
     }
 
@@ -91,13 +88,13 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         model.addElement(new ZoomComboboxItem(ZOOM.Movie, 0));
     }
 
-    private boolean addElementToModel(final DefaultComboBoxModel model, final int calendarValue, final ZOOM zoom) {
+    private boolean addElementToModel(DefaultComboBoxModel model, int calendarValue, ZOOM zoom) {
         model.addElement(new ZoomComboboxItem(zoom, calendarValue));
         return true;
     }
 
     private void fillZoomComboBox() {
-        final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
+        DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();
         model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
@@ -117,36 +114,28 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     private static class ZoomComboboxItem {
 
         private final ZOOM zoom;
-        private final int number;
+        private final long number;
 
-        public ZoomComboboxItem(final ZOOM zoom, final int number) {
+        public ZoomComboboxItem(ZOOM zoom, long number) {
             this.zoom = zoom;
             this.number = number;
         }
 
-        public ZOOM getZoom() {
-            return zoom;
-        }
-
-        public int getNumber() {
-            return number;
-        }
-
         @Override
         public String toString() {
-            final String plural = number > 1 ? "s" : "";
+            String plural = number > 1 ? "s" : "";
 
             switch (zoom) {
             case All:
                 return "Maximum interval";
             case Hour:
-                return Integer.toString(number) + " hour" + plural;
+                return Long.toString(number) + " hour" + plural;
             case Day:
-                return Integer.toString(number) + " day" + plural;
+                return Long.toString(number) + " day" + plural;
             case Month:
-                return Integer.toString(number) + " month" + plural;
+                return Long.toString(number) + " month" + plural;
             case Year:
-                return Integer.toString(number) + " year" + plural;
+                return Long.toString(number) + " year" + plural;
             case Carrington:
                 return "Carrington rotation" + plural;
             case Movie:
@@ -181,9 +170,9 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         }
     }
 
-    private void zoomTo(final ZOOM zoom, final long value) {
-        Interval selectedInterval = drawController.getSelectedInterval();
-        Interval availableInterval = drawController.getAvailableInterval();
+    private void zoomTo(ZOOM zoom, long value) {
+        Interval selectedInterval = EVEPlugin.dc.getSelectedInterval();
+        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
 
         Interval newInterval;
         switch (zoom) {
@@ -212,9 +201,9 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         default:
             newInterval = selectedInterval;
         }
-        drawController.setSelectedInterval(newInterval.start, newInterval.end);
-        drawController.useFullValueRange(true);
-        drawController.resetAvailableTime();
+        EVEPlugin.dc.setSelectedInterval(newInterval.start, newInterval.end);
+        EVEPlugin.dc.useFullValueRange(true);
+        EVEPlugin.dc.resetAvailableTime();
     }
 
     private Interval computeMovieInterval() {
@@ -230,12 +219,12 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         return computeZoomForMilliSeconds(interval, value * 2356585920l);
     }
 
-    private Interval computeZoomForMilliSeconds(final Interval interval, long differenceMilli) {
+    private Interval computeZoomForMilliSeconds(Interval interval, long differenceMilli) {
         long startDate = interval.start;
-        Interval availableInterval = drawController.getAvailableInterval();
+        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
         long endDate = interval.end;
         long now = System.currentTimeMillis();
-        final long lastdataDate = EVEPlugin.dc.getLastDateWithData();
+        long lastdataDate = EVEPlugin.dc.getLastDateWithData();
         if (lastdataDate != -1) {
             if (endDate > lastdataDate) {
                 endDate = lastdataDate;
@@ -246,21 +235,23 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
 
         startDate = endDate - differenceMilli;
 
+        /*
         boolean sInAvailable = availableInterval.containsPointInclusive(startDate);
         boolean eInAvailable = availableInterval.containsPointInclusive(endDate);
 
         if (sInAvailable && eInAvailable) {
             return new Interval(startDate, endDate);
         }
+        */
 
         return new Interval(startDate, endDate);
     }
 
-    private Interval computeZoomInterval(final Interval interval, final int calendarField, final long difference) {
+    private Interval computeZoomInterval(Interval interval, int calendarField, long difference) {
         return computeZoomForMilliSeconds(interval, differenceInMilliseconds(calendarField, difference));
     }
 
-    private Long differenceInMilliseconds(final int calendarField, final long value) {
+    private Long differenceInMilliseconds(int calendarField, long value) {
         switch (calendarField) {
         case Calendar.YEAR:
             return value * 365 * 24 * 60 * 60 * 1000l;
