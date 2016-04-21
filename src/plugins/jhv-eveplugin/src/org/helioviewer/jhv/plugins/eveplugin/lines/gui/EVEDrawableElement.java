@@ -24,14 +24,14 @@ public class EVEDrawableElement implements DrawableElement {
 
     private final List<GraphPolyline> graphPolylines = new ArrayList<GraphPolyline>();
     private Band[] bands = new Band[0];
-    private YAxis yAxisElement;
+    private YAxis yAxis;
     private long lastMilliWithData;
     private final DrawController drawController;
 
     public EVEDrawableElement() {
         drawController = DrawController.getSingletonInstance();
         bands = new Band[0];
-        yAxisElement = new YAxis();
+        yAxis = new YAxis();
         lastMilliWithData = -1;
     }
 
@@ -47,8 +47,8 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     private void updateGraphsData(Rectangle graphArea) {
-        double minValue = yAxisElement.getScaledMinValue();
-        double maxValue = yAxisElement.getScaledMaxValue();
+        double minValue = yAxis.getScaledMinValue();
+        double maxValue = yAxis.getScaledMaxValue();
 
         double ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
 
@@ -69,7 +69,7 @@ public class EVEDrawableElement implements DrawableElement {
                 Iterator<Map.Entry<String, Double>> it = unconvertedWarnLevels.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry<String, Double> pairs = it.next();
-                    warnLevels.add(dY - computeY(yAxisElement.scale(pairs.getValue()), ratioY, minValue));
+                    warnLevels.add(dY - computeY(yAxis.scale(pairs.getValue()), ratioY, minValue));
                     warnLabels.add(pairs.getKey());
                 }
 
@@ -89,7 +89,7 @@ public class EVEDrawableElement implements DrawableElement {
                     long date = values.dates[j];
                     int x = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, date);
                     int y = dY;
-                    y -= computeY(yAxisElement.scale(value), ratioY, minValue);
+                    y -= computeY(yAxis.scale(value), ratioY, minValue);
 
                     if (date > lastMilliWithData) {
                         lastMilliWithData = date;
@@ -161,8 +161,9 @@ public class EVEDrawableElement implements DrawableElement {
                 Point point = points.get(index);
                 Rectangle graphArea = drawController.getGraphArea();
                 double timediff = 0;
-                if (previousX != null)
+                if (previousX != null) {
                     timediff = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, point.x) - drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, previousX);
+                }
                 if (previousX == null || timediff > 2 * TimeUtils.MINUTE_IN_MILLIS) {
                     xPoints.add(new ArrayList<Integer>());
                     yPoints.add(new ArrayList<Integer>());
@@ -198,19 +199,19 @@ public class EVEDrawableElement implements DrawableElement {
         }
     }
 
-    public void set(Band[] bands, YAxis yAxisElement) {
+    public void set(Band[] bands, YAxis _yAxis) {
         this.bands = bands;
-        this.yAxisElement = yAxisElement;
+        yAxis = _yAxis;
     }
 
     @Override
-    public void setYAxis(YAxis yAxisElement) {
-        this.yAxisElement = yAxisElement;
+    public void setYAxis(YAxis _yAxis) {
+        yAxis = _yAxis;
     }
 
     @Override
     public YAxis getYAxis() {
-        return yAxisElement;
+        return yAxis;
     }
 
     @Override
