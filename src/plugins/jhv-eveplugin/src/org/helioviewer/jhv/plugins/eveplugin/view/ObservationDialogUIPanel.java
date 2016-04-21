@@ -130,7 +130,8 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     private void updateDrawController() {
         Interval interval = defineInterval(getDate());
-        EVEPlugin.dc.setSelectedInterval(interval.start, interval.end, true, false);
+        EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
+        EVEPlugin.dc.useFullValueRange(true);
     }
 
     private boolean updateBandController() {
