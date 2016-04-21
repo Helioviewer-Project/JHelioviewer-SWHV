@@ -60,7 +60,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
     }
 
     @Override
-    public void selectedIntervalChanged(boolean keepFullValueRange) {
+    public void selectedIntervalChanged() {
     }
 
     @Override

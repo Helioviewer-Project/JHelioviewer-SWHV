@@ -43,7 +43,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private static EVEDrawController instance;
     private final Timer selectedIntervalChangedTimer;
     private boolean selectedIntervalChanged;
-    private boolean keepFullValueRange;
     private final LineDataSelectorModel selectorModel;
 
     private EVEDrawController() {
@@ -192,8 +191,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     @Override
-    public void selectedIntervalChanged(boolean keepFullValueRange) {
-        this.keepFullValueRange = keepFullValueRange;
+    public void selectedIntervalChanged() {
         selectedIntervalChanged = true;
 
     }
@@ -336,7 +334,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             if (selectedIntervalChanged) {
                 selectedIntervalChanged = false;
                 updateBands();
-                fireRedrawRequest(keepFullValueRange);
+                fireRedrawRequest(EVEPlugin.dc.isFullValueRange());
             }
         }
     }

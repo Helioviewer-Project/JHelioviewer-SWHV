@@ -6,8 +6,8 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.RangeListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
 
@@ -105,7 +105,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Rang
     }
 
     @Override
-    public void selectedIntervalChanged(boolean keepFullValueRange) {
+    public void selectedIntervalChanged() {
         requestData();
     }
 

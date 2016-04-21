@@ -163,7 +163,7 @@ public class DownloadController implements TimingListener {
     }
 
     @Override
-    public void selectedIntervalChanged(boolean keepFullValueRange) {
+    public void selectedIntervalChanged() {
     }
 
     private void fireDownloadStarted(final Band band) {
