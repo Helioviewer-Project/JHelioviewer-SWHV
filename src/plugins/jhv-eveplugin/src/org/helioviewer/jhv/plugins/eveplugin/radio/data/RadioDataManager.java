@@ -100,9 +100,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         zoomManager = ZoomManager.getSingletonInstance();
         drawController = EVEPlugin.dc;
         bufferedImages = new HashMap<Long, BufferedImage>();
-        yAxis = new RadioYAxis();
-        yAxis.setLabel("MHz");
-        yAxis.setIsLogScale(false);
+        yAxis = new RadioYAxis("Mhz", false);
         radioImagePane = new RadioImagePane();
         radioImagePane.setYAxis(yAxis);
         plotConfigList = new HashMap<Long, PlotConfig>();
