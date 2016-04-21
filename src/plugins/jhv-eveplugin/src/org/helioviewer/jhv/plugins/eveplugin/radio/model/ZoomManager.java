@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
 import java.awt.Rectangle;
 
-import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
@@ -39,7 +38,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
     }
 
     public void addZoomDataConfig(Interval interval) {
-        radioDataManager.getYAxis().addValueSpaceListener(this);
+        EVEPlugin.dc.addValueSpaceListener(this);
         if (interval != null) {
             requestData();
         }
@@ -128,7 +127,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Valu
     }
 
     @Override
-    public void valueSpaceChanged(Range availableRange, Range selectedRange) {
+    public void valueSpaceChanged() {
         requestData();
     }
 
