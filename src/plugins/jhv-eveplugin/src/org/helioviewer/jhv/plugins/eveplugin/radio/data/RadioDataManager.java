@@ -21,6 +21,7 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioImagePane;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioOptionsPanel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
@@ -28,7 +29,6 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModelListene
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.DrawableAreaMap;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.PlotConfig;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioYAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomDataConfigListener;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
@@ -80,7 +80,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     private final DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
-    private final RadioYAxis yAxis;
+    private final YAxis yAxis;
     private final RadioImagePane radioImagePane;
     private Map<Long, PlotConfig> plotConfigList;
     /** Map containing per download id a list of no data configurations */
@@ -100,7 +100,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         zoomManager = ZoomManager.getSingletonInstance();
         drawController = EVEPlugin.dc;
         bufferedImages = new HashMap<Long, BufferedImage>();
-        yAxis = new RadioYAxis("Mhz", false);
+        yAxis = new YAxis(new Range(), "Mhz", false);
         radioImagePane = new RadioImagePane();
         radioImagePane.setYAxis(yAxis);
         plotConfigList = new HashMap<Long, PlotConfig>();
@@ -642,7 +642,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         }
     }
 
-    public RadioYAxis getYAxis() {
+    public YAxis getYAxis() {
         return yAxis;
     }
 
