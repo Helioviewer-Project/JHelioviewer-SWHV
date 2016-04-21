@@ -39,7 +39,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Rectangle graphSize;
     private List<YAxisElement> yAxisSet;
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
-    private final Set<ValueSpace> valueSpaces;
     private boolean isLocked;
     private long latestMovieTime;
 
@@ -56,7 +55,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         selectedAxis = new TimeAxis(availableAxis.min, availableAxis.max);
 
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        valueSpaces = new HashSet<ValueSpace>();
         isLocked = false;
         latestMovieTime = Long.MIN_VALUE;
     }
