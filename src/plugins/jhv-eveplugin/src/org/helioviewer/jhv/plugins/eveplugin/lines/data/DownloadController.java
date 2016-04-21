@@ -21,6 +21,8 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
@@ -31,7 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class DownloadController {
+public class DownloadController implements TimingListener {
 
     private static final DownloadController singletonInstance = new DownloadController();
 
@@ -41,8 +43,11 @@ public class DownloadController {
     private final LineDataSelectorModel selectorModel;
     public static final ExecutorService downloadPool = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("EVE Download"), new ThreadPoolExecutor.AbortPolicy());
 
+    private final DrawController drawController = DrawController.getSingletonInstance();
+
     private DownloadController() {
         selectorModel = LineDataSelectorModel.getSingletonInstance();
+        drawController.addTimingListener(this);
     }
 
     public static final DownloadController getSingletonInstance() {
@@ -286,6 +291,21 @@ public class DownloadController {
                 }
             });
         }
+    }
+
+    @Override
+    public void availableIntervalChanged() {
+        Interval availableInterval = drawController.getAvailableInterval();
+        final Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
+
+        DownloadController.getSingletonInstance().updateBands(downloadInterval, drawController.getSelectedInterval());
+
+    }
+
+    @Override
+    public void selectedIntervalChanged(boolean keepFullValueRange) {
+        // TODO Auto-generated method stub
+
     }
 
 }
