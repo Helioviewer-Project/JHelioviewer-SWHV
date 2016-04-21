@@ -204,12 +204,12 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     @Override
-    public void setYAxisElement(YAxis yAxisElement) {
+    public void setYAxis(YAxis yAxisElement) {
         this.yAxisElement = yAxisElement;
     }
 
     @Override
-    public YAxis getYAxisElement() {
+    public YAxis getYAxis() {
         return yAxisElement;
     }
 
