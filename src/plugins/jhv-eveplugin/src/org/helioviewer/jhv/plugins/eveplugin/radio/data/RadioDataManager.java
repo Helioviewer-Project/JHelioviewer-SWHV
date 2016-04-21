@@ -97,7 +97,6 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         ColorLookupModel.getInstance().addFilterModelListener(this);
         drawController = EVEPlugin.dc;
         drawController.addGraphDimensionListener(this);
-        drawController.addGraphDimensionListener(this);
         drawController.addTimingListener(this);
         bufferedImages = new HashMap<Long, BufferedImage>();
         yAxis = new YAxis(new Range(), "Mhz", false);
