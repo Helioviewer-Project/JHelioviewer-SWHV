@@ -98,7 +98,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         removeDrawableElement(element, true, false);
     }
 
-    public List<YAxis> getYAxisElements() {
+    public List<YAxis> getYAxes() {
         return yAxes;
     }
 
@@ -182,7 +182,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         int height = graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE);
 
         int twoYAxis = 0;
-        if (getYAxisElements().size() >= 2) {
+        if (getYAxes().size() >= 2) {
             twoYAxis = 1;
         }
         int width = graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + twoYAxis * DrawConstants.TWO_AXIS_GRAPH_RIGHT);
@@ -218,7 +218,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return false;
     }
 
-    public YAxis getYAxisElementForUnit(String unit) {
+    public YAxis getYAxesForUnit(String unit) {
         for (YAxis el : yAxes) {
             if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {
                 return el;
@@ -228,11 +228,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public boolean canChangeAxis(String unitLabel) {
-        return getAllYAxisElementsForUnit(unitLabel).size() == 2 || yAxes.size() < 2;
+        return getAllYAxesForUnit(unitLabel).size() == 2 || yAxes.size() < 2;
     }
 
-    public YAxis.YAxisLocation getYAxisLocation(YAxis yAxisElement) {
-        switch (yAxes.indexOf(yAxisElement)) {
+    public YAxis.YAxisLocation getYAxisLocation(YAxis yAxis) {
+        switch (yAxes.indexOf(yAxis)) {
         case 0:
             return YAxis.YAxisLocation.LEFT;
         case 1:
@@ -330,9 +330,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private void removeDrawableElement(DrawableElement element, boolean redraw, boolean keepYAxisElement) {
+    private void removeDrawableElement(DrawableElement element, boolean redraw, boolean keepYAxis) {
         Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
-        if (elements != null && !keepYAxisElement) {
+        if (elements != null && !keepYAxis) {
             elements.remove(element);
             if (elements.isEmpty()) {
                 drawableElements.remove(element.getDrawableElementType().getLevel());
@@ -420,7 +420,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         yAxes = newYAxisList;
     }
 
-    private List<YAxis> getAllYAxisElementsForUnit(String unit) {
+    private List<YAxis> getAllYAxesForUnit(String unit) {
         List<YAxis> all = new ArrayList<YAxis>();
         for (YAxis el : yAxes) {
             if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {

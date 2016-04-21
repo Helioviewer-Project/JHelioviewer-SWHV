@@ -70,7 +70,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private void addToMap(final Band band) {
         Interval interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
-        YAxis yAxisElement = drawController.getYAxisElementForUnit(band.getUnitLabel());
+        YAxis yAxisElement = drawController.getYAxesForUnit(band.getUnitLabel());
         if (yAxisElement == null && drawController.hasAxisAvailable()) {
             yAxisElement = new YAxis();
             yAxisElement.addValueSpaceListener(this);

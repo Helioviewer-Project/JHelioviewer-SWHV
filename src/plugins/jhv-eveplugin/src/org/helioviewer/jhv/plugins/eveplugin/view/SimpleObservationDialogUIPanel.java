@@ -132,7 +132,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     @Override
     public boolean loadButtonPressed() {
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
-        List<YAxis> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
+        List<YAxis> yAxisElements = DrawController.getSingletonInstance().getYAxes();
         boolean downloadOK = false;
         if (yAxisElements.size() >= 2) {
             for (YAxis el : yAxisElements) {
