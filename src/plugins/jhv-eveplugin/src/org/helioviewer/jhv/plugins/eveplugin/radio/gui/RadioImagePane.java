@@ -10,14 +10,14 @@ import java.util.Collection;
 
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.PlotConfig;
 
 public class RadioImagePane implements ImageObserver, DrawableElement {
 
-    private YAxisElement yAxisElement;
+    private YAxis yAxisElement;
     private boolean intervalTooBig;
 
     public RadioImagePane() {
@@ -63,13 +63,13 @@ public class RadioImagePane implements ImageObserver, DrawableElement {
     }
 
     @Override
-    public void setYAxisElement(YAxisElement yAxisElement) {
+    public void setYAxisElement(YAxis yAxisElement) {
         this.yAxisElement = yAxisElement;
 
     }
 
     @Override
-    public YAxisElement getYAxisElement() {
+    public YAxis getYAxisElement() {
         return yAxisElement;
     }
 

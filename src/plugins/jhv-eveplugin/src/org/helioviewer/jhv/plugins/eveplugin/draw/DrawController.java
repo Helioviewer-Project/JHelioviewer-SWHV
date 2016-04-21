@@ -21,7 +21,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement.YAxisLocation;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis.YAxisLocation;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
@@ -37,7 +37,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private final List<GraphDimensionListener> gdListeners;
     private final List<DrawControllerListener> listeners;
     private Rectangle graphSize;
-    private List<YAxisElement> yAxisSet;
+    private List<YAxis> yAxisSet;
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private boolean isLocked;
     private long latestMovieTime;
@@ -45,7 +45,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
-        yAxisSet = new ArrayList<YAxisElement>();
+        yAxisSet = new ArrayList<YAxis>();
         tListeners = new ArrayList<TimingListener>();
         gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
@@ -95,7 +95,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         removeDrawableElement(element, true, false);
     }
 
-    public List<YAxisElement> getYAxisElements() {
+    public List<YAxis> getYAxisElements() {
         return yAxisSet;
     }
 
@@ -190,7 +190,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public boolean canBePutOnAxis(String unit) {
-        for (YAxisElement el : yAxisSet) {
+        for (YAxis el : yAxisSet) {
             if (el.getLabel().toLowerCase().equals(unit.toLowerCase())) {
                 return true;
             }
@@ -198,8 +198,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return false;
     }
 
-    public YAxisElement getYAxisElementForUnit(String unit) {
-        for (YAxisElement el : yAxisSet) {
+    public YAxis getYAxisElementForUnit(String unit) {
+        for (YAxis el : yAxisSet) {
             if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {
                 return el;
             }
@@ -211,18 +211,18 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return getAllYAxisElementsForUnit(unitLabel).size() == 2 || yAxisSet.size() < 2;
     }
 
-    public YAxisElement.YAxisLocation getYAxisLocation(YAxisElement yAxisElement) {
+    public YAxis.YAxisLocation getYAxisLocation(YAxis yAxisElement) {
         switch (yAxisSet.indexOf(yAxisElement)) {
         case 0:
-            return YAxisElement.YAxisLocation.LEFT;
+            return YAxis.YAxisLocation.LEFT;
         case 1:
-            return YAxisElement.YAxisLocation.RIGHT;
+            return YAxis.YAxisLocation.RIGHT;
         }
         return YAxisLocation.LEFT;
     }
 
     public void resetSelectedValueAndTimeInterval() {
-        for (YAxisElement yAxis : yAxisSet) {
+        for (YAxis yAxis : yAxisSet) {
             yAxis.resetScaledSelectedRange();
         }
     }
@@ -390,7 +390,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void createYAxisSet() {
-        YAxisElement[] tempArray = new YAxisElement[2];
+        YAxis[] tempArray = new YAxis[2];
         for (Set<DrawableElement> elementsSet : drawableElements.values()) {
             for (DrawableElement de : elementsSet) {
                 if (de.getYAxisElement() != null) {
@@ -400,7 +400,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                 }
             }
         }
-        List<YAxisElement> newYAxisList = new ArrayList<YAxisElement>();
+        List<YAxis> newYAxisList = new ArrayList<YAxis>();
         for (int i = 0; i < 2; i++) {
             if (tempArray[i] != null) {
                 newYAxisList.add(tempArray[i]);
@@ -410,9 +410,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         yAxisSet = newYAxisList;
     }
 
-    private List<YAxisElement> getAllYAxisElementsForUnit(String unit) {
-        List<YAxisElement> all = new ArrayList<YAxisElement>();
-        for (YAxisElement el : yAxisSet) {
+    private List<YAxis> getAllYAxisElementsForUnit(String unit) {
+        List<YAxis> all = new ArrayList<YAxis>();
+        for (YAxis el : yAxisSet) {
             if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {
                 all.add(el);
             }

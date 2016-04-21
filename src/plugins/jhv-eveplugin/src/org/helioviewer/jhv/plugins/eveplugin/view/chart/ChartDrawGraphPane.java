@@ -47,14 +47,14 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableType;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 
 @SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
 
     private final DrawController drawController;
-    private Map<YAxisElement, Double> yRatios;
+    private Map<YAxis, Double> yRatios;
     private long movieTimestamp = Long.MIN_VALUE;
     private int movieLinePosition = -1;
     private Point mousePressedPosition = null;
@@ -87,7 +87,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         addComponentListener(this);
-        yRatios = new HashMap<YAxisElement, Double>();
+        yRatios = new HashMap<YAxis, Double>();
         drawController.addDrawControllerListener(this);
         eventModel = EventModel.getSingletonInstance();
         timer = new Timer("ChartDrawGraphPane redraw timer");
@@ -206,11 +206,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawLabels(final Graphics2D g) {
-        List<YAxisElement> yAxisElements = drawController.getYAxisElements();
+        List<YAxis> yAxisElements = drawController.getYAxisElements();
         Interval interval = drawController.getSelectedInterval();
         int counter = 0;
 
-        for (YAxisElement yAxisElement : yAxisElements) {
+        for (YAxis yAxisElement : yAxisElements) {
             if (!(yAxisElement.getAvailableRange().max == Double.MIN_VALUE && yAxisElement.getAvailableRange().min == Double.MAX_VALUE)) {
                 drawVerticalLabels(g, yAxisElement, counter == 0 ? 0 : 1);
                 if (counter > 1) {
@@ -278,7 +278,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private void drawVerticalLabels(Graphics2D g, YAxisElement yAxisElement, int leftSide) {
+    private void drawVerticalLabels(Graphics2D g, YAxis yAxisElement, int leftSide) {
         g.setColor(Color.WHITE);
         if (leftSide == 0) {
             g.fillRect(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, graphArea.height);
@@ -360,8 +360,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private void updateRatios() {
         Interval interval = drawController.getSelectedInterval();
         ratioX = graphArea.width / (double) (interval.end - interval.start);
-        yRatios = new HashMap<YAxisElement, Double>();
-        for (YAxisElement yAxisElement : drawController.getYAxisElements()) {
+        yRatios = new HashMap<YAxis, Double>();
+        for (YAxis yAxisElement : drawController.getYAxisElements()) {
             double minValue = yAxisElement.getScaledMinValue();
             double maxValue = yAxisElement.getScaledMaxValue();
 
@@ -468,8 +468,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void mouseHelper(double distanceY) {
-        List<YAxisElement> yAxes = drawController.getYAxisElements();
-        for (YAxisElement yAxis : yAxes) {
+        List<YAxis> yAxes = drawController.getYAxisElements();
+        for (YAxis yAxis : yAxes) {
             yAxis.shiftDownPixels(distanceY, graphArea.height);
         }
     }
@@ -585,7 +585,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
             double zoomTimeFactor = 10;
-            List<YAxisElement> yAxisElements = drawController.getYAxisElements();
+            List<YAxis> yAxisElements = drawController.getYAxisElements();
             final int mouseX = e.getX();
             final int mouseY = e.getY();
             boolean inGraphArea = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
@@ -601,7 +601,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
             }
             if (inGraphArea || inYAxis) {
-                for (YAxisElement yAxis : yAxisElements) {
+                for (YAxis yAxis : yAxisElements) {
                     if (((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) || inYAxis) {
                         yAxis.zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
                     }

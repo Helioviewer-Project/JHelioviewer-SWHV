@@ -17,7 +17,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
@@ -137,10 +137,10 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         // final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
 
-        List<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
+        List<YAxis> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
         if (yAxisElements.size() >= 2) {
             boolean present = false;
-            for (YAxisElement el : yAxisElements) {
+            for (YAxis el : yAxisElements) {
                 if (el.getOriginalLabel().equals(bandType.getUnitLabel())) {
                     present = true;
                     break;

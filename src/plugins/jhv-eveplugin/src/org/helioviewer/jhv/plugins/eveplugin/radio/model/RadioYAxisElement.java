@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
 import org.helioviewer.jhv.base.Range;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 
 /**
  * Radio specific implementation of y-axis element. This implementation
@@ -11,7 +11,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
  * @author Bram.Bourgoignie@oma.be
  *
  */
-public class RadioYAxisElement extends YAxisElement {
+public class RadioYAxisElement extends YAxis {
 
     public RadioYAxisElement() {
         super();

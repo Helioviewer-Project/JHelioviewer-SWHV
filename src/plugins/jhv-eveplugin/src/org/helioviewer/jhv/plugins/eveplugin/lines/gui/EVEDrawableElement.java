@@ -15,7 +15,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.EVEValues;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
@@ -24,14 +24,14 @@ public class EVEDrawableElement implements DrawableElement {
 
     private final List<GraphPolyline> graphPolylines = new ArrayList<GraphPolyline>();
     private Band[] bands = new Band[0];
-    private YAxisElement yAxisElement;
+    private YAxis yAxisElement;
     private long lastMilliWithData;
     private final DrawController drawController;
 
     public EVEDrawableElement() {
         drawController = DrawController.getSingletonInstance();
         bands = new Band[0];
-        yAxisElement = new YAxisElement();
+        yAxisElement = new YAxis();
         lastMilliWithData = -1;
     }
 
@@ -198,18 +198,18 @@ public class EVEDrawableElement implements DrawableElement {
         }
     }
 
-    public void set(Band[] bands, YAxisElement yAxisElement) {
+    public void set(Band[] bands, YAxis yAxisElement) {
         this.bands = bands;
         this.yAxisElement = yAxisElement;
     }
 
     @Override
-    public void setYAxisElement(YAxisElement yAxisElement) {
+    public void setYAxisElement(YAxis yAxisElement) {
         this.yAxisElement = yAxisElement;
     }
 
     @Override
-    public YAxisElement getYAxisElement() {
+    public YAxis getYAxisElement() {
         return yAxisElement;
     }
 
