@@ -8,13 +8,15 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class EVECache {
 
-    private final HashMap<Long, EVEDataOfChunk> cacheMap = new HashMap<Long, EVEDataOfChunk>();
     private static final double DISCARD_LOG_LEVEL_LOW = 1e-10;
     private static final double DISCARD_LOG_LEVEL_HIGH = 1e+4;
-    private static final int DAYS_PER_CHUNK = 10;
-    static final int MILLIS_PER_TICK = 60000;
-    static final int CHUNKED_SIZE = (int) (TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK);
+    private static long DAYS_PER_CHUNK = 10;
+
+    static final long MILLIS_PER_TICK = 60000;
+    static final long CHUNKED_SIZE = TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK;
     static final long MILLIS_PER_CHUNK = TimeUtils.DAY_IN_MILLIS * DAYS_PER_CHUNK;
+
+    private final HashMap<Long, EVEDataOfChunk> cacheMap = new HashMap<Long, EVEDataOfChunk>();
 
     private static long date2key(long date) {
         return date / MILLIS_PER_CHUNK;
@@ -35,7 +37,7 @@ public class EVECache {
         }
     }
 
-    public EVEValues getValuesInInterval(final Interval interval, Rectangle space) {
+    public EVEValues getValuesInInterval(Interval interval, Rectangle space) {
         long intervalStart = interval.start;
         long intervalEnd = interval.end;
         long intervalWidth = intervalEnd - intervalStart;
@@ -57,11 +59,10 @@ public class EVECache {
             binEnd = intervalEnd + timePerBin / 2;
         }
 
-        final EVEValues result = new EVEValues(binStart, binEnd, intervalStart, numberOfBins, timePerBin);
+        EVEValues result = new EVEValues(binStart, binEnd, intervalStart, numberOfBins, timePerBin);
 
         long keyEnd = date2key(binEnd);
         long key = date2key(binStart);
-
         while (key <= keyEnd) {
             EVEDataOfChunk cache = cacheMap.get(key);
             if (cache != null) {

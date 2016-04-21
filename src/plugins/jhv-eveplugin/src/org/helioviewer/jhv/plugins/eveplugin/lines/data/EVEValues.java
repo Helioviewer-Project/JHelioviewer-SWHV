@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 public class EVEValues {
-    static int MINIMUMDISTANCEFORTIMEGAP = 60000;
+
+    private static final long MINIMUMDISTANCEFORTIMEGAP = 60000;
+
     public final long[] dates;
     public final float[] maxValues;
 
@@ -80,4 +82,5 @@ public class EVEValues {
             }
         }
     }
+
 }
