@@ -25,8 +25,8 @@ public class BandTypeAPI {
 
     private static BandTypeAPI singletonInstance;
 
-    private final HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
-    private final List<BandGroup> orderedGroups = new ArrayList<BandGroup>();
+    private static final HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
+    private static final ArrayList<BandGroup> orderedGroups = new ArrayList<BandGroup>();
 
     private final Properties defaultProperties = new Properties();
     private final String baseUrl;

@@ -32,7 +32,7 @@ public class EVESettings {
     public static final Long MAXIMUM_INTERVAL_RANGE_MILLI_SEC = 2L * 60 * 60 * 24 * 1000;
     public static final Long MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ = 3L * 60 * 60 * 24 * 1000;
 
-    private static ExecutorService executorService;
+    private static ExecutorService executorService = null;
 
     public static ExecutorService getExecutorService() {
         if (executorService == null) {
