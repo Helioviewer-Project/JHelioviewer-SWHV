@@ -206,8 +206,22 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     }
 
     private void requestForData(long xStart, long xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
-        RequestConfig requestConfig = new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio);
-        handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd);
+        if (xEnd - xStart > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
+            intervalTooBig();
+        } else {
+            RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(xStart, xEnd, 24L * 60 * 60 * 1000);
+            if (radioImages != null) {
+                downloader.requestAndOpenIntervals(result.getMissingInterval(), xRatio, yRatio);
+            }
+            if (radioImages != null) {
+                for (long imageID : result.getToRemove()) {
+                    plotConfigList.remove(imageID);
+                }
+                for (DownloadedJPXData jpxData : result.getAvailableData()) {
+                    handleAvailableData(jpxData, xStart, xEnd, yStart, yEnd);
+                }
+            }
+        }
     }
 
     /**
@@ -361,45 +375,6 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         double start = freqInterval.end - providedRegion.getY() * ratio;
         double end = start - providedRegion.getHeight() * ratio;
         return new Interval((int) start, (int) end);
-    }
-
-    /**
-     * Function handles a request configuration.
-     *
-     * @param requestConfig
-     *            The request configuration to be handled
-     * @param xStart
-     *            The start date of the currently visible time interval
-     * @param xEnd
-     *            The end date of the currently visible time interval
-     * @param yStart
-     *            The start value of the currently visible frequency interval
-     * @param yEnd
-     *            The end value of the currently visible frequency interval
-     */
-    private void handleRequestConfig(RequestConfig requestConfig, long xStart, long xEnd, double yStart, double yEnd) {
-        if (requestConfig.xEnd - requestConfig.xStart > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
-            intervalTooBig();
-        } else {
-            RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.xStart, requestConfig.xEnd, 24L * 60 * 60 * 1000);
-            if (radioImages != null) {
-                downloader.requestAndOpenIntervals(result.getMissingInterval(), requestConfig.xRatio, requestConfig.yRatio);
-            } else {
-                Log.trace("drd is null");
-            }
-
-            if (radioImages != null) {
-                for (long imageID : result.getToRemove()) {
-                    plotConfigList.remove(imageID);
-                }
-                // Log.trace("Size of available images : " +
-                // result.getAvailableData().size());
-                for (DownloadedJPXData jpxData : result.getAvailableData()) {
-                    handleAvailableData(jpxData, xStart, xEnd, yStart, yEnd);
-                }
-            }
-        }
-
     }
 
     /**
