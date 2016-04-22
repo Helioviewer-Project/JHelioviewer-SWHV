@@ -2,22 +2,20 @@ package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 import java.awt.Rectangle;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 
 public class EVECacheController {
 
+    private static final HashSet<EVECacheControllerListener> controllerListeners = new HashSet<EVECacheControllerListener>();
+
+    private static final EVEBandCache cache = new EVEBandCache();
+    private static final HashMap<Band, RequestCache> requestCache = new HashMap<Band, RequestCache>();
+
     private static final EVECacheController singletonInstance = new EVECacheController();
-
-    private final LinkedList<EVECacheControllerListener> controllerListeners = new LinkedList<EVECacheControllerListener>();
-
-    private final EVEBandCache cache = new EVEBandCache();
-
-    private final Map<Band, RequestCache> requestCache = new HashMap<Band, RequestCache>();
 
     private EVECacheController() {
     }
@@ -26,11 +24,11 @@ public class EVECacheController {
         return singletonInstance;
     }
 
-    public void addControllerListener(final EVECacheControllerListener listener) {
+    public void addControllerListener(EVECacheControllerListener listener) {
         controllerListeners.add(listener);
     }
 
-    public void removeControllerListener(final EVECacheControllerListener listener) {
+    public void removeControllerListener(EVECacheControllerListener listener) {
         controllerListeners.remove(listener);
     }
 
@@ -40,13 +38,11 @@ public class EVECacheController {
     }
 
     public List<Interval> addRequest(Band band, Interval interval) {
-        RequestCache rc = getRequestCache(band);
-        return rc.adaptRequestCache(interval.start, interval.end);
+        return getRequestCache(band).adaptRequestCache(interval.start, interval.end);
     }
 
-    public List<Interval> getMissingDaysInInterval(final Band band, final Interval interval) {
-        RequestCache rc = getRequestCache(band);
-        return rc.getMissingIntervals(interval);
+    public List<Interval> getMissingDaysInInterval(Band band, Interval interval) {
+        return getRequestCache(band).getMissingIntervals(interval);
     }
 
     private RequestCache getRequestCache(Band band) {
@@ -57,7 +53,7 @@ public class EVECacheController {
         return requestCache.get(band);
     }
 
-    private void fireDataAdded(final Band band) {
+    private void fireDataAdded(Band band) {
         for (EVECacheControllerListener listener : controllerListeners) {
             listener.dataAdded(band);
         }
