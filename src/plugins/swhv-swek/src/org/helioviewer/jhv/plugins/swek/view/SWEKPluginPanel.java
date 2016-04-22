@@ -22,11 +22,7 @@ public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
 
     private static SWEKPluginPanel swekPluginPanel;
 
-    /** The SWEK configuration manager */
-    private final SWEKConfigurationManager configManager;
-
     private SWEKPluginPanel() {
-        configManager = SWEKConfigurationManager.getSingletonInstance();
         SWEKTreeModel.getSingletonInstance().addSWEKTreeModelListener(this);
 
         setLayout(new BorderLayout());
@@ -34,6 +30,8 @@ public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
         JPanel eventTypePanel = new JPanel();
         BoxLayout boxLayout = new BoxLayout(eventTypePanel, BoxLayout.Y_AXIS);
         eventTypePanel.setLayout(boxLayout);
+
+        SWEKConfigurationManager configManager = SWEKConfigurationManager.getSingletonInstance();
         for (SWEKEventType eventType : configManager.getOrderedEventTypes()) {
             EventPanel eventPanel = new EventPanel(eventType);
             eventPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
