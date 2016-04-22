@@ -98,7 +98,7 @@ public class Displayer implements JHVEventHighlightListener {
     public static UpdateViewpoint getUpdateViewpoint() {
         if (mode == DisplayMode.ORTHO)
             return updateViewpoint;
-        return UpdateViewpoint.updateEarthInertial;
+        return UpdateViewpoint.updateEarthFixedDistance;
     }
 
     static int glWidth = 1;

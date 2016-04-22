@@ -11,12 +11,12 @@ public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
 
-    public static UpdateViewpoint updateEarthInertial = new UpdateViewpointEarthInertial();
+    public static UpdateViewpoint updateEarthFixedDistance = new UpdateViewpointEarthFixedDistance();
     public static UpdateViewpoint updateEarth = new UpdateViewpointEarth();
     public static UpdateViewpoint updateExpert = new UpdateViewpointExpert();
     public static UpdateViewpoint updateObserver = new UpdateViewpointObserver();
 
-    static class UpdateViewpointEarthInertial implements UpdateViewpoint {
+    static class UpdateViewpointEarthFixedDistance implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             Position.L p = Sun.getEarth(time);
