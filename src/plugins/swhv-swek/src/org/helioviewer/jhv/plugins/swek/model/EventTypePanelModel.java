@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
@@ -26,10 +25,10 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     private final SWEKTreeModelEventType eventType;
 
     /** Holds the TreeModelListeners */
-    // private final List<TreeModelListener> listeners;
+    // private final List<TreeModelListener> listeners = new HashSet<TreeModelListener>();
 
     /** Holds the EventPanelModelListeners */
-    private final List<EventTypePanelModelListener> panelModelListeners;
+    private final HashSet<EventTypePanelModelListener> panelModelListeners = new HashSet<EventTypePanelModelListener>();
 
     /** Local instance of the tree model */
     private final SWEKTreeModel treeModelInstance;
@@ -42,9 +41,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     public EventTypePanelModel(SWEKTreeModelEventType eventType) {
         this.eventType = eventType;
-        // listeners = new ArrayList<TreeModelListener>();
         treeModelInstance = SWEKTreeModel.getSingletonInstance();
-        panelModelListeners = new ArrayList<EventTypePanelModelListener>();
     }
 
     /*
