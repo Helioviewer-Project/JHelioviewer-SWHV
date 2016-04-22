@@ -45,14 +45,7 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     private void updateGraphsData(Rectangle graphArea, TimeAxis timeAxis) {
-        double minValue = yAxis.getScaledMinValue();
-        double maxValue = yAxis.getScaledMaxValue();
-
-        double ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
-
         graphPolylines.clear();
-
-        int dY = graphArea.y + graphArea.height;
 
         for (int i = 0; i < bands.length; ++i) {
             if (bands[i].isVisible()) {
@@ -66,7 +59,7 @@ public class EVEDrawableElement implements DrawableElement {
                 Iterator<Map.Entry<String, Double>> it = unconvertedWarnLevels.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry<String, Double> pairs = it.next();
-                    warnLevels.add(dY - computeY(yAxis.scale(pairs.getValue()), ratioY, minValue));
+                    warnLevels.add(yAxis.value2pixel(graphArea.y, graphArea.height, pairs.getValue()));
                     warnLabels.add(pairs.getKey());
                 }
 
@@ -85,9 +78,7 @@ public class EVEDrawableElement implements DrawableElement {
 
                     long date = values.dates[j];
                     int x = timeAxis.value2pixel(graphArea.x, graphArea.width, date);
-                    int y = dY;
-                    y -= computeY(yAxis.scale(value), ratioY, minValue);
-
+                    int y = yAxis.value2pixel(graphArea.y, graphArea.height, value);
                     if (date > lastMilliWithData) {
                         lastMilliWithData = date;
                     }
@@ -102,10 +93,6 @@ public class EVEDrawableElement implements DrawableElement {
             }
 
         }
-    }
-
-    private int computeY(double orig, double ratioY, double minV) {
-        return (int) (ratioY * (orig - minV));
     }
 
     private void drawGraphs(final Graphics2D g, Rectangle graphArea) {
