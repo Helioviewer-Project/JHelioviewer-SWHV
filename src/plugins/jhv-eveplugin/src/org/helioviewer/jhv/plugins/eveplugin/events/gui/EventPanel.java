@@ -27,6 +27,7 @@ import org.helioviewer.jhv.plugins.eveplugin.events.model.EventPlotConfiguration
 public class EventPanel implements DrawableElement {
 
     private static final float dash1[] = { 10f };
+    private static final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
 
     @Override
     public DrawableElementType getDrawableElementType() {
@@ -40,13 +41,11 @@ public class EventPanel implements DrawableElement {
         }
 
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = EventModel.getSingletonInstance().getEvents();
-        if (events.size() > 0) {
-
-            int nrEventTypes = events.size();
+        int nrEventTypes = events.size();
+        if (nrEventTypes > 0) {
             int eventTypeNr = 0;
             int previousLine = 0;
 
-            BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
             Stroke normalStroke = g.getStroke();
             JHVRelatedEvents highlightedEvent = null;
             int spacePerLine = 6;
