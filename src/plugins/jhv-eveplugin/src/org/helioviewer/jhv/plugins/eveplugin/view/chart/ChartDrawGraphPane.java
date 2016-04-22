@@ -317,9 +317,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 final double tickValue = minValue + i * tickDifferenceVertical;
                 String tickText = DrawConstants.DECIMAL_FORMAT.format(tickValue);
 
-                double yAxisRatio = maxValue < minValue ? graphArea.height / (minValue - maxValue) : graphArea.height / (maxValue - minValue);
-
-                int y = _yAxis.value2pixel(graphArea.y, graphArea.height, tickValue);
+                int y = _yAxis.scaledvalue2pixel(graphArea.y, graphArea.height, tickValue);
                 g.setColor(DrawConstants.TICK_LINE_COLOR);
                 if (leftSide == 0) {
                     g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
