@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BandGroup {
+
     private String groupLabel;
     public List<BandType> bandtypes = new ArrayList<BandType>();
 
@@ -19,4 +20,5 @@ public class BandGroup {
     public String toString() {
         return this.groupLabel;
     }
+
 }
