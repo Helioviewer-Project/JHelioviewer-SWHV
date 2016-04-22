@@ -31,9 +31,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     public TimeAxis selectedAxis;
     public TimeAxis availableAxis;
 
-    private final List<TimingListener> tListeners;
-    private final List<GraphDimensionListener> gdListeners;
-    private final List<DrawControllerListener> listeners;
+    private static final HashSet<DrawControllerListener> listeners = new HashSet<DrawControllerListener>();
+    private static final HashSet<TimingListener> tListeners = new HashSet<TimingListener>();
+    private static final HashSet<RangeListener> rangeListeners = new HashSet<RangeListener>();
+    private static final HashSet<GraphDimensionListener> gdListeners = new HashSet<GraphDimensionListener>();
+
     private Rectangle graphSize;
     private List<YAxis> yAxes;
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
@@ -42,16 +44,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Rectangle graphArea;
     private Rectangle plotArea;
     private Rectangle leftAxisArea;
-    protected final Set<RangeListener> rangeListeners;
     private boolean fullValueRange;
 
     public DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
-        listeners = new ArrayList<DrawControllerListener>();
-        rangeListeners = new HashSet<RangeListener>();
+
         yAxes = new ArrayList<YAxis>();
-        tListeners = new ArrayList<TimingListener>();
-        gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
 
         long d = System.currentTimeMillis();
