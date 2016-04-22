@@ -18,7 +18,7 @@ public class Sun {
     public static final double RadiusMeter = 695700000; // photospheric, IAU 2015 Resolution B3
 
     public static final double MeanEarthDistanceMeter = 149597870700.;
-    public static final double MeanEarthDistance = (MeanEarthDistanceMeter / RadiusMeter);
+    public static final double MeanEarthDistance = MeanEarthDistanceMeter / RadiusMeter;
 
     public static final Position.L EpochEarthL;
     public static final Position.Q EpochEarthQ;
