@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector;
 
 public interface LineDataSelectorModelListener {
+
     public abstract void downloadStartded(LineDataSelectorElement element);
 
     public abstract void downloadFinished(LineDataSelectorElement element);
@@ -10,4 +11,5 @@ public interface LineDataSelectorModelListener {
     public abstract void lineDataRemoved(LineDataSelectorElement element);
 
     public abstract void lineDataUpdated(LineDataSelectorElement element);
+
 }

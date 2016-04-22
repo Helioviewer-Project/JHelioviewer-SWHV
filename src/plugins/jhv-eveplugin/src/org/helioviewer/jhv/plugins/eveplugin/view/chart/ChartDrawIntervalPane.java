@@ -30,7 +30,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-// Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
 public class ChartDrawIntervalPane extends JComponent implements DrawControllerListener, MouseInputListener, LayersListener {
 
@@ -387,7 +386,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         } else if ((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK) {
             jumpSelectedInterval(p);
         }
-
     }
 
     private void jumpSelectedInterval(Point point) {

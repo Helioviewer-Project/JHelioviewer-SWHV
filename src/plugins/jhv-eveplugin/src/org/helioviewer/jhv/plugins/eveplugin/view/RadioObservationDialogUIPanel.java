@@ -6,7 +6,7 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
     public RadioObservationDialogUIPanel() {
         super();
 
-        /*
+        /* disabled until there is another radio image server
         JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
         JPanel container = new JPanel();
 
