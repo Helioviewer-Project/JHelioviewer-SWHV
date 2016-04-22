@@ -109,7 +109,7 @@ public class EVEDrawableElement implements DrawableElement {
         }
     }
 
-    private class GraphPolyline {
+    private static class GraphPolyline {
 
         public final ArrayList<ArrayList<Integer>> xPoints;
         public final ArrayList<ArrayList<Integer>> yPoints;
