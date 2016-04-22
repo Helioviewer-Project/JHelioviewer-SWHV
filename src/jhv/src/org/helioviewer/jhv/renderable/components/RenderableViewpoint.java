@@ -3,7 +3,7 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Color;
 import java.awt.Component;
 
-import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;
@@ -142,9 +142,9 @@ public class RenderableViewpoint extends AbstractRenderable {
     }
 
     public void fireTimeUpdated() {
-        Position.Q p = Displayer.getCamera().getViewpoint();
-        timeString = p.time.toString();
-        ImageViewerGui.getCarringtonStatusPanel().update(p.time, p.distance);
+        JHVDate time = Displayer.getCamera().getViewpoint().time;
+        timeString = time.toString();
+        ImageViewerGui.getCarringtonStatusPanel().update(time);
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
     }
 

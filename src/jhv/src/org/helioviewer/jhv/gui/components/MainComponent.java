@@ -193,7 +193,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         renderFloatScene(camera, gl);
         renderFullFloatScene(camera, gl);
 
-        ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
+        ImageViewerGui.getZoomStatusPanel().update(camera.getWidth(), camera.getViewpoint().distance);
     }
 
 }
