@@ -4,7 +4,6 @@ import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 
 public interface EventTypePanelModelListener {
-
     /**
      * Called if the event type supplied by the swek source became active.
      *
@@ -28,4 +27,5 @@ public interface EventTypePanelModelListener {
      *            the supplier providing the event
      */
     public abstract void newEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSupplier supplier);
+
 }

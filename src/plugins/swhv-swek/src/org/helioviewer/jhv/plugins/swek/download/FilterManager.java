@@ -17,7 +17,7 @@ import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
  *
  */
 public class FilterManager {
-    /** Singleton instance */
+
     private static FilterManager instance;
 
     /** the filters */
@@ -31,11 +31,6 @@ public class FilterManager {
         listeners = new HashSet<FilterManagerListener>();
     }
 
-    /**
-     * Gets the singleton instance of the filter manager.
-     *
-     * @return the singleton instance of the filter manager
-     */
     public static FilterManager getSingletonInstance() {
         if (instance == null) {
             instance = new FilterManager();

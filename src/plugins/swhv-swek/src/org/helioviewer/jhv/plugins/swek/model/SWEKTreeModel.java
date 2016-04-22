@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 
@@ -17,10 +16,9 @@ import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 public class SWEKTreeModel {
 
     private static SWEKTreeModel singletonInstance;
-    private final List<SWEKTreeModelListener> listeners;
+    private static final HashSet<SWEKTreeModelListener> listeners = new HashSet<SWEKTreeModelListener>();
 
     private SWEKTreeModel() {
-        listeners = new ArrayList<SWEKTreeModelListener>();
     }
 
     public static SWEKTreeModel getSingletonInstance() {

@@ -20,7 +20,6 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 @SuppressWarnings("serial")
 public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
 
-    /** The singleton panel used */
     private static SWEKPluginPanel swekPluginPanel;
 
     /** The SWEK configuration manager */
@@ -29,14 +28,8 @@ public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
     private SWEKPluginPanel() {
         configManager = SWEKConfigurationManager.getSingletonInstance();
         SWEKTreeModel.getSingletonInstance().addSWEKTreeModelListener(this);
-        initVisualComponents();
-    }
 
-    /**
-     * Initializes the visual components.
-     */
-    private void initVisualComponents() {
-        SWEKPluginPanel.this.setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
         // this.setPreferredSize(new Dimension(150, 200));
         JPanel eventTypePanel = new JPanel();
         BoxLayout boxLayout = new BoxLayout(eventTypePanel, BoxLayout.Y_AXIS);
@@ -47,14 +40,9 @@ public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
             eventTypePanel.add(eventPanel);
         }
         // JScrollPane sp = new JScrollPane(eventTypePanel);
-        SWEKPluginPanel.this.add(eventTypePanel, BorderLayout.CENTER);
+        add(eventTypePanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Gives the main SWEKPluginPanel.
-     * 
-     * @return The swekPluginPanel.
-     */
     public static SWEKPluginPanel getSWEKPluginPanelInstance() {
         if (swekPluginPanel == null) {
             swekPluginPanel = new SWEKPluginPanel();

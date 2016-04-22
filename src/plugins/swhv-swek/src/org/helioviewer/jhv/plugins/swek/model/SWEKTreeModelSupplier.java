@@ -42,4 +42,5 @@ public class SWEKTreeModelSupplier extends AbstractSWEKTreeModelElement {
     public void setSwekSupplier(SWEKSupplier swekSupplier) {
         this.swekSupplier = swekSupplier;
     }
+
 }

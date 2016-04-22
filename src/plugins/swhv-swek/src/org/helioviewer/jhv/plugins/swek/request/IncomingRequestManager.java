@@ -21,14 +21,8 @@ import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 
 public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
-    /** The singleton instance */
     private static IncomingRequestManager instance;
 
-    /**
-     * Gets the singleton instance.
-     *
-     * @return the singleton instance
-     */
     public static IncomingRequestManager getSingletonInstance() {
         if (instance == null) {
             instance = new IncomingRequestManager();

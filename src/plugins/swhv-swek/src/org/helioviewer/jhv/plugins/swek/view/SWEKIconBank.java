@@ -14,25 +14,17 @@ import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
  * 
  */
 public class SWEKIconBank {
-    /** The instance of the SWEK icon bank */
+
     private static SWEKIconBank singletonInstance;
 
     /** the icon bank */
     private final Map<String, ImageIcon> iconBank;
 
-    /**
-     * Private default constructor.
-     */
     private SWEKIconBank() {
         iconBank = new HashMap<String, ImageIcon>();
         initIconBank();
     }
 
-    /**
-     * Gets the singleton instance of the SWEK icon bank.
-     * 
-     * @return the instance of the SWEK icon bank
-     */
     public static SWEKIconBank getSingletonInstance() {
         if (singletonInstance == null) {
             singletonInstance = new SWEKIconBank();
@@ -94,4 +86,5 @@ public class SWEKIconBank {
         iconBank.put("SunSpot", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/ss_icon.png")));
         iconBank.put("Comesep", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/comesep.png")));
     }
+
 }

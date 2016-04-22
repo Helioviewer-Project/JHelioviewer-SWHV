@@ -14,25 +14,17 @@ import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
  * 
  */
 public class SWEKProperties {
-    /** The singleton instance */
+
     private static SWEKProperties singletonInstance;
 
     /** The swek properties */
     private final Properties swekProperties;
 
-    /**
-     * private default constructor
-     */
     private SWEKProperties() {
         this.swekProperties = new Properties();
         loadPluginSettings();
     }
 
-    /**
-     * Gives the singleton instance of the SWEK properties.
-     * 
-     * @return the singleton instance
-     */
     public static SWEKProperties getSingletonInstance() {
         if (singletonInstance == null) {
             singletonInstance = new SWEKProperties();
@@ -60,4 +52,5 @@ public class SWEKProperties {
             Log.error("Could not load the swek settings : ", ex);
         }
     }
+
 }
