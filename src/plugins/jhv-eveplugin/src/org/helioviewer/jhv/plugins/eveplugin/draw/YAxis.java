@@ -39,11 +39,10 @@ public class YAxis {
         setIsLogScale(true);
     }
 
-    /**
-     * Gives the selected range.
-     *
-     * @return The selected range
-     */
+    public int value2pixel(int y0, int h, double value) {
+        return (int) (-h * (value - getScaledMinValue()) / (getScaledMaxValue() - getScaledMinValue()) + y0 + h);
+    }
+
     public Range getSelectedRange() {
         return selectedRange;
     }

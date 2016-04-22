@@ -319,8 +319,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
                 double yAxisRatio = maxValue < minValue ? graphArea.height / (minValue - maxValue) : graphArea.height / (maxValue - minValue);
 
-                final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * signFactor * (tickValue - (1 - useMax) * minValue - useMax * maxValue));
-
+                int y = _yAxis.value2pixel(graphArea.y, graphArea.height, tickValue);
                 g.setColor(DrawConstants.TICK_LINE_COLOR);
                 if (leftSide == 0) {
                     g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
