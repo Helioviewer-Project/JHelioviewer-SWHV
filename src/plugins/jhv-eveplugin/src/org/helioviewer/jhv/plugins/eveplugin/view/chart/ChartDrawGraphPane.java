@@ -196,12 +196,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         updateMovieLineInformation();
     }
 
-    private void drawBackground(final Graphics2D g) {
+    private void drawBackground(Graphics2D g) {
         g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
     }
 
-    private void drawLabels(final Graphics2D g) {
+    private void drawLabels(Graphics2D g) {
         List<YAxis> yAxes = drawController.getYAxes();
         Interval interval = drawController.getSelectedInterval();
         int counter = 0;
@@ -319,11 +319,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private void drawMovieLine(final Graphics2D g) {
+    private void drawMovieLine(Graphics2D g) {
         if (movieLinePosition < 0 || graphArea.height < 0) {
             return;
         }
-
         g.setColor(DrawConstants.MOVIE_FRAME_COLOR);
         g.drawLine(movieLinePosition, graphArea.y, movieLinePosition, graphArea.y + graphArea.height);
     }
@@ -353,18 +352,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         return false;
     }
 
-    private void setMovieFrameManually(final Point point) {
-        Interval interval = drawController.getSelectedInterval();
+    private void setMovieFrameManually(Point point) {
         if (movieTimestamp == Long.MIN_VALUE) {
             return;
         }
         long millis = drawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x);
-
         Layers.setTime(new JHVDate(millis));
     }
 
     @Override
-    public void mouseClicked(final MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
         JHVRelatedEvents event = eventModel.getEventUnderMouse();
         Point p = e.getPoint();
 
@@ -380,28 +377,26 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void mouseEntered(final MouseEvent e) {
+    public void mouseEntered(MouseEvent e) {
     }
 
     @Override
-    public void mouseExited(final MouseEvent e) {
+    public void mouseExited(MouseEvent e) {
         mousePosition = null;
     }
 
     @Override
-    public void mousePressed(final MouseEvent e) {
-        final Rectangle movieFrame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
+    public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
-
-        mousePressedOnMovieFrame = movieFrame.contains(p);
         mousePressedPosition = plotArea.contains(p) ? p : null;
-        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height && !(eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) != null)) {
+        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height &&
+            eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) == null) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }
 
     @Override
-    public void mouseReleased(final MouseEvent e) {
+    public void mouseReleased(MouseEvent e) {
         Point p = e.getPoint();
         if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
@@ -430,7 +425,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void mouseDragged(final MouseEvent e) {
+    public void mouseDragged(MouseEvent e) {
         Point p = e.getPoint();
 
         mouseDragPosition = p;
@@ -451,8 +446,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void mouseMoved(final MouseEvent e) {
-        final Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
+    public void mouseMoved(MouseEvent e) {
+        Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
         Point p = e.getPoint();
 
         mousePosition = new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE);
