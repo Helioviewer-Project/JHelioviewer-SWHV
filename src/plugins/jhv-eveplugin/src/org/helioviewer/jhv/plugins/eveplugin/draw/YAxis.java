@@ -39,8 +39,16 @@ public class YAxis {
         setIsLogScale(true);
     }
 
+    public double pixel2ScaledValue(int y0, int h, int p) {
+        double smin = scale(selectedRange.min);
+        double smax = scale(selectedRange.max);
+        return (smax - smin) * (-p + y0 + h) / h + smin;
+    }
+
     public int scaledvalue2pixel(int y0, int h, double value) {
-        return (int) (-h * (value - getScaledMinValue()) / (getScaledMaxValue() - getScaledMinValue()) + y0 + h);
+        double smin = scale(selectedRange.min);
+        double smax = scale(selectedRange.max);
+        return (int) (-h * (value - smin) / (smax - smin) + y0 + h);
     }
 
     public int value2pixel(int y0, int h, double value) {
@@ -66,22 +74,6 @@ public class YAxis {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    public double getMinValue() {
-        return selectedRange.min;
-    }
-
-    public double getMaxValue() {
-        return selectedRange.max;
-    }
-
-    public double getScaledMinValue() {
-        return scale(selectedRange.min);
-    }
-
-    public double getScaledMaxValue() {
-        return scale(selectedRange.max);
     }
 
     public void set(String label, boolean isLogScale) {

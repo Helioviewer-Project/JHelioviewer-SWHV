@@ -286,18 +286,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.setColor(DrawConstants.LABEL_TEXT_COLOR);
         g.drawString(verticalLabel, (int) (DrawConstants.GRAPH_LEFT_SPACE + Math.max((-1 * DrawConstants.GRAPH_LEFT_SPACE + 3), -((int) verticalLabelBounds.getWidth() / 2 - 3) + leftSide * ((int) verticalLabelBounds.getWidth() / 2 - 3 + graphArea.width - Math.max(verticalLabelBounds.getWidth() / 2, verticalLabelBounds.getWidth() - DrawConstants.TWO_AXIS_GRAPH_RIGHT)))), (int) verticalLabelBounds.getHeight());
 
-        double minValue = _yAxis.getScaledMinValue();
-        double maxValue = _yAxis.getScaledMaxValue();
-
-        double signFactor = 1;
-        double useMax = 0;
-        if (maxValue < minValue) {
-            signFactor = -1;
-            double temp = maxValue;
-            maxValue = minValue;
-            minValue = temp;
-            useMax = 1;
-        }
         final int sizeSteps = graphArea.height / DrawConstants.MIN_VERTICAL_TICK_SPACE;
         int verticalTicks = 2;
         if (sizeSteps >= 4) {
@@ -311,13 +299,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.setColor(DrawConstants.TICK_LINE_COLOR);
             g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
         } else {
-            final double tickDifferenceVertical = (maxValue - minValue) / (verticalTicks - 1);
+            final int tickDifferenceVertical = (graphArea.height) / (verticalTicks - 1);
 
             for (int i = 0; i < verticalTicks; i++) {
-                final double tickValue = minValue + i * tickDifferenceVertical;
+                final int y = graphArea.y + graphArea.height - i * tickDifferenceVertical;
+                double tickValue = _yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, y);
                 String tickText = DrawConstants.DECIMAL_FORMAT.format(tickValue);
 
-                int y = _yAxis.scaledvalue2pixel(graphArea.y, graphArea.height, tickValue);
                 g.setColor(DrawConstants.TICK_LINE_COLOR);
                 if (leftSide == 0) {
                     g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
