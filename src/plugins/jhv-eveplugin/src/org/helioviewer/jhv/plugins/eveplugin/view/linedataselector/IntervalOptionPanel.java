@@ -221,7 +221,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
 
     private Interval computeZoomForMilliSeconds(Interval interval, long differenceMilli) {
         long startDate = interval.start;
-        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
         long endDate = interval.end;
         long now = System.currentTimeMillis();
         long lastdataDate = EVEPlugin.dc.getLastDateWithData();
@@ -236,6 +235,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         startDate = endDate - differenceMilli;
 
         /*
+        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
         boolean sInAvailable = availableInterval.containsPointInclusive(startDate);
         boolean eInAvailable = availableInterval.containsPointInclusive(endDate);
 
