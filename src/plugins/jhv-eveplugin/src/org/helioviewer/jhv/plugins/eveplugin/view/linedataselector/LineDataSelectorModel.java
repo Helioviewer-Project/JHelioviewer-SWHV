@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.event.TableModelEvent;
@@ -12,17 +13,16 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
 
 public class LineDataSelectorModel implements TableModel, DrawControllerListener {
 
-    private final List<LineDataSelectorModelListener> listeners;
-    private final List<LineDataSelectorElement> elements;
+    private static final HashSet<LineDataSelectorModelListener> listeners = new HashSet<LineDataSelectorModelListener>();
+    private static final HashSet<TableModelListener> tableListeners = new HashSet<TableModelListener>();
+
+    private static final ArrayList<LineDataSelectorElement> elements = new ArrayList<LineDataSelectorElement>();
+
     public final static int NUMBEROFCOLUMNS = 5;
-    private final List<TableModelListener> tableListeners;
 
     private static LineDataSelectorModel instance;
 
     private LineDataSelectorModel() {
-        listeners = new ArrayList<LineDataSelectorModelListener>();
-        elements = new ArrayList<LineDataSelectorElement>();
-        tableListeners = new ArrayList<TableModelListener>();
     }
 
     public static LineDataSelectorModel getSingletonInstance() {
@@ -185,4 +185,5 @@ public class LineDataSelectorModel implements TableModel, DrawControllerListener
     @Override
     public void drawMovieLineRequest(long time) {
     }
+
 }
