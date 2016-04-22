@@ -72,10 +72,6 @@ public class YAxis {
         return label;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
     public void set(String label, boolean isLogScale) {
         this.label = label;
         setIsLogScale(isLogScale);
