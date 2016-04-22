@@ -101,33 +101,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         }
     }
 
-    /**
-     * Checks if the selected start date is before selected or equal to end
-     * date. The methods checks the entered times when the dates are equal. If
-     * the start time is greater than the end time the method will return false.
-     *
-     * @return boolean value if selected start date is before selected end date.
-     */
-    /*
-     * private boolean isStartDateBeforeOrEqualEndDate() { final
-     * GregorianCalendar calendar = new GregorianCalendar();
-     * calendar.setTime(getStartDate());
-     * 
-     * final GregorianCalendar calendar2 = new
-     * GregorianCalendar(calendar.get(Calendar.YEAR),
-     * calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)); final
-     * long start = calendar2.getTimeInMillis();
-     * 
-     * calendar.clear(); calendar2.clear();
-     * 
-     * calendar.setTime(getEndDate());
-     * calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-     * calendar.get(Calendar.DAY_OF_MONTH)); final long end =
-     * calendar2.getTimeInMillis();
-     * 
-     * return start <= end; }
-     */
-
     private void updateDrawController() {
         Interval interval = defineInterval(getDate());
         EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
@@ -135,7 +108,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     private boolean updateBandController() {
-        // final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
 
         List<YAxis> yAxes = EVEPlugin.dc.getYAxes();
@@ -154,11 +126,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
             }
         }
 
-        /*
-         * if (!bandController.getSelectedGroup(identifier).equals(group)) {
-         * bandController.removeAllBands(identifier); }
-         */
-
         EVEDrawController.getSingletonInstance().bandAdded(bandType);
 
         return true;
@@ -166,13 +133,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     @Override
     public boolean loadButtonPressed() {
-        // check if start date is before end date -> if not show message
-        /*
-         * if (!isStartDateBeforeOrEqualEndDate()) {
-         * JOptionPane.showMessageDialog(null, "End date is before start date!",
-         * "", JOptionPane.ERROR_MESSAGE); return false; }
-         */
-
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
         if (updateBandController()) {
             updateDrawController();

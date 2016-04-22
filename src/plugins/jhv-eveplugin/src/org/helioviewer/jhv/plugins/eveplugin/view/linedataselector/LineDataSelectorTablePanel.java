@@ -37,7 +37,6 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.RemoveCellRenderer;
 
-//Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
 public class LineDataSelectorTablePanel extends JPanel implements TableModelListener, ListSelectionListener {
 

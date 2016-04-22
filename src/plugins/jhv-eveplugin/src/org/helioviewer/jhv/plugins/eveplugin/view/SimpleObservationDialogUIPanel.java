@@ -37,10 +37,8 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         ObservationDialogDateModel.getInstance().addListener(this);
 
         JLabel labelStartDate = new JLabel("Start date");
-
         calendarStartDate = new JHVCalendarDatePicker();
-        // JComboBox comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
-        // JComboBox comboBoxData = new JComboBox(new DefaultComboBoxModel());
+
         JPanel timePane = new JPanel();
         JPanel plotPane = new JPanel();
 
