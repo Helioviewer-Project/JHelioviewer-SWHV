@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,7 +54,6 @@ import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
 
     private final DrawController drawController;
-    private Map<YAxis, Double> yRatios;
     private long movieTimestamp = Long.MIN_VALUE;
     private int movieLinePosition = -1;
     private Point mousePressedPosition = null;
@@ -63,7 +61,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean mousePressedOnMovieFrame = false;
     private Rectangle graphArea = new Rectangle();
     private Rectangle plotArea = new Rectangle();
-    private double ratioX = 0;
     private BufferedImage screenImage = null;
     private int twoYAxis = 0;
     private final EventModel eventModel;
@@ -88,7 +85,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         addComponentListener(this);
-        yRatios = new HashMap<YAxis, Double>();
         drawController.addDrawControllerListener(this);
         eventModel = EventModel.getSingletonInstance();
         timer = new Timer("ChartDrawGraphPane redraw timer");
@@ -197,7 +193,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void updateDrawInformation() {
         updateGraphArea();
-        updateRatios();
         updateMovieLineInformation();
     }
 
@@ -231,7 +226,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Date previousDate = null;
         for (int i = 0; i < horizontalTickCount; ++i) {
             final Date tickValue = new Date(interval.start + i * tickDifferenceHorizontal);
-            final int x = graphArea.x + (int) (i * tickDifferenceHorizontal * ratioX);
+            final int x = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, tickValue.getTime());
             final String tickText;
             if (previousDate == null) {
                 tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
@@ -322,10 +317,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 final double tickValue = minValue + i * tickDifferenceVertical;
                 String tickText = DrawConstants.DECIMAL_FORMAT.format(tickValue);
 
-                Double yAxisRatio = yRatios.get(_yAxis);
-                if (yAxisRatio == null) {
-                    continue;
-                }
+                double yAxisRatio = maxValue < minValue ? graphArea.height / (minValue - maxValue) : graphArea.height / (maxValue - minValue);
+
                 final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * signFactor * (tickValue - (1 - useMax) * minValue - useMax * maxValue));
 
                 g.setColor(DrawConstants.TICK_LINE_COLOR);
@@ -356,26 +349,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         leftAxisArea = drawController.getLeftAxisArea();
     }
 
-    private void updateRatios() {
-        Interval interval = drawController.getSelectedInterval();
-        ratioX = graphArea.width / (double) (interval.end - interval.start);
-        yRatios = new HashMap<YAxis, Double>();
-        for (YAxis yAxis : drawController.getYAxes()) {
-            double minValue = yAxis.getScaledMinValue();
-            double maxValue = yAxis.getScaledMaxValue();
-
-            double ratioY = maxValue < minValue ? graphArea.height / (minValue - maxValue) : graphArea.height / (maxValue - minValue);
-            yRatios.put(yAxis, ratioY);
-        }
-    }
-
     private boolean updateMovieLineInformation() {
         int newMovieLine = -1;
-        Interval interval = drawController.getSelectedInterval();
         if (movieTimestamp == Long.MIN_VALUE) {
             newMovieLine = -1;
         } else {
-            newMovieLine = (int) ((movieTimestamp - interval.start) * ratioX) + graphArea.x;
+            newMovieLine = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, movieTimestamp);
+
             if (newMovieLine < graphArea.x || newMovieLine > (graphArea.x + graphArea.width)) {
                 newMovieLine = -1;
             }
@@ -393,13 +373,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (movieTimestamp == Long.MIN_VALUE) {
             return;
         }
-        final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
-        final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.start);
+        long millis = drawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x);
 
         Layers.setTime(new JHVDate(millis));
     }
-
-    // Mouse Input Listener
 
     @Override
     public void mouseClicked(final MouseEvent e) {
@@ -407,7 +384,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Point p = e.getPoint();
 
         if (event != null) {
-            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(mouseToTimestamp(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE))));
+            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(drawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x)));
             dialog.setLocation(e.getLocationOnScreen());
             dialog.validate();
             dialog.pack();
@@ -415,12 +392,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         } else if (graphArea.contains(p)) {
             setMovieFrameManually(p);
         }
-    }
-
-    private long mouseToTimestamp(Point point) {
-        Interval interval = drawController.getSelectedInterval();
-        int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
-        return (long) ((x - graphArea.x) / ratioX) + interval.start;
     }
 
     @Override
