@@ -20,12 +20,14 @@ public class RequestCache {
 
     public List<Interval> adaptRequestCache(long startDate, long endDate) {
         ArrayList<Interval> missingIntervals = new ArrayList<Interval>();
+        Interval interval = new Interval(startDate, endDate);
+
         if (requestedAndDownloadedCache.isEmpty()) {
-            missingIntervals.add(new Interval(startDate, endDate));
-            requestedAndDownloadedCache.put(startDate, new Interval(startDate, endDate));
-            requestedCache.put(startDate, new Interval(startDate, endDate));
+            missingIntervals.add(interval);
+            requestedAndDownloadedCache.put(startDate, interval);
+            requestedCache.put(startDate, interval);
         } else {
-            missingIntervals = getMissingIntervals(new Interval(startDate, endDate));
+            missingIntervals = getMissingIntervals(interval);
             updateRequestCache(startDate, endDate);
         }
         return missingIntervals;
