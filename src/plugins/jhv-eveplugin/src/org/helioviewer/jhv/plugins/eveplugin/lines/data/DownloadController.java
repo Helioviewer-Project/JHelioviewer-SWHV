@@ -22,7 +22,6 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
@@ -44,11 +43,9 @@ public class DownloadController implements TimingListener {
     private final LineDataSelectorModel selectorModel;
     public static final ExecutorService downloadPool = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("EVE Download"), new ThreadPoolExecutor.AbortPolicy());
 
-    private final DrawController drawController = EVEPlugin.dc;
-
     private DownloadController() {
         selectorModel = LineDataSelectorModel.getSingletonInstance();
-        drawController.addTimingListener(this);
+        EVEPlugin.dc.addTimingListener(this);
     }
 
     public static final DownloadController getSingletonInstance() {
@@ -156,21 +153,21 @@ public class DownloadController implements TimingListener {
 
     @Override
     public void availableIntervalChanged() {
-        Interval availableInterval = drawController.getAvailableInterval();
-        final Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
+        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
+        Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
 
-        DownloadController.getSingletonInstance().updateBands(downloadInterval, drawController.getSelectedInterval());
+        DownloadController.getSingletonInstance().updateBands(downloadInterval, EVEPlugin.dc.getSelectedInterval());
     }
 
     @Override
     public void selectedIntervalChanged() {
     }
 
-    private void fireDownloadStarted(final Band band) {
+    private void fireDownloadStarted(Band band) {
         selectorModel.downloadStarted(band);
     }
 
-    private void fireDownloadFinished(final Band band) {
+    private void fireDownloadFinished(Band band) {
         selectorModel.downloadFinished(band);
     }
 

@@ -36,9 +36,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private static final HashSet<RangeListener> rangeListeners = new HashSet<RangeListener>();
     private static final HashSet<GraphDimensionListener> gdListeners = new HashSet<GraphDimensionListener>();
 
+    private static final HashMap<DrawableType, Set<DrawableElement>> drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
+
     private Rectangle graphSize;
     private List<YAxis> yAxes;
-    private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private boolean isLocked;
     private long latestMovieTime;
     private Rectangle graphArea;
@@ -47,8 +48,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private boolean fullValueRange;
 
     public DrawController() {
-        drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
-
         yAxes = new ArrayList<YAxis>();
         graphSize = new Rectangle();
 
@@ -56,10 +55,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         availableAxis = new TimeAxis(d - TimeUtils.DAY_IN_MILLIS, d);
         selectedAxis = new TimeAxis(availableAxis.min, availableAxis.max);
 
-        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         isLocked = false;
         latestMovieTime = Long.MIN_VALUE;
         fullValueRange = false;
+
+        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
