@@ -10,9 +10,9 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 public class RadioImage {
 
     private Interval imageTimeInterval;
-    private FrequencyInterval imageFreqInterval;
+    private Interval imageFreqInterval;
     private Interval visibleImageTimeInterval;
-    private FrequencyInterval visibleImageFreqInterval;
+    private Interval visibleImageFreqInterval;
     private int frameInJPX;
     private ResolutionSet resolutioSet;
     private final List<ResolutionSetting> resolutionSettings;
@@ -21,7 +21,7 @@ public class RadioImage {
     private boolean isDownloading;
     private Rectangle lastDataSize;
 
-    public RadioImage(long radioImageID, Interval timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
+    public RadioImage(long radioImageID, Interval timeInterval, Interval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
         super();
         imageTimeInterval = timeInterval;
         imageFreqInterval = freqInterval;
@@ -95,7 +95,7 @@ public class RadioImage {
         return visibleImageTimeInterval;
     }
 
-    public FrequencyInterval getVisibleImageFreqInterval() {
+    public Interval getVisibleImageFreqInterval() {
         return visibleImageFreqInterval;
     }
 
@@ -103,11 +103,11 @@ public class RadioImage {
         imageTimeInterval = timeInterval;
     }
 
-    public FrequencyInterval getFreqInterval() {
+    public Interval getFreqInterval() {
         return imageFreqInterval;
     }
 
-    public void setFreqInterval(FrequencyInterval freqInterval) {
+    public void setFreqInterval(Interval freqInterval) {
         imageFreqInterval = freqInterval;
     }
 
@@ -148,7 +148,7 @@ public class RadioImage {
         return currentBest;
     }
 
-    public boolean withinInterval(Interval intervalToBeIn, FrequencyInterval freqIntervalToBeIn) {
+    public boolean withinInterval(Interval intervalToBeIn, Interval freqIntervalToBeIn) {
         return intervalToBeIn.overlapsInclusive(imageTimeInterval) && freqIntervalToBeIn.overlaps(imageFreqInterval);
     }
 
@@ -184,10 +184,10 @@ public class RadioImage {
             }
 
         }
-        if (imageFreqInterval.containsInclusive(visibleYStart) || imageFreqInterval.containsInclusive(visibleYEnd)) {
-            int tempStartY = imageFreqInterval.squeeze(visibleYStart);
-            int tempEndY = imageFreqInterval.squeeze(visibleYEnd);
-            visibleImageFreqInterval = new FrequencyInterval(tempStartY, tempEndY);
+        if (imageFreqInterval.containsPointInclusive(visibleYStart) || imageFreqInterval.containsPointInclusive(visibleYEnd)) {
+            int tempStartY = (int) imageFreqInterval.squeeze(visibleYStart);
+            int tempEndY = (int) imageFreqInterval.squeeze(visibleYEnd);
+            visibleImageFreqInterval = new Interval(tempStartY, tempEndY);
         } else {
             visibleImageFreqInterval = null;
         }
@@ -207,14 +207,14 @@ public class RadioImage {
             int maxImageWidth = resolutioSet.getResolutionLevel(0).width;
             int maxImageHeight = resolutioSet.getResolutionLevel(0).height;
             long imageTimesize = imageTimeInterval.end - imageTimeInterval.start;
-            int imageFrequencySize = imageFreqInterval.getEnd() - imageFreqInterval.getStart();
+            int imageFrequencySize = (int) (imageFreqInterval.end - imageFreqInterval.start);
             double timePerPix = 1.0 * imageTimesize / maxImageWidth;
             double freqPerPix = 1.0 * imageFrequencySize / maxImageHeight;
 
             int x0 = (int) Math.round((visibleImageTimeInterval.start - imageTimeInterval.start) / timePerPix);
-            int y0 = (int) Math.round((imageFreqInterval.getEnd() - visibleImageFreqInterval.getEnd()) / freqPerPix);
+            int y0 = (int) Math.round((imageFreqInterval.end - visibleImageFreqInterval.end) / freqPerPix);
             int width = (int) Math.round((visibleImageTimeInterval.end - visibleImageTimeInterval.start) / timePerPix);
-            int height = (int) Math.round((visibleImageFreqInterval.getEnd() - visibleImageFreqInterval.getStart()) / freqPerPix);
+            int height = (int) Math.round((visibleImageFreqInterval.end - visibleImageFreqInterval.start) / freqPerPix);
             return new Rectangle(x0, y0, width, height);
         } else {
             return null;
