@@ -28,7 +28,7 @@ import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
  *
  */
 public class SWEKSourceManager {
-    /** Singleton instance of the swek download manager */
+
     private static SWEKSourceManager instance;
 
     private boolean loadExternalJars;
@@ -46,9 +46,6 @@ public class SWEKSourceManager {
 
     private SWEKPlugin swekplugin;
 
-    /**
-     * private constructor
-     */
     private SWEKSourceManager() {
         sourcesLoaded = false;
         loadExternalJars = true;
@@ -56,11 +53,6 @@ public class SWEKSourceManager {
         jarURLList = new ArrayList<URL>();
     }
 
-    /**
-     * Gets the singleton instance of the SWEK source manager.
-     *
-     * @return the instance of the SWEK source manager
-     */
     public static SWEKSourceManager getSingletonInstance() {
         if (instance == null) {
             instance = new SWEKSourceManager();
@@ -280,4 +272,5 @@ public class SWEKSourceManager {
 
         return true;
     }
+
 }

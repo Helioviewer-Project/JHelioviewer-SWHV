@@ -86,4 +86,5 @@ public abstract class AbstractSWEKTreeModelElement {
     public ImageIcon getIcon() {
         return icon;
     }
+
 }

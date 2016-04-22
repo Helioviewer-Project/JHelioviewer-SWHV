@@ -28,4 +28,5 @@ public interface FilterManagerListener {
      *            the event type for which the parameter was removed
      */
     public abstract void filtersRemoved(SWEKEventType swekEventType, SWEKParameter parameter);
+
 }
