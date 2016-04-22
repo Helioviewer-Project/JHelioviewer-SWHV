@@ -18,8 +18,11 @@ public class Interval implements Comparable<Interval> {
     }
 
     public boolean containsPointInclusive(long time) {
-        assert start <= end;
         return time >= start && time <= end;
+    }
+
+    public boolean overlaps(Interval otherInterval) {
+        return !(start > otherInterval.end || end < otherInterval.start);
     }
 
     public boolean overlapsInclusive(Interval other) {

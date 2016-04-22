@@ -61,9 +61,6 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     /** The instance of downloader */
     private RadioDownloader downloader;
 
-    /** A buffer holding all the requests for data. */
-    private RequestForDataBuffer requestBuffer;
-
     /** The instance of the line data selector model */
     private LineDataSelectorModel lineDataSelectorModel;
 
@@ -124,7 +121,6 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     private void init() {
         lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
         cache = RadioImageCache.getInstance();
-        requestBuffer = new RequestForDataBuffer();
         eveState = EVEState.getSingletonInstance();
         requestForDataBusy = false;
         downloader = RadioDownloader.getSingletonInstance();
@@ -147,20 +143,16 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
             if (image != null) {
                 image.setLastDataSize(dataSize);
                 if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
-                    FrequencyInterval dataFrequencyInterval = defineDataFrequencyInterval(image.getFreqInterval(), providedRegion, resolutionHeight);
+                    Interval dataFrequencyInterval = defineDataFrequencyInterval(image.getFreqInterval(), providedRegion, resolutionHeight);
                     BufferedImage newImage = createBufferedImage(dataSize.width, dataSize.height, byteData);
                     bufferedImages.put(imageID, newImage);
                     radioImagePane.setIntervalTooBig(false);
-                    DrawableAreaMap dam = getDrawableAreaMap(image.getVisibleImageTimeInterval().start, image.getVisibleImageTimeInterval().end, dataFrequencyInterval.getStart(), dataFrequencyInterval.getEnd(), image.getFreqInterval().getStart(), image.getFreqInterval().getEnd(), dataSize);
+                    DrawableAreaMap dam = getDrawableAreaMap(image.getVisibleImageTimeInterval().start, image.getVisibleImageTimeInterval().end, dataFrequencyInterval.start, dataFrequencyInterval.end, image.getFreqInterval().start, image.getFreqInterval().end, dataSize);
                     PlotConfig pc = new PlotConfig(newImage, dam, isVisible, imageID);
                     plotConfigList.put(imageID, pc);
                     fireDrawNewBufferedImage();
                 }
-            } else {
-                // Log.debug("The image was null");
             }
-        } else {
-            // Log.debug("Download request data was null");
         }
     }
 
@@ -213,45 +205,9 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         lineDataSelectorModel.lineDataElementUpdated(this);
     }
 
-    /**
-     * Request the radio data manager for new data.
-     *
-     * As long as the mouse is dragged no new data is requested. This to improve
-     * the responsiveness of the program.
-     *
-     * This function can be called asynchronously. A request buffer is used to
-     * store the all the calls. As long as there are requests in the buffer
-     * function continues.
-     *
-     * @param xStart
-     *            The start time for which new data is requested
-     * @param xEnd
-     *            The end time for which new data is requested
-     * @param yStart
-     *            The start frequency for which new data is requested
-     * @param yEnd
-     *            The end frequency for which new data is requested
-     * @param xRatio
-     *            The x-ratio (time per pixel)
-     * @param yRatio
-     *            The y-ratio (frequency per pixel)
-     * @param iDs
-     *            The download ID-s for which new data is requested
-     * @param plotIdentifier
-     *            The identifier of the plot for which new data is requested
-     */
     private void requestForData(long xStart, long xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
-        if (!requestForDataBusy && !requestBuffer.hasData()) {
-            requestForDataBusy = true;
-            requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));
-            while (requestBuffer.hasData()) {
-                RequestConfig requestConfig = requestBuffer.getData();
-                handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd);
-            }
-            requestForDataBusy = false;
-        } else {
-            requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));
-        }
+        RequestConfig requestConfig = new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio);
+        handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd);
     }
 
     /**
@@ -372,39 +328,39 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
      *            The plot identifier for which the bound are defined
      */
     private void defineMaxBounds() {
-        FrequencyInterval maxFrequencyInterval = new FrequencyInterval();
+        Interval maxFrequencyInterval = new Interval(20, 400);
         if (radioImages != null) {
             if (!radioImages.isEmpty()) {
-                int localMinFrequency = -1;
-                int localMaxFrequency = -1;
+                long localMinFrequency = -1;
+                long localMaxFrequency = -1;
                 boolean first = true;
                 for (RadioImage image : radioImages.values()) {
                     if (first) {
-                        localMinFrequency = image.getFreqInterval().getStart();
-                        localMaxFrequency = image.getFreqInterval().getEnd();
+                        localMinFrequency = image.getFreqInterval().start;
+                        localMaxFrequency = image.getFreqInterval().end;
                         first = false;
                     } else {
-                        if (image.getFreqInterval().getStart() < localMinFrequency) {
-                            localMinFrequency = image.getFreqInterval().getStart();
+                        if (image.getFreqInterval().start < localMinFrequency) {
+                            localMinFrequency = (int) image.getFreqInterval().start;
                         }
-                        if (image.getFreqInterval().getEnd() > localMaxFrequency) {
-                            localMaxFrequency = image.getFreqInterval().getEnd();
+                        if (image.getFreqInterval().end > localMaxFrequency) {
+                            localMaxFrequency = (int) image.getFreqInterval().end;
                         }
                     }
                 }
-                maxFrequencyInterval = new FrequencyInterval(localMinFrequency, localMaxFrequency);
+                maxFrequencyInterval = new Interval(localMinFrequency, localMaxFrequency);
             } else {
-                maxFrequencyInterval = new FrequencyInterval(0, 0);
+                maxFrequencyInterval = new Interval(0, 0);
             }
         }
-        yAxis.setSelectedRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
+        yAxis.setSelectedRange(new Range(maxFrequencyInterval.start, maxFrequencyInterval.end));
     }
 
-    private FrequencyInterval defineDataFrequencyInterval(FrequencyInterval freqInterval, Rectangle providedRegion, int resolutionHeight) {
-        double ratio = (freqInterval.getEnd() - freqInterval.getStart()) / (double) resolutionHeight;
-        double start = freqInterval.getEnd() - providedRegion.getY() * ratio;
+    private Interval defineDataFrequencyInterval(Interval freqInterval, Rectangle providedRegion, int resolutionHeight) {
+        double ratio = (freqInterval.end - freqInterval.start) / (double) resolutionHeight;
+        double start = freqInterval.end - providedRegion.getY() * ratio;
         double end = start - providedRegion.getHeight() * ratio;
-        return new FrequencyInterval((int) start, (int) end);
+        return new Interval((int) start, (int) end);
     }
 
     /**
@@ -513,7 +469,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
                     long end = JHVDate.parseDateTime(hvMetaData.get("DATE-END")).milli;
                     hvMetaData.destroyXML();
 
-                    FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));
+                    Interval fi = new Interval((int) Math.round(freqStart), (int) Math.round(freqEnd));
 
                     List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
                     Interval dateInterval = new Interval(start, end);
@@ -712,7 +668,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         return true;
     }
 
-    private DrawableAreaMap getDrawableAreaMap(long startDate, long endDate, int visualStartFrequency, int visualEndFrequency, int imageStartFrequency, int imageEndFrequency, Rectangle area) {
+    private DrawableAreaMap getDrawableAreaMap(long startDate, long endDate, long visualStartFrequency, long visualEndFrequency, long imageStartFrequency, long imageEndFrequency, Rectangle area) {
         int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
         int sourceY0 = 0;
         int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
@@ -741,7 +697,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         return new DrawableAreaMap(0, 0, 0, 0, destX0, destY0, destX1, destY1);
     }
 
-    private int defineYInDestinationArea(int frequencyToFind, YAxis _yAxis) {
+    private int defineYInDestinationArea(long frequencyToFind, YAxis _yAxis) {
         Rectangle displaySize = drawController.getPlotArea();
         return displaySize.height - (int) Math.floor((frequencyToFind - _yAxis.getSelectedRange().min) / (1.0 * (_yAxis.getSelectedRange().max - _yAxis.getSelectedRange().min) / displaySize.height));
     }
