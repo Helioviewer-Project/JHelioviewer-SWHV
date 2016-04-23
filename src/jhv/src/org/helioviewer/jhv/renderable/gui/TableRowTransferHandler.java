@@ -26,7 +26,7 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 public class TableRowTransferHandler extends TransferHandler {
 
     private final DataFlavor integerObjectFlavor = new ActivationDataFlavor(Integer.class, "Integer Row Index");
-    private JTable grid = null;
+    private final JTable grid;
     BufferedImage image;
 
     public TableRowTransferHandler(JTable table) {

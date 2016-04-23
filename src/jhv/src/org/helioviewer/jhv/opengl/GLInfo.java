@@ -48,11 +48,7 @@ public class GLInfo {
             Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode) + " - @" + message);
             errors++;
         }
-
-        if (errors == 0)
-            return false;
-        else
-            return true;
+        return errors != 0;
     }
 
 }

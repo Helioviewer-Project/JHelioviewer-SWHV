@@ -42,7 +42,7 @@ public class GLImage {
 
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
-        if (imageData.getUploaded() == false) {
+        if (!imageData.getUploaded()) {
             imageData.setUploaded(true);
             tex.copyImageData2D(gl, imageData);
         }

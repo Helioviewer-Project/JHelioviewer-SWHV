@@ -46,7 +46,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     private JRadioButton loadDefaultMovieOnStartUp;
     private JRadioButton doNothingOnStartUp;
-    private JPanel paramsPanel;
     private DefaultsSelectionPanel defaultsPanel;
 
     private final Settings settings = Settings.getSingletonInstance();
@@ -171,8 +170,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * @return General parameters panel
      */
     private JPanel createParametersPanel() {
-        paramsPanel = new JPanel();
-
+        JPanel paramsPanel = new JPanel();
         paramsPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         paramsPanel.setLayout(new GridLayout(0, 1));
 
@@ -218,7 +216,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     private static class DefaultsSelectionPanel extends JPanel {
 
-        private JTable table = null;
+        private final JTable table;
 
         public DefaultsSelectionPanel() {
             super(new BorderLayout());

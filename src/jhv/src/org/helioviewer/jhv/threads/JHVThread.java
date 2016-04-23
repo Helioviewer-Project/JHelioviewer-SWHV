@@ -46,7 +46,6 @@ public class JHVThread {
 
         private static void createSchema() {
             try {
-
                 Statement statement = connection.createStatement();
                 statement.setQueryTimeout(30);
                 statement.executeUpdate("CREATE TABLE if not exists event_type (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING , supplier STRING, UNIQUE(name, supplier) ON CONFLICT IGNORE)");

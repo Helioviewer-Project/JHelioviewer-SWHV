@@ -586,7 +586,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     return;
                 }
             }
-            if (items.size() > 0)
+            if (!items.isEmpty())
                 container.setSelectedIndex(0);
         }
 
