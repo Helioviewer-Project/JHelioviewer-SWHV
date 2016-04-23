@@ -41,8 +41,6 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     private DataCollapsiblePanel followingEventsPanel;
     private DataCollapsiblePanel otherRelatedEventsPanel;
 
-    private EventDescriptionPanel eventDescriptionPanel;
-
     private final JHVEvent event;
     private final JHVRelatedEvents rEvent;
 
@@ -54,8 +52,6 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         rEvent = revent;
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
-
-        eventDescriptionPanel = new EventDescriptionPanel(revent, event);
 
         initAllTablePanel();
         initParameterCollapsiblePanels();
@@ -71,7 +67,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         eventDescriptionConstraint.anchor = GridBagConstraints.WEST;
         eventDescriptionConstraint.fill = GridBagConstraints.BOTH;
 
-        add(eventDescriptionPanel, eventDescriptionConstraint);
+        add(new EventDescriptionPanel(revent, event), eventDescriptionConstraint);
 
         GridBagConstraints allTablePanelConstraint = new GridBagConstraints();
         allTablePanelConstraint.gridx = 0;
@@ -180,7 +176,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
         for (final JHVRelatedEvents rEvent : rEvents) {
             ArrayList<JHVEvent> evs = rEvent.getEvents();
-            if (evs.size() > 0) {
+            if (!evs.isEmpty()) {
                 allPrecedingEvents.add(createEventPanel(rEvent, evs.get(0)));
             }
         }
