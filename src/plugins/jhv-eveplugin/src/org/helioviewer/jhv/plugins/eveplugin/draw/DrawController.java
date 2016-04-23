@@ -16,6 +16,7 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
@@ -60,6 +61,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fullValueRange = false;
 
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
+        JHVRelatedEvents.addHighlightListener(this);
+        JHVRelatedEvents.addHighlightListener(Displayer.getSingletonInstance());
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
