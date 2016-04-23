@@ -29,23 +29,20 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelListener, ActionListener {
 
     /** The event type for which the event panel is created */
     private final SWEKEventType eventType;
 
     /** Tree containing the event type and its sources. */
-    private JTree eventTypeTree;
+    private final JTree eventTypeTree;
 
     /** The model for this panel */
     private final EventTypePanelModel eventPanelModel;
 
-    /** Instance of the download manager */
-    private final SWEKDownloadManager downloadManager;
-
     /** The label holding the loading text */
-    private JLabel loadingLabel;
+    private final JLabel loadingLabel;
 
     /** The timer handling the loading animation */
     private final Timer loadingTimer;
@@ -56,20 +53,13 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
      * Creates a event panel for a certain eventType.
      */
     public EventPanel(SWEKEventType eventType) {
-        downloadManager = SWEKDownloadManager.getSingletonInstance();
-        SWEKTreeModel.getSingletonInstance().addSWEKTreeModelListener(this);
         this.eventType = eventType;
+        SWEKTreeModel.getSingletonInstance().addSWEKTreeModelListener(this);
         eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(this.eventType));
-        eventPanelModel.addEventPanelModelListener(downloadManager);
+        eventPanelModel.addEventPanelModelListener(SWEKDownloadManager.getSingletonInstance());
         loadingTimer = new Timer(500, this);
         loadingStep = 0;
-        initVisualComponents();
-    }
 
-    /**
-     * Initializes the visual components
-     */
-    private void initVisualComponents() {
         setLayout(new BorderLayout());
         eventTypeTree = new JTree(eventPanelModel);
         eventTypeTree.setShowsRootHandles(true);
@@ -164,23 +154,19 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
 
     @Override
     public void startedDownloadingEventType(SWEKEventType eventType) {
-        if (eventType.equals(this.eventType)) {
-            if (!loadingTimer.isRunning()) {
-                loadingLabel.setText("Loading   ");
-                loadingStep = 0;
-                loadingTimer.start();
-            }
+        if (eventType.equals(this.eventType) && !loadingTimer.isRunning()) {
+            loadingLabel.setText("Loading   ");
+            loadingStep = 0;
+            loadingTimer.start();
         }
     }
 
     @Override
     public void stoppedDownloadingEventType(SWEKEventType eventType) {
-        if (eventType.equals(this.eventType)) {
-            if (loadingTimer.isRunning()) {
-                loadingTimer.stop();
-                loadingLabel.setText("          ");
-                loadingStep = 0;
-            }
+        if (eventType.equals(this.eventType) && loadingTimer.isRunning()) {
+            loadingTimer.stop();
+            loadingLabel.setText("          ");
+            loadingStep = 0;
         }
     }
 

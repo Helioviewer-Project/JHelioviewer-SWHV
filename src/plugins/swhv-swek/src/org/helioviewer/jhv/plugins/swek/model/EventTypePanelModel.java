@@ -186,11 +186,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     @Override
     public boolean isLeaf(Object node) {
-        if (node instanceof SWEKTreeModelEventType) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(node instanceof SWEKTreeModelEventType);
     }
 
     /*
