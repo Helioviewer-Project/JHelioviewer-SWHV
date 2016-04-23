@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -21,7 +22,6 @@ public class ComesepParser implements SWEKParser {
     private void parseParameter(JSONObject result, Object key, JHVEvent currentEvent) throws JSONException {
         if (key instanceof String) {
             String keyString = (String) key;
-            String lowerkey = keyString.toLowerCase();
             String value = null;
             if (!result.isNull(keyString)) {
                 value = result.optString(keyString);
@@ -29,6 +29,7 @@ public class ComesepParser implements SWEKParser {
                 return;
             }
 
+            String lowerkey = keyString.toLowerCase(Locale.ENGLISH);
             if (!(lowerkey.equals("atearliest") || lowerkey.equals("atlatest") || lowerkey.equals("begin_time_value") || lowerkey.equals("end_time_value") || lowerkey.equalsIgnoreCase("liftoffduration_value"))) {
                 value = value.trim();
                 if (value.length() != 0)
