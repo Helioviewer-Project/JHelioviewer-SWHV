@@ -8,10 +8,9 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
 
-public class LineDataSelectorModel implements TableModel, DrawControllerListener {
+public class LineDataSelectorModel implements TableModel {
 
     private static final HashSet<LineDataSelectorModelListener> listeners = new HashSet<LineDataSelectorModelListener>();
     private static final HashSet<TableModelListener> tableListeners = new HashSet<TableModelListener>();
@@ -175,15 +174,6 @@ public class LineDataSelectorModel implements TableModel, DrawControllerListener
     public void removeRow(int row) {
         LineDataSelectorElement el = elements.get(row);
         el.removeLineData();
-    }
-
-    @Override
-    public void drawRequest() {
-        fireListeners();
-    }
-
-    @Override
-    public void drawMovieLineRequest(long time) {
     }
 
 }
