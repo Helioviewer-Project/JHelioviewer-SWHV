@@ -77,19 +77,14 @@ public class DynamicModel implements TreeModel {
         editorKit.read(br, htmlDoc, 0);
 
         HTMLDocument.Iterator iter = htmlDoc.getIterator(HTML.Tag.A);
-
         while (iter.isValid()) {
-
             String link = (String) iter.getAttributes().getAttribute(HTML.Attribute.HREF);
-
             if (link.charAt(link.length() - 1) == '/' && link.charAt(0) != '/') {
                 returnlist.add(urlString + (String) iter.getAttributes().getAttribute(HTML.Attribute.HREF));
             }
-
             if (link.toLowerCase().endsWith(".jp2") || link.toLowerCase().endsWith(".jpx")) {
                 returnlist.add(urlString + link);
             }
-
             iter.next();
         }
         return returnlist;
@@ -133,7 +128,6 @@ public class DynamicModel implements TreeModel {
 
         ((Node) node).ensureChildren();
         return ((Node) node).children.size();
-
     }
 
     /**
@@ -188,7 +182,7 @@ public class DynamicModel implements TreeModel {
      * 
      */
     private class Node {
-        private String name;
+        private final String name;
         private String toShow;
         LinkedList<Node> children = new LinkedList<Node>();
 
@@ -228,14 +222,12 @@ public class DynamicModel implements TreeModel {
          * to the directory strucutre on the http server
          */
         private void ensureChildren() {
-            if (children.size() == 0) {
+            if (children.isEmpty()) {
                 // reads the children of the node from the http server
                 ArrayList<String> children;
                 try {
                     children = getSubdirectories(name);
-
                     for (String child : children) {
-
                         Node n = new Node(child);
                         n.toShow = child.substring(name.length(), child.length());
                         this.children.add(n);

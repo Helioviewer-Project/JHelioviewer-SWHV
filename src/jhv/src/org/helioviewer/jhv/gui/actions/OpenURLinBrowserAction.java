@@ -6,15 +6,10 @@ import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.JHVGlobals;
 
-/**
- * Action to open a browser showing any given URL.
- * This function is platform dependent and tries to open the URL in a browser.
- * @author Markus Langenberg
- */
 @SuppressWarnings("serial")
 public class OpenURLinBrowserAction extends AbstractAction {
 
-    private String urlToOpen;
+    private final String urlToOpen;
 
     /**
      * @param name

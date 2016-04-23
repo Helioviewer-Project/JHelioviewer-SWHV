@@ -236,7 +236,7 @@ public class Displayer implements JHVEventHighlightListener {
     private static class DisplayTimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (toDisplay == true) {
+            if (toDisplay) {
                 ImageViewerGui.getMainComponent().repaint();
                 toDisplay = false;
             }

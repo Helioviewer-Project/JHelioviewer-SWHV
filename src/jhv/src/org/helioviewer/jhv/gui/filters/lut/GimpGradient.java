@@ -18,11 +18,11 @@ public class GimpGradient {
     /**
      * List of segments uses in this gradient
      */
-    private List<GimpGradientSegment> segments;
+    private final List<GimpGradientSegment> segments;
     /**
      * Name from the gradient file
      */
-    private String name;
+    private final String name;
 
     /**
      * Give back the name
