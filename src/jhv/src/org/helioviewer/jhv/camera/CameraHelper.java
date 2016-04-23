@@ -107,8 +107,6 @@ public class CameraHelper {
     }
 
     public static Vec3 getVectorFromPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
-        double up1x = computeUpX(camera, vp, screenX);
-        double up1y = computeUpY(camera, vp, screenY);
         Quat currentDragRotation = camera.getCurrentDragRotation();
         Vec3 altnormal = rotation.rotateVector(Vec3.ZAxis);
         if (correctDrag)
@@ -117,6 +115,8 @@ public class CameraHelper {
         if (altnormal.z == 0)
             return null;
 
+        double up1x = computeUpX(camera, vp, screenX);
+        double up1y = computeUpY(camera, vp, screenY);
         double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
 
         Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
@@ -128,7 +128,6 @@ public class CameraHelper {
 
     public static Vec3 getVectorFromSphereOrPlane(Camera camera, Viewport vp, double x, double y, Quat cameraDifferenceRotation) {
         Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, cameraDifferenceRotation, false);
-
         if (rotatedHitPoint != null && rotatedHitPoint.z > 0.)
             return rotatedHitPoint;
 
@@ -137,13 +136,12 @@ public class CameraHelper {
 
     public static void zoomToFit(Camera camera) {
         double newFOV = Camera.INITFOV;
-        double size;
+        double size = 1;
 
-        if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
-            size = 1.;
-        } else {
+        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
             size = Layers.getLargestPhysicalHeight();
         }
+
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
         camera.setCameraFOV(newFOV);

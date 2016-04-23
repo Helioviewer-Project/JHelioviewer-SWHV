@@ -221,7 +221,7 @@ public class SWEKEventType {
      */
     public boolean containsParameter(String name) {
         for (SWEKParameter parameter : parameterList) {
-            if (parameter.getParameterName().toLowerCase().equals(name.toLowerCase())) {
+            if (parameter.getParameterName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
@@ -238,7 +238,7 @@ public class SWEKEventType {
      */
     public SWEKParameter getParameter(String name) {
         for (SWEKParameter parameter : parameterList) {
-            if (parameter.getParameterName().toLowerCase().equals(name.toLowerCase())) {
+            if (parameter.getParameterName().equalsIgnoreCase(name)) {
                 return parameter;
             }
         }

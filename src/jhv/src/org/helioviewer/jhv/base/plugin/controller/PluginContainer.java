@@ -13,10 +13,10 @@ import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
  */
 public class PluginContainer implements Container {
 
-    private Plugin plugin;
-    private URI pluginLocation;
+    private final ClassLoader classLoader;
+    private final Plugin plugin;
+    private final URI pluginLocation;
     private boolean pluginActive;
-    private ClassLoader classLoader;
 
     /**
      * Default constructor.

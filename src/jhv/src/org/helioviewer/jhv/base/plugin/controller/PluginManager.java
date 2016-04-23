@@ -35,11 +35,6 @@ public class PluginManager {
     private PluginManager() {
     }
 
-    /**
-     * Method returns the sole instance of this class.
-     *
-     * @return the only instance of this class.
-     * */
     public static PluginManager getSingletonInstance() {
         return singletonInstance;
     }
@@ -87,7 +82,7 @@ public class PluginManager {
 
         // if there is at least one plug-in which could not be loaded throw an
         // exception and add plug-in names to the message of the exception.
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             StringBuilder message = new StringBuilder();
             for (String item : list) {
                 message.append(item).append("\n");
@@ -118,9 +113,7 @@ public class PluginManager {
             if (f.isDirectory()) {
                 result.addAll(searchAndLoadPlugins(f, recursivly, deactivedPlugins));
             } else if (f.isFile() && f.getName().toLowerCase().endsWith(".jar") && !deactivedPlugins.contains(f.getName())) {
-
                 Log.debug("Found Plugin Jar File: " + f.toURI());
-
                 try {
                     if (!loadPlugin(f.toURI())) {
                         result.add(f.getPath());
@@ -130,7 +123,6 @@ public class PluginManager {
                 }
             }
         }
-
         return result;
     }
 
@@ -166,13 +158,11 @@ public class PluginManager {
      */
     public AbstractList<PluginContainer> getPlugins(boolean activated) {
         AbstractList<PluginContainer> result = new LinkedList<PluginContainer>();
-
         for (PluginContainer container : plugins.values()) {
             if (container.isActive() == activated) {
                 result.add(container);
             }
         }
-
         return result;
     }
 
@@ -313,7 +303,6 @@ public class PluginManager {
                 return false;
             }
         }
-
         return true;
     }
 

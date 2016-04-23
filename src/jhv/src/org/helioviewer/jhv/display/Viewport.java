@@ -22,10 +22,7 @@ public class Viewport {
     }
 
     public boolean contains(int px, int py) {
-        if (px >= x && px < x + width && py >= yAWT && py < yAWT + height) {
-            return true;
-        }
-        return false;
+        return px >= x && px < x + width && py >= yAWT && py < yAWT + height;
     }
 
     @Override
