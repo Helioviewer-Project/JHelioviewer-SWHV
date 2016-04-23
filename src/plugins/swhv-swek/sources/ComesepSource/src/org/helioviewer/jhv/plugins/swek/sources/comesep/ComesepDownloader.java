@@ -35,18 +35,13 @@ public class ComesepDownloader extends SWEKDownloader {
             for (int i = 0; i < results.length(); i++) {
                 JSONObject result = results.getJSONObject(i);
 
-                String uid = result.getString("alertid");
-                long start;
-                long end;
-                long archiv;
-
-                start = result.getLong("atearliest") * 1000;
-                end = result.getLong("atlatest") * 1000;
+                long start = result.getLong("atearliest") * 1000;
+                long end = result.getLong("atlatest") * 1000;
                 if (result.has("liftoffduration_value")) {
                     long cactusLiftOff = result.getLong("liftoffduration_value");
                     end = end + cactusLiftOff * 60000;
                 }
-                archiv = start;
+
                 byte[] compressedJson;
                 try {
                     compressedJson = JHVDatabase.compress(result.toString());
@@ -54,8 +49,12 @@ public class ComesepDownloader extends SWEKDownloader {
                     Log.error("compression error");
                     return false;
                 }
+
+                long archiv = start;
+                String uid = result.getString("alertid");
                 event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, archiv, uid, new ArrayList<JHVDatabaseParam>()));
             }
+
             int id = JHVDatabase.dump_event2db(event2db_list, type);
             if (id == -1) {
                 Log.error("failed to dump to database");
@@ -77,11 +76,7 @@ public class ComesepDownloader extends SWEKDownloader {
             JSONObject asobj = associations.getJSONObject(i);
             assocs[i] = new Pair<String, String>(asobj.getString("parent"), asobj.getString("child"));
         }
-        int ret = JHVDatabase.dump_association2db(assocs);
-        if (ret == -1) {
-            return false;
-        }
-        return true;
+        return JHVDatabase.dump_association2db(assocs) != -1;
     }
 
     @Override

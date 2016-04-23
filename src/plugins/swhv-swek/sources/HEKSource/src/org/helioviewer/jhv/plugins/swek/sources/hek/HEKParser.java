@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugins.swek.sources.hek;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 import org.helioviewer.jhv.base.astronomy.Position;
@@ -48,7 +49,8 @@ public class HEKParser implements SWEKParser {
             Object key = keys.next();
             if (key instanceof String) {
                 String originalKeyString = (String) key;
-                String keyString = originalKeyString.toLowerCase();
+
+                String keyString = originalKeyString.toLowerCase(Locale.ENGLISH);
                 if (keyString.equals("refs")) {
                     parseRefs(currentEvent, result.getJSONArray(originalKeyString));
                 } else {
@@ -97,11 +99,11 @@ public class HEKParser implements SWEKParser {
             Object key = keys.next();
             if (key instanceof String) {
                 String keyString = (String) key;
-                String lkeyString = keyString.toLowerCase();
+                String lkeyString = keyString.toLowerCase(Locale.ENGLISH);
 
                 String value = ref.getString(keyString);
                 if (lkeyString.equals("ref_type")) {
-                    String lvalue = value.toLowerCase();
+                    String lvalue = value.toLowerCase(Locale.ENGLISH);
                     if (lvalue.equals("movie")) {
                         type = "Reference Movie";
                         ok = true;
@@ -132,7 +134,7 @@ public class HEKParser implements SWEKParser {
      */
     private static List<Vec3> parsePolygon(String value) {
         List<Vec3> polygonPoints = new ArrayList<Vec3>();
-        if (value.toLowerCase().contains("polygon")) {
+        if (value.toLowerCase(Locale.ENGLISH).contains("polygon")) {
             String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
             String coordinates = coordinatesString.substring(coordinatesString.indexOf('(') + 1, coordinatesString.lastIndexOf(')'));
 
@@ -158,7 +160,7 @@ public class HEKParser implements SWEKParser {
      * @return The GL3DVec3 or null if it could not be parsed.
      */
     private static Vec3 parsePoint(String value) {
-        if (value.toLowerCase().contains("point")) {
+        if (value.toLowerCase(Locale.ENGLISH).contains("point")) {
             String coordinates = value.substring(value.indexOf('(') + 1, value.indexOf(')'));
             return parseCoordinates(coordinates);
         }

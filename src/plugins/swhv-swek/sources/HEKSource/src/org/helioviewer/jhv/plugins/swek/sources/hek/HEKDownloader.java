@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.Pair;
@@ -32,7 +33,7 @@ public class HEKDownloader extends SWEKDownloader {
         for (int i = 0; i < results.length(); i++) {
             JSONObject result = results.getJSONObject(i);
 
-            String uid = result.getString("kb_archivid");
+            String uid;
             long start;
             long end;
             long archiv;
@@ -41,22 +42,22 @@ public class HEKDownloader extends SWEKDownloader {
                 start = TimeUtils.utcDateFormat.parse(result.getString("event_starttime")).getTime();
                 end = TimeUtils.utcDateFormat.parse(result.getString("event_endtime")).getTime();
                 archiv = TimeUtils.utcDateFormat.parse(result.getString("kb_archivdate")).getTime();
+                uid = result.getString("kb_archivid");
 
                 HashMap<String, String> dbFields = type.getEventType().getAllDatabaseFields();
                 for (Map.Entry<String, String> entry : dbFields.entrySet()) {
                     String dbType = entry.getValue();
                     String fieldName = entry.getKey();
-                    String lfieldName = fieldName.toLowerCase();
-                    if (dbType.equals(JHVDatabaseParam.DBINTTYPE)) {
-                        if (!result.isNull(lfieldName)) {
+
+                    String lfieldName = fieldName.toLowerCase(Locale.ENGLISH);
+                    if (!result.isNull(lfieldName)) {
+                        if (dbType.equals(JHVDatabaseParam.DBINTTYPE)) {
                             paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBINTTYPE, result.getInt(lfieldName), fieldName));
-                        }
-                    } else if (dbType.equals(JHVDatabaseParam.DBSTRINGTYPE)) {
-                        if (!result.isNull(lfieldName))
+                        } else if (dbType.equals(JHVDatabaseParam.DBSTRINGTYPE)) {
                             paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBSTRINGTYPE, result.getString(lfieldName), fieldName));
+                        }
                     }
                 }
-
             } catch (JSONException e) {
                 return false;
             } catch (ParseException e) {
@@ -71,8 +72,8 @@ public class HEKDownloader extends SWEKDownloader {
                 return false;
             }
             event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, archiv, uid, paramList));
-
         }
+
         int id = JHVDatabase.dump_event2db(event2db_list, type);
         if (id == -1) {
             Log.error("failed to dump to database");
@@ -90,11 +91,7 @@ public class HEKDownloader extends SWEKDownloader {
             JSONObject asobj = associations.getJSONObject(i);
             assocs[i] = new Pair<String, String>(asobj.getString("first_ivorn"), asobj.getString("second_ivorn"));
         }
-        int ret = JHVDatabase.dump_association2db(assocs);
-        if (ret == -1) {
-            return false;
-        }
-        return true;
+        return JHVDatabase.dump_association2db(assocs) != -1;
     }
 
     @Override
