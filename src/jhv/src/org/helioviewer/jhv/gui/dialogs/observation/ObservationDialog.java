@@ -201,7 +201,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
      * name.
      * */
     public void showDialog(final String dataSourceName) {
-        if (uiMap.size() <= 0) {
+        if (uiMap.isEmpty()) {
             Message.err("Error", "There are no data sources available!", false);
             return;
         }

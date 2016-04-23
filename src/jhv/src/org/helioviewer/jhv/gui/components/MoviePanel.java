@@ -568,7 +568,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static class SliderListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (cacheChanged == true) {
+            if (cacheChanged) {
                 cacheChanged = false;
                 timeSlider.repaint();
             }
