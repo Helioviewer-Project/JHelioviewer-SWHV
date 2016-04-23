@@ -373,7 +373,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 txts.add(p.getParameterDisplayName() + " : " + value);
             }
         }
-        if (txts.size() != 0)
+        if (!txts.isEmpty())
             GLText.drawText(gl, vp, txts, pt.x + MOUSE_OFFSET_X, pt.y + MOUSE_OFFSET_Y);
     }
 

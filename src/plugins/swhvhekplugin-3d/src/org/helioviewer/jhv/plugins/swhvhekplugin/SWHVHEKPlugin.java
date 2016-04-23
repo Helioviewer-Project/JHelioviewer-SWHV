@@ -8,7 +8,7 @@ import org.helioviewer.jhv.layers.Layers;
 
 public class SWHVHEKPlugin implements Plugin {
 
-    private SWHVHEKPluginRenderable renderable;
+    private final SWHVHEKPluginRenderable renderable;
 
     public SWHVHEKPlugin() {
         renderable = new SWHVHEKPluginRenderable();
