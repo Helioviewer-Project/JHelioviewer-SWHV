@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.fitsview;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URI;
 
 import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
@@ -13,7 +12,7 @@ import org.helioviewer.jhv.viewmodel.view.AbstractView;
 
 public class FITSView extends AbstractView {
 
-    protected FITSImage fits;
+    private final FITSImage fits;
     private final URI uri;
 
     /**
@@ -24,17 +23,12 @@ public class FITSView extends AbstractView {
      * @throws IOException
      *             when an error occurred during reading the fits file.
      * */
-    public FITSView(URI _uri) throws IOException {
+    public FITSView(URI _uri) throws Exception {
         uri = _uri;
         if (!uri.getScheme().equalsIgnoreCase("file"))
-            throw new IOException("FITS does not support the " + uri.getScheme() + " protocol");
+            throw new Exception("FITS does not support the " + uri.getScheme() + " protocol");
 
-        try {
-            fits = new FITSImage(uri.toURL().toString());
-        } catch (Exception e) {
-            throw new IOException("FITS image data cannot be accessed.");
-        }
-
+        fits = new FITSImage(uri.toURL().toString());
         HelioviewerMetaData m = new HelioviewerMetaData(fits, 0);
 
         BufferedImage bi = fits.getImage(0, 0, m.getPixelHeight(), m.getPixelWidth());

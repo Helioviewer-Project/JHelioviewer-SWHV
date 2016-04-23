@@ -9,7 +9,7 @@ import kdu_jni.Kdu_message;
  */
 public class JHV_Kdu_message extends Kdu_message {
 
-    private boolean raiseException;
+    private final boolean raiseException;
 
     public JHV_Kdu_message(boolean raiseException) {
         this.raiseException = raiseException;

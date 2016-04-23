@@ -31,7 +31,7 @@ public class JPIPDataInputStream {
     private int vbasFstByte = 0;
 
     /** The <code>InputStream</code> base. */
-    private InputStream in;
+    private final InputStream in;
 
     /** Constructs a object based on the indicated <code>InputStream</code>. */
     public JPIPDataInputStream(InputStream in) {

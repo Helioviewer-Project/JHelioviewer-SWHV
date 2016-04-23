@@ -179,11 +179,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         double stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
         if (Double.isNaN(stonyhurstLatitude) || stonyhurstLatitude == 0 /* not found */) {
-            if ((stonyhurstLatitude = m.tryGetDouble("CRLT_OBS")) == 0) {
-                if ((stonyhurstLatitude = m.tryGetDouble("REF_B0")) == 0) {
-                    // presumably not found
-                    stonyhurstLatitude = p.lat * MathUtils.radeg;
-                }
+            if ((stonyhurstLatitude = m.tryGetDouble("CRLT_OBS")) == 0 && (stonyhurstLatitude = m.tryGetDouble("REF_B0")) == 0) {
+                // presumably not found
+                stonyhurstLatitude = p.lat * MathUtils.radeg;
             }
         }
         double theta = stonyhurstLatitude / MathUtils.radeg;

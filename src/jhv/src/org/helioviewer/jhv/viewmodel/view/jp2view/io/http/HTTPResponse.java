@@ -12,10 +12,10 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 public class HTTPResponse extends HTTPMessage {
 
     /** The status code */
-    private int code;
+    private final int code;
 
     /** The reason phrase */
-    private String reason;
+    private final String reason;
 
     /**
      * Constructs a new HTTP response, with its status code and reason phrase.

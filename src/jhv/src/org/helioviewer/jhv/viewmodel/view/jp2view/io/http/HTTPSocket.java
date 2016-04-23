@@ -192,13 +192,11 @@ public class HTTPSocket extends Socket {
         }
         int len = rawdata.length;
         int offset = 0;
-        if (len > 0) {
-            if (rawdata[len - 1] == '\n') {
-                offset++;
-                if (len > 1) {
-                    if (rawdata[len - 2] == '\r') {
-                        offset++;
-                    }
+        if (len > 0 && rawdata[len - 1] == '\n') {
+            offset++;
+            if (len > 1) {
+                if (rawdata[len - 2] == '\r') {
+                    offset++;
                 }
             }
         }

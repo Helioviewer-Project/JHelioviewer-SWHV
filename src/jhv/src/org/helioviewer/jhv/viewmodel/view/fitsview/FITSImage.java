@@ -28,7 +28,7 @@ public class FITSImage implements MetaDataContainer {
 
     private static final float MDI_THRESHOLD = 2000f;
 
-    private Header header = null;
+    private final Header header;
     private BufferedImage image = null;
 
     /**
