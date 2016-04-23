@@ -46,17 +46,11 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     private JHVCalendarDatePicker endDatePicker;
     private TimeTextField endTimePicker;
 
-    private JSeparatorComboBox objectCombobox;
-
-    private JButton synchronizeWithLayersButton;
-    private JButton synchronizeWithNowButton;
-    private JButton synchronizeWithCurrentButton;
-
     private JPanel buttonPanel;
 
     private final JCheckBox exactDateCheckBox;
 
-    private boolean firstComboChanged = false;
+    private boolean firstComboChanged;
 
     private final PositionLoad positionLoad;
 
@@ -117,7 +111,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     private void addSyncButtons(GridBagConstraints c) {
-        synchronizeWithLayersButton = new JButton("Sync");
+        JButton synchronizeWithLayersButton = new JButton("Sync");
         synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
         synchronizeWithLayersButton.addActionListener(new ActionListener() {
             @Override
@@ -126,7 +120,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             }
         });
 
-        synchronizeWithNowButton = new JButton("Now");
+        JButton synchronizeWithNowButton = new JButton("Now");
         synchronizeWithNowButton.setToolTipText("Fill twice current time");
         synchronizeWithNowButton.addActionListener(new ActionListener() {
             @Override
@@ -135,7 +129,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             }
         });
 
-        synchronizeWithCurrentButton = new JButton("Current");
+        JButton synchronizeWithCurrentButton = new JButton("Current");
         synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
         synchronizeWithCurrentButton.addActionListener(new ActionListener() {
             @Override
@@ -180,7 +174,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     private void addObjectCombobox(GridBagConstraints c) {
-        objectCombobox = new JSeparatorComboBox(SpaceObject.getObjectList().toArray());
+        JSeparatorComboBox objectCombobox = new JSeparatorComboBox(SpaceObject.getObjectList().toArray());
         objectCombobox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent event) {

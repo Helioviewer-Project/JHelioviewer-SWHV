@@ -104,16 +104,14 @@ public class RequestCache {
                 }
             }
         }
-        if (!startFound) {
-            if (previousInterval.containsPointInclusive(startDate)) {
-                if (!previousInterval.containsPointInclusive(endDate)) {
-                    intervalsToRemove.add(previousInterval.start);
-                    addStart = previousInterval.start;
-                } else {
-                    addStart = previousInterval.start;
-                    addEnd = previousInterval.end;
-                    endFound = true;
-                }
+        if (!startFound && previousInterval.containsPointInclusive(startDate)) {
+            if (!previousInterval.containsPointInclusive(endDate)) {
+                intervalsToRemove.add(previousInterval.start);
+                addStart = previousInterval.start;
+            } else {
+                addStart = previousInterval.start;
+                addEnd = previousInterval.end;
+                endFound = true;
             }
         }
         if (!endFound) {

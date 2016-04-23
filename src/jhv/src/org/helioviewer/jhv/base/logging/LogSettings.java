@@ -27,7 +27,7 @@ import org.helioviewer.jhv.base.FileUtils;
  */
 public class LogSettings {
 
-    private Logger logger = Logger.getRootLogger();
+    private static final Logger logger = Logger.getRootLogger();
 
     private static LogSettings instance;
 
@@ -85,7 +85,6 @@ public class LogSettings {
      */
     public static void init(String defaultLogSettingsPath, String logSettingsPath, String logsDirectory, boolean useExistingTimeStamp) {
         instance = new LogSettings(defaultLogSettingsPath, logSettingsPath, logsDirectory, useExistingTimeStamp);
-
     }
 
     /**
