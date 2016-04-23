@@ -2,8 +2,9 @@ package org.helioviewer.jhv.base.interval;
 
 import java.util.ArrayList;
 
+import org.helioviewer.jhv.base.time.TimeUtils;
+
 public class Interval implements Comparable<Interval> {
-    private static long MILLISECSPERDAY = 86400 * 1000;
 
     public final long start;
     public final long end;
@@ -54,13 +55,12 @@ public class Interval implements Comparable<Interval> {
 
     }
 
-    public static ArrayList<Interval> splitInterval(final Interval interval, int days) {
-        final ArrayList<Interval> intervals = new ArrayList<Interval>();
+    public static ArrayList<Interval> splitInterval(Interval interval, int days) {
+        ArrayList<Interval> intervals = new ArrayList<Interval>();
         long startDate = interval.start;
 
         while (true) {
-            final long newStartDate = startDate + MILLISECSPERDAY * days;
-
+            long newStartDate = startDate + TimeUtils.DAY_IN_MILLIS * days;
             if (interval.containsPointInclusive(newStartDate)) {
                 intervals.add(new Interval(startDate, newStartDate));
                 startDate = newStartDate;

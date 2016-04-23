@@ -24,7 +24,7 @@ import org.helioviewer.jhv.viewmodel.imageformat.SingleChannelImageFormat;
  */
 public class SingleChannelShortImageData extends AbstractImageData {
 
-    private SingleChannelImageFormat format;
+    private final SingleChannelImageFormat format;
 
     /**
      * Constructor, given an array as data source.

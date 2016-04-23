@@ -40,13 +40,9 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
     private static final int default_width = 600;
     private static final int default_height = 400;
 
-    private static final JHVUncaughtExceptionHandler handler = new JHVUncaughtExceptionHandler();
+    private static final JHVUncaughtExceptionHandler instance = new JHVUncaughtExceptionHandler();
 
     private JHVUncaughtExceptionHandler() {
-    }
-
-    public static JHVUncaughtExceptionHandler getSingletonInstance() {
-        return handler;
     }
 
     /**
@@ -54,7 +50,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
      * method should be called once when the application starts.
      */
     public static void setupHandlerForThread() {
-        Thread.setDefaultUncaughtExceptionHandler(JHVUncaughtExceptionHandler.getSingletonInstance());
+        Thread.setDefaultUncaughtExceptionHandler(instance);
     }
 
     /**
@@ -82,7 +78,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
         report.setEditable(false);
         report.setOpaque(false);
-        report.addHyperlinkListener(handler);
+        report.addHyperlinkListener(instance);
         objects.add(report);
 
         if (msg instanceof String) {

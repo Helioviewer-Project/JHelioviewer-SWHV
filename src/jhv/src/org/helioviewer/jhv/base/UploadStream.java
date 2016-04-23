@@ -23,7 +23,7 @@ public class UploadStream {
     /**
      * Used uri to connect
      */
-    private URI uri;
+    private final URI uri;
     /**
      * Created output stream
      */
