@@ -24,7 +24,7 @@ public class PfssData {
     private final static Color LOOPCOLOR = Color.WHITE;
     private final static Color INSIDEFIELDCOLOR = Color.BLUE;
 
-    private byte[] gzipFitsFile = null;
+    private final byte[] gzipFitsFile;
 
     private int[] buffer;
     private FloatBuffer vertices;
@@ -39,12 +39,6 @@ public class PfssData {
     private String dateString;
     private final long time;
 
-    /**
-     * Constructor
-     *
-     * @param time
-     * @param url
-     */
     public PfssData(byte[] gzipFitsFile, long time) {
         this.gzipFitsFile = gzipFitsFile;
         this.time = time;
