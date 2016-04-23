@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class APIResponseDump {
 
     private static final APIResponseDump singletonInstance = new APIResponseDump();
-    private HashMap<URI, APIResponse> dump = new HashMap<URI, APIResponse>();
+    private static final HashMap<URI, APIResponse> dump = new HashMap<URI, APIResponse>();
 
     private APIResponseDump() {
     }

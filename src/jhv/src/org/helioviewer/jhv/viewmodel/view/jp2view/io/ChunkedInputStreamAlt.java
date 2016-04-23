@@ -66,7 +66,7 @@ import java.io.InputStream;
 
 public class ChunkedInputStreamAlt extends InputStream {
     /** The inputstream that we're wrapping */
-    private InputStream in;
+    private final InputStream in;
 
     /** The chunk size */
     private int chunkSize;
@@ -89,7 +89,7 @@ public class ChunkedInputStreamAlt extends InputStream {
     /**
      * Returns the total length of the read data.
      */
-    public final int getTotalLength() {
+    public int getTotalLength() {
         return totalLength;
     }
 
@@ -100,7 +100,7 @@ public class ChunkedInputStreamAlt extends InputStream {
      *
      * @throws IOException If an IO error occurs
      */
-    public ChunkedInputStreamAlt(final InputStream in) throws IOException {
+    public ChunkedInputStreamAlt(InputStream in) throws IOException {
         if (in == null) {
             throw new IllegalArgumentException("InputStream parameter may not be null");
         }
@@ -225,8 +225,8 @@ public class ChunkedInputStreamAlt extends InputStream {
      * 
      * @throws IOException when the chunk size could not be parsed
      */
-    @SuppressWarnings({"fallthrough"})
-    private static int getChunkSizeFromInputStream(final InputStream in) throws IOException {
+    @SuppressWarnings("fallthrough")
+    private static int getChunkSizeFromInputStream(InputStream in) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // States: 0=normal, 1=\r was scanned, 2=inside quoted string, -1=end
         int state = 0;
@@ -324,7 +324,7 @@ public class ChunkedInputStreamAlt extends InputStream {
      * @param inStream The {@link InputStream} to exhaust.
      * @throws IOException If an IO problem occurs
      */
-    static void exhaustInputStream(InputStream inStream) throws IOException {
+    private static void exhaustInputStream(InputStream inStream) throws IOException {
         // read and discard the remainder of the message
         byte buffer[] = new byte[1024];
         while (inStream.read(buffer) >= 0) {
