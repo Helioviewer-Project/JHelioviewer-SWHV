@@ -56,12 +56,11 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
     private final JPanel optionsPanelWrapper;
     private final GridBagConstraints gc = new GridBagConstraints();
     private Component optionsPanel = new JPanel();
-    private final IntervalOptionPanel intervalOptionPanel;
 
     private int lastSelectedIndex = -1;
 
     public LineDataSelectorTablePanel() {
-        intervalOptionPanel = new IntervalOptionPanel();
+        IntervalOptionPanel intervalOptionPanel = new IntervalOptionPanel();
         this.setLayout(new GridBagLayout());
         tableModel = LineDataSelectorModel.getSingletonInstance();
 

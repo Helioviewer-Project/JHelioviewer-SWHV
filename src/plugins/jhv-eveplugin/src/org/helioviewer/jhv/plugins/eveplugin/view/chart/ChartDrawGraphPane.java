@@ -58,7 +58,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private int movieLinePosition = -1;
     private Point mousePressedPosition = null;
     private Point mouseDragPosition = null;
-    private boolean mousePressedOnMovieFrame = false;
+
+    private final boolean mousePressedOnMovieFrame = false; // !!!
+
     private Rectangle graphArea = new Rectangle();
     private Rectangle plotArea = new Rectangle();
     private BufferedImage screenImage = null;
@@ -72,29 +74,29 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private int lastWidth;
     private int lastHeight;
     private boolean updateRequestReceived;
-    private final Timer timer;
+
     private final List<DrawableType> zOrderList = new ArrayList<DrawableType>(EnumSet.allOf(DrawableType.class));
     private boolean movieLineRequest = false;
     private boolean forceRedrawGraph = false;
 
     public ChartDrawGraphPane() {
+        setOpaque(true);
+        setDoubleBuffered(false);
+
         updateRequestReceived = false;
         drawController = EVEPlugin.dc;
-        initVisualComponents();
+
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         addComponentListener(this);
         drawController.addDrawControllerListener(this);
         eventModel = EventModel.getSingletonInstance();
-        timer = new Timer("ChartDrawGraphPane redraw timer");
-        timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 20));
-        setChartInformation();
-    }
 
-    private void initVisualComponents() {
-        setOpaque(true);
-        setDoubleBuffered(false);
+        Timer timer = new Timer("ChartDrawGraphPane redraw timer");
+        timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 20));
+
+        setChartInformation();
     }
 
     @Override
