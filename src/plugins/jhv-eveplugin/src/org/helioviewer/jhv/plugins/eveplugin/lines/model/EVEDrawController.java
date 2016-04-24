@@ -39,7 +39,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private final Map<YAxis, List<Band>> bandsPerYAxis;
 
     private static EVEDrawController instance;
-    private final Timer selectedIntervalChangedTimer;
     private boolean selectedIntervalChanged;
     private final LineDataSelectorModel selectorModel;
 
@@ -50,7 +49,8 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         yAxisMap = new HashMap<Band, YAxis>();
         bandsPerYAxis = new HashMap<YAxis, List<Band>>();
         selectedIntervalChanged = false;
-        selectedIntervalChangedTimer = new Timer(300, new SelectedIntervalTimerTask());
+
+        Timer selectedIntervalChangedTimer = new Timer(300, new SelectedIntervalTimerTask());
         selectedIntervalChangedTimer.start();
 
         EVEPlugin.dc.addTimingListener(this);

@@ -132,7 +132,7 @@ public class DownloadController implements TimingListener {
         if (list == null) {
             return;
         }
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             downloadMap.remove(band);
         }
         final List<Future<?>> fjs = futureJobs.get(band);
