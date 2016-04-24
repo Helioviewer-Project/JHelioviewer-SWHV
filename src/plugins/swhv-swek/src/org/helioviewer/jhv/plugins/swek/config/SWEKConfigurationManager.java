@@ -320,7 +320,6 @@ public class SWEKConfigurationManager {
     private boolean parseJSONConfig(JSONObject configJSON) {
         try {
             configuration = new SWEKConfiguration(parseVersion(configJSON), parseManuallyChanged(configJSON), parseSources(configJSON), parseEventTypes(configJSON), parseRelatedEvents(configJSON));
-            configuration.getRelatedEvents();
             SWEKEventType.setSwekRelatedEvents(configuration.getRelatedEvents());
             return true;
         } catch (JSONException e) {
