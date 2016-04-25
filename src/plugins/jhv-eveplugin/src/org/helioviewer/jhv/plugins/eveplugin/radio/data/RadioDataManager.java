@@ -123,7 +123,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         }
 
         if (!toDownloadStartDates.isEmpty()) {
-            LineDataSelectorModel.getSingletonInstance().downloadStarted(RadioDataManager.getSingletonInstance());
+            LineDataSelectorModel.getSingletonInstance().downloadStarted(this);
             JHVWorker<ArrayList<JP2ViewCallisto>, Void> imageDownloadWorker = new RadioJPXDownload().init(toDownloadStartDates);
             imageDownloadWorker.setThreadName("EVE--RadioDownloader");
             EVESettings.getExecutorService().execute(imageDownloadWorker);
