@@ -31,8 +31,8 @@ public class DownloadedJPXData implements ImageDataHandler {
 
     private final long startDate;
     private final long endDate;
-    private double startFreq = 400;
-    private double endFreq = 20;
+    private double startFreq;
+    private double endFreq;
     private int jp2Width;
     private int jp2Height;
 
