@@ -47,7 +47,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
  */
 public class RadioDataManager implements ColorLookupModelListener, LineDataSelectorElement, DrawableElement {
 
-    private static RadioDataManager instance;
     private final LineDataSelectorModel lineDataSelectorModel;
 
     private final DrawController drawController;
