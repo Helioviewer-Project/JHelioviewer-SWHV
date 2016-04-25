@@ -27,13 +27,13 @@ public class TableRowTransferHandler extends TransferHandler {
 
     private final DataFlavor integerObjectFlavor = new ActivationDataFlavor(Integer.class, "Integer Row Index");
     private final JTable grid;
-    BufferedImage image;
+    private BufferedImage image;
 
     public TableRowTransferHandler(JTable table) {
         this.grid = table;
     }
 
-    public void createImageOfRow(int rowIndex) {
+    private void createImageOfRow(int rowIndex) {
         int x = grid.getX();
         int y = grid.getRowHeight() * rowIndex;
         int w = grid.getWidth();
@@ -90,8 +90,8 @@ public class TableRowTransferHandler extends TransferHandler {
 
             if (rowFrom != -1 && rowFrom != index) {
                 ((Reorderable) grid.getModel()).reorder(rowFrom, index);
-                if (index > rowFrom)
-                    index--;
+                // if (index > rowFrom)
+                //    index--;
                 return true;
             }
         } catch (Exception e) {
