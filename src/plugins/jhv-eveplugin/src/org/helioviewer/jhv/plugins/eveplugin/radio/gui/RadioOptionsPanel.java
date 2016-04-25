@@ -13,7 +13,7 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
 @SuppressWarnings("serial")
 public class RadioOptionsPanel extends JPanel implements ActionListener {
 
-    private JComboBox lut;
+    private final JComboBox lut;
 
     public RadioOptionsPanel() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
