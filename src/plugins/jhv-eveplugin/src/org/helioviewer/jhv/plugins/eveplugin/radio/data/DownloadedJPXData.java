@@ -114,11 +114,10 @@ public class DownloadedJPXData implements ImageDataHandler {
             region = imageData.getRegion();
             bufferedImage = createBufferedImage(imageData.getWidth(), imageData.getHeight(), data);
             if (!hasData) {
-                LineDataSelectorModel.getSingletonInstance().downloadFinished(RadioDataManager.getSingletonInstance());
+                LineDataSelectorModel.getSingletonInstance().downloadFinished(EVEPlugin.rdm);
             }
             hasData = true;
-            EVEPlugin.dc.updateDrawableElement(RadioDataManager.getSingletonInstance(), true);
-
+            EVEPlugin.dc.updateDrawableElement(EVEPlugin.rdm, true);
         }
     }
 
@@ -134,7 +133,7 @@ public class DownloadedJPXData implements ImageDataHandler {
         if (inited) {
             JP2ViewCallisto jp2View = getView();
             JP2ImageCallisto image = jp2View.getJP2Image();
-            Rectangle roi = getROI(EVEPlugin.dc.selectedAxis, RadioDataManager.getSingletonInstance().getYAxis());
+            Rectangle roi = getROI(EVEPlugin.dc.selectedAxis, EVEPlugin.rdm.getYAxis());
 
             if (roi.width > 0 && roi.height > 0) {
                 image.setRegion(roi);

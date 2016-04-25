@@ -48,7 +48,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 public class RadioDataManager implements ColorLookupModelListener, LineDataSelectorElement, DrawableElement {
 
     private static RadioDataManager instance;
-    private LineDataSelectorModel lineDataSelectorModel;
+    private final LineDataSelectorModel lineDataSelectorModel;
 
     private final DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
@@ -61,24 +61,14 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     public static final int MAX_AMOUNT_OF_DAYS = 3;
     public static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 1;
 
-    private RadioDataManager() {
+    public RadioDataManager() {
         ColorLookupModel.getInstance().addFilterModelListener(this);
         drawController = EVEPlugin.dc;
         bufferedImages = new HashMap<Long, BufferedImage>();
         yAxis = new YAxis(new Range(400, 20), "Mhz", false);
         isVisible = true;
-    }
-
-    public static RadioDataManager getSingletonInstance() {
-        if (instance == null) {
-            instance = new RadioDataManager();
-            instance.init();
-        }
-        return instance;
-    }
-
-    private void init() {
         lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
+
     }
 
     public void clearCache() {
@@ -338,8 +328,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         protected void done() {
             try {
                 ArrayList<JP2ViewCallisto> jpList = get();
-                RadioDataManager.getSingletonInstance().initJPX(jpList, datesToDownload);
-
+                EVEPlugin.rdm.initJPX(jpList, datesToDownload);
             } catch (InterruptedException e) {
                 Log.error("ImageDownloadWorker execution interrupted: " + e.getMessage());
             } catch (ExecutionException e) {
