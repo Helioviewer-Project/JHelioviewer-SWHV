@@ -18,7 +18,8 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-        if (value != null) { // In some case this can be called with value null
+        // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
+        if (value instanceof LineDataSelectorElement) {
             LineDataSelectorElement lineDataElement = (LineDataSelectorElement) value;
 
             label.setText(null);
