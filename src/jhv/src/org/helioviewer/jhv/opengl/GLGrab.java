@@ -30,6 +30,7 @@ public class GLGrab {
         fboTex = fbo.attachTexture2D(gl, 0, true);
 
         fbo.attachRenderbuffer(gl, Type.DEPTH, FBObject.CHOSEN_BITS);
+        fbo.reset(gl, fbo.getWidth(), fbo.getHeight(), GLInfo.GLSAMPLES);
         fbo.unbind(gl);
     }
 
@@ -77,4 +78,5 @@ public class GLGrab {
 
         return screenshot;
     }
+
 }
