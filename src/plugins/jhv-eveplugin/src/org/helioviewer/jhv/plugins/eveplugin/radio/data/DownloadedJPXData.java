@@ -7,7 +7,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
-import java.util.Date;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
@@ -101,8 +100,6 @@ public class DownloadedJPXData implements ImageDataHandler {
             view.abolish();
             view = null;
         }
-        System.out.println("ABOLISH JPX " + new Date(startDate) + " " + this);
-
     }
 
     @Override

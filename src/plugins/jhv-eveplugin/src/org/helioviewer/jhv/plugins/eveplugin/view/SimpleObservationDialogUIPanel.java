@@ -26,7 +26,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
-import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -127,7 +126,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         end.set(Calendar.HOUR_OF_DAY, 23);
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
-        RadioDownloader.getSingletonInstance().requestAndOpenIntervals(selectedInterval.start, end.getTimeInMillis());
+        RadioDataManager.getSingletonInstance().requestAndOpenIntervals(selectedInterval.start, end.getTimeInMillis());
         LineDataSelectorModel.getSingletonInstance().addLineData(RadioDataManager.getSingletonInstance());
         EVEPlugin.dc.updateDrawableElement(RadioDataManager.getSingletonInstance(), true);
     }
