@@ -138,16 +138,13 @@ public class DownloadedJPXData implements ImageDataHandler {
 
             if (roi.width > 0 && roi.height > 0) {
                 image.setRegion(roi);
-                jp2View.render(null, null, defineFactor(getVisibleImagePercentage(roi)));
+                jp2View.render(null, null, defineFactor(roi));
             }
         }
     }
 
-    public double getVisibleImagePercentage(Rectangle roi) {
-        return roi.getWidth() * roi.getHeight() / (jp2Width * jp2Height);
-    }
-
-    private double defineFactor(double visibleImagePercentage) {
+    private double defineFactor(Rectangle roi) {
+        double visibleImagePercentage = roi.getWidth() * roi.getHeight() / (jp2Width * jp2Height);
         if (visibleImagePercentage <= 0.03125) {
             return 1;
         } else if (visibleImagePercentage <= 0.0625) {
@@ -165,7 +162,7 @@ public class DownloadedJPXData implements ImageDataHandler {
 
     private boolean first = true;
 
-    public Rectangle getROI(TimeAxis xAxis, YAxis yAxis) {
+    private Rectangle getROI(TimeAxis xAxis, YAxis yAxis) {
         long imageTimesize = endDate - startDate;
         int imageFrequencySize = (int) (endFreq - startFreq);
         double timePerPix = 1.0 * imageTimesize / jp2Width;
@@ -224,7 +221,7 @@ public class DownloadedJPXData implements ImageDataHandler {
         }
     }
 
-    public void drawNoData(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
+    private void drawNoData(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
         int dx0 = xAxis.value2pixel(ga.x, ga.width, Math.max(startDate, xAxis.min));
         int dx1 = xAxis.value2pixel(ga.x, ga.width, Math.min(endDate, xAxis.max));
         int dy0 = 0;
