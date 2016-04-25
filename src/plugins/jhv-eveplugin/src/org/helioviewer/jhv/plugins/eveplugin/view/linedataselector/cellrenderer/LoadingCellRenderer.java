@@ -20,15 +20,16 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (value != null) { // In some case this can be called with value null
             LineDataSelectorElement element = (LineDataSelectorElement) value;
+            JLabel p = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (element.isDownloading()) {
                 downloadProgressBar.setIndeterminate(true);
                 downloadProgressBar.setVisible(element.isDownloading());
                 downloadProgressBar.setBorder(LineDataSelectorTablePanel.commonBorder);
-                downloadProgressBar.setOpaque(false);
+                downloadProgressBar.setOpaque(true);
                 downloadProgressBar.setPreferredSize(new Dimension(20, downloadProgressBar.getPreferredSize().height));
+                downloadProgressBar.setBackground(p.getBackground());
                 return downloadProgressBar;
             } else {
-                JLabel p = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 p.setBorder(LineDataSelectorTablePanel.commonBorder);
                 p.setText(null);
                 return p;
