@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
@@ -46,7 +45,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
  */
 public class RadioDataManager implements ColorLookupModelListener, LineDataSelectorElement, DrawableElement {
 
-    private Map<Long, BufferedImage> bufferedImages;
     private YAxis yAxis;
 
     private boolean isVisible;
@@ -58,7 +56,6 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     public RadioDataManager() {
         ColorLookupModel.getInstance().addFilterModelListener(this);
-        bufferedImages = new HashMap<Long, BufferedImage>();
         yAxis = new YAxis(new Range(400, 20), "Mhz", false);
         isVisible = true;
     }
@@ -156,14 +153,11 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     @Override
     public void colorLUTChanged() {
         ColorModel cm = ColorLookupModel.getInstance().getColorModel();
-        Map<Long, BufferedImage> newBufferedImages = new HashMap<Long, BufferedImage>();
-        for (Map.Entry<Long, BufferedImage> entry : bufferedImages.entrySet()) {
-            long index = entry.getKey();
-            BufferedImage old = entry.getValue();
-            BufferedImage newIm = new BufferedImage(cm, old.getRaster(), false, null);
-            newBufferedImages.put(index, newIm);
+        for (Entry<Long, DownloadedJPXData> entry : cache.entrySet()) {
+            DownloadedJPXData jpxData = entry.getValue();
+            jpxData.changeColormap(cm);
         }
-        bufferedImages = newBufferedImages;
+        EVEPlugin.dc.updateDrawableElement(this, true);
     }
 
     @Override

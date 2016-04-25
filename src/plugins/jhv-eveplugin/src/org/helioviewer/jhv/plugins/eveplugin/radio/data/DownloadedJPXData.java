@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 
@@ -253,6 +254,13 @@ public class DownloadedJPXData implements ImageDataHandler {
 
     public boolean isDownloading() {
         return !hasData && !downloadJPXFailed;
+    }
+
+    public void changeColormap(ColorModel cm) {
+        if (hasData) {
+            BufferedImage old = bufferedImage;
+            bufferedImage = new BufferedImage(cm, old.getRaster(), false, null);
+        }
     }
 
 }
