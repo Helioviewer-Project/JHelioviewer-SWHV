@@ -57,10 +57,6 @@ public class DownloadController implements TimingListener {
     }
 
     public void updateBand(Band band, Interval queryInterval, Interval priorityInterval) {
-        if (band == null || queryInterval == null) {
-            return;
-        }
-
         List<Interval> missingIntervalsNoExtend = EVECacheController.getSingletonInstance().getMissingDaysInInterval(band, queryInterval);
         if (!missingIntervalsNoExtend.isEmpty()) {
             Interval realQueryInterval = extendQueryInterval(queryInterval);
@@ -206,7 +202,7 @@ public class DownloadController implements TimingListener {
         private final Interval interval;
         private final Band band;
 
-        public DownloadThread(final Band band, final Interval interval) {
+        public DownloadThread(Band band, Interval interval) {
             this.interval = interval;
             this.band = band;
         }
@@ -278,7 +274,7 @@ public class DownloadController implements TimingListener {
             }
         }
 
-        private URL buildRequestURL(final Interval interval, final BandType type) throws MalformedURLException {
+        private URL buildRequestURL(Interval interval, BandType type) throws MalformedURLException {
             String urlf = type.getBaseUrl() + "start_date=%s&end_date=%s&timeline=%s&data_format=json";
             String url = String.format(urlf, TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
             return new URL(url);
