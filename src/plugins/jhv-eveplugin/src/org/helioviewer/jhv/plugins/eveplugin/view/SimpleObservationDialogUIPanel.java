@@ -25,7 +25,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
@@ -126,7 +125,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         end.set(Calendar.MINUTE, 59);
         end.set(Calendar.SECOND, 59);
         EVEPlugin.rdm.requestAndOpenIntervals(selectedInterval.start, end.getTimeInMillis());
-        LineDataSelectorModel.getSingletonInstance().addLineData(EVEPlugin.rdm);
+        EVEPlugin.ldsm.addLineData(EVEPlugin.rdm);
         EVEPlugin.dc.updateDrawableElement(EVEPlugin.rdm, true);
     }
 

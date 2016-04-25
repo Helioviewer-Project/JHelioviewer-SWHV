@@ -26,7 +26,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,11 +39,9 @@ public class DownloadController implements TimingListener {
     private final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<Band, ArrayList<Interval>>();
     private final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
 
-    private final LineDataSelectorModel selectorModel;
     public static final ExecutorService downloadPool = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("EVE Download"), new ThreadPoolExecutor.AbortPolicy());
 
     private DownloadController() {
-        selectorModel = LineDataSelectorModel.getSingletonInstance();
         EVEPlugin.dc.addTimingListener(this);
     }
 
@@ -164,11 +161,11 @@ public class DownloadController implements TimingListener {
     }
 
     private void fireDownloadStarted(Band band) {
-        selectorModel.downloadStarted(band);
+        EVEPlugin.ldsm.downloadStarted(band);
     }
 
     private void fireDownloadFinished(Band band) {
-        selectorModel.downloadFinished(band);
+        EVEPlugin.ldsm.downloadFinished(band);
     }
 
     private List<Future<?>> addDownloads(final DownloadThread[] jobs) {

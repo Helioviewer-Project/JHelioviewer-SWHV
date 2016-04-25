@@ -21,9 +21,9 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis.YAxisLocation;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -60,7 +60,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         latestMovieTime = Long.MIN_VALUE;
         fullValueRange = false;
 
-        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
+        EVEPlugin.ldsm.addLineDataSelectorModelListener(this);
         JHVRelatedEvents.addHighlightListener(this);
         JHVRelatedEvents.addHighlightListener(Displayer.getSingletonInstance());
     }
@@ -396,7 +396,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             for (DrawableElement de : elementsSet) {
                 if (de.getYAxis() != null && yAxes.contains(de.getYAxis())) {
                     tempArray[yAxes.indexOf(de.getYAxis())] = de.getYAxis();
-                 }
+                }
             }
         }
         List<YAxis> newYAxisList = new ArrayList<YAxis>();

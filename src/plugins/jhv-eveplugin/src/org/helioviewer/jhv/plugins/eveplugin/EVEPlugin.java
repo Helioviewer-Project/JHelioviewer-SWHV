@@ -18,6 +18,7 @@ import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.RadioObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 import org.helioviewer.jhv.threads.JHVWorker;
 
@@ -28,6 +29,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
     public final static DrawController dc = new DrawController();
     public final static RadioDataManager rdm = new RadioDataManager();
+    public final static LineDataSelectorModel ldsm = new LineDataSelectorModel();
 
     @Override
     public void installPlugin() {

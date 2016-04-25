@@ -15,7 +15,6 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -114,7 +113,7 @@ public class DownloadedJPXData implements ImageDataHandler {
             region = imageData.getRegion();
             bufferedImage = createBufferedImage(imageData.getWidth(), imageData.getHeight(), data);
             if (!hasData) {
-                LineDataSelectorModel.getSingletonInstance().downloadFinished(EVEPlugin.rdm);
+                EVEPlugin.ldsm.downloadFinished(EVEPlugin.rdm);
             }
             hasData = true;
             EVEPlugin.dc.updateDrawableElement(EVEPlugin.rdm, true);

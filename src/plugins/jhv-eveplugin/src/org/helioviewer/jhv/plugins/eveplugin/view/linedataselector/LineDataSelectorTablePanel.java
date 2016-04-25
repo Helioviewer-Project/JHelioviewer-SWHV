@@ -30,6 +30,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
@@ -62,23 +63,23 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
     public LineDataSelectorTablePanel() {
         IntervalOptionPanel intervalOptionPanel = new IntervalOptionPanel();
         this.setLayout(new GridBagLayout());
-        tableModel = LineDataSelectorModel.getSingletonInstance();
+        tableModel = EVEPlugin.ldsm;
 
         grid = new JTable(tableModel) {
-                    @Override
-                    public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                        if (columnIndex == VISIBLE_COL || columnIndex == REMOVE_COL) {
-                            // prevent changing selection
-                            return;
-                        }
-                        super.changeSelection(rowIndex, columnIndex, toggle, extend);
-                    }
+            @Override
+            public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+                if (columnIndex == VISIBLE_COL || columnIndex == REMOVE_COL) {
+                    // prevent changing selection
+                    return;
+                }
+                super.changeSelection(rowIndex, columnIndex, toggle, extend);
+            }
 
-                    @Override
-                    public void clearSelection() {
-                        // prevent losing selection
-                    }
-                };
+            @Override
+            public void clearSelection() {
+                // prevent losing selection
+            }
+        };
         tableModel.addTableModelListener(grid);
 
         grid.getSelectionModel().addListSelectionListener(this);
@@ -212,6 +213,7 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
     }
 
     private int rowHeight = -1;
+
     private int getGridRowHeight() {
         if (rowHeight == -1) {
             rowHeight = grid.getRowHeight() + 4;
