@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin.view.chart;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -12,6 +11,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -27,10 +28,9 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.JComponent;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -68,7 +68,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private final EventModel eventModel;
     private Rectangle leftAxisArea;
 
-    private boolean reschedule = false;
     private Point mousePosition;
     private boolean mouseOverEvent;
     private int lastWidth;
@@ -93,10 +92,21 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         drawController.addDrawControllerListener(this);
         eventModel = EventModel.getSingletonInstance();
 
-        Timer timer = new Timer("ChartDrawGraphPane redraw timer");
-        timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 20));
+        Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
+        redrawTimer.start();
 
         setChartInformation();
+    }
+
+    private class RedrawListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (updateRequestReceived) {
+                updateRequestReceived = false;
+                updateDrawInformation();
+                redrawGraph();
+            }
+        }
     }
 
     @Override
@@ -109,24 +119,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
             drawMovieLine(g);
         }
-        if (reschedule && !drawController.isLocked()) {
-            reschedule = false;
-            updateGraph();
-        }
     }
 
     private void updateGraph() {
         updateRequestReceived = true;
-    }
-
-    private void timerRedrawGraph() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                updateDrawInformation();
-                redrawGraph();
-            }
-        });
     }
 
     private void redrawGraph() {
@@ -558,16 +554,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                         yAxis.zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
                     }
                 }
-            }
-        }
-    }
-
-    private class RedrawTimerTask extends TimerTask {
-        @Override
-        public void run() {
-            if (updateRequestReceived) {
-                updateRequestReceived = false;
-                timerRedrawGraph();
             }
         }
     }
