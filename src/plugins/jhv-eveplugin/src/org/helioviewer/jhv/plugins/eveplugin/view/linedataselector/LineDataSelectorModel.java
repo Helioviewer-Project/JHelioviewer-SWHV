@@ -19,18 +19,6 @@ public class LineDataSelectorModel implements TableModel {
 
     public final static int NUMBEROFCOLUMNS = 5;
 
-    private static LineDataSelectorModel instance;
-
-    private LineDataSelectorModel() {
-    }
-
-    public static LineDataSelectorModel getSingletonInstance() {
-        if (instance == null) {
-            instance = new LineDataSelectorModel();
-        }
-        return instance;
-    }
-
     public void addLineDataSelectorModelListener(LineDataSelectorModelListener listener) {
         listeners.add(listener);
     }

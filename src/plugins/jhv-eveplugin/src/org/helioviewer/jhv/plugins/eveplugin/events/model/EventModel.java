@@ -16,7 +16,6 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventPanel;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventsSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
 /*
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
@@ -43,7 +42,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
         eventPanel = new EventPanel();
         eventSelectorElement = new EventsSelectorElement(this);
         eventsActivated = false;
-        LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
+        EVEPlugin.ldsm.addLineData(eventSelectorElement);
     }
 
     public static EventModel getSingletonInstance() {
@@ -85,7 +84,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
         if (eventsVisible != visible) {
             eventsVisible = visible;
             EVEPlugin.dc.updateDrawableElement(eventPanel, true);
-            LineDataSelectorModel.getSingletonInstance().lineDataElementUpdated(eventSelectorElement);
+            EVEPlugin.ldsm.lineDataElementUpdated(eventSelectorElement);
         }
     }
 

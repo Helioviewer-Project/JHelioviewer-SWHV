@@ -21,7 +21,6 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
@@ -31,7 +30,6 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModelListener;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 
@@ -47,9 +45,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
  */
 public class RadioDataManager implements ColorLookupModelListener, LineDataSelectorElement, DrawableElement {
 
-    private final LineDataSelectorModel lineDataSelectorModel;
-
-    private final DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
     private YAxis yAxis;
 
@@ -62,12 +57,9 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     public RadioDataManager() {
         ColorLookupModel.getInstance().addFilterModelListener(this);
-        drawController = EVEPlugin.dc;
         bufferedImages = new HashMap<Long, BufferedImage>();
         yAxis = new YAxis(new Range(400, 20), "Mhz", false);
         isVisible = true;
-        lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
-
     }
 
     public void clearCache() {
@@ -112,7 +104,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         }
 
         if (!toDownloadStartDates.isEmpty()) {
-            LineDataSelectorModel.getSingletonInstance().downloadStarted(this);
+            EVEPlugin.ldsm.downloadStarted(this);
             JHVWorker<ArrayList<JP2ViewCallisto>, Void> imageDownloadWorker = new RadioJPXDownload().init(toDownloadStartDates);
             imageDownloadWorker.setThreadName("EVE--RadioDownloader");
             EVESettings.getExecutorService().execute(imageDownloadWorker);
@@ -140,17 +132,17 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     private void removeRadioData() {
         clearCache();
-        lineDataSelectorModel.removeLineData(this);
+        EVEPlugin.ldsm.removeLineData(this);
     }
 
     public void radioDataVisibilityChanged() {
         if (isVisible) {
-            drawController.updateDrawableElement(this, true);
+            EVEPlugin.dc.updateDrawableElement(this, true);
         } else {
-            drawController.removeDrawableElement(this);
+            EVEPlugin.dc.removeDrawableElement(this);
         }
 
-        lineDataSelectorModel.lineDataElementUpdated(this);
+        EVEPlugin.ldsm.lineDataElementUpdated(this);
     }
 
     void requestForData() {

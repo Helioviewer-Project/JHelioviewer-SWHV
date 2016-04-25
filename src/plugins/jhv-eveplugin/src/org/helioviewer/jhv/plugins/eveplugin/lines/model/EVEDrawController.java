@@ -28,7 +28,6 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.data.EVECacheControllerListen
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.EVEValues;
 import org.helioviewer.jhv.plugins.eveplugin.lines.gui.EVEDrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
 public class EVEDrawController implements TimingListener, EVECacheControllerListener, RangeListener {
 
@@ -40,10 +39,8 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
 
     private static EVEDrawController instance;
     private boolean selectedIntervalChanged;
-    private final LineDataSelectorModel selectorModel;
 
     private EVEDrawController() {
-        selectorModel = LineDataSelectorModel.getSingletonInstance();
         eveDrawableElementMap = new HashMap<YAxis, EVEDrawableElement>();
         bandTypes = new HashSet<BandType>();
         yAxisMap = new HashMap<Band, YAxis>();
@@ -201,7 +198,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             band.setDataColor(BandColors.getNextColor());
             DownloadController.getSingletonInstance().updateBand(band, EVEPlugin.dc.getAvailableInterval(), EVEPlugin.dc.getSelectedInterval());
             addToMap(band);
-            selectorModel.addLineData(band);
+            EVEPlugin.ldsm.addLineData(band);
         }
     }
 
@@ -218,7 +215,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         DownloadController.getSingletonInstance().stopDownloads(band);
         removeFromMap(band);
         fixAxis();
-        selectorModel.removeLineData(band);
+        EVEPlugin.ldsm.removeLineData(band);
     }
 
     // EVE Cache Controller Listener
@@ -313,8 +310,8 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
 
     public boolean canChangeAxis(Band band) {
         return EVEPlugin.dc.canChangeAxis(band.getUnitLabel()) && yAxisMap.size() > 1 &&
-              (EVEPlugin.dc.getYAxisLocation(yAxisMap.get(band)) == YAxis.YAxisLocation.RIGHT ||
-              (EVEPlugin.dc.getYAxisLocation(yAxisMap.get(band)) == YAxis.YAxisLocation.LEFT && bandsPerYAxis.get(yAxisMap.get(band)).size() > 1));
+                (EVEPlugin.dc.getYAxisLocation(yAxisMap.get(band)) == YAxis.YAxisLocation.RIGHT ||
+                (EVEPlugin.dc.getYAxisLocation(yAxisMap.get(band)) == YAxis.YAxisLocation.LEFT && bandsPerYAxis.get(yAxisMap.get(band)).size() > 1));
     }
 
     public int getAxisLocation(Band band) {
