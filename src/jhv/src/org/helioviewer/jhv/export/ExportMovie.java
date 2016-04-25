@@ -67,6 +67,7 @@ public class ExportMovie implements FrameListener {
 
     private void exportMovieFinish(GL2 gl) {
         ImageViewerGui.getMainComponent().detachExport();
+        _isRecording = false;
         MoviePanel.recordPanelSetEnabled(true);
 
         try {
@@ -108,6 +109,12 @@ public class ExportMovie implements FrameListener {
 
     private static final int MACROBLOCK = 8;
 
+    private static boolean _isRecording = false;
+
+    public static boolean isRecording() {
+        return _isRecording;
+    }
+
     public static void start(int _w, int _h, boolean isInternal, int fps, RecordMode _mode) {
         int scrw = 1;
         int scrh = 0;
@@ -148,6 +155,7 @@ public class ExportMovie implements FrameListener {
 
         grabber = new GLGrab(canvasWidth, canvasHeight);
         ImageViewerGui.getMainComponent().attachExport(instance);
+        _isRecording = true;
 
         if (mode == RecordMode.SHOT) {
             Displayer.display();
