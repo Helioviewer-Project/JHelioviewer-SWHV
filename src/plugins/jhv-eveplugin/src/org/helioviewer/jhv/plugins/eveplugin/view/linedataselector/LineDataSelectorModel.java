@@ -40,12 +40,10 @@ public class LineDataSelectorModel implements TableModel {
     }
 
     public void downloadStarted(LineDataSelectorElement element) {
-        fireDownloadStarted(element);
         fireListeners();
     }
 
     public void downloadFinished(LineDataSelectorElement element) {
-        fireDownloadFinished(element);
         fireListeners();
     }
 
@@ -84,11 +82,6 @@ public class LineDataSelectorModel implements TableModel {
         return false;
     }
 
-    public void addLineData(LineDataSelectorElement element, int rowIndex) {
-        elements.add(rowIndex, element);
-        fireListeners();
-    }
-
     private void fireListeners() {
         TableModelEvent e = new TableModelEvent(this);
         for (TableModelListener listener : tableListeners) {
@@ -105,18 +98,6 @@ public class LineDataSelectorModel implements TableModel {
     private void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataAdded(element);
-        }
-    }
-
-    private void fireDownloadStarted(LineDataSelectorElement element) {
-        for (LineDataSelectorModelListener listener : listeners) {
-            listener.downloadStartded(element);
-        }
-    }
-
-    private void fireDownloadFinished(LineDataSelectorElement element) {
-        for (LineDataSelectorModelListener listener : listeners) {
-            listener.downloadFinished(element);
         }
     }
 

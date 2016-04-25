@@ -263,14 +263,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void downloadStartded(LineDataSelectorElement element) {
-    }
-
-    @Override
-    public void downloadFinished(LineDataSelectorElement element) {
-    }
-
-    @Override
     public void lineDataAdded(LineDataSelectorElement element) {
     }
 
