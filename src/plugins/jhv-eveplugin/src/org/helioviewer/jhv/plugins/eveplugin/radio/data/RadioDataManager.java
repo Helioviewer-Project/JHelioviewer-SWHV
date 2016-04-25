@@ -129,8 +129,6 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
             EVESettings.getExecutorService().execute(imageDownloadWorker);
         }
 
-        Iterator<Entry<Long, DownloadedJPXData>> itt = cache.entrySet().iterator();
-
     }
 
     public void initJPX(ArrayList<JP2ViewCallisto> jpList, ArrayList<Long> datesToDownload) {
