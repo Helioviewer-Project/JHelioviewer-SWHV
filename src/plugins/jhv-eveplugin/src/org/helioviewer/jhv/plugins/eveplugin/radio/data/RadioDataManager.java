@@ -125,7 +125,8 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
                 }
             }
             else {
-                jpxData.downloadJPXFailed();
+                if (jpxData != null)
+                    jpxData.downloadJPXFailed();
             }
         }
     }
