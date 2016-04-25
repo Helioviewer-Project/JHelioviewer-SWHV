@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
@@ -237,11 +238,13 @@ public class DownloadedJPXData implements ImageDataHandler {
         if (downloadJPXFailed) {
             text = "No data available";
         }
-        int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
-        int textHeight = (int) g.getFontMetrics().getStringBounds(text, g).getHeight();
-        int x1 = dx0 + dwidth / 2 - textWidth / 2;
-        int y1 = dheight / 2 - textHeight / 2;
-        g.drawString(text, x1, y1);
+
+        Rectangle2D r = g.getFontMetrics().getStringBounds(text, g);
+        int tWidth = (int) r.getWidth();
+        int tHeight = (int) r.getHeight();
+        int x = dx0 + dwidth / 2 - tWidth / 2;
+        int y = dheight / 2 - tHeight / 2;
+        g.drawString(text, x, y);
     }
 
     public void downloadJPXFailed() {
