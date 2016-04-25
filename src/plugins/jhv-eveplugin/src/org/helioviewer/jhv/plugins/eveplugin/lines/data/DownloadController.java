@@ -36,8 +36,8 @@ public class DownloadController implements TimingListener {
 
     private static final DownloadController singletonInstance = new DownloadController();
 
-    private final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<Band, ArrayList<Interval>>();
-    private final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
+    private static final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<Band, ArrayList<Interval>>();
+    private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
 
     public static final ExecutorService downloadPool = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("EVE Download"), new ThreadPoolExecutor.AbortPolicy());
 
@@ -49,14 +49,14 @@ public class DownloadController implements TimingListener {
         return singletonInstance;
     }
 
-    private void updateBands(final Interval interval, final Interval priorityInterval) {
+    private void updateBands(Interval interval, Interval priorityInterval) {
         Set<Band> bands = EVEDrawController.getSingletonInstance().getAllBands();
         for (Band b : bands) {
             updateBand(b, interval, priorityInterval);
         }
     }
 
-    public void updateBand(final Band band, final Interval queryInterval, final Interval priorityInterval) {
+    public void updateBand(Band band, Interval queryInterval, Interval priorityInterval) {
         if (band == null || queryInterval == null) {
             return;
         }
@@ -73,23 +73,22 @@ public class DownloadController implements TimingListener {
                 return;
             }
 
-            if (intervals.size() == 0) {
+            int n = intervals.size();
+            if (n == 0) {
                 fireDownloadStarted(band);
                 return;
             }
 
             // create download jobs and allocate priorities
-            final DownloadThread[] jobs = new DownloadThread[intervals.size()];
-
+            DownloadThread[] jobs = new DownloadThread[n];
             int i = 0;
-            for (final Interval interval : intervals) {
+            for (Interval interval : intervals) {
                 jobs[i] = new DownloadThread(band, interval);
                 ++i;
             }
 
             // add download jobs
             addFutureJobs(addDownloads(jobs), band);
-
             // inform listeners
             fireDownloadStarted(band);
         }
@@ -108,31 +107,31 @@ public class DownloadController implements TimingListener {
         return new Interval(queryInterval.start - 7 * TimeUtils.DAY_IN_MILLIS, queryInterval.end + 7 * TimeUtils.DAY_IN_MILLIS);
     }
 
-    private ArrayList<Interval> getIntervals(final Band band, final Interval queryInterval) {
+    private ArrayList<Interval> getIntervals(Band band, Interval queryInterval) {
         // get missing data intervals within given interval
-        final List<Interval> missingIntervals = EVECacheController.getSingletonInstance().addRequest(band, queryInterval);
+        List<Interval> missingIntervals = EVECacheController.getSingletonInstance().addRequest(band, queryInterval);
         if (missingIntervals.isEmpty()) {
             return null;
         }
 
         // split intervals (if necessary) into smaller intervals
-        final ArrayList<Interval> intervals = new ArrayList<Interval>();
-        for (final Interval i : missingIntervals) {
+        ArrayList<Interval> intervals = new ArrayList<Interval>();
+        for (Interval i : missingIntervals) {
             intervals.addAll(Interval.splitInterval(i, EVESettings.DOWNLOADER_MAX_DAYS_PER_BLOCK));
         }
 
         return intervals;
     }
 
-    public void stopDownloads(final Band band) {
-        final ArrayList<Interval> list = downloadMap.get(band);
+    public void stopDownloads(Band band) {
+        ArrayList<Interval> list = downloadMap.get(band);
         if (list == null) {
             return;
         }
         if (list.isEmpty()) {
             downloadMap.remove(band);
         }
-        final List<Future<?>> fjs = futureJobs.get(band);
+        List<Future<?>> fjs = futureJobs.get(band);
         for (Future<?> fj : fjs) {
             fj.cancel(true);
         }
@@ -140,19 +139,18 @@ public class DownloadController implements TimingListener {
         fireDownloadFinished(band);
     }
 
-    public boolean isDownloadActive(final Band band) {
-        final ArrayList<Interval> list = downloadMap.get(band);
+    public boolean isDownloadActive(Band band) {
+        ArrayList<Interval> list = downloadMap.get(band);
         if (list == null) {
             return false;
         }
-        return list.size() > 0;
+        return !list.isEmpty();
     }
 
     @Override
     public void availableIntervalChanged() {
         Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
         Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
-
         DownloadController.getSingletonInstance().updateBands(downloadInterval, EVEPlugin.dc.getSelectedInterval());
     }
 
@@ -168,12 +166,12 @@ public class DownloadController implements TimingListener {
         EVEPlugin.ldsm.downloadFinished(band);
     }
 
-    private List<Future<?>> addDownloads(final DownloadThread[] jobs) {
+    private List<Future<?>> addDownloads(DownloadThread[] jobs) {
         List<Future<?>> futureJobs = new ArrayList<Future<?>>();
         for (int i = 0; i < jobs.length; ++i) {
             // add to download map
-            final Band band = jobs[i].getBand();
-            final Interval interval = jobs[i].getInterval();
+            Band band = jobs[i].getBand();
+            Interval interval = jobs[i].getInterval();
 
             ArrayList<Interval> list = downloadMap.get(band);
             if (list == null) {
@@ -191,14 +189,10 @@ public class DownloadController implements TimingListener {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                int numberOfDownloads = 0;
-
-                final ArrayList<Interval> list = downloadMap.get(band);
+                ArrayList<Interval> list = downloadMap.get(band);
                 if (list != null) {
                     list.remove(interval);
-                    numberOfDownloads = list.size();
-
-                    if (numberOfDownloads == 0) {
+                    if (list.isEmpty()) {
                         downloadMap.remove(band);
                     }
                 }
@@ -239,7 +233,7 @@ public class DownloadController implements TimingListener {
 
             try {
                 url = buildRequestURL(interval, band.getBandType());
-            } catch (final MalformedURLException e) {
+            } catch (MalformedURLException e) {
                 Log.error("Error Creating the EVE URL.", e);
             }
 
