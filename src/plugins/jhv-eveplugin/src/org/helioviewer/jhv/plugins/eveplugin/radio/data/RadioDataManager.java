@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -291,7 +290,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     private class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
 
-        private ArrayList<Long> datesToDownload;
+        private final ArrayList<Long> datesToDownload;
 
         public RadioJPXDownload(ArrayList<Long> toDownload) {
             datesToDownload = toDownload;
