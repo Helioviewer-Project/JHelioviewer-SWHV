@@ -131,6 +131,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     private void removeRadioData() {
         clearCache();
         EVEPlugin.ldsm.removeLineData(this);
+        EVEPlugin.dc.removeDrawableElement(this);
     }
 
     public void radioDataVisibilityChanged() {
