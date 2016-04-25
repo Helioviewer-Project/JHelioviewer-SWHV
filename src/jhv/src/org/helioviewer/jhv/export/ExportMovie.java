@@ -106,6 +106,8 @@ public class ExportMovie implements FrameListener {
         }
     }
 
+    private static final int MACROBLOCK = 8;
+
     public static void start(int _w, int _h, boolean isInternal, int fps, RecordMode _mode) {
         int scrw = 1;
         int scrh = 0;
@@ -120,7 +122,7 @@ public class ExportMovie implements FrameListener {
         if (mode == RecordMode.SHOT)
             canvasWidth = _w;
         else
-            canvasWidth = (_w / 2) * 2; // wiser for video formats
+            canvasWidth = (_w / MACROBLOCK) * MACROBLOCK; // video formats
 
         int sh = (int) (scrh / (double) scrw * canvasWidth + .5);
         if (isInternal)
@@ -131,7 +133,7 @@ public class ExportMovie implements FrameListener {
         if (mode == RecordMode.SHOT)
             exportHeight = canvasHeight + sh;
         else
-            exportHeight = ((canvasHeight + sh) / 2) * 2; // wiser for video formats
+            exportHeight = ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK; // video formats
 
         canvasHeight = exportHeight - sh;
 
