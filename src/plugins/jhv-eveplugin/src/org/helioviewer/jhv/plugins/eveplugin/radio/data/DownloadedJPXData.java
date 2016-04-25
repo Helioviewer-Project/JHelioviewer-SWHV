@@ -145,8 +145,6 @@ public class DownloadedJPXData implements ImageDataHandler {
         return roi.getWidth() * roi.getHeight() / (jp2Width * jp2Height);
     }
 
-    //private final double[] factors = { 0.03125, 0.0625, 0.125, 0.25, 0.5 };
-
     private double defineFactor(double visibleImagePercentage) {
         if (visibleImagePercentage <= 0.03125) {
             return 1;
