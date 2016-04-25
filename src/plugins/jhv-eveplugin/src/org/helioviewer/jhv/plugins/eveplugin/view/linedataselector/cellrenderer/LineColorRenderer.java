@@ -15,33 +15,37 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 @SuppressWarnings("serial")
 public class LineColorRenderer extends DefaultTableCellRenderer {
 
+    private final LineColorPanel lineColorPanel = new LineColorPanel();
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        if (value != null) {
-            JLabel p = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if (value instanceof LineDataSelectorElement) {
-                LineDataSelectorElement ldse = (LineDataSelectorElement) value;
-                if (ldse.getDataColor() != null) {
-                    LineColorPanel lineColorPanel = new LineColorPanel(ldse.getDataColor());
-                    lineColorPanel.setBackground(p.getBackground());
-                    lineColorPanel.setBorder(LineDataSelectorTablePanel.commonBorder);
-                    return lineColorPanel;
-                } else {
-                    p.setBorder(LineDataSelectorTablePanel.commonBorder);
-                    p.setText(null);
-                    return p;
-                }
+        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+        // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
+        if (value instanceof LineDataSelectorElement) {
+            LineDataSelectorElement ldse = (LineDataSelectorElement) value;
+
+            Color c = ldse.getDataColor();
+            if (c != null) {
+                lineColorPanel.setLineColor(c);
+                lineColorPanel.setBackground(label.getBackground());
+                lineColorPanel.setBorder(LineDataSelectorTablePanel.commonBorder);
+                return lineColorPanel;
             }
+
+            label.setText(null);
+            label.setBorder(LineDataSelectorTablePanel.commonBorder);
         }
-        return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+        return label;
     }
 
     private static class LineColorPanel extends JPanel {
-        private final Color c;
 
-        public LineColorPanel(Color c) {
+        private Color c;
+
+        public void setLineColor(Color c) {
             this.c = c;
-            this.setBackground(super.getBackground());
         }
 
         @Override
@@ -50,6 +54,7 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
             g.setColor(c);
             g.fillRect(0, getHeight() / 2 - 1, getWidth(), 2);
         }
+
     }
 
 }

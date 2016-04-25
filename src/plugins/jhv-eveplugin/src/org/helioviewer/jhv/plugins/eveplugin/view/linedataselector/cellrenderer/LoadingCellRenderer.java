@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
@@ -18,25 +19,27 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        if (value != null) { // In some case this can be called with value null
+        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+        // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
+        if (value instanceof LineDataSelectorElement) {
             LineDataSelectorElement element = (LineDataSelectorElement) value;
-            JLabel p = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
             if (element.isDownloading()) {
                 downloadProgressBar.setIndeterminate(true);
                 downloadProgressBar.setVisible(element.isDownloading());
-                downloadProgressBar.setBorder(LineDataSelectorTablePanel.commonBorder);
                 downloadProgressBar.setOpaque(true);
                 downloadProgressBar.setPreferredSize(new Dimension(20, downloadProgressBar.getPreferredSize().height));
-                downloadProgressBar.setBackground(p.getBackground());
+                downloadProgressBar.setBackground(label.getBackground());
+                downloadProgressBar.setBorder(LineDataSelectorTablePanel.commonBorder);
                 return downloadProgressBar;
-            } else {
-                p.setBorder(LineDataSelectorTablePanel.commonBorder);
-                p.setText(null);
-                return p;
             }
-        } else {
-            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+            label.setText(null);
+            label.setBorder(LineDataSelectorTablePanel.commonBorder);
         }
+
+        return label;
     }
 
 }
