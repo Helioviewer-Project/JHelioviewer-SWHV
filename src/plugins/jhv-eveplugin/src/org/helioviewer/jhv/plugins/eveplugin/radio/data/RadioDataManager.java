@@ -48,8 +48,9 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     private boolean isVisible;
 
-    private final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();;
+    private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();;
     private static final String ROBserver = DataSources.ROBsettings.get("API.jp2images.path");
+
     public static final int MAX_AMOUNT_OF_DAYS = 3;
     public static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 1;
 
@@ -68,7 +69,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     }
 
     public void requestAndOpenIntervals(long start, long end) {
-        final ArrayList<Long> toDownloadStartDates = new ArrayList<Long>();
+        ArrayList<Long> toDownloadStartDates = new ArrayList<Long>();
         long startDate = start - start % TimeUtils.DAY_IN_MILLIS;
 
         ArrayList<Long> incomingStartDates = new ArrayList<Long>(DAYS_IN_CACHE);
@@ -102,7 +103,6 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
             imageDownloadWorker.setThreadName("EVE--RadioDownloader");
             EVESettings.getExecutorService().execute(imageDownloadWorker);
         }
-
     }
 
     private void initJPX(ArrayList<JP2ViewCallisto> jpList, ArrayList<Long> datesToDownload) {
@@ -124,28 +124,6 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         }
     }
 
-    private void removeRadioData() {
-        clearCache();
-        EVEPlugin.ldsm.removeLineData(this);
-        EVEPlugin.dc.removeDrawableElement(this);
-    }
-
-    public void radioDataVisibilityChanged() {
-        if (isVisible) {
-            EVEPlugin.dc.updateDrawableElement(this, true);
-        } else {
-            EVEPlugin.dc.removeDrawableElement(this);
-        }
-
-        EVEPlugin.ldsm.lineDataElementUpdated(this);
-    }
-
-    void requestForData() {
-        for (DownloadedJPXData jpxData : cache.values()) {
-            jpxData.requestData();
-        }
-    }
-
     @Override
     public void colorLUTChanged() {
         ColorModel cm = ColorLookupModel.getInstance().getColorModel();
@@ -163,13 +141,21 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     @Override
     public void removeLineData() {
-        removeRadioData();
+        clearCache();
+        EVEPlugin.ldsm.removeLineData(this);
+        EVEPlugin.dc.removeDrawableElement(this);
     }
 
     @Override
     public void setVisibility(boolean visible) {
         isVisible = visible;
-        radioDataVisibilityChanged();
+
+        if (isVisible) {
+            EVEPlugin.dc.updateDrawableElement(this, true);
+        } else {
+            EVEPlugin.dc.removeDrawableElement(this);
+        }
+        EVEPlugin.ldsm.lineDataElementUpdated(this);
     }
 
     @Override
@@ -235,6 +221,12 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         ymin = yAxis.getSelectedRange().min;
         ymax = yAxis.getSelectedRange().max;
         return !cond;
+    }
+
+    private void requestForData() {
+        for (DownloadedJPXData jpxData : cache.values()) {
+            jpxData.requestData();
+        }
     }
 
     @Override
