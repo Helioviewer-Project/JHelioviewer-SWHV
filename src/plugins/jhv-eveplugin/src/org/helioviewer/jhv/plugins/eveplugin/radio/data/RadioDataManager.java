@@ -59,16 +59,12 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         isVisible = true;
     }
 
-    public void clearCache() {
+    private void clearCache() {
         for (DownloadedJPXData jpxData : cache.values()) {
             if (jpxData.isInited())
                 jpxData.remove();
         }
         cache.clear();
-    }
-
-    public HashMap<Long, DownloadedJPXData> getCache() {
-        return cache;
     }
 
     public void requestAndOpenIntervals(long start, long end) {
