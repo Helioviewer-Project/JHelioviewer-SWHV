@@ -27,9 +27,10 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
     private final PlotPanel plotOne = new PlotPanel();
     private final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
+    public final static LineDataSelectorModel ldsm = new LineDataSelectorModel();
+
     public final static DrawController dc = new DrawController();
     public final static RadioDataManager rdm = new RadioDataManager();
-    public final static LineDataSelectorModel ldsm = new LineDataSelectorModel();
 
     @Override
     public void installPlugin() {
