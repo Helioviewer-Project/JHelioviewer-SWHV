@@ -27,12 +27,12 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private final PlotPanel plotOne = new PlotPanel();
     private final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
     public final static DrawController dc = new DrawController();
+    public final static RadioDataManager rdm = new RadioDataManager();
 
     @Override
     public void installPlugin() {
         dc.addTimingListener(EventModel.getSingletonInstance());
 
-        RadioDataManager.getSingletonInstance();
         pluginPanes.add(plotOne);
 
         ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
