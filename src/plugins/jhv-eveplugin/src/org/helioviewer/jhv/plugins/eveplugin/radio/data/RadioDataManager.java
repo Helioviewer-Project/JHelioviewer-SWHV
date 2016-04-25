@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.io.IOException;
@@ -105,14 +106,14 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
         if (!toDownloadStartDates.isEmpty()) {
             EVEPlugin.ldsm.downloadStarted(this);
-            JHVWorker<ArrayList<JP2ViewCallisto>, Void> imageDownloadWorker = new RadioJPXDownload().init(toDownloadStartDates);
+            JHVWorker<ArrayList<JP2ViewCallisto>, Void> imageDownloadWorker = new RadioJPXDownload(toDownloadStartDates);
             imageDownloadWorker.setThreadName("EVE--RadioDownloader");
             EVESettings.getExecutorService().execute(imageDownloadWorker);
         }
 
     }
 
-    public void initJPX(ArrayList<JP2ViewCallisto> jpList, ArrayList<Long> datesToDownload) {
+    private void initJPX(ArrayList<JP2ViewCallisto> jpList, ArrayList<Long> datesToDownload) {
         for (int i = 0; i < jpList.size(); i++) {
             JP2ViewCallisto v = jpList.get(i);
             long date = datesToDownload.get(i);
@@ -259,15 +260,20 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
             }
         } else {
             String text1 = "The selected interval is too big.";
+            Rectangle2D r1 = g.getFontMetrics().getStringBounds(text1, g);
+            int t1Width = (int) r1.getWidth();
+            int t1Height = (int) r1.getHeight();
+
             String text2 = "Reduce the interval to see the radio spectrograms.";
-            final int text1Width = (int) g.getFontMetrics().getStringBounds(text1, g).getWidth();
-            final int text2Width = (int) g.getFontMetrics().getStringBounds(text2, g).getWidth();
-            final int text1height = (int) g.getFontMetrics().getStringBounds(text2, g).getHeight();
-            final int text2height = (int) g.getFontMetrics().getStringBounds(text2, g).getHeight();
-            final int x1 = graphArea.x + (graphArea.width / 2) - (text1Width / 2);
-            final int y1 = (int) (graphArea.y + (graphArea.height / 2) - 1.5 * text1height);
-            final int x2 = graphArea.x + (graphArea.width / 2) - (text2Width / 2);
-            final int y2 = (int) (graphArea.y + graphArea.height / 2 + 0.5 * text2height);
+            Rectangle2D r2 = g.getFontMetrics().getStringBounds(text2, g);
+            int t2Width = (int) r2.getWidth();
+            int t2Height = (int) r2.getHeight();
+
+            int x1 = graphArea.x + (graphArea.width / 2) - (t1Width / 2);
+            int y1 = (int) (graphArea.y + (graphArea.height / 2) - 1.5 * t1Height);
+            int x2 = graphArea.x + (graphArea.width / 2) - (t2Width / 2);
+            int y2 = (int) (graphArea.y + graphArea.height / 2 + 0.5 * t2Height);
+
             g.setColor(Color.black);
             g.drawString(text1, x1, y1);
             g.drawString(text2, x2, y2);
@@ -289,13 +295,12 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         return -1;
     }
 
-    private static class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
+    private class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
 
         private ArrayList<Long> datesToDownload;
 
-        public RadioJPXDownload init(ArrayList<Long> toDownload) {
+        public RadioJPXDownload(ArrayList<Long> toDownload) {
             datesToDownload = toDownload;
-            return this;
         }
 
         @Override
@@ -320,7 +325,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         protected void done() {
             try {
                 ArrayList<JP2ViewCallisto> jpList = get();
-                EVEPlugin.rdm.initJPX(jpList, datesToDownload);
+                initJPX(jpList, datesToDownload);
             } catch (InterruptedException e) {
                 Log.error("ImageDownloadWorker execution interrupted: " + e.getMessage());
             } catch (ExecutionException e) {
@@ -329,4 +334,5 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         }
 
     }
+
 }
