@@ -28,7 +28,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     static {
         capabilities.setSampleBuffers(true);
-        capabilities.setNumSamples(4);
+        capabilities.setNumSamples(GLInfo.GLSAMPLES);
     }
 
     public MainComponent() {

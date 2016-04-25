@@ -9,6 +9,8 @@ import com.jogamp.opengl.glu.GLU;
 
 public class GLInfo {
 
+    public static final int GLSAMPLES = 4;
+
     public static int[] pixelScale = new int[] { 1, 1 };
     static float[] pixelScaleFloat = new float[] { 1f, 1f };
 
@@ -26,9 +28,7 @@ public class GLInfo {
             throw new GLException(err);
         }
 
-        int[] out = new int[1];
-
-        out[0] = 0;
+        int[] out = new int[] { 0 };
         gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, out, 0);
         maxTextureSize = out[0];
         Log.debug(">> GLInfo > max texture size: " + out[0]);
