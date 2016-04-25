@@ -27,6 +27,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
 public class DownloadedJPXData implements ImageDataHandler {
+
     private JP2ViewCallisto view;
     private boolean inited = false;
     private boolean hasData = false;
@@ -75,27 +76,11 @@ public class DownloadedJPXData implements ImageDataHandler {
         inited = true;
     }
 
-    public boolean isInited() {
+    boolean isInited() {
         return inited;
     }
 
-    public boolean hasData() {
-        return hasData;
-    }
-
-    public JP2ViewCallisto getView() {
-        return view;
-    }
-
-    public long getStartDate() {
-        return startDate;
-    }
-
-    public long getEndDate() {
-        return endDate;
-    }
-
-    public void remove() {
+    void remove() {
         if (view != null) {
             view.setDataHandler(null);
             view.abolish();
@@ -130,15 +115,14 @@ public class DownloadedJPXData implements ImageDataHandler {
         return newImage;
     }
 
-    public void requestData() {
+    void requestData() {
         if (inited) {
-            JP2ViewCallisto jp2View = getView();
-            JP2ImageCallisto image = jp2View.getJP2Image();
+            JP2ImageCallisto image = view.getJP2Image();
             Rectangle roi = getROI(EVEPlugin.dc.selectedAxis, EVEPlugin.rdm.getYAxis());
 
             if (roi.width > 0 && roi.height > 0) {
                 image.setRegion(roi);
-                jp2View.render(null, null, defineFactor(roi));
+                view.render(null, null, defineFactor(roi));
             }
         }
     }
@@ -196,7 +180,7 @@ public class DownloadedJPXData implements ImageDataHandler {
         return new Rectangle(x0, y0, width, height);
     }
 
-    public void draw(Graphics2D g, Rectangle ga, TimeAxis xAxis, YAxis yAxis) {
+    void draw(Graphics2D g, Rectangle ga, TimeAxis xAxis, YAxis yAxis) {
         if (hasData) {
             int sx0 = 0;
             int sx1 = bufferedImage.getWidth();
@@ -245,15 +229,15 @@ public class DownloadedJPXData implements ImageDataHandler {
         g.drawString(text, x, y);
     }
 
-    public void downloadJPXFailed() {
+    void downloadJPXFailed() {
         downloadJPXFailed = true;
     }
 
-    public boolean isDownloading() {
+    boolean isDownloading() {
         return !hasData && !downloadJPXFailed;
     }
 
-    public void changeColormap(ColorModel cm) {
+    void changeColormap(ColorModel cm) {
         if (hasData) {
             BufferedImage old = bufferedImage;
             bufferedImage = new BufferedImage(cm, old.getRaster(), false, null);
