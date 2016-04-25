@@ -56,7 +56,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     private boolean isVisible;
 
-    private final HashMap<Long, DownloadedJPXData> requestDateCache = new HashMap<Long, DownloadedJPXData>();;
+    private final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();;
     private static final String ROBserver = DataSources.ROBsettings.get("API.jp2images.path");
     public static final int MAX_AMOUNT_OF_DAYS = 3;
     public static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 1;
@@ -82,15 +82,15 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     }
 
     public void clearCache() {
-        for (DownloadedJPXData jpxData : requestDateCache.values()) {
+        for (DownloadedJPXData jpxData : cache.values()) {
             if (jpxData.isInited())
                 jpxData.remove();
         }
-        requestDateCache.clear();
+        cache.clear();
     }
 
     public HashMap<Long, DownloadedJPXData> getCache() {
-        return requestDateCache;
+        return cache;
     }
 
     public void requestAndOpenIntervals(long start, long end) {
@@ -102,7 +102,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
             incomingStartDates.add(startDate + i * TimeUtils.DAY_IN_MILLIS);
         }
 
-        Iterator<Entry<Long, DownloadedJPXData>> it = requestDateCache.entrySet().iterator();
+        Iterator<Entry<Long, DownloadedJPXData>> it = cache.entrySet().iterator();
         while (it.hasNext()) {
             Entry<Long, DownloadedJPXData> entry = it.next();
             Long key = entry.getKey();
@@ -116,9 +116,9 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         }
 
         for (long incomingStart : incomingStartDates) {
-            if (!requestDateCache.containsKey(incomingStart)) {
+            if (!cache.containsKey(incomingStart)) {
                 toDownloadStartDates.add(incomingStart);
-                requestDateCache.put(incomingStart, new DownloadedJPXData(incomingStart, incomingStart + TimeUtils.DAY_IN_MILLIS));
+                cache.put(incomingStart, new DownloadedJPXData(incomingStart, incomingStart + TimeUtils.DAY_IN_MILLIS));
             }
         }
 
@@ -129,7 +129,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
             EVESettings.getExecutorService().execute(imageDownloadWorker);
         }
 
-        Iterator<Entry<Long, DownloadedJPXData>> itt = requestDateCache.entrySet().iterator();
+        Iterator<Entry<Long, DownloadedJPXData>> itt = cache.entrySet().iterator();
 
     }
 
@@ -137,7 +137,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         for (int i = 0; i < jpList.size(); i++) {
             JP2ViewCallisto v = jpList.get(i);
             long date = datesToDownload.get(i);
-            DownloadedJPXData jpxData = requestDateCache.get(date);
+            DownloadedJPXData jpxData = cache.get(date);
             if (v != null) {
                 if (jpxData != null) {
                     jpxData.init(v);
@@ -167,7 +167,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     }
 
     void requestForData() {
-        for (DownloadedJPXData jpxData : requestDateCache.values()) {
+        for (DownloadedJPXData jpxData : cache.values()) {
             jpxData.requestData();
         }
     }
@@ -218,7 +218,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     @Override
     public boolean isDownloading() {
-        for (DownloadedJPXData jpxData : requestDateCache.values()) {
+        for (DownloadedJPXData jpxData : cache.values()) {
             if (jpxData.isDownloading()) {
                 return true;
             }
@@ -274,7 +274,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
             requestAndOpenIntervals(timeAxis.min, timeAxis.max);
         }
         if (timediffCond) {
-            for (DownloadedJPXData djpx : requestDateCache.values()) {
+            for (DownloadedJPXData djpx : cache.values()) {
                 djpx.draw(g, graphArea, timeAxis, yAxis);
             }
         } else {
