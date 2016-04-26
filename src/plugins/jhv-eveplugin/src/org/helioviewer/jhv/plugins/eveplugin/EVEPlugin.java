@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.eveplugin;
 
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
 
 import javax.swing.JComponent;
 
@@ -20,17 +21,20 @@ import org.helioviewer.jhv.plugins.eveplugin.view.RadioObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
+import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
+    public static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("EVE", EVESettings.MAX_WORKER_THREADS);
+
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
     private final PlotPanel plotOne = new PlotPanel();
     private final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
-    public final static LineDataSelectorModel ldsm = new LineDataSelectorModel();
+    public static final  LineDataSelectorModel ldsm = new LineDataSelectorModel();
 
-    public final static DrawController dc = new DrawController();
-    public final static RadioDataManager rdm = new RadioDataManager();
+    public static final DrawController dc = new DrawController();
+    public static final RadioDataManager rdm = new RadioDataManager();
 
     @Override
     public void installPlugin() {
@@ -66,7 +70,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         };
 
         loadSources.setThreadName("EVE--LoadSources");
-        EVESettings.getExecutorService().execute(loadSources);
+        executorService.execute(loadSources);
     }
 
     @Override

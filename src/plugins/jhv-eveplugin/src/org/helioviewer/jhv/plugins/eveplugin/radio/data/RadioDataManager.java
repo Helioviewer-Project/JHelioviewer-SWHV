@@ -27,7 +27,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioOptionsPanel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModelListener;
-import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
@@ -101,7 +100,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
             EVEPlugin.ldsm.downloadStarted(this);
             JHVWorker<ArrayList<JP2ViewCallisto>, Void> imageDownloadWorker = new RadioJPXDownload(toDownloadStartDates);
             imageDownloadWorker.setThreadName("EVE--RadioDownloader");
-            EVESettings.getExecutorService().execute(imageDownloadWorker);
+            EVEPlugin.executorService.execute(imageDownloadWorker);
         }
     }
 

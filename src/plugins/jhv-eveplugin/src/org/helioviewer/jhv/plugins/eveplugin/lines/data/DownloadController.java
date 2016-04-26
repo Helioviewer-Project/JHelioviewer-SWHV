@@ -170,7 +170,7 @@ public class DownloadController implements TimingListener {
             list.add(interval);
 
             downloadMap.put(band, list);
-            futureJobs.add(EVESettings.getExecutorService().submit(jobs[i]));
+            futureJobs.add(EVEPlugin.executorService.submit(jobs[i]));
         }
         return futureJobs;
     }
