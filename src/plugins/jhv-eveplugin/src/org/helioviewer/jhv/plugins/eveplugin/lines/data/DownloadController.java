@@ -10,11 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
@@ -38,8 +34,6 @@ public class DownloadController implements TimingListener {
 
     private static final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<Band, ArrayList<Interval>>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
-
-    public static final ExecutorService downloadPool = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("EVE Download"), new ThreadPoolExecutor.AbortPolicy());
 
     private DownloadController() {
         EVEPlugin.dc.addTimingListener(this);
@@ -176,7 +170,7 @@ public class DownloadController implements TimingListener {
             list.add(interval);
 
             downloadMap.put(band, list);
-            futureJobs.add(downloadPool.submit(jobs[i]));
+            futureJobs.add(EVESettings.getExecutorService().submit(jobs[i]));
         }
         return futureJobs;
     }
@@ -238,8 +232,6 @@ public class DownloadController implements TimingListener {
             }
 
             // Log.debug("Requesting EVE Data: " + url);
-
-            // this might take a while
             try {
                 DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
                 BufferedReader in = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
