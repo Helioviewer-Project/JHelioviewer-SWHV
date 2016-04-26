@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.threads;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -10,12 +8,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import sun.awt.AppContext;
-
 public class JHVExecutor {
 
+/*
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import sun.awt.AppContext;
+
     public static synchronized void setSwingWorkersExecutorService(int MAX_WORKER_THREADS) {
-        /*
+
                 final AppContext appContext = AppContext.getAppContext();
                 ExecutorService executorService = (ExecutorService) appContext.get(SwingWorker.class);
                 if (executorService == null) {
@@ -26,15 +28,6 @@ public class JHVExecutor {
 
                     appContext.put(SwingWorker.class, executorService);
                 }
-        */
-    }
-
-    public static synchronized ExecutorService getJHVWorkersExecutorService(String name, int MAX_WORKER_THREADS) {
-        ExecutorService executorService = new ThreadPoolExecutor(MAX_WORKER_THREADS / 2, MAX_WORKER_THREADS,
-                10L, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>(),
-                new JHVThread.NamedThreadFactory("JHVWorker-" + name));
-        shutdownOnDisposal(AppContext.getAppContext(), executorService);
-        return executorService;
     }
 
     private static void shutdownOnDisposal(AppContext appContext, final ExecutorService es) {
@@ -63,6 +56,41 @@ public class JHVExecutor {
                     }
                 }
                 );
+    }
+*/
+
+    public static synchronized ExecutorService getJHVWorkersExecutorService(String name, int MAX_WORKER_THREADS) {
+        ExecutorService executorService = new ThreadPoolExecutor(MAX_WORKER_THREADS / 2, MAX_WORKER_THREADS,
+                10L, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("JHVWorker-" + name));
+        shutdownOnDisposal(executorService);
+        return executorService;
+    }
+
+    public static void shutdownOnDisposal(final ExecutorService es) {
+        final Runnable shutdownHook =
+            new Runnable() {
+                final WeakReference<ExecutorService> executorServiceRef = new WeakReference<ExecutorService>(es);
+                public void run() {
+                    final ExecutorService executorService = executorServiceRef.get();
+                    if (executorService != null) {
+                        AccessController.doPrivileged(
+                            new PrivilegedAction<Void>() {
+                                public Void run() {
+                                    executorService.shutdown();
+                                    return null;
+                                }
+                        });
+                    }
+                }
+            };
+
+        AccessController.doPrivileged(
+            new PrivilegedAction<Void>() {
+                public Void run() {
+                    Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
+                    return null;
+                }
+        });
     }
 
 }
