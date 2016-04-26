@@ -218,8 +218,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             double solarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
             unitPerPixel = Sun.Radius / solarPixelRadius;
 
-            double sunX = m.tryGetDouble("CRPIX1") - 1;
-            double sunY = m.tryGetDouble("CRPIX2") - 1;
+            double sunX = m.tryGetDouble("CRPIX1") - 0.5;
+            double sunY = m.tryGetDouble("CRPIX2") - 0.5;
 
             sunPositionX = unitPerPixel * sunX;
             sunPositionY = unitPerPixel * (pixelHeight - 1 - sunY);
