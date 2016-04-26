@@ -19,7 +19,6 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
-import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
 /**
@@ -105,8 +104,6 @@ public class JavaHelioViewer {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JHVExecutor.setSwingWorkersExecutorService(10);
-
                 TimeUtils.getSingletonInstance(); // instantiate class
                 Sun.getSingletonInstance();
 
