@@ -19,10 +19,11 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimeLineListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener {
+public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener, TimeLineListener {
 
     private final JComboBox zoomComboBox;
     private final JToggleButton periodFromLayersButton;
@@ -50,6 +51,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         add(periodFromLayersButton);
 
         Layers.addLayersListener(this);
+        EVEPlugin.dc.addTimeListener(this);
     }
 
     @Override
@@ -155,7 +157,11 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         periodFromLayersButton.setEnabled(view != null);
     }
 
+    @Override
     public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
+        if (selectedIntervalByZoombox == null) {
+            return;
+        }
         if (selectedAxis.start == selectedIntervalByZoombox.start && selectedAxis.end == selectedIntervalByZoombox.end) {
             selectedIndexSetByProgram = true;
             zoomComboBox.setSelectedIndex(0);
