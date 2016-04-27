@@ -19,6 +19,7 @@ public class Sun {
 
     public static final double MeanEarthDistanceMeter = 149597870700.;
     public static final double MeanEarthDistance = MeanEarthDistanceMeter / RadiusMeter;
+    public static final double MeanEarthDistanceInv = RadiusMeter / MeanEarthDistanceMeter;
 
     public static final Position.L EpochEarthL;
     public static final Position.Q EpochEarthQ;
