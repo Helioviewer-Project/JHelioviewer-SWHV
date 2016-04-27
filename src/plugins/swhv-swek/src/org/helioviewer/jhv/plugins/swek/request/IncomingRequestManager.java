@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.helioviewer.jhv.base.GZIPUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainerRequestHandler;
@@ -78,7 +79,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     private JHVEvent parseJSON(JsonEvent jsonEvent) {
         SWEKParser parser = SWEKSourceManager.getSingletonInstance().getParser(jsonEvent.type.getSupplier().getSource());
-        final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(JHVDatabase.decompress(jsonEvent.json)), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end);
+        final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end);
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {

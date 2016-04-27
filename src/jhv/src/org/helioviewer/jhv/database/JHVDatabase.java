@@ -1,13 +1,6 @@
 package org.helioviewer.jhv.database;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,9 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
+import org.helioviewer.jhv.base.GZIPUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -95,37 +87,6 @@ public class JHVDatabase {
             statements.put(statement, pstat);
         }
         return pstat;
-    }
-
-    public static byte[] compress(final String str) throws IOException {
-        if ((str == null) || (str.length() == 0)) {
-            return null;
-        }
-        ByteArrayOutputStream obj = new ByteArrayOutputStream();
-        GZIPOutputStream gzip = new GZIPOutputStream(obj);
-        gzip.write(str.getBytes("UTF-8"));
-        gzip.close();
-        return obj.toByteArray();
-    }
-
-    private static boolean isCompressed(final byte[] compressed) {
-        return (compressed[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
-    }
-
-    public static InputStream decompress(byte[] compressed) {
-        byte[] buf = compressed;
-        if (buf == null || buf.length == 0)
-            buf = new byte[0];
-
-        try {
-            InputStream in = new ByteArrayInputStream(buf);
-            if (buf.length != 0 && isCompressed(buf)) {
-                in = new GZIPInputStream(in);
-            }
-            return in;
-        } catch (IOException e) {
-            return new ByteArrayInputStream(new byte[0]);
-        }
     }
 
     private static int getEventTypeId(Connection connection, JHVEventType eventType) {
