@@ -169,67 +169,64 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private void zoomTo(ZOOM zoom, long value) {
-        Interval selectedInterval = EVEPlugin.dc.getSelectedInterval();
-        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
+        TimeAxis selectedInterval = EVEPlugin.dc.selectedAxis;
+        TimeAxis availableInterval = EVEPlugin.dc.availableAxis;
 
-        Interval newInterval;
         switch (zoom) {
         case All:
-            newInterval = availableInterval;
+            EVEPlugin.dc.setSelectedInterval(availableInterval.start, availableInterval.end);
             break;
         case Day:
-            newInterval = computeZoomInterval(selectedInterval, Calendar.DAY_OF_MONTH, value);
+            computeZoomInterval(selectedInterval.start, selectedInterval.end, Calendar.DAY_OF_MONTH, value);
             break;
         case Hour:
-            newInterval = computeZoomInterval(selectedInterval, Calendar.HOUR, value);
+            computeZoomInterval(selectedInterval.start, selectedInterval.end, Calendar.HOUR, value);
             break;
         case Month:
-            newInterval = computeZoomInterval(selectedInterval, Calendar.MONTH, value);
+            computeZoomInterval(selectedInterval.start, selectedInterval.end, Calendar.MONTH, value);
             break;
         case Year:
-            newInterval = computeZoomInterval(selectedInterval, Calendar.YEAR, value);
+            computeZoomInterval(selectedInterval.start, selectedInterval.end, Calendar.YEAR, value);
             break;
         case Carrington:
-            newInterval = computeCarringtonInterval(selectedInterval, value);
+            computeCarringtonInterval(selectedInterval.start, selectedInterval.end, value);
             break;
         case Movie:
-            newInterval = computeMovieInterval();
+            computeMovieInterval();
             break;
         case CUSTOM:
         default:
-            newInterval = selectedInterval;
         }
-        EVEPlugin.dc.setSelectedInterval(newInterval.start, newInterval.end);
     }
 
-    private Interval computeMovieInterval() {
+    private void computeMovieInterval() {
         View view = Layers.getActiveView();
         if (view != null && view.isMultiFrame()) {
-            return new Interval(view.getFirstTime().milli, view.getLastTime().milli);
+            EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
         }
         long now = System.currentTimeMillis();
-        return new Interval(now, now);
+        EVEPlugin.dc.setSelectedInterval(now, now);
+
     }
 
-    private Interval computeCarringtonInterval(Interval interval, long value) {
-        return computeZoomForMilliSeconds(interval, value * 2356585920l);
+    private void computeCarringtonInterval(long start, long end, long value) {
+        computeZoomForMilliSeconds(start, end, value * 2356585920l);
     }
 
-    private Interval computeZoomForMilliSeconds(Interval interval, long differenceMilli) {
-        long startDate = interval.start;
-        long endDate = interval.end;
+    private void computeZoomForMilliSeconds(long start, long end, long differenceMilli) {
+        long startDate = start;
+        long endDate = end;
         long now = System.currentTimeMillis();
         if (endDate > now) {
             endDate = now;
         }
 
         startDate = endDate - differenceMilli;
-
-        return new Interval(startDate, endDate);
+        EVEPlugin.dc.setSelectedInterval(startDate, endDate);
     }
 
-    private Interval computeZoomInterval(Interval interval, int calendarField, long difference) {
-        return computeZoomForMilliSeconds(interval, differenceInMilliseconds(calendarField, difference));
+    private void computeZoomInterval(long start, long end, int calendarField, long difference) {
+        computeZoomForMilliSeconds(start, end, differenceInMilliseconds(calendarField, difference));
     }
 
     private Long differenceInMilliseconds(int calendarField, long value) {
