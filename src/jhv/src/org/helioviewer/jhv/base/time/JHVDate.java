@@ -26,9 +26,8 @@ public class JHVDate implements Comparable<JHVDate> {
     }
 
     public JHVDate(long millis) {
-        if (millis < 0) {
+        if (millis < 0)
             throw new IllegalArgumentException("Arguments cannot be negative!");
-        }
 
         Calendar c = Calendar.getInstance(TimeUtils.UTC);
         c.clear();
@@ -83,7 +82,7 @@ public class JHVDate implements Comparable<JHVDate> {
                 hour = Integer.parseInt(secondDivide2[0]);
                 minute = Integer.parseInt(secondDivide2[1]);
                 second = Integer.parseInt(thirdDivide[0]);
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 year = 0;
                 month = 0;
                 day = 0;
