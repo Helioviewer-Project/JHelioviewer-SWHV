@@ -254,11 +254,6 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
         yAxis = _yAxis;
     }
 
-    @Override
-    public boolean hasElementsToDraw() {
-        return true;
-    }
-
     private class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
 
         private final ArrayList<Long> datesToDownload;

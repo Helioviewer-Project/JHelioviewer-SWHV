@@ -159,7 +159,7 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
                 eventTypeNr++;
             }
-            EventModel.getSingletonInstance().setEventUnderMouse(highlightedEvent);
+            setEventUnderMouse(highlightedEvent);
             if (mousePosition != null) {
                 JHVEventContainer.highlight(highlightedEvent);
             }
@@ -173,11 +173,6 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
     @Override
     public YAxis getYAxis() {
         return null;
-    }
-
-    @Override
-    public boolean hasElementsToDraw() {
-        return EventModel.getSingletonInstance().hasElementsToDraw();
     }
 
     @Override

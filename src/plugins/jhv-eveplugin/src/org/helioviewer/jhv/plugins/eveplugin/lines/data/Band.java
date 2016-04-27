@@ -250,11 +250,6 @@ public class Band implements LineDataSelectorElement {
         return yAxis;
     }
 
-    @Override
-    public boolean hasElementsToDraw() {
-        return true;
-    }
-
     public List<Interval> addRequest(Band band, Interval interval) {
         return requestCache.adaptRequestCache(interval.start, interval.end);
     }

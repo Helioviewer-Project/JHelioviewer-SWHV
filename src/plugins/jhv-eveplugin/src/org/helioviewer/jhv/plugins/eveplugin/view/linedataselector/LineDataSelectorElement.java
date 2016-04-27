@@ -37,8 +37,6 @@ public interface LineDataSelectorElement {
 
     public abstract YAxis getYAxis();
 
-    public abstract boolean hasElementsToDraw();
-
     public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis);
 
     public abstract void yaxisChanged();
