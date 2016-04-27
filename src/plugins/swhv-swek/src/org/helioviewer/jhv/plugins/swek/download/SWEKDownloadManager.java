@@ -28,6 +28,7 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.threads.JHVThread;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class SWEKDownloadManager implements EventTypePanelModelListener, FilterManagerListener {
 
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;

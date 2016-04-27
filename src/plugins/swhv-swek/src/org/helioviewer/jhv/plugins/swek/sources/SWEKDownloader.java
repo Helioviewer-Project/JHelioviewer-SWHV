@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.sources;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -11,6 +9,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -19,7 +18,6 @@ import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.database.JHVDatabase;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public abstract class SWEKDownloader {
 
@@ -59,9 +57,7 @@ public abstract class SWEKDownloader {
         }
 
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-            JSONObject eventJSON = new JSONObject(new JSONTokener(br));
-
+            JSONObject eventJSON = JSONUtils.getJSONStream(stream);
             if (eventJSON.has("overmax"))
                 overmax = eventJSON.getBoolean("overmax");
             else
@@ -71,11 +67,6 @@ public abstract class SWEKDownloader {
                 return false;
 
             return parseAssociations(eventJSON);
-        } catch (IOException e) {
-            overmax = false;
-            Log.error("Could not read the inputstream. " + e);
-            e.printStackTrace();
-            return false;
         } catch (JSONException e) {
             overmax = false;
             Log.error("JSON parsing error " + e);

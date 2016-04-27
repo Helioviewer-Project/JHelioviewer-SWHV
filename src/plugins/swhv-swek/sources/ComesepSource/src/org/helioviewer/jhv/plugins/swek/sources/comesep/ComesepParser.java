@@ -39,10 +39,9 @@ public class ComesepParser implements SWEKParser {
     }
 
     @Override
-    public JHVEvent parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
-        JSONObject result = new JSONObject(json);
+    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end) throws JSONException {
         JHVEvent currentEvent = new JHVEvent(type, id, start, end);
-        if (!parseResult(result, currentEvent)) {
+        if (!parseResult(json, currentEvent)) {
             return null;
         }
         return currentEvent;

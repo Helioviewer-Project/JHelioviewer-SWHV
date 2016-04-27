@@ -23,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class HEKDownloader extends SWEKDownloader {
 
     @Override
