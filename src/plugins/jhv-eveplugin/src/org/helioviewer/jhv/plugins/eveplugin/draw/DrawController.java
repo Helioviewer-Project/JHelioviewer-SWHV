@@ -173,9 +173,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void activeLayerChanged(View view) {
-        if (view == null) {
+        if (view == null)
             fireRedrawRequestMovieFrameChanged(Long.MIN_VALUE);
-        }
+        else
+            fireMovieIntervalChanged(view.getFirstTime().milli, view.getLastTime().milli);
     }
 
     public void fireRedrawRequest() {
@@ -184,9 +185,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private void fireRedrawRequestMovieFrameChanged(final long time) {
+    private void fireRedrawRequestMovieFrameChanged(long time) {
         for (DrawControllerListener l : listeners) {
             l.drawMovieLineRequest(time);
+        }
+    }
+
+    private void fireMovieIntervalChanged(long start, long end) {
+        for (DrawControllerListener l : listeners) {
+            l.movieIntervalChanged(start, end);
         }
     }
 

@@ -501,6 +501,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
+    public void movieIntervalChanged(long start, long end) {
+    }
+
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
