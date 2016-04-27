@@ -1,9 +1,6 @@
 package org.helioviewer.jhv.io;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,6 +14,7 @@ import java.util.TreeSet;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
@@ -24,7 +22,6 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 /**
  * Data objects storing the information of available data as a central singleton
@@ -330,10 +327,8 @@ public class DataSources {
                 while (true) {
                     try {
                         String queryString = Settings.getSingletonInstance().getProperty("API.dataSources.path");
-                        URL query = new URL(queryString);
-                        DownloadStream ds = new DownloadStream(query, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-                        Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
-                        newJsonResult = new JSONObject(new JSONTokener(reader));
+                        DownloadStream ds = new DownloadStream(new URL(queryString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
+                        newJsonResult = JSONUtils.getJSONStream(ds.getInput());
                         break;
                     } catch (MalformedURLException e) {
                         Log.error("Invalid url to retrieve data source", e);
