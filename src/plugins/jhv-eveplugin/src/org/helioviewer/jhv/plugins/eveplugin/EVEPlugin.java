@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutorService;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
@@ -44,6 +46,11 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
         ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
 
+        Layers.addLayersListener(dc);
+        Layers.addTimeListener(dc);
+        JHVRelatedEvents.addHighlightListener(dc);
+        JHVRelatedEvents.addHighlightListener(Displayer.getSingletonInstance());
+
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
             @Override
@@ -67,6 +74,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void uninstallPlugin() {
+        JHVRelatedEvents.removeHighlightListener(dc);
         Layers.removeTimeListener(dc);
         Layers.removeLayersListener(dc);
 

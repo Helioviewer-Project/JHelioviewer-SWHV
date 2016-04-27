@@ -27,7 +27,7 @@ public class TimestampRollingFileAppender extends FileAppender {
     private String directory;
     private String pattern;
     private String timeStampString;
-    private SimpleDateFormat formatter;
+    private final SimpleDateFormat formatter;
 
     public TimestampRollingFileAppender() {
         formatter = new SimpleDateFormat();
