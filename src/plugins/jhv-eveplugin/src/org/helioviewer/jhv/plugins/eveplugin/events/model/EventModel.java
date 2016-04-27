@@ -182,7 +182,7 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
     @Override
     public void setVisibility(boolean visible) {
-        isVisible = false;
+        isVisible = visible;
         EVEPlugin.dc.fireRedrawRequest();
         EVEPlugin.ldsm.lineDataElementUpdated(this);
     }
@@ -229,7 +229,5 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
     @Override
     public void yaxisChanged() {
-        // TODO Auto-generated method stub
-
     }
 }
