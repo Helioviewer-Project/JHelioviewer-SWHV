@@ -21,18 +21,14 @@ import javax.swing.event.MouseInputListener;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
-import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class ChartDrawIntervalPane extends JComponent implements DrawControllerListener, MouseInputListener, LayersListener {
+public class ChartDrawIntervalPane extends JComponent implements DrawControllerListener, MouseInputListener {
 
     private Interval movieInterval;
 
@@ -44,7 +40,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     private int leftIntervalBorderPosition = -10;
     private int rightIntervalBorderPosition = -10;
 
-    private final DrawController drawController;
     private final EVEState eveState;
 
     public ChartDrawIntervalPane() {
@@ -53,9 +48,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
 
         addMouseListener(this);
         addMouseMotionListener(this);
-        Layers.addLayersListener(this);
-        drawController = EVEPlugin.dc;
-        drawController.addDrawControllerListener(this);
+
+        EVEPlugin.dc.addDrawControllerListener(this);
         eveState = EVEState.getSingletonInstance();
     }
 
@@ -358,9 +352,9 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
             final int intervalWidthPixel = rightIntervalBorderPosition - leftIntervalBorderPosition;
             if (mousePressed.x > newMousePosition.x) {
-                drawController.move(0, intervalWidthPixel, -diffPixel);
+                EVEPlugin.dc.move(0, intervalWidthPixel, -diffPixel);
             } else {
-                drawController.move(0, intervalWidthPixel, diffPixel);
+                EVEPlugin.dc.move(0, intervalWidthPixel, diffPixel);
             }
             mousePressed = newMousePosition;
         }
@@ -387,8 +381,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         final double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
         double middle = leftIntervalBorderPosition + 0.5 * intervalWidthPixel;
         double distance = point.getX() - middle;
-        Rectangle graphArea = drawController.getGraphArea();
-        drawController.move(graphArea.x, graphArea.width, distance);
+        Rectangle graphArea = EVEPlugin.dc.getGraphArea();
+        EVEPlugin.dc.move(graphArea.x, graphArea.width, distance);
     }
 
     @Override
@@ -461,20 +455,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         }
     }
 
-    // Layers Listener
-
-    @Override
-    public void layerAdded(View view) {
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
-        if (view != null) {
-            movieInterval = new Interval(view.getFirstTime().milli, view.getLastTime().milli);
-            repaint();
-        }
-    }
-
     @Override
     public void drawRequest() {
         repaint();
@@ -482,6 +462,12 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
 
     @Override
     public void drawMovieLineRequest(long time) {
+        repaint();
+    }
+
+    @Override
+    public void movieIntervalChanged(long start, long end) {
+        movieInterval = new Interval(start, end);
         repaint();
     }
 

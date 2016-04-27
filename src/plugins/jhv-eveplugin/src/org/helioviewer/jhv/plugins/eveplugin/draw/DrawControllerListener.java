@@ -7,4 +7,6 @@ public interface DrawControllerListener {
 
     public abstract void drawMovieLineRequest(long time);
 
+    public abstract void movieIntervalChanged(long start, long end);
+
 }
