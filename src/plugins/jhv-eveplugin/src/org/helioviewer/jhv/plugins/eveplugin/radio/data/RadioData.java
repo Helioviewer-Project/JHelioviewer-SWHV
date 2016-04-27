@@ -38,7 +38,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
  * @author Bram.Bourgoignie@oma.be
  *
  */
-public class RadioDataManager implements ColorLookupModelListener, LineDataSelectorElement {
+public class RadioData implements ColorLookupModelListener, LineDataSelectorElement {
 
     private YAxis yAxis;
 
@@ -50,7 +50,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     public static final int MAX_AMOUNT_OF_DAYS = 3;
     public static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 1;
 
-    public RadioDataManager() {
+    public RadioData() {
         ColorLookupModel.getInstance().addFilterModelListener(this);
         yAxis = new YAxis(400, 20, "Mhz", false);
         isVisible = true;
