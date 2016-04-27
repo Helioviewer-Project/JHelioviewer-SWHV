@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.helioviewer.jhv.base.GZIPUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -18,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ComesepDownloader extends SWEKDownloader {
 
     private final Properties comesepSourceProperties;
@@ -44,7 +46,7 @@ public class ComesepDownloader extends SWEKDownloader {
 
                 byte[] compressedJson;
                 try {
-                    compressedJson = JHVDatabase.compress(result.toString());
+                    compressedJson = GZIPUtils.compress(result.toString());
                 } catch (IOException e) {
                     Log.error("compression error");
                     return false;

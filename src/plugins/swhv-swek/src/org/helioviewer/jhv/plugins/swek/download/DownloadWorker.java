@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.helioviewer.jhv.base.GZIPUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
@@ -68,7 +69,7 @@ public class DownloadWorker implements Runnable {
                 SWEKParser parser = sourceManager.getParser(swekSource);
                 ArrayList<JsonEvent> eventList = JHVDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
                 for (JsonEvent event : eventList) {
-                    final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(JHVDatabase.decompress(event.json)), event.type, event.id, event.start, event.end);
+                    final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end);
                     EventQueue.invokeLater(new Runnable() {
                         @Override
                         public void run() {
