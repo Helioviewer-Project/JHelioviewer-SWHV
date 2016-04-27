@@ -59,7 +59,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         eveState = EVEState.getSingletonInstance();
     }
 
-
     @Override
     protected void paintComponent(Graphics g1) {
         super.paintComponent(g1);
