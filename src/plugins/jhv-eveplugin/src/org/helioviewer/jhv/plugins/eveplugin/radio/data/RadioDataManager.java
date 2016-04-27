@@ -14,19 +14,16 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
-import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
+import org.helioviewer.jhv.plugins.eveplugin.radio.gui.ColorLookupModel;
+import org.helioviewer.jhv.plugins.eveplugin.radio.gui.ColorLookupModelListener;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioOptionsPanel;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModelListener;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
@@ -41,7 +38,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
  * @author Bram.Bourgoignie@oma.be
  *
  */
-public class RadioDataManager implements ColorLookupModelListener, LineDataSelectorElement, DrawableElement {
+public class RadioDataManager implements ColorLookupModelListener, LineDataSelectorElement {
 
     private YAxis yAxis;
 
@@ -55,7 +52,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     public RadioDataManager() {
         ColorLookupModel.getInstance().addFilterModelListener(this);
-        yAxis = new YAxis(new Range(400, 20), "Mhz", false);
+        yAxis = new YAxis(400, 20, "Mhz", false);
         isVisible = true;
     }
 
@@ -123,6 +120,21 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
         }
     }
 
+    private void removeRadioData() {
+        clearCache();
+        EVEPlugin.ldsm.removeLineData(this);
+    }
+
+    public void radioDataVisibilityChanged() {
+        EVEPlugin.ldsm.lineDataElementUpdated(this);
+    }
+
+    void requestForData() {
+        for (DownloadedJPXData jpxData : cache.values()) {
+            jpxData.requestData();
+        }
+    }
+
     @Override
     public void colorLUTChanged() {
         ColorModel cm = ColorLookupModel.getInstance().getColorModel();
@@ -130,7 +142,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
             DownloadedJPXData jpxData = entry.getValue();
             jpxData.changeColormap(cm);
         }
-        EVEPlugin.dc.updateDrawableElement(this, true);
+        EVEPlugin.dc.fireRedrawRequest();
     }
 
     @Override
@@ -139,21 +151,20 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     }
 
     @Override
+    public boolean showYAxis() {
+        return true;
+    }
+
+    @Override
     public void removeLineData() {
         clearCache();
         EVEPlugin.ldsm.removeLineData(this);
-        EVEPlugin.dc.removeDrawableElement(this);
     }
 
     @Override
     public void setVisibility(boolean visible) {
         isVisible = visible;
-
-        if (isVisible) {
-            EVEPlugin.dc.updateDrawableElement(this, true);
-        } else {
-            EVEPlugin.dc.removeDrawableElement(this);
-        }
+        EVEPlugin.dc.fireRedrawRequest();
         EVEPlugin.ldsm.lineDataElementUpdated(this);
     }
 
@@ -169,7 +180,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     @Override
     public Color getDataColor() {
-        return null;
+        return Color.BLACK;
     }
 
     @Override
@@ -198,43 +209,20 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     }
 
     @Override
-    public DrawableElementType getDrawableElementType() {
-        return DrawableElementType.RADIO;
-    }
-
-    private long xmin;
-    private long xmax;
-
-    public boolean xAxisChanged(TimeAxis timeAxis) {
-        boolean cond = timeAxis.min == xmin && timeAxis.max == xmax;
-        xmin = timeAxis.min;
-        xmax = timeAxis.max;
-        return !cond;
-    }
-
-    private double ymin;
-    private double ymax;
-
-    public boolean yAxisChanged(YAxis yAxis) {
-        boolean cond = yAxis.getSelectedRange().min == ymin && yAxis.getSelectedRange().max == ymax;
-        ymin = yAxis.getSelectedRange().min;
-        ymax = yAxis.getSelectedRange().max;
-        return !cond;
-    }
-
-    private void requestForData() {
-        for (DownloadedJPXData jpxData : cache.values()) {
-            jpxData.requestData();
+    public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
+        boolean timediffCond = selectedAxis.end - selectedAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
+        if (timediffCond) {
+            requestForData();
+            requestAndOpenIntervals(selectedAxis.start, selectedAxis.end);
         }
     }
 
     @Override
-    public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
-        boolean timediffCond = timeAxis.max - timeAxis.min <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
-        if (timediffCond && (xAxisChanged(timeAxis) || yAxisChanged(yAxis))) {
-            requestForData();
-            requestAndOpenIntervals(timeAxis.min, timeAxis.max);
+    public void draw(Graphics2D g, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
+        if (!isVisible) {
+            return;
         }
+        boolean timediffCond = timeAxis.end - timeAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
         if (timediffCond) {
             for (DownloadedJPXData djpx : cache.values()) {
                 djpx.draw(g, graphArea, timeAxis, yAxis);
@@ -269,11 +257,6 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
     @Override
     public boolean hasElementsToDraw() {
         return true;
-    }
-
-    @Override
-    public long getLastDateWithData() {
-        return -1;
     }
 
     private class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
@@ -313,6 +296,12 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
                 Log.error("ImageDownloadWorker execution error: " + e.getMessage());
             }
         }
+
+    }
+
+    @Override
+    public void yaxisChanged() {
+        // TODO Auto-generated method stub
 
     }
 

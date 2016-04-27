@@ -3,6 +3,7 @@ package org.helioviewer.jhv.base.time;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.helioviewer.jhv.base.interval.Interval;
 
 public class TimeUtils {
 
@@ -30,6 +31,19 @@ public class TimeUtils {
     }
 
     private TimeUtils() {
+    }
+
+    public static Interval makeCompleteDay(final long start, final long end) {
+        long endDate = end;
+        long now = System.currentTimeMillis();
+        if (end > now) {
+            endDate = now;
+        }
+
+        long new_start = start - start % TimeUtils.DAY_IN_MILLIS;
+        long new_end = endDate - endDate % TimeUtils.DAY_IN_MILLIS + TimeUtils.DAY_IN_MILLIS;
+
+        return new Interval(new_start, new_end);
     }
 
 }

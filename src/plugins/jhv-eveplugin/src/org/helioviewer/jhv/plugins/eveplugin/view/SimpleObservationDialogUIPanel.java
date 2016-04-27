@@ -5,16 +5,13 @@ import java.awt.GridLayout;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
@@ -24,7 +21,6 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
@@ -71,7 +67,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     private void updateDrawController() {
         Interval interval = defineInterval(getDate());
         EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
-        EVEPlugin.dc.useFullValueRange(true);
     }
 
     protected Interval defineInterval(Date date) {
@@ -126,31 +121,14 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         end.set(Calendar.SECOND, 59);
         EVEPlugin.rdm.requestAndOpenIntervals(selectedInterval.start, end.getTimeInMillis());
         EVEPlugin.ldsm.addLineData(EVEPlugin.rdm);
-        EVEPlugin.dc.updateDrawableElement(EVEPlugin.rdm, true);
+        EVEPlugin.dc.fireRedrawRequest();
     }
 
     @Override
     public boolean loadButtonPressed() {
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
-        List<YAxis> yAxes = EVEPlugin.dc.getYAxes();
-        boolean downloadOK = false;
-        if (yAxes.size() >= 2) {
-            for (YAxis el : yAxes) {
-                if (el.getOriginalLabel().equals("MHz")) {
-                    downloadOK = true;
-                    break;
-                }
-            }
-        } else {
-            downloadOK = true;
-        }
-        if (downloadOK) {
-            updateDrawController();
-            startRadioDownload();
-        } else {
-            JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), "No more than two y-axes can be used. Remove some of the lines before adding a new line.", "Too much y-axes", JOptionPane.WARNING_MESSAGE);
-        }
-
+        updateDrawController();
+        startRadioDownload();
         return true;
     }
 

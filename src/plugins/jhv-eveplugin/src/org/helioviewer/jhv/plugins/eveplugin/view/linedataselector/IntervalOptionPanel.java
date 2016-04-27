@@ -18,11 +18,11 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener, TimingListener {
+public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener {
 
     private final JComboBox zoomComboBox;
     private final JToggleButton periodFromLayersButton;
@@ -34,7 +34,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     };
 
     public IntervalOptionPanel() {
-        EVEPlugin.dc.addTimingListener(this);
 
         zoomComboBox = new JComboBox(new DefaultComboBoxModel());
         fillZoomComboBox();
@@ -84,7 +83,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private void addMovieToModel(DefaultComboBoxModel model) {
-        // TODO Auto-generated method stub
         model.addElement(new ZoomComboboxItem(ZOOM.Movie, 0));
     }
 
@@ -157,14 +155,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         periodFromLayersButton.setEnabled(view != null);
     }
 
-    @Override
-    public void availableIntervalChanged() {
-    }
-
-    @Override
-    public void selectedIntervalChanged() {
-        Interval newInterval = EVEPlugin.dc.getSelectedInterval();
-        if (newInterval.equals(selectedIntervalByZoombox)) {
+    public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
+        if (selectedAxis.start == selectedIntervalByZoombox.start && selectedAxis.end == selectedIntervalByZoombox.end) {
             selectedIndexSetByProgram = true;
             zoomComboBox.setSelectedIndex(0);
         }
@@ -202,8 +194,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
             newInterval = selectedInterval;
         }
         EVEPlugin.dc.setSelectedInterval(newInterval.start, newInterval.end);
-        EVEPlugin.dc.useFullValueRange(true);
-        EVEPlugin.dc.resetAvailableTime();
     }
 
     private Interval computeMovieInterval() {
@@ -223,26 +213,11 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         long startDate = interval.start;
         long endDate = interval.end;
         long now = System.currentTimeMillis();
-        long lastdataDate = EVEPlugin.dc.getLastDateWithData();
-        if (lastdataDate != -1) {
-            if (endDate > lastdataDate) {
-                endDate = lastdataDate;
-            }
-        } else if (endDate > now) {
+        if (endDate > now) {
             endDate = now;
         }
 
         startDate = endDate - differenceMilli;
-
-        /*
-        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
-        boolean sInAvailable = availableInterval.containsPointInclusive(startDate);
-        boolean eInAvailable = availableInterval.containsPointInclusive(endDate);
-
-        if (sInAvailable && eInAvailable) {
-            return new Interval(startDate, endDate);
-        }
-        */
 
         return new Interval(startDate, endDate);
     }

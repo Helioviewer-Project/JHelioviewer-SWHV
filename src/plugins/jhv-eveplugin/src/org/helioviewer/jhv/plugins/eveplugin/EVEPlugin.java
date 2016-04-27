@@ -12,7 +12,6 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
@@ -38,16 +37,12 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
-        dc.addTimingListener(EventModel.getSingletonInstance());
-
         pluginPanes.add(plotOne);
 
         ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
 
         ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
-
-        EventModel.getSingletonInstance().activateEvents();
 
         Layers.addLayersListener(dc);
         Layers.addTimeListener(dc);

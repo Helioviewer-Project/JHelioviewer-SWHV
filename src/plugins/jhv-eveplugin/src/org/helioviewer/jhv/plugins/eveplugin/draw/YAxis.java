@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-import org.helioviewer.jhv.base.Range;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-
 /**
  * This class describes an Y-axis.
  *
@@ -16,7 +13,8 @@ public class YAxis {
     }
 
     /** The current selected range */
-    protected Range selectedRange;
+    public double start;
+    public double end;
     /** The label of the y-axis */
     private String label;
 
@@ -27,41 +25,27 @@ public class YAxis {
     private final static float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
     private final static float UNSCALED_MAX_BOUND = Float.MAX_VALUE;
 
-    public YAxis(Range selectedRange, String label, boolean isLogScale) {
-        this.selectedRange = selectedRange;
-        this.label = label;
+    public YAxis(double _start, double _end, String _label, boolean isLogScale) {
+        start = _start;
+        end = _end;
+        label = _label;
         setIsLogScale(isLogScale);
     }
 
-    public YAxis() {
-        selectedRange = new Range();
-        label = "";
-        setIsLogScale(true);
-    }
-
     public double pixel2ScaledValue(int y0, int h, int p) {
-        double smin = scale(selectedRange.min);
-        double smax = scale(selectedRange.max);
+        double smin = scale(start);
+        double smax = scale(end);
         return (smax - smin) * (-p + y0 + h) / h + smin;
     }
 
     public int scaledvalue2pixel(int y0, int h, double value) {
-        double smin = scale(selectedRange.min);
-        double smax = scale(selectedRange.max);
+        double smin = scale(start);
+        double smax = scale(end);
         return (int) (-h * (value - smin) / (smax - smin) + y0 + h);
     }
 
     public int value2pixel(int y0, int h, double value) {
         return scaledvalue2pixel(y0, h, scale(value));
-    }
-
-    public Range getSelectedRange() {
-        return selectedRange;
-    }
-
-    public void setSelectedRange(Range selectedRange) {
-        this.selectedRange = selectedRange;
-        fireSelectedRangeChanged();
     }
 
     public String getLabel() {
@@ -93,17 +77,9 @@ public class YAxis {
         this.location = location;
     }
 
-    protected void fireSelectedRangeChanged() {
-        EVEPlugin.dc.rangeChanged();
-    }
-
-    public void reset() {
-        selectedRange = new Range();
-    }
-
     public void shiftDownPixels(double distanceY, int height) {
-        double scaledMin = scale(selectedRange.min);
-        double scaledMax = scale(selectedRange.max);
+        double scaledMin = scale(start);
+        double scaledMax = scale(end);
 
         double ratioValue = (scaledMax - scaledMin) / height;
         double shift = distanceY * ratioValue;
@@ -118,14 +94,13 @@ public class YAxis {
             endValue = scale(UNSCALED_MAX_BOUND);
             startValue = endValue - (oldEnd - startValue);
         }
-        selectedRange.min = invScale(startValue);
-        selectedRange.max = invScale(endValue);
-        fireSelectedRangeChanged();
+        start = invScale(startValue);
+        end = invScale(endValue);
     }
 
     public void zoomSelectedRange(double scrollValue, double relativeY, double height) {
-        double scaledMin = scale(selectedRange.min);
-        double scaledMax = scale(selectedRange.max);
+        double scaledMin = scale(start);
+        double scaledMax = scale(end);
         double scaled = scaledMin + (scaledMax - scaledMin) * (relativeY / height);
         double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
         double newScaledMin = (1 + delta) * scaledMin - delta * scaled;
@@ -134,9 +109,8 @@ public class YAxis {
         newScaledMax = Math.min(scale(UNSCALED_MAX_BOUND), newScaledMax);
 
         if (newScaledMax - newScaledMin > 0.04) {
-            selectedRange.min = invScale(newScaledMin);
-            selectedRange.max = invScale(newScaledMax);
-            fireSelectedRangeChanged();
+            start = invScale(newScaledMin);
+            end = invScale(newScaledMax);
         }
     }
 

@@ -8,7 +8,6 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.filters.lut.LUT;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
 
 @SuppressWarnings("serial")
 public class RadioOptionsPanel extends JPanel implements ActionListener {

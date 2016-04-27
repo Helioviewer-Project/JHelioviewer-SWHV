@@ -27,7 +27,7 @@ public class RequestCache {
             requestedAndDownloadedCache.put(startDate, interval);
             requestedCache.put(startDate, interval);
         } else {
-            missingIntervals = getMissingIntervals(interval);
+            missingIntervals = getMissingIntervals(interval.start, interval.end);
             updateRequestCache(startDate, endDate);
         }
         return missingIntervals;
@@ -187,11 +187,11 @@ public class RequestCache {
         return requestedCache.values();
     }
 
-    public ArrayList<Interval> getMissingIntervals(Interval interval) {
+    public ArrayList<Interval> getMissingIntervals(long start, long end) {
         ArrayList<Interval> missingIntervals = new ArrayList<Interval>();
-        long startDate = interval.start;
-        long endDate = interval.end;
-        long currentStartDate = interval.start;
+        long startDate = start;
+        long endDate = end;
+        long currentStartDate = start;
         boolean endDateUsed = false;
         if (requestedAndDownloadedCache.isEmpty()) {
             missingIntervals.add(new Interval(startDate, endDate));

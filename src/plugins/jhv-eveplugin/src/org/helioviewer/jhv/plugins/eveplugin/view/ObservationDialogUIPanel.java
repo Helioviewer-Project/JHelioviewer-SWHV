@@ -10,15 +10,14 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
+import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
+import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
+import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
@@ -83,7 +82,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     private void updateGroupValues() {
-        final EVEDrawController eveDrawController = EVEDrawController.getSingletonInstance();
         final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxData.getModel();
         final BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
@@ -91,7 +89,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         model.removeAllElements();
 
         for (final BandType value : values) {
-            if (!eveDrawController.containsBandType(value)) {
+            if (!EVEPlugin.ldsm.containsBandType(value)) {
                 model.addElement(value);
             }
         }
@@ -104,30 +102,13 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     private void updateDrawController() {
         Interval interval = defineInterval(getDate());
         EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
-        EVEPlugin.dc.useFullValueRange(true);
     }
 
     private boolean updateBandController() {
-        final BandType bandType = (BandType) comboBoxData.getSelectedItem();
-
-        List<YAxis> yAxes = EVEPlugin.dc.getYAxes();
-        if (yAxes.size() >= 2) {
-            boolean present = false;
-            for (YAxis el : yAxes) {
-                if (el.getOriginalLabel().equals(bandType.getUnitLabel())) {
-                    present = true;
-                    break;
-                }
-            }
-            if (!present) {
-                // Show dialog box to unselect one of the lines.
-                JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), "No more than two Y-axes can be used. Remove some of the lines before adding a new line.", "Too much y-axes", JOptionPane.WARNING_MESSAGE);
-                return false;
-            }
-        }
-
-        EVEDrawController.getSingletonInstance().bandAdded(bandType);
-
+        BandType bandType = (BandType) comboBoxData.getSelectedItem();
+        Band band = new Band(bandType);
+        band.setDataColor(BandColors.getNextColor());
+        DownloadController.getSingletonInstance().updateBand(band, EVEPlugin.dc.availableAxis.start, EVEPlugin.dc.availableAxis.end);
         return true;
     }
 
