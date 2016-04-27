@@ -28,7 +28,7 @@ public class TimeAxis {
         double diff = (double) (end - start) / w;
         start = (long) (start + pixelDistance * diff);
         end = (long) (end + pixelDistance * diff);
-        adaptBounds();
+        //adaptBounds();
     }
 
     void zoom(int x0, int w, int x, double factor) {
@@ -36,13 +36,13 @@ public class TimeAxis {
         double ratio = (x - x0) / (double) w;
         start = (long) (start - multiplier * ratio);
         end = (long) (end + multiplier * (1. - ratio));
-        adaptBounds();
+        //adaptBounds();
     }
 
     void set(long _start, long _end) {
         start = _start;
         end = _end;
-        adaptBounds();
+        //adaptBounds();
     }
 
     private void adaptBounds() {

@@ -30,7 +30,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
     private final PlotPanel plotOne = new PlotPanel();
     private final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
-    public static final  LineDataSelectorModel ldsm = new LineDataSelectorModel();
+    public static final LineDataSelectorModel ldsm = new LineDataSelectorModel();
 
     public static final DrawController dc = new DrawController();
     public static final RadioDataManager rdm = new RadioDataManager();
@@ -43,9 +43,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         ImageViewerGui.getLeftContentPane().revalidate();
 
         ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
-
-        Layers.addLayersListener(dc);
-        Layers.addTimeListener(dc);
 
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 

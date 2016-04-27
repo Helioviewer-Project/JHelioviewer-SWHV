@@ -45,6 +45,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         EVEPlugin.ldsm.addLineDataSelectorModelListener(this);
         JHVRelatedEvents.addHighlightListener(this);
         JHVRelatedEvents.addHighlightListener(Displayer.getSingletonInstance());
+        Layers.addLayersListener(this);
+        Layers.addTimeListener(this);
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
@@ -185,7 +187,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void centraliseSelected(long time) {
-        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked && availableAxis.start <= time && availableAxis.end >= time) {
+        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked
+                && availableAxis.start <= time && availableAxis.end >= time) {
             latestMovieTime = time;
             long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
             setSelectedInterval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)));
