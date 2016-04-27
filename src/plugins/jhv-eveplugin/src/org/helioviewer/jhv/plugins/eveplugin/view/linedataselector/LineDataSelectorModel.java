@@ -168,4 +168,5 @@ public class LineDataSelectorModel implements TableModel {
         }
         return ct;
     }
+
 }

@@ -3,23 +3,22 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.gui;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 
 public class ColorLookupModel {
+
     private static ColorLookupModel instance;
 
     private LUT lut;
 
     private IndexColorModel indexColorModel;
 
-    private final Set<ColorLookupModelListener> listeners;
+    private static final HashSet<ColorLookupModelListener> listeners = new HashSet<ColorLookupModelListener>();
 
     private ColorLookupModel() {
         lut = LUT.getStandardList().get("Rainbow 2");
         indexColorModel = createIndexColorModelFromLUT(lut);
-        listeners = new HashSet<ColorLookupModelListener>();
     }
 
     public static ColorLookupModel getInstance() {
