@@ -35,7 +35,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     };
 
     public IntervalOptionPanel() {
-
         zoomComboBox = new JComboBox(new DefaultComboBoxModel());
         fillZoomComboBox();
         zoomComboBox.addActionListener(this);
@@ -51,7 +50,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         add(periodFromLayersButton);
 
         Layers.addLayersListener(this);
-        EVEPlugin.dc.addTimeListener(this);
+        EVEPlugin.dc.addTimeLineListener(this);
     }
 
     @Override
@@ -206,7 +205,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         }
         long now = System.currentTimeMillis();
         EVEPlugin.dc.setSelectedInterval(now, now);
-
     }
 
     private void computeCarringtonInterval(long start, long end, long value) {

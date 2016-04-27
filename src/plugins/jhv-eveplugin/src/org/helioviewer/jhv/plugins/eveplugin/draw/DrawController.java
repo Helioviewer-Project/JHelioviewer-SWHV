@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -24,6 +23,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     public TimeAxis availableAxis;
 
     private static final HashSet<DrawControllerListener> listeners = new HashSet<DrawControllerListener>();
+    private static final HashSet<TimeLineListener> timeLineListeners = new HashSet<TimeLineListener>();
 
     private Rectangle graphSize;
     private boolean isLocked;
@@ -31,7 +31,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Rectangle graphArea;
     private Rectangle plotArea;
     private Rectangle leftAxisArea;
-    private final ArrayList<TimeLineListener> timeListeners = new ArrayList<TimeLineListener>();
 
     public DrawController() {
         graphSize = new Rectangle();
@@ -52,6 +51,14 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public void removeDrawControllerListener(DrawControllerListener listener) {
         listeners.remove(listener);
+    }
+
+    public void addTimeLineListener(TimeLineListener tl) {
+        timeLineListeners.add(tl);
+    }
+
+    public void removeTimeLineListener(TimeLineListener tl) {
+        timeLineListeners.remove(tl);
     }
 
     public final Interval getAvailableInterval() {
@@ -88,13 +95,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             el.fetchData(selectedAxis, availableAxis);
         }
-        for (TimeLineListener tl : timeListeners) {
+        for (TimeLineListener tl : timeLineListeners) {
             tl.fetchData(selectedAxis, availableAxis);
         }
-    }
-
-    public void addTimeListener(TimeLineListener tl) {
-        timeListeners.add(tl);
     }
 
     public Interval getSelectedInterval() {
