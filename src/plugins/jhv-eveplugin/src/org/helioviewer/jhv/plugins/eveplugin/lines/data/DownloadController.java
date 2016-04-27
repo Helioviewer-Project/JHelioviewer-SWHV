@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 import java.awt.EventQueue;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import java.util.concurrent.Future;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -234,8 +233,7 @@ public class DownloadController implements TimingListener {
             // Log.debug("Requesting EVE Data: " + url);
             try {
                 DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-                BufferedReader in = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
-                JSONObject json = new JSONObject(new JSONTokener(in));
+                JSONObject json = JSONUtils.getJSONStream(ds.getInput());
 
                 double multiplier = 1.0;
                 if (json.has("multiplier")) {
