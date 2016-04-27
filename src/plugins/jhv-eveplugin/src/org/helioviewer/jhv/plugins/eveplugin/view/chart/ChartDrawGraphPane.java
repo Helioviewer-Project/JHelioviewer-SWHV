@@ -21,19 +21,14 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -45,10 +40,10 @@ import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableType;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 @SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
@@ -64,7 +59,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Rectangle graphArea = new Rectangle();
     private Rectangle plotArea = new Rectangle();
     private BufferedImage screenImage = null;
-    private int twoYAxis = 0;
     private final EventModel eventModel;
     private Rectangle leftAxisArea;
 
@@ -74,7 +68,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private int lastHeight;
     private boolean updateRequestReceived;
 
-    private final List<DrawableType> zOrderList = new ArrayList<DrawableType>(EnumSet.allOf(DrawableType.class));
     private boolean movieLineRequest = false;
     private boolean forceRedrawGraph = false;
 
@@ -148,45 +141,24 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
             g.setTransform(tf);
             drawBackground(g);
-            BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, width - sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + twoYAxis * DrawConstants.TWO_AXIS_GRAPH_RIGHT), height - sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE));
-            Graphics2D gplotPart = plotPart.createGraphics();
-            gplotPart.setTransform(tf);
-            BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * DrawConstants.GRAPH_LEFT_SPACE, height);
-            Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
-            gleftAxisPart.setTransform(tf);
-            gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            gplotPart.setFont(DrawConstants.font);
+
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             g.setFont(DrawConstants.font);
-            gleftAxisPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            gleftAxisPart.setFont(DrawConstants.font);
-            drawData(gplotPart, g, gleftAxisPart, mousePosition);
-            gplotPart.dispose();
-            gleftAxisPart.dispose();
+            drawData(g, mousePosition);
+
             g.dispose();
         }
         this.repaint();
         movieLineRequest = false;
         forceRedrawGraph = false;
-        // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
-    private void drawData(Graphics2D chartg, Graphics2D plotG, Graphics2D leftAxisG, Point mousePosition) {
-        Map<DrawableType, Set<DrawableElement>> drawableElements = drawController.getDrawableElements();
-        List<DrawableType> drawTypeList = zOrderList;
-        boolean labelsDrawn = false;
-        for (DrawableType dt : drawTypeList) {
-            if ((dt != DrawableType.FULL_IMAGE) && !labelsDrawn) {
-                drawLabels(plotG);
-                labelsDrawn = true;
-            }
-            Set<DrawableElement> del = drawableElements.get(dt);
-            if (del != null) {
-                for (DrawableElement de : del) {
-                    de.draw(chartg, leftAxisG, plotArea, leftAxisArea, drawController.selectedAxis, mousePosition);
-                }
-            }
+    private void drawData(Graphics2D plotG, Point mousePosition) {
+        List<LineDataSelectorElement> els = EVEPlugin.ldsm.getAllLineDataSelectorElements();
+        for (LineDataSelectorElement el : els) {
+            el.draw(plotG, graphArea, leftAxisArea, drawController.selectedAxis, mousePosition);
         }
+        drawLabels(plotG);
     }
 
     private void updateDrawInformation() {
@@ -199,31 +171,34 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.fillRect(0, 0, getWidth(), getHeight());
     }
 
-    private void drawLabels(Graphics2D g) {
-        List<YAxis> yAxes = drawController.getYAxes();
-        Interval interval = drawController.getSelectedInterval();
-        int counter = 0;
-
-        for (YAxis yAxis : yAxes) {
-            drawVerticalLabels(g, yAxis, counter == 0 ? 0 : 1);
-            if (counter > 1) {
-                break;
+    private void drawLabels(final Graphics2D g) {
+        g.setColor(Color.WHITE);
+        g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, graphArea.height + DrawConstants.GRAPH_TOP_SPACE, graphArea.width, DrawConstants.GRAPH_BOTTOM_SPACE);
+        TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
+        int ct = 0;
+        Color c = DrawConstants.TICK_LINE_COLOR;
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            if (el.showYAxis()) {
+                if (ct == 0) {
+                    c = el.getDataColor();
+                }
+                drawVerticalLabels(g, el, ct);
+                ct++;
             }
-            counter++;
         }
 
-        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(interval.start)), g);
+        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(xAxis.start)), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         final int tickTextHeight = (int) tickTextBounds.getHeight();
         final int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        final long tickDifferenceHorizontal = (interval.end - interval.start) / (horizontalTickCount - 1);
+        final long tickDifferenceHorizontal = (xAxis.end - xAxis.start) / (horizontalTickCount - 1);
 
         GregorianCalendar tickGreg = new GregorianCalendar();
         GregorianCalendar previousGreg = new GregorianCalendar();
 
         Date previousDate = null;
         for (int i = 0; i < horizontalTickCount; ++i) {
-            final Date tickValue = new Date(interval.start + i * tickDifferenceHorizontal);
+            final Date tickValue = new Date(xAxis.start + i * tickDifferenceHorizontal);
             final int x = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, tickValue.getTime());
             final String tickText;
             if (previousDate == null) {
@@ -238,17 +213,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
             }
 
-            g.setColor(DrawConstants.TICK_LINE_COLOR);
+            g.setColor(c);
             g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
-
-            g.setColor(DrawConstants.LABEL_TEXT_COLOR);
 
             int yl = graphArea.y + graphArea.height + 2 + tickTextHeight;
             for (String line : tickText.split("\n")) {
                 tickTextBounds = g.getFontMetrics().getStringBounds(line, g);
                 tickTextWidth = (int) tickTextBounds.getWidth();
                 int xl = x - (tickTextWidth / 2);
-                if (xl + tickTextWidth > getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
+                if (xl > getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth) {
                     xl = getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth;
                 }
                 g.drawString(line, xl, yl);
@@ -259,7 +232,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
 
         // inform when no data is available
-        if (drawController.getDrawableElements().isEmpty()) {
+        if (EVEPlugin.ldsm.getAllLineDataSelectorElements().isEmpty()) {
             final String text = DrawConstants.absentText;
             final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
             final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
@@ -270,19 +243,32 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private void drawVerticalLabels(Graphics2D g, YAxis _yAxis, int leftSide) {
+    private void drawVerticalLabels(Graphics2D g, LineDataSelectorElement el, int leftSide) {
         g.setColor(Color.WHITE);
         if (leftSide == 0) {
             g.fillRect(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, graphArea.height);
-            g.fillRect(DrawConstants.GRAPH_LEFT_SPACE + graphArea.width, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.TWO_AXIS_GRAPH_RIGHT, graphArea.height);
+            g.fillRect(graphArea.x + graphArea.width, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.RIGHT_AXIS_WIDTH, graphArea.height);
         } else {
-            g.fillRect(DrawConstants.GRAPH_LEFT_SPACE + graphArea.width, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.TWO_AXIS_GRAPH_RIGHT + DrawConstants.GRAPH_RIGHT_SPACE, graphArea.height);
+            g.fillRect(graphArea.x + graphArea.width + (leftSide - 1) * DrawConstants.RIGHT_AXIS_WIDTH, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.RIGHT_AXIS_WIDTH, graphArea.height);
         }
-        String verticalLabel = _yAxis.getLabel();
+        YAxis yAxis = el.getYAxis();
+        int axis_x_offset;
+        if (leftSide == 0) {
+            axis_x_offset = graphArea.x;
+        }
+        else {
+            axis_x_offset = graphArea.x + graphArea.width + (leftSide - 1) * DrawConstants.RIGHT_AXIS_WIDTH;
+        }
 
-        final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
-        g.setColor(DrawConstants.LABEL_TEXT_COLOR);
-        g.drawString(verticalLabel, (int) (DrawConstants.GRAPH_LEFT_SPACE + Math.max((-1 * DrawConstants.GRAPH_LEFT_SPACE + 3), -((int) verticalLabelBounds.getWidth() / 2 - 3) + leftSide * ((int) verticalLabelBounds.getWidth() / 2 - 3 + graphArea.width - Math.max(verticalLabelBounds.getWidth() / 2, verticalLabelBounds.getWidth() - DrawConstants.TWO_AXIS_GRAPH_RIGHT)))), (int) verticalLabelBounds.getHeight());
+        {
+            String verticalLabel = yAxis.getLabel();
+            final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
+            int vWidth = (int) verticalLabelBounds.getWidth();
+            int vHeight = (int) verticalLabelBounds.getHeight();
+            int labelCompensation = vWidth / 2;
+            g.setColor(el.getDataColor());
+            g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
+        }
 
         final int sizeSteps = graphArea.height / DrawConstants.MIN_VERTICAL_TICK_SPACE;
         int verticalTicks = 2;
@@ -293,25 +279,27 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
         if (verticalTicks == 0) {
             final int y = graphArea.y + graphArea.height;
-
-            g.setColor(DrawConstants.TICK_LINE_COLOR);
             g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
         } else {
             final int tickDifferenceVertical = (graphArea.height) / (verticalTicks - 1);
-
             for (int i = 0; i < verticalTicks; i++) {
                 final int y = graphArea.y + graphArea.height - i * tickDifferenceVertical;
-                double tickValue = _yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, y);
+                double tickValue = yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, y);
                 String tickText = DrawConstants.DECIMAL_FORMAT.format(tickValue);
-
-                g.setColor(DrawConstants.TICK_LINE_COLOR);
                 if (leftSide == 0) {
                     g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
                 }
-
+                else {
+                    g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
+                }
                 final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
-                final int x = graphArea.x - 6 - (int) bounds.getWidth() + leftSide * (graphArea.width + (int) bounds.getWidth() + 6);
-                g.setColor(DrawConstants.LABEL_TEXT_COLOR);
+                int x;
+                if (leftSide == 0) {
+                    x = axis_x_offset - 6 - (int) bounds.getWidth();
+                }
+                else {
+                    x = axis_x_offset;
+                }
                 g.drawString(tickText, x, y + (int) (bounds.getHeight() / 2));
             }
         }
@@ -388,7 +376,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Point p = e.getPoint();
         mousePressedPosition = plotArea.contains(p) ? p : null;
         if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height &&
-            eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) == null) {
+                eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) == null) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }
@@ -404,8 +392,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
             double distanceX = mousePressedPosition.x - p.x;
-            drawController.selectedAxis.move(graphArea.x, graphArea.width, distanceX);
-            drawController.setSelectedInterval();
+            drawController.move(graphArea.x, graphArea.width, distanceX);
 
             double distanceY = p.y - mousePressedPosition.y;
             mouseHelper(distanceY);
@@ -416,9 +403,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void mouseHelper(double distanceY) {
-        List<YAxis> yAxes = drawController.getYAxes();
-        for (YAxis yAxis : yAxes) {
-            yAxis.shiftDownPixels(distanceY, graphArea.height);
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            if (el.showYAxis())
+                el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
         }
     }
 
@@ -428,16 +415,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         mouseDragPosition = p;
 
-        if (mousePressedPosition != null && mousePressedOnMovieFrame) {
-            setMovieFrameManually(mouseDragPosition);
-        }
+        //if (mousePressedPosition != null && mousePressedOnMovieFrame) {
+        //    setMovieFrameManually(mouseDragPosition);
+        //}
 
         if (mousePressedPosition != null && !mousePressedOnMovieFrame) {
             setCursor(UIGlobals.closedHandCursor);
             double distanceX = mousePressedPosition.x - p.x;
             double distanceY = p.y - mousePressedPosition.y;
-            drawController.selectedAxis.move(graphArea.x, graphArea.width, distanceX);
-            drawController.setSelectedInterval();
+            drawController.move(graphArea.x, graphArea.width, distanceX);
             mouseHelper(distanceY);
         }
         mousePressedPosition = p;
@@ -467,8 +453,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         updateGraph();
     }
 
-    // Component Listener
-
     @Override
     public void componentHidden(ComponentEvent e) {
     }
@@ -488,23 +472,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void setChartInformation() {
-        setTwoAxisInformation();
         drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
-    }
-
-    // Graph Polyline
-
-    private void setTwoAxisInformation() {
-        if (drawController.getYAxes().size() >= 2) {
-            twoYAxis = 1;
-        } else {
-            twoYAxis = 0;
-        }
     }
 
     @Override
     public void drawRequest() {
-        setTwoAxisInformation();
         forceRedrawGraph = true;
         updateGraph();
     }
@@ -533,7 +505,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
             double zoomTimeFactor = 10;
-            List<YAxis> yAxes = drawController.getYAxes();
             final int mouseX = e.getX();
             final int mouseY = e.getY();
             boolean inGraphArea = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
@@ -541,17 +512,19 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             boolean inYAxis = (mouseX < graphArea.x || mouseX > graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
             if (inGraphArea || inXAxisOrAboveGraph) {
                 if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
-                    drawController.selectedAxis.zoom(graphArea.x, graphArea.width, mouseX, zoomTimeFactor * scrollDistance);
-                    drawController.setSelectedInterval();
+                    drawController.zoom(graphArea.x, graphArea.width, mouseX, zoomTimeFactor * scrollDistance);
                 } else if (e.isShiftDown()) {
-                    drawController.selectedAxis.move(graphArea.x, graphArea.width, zoomTimeFactor * scrollDistance);
-                    drawController.setSelectedInterval();
+                    drawController.move(graphArea.x, graphArea.width, zoomTimeFactor * scrollDistance);
                 }
             }
             if (inGraphArea || inYAxis) {
-                for (YAxis yAxis : yAxes) {
-                    if (((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) || inYAxis) {
-                        yAxis.zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
+                if (((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) || inYAxis) {
+                    for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+                        if (el.showYAxis()) {
+                            el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
+                            el.yaxisChanged();
+                            drawController.fireRedrawRequest();
+                        }
                     }
                 }
             }

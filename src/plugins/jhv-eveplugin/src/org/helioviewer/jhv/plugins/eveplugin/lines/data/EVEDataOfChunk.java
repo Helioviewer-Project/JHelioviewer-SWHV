@@ -4,15 +4,15 @@ import java.util.Arrays;
 
 public class EVEDataOfChunk {
 
-    private final float[] values = new float[(int) EVECache.CHUNKED_SIZE];
-    private final long[] dates = new long[(int) EVECache.CHUNKED_SIZE];
+    private final float[] values = new float[(int) Band.CHUNKED_SIZE];
+    private final long[] dates = new long[(int) Band.CHUNKED_SIZE];
     private boolean hasData = false;
 
     public EVEDataOfChunk(long key) {
         Arrays.fill(values, Float.NaN);
-        long startdate = key * EVECache.MILLIS_PER_CHUNK;
+        long startdate = key * Band.MILLIS_PER_CHUNK;
         for (int i = 0; i < values.length; i++) {
-            dates[i] = startdate + i * EVECache.MILLIS_PER_TICK;
+            dates[i] = startdate + i * Band.MILLIS_PER_TICK;
         }
     }
 

@@ -362,11 +362,10 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
             final int intervalWidthPixel = rightIntervalBorderPosition - leftIntervalBorderPosition;
             if (mousePressed.x > newMousePosition.x) {
-                drawController.selectedAxis.move(0, intervalWidthPixel, -diffPixel);
+                drawController.move(0, intervalWidthPixel, -diffPixel);
             } else {
-                drawController.selectedAxis.move(0, intervalWidthPixel, diffPixel);
+                drawController.move(0, intervalWidthPixel, diffPixel);
             }
-            drawController.setSelectedInterval();
             mousePressed = newMousePosition;
         }
     }
@@ -393,8 +392,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         double middle = leftIntervalBorderPosition + 0.5 * intervalWidthPixel;
         double distance = point.getX() - middle;
         Rectangle graphArea = drawController.getGraphArea();
-        drawController.selectedAxis.move(graphArea.x, graphArea.width, distance);
-        drawController.setSelectedInterval();
+        drawController.move(graphArea.x, graphArea.width, distance);
     }
 
     @Override
@@ -484,7 +482,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     @Override
     public void drawRequest() {
         repaint();
-
     }
 
     @Override

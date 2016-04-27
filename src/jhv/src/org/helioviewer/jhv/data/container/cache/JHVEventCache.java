@@ -49,7 +49,7 @@ public class JHVEventCache {
         @Override
         public int hashCode() {
             assert false : "hashCode not designed";
-            return 42;
+        return 42;
         }
 
         @Override
@@ -164,7 +164,7 @@ public class JHVEventCache {
                 SortedMap<SortedDateInterval, JHVRelatedEvents> submap = sortedEvents.subMap(new SortedDateInterval(startDate - delta, startDate - delta), new SortedDateInterval(endDate + delta, endDate + delta));
                 eventsResult.put(evt, submap);
             }
-            List<Interval> missing = downloadedCache.get(evt).getMissingIntervals(new Interval(startDate, endDate));
+            List<Interval> missing = downloadedCache.get(evt).getMissingIntervals(startDate, endDate);
             if (!missing.isEmpty()) {
                 missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
                 missingIntervals.put(evt, missing);

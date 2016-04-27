@@ -1,48 +1,52 @@
 package org.helioviewer.jhv.plugins.eveplugin.events.model;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 
+import javax.swing.ImageIcon;
+
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
-import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventPanel;
-import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventsSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 /*
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-public class EventModel implements TimingListener, JHVEventHandler {
+public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
+    YAxis yaxis = new YAxis(-1, 1, "", true);
     private static EventModel instance;
     private final JHVEventContainer eventContainer;
-    private boolean eventsVisible;
+    private boolean isVisible = true;
     private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
-    private final EventPanel eventPanel;
-
-    private final EventsSelectorElement eventSelectorElement;
-
-    private boolean eventsActivated;
+    private static final float dash1[] = { 10f };
+    private static final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
 
     private JHVRelatedEvents eventUnderMouse;
 
     private EventModel() {
         eventContainer = JHVEventContainer.getSingletonInstance();
         events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
-        eventsVisible = false;
-        eventPanel = new EventPanel();
-        eventSelectorElement = new EventsSelectorElement(this);
-        eventsActivated = false;
-        EVEPlugin.ldsm.addLineData(eventSelectorElement);
+        isVisible = false;
+        EVEPlugin.ldsm.addLineData(this);
     }
 
     public static EventModel getSingletonInstance() {
@@ -53,22 +57,15 @@ public class EventModel implements TimingListener, JHVEventHandler {
     }
 
     @Override
-    public void availableIntervalChanged() {
-        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
-        eventContainer.requestForInterval(availableInterval.start, availableInterval.end, EventModel.this);
-    }
-
-    @Override
-    public void selectedIntervalChanged() {
+    public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
+        eventContainer.requestForInterval(availableAxis.start, availableAxis.end, EventModel.this);
     }
 
     @Override
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
         this.events = events;
-        if (EventModel.getSingletonInstance().isEventsVisible()) {
-            EVEPlugin.dc.updateDrawableElement(eventPanel, true);
-        } else {
-            Log.debug("event plot configurations not visible");
+        if (isVisible) {
+            EVEPlugin.dc.fireRedrawRequest();
         }
     }
 
@@ -76,51 +73,15 @@ public class EventModel implements TimingListener, JHVEventHandler {
         return events;
     }
 
-    public boolean isEventsVisible() {
-        return eventsVisible;
-    }
-
-    public void setEventsVisible(boolean visible) {
-        if (eventsVisible != visible) {
-            eventsVisible = visible;
-            EVEPlugin.dc.updateDrawableElement(eventPanel, true);
-            EVEPlugin.ldsm.lineDataElementUpdated(eventSelectorElement);
-        }
-    }
-
-    public void deactivateEvents() {
-        if (eventsActivated) {
-            eventsVisible = false;
-            eventsActivated = false;
-            EVEPlugin.dc.removeDrawableElement(eventPanel);
-        }
-    }
-
-    public void activateEvents() {
-        if (!eventsActivated) {
-            eventsVisible = true;
-            eventsActivated = true;
-            EVEPlugin.dc.updateDrawableElement(eventPanel, true);
-        }
-    }
-
     public JHVRelatedEvents getEventAtPosition(Point point) {
         return null;
-    }
-
-    public long getLastDateWithData() {
-        return -1;
-    }
-
-    public boolean hasElementsToDraw() {
-        return true;
     }
 
     @Override
     public void cacheUpdated() {
         Interval selectedInterval = EVEPlugin.dc.getSelectedInterval();
         eventContainer.requestForInterval(selectedInterval.start, selectedInterval.end, this);
-        EVEPlugin.dc.updateDrawableElement(eventPanel, true);
+        EVEPlugin.dc.fireRedrawRequest();
     }
 
     public JHVRelatedEvents getEventUnderMouse() {
@@ -131,4 +92,149 @@ public class EventModel implements TimingListener, JHVEventHandler {
         eventUnderMouse = event;
     }
 
+    @Override
+    public void draw(Graphics2D g, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
+        if (!isVisible) {
+            return;
+        }
+
+        int nrEventTypes = events.size();
+        if (nrEventTypes > 0) {
+            int eventTypeNr = 0;
+            int previousLine = 0;
+
+            Stroke normalStroke = g.getStroke();
+            JHVRelatedEvents highlightedEvent = null;
+            int spacePerLine = 6;
+
+            ArrayList<Long> endDates = new ArrayList<Long>();
+
+            for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> entry : events.entrySet()) {
+                JHVEventType eventType = entry.getKey();
+                SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = entry.getValue();
+
+                endDates.clear();
+
+                int nrLines = 0;
+                EventPlotConfiguration shouldRedraw = null;
+
+                for (JHVRelatedEvents event : eventMap.values()) {
+                    int i = 0;
+                    while (i < nrLines && endDates.get(i) >= event.getStart()) {
+                        i++;
+                    }
+                    if (i == nrLines) {
+                        endDates.add(event.getEnd());
+                    } else {
+                        endDates.set(i, event.getEnd());
+                    }
+                    int eventPosition = i;
+                    nrLines = endDates.size();
+
+                    int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
+                    int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
+                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition, event.isHighlighted());
+                    if (rEvent != null) {
+                        shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
+                        highlightedEvent = rEvent;
+                    }
+                }
+
+                if (shouldRedraw != null) {
+                    shouldRedraw.draw(g, previousLine, mousePosition);
+                }
+
+                int spaceNeeded = spacePerLine * nrLines;
+                ImageIcon icon = eventType.getEventType().getEventIcon();
+                g.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+
+                previousLine += nrLines;
+                if (eventTypeNr != nrEventTypes - 1) {
+                    g.setStroke(dashed);
+                    g.setColor(Color.black);
+                    int sepLinePos = previousLine * spacePerLine - spacePerLine / 4 + DrawConstants.EVENT_OFFSET;
+                    g.drawLine(0, sepLinePos, graphArea.width, sepLinePos);
+                    g.setStroke(normalStroke);
+                }
+
+                eventTypeNr++;
+            }
+            EventModel.getSingletonInstance().setEventUnderMouse(highlightedEvent);
+            if (mousePosition != null) {
+                JHVEventContainer.highlight(highlightedEvent);
+            }
+        }
+    }
+
+    @Override
+    public void setYAxis(YAxis yAxis) {
+    }
+
+    @Override
+    public YAxis getYAxis() {
+        return null;
+    }
+
+    @Override
+    public boolean hasElementsToDraw() {
+        return EventModel.getSingletonInstance().hasElementsToDraw();
+    }
+
+    @Override
+    public void removeLineData() {
+        isVisible = false;
+    }
+
+    @Override
+    public void setVisibility(boolean visible) {
+        isVisible = false;
+        EVEPlugin.dc.fireRedrawRequest();
+        EVEPlugin.ldsm.lineDataElementUpdated(this);
+    }
+
+    @Override
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    @Override
+    public String getName() {
+        return "SWEK Events";
+    }
+
+    @Override
+    public Color getDataColor() {
+        return null;
+    }
+
+    @Override
+    public boolean isDownloading() {
+        return false;
+    }
+
+    @Override
+    public Component getOptionsPanel() {
+        return null;
+    }
+
+    @Override
+    public boolean hasData() {
+        return true;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return false;
+    }
+
+    @Override
+    public boolean showYAxis() {
+        return false;
+    }
+
+    @Override
+    public void yaxisChanged() {
+        // TODO Auto-generated method stub
+
+    }
 }

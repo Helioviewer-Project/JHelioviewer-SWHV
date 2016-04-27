@@ -7,7 +7,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -17,47 +16,31 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
-import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
-import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class DownloadController implements TimingListener {
+public class DownloadController {
 
     private static final DownloadController singletonInstance = new DownloadController();
 
     private static final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<Band, ArrayList<Interval>>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
 
-    private DownloadController() {
-        EVEPlugin.dc.addTimingListener(this);
-    }
-
     public static final DownloadController getSingletonInstance() {
         return singletonInstance;
     }
 
-    private void updateBands(Interval interval, Interval priorityInterval) {
-        Set<Band> bands = EVEDrawController.getSingletonInstance().getAllBands();
-        for (Band b : bands) {
-            updateBand(b, interval, priorityInterval);
-        }
-    }
+    public void updateBand(Band band, long start, long end) {
 
-    public void updateBand(Band band, Interval queryInterval, Interval priorityInterval) {
-        List<Interval> missingIntervalsNoExtend = EVECacheController.getSingletonInstance().getMissingDaysInInterval(band, queryInterval);
+        List<Interval> missingIntervalsNoExtend = band.getMissingDaysInInterval(start, end);
         if (!missingIntervalsNoExtend.isEmpty()) {
-            Interval realQueryInterval = extendQueryInterval(queryInterval);
-
-            // get all intervals within query interval where data is missing
+            Interval realQueryInterval = extendQueryInterval(start, end);
             ArrayList<Interval> intervals = getIntervals(band, realQueryInterval);
 
             if (intervals == null) {
-                // there is no interval where data is missing
                 return;
             }
 
@@ -67,17 +50,14 @@ public class DownloadController implements TimingListener {
                 return;
             }
 
-            // create download jobs and allocate priorities
             DownloadThread[] jobs = new DownloadThread[n];
+
             int i = 0;
             for (Interval interval : intervals) {
                 jobs[i] = new DownloadThread(band, interval);
                 ++i;
             }
-
-            // add download jobs
             addFutureJobs(addDownloads(jobs), band);
-            // inform listeners
             fireDownloadStarted(band);
         }
     }
@@ -91,18 +71,16 @@ public class DownloadController implements TimingListener {
         futureJobs.put(band, fj);
     }
 
-    private Interval extendQueryInterval(Interval queryInterval) {
-        return new Interval(queryInterval.start - 7 * TimeUtils.DAY_IN_MILLIS, queryInterval.end + 7 * TimeUtils.DAY_IN_MILLIS);
+    private Interval extendQueryInterval(long start, long end) {
+        return new Interval(start - 7 * TimeUtils.DAY_IN_MILLIS, end + 7 * TimeUtils.DAY_IN_MILLIS);
     }
 
     private ArrayList<Interval> getIntervals(Band band, Interval queryInterval) {
-        // get missing data intervals within given interval
-        List<Interval> missingIntervals = EVECacheController.getSingletonInstance().addRequest(band, queryInterval);
+        List<Interval> missingIntervals = band.addRequest(band, queryInterval);
         if (missingIntervals.isEmpty()) {
             return null;
         }
 
-        // split intervals (if necessary) into smaller intervals
         ArrayList<Interval> intervals = new ArrayList<Interval>();
         for (Interval i : missingIntervals) {
             intervals.addAll(Interval.splitInterval(i, EVESettings.DOWNLOADER_MAX_DAYS_PER_BLOCK));
@@ -135,17 +113,6 @@ public class DownloadController implements TimingListener {
         return !list.isEmpty();
     }
 
-    @Override
-    public void availableIntervalChanged() {
-        Interval availableInterval = EVEPlugin.dc.getAvailableInterval();
-        Interval downloadInterval = new Interval(availableInterval.start, availableInterval.end - TimeUtils.DAY_IN_MILLIS);
-        DownloadController.getSingletonInstance().updateBands(downloadInterval, EVEPlugin.dc.getSelectedInterval());
-    }
-
-    @Override
-    public void selectedIntervalChanged() {
-    }
-
     private void fireDownloadStarted(Band band) {
         EVEPlugin.ldsm.downloadStarted(band);
     }
@@ -157,7 +124,6 @@ public class DownloadController implements TimingListener {
     private List<Future<?>> addDownloads(DownloadThread[] jobs) {
         List<Future<?>> futureJobs = new ArrayList<Future<?>>();
         for (int i = 0; i < jobs.length; ++i) {
-            // add to download map
             Band band = jobs[i].getBand();
             Interval interval = jobs[i].getInterval();
 
@@ -229,7 +195,6 @@ public class DownloadController implements TimingListener {
                 return;
             }
 
-            // Log.debug("Requesting EVE Data: " + url);
             try {
                 DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
                 JSONObject json = JSONUtils.getJSONStream(ds.getInput());
@@ -245,7 +210,6 @@ public class DownloadController implements TimingListener {
                     return;
                 }
 
-                // Log.warn(data.toString());
                 float[] values = new float[length];
                 long[] dates = new long[length];
 
@@ -273,7 +237,7 @@ public class DownloadController implements TimingListener {
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    EVECacheController.getSingletonInstance().addToCache(band, values, dates);
+                    band.addToCache(values, dates);
                 }
             });
         }

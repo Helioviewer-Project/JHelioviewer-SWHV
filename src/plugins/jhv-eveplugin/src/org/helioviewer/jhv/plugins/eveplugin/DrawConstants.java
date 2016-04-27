@@ -13,7 +13,7 @@ public class DrawConstants {
     public static final int GRAPH_RIGHT_SPACE = 10;
     public static final int GRAPH_TOP_SPACE = 20;
     public static final int GRAPH_BOTTOM_SPACE = 22;
-    public static final int TWO_AXIS_GRAPH_RIGHT = 30;
+    public static final int RIGHT_AXIS_WIDTH = 30;
 
     public static final int MIN_VERTICAL_TICK_SPACE = 20;
 

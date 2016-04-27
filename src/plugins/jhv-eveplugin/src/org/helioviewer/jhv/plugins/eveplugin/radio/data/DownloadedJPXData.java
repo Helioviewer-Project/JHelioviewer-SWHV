@@ -16,7 +16,7 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
+import org.helioviewer.jhv.plugins.eveplugin.radio.gui.ColorLookupModel;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -103,7 +103,7 @@ public class DownloadedJPXData implements ImageDataHandler {
                 EVEPlugin.ldsm.downloadFinished(EVEPlugin.rdm);
             }
             hasData = true;
-            EVEPlugin.dc.updateDrawableElement(EVEPlugin.rdm, true);
+            EVEPlugin.dc.fireRedrawRequest();
         }
     }
 
@@ -156,21 +156,21 @@ public class DownloadedJPXData implements ImageDataHandler {
         long visibleEnd = endDate;
 
         if (!first) {
-            if (visibleStart <= xAxis.min)
-                visibleStart = xAxis.min;
+            if (visibleStart <= xAxis.start)
+                visibleStart = xAxis.start;
 
-            if (visibleEnd >= xAxis.max)
-                visibleEnd = xAxis.max;
+            if (visibleEnd >= xAxis.end)
+                visibleEnd = xAxis.end;
         }
         first = false;
 
         double visibleStartFreq = startFreq;
         double visibleEndFreq = endFreq;
-        if (visibleStartFreq < yAxis.getSelectedRange().min) {
-            visibleStartFreq = yAxis.getSelectedRange().min;
+        if (visibleStartFreq < yAxis.start) {
+            visibleStartFreq = yAxis.start;
         }
-        if (visibleEndFreq > yAxis.getSelectedRange().max) {
-            visibleEndFreq = yAxis.getSelectedRange().max;
+        if (visibleEndFreq > yAxis.end) {
+            visibleEndFreq = yAxis.end;
         }
 
         int x0 = (int) Math.round((visibleStart - startDate) / timePerPix);
@@ -206,8 +206,8 @@ public class DownloadedJPXData implements ImageDataHandler {
     }
 
     private void drawNoData(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
-        int dx0 = xAxis.value2pixel(ga.x, ga.width, Math.max(startDate, xAxis.min));
-        int dx1 = xAxis.value2pixel(ga.x, ga.width, Math.min(endDate, xAxis.max));
+        int dx0 = xAxis.value2pixel(ga.x, ga.width, Math.max(startDate, xAxis.start));
+        int dx1 = xAxis.value2pixel(ga.x, ga.width, Math.min(endDate, xAxis.end));
         int dy0 = 0;
         int dy1 = ga.height;
         int dwidth = dx1 - dx0;
