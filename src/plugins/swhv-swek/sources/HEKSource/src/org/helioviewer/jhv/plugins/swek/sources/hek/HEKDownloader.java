@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.helioviewer.jhv.base.GZIPUtils;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -68,11 +68,12 @@ public class HEKDownloader extends SWEKDownloader {
 
             byte[] compressedJson;
             try {
-                compressedJson = GZIPUtils.compress(result.toString());
+                compressedJson = JSONUtils.writeJSONCompressed(result);
             } catch (IOException e) {
                 Log.error("compression error");
                 return false;
             }
+
             event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, archiv, uid, paramList));
         }
 
