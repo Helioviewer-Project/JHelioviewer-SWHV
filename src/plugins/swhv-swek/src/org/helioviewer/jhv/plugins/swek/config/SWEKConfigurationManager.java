@@ -1,12 +1,9 @@
 package org.helioviewer.jhv.plugins.swek.config;
 
 import java.awt.Color;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -24,6 +21,7 @@ import java.util.Properties;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.SWEKConfiguration;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -136,16 +134,7 @@ public class SWEKConfigurationManager {
     private boolean isManuallyChanged() {
         try {
             Log.debug("configURL: " + configFileURL);
-            InputStream configIs = configFileURL.openStream();
-            StringBuilder sb = new StringBuilder();
-            BufferedReader br = new BufferedReader(new InputStreamReader(configIs, "UTF-8"));
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            br.close();
-
-            JSONObject configJSON = new JSONObject(sb.toString());
+            JSONObject configJSON = JSONUtils.getJSONStream(configFileURL.openStream());
             return parseManuallyChanged(configJSON);
         } catch (JSONException e) {
             Log.error("Could not parse JSON: " + e.getMessage());
@@ -288,19 +277,8 @@ public class SWEKConfigurationManager {
      */
     private boolean parseConfigFile() {
         try {
-            InputStream configIs = configFileURL.openStream();
-            StringBuilder sb = new StringBuilder();
-            BufferedReader br = new BufferedReader(new InputStreamReader(configIs, "UTF-8"));
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            br.close();
-
-            String cf = sb.toString();
-            JHVDatabase.config_hash = Arrays.hashCode(cf.toCharArray());
-
-            JSONObject configJSON = new JSONObject(cf);
+            JSONObject configJSON = JSONUtils.getJSONStream(configFileURL.openStream());
+            JHVDatabase.config_hash = Arrays.hashCode(configJSON.toString().toCharArray());
             return parseJSONConfig(configJSON);
         } catch (IOException e) {
             Log.debug("Configuration file could not be parsed: " + e);
