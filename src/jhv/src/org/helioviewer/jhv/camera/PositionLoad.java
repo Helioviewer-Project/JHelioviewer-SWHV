@@ -1,9 +1,6 @@
 package org.helioviewer.jhv.camera;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -14,6 +11,7 @@ import java.util.Iterator;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
@@ -24,7 +22,6 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class PositionLoad {
 
@@ -81,12 +78,11 @@ public class PositionLoad {
                 URL url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + beginDate + "&utc_end=" + endDate + "&deltat=" + deltat +
                                             "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
                 DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
-                Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                 if (!ds.getResponse400()) {
-                    result = new JSONObject(new JSONTokener(reader));
+                    result = JSONUtils.getJSONStream(ds.getInput());
                     ret = parseData(result);
                 } else {
-                    JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
+                    JSONObject jsonObject = JSONUtils.getJSONStream(ds.getInput());
                     if (jsonObject.has("faultstring")) {
                         report = jsonObject.getString("faultstring");
                     } else {
