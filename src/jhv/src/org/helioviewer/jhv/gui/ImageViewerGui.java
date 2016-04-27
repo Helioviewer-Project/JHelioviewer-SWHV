@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.InteractionAnnotate;
@@ -185,17 +186,10 @@ public class ImageViewerGui {
                 Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", Window.class, boolean.class);
                 setWindowCanFullScreen.invoke(fullScreenUtilities, window, true);
 
-                /*
-                Class<?> applicationClass = Class.forName("com.apple.eawt.Application");
-                Method getSingletonApplication = applicationClass.getMethod("getApplication", (Class<?>[]) null);
-                Object application = getSingletonApplication.invoke(applicationClass.newInstance());
-                Method removeAboutMenuItem = applicationClass.getMethod("removeAboutMenuItem", (Class<?>[]) null);
-                removeAboutMenuItem.invoke(application);
-                */
-
                 System.setProperty("apple.laf.useScreenMenuBar", "true");
             } catch (Exception e) {
-                throw new RuntimeException("FullScreen utilities not available", e);
+                Log.error(">> FullScreen utilities not available");
+                e.printStackTrace();
             }
         }
     }
