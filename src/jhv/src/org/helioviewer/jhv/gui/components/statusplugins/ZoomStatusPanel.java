@@ -11,7 +11,7 @@ public class ZoomStatusPanel extends StatusPanel.StatusPlugin {
     }
 
     public void update(double cameraWidth, double distance) {
-        setText(String.format("FOV: %5.2fR\u2299 | D\u2299: %6.3fau", 2 * cameraWidth, distance / Sun.MeanEarthDistance));
+        setText(String.format("FOV: %5.2fR\u2299 | D\u2299: %6.3fau", 2 * cameraWidth, distance * Sun.MeanEarthDistanceInv));
     }
 
 }
