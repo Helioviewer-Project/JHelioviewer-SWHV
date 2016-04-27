@@ -11,6 +11,15 @@ import org.json.JSONObject;
 
 public class ComesepParser implements SWEKParser {
 
+    @Override
+    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end) throws JSONException {
+        JHVEvent currentEvent = new JHVEvent(type, id, start, end);
+        if (!parseResult(json, currentEvent)) {
+            return null;
+        }
+        return currentEvent;
+    }
+
     private boolean parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
         Iterator<?> keys = result.keys();
         while (keys.hasNext()) {
@@ -36,15 +45,6 @@ public class ComesepParser implements SWEKParser {
                     currentEvent.addParameter(keyString, value);
             }
         }
-    }
-
-    @Override
-    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end) throws JSONException {
-        JHVEvent currentEvent = new JHVEvent(type, id, start, end);
-        if (!parseResult(json, currentEvent)) {
-            return null;
-        }
-        return currentEvent;
     }
 
 }
