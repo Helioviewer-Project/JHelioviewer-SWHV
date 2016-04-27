@@ -214,14 +214,13 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private void computeZoomForMilliSeconds(long start, long end, long differenceMilli) {
-        long startDate = start;
         long endDate = end;
         long now = System.currentTimeMillis();
         if (endDate > now) {
             endDate = now;
         }
 
-        startDate = endDate - differenceMilli;
+        long startDate = endDate - differenceMilli;
         EVEPlugin.dc.setSelectedInterval(startDate, endDate);
     }
 

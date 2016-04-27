@@ -120,11 +120,6 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
         }
     }
 
-    private void removeRadioData() {
-        clearCache();
-        EVEPlugin.ldsm.removeLineData(this);
-    }
-
     public void radioDataVisibilityChanged() {
         EVEPlugin.ldsm.lineDataElementUpdated(this);
     }
@@ -296,8 +291,6 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
 
     @Override
     public void yaxisChanged() {
-        // TODO Auto-generated method stub
-
     }
 
 }
