@@ -152,7 +152,7 @@ public class RadioDataManager implements ColorLookupModelListener, LineDataSelec
 
     @Override
     public boolean showYAxis() {
-        return true;
+        return isVisible;
     }
 
     @Override

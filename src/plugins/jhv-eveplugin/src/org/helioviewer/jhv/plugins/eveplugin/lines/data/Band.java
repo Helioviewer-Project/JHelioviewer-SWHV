@@ -103,12 +103,25 @@ public class Band implements LineDataSelectorElement {
 
     @Override
     public boolean showYAxis() {
-        return true;
+        return isVisible;
     }
 
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
-        drawGraphs(g, graphArea);
+        if (!isVisible) {
+            return;
+        }
+        for (GraphPolyline line : graphPolylines) {
+            g.setColor(line.color);
+            for (int k = 0; k < line.xPoints.size(); k++) {
+                g.drawPolyline(line.xPointsArray.get(k), line.yPointsArray.get(k), line.yPoints.get(k).size());
+            }
+
+        }
+        for (int j = 0; j < warnLevels.length; j++) {
+            g.drawLine(graphArea.x, warnLevels[j], graphArea.x + graphArea.width, warnLevels[j]);
+            g.drawString(warnLabels[j], graphArea.x, warnLevels[j] - 2);
+        }
     }
 
     private void updateWarnLevels(Rectangle graphArea) {
@@ -151,20 +164,6 @@ public class Band implements LineDataSelectorElement {
             graphPolylines.add(new GraphPolyline(pointList, graphColor, graphArea, timeAxis));
         }
 
-    }
-
-    private void drawGraphs(final Graphics2D g, Rectangle graphArea) {
-        for (GraphPolyline line : graphPolylines) {
-            g.setColor(line.color);
-            for (int k = 0; k < line.xPoints.size(); k++) {
-                g.drawPolyline(line.xPointsArray.get(k), line.yPointsArray.get(k), line.yPoints.get(k).size());
-            }
-
-        }
-        for (int j = 0; j < warnLevels.length; j++) {
-            g.drawLine(graphArea.x, warnLevels[j], graphArea.x + graphArea.width, warnLevels[j]);
-            g.drawString(warnLabels[j], graphArea.x, warnLevels[j] - 2);
-        }
     }
 
     private void setWarn(LinkedList<Integer> _warnLevels, LinkedList<String> _warnLabels) {
