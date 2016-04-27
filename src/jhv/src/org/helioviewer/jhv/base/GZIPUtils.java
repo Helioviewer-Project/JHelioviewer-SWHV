@@ -18,7 +18,7 @@ public class GZIPUtils {
 
         try {
             InputStream in = new ByteArrayInputStream(buf);
-            if (buf.length != 0 && isCompressed(buf)) {
+            if (isCompressed(buf)) {
                 in = new GZIPInputStream(in);
             }
             return in;
