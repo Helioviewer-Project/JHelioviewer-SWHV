@@ -3,6 +3,11 @@ package org.helioviewer.jhv.database;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -107,28 +112,20 @@ public class JHVDatabase {
         return (compressed[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
     }
 
-    public static String decompress(final byte[] compressed) {
-        String outStr = "";
+    public static InputStream decompress(byte[] compressed) {
+        byte[] buf = compressed;
+        if (buf == null || buf.length == 0)
+            buf = new byte[0];
+
         try {
-            if ((compressed == null) || (compressed.length == 0)) {
-                return "";
+            InputStream in = new ByteArrayInputStream(buf);
+            if (buf.length != 0 && isCompressed(buf)) {
+                in = new GZIPInputStream(in);
             }
-            if (isCompressed(compressed)) {
-                GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed));
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[8192];
-                int length;
-                while ((length = gis.read(buffer)) != -1) {
-                    baos.write(buffer, 0, length);
-                }
-                outStr = baos.toString("UTF-8");
-            } else {
-                outStr = new String(compressed, "UTF-8");
-            }
+            return in;
         } catch (IOException e) {
-            System.out.println("could not decompress");
+            return new ByteArrayInputStream(new byte[0]);
         }
-        return outStr;
     }
 
     private static int getEventTypeId(Connection connection, JHVEventType eventType) {
