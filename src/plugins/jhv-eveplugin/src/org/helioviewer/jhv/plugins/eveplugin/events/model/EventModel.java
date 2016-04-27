@@ -26,13 +26,8 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
-/*
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
 public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
-    YAxis yaxis = new YAxis(-1, 1, "", true);
     private static EventModel instance;
     private final JHVEventContainer eventContainer;
     private boolean isVisible = true;
@@ -230,4 +225,5 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
     @Override
     public void yaxisChanged() {
     }
+
 }

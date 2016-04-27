@@ -48,7 +48,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     private final EVEState eveState;
 
     public ChartDrawIntervalPane() {
-        initVisualComponents();
+        setPreferredSize(new Dimension(getPreferredSize().width, DrawConstants.INTERVAL_SELECTION_HEIGHT));
+        setSize(getPreferredSize());
 
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -58,10 +59,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         eveState = EVEState.getSingletonInstance();
     }
 
-    private void initVisualComponents() {
-        setPreferredSize(new Dimension(getPreferredSize().width, DrawConstants.INTERVAL_SELECTION_HEIGHT));
-        setSize(getPreferredSize());
-    }
 
     @Override
     protected void paintComponent(Graphics g1) {
@@ -109,7 +106,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
 
         g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 2, availableIntervalSpace, getHeight() - 3);
-
     }
 
     private void drawInterval(Graphics2D g) {
