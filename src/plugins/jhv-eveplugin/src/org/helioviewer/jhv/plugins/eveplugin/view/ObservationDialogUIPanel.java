@@ -21,9 +21,11 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
-public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements ActionListener {
+public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements ActionListener, LineDataSelectorModelListener {
 
     private final JComboBox comboBoxGroup;
     private final JComboBox comboBoxData;
@@ -69,6 +71,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         this.add(container);
 
         initGroups();
+        EVEPlugin.ldsm.addLineDataSelectorModelListener(this);
     }
 
     private void initGroups() {
@@ -121,13 +124,25 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         return true;
     }
 
-    // Action Listener
-
     @Override
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(comboBoxGroup)) {
             updateGroupValues();
         }
+    }
+
+    @Override
+    public void lineDataAdded(LineDataSelectorElement element) {
+        updateGroupValues();
+    }
+
+    @Override
+    public void lineDataRemoved(LineDataSelectorElement element) {
+        updateGroupValues();
+    }
+
+    @Override
+    public void lineDataUpdated(LineDataSelectorElement element) {
     }
 
 }
