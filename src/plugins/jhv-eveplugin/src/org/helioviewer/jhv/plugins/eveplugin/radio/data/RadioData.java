@@ -67,7 +67,6 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
     public void requestAndOpenIntervals(long start, long end) {
         ArrayList<Long> toDownloadStartDates = new ArrayList<Long>();
         long startDate = start - start % TimeUtils.DAY_IN_MILLIS;
-
         ArrayList<Long> incomingStartDates = new ArrayList<Long>(DAYS_IN_CACHE);
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             incomingStartDates.add(startDate + i * TimeUtils.DAY_IN_MILLIS);
@@ -159,8 +158,9 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
     @Override
     public void setVisibility(boolean visible) {
         isVisible = visible;
-        EVEPlugin.dc.fireRedrawRequest();
         EVEPlugin.ldsm.lineDataElementUpdated(this);
+        fetchData(EVEPlugin.dc.selectedAxis, EVEPlugin.dc.availableAxis);
+        EVEPlugin.dc.fireRedrawRequest();
     }
 
     @Override
