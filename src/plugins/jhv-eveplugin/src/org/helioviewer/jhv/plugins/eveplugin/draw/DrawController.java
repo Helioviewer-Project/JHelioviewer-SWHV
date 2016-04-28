@@ -66,7 +66,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void setSelectedInterval(long newStart, long newEnd) {
-        selectedAxis.set(newStart, newEnd);
+        selectedAxis.set(newStart, newEnd, true);
         setAvailableInterval();
     }
 
@@ -80,7 +80,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         setAvailableInterval();
     }
 
-    public void setAvailableInterval() {
+    private void setAvailableInterval() {
         long availableStart = availableAxis.start;
         long availableEnd = availableAxis.end;
 
@@ -91,6 +91,20 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             availableAxis.start = availableInterval.start;
             availableAxis.end = availableInterval.end;
         }
+        publishAxisInfo();
+    }
+
+    private void centraliseSelected(long time) {
+        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked
+                && availableAxis.start <= time && availableAxis.end >= time) {
+            latestMovieTime = time;
+            long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
+            selectedAxis.set(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)), false);
+            publishAxisInfo();
+        }
+    }
+
+    public void publishAxisInfo() {
         fireRedrawRequest();
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             el.fetchData(selectedAxis, availableAxis);
@@ -197,15 +211,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private void fireMovieIntervalChanged(long start, long end) {
         for (DrawControllerListener l : listeners) {
             l.movieIntervalChanged(start, end);
-        }
-    }
-
-    private void centraliseSelected(long time) {
-        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked
-                && availableAxis.start <= time && availableAxis.end >= time) {
-            latestMovieTime = time;
-            long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
-            setSelectedInterval(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)));
         }
     }
 
