@@ -12,15 +12,12 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
 
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeLineListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
@@ -29,7 +26,6 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
     private final JComboBox zoomComboBox;
     private final JToggleButton periodFromLayersButton;
     private boolean selectedIndexSetByProgram;
-    private Interval selectedIntervalByZoombox = null;
 
     private enum ZOOM {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
@@ -66,16 +62,13 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
             }
         } else if (e.getSource().equals(zoomComboBox)) {
+            if (selectedIndexSetByProgram) {
+                selectedIndexSetByProgram = false;
+                return;
+            }
             ZoomComboboxItem item = (ZoomComboboxItem) zoomComboBox.getSelectedItem();
-            selectedIntervalByZoombox = null;
-
-            if (item != null && !selectedIndexSetByProgram) {
+            if (item != null) {
                 zoomTo(item.zoom, item.number);
-                selectedIntervalByZoombox = EVEPlugin.dc.getSelectedInterval();
-            } else {
-                if (selectedIndexSetByProgram) {
-                    selectedIndexSetByProgram = false;
-                }
             }
         }
     }
@@ -159,13 +152,8 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
 
     @Override
     public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
-        if (selectedIntervalByZoombox == null) {
-            return;
-        }
-        if (selectedAxis.start == selectedIntervalByZoombox.start && selectedAxis.end == selectedIntervalByZoombox.end) {
-            selectedIndexSetByProgram = true;
-            zoomComboBox.setSelectedIndex(0);
-        }
+        selectedIndexSetByProgram = true;
+        zoomComboBox.setSelectedIndex(0);
     }
 
     private void zoomTo(ZOOM zoom, long value) {
@@ -237,14 +225,14 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
     private Long differenceInMilliseconds(int calendarField, long value) {
         switch (calendarField) {
         case Calendar.YEAR:
-            return value * 365 * 24 * 60 * 60 * 1000l;
+            return value * 365 * TimeUtils.DAY_IN_MILLIS;
         case Calendar.MONTH:
-            return value * 30 * 24 * 60 * 60 * 1000l;
+            return value * 30 * TimeUtils.DAY_IN_MILLIS;
         case Calendar.DAY_OF_MONTH:
         case Calendar.DAY_OF_WEEK:
         case Calendar.DAY_OF_WEEK_IN_MONTH:
         case Calendar.DAY_OF_YEAR:
-            return value * 24 * 60 * 60 * 1000l;
+            return value * TimeUtils.DAY_IN_MILLIS;
         case Calendar.HOUR:
         case Calendar.HOUR_OF_DAY:
             return value * 60 * 60 * 1000l;

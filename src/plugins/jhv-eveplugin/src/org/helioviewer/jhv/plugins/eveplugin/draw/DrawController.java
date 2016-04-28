@@ -61,10 +61,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         timeLineListeners.remove(tl);
     }
 
-    public final Interval getAvailableInterval() {
-        return new Interval(availableAxis.start, availableAxis.end);
-    }
-
     public void setSelectedInterval(long newStart, long newEnd) {
         selectedAxis.set(newStart, newEnd, true);
         setAvailableInterval();
@@ -91,7 +87,14 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             availableAxis.start = availableInterval.start;
             availableAxis.end = availableInterval.end;
         }
-        publishAxisInfo();
+
+        fireRedrawRequest();
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            el.fetchData(selectedAxis, availableAxis);
+        }
+        for (TimeLineListener tl : timeLineListeners) {
+            tl.fetchData(selectedAxis, availableAxis);
+        }
     }
 
     private void centraliseSelected(long time) {
@@ -100,17 +103,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             latestMovieTime = time;
             long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
             selectedAxis.set(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)), false);
-            publishAxisInfo();
-        }
-    }
-
-    public void publishAxisInfo() {
-        fireRedrawRequest();
-        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-            el.fetchData(selectedAxis, availableAxis);
-        }
-        for (TimeLineListener tl : timeLineListeners) {
-            tl.fetchData(selectedAxis, availableAxis);
+            fireRedrawRequest();
+            for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+                el.fetchData(selectedAxis, availableAxis);
+            }
         }
     }
 
