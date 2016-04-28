@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.zip.GZIPOutputStream;
 
+import org.helioviewer.jhv.base.logging.Log;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -19,11 +20,12 @@ public class JSONUtils {
         try {
             return new JSONObject(new JSONTokener(new BufferedReader(new InputStreamReader(in, "UTF-8"), BUFSIZ)));
         } catch (Exception e) {
+            Log.error("Invalid JSON response " + e);
             return new JSONObject();
         }
     }
 
-    public static byte[] writeJSONCompressed(JSONObject json) throws IOException {
+    public static byte[] compressJSON(JSONObject json) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStreamWriter out = new OutputStreamWriter(new GZIPOutputStream(baos, BUFSIZ), "UTF-8");
         json.write(out);
