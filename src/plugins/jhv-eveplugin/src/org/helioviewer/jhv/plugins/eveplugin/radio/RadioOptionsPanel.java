@@ -5,13 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
-import javax.swing.JPanel;
 
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 
 @SuppressWarnings("serial")
-class RadioOptionsPanel extends JPanel implements ActionListener {
+class RadioOptionsPanel extends ComponentUtils.SmallPanel implements ActionListener {
 
     private final JComboBox lutBox;
 
@@ -21,8 +21,9 @@ class RadioOptionsPanel extends JPanel implements ActionListener {
         lutBox = new JComboBox(LUT.getStandardList().keySet().toArray());
         lutBox.setSelectedItem(selected);
         lutBox.addActionListener(this);
-
         add(lutBox);
+
+        setSmall();
     }
 
     @Override

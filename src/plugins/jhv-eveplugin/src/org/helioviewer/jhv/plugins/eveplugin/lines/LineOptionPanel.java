@@ -9,12 +9,12 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
-import javax.swing.JPanel;
 
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 @SuppressWarnings("serial")
-class LineOptionPanel extends JPanel {
+class LineOptionPanel extends ComponentUtils.SmallPanel {
 
     private final Band band;
 
@@ -42,6 +42,8 @@ class LineOptionPanel extends JPanel {
             }
         });
         add(pickColor, c);
+
+        setSmall();
     }
 
 }
