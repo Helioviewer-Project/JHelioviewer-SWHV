@@ -18,7 +18,6 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioData;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
-import org.helioviewer.jhv.plugins.eveplugin.view.RadioObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
@@ -78,8 +77,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         Layers.removeTimeListener(dc);
         Layers.removeLayersListener(dc);
 
-        ObservationDialog.getInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-        ObservationDialog.getInstance().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+        ObservationDialog.getInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME);
+        //ObservationDialog.getInstance().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
 
         ImageViewerGui.getMainContentPanel().removePlugin(this);
 
