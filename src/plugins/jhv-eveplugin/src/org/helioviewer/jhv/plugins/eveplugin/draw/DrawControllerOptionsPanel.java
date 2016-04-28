@@ -165,19 +165,19 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
             EVEPlugin.dc.setSelectedInterval(availableInterval.start, availableInterval.end);
             break;
         case Day:
-            computeZoomInterval(selectedInterval.start, selectedInterval.end, Calendar.DAY_OF_MONTH, value);
+            computeZoomInterval(selectedInterval.end, Calendar.DAY_OF_MONTH, value);
             break;
         case Hour:
-            computeZoomInterval(selectedInterval.start, selectedInterval.end, Calendar.HOUR, value);
+            computeZoomInterval(selectedInterval.end, Calendar.HOUR, value);
             break;
         case Month:
-            computeZoomInterval(selectedInterval.start, selectedInterval.end, Calendar.MONTH, value);
+            computeZoomInterval(selectedInterval.end, Calendar.MONTH, value);
             break;
         case Year:
-            computeZoomInterval(selectedInterval.start, selectedInterval.end, Calendar.YEAR, value);
+            computeZoomInterval(selectedInterval.end, Calendar.YEAR, value);
             break;
         case Carrington:
-            computeCarringtonInterval(selectedInterval.start, selectedInterval.end, value);
+            computeCarringtonInterval(selectedInterval.end, value);
             break;
         case Movie:
             computeMovieInterval();
@@ -203,11 +203,15 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
             EVEPlugin.dc.setSelectedInterval(now - TimeUtils.DAY_IN_MILLIS, now);
     }
 
-    private void computeCarringtonInterval(long start, long end, long value) {
-        computeZoomForMilliSeconds(start, end, (long) (TimeUtils.CARRINGTON_SYNODIC * TimeUtils.DAY_IN_MILLIS * value));
+    private void computeCarringtonInterval(long end, long value) {
+        computeZoomForMilliSeconds(end, (long) (TimeUtils.CARRINGTON_SYNODIC * TimeUtils.DAY_IN_MILLIS * value));
     }
 
-    private void computeZoomForMilliSeconds(long start, long end, long differenceMilli) {
+    private void computeZoomInterval(long end, int calendarField, long difference) {
+        computeZoomForMilliSeconds(end, differenceInMilliseconds(calendarField, difference));
+    }
+
+    private void computeZoomForMilliSeconds(long end, long differenceMilli) {
         long endDate = end;
         long now = System.currentTimeMillis();
         if (endDate > now) {
@@ -216,10 +220,6 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
 
         long startDate = endDate - differenceMilli;
         EVEPlugin.dc.setSelectedInterval(startDate, endDate);
-    }
-
-    private void computeZoomInterval(long start, long end, int calendarField, long difference) {
-        computeZoomForMilliSeconds(start, end, differenceInMilliseconds(calendarField, difference));
     }
 
     private Long differenceInMilliseconds(int calendarField, long value) {
