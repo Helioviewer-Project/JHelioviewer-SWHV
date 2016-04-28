@@ -54,8 +54,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Point mousePressedPosition = null;
     private Point mouseDragPosition = null;
 
-    private final boolean mousePressedOnMovieFrame = false; // !!!
-
     private Rectangle graphArea = new Rectangle();
     private Rectangle plotArea = new Rectangle();
     private BufferedImage screenImage = null;
@@ -390,7 +388,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(Cursor.getDefaultCursor());
         }
 
-        if (mousePressedPosition != null && mouseDragPosition != null && !mousePressedOnMovieFrame) {
+        if (mousePressedPosition != null && mouseDragPosition != null) {
             double distanceX = mousePressedPosition.x - p.x;
             drawController.move(graphArea.x, graphArea.width, distanceX);
 
@@ -415,11 +413,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         mouseDragPosition = p;
 
-        if (mousePressedPosition != null && mousePressedOnMovieFrame) {
-            setMovieFrameManually(mouseDragPosition);
-        }
-
-        if (mousePressedPosition != null && !mousePressedOnMovieFrame) {
+        if (mousePressedPosition != null) {
             setCursor(UIGlobals.closedHandCursor);
             double distanceX = mousePressedPosition.x - p.x;
             double distanceY = p.y - mousePressedPosition.y;
