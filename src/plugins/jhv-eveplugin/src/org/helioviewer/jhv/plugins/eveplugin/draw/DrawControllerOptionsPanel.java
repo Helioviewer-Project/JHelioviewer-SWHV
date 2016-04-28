@@ -12,7 +12,7 @@ import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
@@ -20,7 +20,7 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-class DrawControllerOptionsPanel extends ComponentUtils.SmallPanel implements ActionListener {
+class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
 
     private final JComboBox zoomComboBox;
     final JToggleButton periodFromLayersButton;

@@ -11,13 +11,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-public class RenderableMiniviewOptionsPanel extends ComponentUtils.SmallPanel {
+public class RenderableMiniviewOptionsPanel extends SmallPanel {
 
     private JSpinner xSpinner;
     private static final int DEFAULT = 10;

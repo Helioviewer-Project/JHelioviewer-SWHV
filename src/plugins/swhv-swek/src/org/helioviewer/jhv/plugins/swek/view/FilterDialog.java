@@ -16,6 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.AbstractFilterPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
 
@@ -153,13 +154,16 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
         super.addFocusListener(this);
         super.addWindowFocusListener(this);
         List<AbstractFilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(eventType);
-        JPanel filterPanel = new JPanel();
+
+        SmallPanel filterPanel = new SmallPanel();
         filterPanel.setLayout(new GridLayout(filterPanels.size(), 1));
         filterPanel.setOpaque(false);
         filterPanel.setBackground(Color.white);
         for (AbstractFilterPanel afp : filterPanels) {
             filterPanel.add(afp);
         }
+        filterPanel.setSmall();
+
         super.setContentPane(filterPanel);
         super.pack();
         super.validate();

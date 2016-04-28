@@ -18,11 +18,11 @@ import javax.swing.event.ChangeListener;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-public class PfssPluginPanel extends ComponentUtils.SmallPanel {
+public class PfssPluginPanel extends SmallPanel {
 
     private JSpinner levelSpinner;
 

@@ -9,10 +9,10 @@ import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 
 @SuppressWarnings("serial")
-public class SWHVHEKPluginPanel extends ComponentUtils.SmallPanel {
+public class SWHVHEKPluginPanel extends SmallPanel {
 
     protected boolean icons = true;
 
