@@ -22,7 +22,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -30,6 +29,7 @@ import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -193,20 +193,18 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
         final long tickDifferenceHorizontal = (xAxis.end - xAxis.start) / (horizontalTickCount - 1);
 
-        GregorianCalendar tickGreg = new GregorianCalendar();
-        GregorianCalendar previousGreg = new GregorianCalendar();
-
-        Date previousDate = null;
+        long previousDate = Long.MIN_VALUE;
         for (int i = 0; i < horizontalTickCount; ++i) {
-            final Date tickValue = new Date(xAxis.start + i * tickDifferenceHorizontal);
-            final int x = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, tickValue.getTime());
+            final long tickValue = xAxis.start + i * tickDifferenceHorizontal;
+            final int x = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, tickValue);
             final String tickText;
-            if (previousDate == null) {
+            if (previousDate == Long.MIN_VALUE) {
                 tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
             } else {
-                tickGreg.setTime(tickValue);
-                previousGreg.setTime(previousDate);
-                if (tickGreg.get(GregorianCalendar.DAY_OF_MONTH) == previousGreg.get(GregorianCalendar.DAY_OF_MONTH) && tickGreg.get(GregorianCalendar.MONTH) == previousGreg.get(GregorianCalendar.MONTH) && tickGreg.get(GregorianCalendar.YEAR) == previousGreg.get(GregorianCalendar.YEAR)) {
+                long tickDayNumber = tickValue / TimeUtils.DAY_IN_MILLIS;
+                long prevDayNumber = previousDate / TimeUtils.DAY_IN_MILLIS;
+
+                if (tickDayNumber == prevDayNumber) {
                     tickText = DrawConstants.HOUR_TIME_FORMAT.format(tickValue);
                 } else {
                     tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
@@ -216,6 +214,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.setColor(c);
             g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
 
+            g.setColor(Color.BLACK);
             int yl = graphArea.y + graphArea.height + 2 + tickTextHeight;
             for (String line : tickText.split("\n")) {
                 tickTextBounds = g.getFontMetrics().getStringBounds(line, g);
