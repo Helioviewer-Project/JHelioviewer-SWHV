@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.radio.data;
+package org.helioviewer.jhv.plugins.eveplugin.radio;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -16,7 +16,6 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.radio.gui.ColorLookupModel;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -106,7 +105,7 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     private BufferedImage createBufferedImage(int width, int height, byte[] data) {
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, ColorLookupModel.getInstance().getColorModel());
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, EVEPlugin.rdm.getColorModel());
         DataBufferByte dataBuffer = new DataBufferByte(data, width * height);
         Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xff }, new Point(0, 0));
         newImage.setData(raster);

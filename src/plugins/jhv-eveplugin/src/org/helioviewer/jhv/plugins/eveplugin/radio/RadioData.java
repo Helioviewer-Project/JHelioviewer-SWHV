@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.radio.data;
+package org.helioviewer.jhv.plugins.eveplugin.radio;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -6,7 +6,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,29 +17,17 @@ import java.util.concurrent.ExecutionException;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.radio.gui.ColorLookupModel;
-import org.helioviewer.jhv.plugins.eveplugin.radio.gui.ColorLookupModelListener;
-import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioOptionsPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 
-/**
- * The radio data manager manages all the downloaded data for radio
- * spectrograms.
- *
- * It receives all of its input from the radio downloader as listener of the
- * radio downloader.
- *
- * @author Bram.Bourgoignie@oma.be
- *
- */
-public class RadioData implements ColorLookupModelListener, LineDataSelectorElement {
+public class RadioData implements LineDataSelectorElement {
 
     private YAxis yAxis;
 
@@ -50,10 +39,33 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
     public static final int MAX_AMOUNT_OF_DAYS = 3;
     public static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 1;
 
+    private static IndexColorModel colorModel;
+    private static RadioOptionsPanel optionsPanel;
+
     public RadioData() {
-        ColorLookupModel.getInstance().addFilterModelListener(this);
+        String cm = "Rainbow 2";
+        colorModel = createIndexColorModelFromLUT(LUT.getStandardList().get(cm));
+        optionsPanel = new RadioOptionsPanel(cm);
+
         yAxis = new YAxis(400, 20, "Mhz", false);
         EVEPlugin.ldsm.addLineData(this);
+    }
+
+    private IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
+        return new IndexColorModel(8, lut2.getLut8().length, lut2.getLut8(), 0, false, -1, DataBuffer.TYPE_BYTE);
+    }
+
+    void setLUT(LUT lut) {
+        colorModel = createIndexColorModelFromLUT(lut);
+        for (Entry<Long, DownloadedJPXData> entry : cache.entrySet()) {
+            DownloadedJPXData jpxData = entry.getValue();
+            jpxData.changeColormap(colorModel);
+        }
+        EVEPlugin.dc.fireRedrawRequest();
+    }
+
+    IndexColorModel getColorModel() {
+        return colorModel;
     }
 
     private void clearCache() {
@@ -126,15 +138,6 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
         }
     }
 
-    @Override
-    public void colorLUTChanged() {
-        ColorModel cm = ColorLookupModel.getInstance().getColorModel();
-        for (Entry<Long, DownloadedJPXData> entry : cache.entrySet()) {
-            DownloadedJPXData jpxData = entry.getValue();
-            jpxData.changeColormap(cm);
-        }
-        EVEPlugin.dc.fireRedrawRequest();
-    }
 
     @Override
     public YAxis getYAxis() {
@@ -187,7 +190,7 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
 
     @Override
     public Component getOptionsPanel() {
-        return new RadioOptionsPanel();
+        return optionsPanel;
     }
 
     @Override
