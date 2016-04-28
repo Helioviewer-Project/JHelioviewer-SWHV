@@ -62,7 +62,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
             @Override
             public void done() {
                 ObservationDialog.getInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-                //ObservationDialog.getInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
             }
 
         };
@@ -78,7 +77,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         Layers.removeLayersListener(dc);
 
         ObservationDialog.getInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME);
-        //ObservationDialog.getInstance().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
 
         ImageViewerGui.getMainContentPanel().removePlugin(this);
 
