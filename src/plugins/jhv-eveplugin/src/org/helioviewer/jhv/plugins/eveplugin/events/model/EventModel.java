@@ -128,7 +128,7 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
                     int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
                     int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
-                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition, event.isHighlighted());
+                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, previousLine, mousePosition, event.isHighlighted());
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                         highlightedEvent = rEvent;
@@ -136,7 +136,7 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
                 }
 
                 if (shouldRedraw != null) {
-                    shouldRedraw.draw(g, previousLine, mousePosition);
+                    shouldRedraw.draw(graphArea, g, previousLine, mousePosition);
                 }
 
                 int spaceNeeded = spacePerLine * nrLines;
