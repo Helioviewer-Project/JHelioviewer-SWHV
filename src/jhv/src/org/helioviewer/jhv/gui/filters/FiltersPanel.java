@@ -3,12 +3,12 @@ package org.helioviewer.jhv.gui.filters;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class FiltersPanel extends ComponentUtils.SmallPanel {
+public class FiltersPanel extends SmallPanel {
 
     private final RunningDifferencePanel runningDifferencePanel;
     private final OpacityPanel opacityPanel;

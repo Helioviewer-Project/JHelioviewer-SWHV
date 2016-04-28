@@ -10,11 +10,11 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
-import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 @SuppressWarnings("serial")
-class LineOptionPanel extends ComponentUtils.SmallPanel {
+class LineOptionPanel extends SmallPanel {
 
     private final Band band;
 

@@ -17,6 +17,7 @@ import javax.swing.JTree;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
@@ -76,7 +77,7 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
         add(eventTypeTree, BorderLayout.CENTER);
         final FilterDialog filterDialog = new FilterDialog(eventType);
 
-        JPanel filterPanel = new JPanel();
+        SmallPanel filterPanel = new SmallPanel();
         filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
         filterPanel.setOpaque(true);
         filterPanel.setBackground(Color.WHITE);
@@ -84,7 +85,6 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
         if (eventType.containsFilter()) {
             JButton filterButton = new JButton("Filter");
             filterButton.addActionListener(new ActionListener() {
-
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     filterDialog.setVisible(true);
@@ -121,6 +121,7 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
         }
         loadingLabel = new JLabel();
         filterPanel.add(loadingLabel);
+        filterPanel.setSmall();
         add(filterPanel, BorderLayout.LINE_END);
     }
 

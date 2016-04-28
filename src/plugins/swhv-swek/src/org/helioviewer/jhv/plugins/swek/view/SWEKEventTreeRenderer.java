@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.plugins.swek.model.AbstractSWEKTreeModelElement;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelSupplier;
@@ -65,7 +65,7 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
      * @return The panel to be placed in the tree
      */
     private JPanel createLeaf(String name, Object whatToDisplay) {
-        ComponentUtils.SmallPanel panel = new ComponentUtils.SmallPanel(new BorderLayout());
+        SmallPanel panel = new SmallPanel(new BorderLayout());
         panel.setOpaque(false);
 
         ImageIcon icon = ((AbstractSWEKTreeModelElement) whatToDisplay).getIcon();

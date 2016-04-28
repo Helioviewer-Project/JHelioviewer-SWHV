@@ -6,12 +6,12 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
 
-import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 
 @SuppressWarnings("serial")
-class RadioOptionsPanel extends ComponentUtils.SmallPanel implements ActionListener {
+class RadioOptionsPanel extends SmallPanel implements ActionListener {
 
     private final JComboBox lutBox;
 

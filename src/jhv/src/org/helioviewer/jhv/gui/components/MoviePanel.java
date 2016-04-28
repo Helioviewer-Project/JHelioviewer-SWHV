@@ -44,6 +44,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -184,9 +185,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static JComboBox speedUnitComboBox;
     private static JComboBox animationModeComboBox;
 
-    private static ComponentUtils.SmallPanel speedPanel;
-    private static ComponentUtils.SmallPanel modePanel;
-    private static ComponentUtils.SmallPanel recordPanel;
+    private static SmallPanel speedPanel;
+    private static SmallPanel modePanel;
+    private static SmallPanel recordPanel;
 
     // Icons
     private static final Icon playIcon = IconBank.getIcon(JHVIcon.PLAY);
@@ -287,7 +288,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // It is not included in the main Panel to save space if it is not shown
 
         // Speed
-        speedPanel = new ComponentUtils.SmallPanel(new FlowLayout(FlowLayout.RIGHT));
+        speedPanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT));
         speedPanel.add(new JLabel("Speed", JLabel.RIGHT));
 
         int speedMin = 1, speedMax = 60;
@@ -311,7 +312,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         mainPanel.add(speedPanel);
 
         // Animation mode
-        modePanel = new ComponentUtils.SmallPanel(new FlowLayout(FlowLayout.RIGHT));
+        modePanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT));
         modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
 
         AnimationMode[] modi = { AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING };
@@ -322,7 +323,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         mainPanel.add(modePanel);
 
-        recordPanel = new ComponentUtils.SmallPanel(new GridBagLayout());
+        recordPanel = new SmallPanel(new GridBagLayout());
         recordPanel.setBorder(BorderFactory.createTitledBorder(" Recording "));
 
         GridBagConstraints c = new GridBagConstraints();
