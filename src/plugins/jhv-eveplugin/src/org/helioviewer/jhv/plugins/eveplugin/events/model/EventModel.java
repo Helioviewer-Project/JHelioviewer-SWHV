@@ -14,7 +14,6 @@ import java.util.SortedMap;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
@@ -74,8 +73,8 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
     @Override
     public void cacheUpdated() {
-        Interval selectedInterval = EVEPlugin.dc.getSelectedInterval();
-        eventContainer.requestForInterval(selectedInterval.start, selectedInterval.end, this);
+        TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
+        eventContainer.requestForInterval(xAxis.start, xAxis.end, this);
         EVEPlugin.dc.fireRedrawRequest();
     }
 
