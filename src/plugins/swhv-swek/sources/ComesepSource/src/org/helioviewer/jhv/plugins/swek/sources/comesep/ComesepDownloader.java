@@ -44,9 +44,9 @@ public class ComesepDownloader extends SWEKDownloader {
                     end = end + cactusLiftOff * 60000;
                 }
 
-                byte[] compressedJson;
+                byte[] compressed;
                 try {
-                    compressedJson = JSONUtils.writeJSONCompressed(result);
+                    compressed = JSONUtils.compressJSON(result);
                 } catch (IOException e) {
                     Log.error("compression error");
                     return false;
@@ -54,7 +54,7 @@ public class ComesepDownloader extends SWEKDownloader {
 
                 long archiv = start;
                 String uid = result.getString("alertid");
-                event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, archiv, uid, new ArrayList<JHVDatabaseParam>()));
+                event2db_list.add(new JHVDatabase.Event2Db(compressed, start, end, archiv, uid, new ArrayList<JHVDatabaseParam>()));
             }
 
             int id = JHVDatabase.dump_event2db(event2db_list, type);

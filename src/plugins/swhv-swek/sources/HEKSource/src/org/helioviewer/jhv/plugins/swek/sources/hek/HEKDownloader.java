@@ -66,15 +66,15 @@ public class HEKDownloader extends SWEKDownloader {
                 return false;
             }
 
-            byte[] compressedJson;
+            byte[] compressed;
             try {
-                compressedJson = JSONUtils.writeJSONCompressed(result);
+                compressed = JSONUtils.compressJSON(result);
             } catch (IOException e) {
                 Log.error("compression error");
                 return false;
             }
 
-            event2db_list.add(new JHVDatabase.Event2Db(compressedJson, start, end, archiv, uid, paramList));
+            event2db_list.add(new JHVDatabase.Event2Db(compressed, start, end, archiv, uid, paramList));
         }
 
         int id = JHVDatabase.dump_event2db(event2db_list, type);

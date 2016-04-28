@@ -2,7 +2,6 @@ package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
@@ -211,7 +210,7 @@ public class APIRequestManager {
     private static View requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-            APIResponse response = new APIResponse(new InputStreamReader(ds.getInput(), "UTF-8"));
+            APIResponse response = new APIResponse(ds.getInput());
 
             // Could we handle the answer from the server
             if (!response.hasData()) {
