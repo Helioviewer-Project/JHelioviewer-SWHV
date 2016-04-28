@@ -58,8 +58,7 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
 
     private void clearCache() {
         for (DownloadedJPXData jpxData : cache.values()) {
-            if (jpxData.isInited())
-                jpxData.remove();
+            jpxData.remove();
         }
         cache.clear();
     }
@@ -78,9 +77,7 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
             Long key = entry.getKey();
             if (!incomingStartDates.contains(key)) {
                 DownloadedJPXData jpxData = entry.getValue();
-                if (jpxData.isInited()) {
-                    jpxData.remove();
-                }
+                jpxData.remove();
                 it.remove();
             }
         }

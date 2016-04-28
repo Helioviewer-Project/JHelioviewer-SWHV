@@ -26,10 +26,9 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ImageCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
-public class DownloadedJPXData implements ImageDataHandler {
+class DownloadedJPXData implements ImageDataHandler {
 
     private JP2ViewCallisto view;
-    private boolean inited = false;
     private boolean hasData = false;
 
     private final long startDate;
@@ -51,6 +50,7 @@ public class DownloadedJPXData implements ImageDataHandler {
     public void init(JP2ViewCallisto _view) {
         view = _view;
         view.setDataHandler(this);
+
         JP2ImageCallisto image = view.getJP2Image();
         image.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
         ResolutionSet resolutionSet = image.getResolutionSet(0);
@@ -73,11 +73,6 @@ public class DownloadedJPXData implements ImageDataHandler {
             return;
         }
         requestData();
-        inited = true;
-    }
-
-    boolean isInited() {
-        return inited;
     }
 
     void remove() {
@@ -116,7 +111,7 @@ public class DownloadedJPXData implements ImageDataHandler {
     }
 
     void requestData() {
-        if (inited) {
+        if (view != null) {
             JP2ImageCallisto image = view.getJP2Image();
             Rectangle roi = getROI(EVEPlugin.dc.selectedAxis, EVEPlugin.rdm.getYAxis());
 
