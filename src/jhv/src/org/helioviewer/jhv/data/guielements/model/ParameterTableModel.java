@@ -1,9 +1,5 @@
 package org.helioviewer.jhv.data.guielements.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -18,7 +14,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 public class ParameterTableModel extends AbstractTableModel {
 
     /** The parameters in this model */
-    private final List<JHVEventParameter> parameters;
+    private final JHVEventParameter[] parameters;
 
     private static final int STRING_CUTOFF = 256;
 
@@ -28,15 +24,14 @@ public class ParameterTableModel extends AbstractTableModel {
      * @param parameters
      *            the parameters
      */
-    public ParameterTableModel(Collection<JHVEventParameter> parameters) {
+    public ParameterTableModel(JHVEventParameter[] parameters) {
         super();
-        this.parameters = new ArrayList<JHVEventParameter>();
-        this.parameters.addAll(parameters);
+        this.parameters = parameters;
     }
 
     @Override
     public int getRowCount() {
-        return parameters.size();
+        return parameters.length;
     }
 
     @Override
@@ -55,11 +50,11 @@ public class ParameterTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if (rowIndex < parameters.size()) {
+        if (rowIndex < parameters.length) {
             if (columnIndex == 0) {
-                return parameters.get(rowIndex).getParameterDisplayName();
+                return parameters[rowIndex].getParameterDisplayName();
             } else if (columnIndex == 1) {
-                String result = parameters.get(rowIndex).getDisplayParameterValue();
+                String result = parameters[rowIndex].getDisplayParameterValue();
                 if (result.length() > STRING_CUTOFF) {
                     return result.substring(0, STRING_CUTOFF) + "...";
                 } else {

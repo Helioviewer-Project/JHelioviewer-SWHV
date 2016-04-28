@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.data.datatype.event;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 public class JHVEvent {
 
@@ -10,9 +9,10 @@ public class JHVEvent {
 
     private final String eventName;
 
-    private final Map<String, JHVEventParameter> allParameters = new HashMap<String, JHVEventParameter>();
-    private final Map<String, JHVEventParameter> allVisibleParameters = new HashMap<String, JHVEventParameter>();
-
+    private JHVEventParameter[] allParameters;
+    private JHVEventParameter[] visibleParameters;
+    private ArrayList<JHVEventParameter> visibleParametersArray;
+    private ArrayList<JHVEventParameter> allParametersArray;
     private final JHVEventType eventType;
     private JHVPositionInformation positionInformation = null;
     private Integer id;
@@ -25,12 +25,23 @@ public class JHVEvent {
         id = _id;
     }
 
-    public Map<String, JHVEventParameter> getAllEventParameters() {
+    public JHVEventParameter[] getAllEventParameters() {
         return allParameters;
     }
 
-    public Map<String, JHVEventParameter> getVisibleEventParameters() {
-        return allVisibleParameters;
+    public JHVEventParameter getParameter(String key) {
+        int i = 0;
+        while (i < allParameters.length) {
+            JHVEventParameter p = allParameters[i];
+            if (p.getParameterName() == key)
+                return p;
+            i++;
+        }
+        return null;
+    }
+
+    public JHVEventParameter[] getVisibleEventParameters() {
+        return visibleParameters;
     }
 
     public String getName() {
@@ -57,12 +68,10 @@ public class JHVEvent {
         this.id = id;
     }
 
-    // configured = was the event in the configuration file
     public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured) {
-        String name = parameter.getParameterName();
-        allParameters.put(name, parameter);
+        allParametersArray.add(parameter);
         if (configured && visible) {
-            allVisibleParameters.put(name, parameter);
+            visibleParametersArray.add(parameter);
         }
     }
 
@@ -88,4 +97,23 @@ public class JHVEvent {
         addParameter(parameter, visible, configured);
     }
 
+    public void finishParams() {
+        int sz = allParametersArray.size();
+        allParameters = new JHVEventParameter[sz];
+        for (int i = 0; i < sz; i++) {
+            allParameters[i] = allParametersArray.get(i);
+        }
+        allParametersArray = null;
+        sz = visibleParametersArray.size();
+        visibleParameters = new JHVEventParameter[sz];
+        for (int i = 0; i < sz; i++) {
+            visibleParameters[i] = visibleParametersArray.get(i);
+        }
+        visibleParametersArray = null;
+    }
+
+    public void initParams() {
+        allParametersArray = new ArrayList<JHVEventParameter>();
+        visibleParametersArray = new ArrayList<JHVEventParameter>();
+    }
 }

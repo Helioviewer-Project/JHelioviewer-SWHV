@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
@@ -20,7 +19,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
-import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -150,9 +148,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
 
             if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
-                    Map<String, JHVEventParameter> params = evt.getAllEventParameters();
-                    double principalAngle = Math.toRadians(SWHVHEKData.readCMEPrincipalAngleDegree(params));
-                    double speed = SWHVHEKData.readCMESpeed(params);
+                    double principalAngle = Math.toRadians(SWHVHEKData.readCMEPrincipalAngleDegree(evt));
+                    double speed = SWHVHEKData.readCMESpeed(evt);
                     double distSun = 2.4;
                     distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
 
@@ -179,9 +176,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 Vec2 mousepos = null;
                 if (evt.getName().equals("Coronal Mass Ejection")) {
                     if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR) {
-                        Map<String, JHVEventParameter> params = evt.getAllEventParameters();
-                        double principalAngle = SWHVHEKData.readCMEPrincipalAngleDegree(params) - 90;
-                        double speed = SWHVHEKData.readCMESpeed(params);
+                        double principalAngle = SWHVHEKData.readCMEPrincipalAngleDegree(evt) - 90;
+                        double speed = SWHVHEKData.readCMESpeed(evt);
                         double distSun = 2.4;
                         distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
                         GridScale scale = GridScale.current;

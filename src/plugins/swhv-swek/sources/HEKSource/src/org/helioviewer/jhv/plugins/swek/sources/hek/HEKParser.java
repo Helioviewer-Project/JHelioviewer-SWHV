@@ -31,9 +31,12 @@ public class HEKParser implements SWEKParser {
     @Override
     public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end) throws JSONException {
         JHVEvent currentEvent = new JHVEvent(type, id, start, end);
+        currentEvent.initParams();
         if (!parseResult(json, currentEvent)) {
+            currentEvent.finishParams();
             return null;
         }
+        currentEvent.finishParams();
         return currentEvent;
     }
 
@@ -70,7 +73,7 @@ public class HEKParser implements SWEKParser {
                     } else if (keyString.equals("hgs_y")) {
                         hgsY = Double.valueOf(value);
                     } else if (keyString.equals("rasterscan") || keyString.equals("bound_chaincode") ||
-                              keyString.startsWith("hgc_") || keyString.startsWith("hgs_") || keyString.startsWith("hpc_") || keyString.startsWith("hrc_")) {
+                            keyString.startsWith("hgc_") || keyString.startsWith("hgs_") || keyString.startsWith("hpc_") || keyString.startsWith("hrc_")) {
                         // nothing, delete
                     } else {
                         value = value.trim();
@@ -272,7 +275,7 @@ public class HEKParser implements SWEKParser {
             }
 
             currentEvent.addPositionInformation(new JHVPositionInformation(jhvCentralPoint, jhvBoundedBox, jhvBoundCC,
-                                                currentEvent.getName().equals("Coronal Mass Ejection") ? new Position.Q(p.time, p.rad, new Quat(p.lat, p.lon)) : null)); // reduce memory usage
+                    currentEvent.getName().equals("Coronal Mass Ejection") ? new Position.Q(p.time, p.rad, new Quat(p.lat, p.lon)) : null)); // reduce memory usage
         }
     }
 

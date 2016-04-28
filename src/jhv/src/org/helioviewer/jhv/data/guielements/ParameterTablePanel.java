@@ -9,7 +9,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.Collection;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,7 +32,7 @@ import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 @SuppressWarnings("serial")
 public class ParameterTablePanel extends JPanel {
 
-    public ParameterTablePanel(Collection<JHVEventParameter> parameters) {
+    public ParameterTablePanel(JHVEventParameter[] parameters) {
         super();
         setLayout(new BorderLayout());
 
