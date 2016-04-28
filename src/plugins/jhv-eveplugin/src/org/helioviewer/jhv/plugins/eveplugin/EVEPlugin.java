@@ -63,7 +63,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
             @Override
             public void done() {
                 ObservationDialog.getInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-                ObservationDialog.getInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+                //ObservationDialog.getInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
             }
 
         };
