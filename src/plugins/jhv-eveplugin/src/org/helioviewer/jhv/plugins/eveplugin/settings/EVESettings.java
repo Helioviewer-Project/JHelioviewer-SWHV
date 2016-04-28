@@ -11,8 +11,6 @@ public class EVESettings {
      * */
     public static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
-    public static final String RADIO_OBSERVATION_UI_NAME = "Radio data";
-
     public static final String OBSERVATION_UI_NAME = "1D time series";
 
 }

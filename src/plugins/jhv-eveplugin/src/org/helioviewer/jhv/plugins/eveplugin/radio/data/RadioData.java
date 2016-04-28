@@ -175,7 +175,7 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
 
     @Override
     public Color getDataColor() {
-        return Color.BLACK;
+        return null;
     }
 
     @Override
@@ -200,7 +200,7 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
 
     @Override
     public boolean isDeletable() {
-        return true;
+        return false;
     }
 
     @Override
