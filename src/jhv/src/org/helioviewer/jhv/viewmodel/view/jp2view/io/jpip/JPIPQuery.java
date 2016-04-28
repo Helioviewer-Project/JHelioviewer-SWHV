@@ -89,7 +89,7 @@ public class JPIPQuery implements Cloneable {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         for (Map.Entry<String, String> entry : fields.entrySet()) {
-            buf.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            buf.append(entry.getKey()).append('=').append(entry.getValue()).append('&');
         }
 
         String ret = buf.toString();
