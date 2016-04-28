@@ -86,14 +86,17 @@ class DownloadedJPXData implements ImageDataHandler {
     @Override
     public void handleData(ImageData imageData) {
         if (imageData instanceof SingleChannelByte8ImageData) {
-            if (imageData.getWidth() < 1 || imageData.getHeight() < 1) {
-                Log.error("width: " + imageData.getWidth() + " height: " + imageData.getHeight());
+            int w = imageData.getWidth();
+            int h = imageData.getHeight();
+            if (w < 1 || h < 1) {
+                Log.error("width: " + w + " height: " + h);
                 return;
             }
-            byte[] data = (byte[]) imageData.getBuffer().array();
 
             region = imageData.getRegion();
-            bufferedImage = createBufferedImage(imageData.getWidth(), imageData.getHeight(), data);
+            byte[] data = (byte[]) imageData.getBuffer().array();
+            bufferedImage = createBufferedImage(w, h, data);
+
             if (!hasData) {
                 EVEPlugin.ldsm.downloadFinished(EVEPlugin.rdm);
             }

@@ -299,7 +299,7 @@ public class Band implements LineDataSelectorElement {
         updateGraphsData();
     }
 
-    public EVEValues getValuesInInterval(TimeAxis timeAxis, Rectangle space) {
+    private EVEValues getValuesInInterval(TimeAxis timeAxis, Rectangle space) {
         long intervalStart = timeAxis.start;
         long intervalEnd = timeAxis.end;
         long intervalWidth = intervalEnd - intervalStart;
