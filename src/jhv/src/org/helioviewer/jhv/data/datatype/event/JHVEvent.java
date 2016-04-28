@@ -98,17 +98,9 @@ public class JHVEvent {
     }
 
     public void finishParams() {
-        int sz = allParametersArray.size();
-        allParameters = new JHVEventParameter[sz];
-        for (int i = 0; i < sz; i++) {
-            allParameters[i] = allParametersArray.get(i);
-        }
+        allParameters = allParametersArray.toArray(new JHVEventParameter[allParametersArray.size()]);
         allParametersArray = null;
-        sz = visibleParametersArray.size();
-        visibleParameters = new JHVEventParameter[sz];
-        for (int i = 0; i < sz; i++) {
-            visibleParameters[i] = visibleParametersArray.get(i);
-        }
+        visibleParameters = visibleParametersArray.toArray(new JHVEventParameter[visibleParametersArray.size()]);
         visibleParametersArray = null;
     }
 
