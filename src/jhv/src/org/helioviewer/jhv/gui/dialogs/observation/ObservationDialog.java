@@ -184,7 +184,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     /**
      * Allows a component or plug-in to remove its panel from the dialog.
      * */
-    public void removeUserInterface(final String name, final ObservationDialogPanel userInterface) {
+    public void removeUserInterface(final String name) {
         uiMap.remove(name);
         uiSelectionComboBox.removeItem(name);
     }
