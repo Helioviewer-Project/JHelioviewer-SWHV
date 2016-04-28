@@ -172,6 +172,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private void drawLabels(final Graphics2D g) {
         g.setColor(Color.WHITE);
         g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, graphArea.height + DrawConstants.GRAPH_TOP_SPACE, graphArea.width, DrawConstants.GRAPH_BOTTOM_SPACE);
+        g.fillRect(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, graphArea.height);
+
         TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
         int ct = 0;
         Color c = DrawConstants.TICK_LINE_COLOR;
