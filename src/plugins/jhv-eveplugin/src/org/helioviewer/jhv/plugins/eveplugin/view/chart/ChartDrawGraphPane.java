@@ -503,7 +503,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             final int mouseY = e.getY();
             boolean inGraphArea = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
             boolean inXAxisOrAboveGraph = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && (mouseY <= graphArea.y || mouseY >= graphArea.y + graphArea.height));
-            boolean inYAxis = (mouseX < graphArea.x || mouseX > graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
+            boolean yAxisVerticalCondition = (mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
+            boolean inLeftYAxis = mouseX < graphArea.x && yAxisVerticalCondition;
+            boolean inRightYAxes = mouseX > graphArea.x + graphArea.width && yAxisVerticalCondition;
+
             if (inGraphArea || inXAxisOrAboveGraph) {
                 if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
                     drawController.zoom(graphArea.x, graphArea.width, mouseX, zoomTimeFactor * scrollDistance);
@@ -511,18 +514,30 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     drawController.move(graphArea.x, graphArea.width, zoomTimeFactor * scrollDistance);
                 }
             }
-            if (inGraphArea || inYAxis) {
-                if (((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) || inYAxis) {
-                    for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-                        if (el.showYAxis()) {
+            if ((inGraphArea && ((e.isControlDown() || e.isAltDown()) && !e.isShiftDown())) || inLeftYAxis) {
+                for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+                    if (el.showYAxis()) {
+                        el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
+                        el.yaxisChanged();
+                    }
+                }
+                drawController.fireRedrawRequest();
+            }
+            if (inRightYAxes) {
+                int rightYAxisNumber = (mouseX - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+                int ct = -1;
+                for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+                    if (el.showYAxis()) {
+                        if (rightYAxisNumber == ct) {
                             el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
                             el.yaxisChanged();
                             drawController.fireRedrawRequest();
+                            break;
                         }
+                        ct++;
                     }
                 }
             }
         }
     }
-
 }
