@@ -205,10 +205,12 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
 
     @Override
     public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
-        boolean timediffCond = selectedAxis.end - selectedAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
-        if (timediffCond) {
-            requestForData();
-            requestAndOpenIntervals(selectedAxis.start, selectedAxis.end);
+        if (isVisible) {
+            boolean timediffCond = selectedAxis.end - selectedAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
+            if (timediffCond) {
+                requestForData();
+                requestAndOpenIntervals(selectedAxis.start, selectedAxis.end);
+            }
         }
     }
 
