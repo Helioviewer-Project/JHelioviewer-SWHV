@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.lines.gui;
+package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -12,10 +12,9 @@ import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
 
 @SuppressWarnings("serial")
-public class LineOptionPanel extends JPanel {
+class LineOptionPanel extends JPanel {
 
     private final Band band;
 
