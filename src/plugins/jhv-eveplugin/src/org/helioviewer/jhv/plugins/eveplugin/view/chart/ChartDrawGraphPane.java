@@ -415,9 +415,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         mouseDragPosition = p;
 
-        //if (mousePressedPosition != null && mousePressedOnMovieFrame) {
-        //    setMovieFrameManually(mouseDragPosition);
-        //}
+        if (mousePressedPosition != null && mousePressedOnMovieFrame) {
+            setMovieFrameManually(mouseDragPosition);
+        }
 
         if (mousePressedPosition != null && !mousePressedOnMovieFrame) {
             setCursor(UIGlobals.closedHandCursor);
