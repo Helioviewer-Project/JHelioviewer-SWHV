@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector;
+package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -23,7 +23,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimeLineListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener, TimeLineListener {
+public class DrawControllerOptionsPanel extends JPanel implements ActionListener, LayersListener, TimeLineListener {
 
     private final JComboBox zoomComboBox;
     private final JToggleButton periodFromLayersButton;
@@ -34,7 +34,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
     };
 
-    public IntervalOptionPanel() {
+    public DrawControllerOptionsPanel() {
         zoomComboBox = new JComboBox(new DefaultComboBoxModel());
         fillZoomComboBox();
         zoomComboBox.addActionListener(this);
