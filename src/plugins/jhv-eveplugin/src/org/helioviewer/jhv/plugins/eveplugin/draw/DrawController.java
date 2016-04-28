@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
+import java.awt.Component;
 import java.awt.Rectangle;
 import java.util.HashSet;
 
@@ -23,7 +24,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     public TimeAxis availableAxis;
 
     private static final HashSet<DrawControllerListener> listeners = new HashSet<DrawControllerListener>();
-    private static final HashSet<TimeLineListener> timeLineListeners = new HashSet<TimeLineListener>();
+
+    private final DrawControllerOptionsPanel optionsPanel;
 
     private Rectangle graphSize;
     private boolean isLocked;
@@ -42,7 +44,13 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         isLocked = false;
         latestMovieTime = Long.MIN_VALUE;
 
+        optionsPanel = new DrawControllerOptionsPanel();
+
         EVEPlugin.ldsm.addLineDataSelectorModelListener(this);
+    }
+
+    public Component getOptionsPanel() {
+        return optionsPanel;
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
@@ -51,14 +59,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public void removeDrawControllerListener(DrawControllerListener listener) {
         listeners.remove(listener);
-    }
-
-    public void addTimeLineListener(TimeLineListener tl) {
-        timeLineListeners.add(tl);
-    }
-
-    public void removeTimeLineListener(TimeLineListener tl) {
-        timeLineListeners.remove(tl);
     }
 
     public void setSelectedInterval(long newStart, long newEnd) {
@@ -92,9 +92,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             el.fetchData(selectedAxis, availableAxis);
         }
-        for (TimeLineListener tl : timeLineListeners) {
-            tl.fetchData(selectedAxis, availableAxis);
-        }
+        optionsPanel.fetchData(selectedAxis, availableAxis);
     }
 
     private void centraliseSelected(long time) {
@@ -190,10 +188,13 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void activeLayerChanged(View view) {
-        if (view == null)
+        if (view == null) {
             fireRedrawRequestMovieFrameChanged(Long.MIN_VALUE);
-        else
+            optionsPanel.periodFromLayersButton.setEnabled(false);
+        } else {
             fireMovieIntervalChanged(view.getFirstTime().milli, view.getLastTime().milli);
+            optionsPanel.periodFromLayersButton.setEnabled(true);
+        }
     }
 
     public void fireRedrawRequest() {
