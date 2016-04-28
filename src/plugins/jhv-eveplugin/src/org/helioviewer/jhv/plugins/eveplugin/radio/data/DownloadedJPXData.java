@@ -208,12 +208,9 @@ public class DownloadedJPXData implements ImageDataHandler {
     private void drawNoData(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
         int dx0 = xAxis.value2pixel(ga.x, ga.width, Math.max(startDate, xAxis.start));
         int dx1 = xAxis.value2pixel(ga.x, ga.width, Math.min(endDate, xAxis.end));
-        int dy0 = 0;
-        int dy1 = ga.height;
         int dwidth = dx1 - dx0;
-        int dheight = dy1 - dy0;
         g.setColor(Color.GRAY);
-        g.fillRect(dx0, dy0, dwidth, dheight);
+        g.fillRect(dx0, ga.y, dwidth, ga.height);
         g.setColor(Color.WHITE);
 
         String text = "Fetching data";
@@ -225,7 +222,7 @@ public class DownloadedJPXData implements ImageDataHandler {
         int tWidth = (int) r.getWidth();
         int tHeight = (int) r.getHeight();
         int x = dx0 + dwidth / 2 - tWidth / 2;
-        int y = dheight / 2 - tHeight / 2;
+        int y = ga.y + ga.height / 2 - tHeight / 2;
         g.drawString(text, x, y);
     }
 

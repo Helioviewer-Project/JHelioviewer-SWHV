@@ -42,7 +42,7 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
 
     private YAxis yAxis;
 
-    private boolean isVisible;
+    private boolean isVisible = false;
 
     private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();;
     private static final String ROBserver = DataSources.ROBsettings.get("API.jp2images.path");
@@ -53,7 +53,7 @@ public class RadioData implements ColorLookupModelListener, LineDataSelectorElem
     public RadioData() {
         ColorLookupModel.getInstance().addFilterModelListener(this);
         yAxis = new YAxis(400, 20, "Mhz", false);
-        isVisible = true;
+        EVEPlugin.ldsm.addLineData(this);
     }
 
     private void clearCache() {
