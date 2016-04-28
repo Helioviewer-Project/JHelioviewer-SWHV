@@ -55,6 +55,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Point mouseDragPosition = null;
 
     private Rectangle graphArea = new Rectangle();
+    private Rectangle graphSize = new Rectangle();
     private Rectangle plotArea = new Rectangle();
     private BufferedImage screenImage = null;
     private final EventModel eventModel;
@@ -171,8 +172,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void drawLabels(final Graphics2D g) {
         g.setColor(Color.WHITE);
-        g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, graphArea.height + DrawConstants.GRAPH_TOP_SPACE, graphArea.width, DrawConstants.GRAPH_BOTTOM_SPACE);
-        g.fillRect(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, graphArea.height);
+        g.fillRect(0, 0, graphSize.width, DrawConstants.GRAPH_TOP_SPACE);
+        g.fillRect(0, graphArea.height + DrawConstants.GRAPH_TOP_SPACE, graphSize.width, DrawConstants.GRAPH_BOTTOM_SPACE);
+        g.fillRect(0, 0, DrawConstants.GRAPH_LEFT_SPACE, graphSize.height);
 
         TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
         int ct = 0;
@@ -315,6 +317,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateGraphArea() {
+        graphSize = drawController.getGraphSize();
         graphArea = drawController.getGraphArea();
         plotArea = drawController.getPlotArea();
         leftAxisArea = drawController.getLeftAxisArea();

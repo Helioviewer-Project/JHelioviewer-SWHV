@@ -138,6 +138,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return plotArea;
     }
 
+    public Rectangle getGraphSize() {
+        return graphSize;
+    }
+
     public Rectangle getLeftAxisArea() {
         return leftAxisArea;
     }
