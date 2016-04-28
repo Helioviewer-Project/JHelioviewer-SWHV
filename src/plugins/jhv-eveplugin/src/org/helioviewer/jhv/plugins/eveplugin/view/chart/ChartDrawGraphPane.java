@@ -247,58 +247,56 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, LineDataSelectorElement el, int leftSide) {
+        int axis_x_offset;
         g.setColor(Color.WHITE);
         if (leftSide == 0) {
             g.fillRect(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, graphArea.height);
             g.fillRect(graphArea.x + graphArea.width, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.RIGHT_AXIS_WIDTH, graphArea.height);
+            axis_x_offset = graphArea.x;
+
         } else {
             g.fillRect(graphArea.x + graphArea.width + (leftSide - 1) * DrawConstants.RIGHT_AXIS_WIDTH, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.RIGHT_AXIS_WIDTH, graphArea.height);
-        }
-        YAxis yAxis = el.getYAxis();
-        int axis_x_offset;
-        if (leftSide == 0) {
-            axis_x_offset = graphArea.x;
-        }
-        else {
             axis_x_offset = graphArea.x + graphArea.width + (leftSide - 1) * DrawConstants.RIGHT_AXIS_WIDTH;
-        }
 
+        }
+        g.setColor(el.getDataColor());
+
+        YAxis yAxis = el.getYAxis();
+        //Label and axis
         {
             String verticalLabel = yAxis.getLabel();
             final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
             int vWidth = (int) verticalLabelBounds.getWidth();
             int vHeight = (int) verticalLabelBounds.getHeight();
             int labelCompensation = vWidth / 2;
-            g.setColor(el.getDataColor());
             g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
+            g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
         }
 
-        final int sizeSteps = graphArea.height / DrawConstants.MIN_VERTICAL_TICK_SPACE;
-        int verticalTicks = 3;
-        if (sizeSteps >= 4) {
-            verticalTicks = 5;
-        }
+        //Vertical lines
+        {
+            final int sizeSteps = graphArea.height / DrawConstants.MIN_VERTICAL_TICK_SPACE;
+            int verticalTicks = 3;
+            if (sizeSteps >= 4) {
+                verticalTicks = 5;
+            }
 
-        final int tickDifferenceVertical = (graphArea.height) / (verticalTicks - 1);
-        for (int i = 0; i < verticalTicks; i++) {
-            final int y = graphArea.y + graphArea.height - i * tickDifferenceVertical;
-            double tickValue = yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, y);
-            String tickText = DrawConstants.DECIMAL_FORMAT.format(tickValue);
-            if (leftSide == 0) {
-                g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
+            final int tickDifferenceVertical = (graphArea.height) / (verticalTicks - 1);
+            for (int i = 0; i < verticalTicks; i++) {
+                final int y = graphArea.y + graphArea.height - i * tickDifferenceVertical;
+                double tickValue = yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, y);
+                String tickText = DrawConstants.DECIMAL_FORMAT.format(tickValue);
+                final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
+                int x_str;
+                if (leftSide == 0) {
+                    x_str = axis_x_offset - 6 - (int) bounds.getWidth();
+                    g.drawLine(axis_x_offset - 3, y, graphArea.x + graphArea.width, y);
+                }
+                else {
+                    x_str = axis_x_offset;
+                }
+                g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
             }
-            else {
-                g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
-            }
-            final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
-            int x;
-            if (leftSide == 0) {
-                x = axis_x_offset - 6 - (int) bounds.getWidth();
-            }
-            else {
-                x = axis_x_offset;
-            }
-            g.drawString(tickText, x, y + (int) (bounds.getHeight() / 2));
         }
 
     }
