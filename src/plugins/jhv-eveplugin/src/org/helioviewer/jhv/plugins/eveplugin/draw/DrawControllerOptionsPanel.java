@@ -201,11 +201,18 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
 
     private void computeMovieInterval() {
         View view = Layers.getActiveView();
-        if (view != null && view.isMultiFrame()) {
-            EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
-        }
         long now = System.currentTimeMillis();
-        EVEPlugin.dc.setSelectedInterval(now - TimeUtils.DAY_IN_MILLIS, now);
+        if (view != null) {
+            if (view.isMultiFrame())
+                EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
+            else {
+                long end = view.getFirstTime().milli + TimeUtils.DAY_IN_MILLIS / 2;
+                if (end > now)
+                    end = now;
+                EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli - TimeUtils.DAY_IN_MILLIS / 2, end);
+            }
+        } else
+            EVEPlugin.dc.setSelectedInterval(now - TimeUtils.DAY_IN_MILLIS, now);
     }
 
     private void computeCarringtonInterval(long start, long end, long value) {
