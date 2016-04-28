@@ -8,11 +8,11 @@ import java.util.Calendar;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
@@ -20,7 +20,7 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-class DrawControllerOptionsPanel extends JPanel implements ActionListener {
+class DrawControllerOptionsPanel extends ComponentUtils.SmallPanel implements ActionListener {
 
     private final JComboBox zoomComboBox;
     final JToggleButton periodFromLayersButton;
@@ -44,6 +44,8 @@ class DrawControllerOptionsPanel extends JPanel implements ActionListener {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         add(zoomComboBox);
         add(periodFromLayersButton);
+
+        setSmall();
     }
 
     @Override
