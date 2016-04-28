@@ -35,8 +35,7 @@ public class EventPlotConfiguration {
     public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, int nrPreviousLines, Point mousePosition, boolean highlight) {
         JHVRelatedEvents highlightedEvent = null;
         int spacePerLine = 3;
-        int startPosition = graphArea.y + spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
-        int y = startPosition;
+        int y = graphArea.y + spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
         int w = Math.max(x1 - x0, 1);
         int h = spacePerLine;
         if (w < 5) {
