@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.events.model;
+package org.helioviewer.jhv.plugins.eveplugin.events;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

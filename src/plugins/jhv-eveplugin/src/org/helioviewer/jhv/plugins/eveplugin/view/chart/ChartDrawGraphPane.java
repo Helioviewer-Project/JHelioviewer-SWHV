@@ -42,7 +42,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
+import org.helioviewer.jhv.plugins.eveplugin.events.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 @SuppressWarnings("serial")
@@ -262,7 +262,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.setColor(el.getDataColor());
 
         YAxis yAxis = el.getYAxis();
-        //Label and axis
+        // Label and axis
         {
             String verticalLabel = yAxis.getLabel();
             final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
@@ -273,7 +273,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
         }
 
-        //Vertical lines
+        // Vertical lines
         {
             final int sizeSteps = graphArea.height / DrawConstants.MIN_VERTICAL_TICK_SPACE;
             int verticalTicks = 3;
@@ -291,8 +291,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 if (leftSide == 0) {
                     x_str = axis_x_offset - 6 - (int) bounds.getWidth();
                     g.drawLine(axis_x_offset - 3, y, graphArea.x + graphArea.width, y);
-                }
-                else {
+                } else {
                     x_str = axis_x_offset;
                 }
                 g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
@@ -372,8 +371,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
         mousePressedPosition = plotArea.contains(p) ? p : null;
-        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height &&
-                eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) == null) {
+        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height && eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) == null) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }
@@ -401,8 +399,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void mouseHelper(double distanceY) {
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-            if (el.showYAxis())
+            if (el.showYAxis()) {
                 el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
+            }
         }
     }
 
