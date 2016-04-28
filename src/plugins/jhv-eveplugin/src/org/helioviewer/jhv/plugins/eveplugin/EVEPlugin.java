@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioData;
+import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
