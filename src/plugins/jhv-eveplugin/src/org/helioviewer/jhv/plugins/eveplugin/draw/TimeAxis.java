@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
+import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class TimeAxis {
 
@@ -27,6 +28,7 @@ public class TimeAxis {
         double diff = (double) (end - start) / w;
         start = (long) (start + pixelDistance * diff);
         end = (long) (end + pixelDistance * diff);
+        adaptBounds();
     }
 
     void zoom(int x0, int w, int x, double factor) {
@@ -34,11 +36,26 @@ public class TimeAxis {
         double ratio = (x - x0) / (double) w;
         start = (long) (start - multiplier * ratio);
         end = (long) (end + multiplier * (1. - ratio));
+        adaptBounds();
     }
 
-    void set(long _start, long _end) {
+    void set(long _start, long _end, boolean needAdapt) {
         start = _start;
         end = _end;
+        if (needAdapt)
+            adaptBounds();
     }
 
+    private void adaptBounds() {
+        long now = System.currentTimeMillis();
+        long intervalLength = end - start;
+        if (intervalLength == 0) {
+            end = start + TimeUtils.MINUTE_IN_MILLIS;
+            intervalLength = TimeUtils.MINUTE_IN_MILLIS;
+        }
+        if (end > now) {
+            start = now - intervalLength;
+            end = now;
+        }
+    }
 }
