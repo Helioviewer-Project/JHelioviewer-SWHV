@@ -12,13 +12,10 @@ public class YAxis {
         LEFT, RIGHT;
     }
 
-    /** The current selected range */
     public double start;
     public double end;
-    /** The label of the y-axis */
-    private String label;
+    private final String label;
 
-    private YAxisLocation location;
     private YAxisScale scale;
     protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
 
@@ -29,7 +26,11 @@ public class YAxis {
         start = _start;
         end = _end;
         label = _label;
-        setIsLogScale(isLogScale);
+        if (isLogScale) {
+            scale = new YAxisLogScale(label);
+        } else {
+            scale = new YAxisIdentityScale(label);
+        }
     }
 
     public double pixel2ScaledValue(int y0, int h, int p) {
@@ -38,7 +39,7 @@ public class YAxis {
         return (smax - smin) * (-p + y0 + h) / h + smin;
     }
 
-    public int scaledvalue2pixel(int y0, int h, double value) {
+    private int scaledvalue2pixel(int y0, int h, double value) {
         double smin = scale(start);
         double smax = scale(end);
         return (int) (-h * (value - smin) / (smax - smin) + y0 + h);
@@ -50,31 +51,6 @@ public class YAxis {
 
     public String getLabel() {
         return scale.getLabel();
-    }
-
-    public String getOriginalLabel() {
-        return label;
-    }
-
-    public void set(String label, boolean isLogScale) {
-        this.label = label;
-        setIsLogScale(isLogScale);
-    }
-
-    public void setIsLogScale(boolean isLogScale) {
-        if (isLogScale) {
-            scale = new YAxisLogScale(label);
-        } else {
-            scale = new YAxisIdentityScale(label);
-        }
-    }
-
-    public YAxisLocation getLocation() {
-        return location;
-    }
-
-    public void setLocation(YAxisLocation location) {
-        this.location = location;
     }
 
     public void shiftDownPixels(double distanceY, int height) {
@@ -103,15 +79,15 @@ public class YAxis {
         double scaledMax = scale(end);
         double scaled = scaledMin + (scaledMax - scaledMin) * (relativeY / height);
         double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
+
         double newScaledMin = (1 + delta) * scaledMin - delta * scaled;
         double newScaledMax = (1 + delta) * scaledMax - delta * scaled;
+
         newScaledMin = Math.max(scale(UNSCALED_MIN_BOUND), newScaledMin);
         newScaledMax = Math.min(scale(UNSCALED_MAX_BOUND), newScaledMax);
 
-        if (newScaledMax - newScaledMin > 0.04) {
-            start = invScale(newScaledMin);
-            end = invScale(newScaledMax);
-        }
+        start = invScale(newScaledMin);
+        end = invScale(newScaledMax);
     }
 
     public double scale(double maxValue) {
