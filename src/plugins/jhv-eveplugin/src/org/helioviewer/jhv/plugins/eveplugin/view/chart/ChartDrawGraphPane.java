@@ -274,11 +274,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
 
         final int sizeSteps = graphArea.height / DrawConstants.MIN_VERTICAL_TICK_SPACE;
-        int verticalTicks = 2;
+        int verticalTicks = 3;
         if (sizeSteps >= 4) {
             verticalTicks = 5;
-        } else if (verticalTicks >= 2) {
-            verticalTicks = 3;
         }
         if (verticalTicks == 0) {
             final int y = graphArea.y + graphArea.height;
