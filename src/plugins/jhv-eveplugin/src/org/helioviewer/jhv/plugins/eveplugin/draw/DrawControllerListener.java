@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-
 public interface DrawControllerListener {
 
     public abstract void drawRequest();

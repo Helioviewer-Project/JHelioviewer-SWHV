@@ -31,6 +31,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerOptionsPanel;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
@@ -61,7 +62,7 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
     private int lastSelectedIndex = -1;
 
     public LineDataSelectorTablePanel() {
-        IntervalOptionPanel intervalOptionPanel = new IntervalOptionPanel();
+        DrawControllerOptionsPanel intervalOptionPanel = new DrawControllerOptionsPanel();
         this.setLayout(new GridBagLayout());
         tableModel = EVEPlugin.ldsm;
 
