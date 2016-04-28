@@ -33,7 +33,6 @@ public class HEKParser implements SWEKParser {
         JHVEvent currentEvent = new JHVEvent(type, id, start, end);
         currentEvent.initParams();
         if (!parseResult(json, currentEvent)) {
-            currentEvent.finishParams();
             return null;
         }
         currentEvent.finishParams();
