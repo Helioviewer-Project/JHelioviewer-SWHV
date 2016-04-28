@@ -143,7 +143,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             g.setFont(DrawConstants.font);
-            drawData(g, mousePosition);
+            drawData(g, graphArea, mousePosition);
 
             g.dispose();
         }
@@ -152,12 +152,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         forceRedrawGraph = false;
     }
 
-    private void drawData(Graphics2D plotG, Point mousePosition) {
+    private void drawData(Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
         List<LineDataSelectorElement> els = EVEPlugin.ldsm.getAllLineDataSelectorElements();
         for (LineDataSelectorElement el : els) {
             el.draw(plotG, graphArea, leftAxisArea, drawController.selectedAxis, mousePosition);
         }
-        drawLabels(plotG);
+        drawLabels(plotG, graphArea);
     }
 
     private void updateDrawInformation() {
@@ -170,7 +170,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.fillRect(0, 0, getWidth(), getHeight());
     }
 
-    private void drawLabels(final Graphics2D g) {
+    private void drawLabels(Graphics2D g, Rectangle graphArea) {
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, graphSize.width, DrawConstants.GRAPH_TOP_SPACE);
         g.fillRect(0, graphArea.height + DrawConstants.GRAPH_TOP_SPACE, graphSize.width, DrawConstants.GRAPH_BOTTOM_SPACE);
@@ -184,7 +184,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 if (ct == 0) {
                     c = el.getDataColor();
                 }
-                drawVerticalLabels(g, el, ct);
+                drawVerticalLabels(g, graphArea, el, ct);
                 ct++;
             }
         }
@@ -246,7 +246,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.drawString(text, x, y);
     }
 
-    private void drawVerticalLabels(Graphics2D g, LineDataSelectorElement el, int leftSide) {
+    private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, LineDataSelectorElement el, int leftSide) {
         g.setColor(Color.WHITE);
         if (leftSide == 0) {
             g.fillRect(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, graphArea.height);
