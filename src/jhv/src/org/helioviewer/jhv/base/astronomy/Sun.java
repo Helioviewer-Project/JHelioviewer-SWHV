@@ -30,7 +30,7 @@ public class Sun {
     }
 
     private static double milli2mjd(long milli) {
-        return JulianDay.UNIX_EPOCH_MJD + milli / (86400 * 1000.);
+        return JulianDay.UNIX_EPOCH_MJD + milli / (double) TimeUtils.DAY_IN_MILLIS;
     }
 
     private static double mjd2jcy(double mjd, double epoch) {
@@ -81,13 +81,13 @@ public class Sun {
 
     private static double sunRot(double mjd) {
         // 1854-01-01.5 / Carrington sidereal period 25.38
-        return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / 25.38); // rad
+        return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / TimeUtils.CARRINGTON_SIDEREAL); // rad
     }
 
     // derived from tim2carr
     public static double getCarringtonRotation(JHVDate time) {
         double mjd = milli2mjd(time.milli);
-        double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / 27.2753 + 1.;
+        double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / TimeUtils.CARRINGTON_SYNODIC + 1.;
 
         Position.L p = getEarth(time);
         double flon = 1. + p.lon / (2 * Math.PI);

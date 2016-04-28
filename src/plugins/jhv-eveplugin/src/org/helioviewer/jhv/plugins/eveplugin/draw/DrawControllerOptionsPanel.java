@@ -204,7 +204,7 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
     }
 
     private void computeCarringtonInterval(long start, long end, long value) {
-        computeZoomForMilliSeconds(start, end, value * 2356585920l);
+        computeZoomForMilliSeconds(start, end, (long) (TimeUtils.CARRINGTON_SYNODIC * TimeUtils.DAY_IN_MILLIS * value));
     }
 
     private void computeZoomForMilliSeconds(long start, long end, long differenceMilli) {
