@@ -16,15 +16,14 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class DrawControllerOptionsPanel extends JPanel implements ActionListener, LayersListener, TimeLineListener {
+public class DrawControllerOptionsPanel extends JPanel implements ActionListener {
 
     private final JComboBox zoomComboBox;
-    private final JToggleButton periodFromLayersButton;
+    final JToggleButton periodFromLayersButton;
     private boolean selectedIndexSetByProgram;
 
     private enum ZOOM {
@@ -45,9 +44,6 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         add(zoomComboBox);
         add(periodFromLayersButton);
-
-        Layers.addLayersListener(this);
-        EVEPlugin.dc.addTimeLineListener(this);
     }
 
     @Override
@@ -141,17 +137,7 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
         }
     }
 
-    @Override
-    public void layerAdded(View view) {
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
-        periodFromLayersButton.setEnabled(view != null);
-    }
-
-    @Override
-    public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
+    void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
         selectedIndexSetByProgram = true;
         zoomComboBox.setSelectedIndex(0);
     }

@@ -31,7 +31,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerOptionsPanel;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
@@ -62,10 +61,9 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
     private int lastSelectedIndex = -1;
 
     public LineDataSelectorTablePanel() {
-        DrawControllerOptionsPanel intervalOptionPanel = new DrawControllerOptionsPanel();
-        this.setLayout(new GridBagLayout());
-        tableModel = EVEPlugin.ldsm;
+        setLayout(new GridBagLayout());
 
+        tableModel = EVEPlugin.ldsm;
         grid = new JTable(tableModel) {
             @Override
             public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
@@ -207,7 +205,7 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         optionsPanelWrapper.setLayout(new BorderLayout());
 
         optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
-        optionsPanelWrapper.add(intervalOptionPanel, BorderLayout.PAGE_END);
+        optionsPanelWrapper.add(EVEPlugin.dc.getOptionsPanel(), BorderLayout.PAGE_END);
 
         gc.gridy = 1;
         add(optionsPanelWrapper, gc);
