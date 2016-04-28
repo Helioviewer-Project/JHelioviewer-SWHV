@@ -99,21 +99,21 @@ public class HEKDownloader extends SWEKDownloader {
 
     @Override
     protected String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page) {
-        StringBuilder baseURL = new StringBuilder(HEKSourceProperties.getSingletonInstance().getHEKSourceProperties().getProperty("heksource.baseurl")).append("?");
+        StringBuilder baseURL = new StringBuilder(HEKSourceProperties.getSingletonInstance().getHEKSourceProperties().getProperty("heksource.baseurl")).append('?');
         baseURL.append("cmd=search&");
         baseURL.append("type=column&");
-        baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()).getAbbreviation()).append("&");
-        baseURL.append("event_coordsys=").append(eventType.getCoordinateSystem()).append("&");
-        baseURL.append("x1=").append(eventType.getSpatialRegion().x1).append("&");
-        baseURL.append("x2=").append(eventType.getSpatialRegion().x2).append("&");
-        baseURL.append("y1=").append(eventType.getSpatialRegion().y1).append("&");
-        baseURL.append("y2=").append(eventType.getSpatialRegion().y2).append("&");
+        baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()).getAbbreviation()).append('&');
+        baseURL.append("event_coordsys=").append(eventType.getCoordinateSystem()).append('&');
+        baseURL.append("x1=").append(eventType.getSpatialRegion().x1).append('&');
+        baseURL.append("x2=").append(eventType.getSpatialRegion().x2).append('&');
+        baseURL.append("y1=").append(eventType.getSpatialRegion().y1).append('&');
+        baseURL.append("y2=").append(eventType.getSpatialRegion().y2).append('&');
         baseURL.append("cosec=2&");
-        baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.utcDateFormat.format(end)).append("&");
+        baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.utcDateFormat.format(end)).append('&');
         baseURL = appendParams(baseURL, params);
-        baseURL.append("event_starttime=").append(TimeUtils.utcDateFormat.format(start)).append("&");
+        baseURL.append("event_starttime=").append(TimeUtils.utcDateFormat.format(start)).append('&');
         long max = Math.max(System.currentTimeMillis(), end);
-        baseURL.append("event_endtime=").append(TimeUtils.utcDateFormat.format(max)).append("&");
+        baseURL.append("event_endtime=").append(TimeUtils.utcDateFormat.format(max)).append('&');
         baseURL.append("page=").append(page);
         return baseURL.toString();
     }
@@ -129,7 +129,7 @@ public class HEKDownloader extends SWEKDownloader {
                 } catch (UnsupportedEncodingException e) {
                     encodedValue = param.getValue();
                 }
-                baseURL.append("param").append(paramCount).append("=").append("frm_name").append("&").append("op").append(paramCount).append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount).append("=").append(encodedValue).append("&");
+                baseURL.append("param").append(paramCount).append('=').append("frm_name").append('&').append("op").append(paramCount).append('=').append(param.getOperand().URLEncodedRepresentation()).append('&').append("value").append(paramCount).append('=').append(encodedValue).append('&');
                 paramCount++;
             }
         }

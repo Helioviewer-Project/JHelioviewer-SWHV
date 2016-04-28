@@ -164,16 +164,12 @@ public class JPIPSocket extends HTTPSocket {
         StringBuilder str = new StringBuilder();
 
         // Adds the URI line
-        str.append(_req.getMethod());
-        str.append(" ");
-        str.append(jpipPath);
+        str.append(_req.getMethod()).append(' ').append(jpipPath);
         if (_req.getMethod() == Method.GET) {
-            str.append("?");
+            str.append('?');
             str.append(queryStr);
         }
-        str.append(" ");
-        str.append(HTTPConstants.versionText);
-        str.append(HTTPConstants.CRLF);
+        str.append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
 
         // Adds the headers
         for (String key : _req.getHeaders()) {

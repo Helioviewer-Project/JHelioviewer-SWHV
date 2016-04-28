@@ -8,10 +8,7 @@ public final class HTTPConstants {
     /** The version in standard formated text */
     public static final String versionText = "HTTP/" + Double.toString(version);
 
-    /** The array of bytes that contains the CRLF codes */
-    private static final byte CRLFBytes[] = { 13, 10 };
-
-    /** The string representation of the CRLF codes */
-    public static final String CRLF = new String(CRLFBytes);
+    /** The array of chars that contains the CRLF codes */
+    public static final char CRLF[] = { 13, 10 };
 
 }

@@ -83,10 +83,10 @@ public class ComesepDownloader extends SWEKDownloader {
 
     @Override
     protected String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page) {
-        StringBuilder baseURL = new StringBuilder(comesepSourceProperties.getProperty("comesepsource.baseurl")).append("?");
-        baseURL = appendModel(baseURL, params).append("&");
-        baseURL.append("startdate=").append(TimeUtils.utcDateFormat.format(start)).append("&");
-        baseURL.append("enddate=").append(TimeUtils.utcDateFormat.format(end)).append("&");
+        StringBuilder baseURL = new StringBuilder(comesepSourceProperties.getProperty("comesepsource.baseurl")).append('?');
+        baseURL = appendModel(baseURL, params).append('&');
+        baseURL.append("startdate=").append(TimeUtils.utcDateFormat.format(start)).append('&');
+        baseURL.append("enddate=").append(TimeUtils.utcDateFormat.format(end)).append('&');
         return baseURL.toString();
     }
 

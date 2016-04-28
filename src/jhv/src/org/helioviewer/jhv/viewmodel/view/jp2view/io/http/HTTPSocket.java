@@ -77,12 +77,7 @@ public class HTTPSocket extends Socket {
             String msgBody = req.getMessageBody();
 
             // Adds the URI line
-            str.append(req.getMethod());
-            str.append(" ");
-            str.append(req.getURI());
-            str.append(" ");
-            str.append(HTTPConstants.versionText);
-            str.append(HTTPConstants.CRLF);
+            str.append(req.getMethod()).append(' ').append(req.getURI()).append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
 
             // Sets the content length header if it's a POST
             if (req.getMethod() == HTTPRequest.Method.POST)
