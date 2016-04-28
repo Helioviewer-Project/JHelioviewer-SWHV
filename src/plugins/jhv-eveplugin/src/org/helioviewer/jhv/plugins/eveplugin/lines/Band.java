@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.lines.data;
+package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -18,13 +18,13 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.lines.gui.LineOptionPanel;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 public class Band implements LineDataSelectorElement {
 
     private final BandType bandType;
+    public final LineOptionPanel optionsPanel;
 
     private boolean isVisible = true;
     private Color graphColor = Color.BLACK;
@@ -36,6 +36,8 @@ public class Band implements LineDataSelectorElement {
 
     public Band(BandType _bandType) {
         bandType = _bandType;
+        optionsPanel = new LineOptionPanel(this);
+
         EVEPlugin.dc.fireRedrawRequest();
         EVEPlugin.ldsm.addLineData(this);
         yAxis = new YAxis(Math.pow(10, -7), Math.pow(10, -3), bandType.getUnitLabel(), true);
@@ -87,7 +89,7 @@ public class Band implements LineDataSelectorElement {
 
     @Override
     public Component getOptionsPanel() {
-        return new LineOptionPanel(this);
+        return optionsPanel;
     }
 
     @Override

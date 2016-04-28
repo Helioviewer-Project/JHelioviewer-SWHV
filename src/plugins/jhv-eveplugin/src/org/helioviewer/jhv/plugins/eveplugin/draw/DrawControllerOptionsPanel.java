@@ -20,7 +20,7 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class DrawControllerOptionsPanel extends JPanel implements ActionListener {
+class DrawControllerOptionsPanel extends JPanel implements ActionListener {
 
     private final JComboBox zoomComboBox;
     final JToggleButton periodFromLayersButton;

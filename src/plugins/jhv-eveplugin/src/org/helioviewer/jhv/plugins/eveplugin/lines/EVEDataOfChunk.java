@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.lines.data;
+package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.util.Arrays;
 

@@ -8,8 +8,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
-import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
+import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
+import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 
 public class LineDataSelectorModel implements TableModel {
