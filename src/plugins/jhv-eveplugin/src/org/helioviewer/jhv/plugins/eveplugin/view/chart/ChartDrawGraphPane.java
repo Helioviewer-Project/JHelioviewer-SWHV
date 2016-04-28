@@ -186,7 +186,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 ct++;
             }
         }
-
+        if (ct == 0) {
+            drawNoData(g, graphArea);
+            return;
+        }
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(xAxis.start)), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         final int tickTextHeight = (int) tickTextBounds.getHeight();
@@ -229,17 +232,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
             previousDate = tickValue;
         }
+    }
 
-        // inform when no data is available
-        if (EVEPlugin.ldsm.getAllLineDataSelectorElements().isEmpty()) {
-            final String text = DrawConstants.absentText;
-            final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
-            final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
-            final int y = graphArea.y + graphArea.height / 2;
+    private void drawNoData(Graphics2D g, Rectangle graphArea) {
+        final String text = DrawConstants.absentText;
+        final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
+        final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
+        final int y = graphArea.y + graphArea.height / 2;
 
-            g.setColor(DrawConstants.LABEL_TEXT_COLOR);
-            g.drawString(text, x, y);
-        }
+        g.setColor(DrawConstants.LABEL_TEXT_COLOR);
+        g.drawString(text, x, y);
     }
 
     private void drawVerticalLabels(Graphics2D g, LineDataSelectorElement el, int leftSide) {
