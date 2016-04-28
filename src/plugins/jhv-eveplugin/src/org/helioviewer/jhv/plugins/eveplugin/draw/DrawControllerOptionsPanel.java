@@ -13,6 +13,7 @@ import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
@@ -204,7 +205,7 @@ public class DrawControllerOptionsPanel extends JPanel implements ActionListener
             EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
         }
         long now = System.currentTimeMillis();
-        EVEPlugin.dc.setSelectedInterval(now, now);
+        EVEPlugin.dc.setSelectedInterval(now - TimeUtils.DAY_IN_MILLIS, now);
     }
 
     private void computeCarringtonInterval(long start, long end, long value) {
