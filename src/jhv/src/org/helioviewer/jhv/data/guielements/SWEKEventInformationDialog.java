@@ -87,10 +87,10 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     }
 
     private void initParameterCollapsiblePanels() {
-        ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters().values());
+        ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters());
         standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, true, model);
 
-        ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters().values());
+        ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters());
         allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
 
         ArrayList<JHVEvent> precedingEvents = rEvent.getPreviousEvents(event);

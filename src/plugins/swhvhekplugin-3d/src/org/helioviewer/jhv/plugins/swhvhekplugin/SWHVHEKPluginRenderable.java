@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 
@@ -91,12 +90,11 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
     private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
-        Map<String, JHVEventParameter> params = evt.getAllEventParameters();
-        double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(params);
+        double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
-        double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(params);
+        double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(evt);
         double principalAngle = Math.toRadians(principalAngleDegree);
-        double speed = SWHVHEKData.readCMESpeed(params);
+        double speed = SWHVHEKData.readCMESpeed(evt);
         double factor = Sun.RadiusMeter;
         double distSunBegin = 2.4;
         double distSun = distSunBegin + speed * (timestamp - evt.start) / factor;
@@ -261,10 +259,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale, Viewport vp) {
-        Map<String, JHVEventParameter> params = evt.getAllEventParameters();
-        double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(params);
-        double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(params) - 90;
-        double speed = SWHVHEKData.readCMESpeed(params);
+        double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(evt);
+        double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(evt) - 90;
+        double speed = SWHVHEKData.readCMESpeed(evt);
         double factor = Sun.RadiusMeter;
         double distSunBegin = 2.4;
         double distSun = distSunBegin + speed * (timestamp - evt.start) / factor;
@@ -363,10 +360,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, Point pt) {
         JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
-        Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
+        JHVEventParameter[] params = evt.getVisibleEventParameters();
         ArrayList<String> txts = new ArrayList<String>();
 
-        for (JHVEventParameter p : params.values()) {
+        for (JHVEventParameter p : params) {
             String name = p.getParameterName();
             String value = p.getDisplayParameterValue();
             if (!Regex.WEB_URL.matcher(value).matches() && !name.equals("event_description") && !name.equals("event_title")) {

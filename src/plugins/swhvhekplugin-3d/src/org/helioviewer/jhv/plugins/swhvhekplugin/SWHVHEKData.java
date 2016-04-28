@@ -10,6 +10,7 @@ import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -116,31 +117,35 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         return activeEvents;
     }
 
-    public static double readCMESpeed(Map<String, JHVEventParameter> params) {
+    public static double readCMESpeed(JHVEvent evt) {
         double speed = 500;
         try {
-            if (params.containsKey("cme_radiallinvel"))
-                speed = Double.parseDouble(params.get("cme_radiallinvel").getParameterValue());
+            JHVEventParameter p = evt.getParameter("cme_radiallinvel");
+            if (p != null)
+                speed = Double.parseDouble(p.getParameterValue());
         } catch (Exception e) {
         }
         return speed;
     }
 
-    public static double readCMEPrincipalAngleDegree(Map<String, JHVEventParameter> params) {
+    public static double readCMEPrincipalAngleDegree(JHVEvent evt) {
         double principalAngle = 0;
+        JHVEventParameter p = evt.getParameter("event_coord1");
+
         try {
-            if (params.containsKey("event_coord1"))
-                principalAngle = Double.parseDouble(params.get("event_coord1").getParameterValue()) + 90;
+            if (p != null)
+                principalAngle = Double.parseDouble(p.getParameterValue()) + 90;
         } catch (Exception e) {
         }
         return principalAngle;
     }
 
-    public static double readCMEAngularWidthDegree(Map<String, JHVEventParameter> params) {
+    public static double readCMEAngularWidthDegree(JHVEvent evt) {
         double angularWidthDegree = 0;
+        JHVEventParameter p = evt.getParameter("cme_angularwidth");
         try {
-            if (params.containsKey("cme_angularwidth"))
-                angularWidthDegree = Double.parseDouble(params.get("cme_angularwidth").getParameterValue());
+            if (p != null)
+                angularWidthDegree = Double.parseDouble(p.getParameterValue());
         } catch (Exception e) {
         }
         return angularWidthDegree;
