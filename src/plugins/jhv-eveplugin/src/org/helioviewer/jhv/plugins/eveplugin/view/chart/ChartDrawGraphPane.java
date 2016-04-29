@@ -175,8 +175,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.fillRect(0, 0, graphSize.width, DrawConstants.GRAPH_TOP_SPACE);
         g.fillRect(0, graphArea.height + DrawConstants.GRAPH_TOP_SPACE, graphSize.width, DrawConstants.GRAPH_BOTTOM_SPACE);
         g.fillRect(0, 0, DrawConstants.GRAPH_LEFT_SPACE, graphSize.height);
+
         Color c = DrawConstants.TICK_LINE_COLOR;
-        TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
         int ct = 0;
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
@@ -191,7 +191,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawNoData(g, graphArea);
             return;
         }
-        drawHorizontalLabels(g, graphArea, xAxis, c);
+        drawHorizontalLabels(g, graphArea, EVEPlugin.dc.selectedAxis, c);
     }
 
     private void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Color c) {
