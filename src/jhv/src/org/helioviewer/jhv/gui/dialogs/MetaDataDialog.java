@@ -41,12 +41,10 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -212,13 +210,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     }
 
     private void setMetaData(View v) {
-        MetaData metaData;
-        ImageData d = v.getImageLayer().getImageData();
-        if (d == null) // not yet decoded
-            metaData = v.getMetaData(new JHVDate(0));
-        else
-            metaData = d.getMetaData();
-
+        MetaData metaData = v.getImageLayer().getMetaData();
         if (!(metaData instanceof HelioviewerMetaData)) {
             metaDataOK = false;
             resetData();

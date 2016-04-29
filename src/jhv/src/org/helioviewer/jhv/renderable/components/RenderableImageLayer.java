@@ -11,6 +11,7 @@ import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
@@ -25,6 +26,7 @@ import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 import com.jogamp.common.nio.Buffers;
@@ -459,6 +461,13 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     public ImageData getImageData() {
         return imageData;
+    }
+
+    public MetaData getMetaData() {
+        if (imageData == null) // not yet decoded
+            return view.getMetaData(new JHVDate(0));
+        else
+            return imageData.getMetaData();
     }
 
     @Override

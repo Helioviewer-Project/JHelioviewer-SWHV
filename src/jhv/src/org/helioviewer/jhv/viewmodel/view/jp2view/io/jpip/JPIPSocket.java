@@ -166,8 +166,7 @@ public class JPIPSocket extends HTTPSocket {
         // Adds the URI line
         str.append(_req.getMethod()).append(' ').append(jpipPath);
         if (_req.getMethod() == Method.GET) {
-            str.append('?');
-            str.append(queryStr);
+            str.append('?').append(queryStr);
         }
         str.append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
 
