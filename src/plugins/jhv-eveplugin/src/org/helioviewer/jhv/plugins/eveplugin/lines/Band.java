@@ -14,25 +14,26 @@ import java.util.Map;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
+import org.helioviewer.jhv.plugins.eveplugin.lines.BandCache.GraphPolyline;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 public class Band implements LineDataSelectorElement {
 
     private final BandType bandType;
-    public final LineOptionPanel optionsPanel;
+    private final LineOptionPanel optionsPanel;
 
     private boolean isVisible = true;
     private Color graphColor = Color.BLACK;
     private YAxis yAxis;
-    private final List<GraphPolyline> graphPolylines = new ArrayList<GraphPolyline>();
+    private final ArrayList<BandCache.GraphPolyline> graphPolylines = new ArrayList<BandCache.GraphPolyline>();
     private final RequestCache requestCache = new RequestCache();
-    public int[] warnLevels;
-    public String[] warnLabels;
+    private int[] warnLevels;
+    private String[] warnLabels;
+    private final BandCache bandCache = new BandCache();
 
     public Band(BandType _bandType) {
         bandType = _bandType;
@@ -141,52 +142,7 @@ public class Band implements LineDataSelectorElement {
         if (isVisible) {
             updateWarnLevels(graphArea);
             graphPolylines.clear();
-            createPolyLines(timeAxis);
-        }
-
-    }
-
-    private void createPolyLines(TimeAxis timeAxis) {
-        long keyEnd = date2key(timeAxis.end);
-        long key = date2key(timeAxis.start);
-        int level = 0;
-        double factor = 1;
-
-        double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-        double noelements = (timeAxis.end - timeAxis.start) / (elsz);
-        double graphWidth = EVEPlugin.dc.getGraphSize().width;
-        while (level < EVEDataOfChunk.MAX_LEVEL - 1 && noelements > graphWidth) {
-            level++;
-            factor *= EVEDataOfChunk.FACTOR_STEP;
-            elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-            noelements = (timeAxis.end - timeAxis.start) / (elsz);
-        }
-        Rectangle graphArea = EVEPlugin.dc.getGraphArea();
-        ArrayList<Integer> tvalues = new ArrayList<Integer>();
-        ArrayList<Integer> tdates = new ArrayList<Integer>();
-        while (key <= keyEnd) {
-            EVEDataOfChunk cache = cacheMap.get(key);
-            key++;
-            if (cache == null)
-                continue;
-            float[] values = cache.getValues(level);
-            long[] dates = cache.getDates(level);
-            int i = 0;
-            while (i < values.length) {
-                float value = values[i];
-                if (value <= Float.MIN_VALUE && !tvalues.isEmpty()) {
-                    graphPolylines.add(new GraphPolyline(tdates, tvalues));
-                    tvalues.clear();
-                    tdates.clear();
-                } else if (value > Float.MIN_VALUE) {
-                    tdates.add(timeAxis.value2pixel(graphArea.x, graphArea.width, dates[i]));
-                    tvalues.add(yAxis.value2pixel(graphArea.y, graphArea.height, value));
-                }
-                i++;
-            }
-        }
-        if (!tvalues.isEmpty()) {
-            graphPolylines.add(new GraphPolyline(tdates, tvalues));
+            bandCache.createPolyLines(timeAxis, yAxis, graphPolylines);
         }
     }
 
@@ -203,22 +159,6 @@ public class Band implements LineDataSelectorElement {
         for (final String warnLabel : _warnLabels) {
             warnLabels[counter] = warnLabel;
             counter++;
-        }
-    }
-
-    private static class GraphPolyline {
-
-        public final int[] xPoints;
-        public final int[] yPoints;
-
-        public GraphPolyline(List<Integer> dates, List<Integer> values) {
-            int llen = dates.size();
-            xPoints = new int[llen];
-            yPoints = new int[llen];
-            for (int j = 0; j < llen; j++) {
-                xPoints[j] = dates.get(j);
-                yPoints[j] = values.get(j);
-            }
         }
     }
 
@@ -251,31 +191,8 @@ public class Band implements LineDataSelectorElement {
         updateGraphsData();
     }
 
-    private static final double DISCARD_LOG_LEVEL_LOW = 1e-10;
-    private static final double DISCARD_LOG_LEVEL_HIGH = 1e+4;
-    private static long DAYS_PER_CHUNK = 8;
-    static final long MILLIS_PER_TICK = 60000;
-    static final long CHUNKED_SIZE = TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK;
-    static final long MILLIS_PER_CHUNK = TimeUtils.DAY_IN_MILLIS * DAYS_PER_CHUNK;
-
-    private final HashMap<Long, EVEDataOfChunk> cacheMap = new HashMap<Long, EVEDataOfChunk>();
-
-    private static long date2key(long date) {
-        return date / MILLIS_PER_CHUNK;
-    }
-
-    public void addToCache(final float[] values, final long[] dates) {
-        for (int i = 0; i < values.length; i++) {
-            long key = date2key(dates[i]);
-            EVEDataOfChunk cache = cacheMap.get(key);
-            if (cache == null) {
-                cache = new EVEDataOfChunk(key);
-                cacheMap.put(key, cache);
-            }
-            if (values[i] > DISCARD_LOG_LEVEL_LOW && values[i] < DISCARD_LOG_LEVEL_HIGH) {
-                cache.setValue((int) ((dates[i] % (MILLIS_PER_CHUNK)) / MILLIS_PER_TICK), values[i]);
-            }
-        }
+    public void addToCache(float[] values, long[] dates) {
+        bandCache.addToCache(values, dates);
         updateGraphsData();
         EVEPlugin.dc.fireRedrawRequest();
     }
