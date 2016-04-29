@@ -169,4 +169,8 @@ public class LineDataSelectorModel implements TableModel {
         return ct;
     }
 
+    int getRowIndex(LineDataSelectorElement element) {
+        return elements.indexOf(element);
+    }
+
 }

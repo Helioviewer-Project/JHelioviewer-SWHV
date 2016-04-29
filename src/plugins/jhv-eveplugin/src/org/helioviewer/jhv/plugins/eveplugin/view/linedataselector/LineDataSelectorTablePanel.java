@@ -23,8 +23,6 @@ import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -38,7 +36,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.RemoveCellRenderer;
 
 @SuppressWarnings("serial")
-public class LineDataSelectorTablePanel extends JPanel implements TableModelListener, ListSelectionListener {
+public class LineDataSelectorTablePanel extends JPanel {
 
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
@@ -78,9 +76,23 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
                 // prevent losing selection
             }
         };
-        tableModel.addTableModelListener(grid);
 
-        grid.getSelectionModel().addListSelectionListener(this);
+        tableModel.addLineDataSelectorModelListener(new LineDataSelectorModelListener() {
+            @Override
+            public void lineDataAdded(LineDataSelectorElement element) {
+                int i = tableModel.getRowIndex(element);
+                grid.getSelectionModel().setSelectionInterval(i, i);
+            }
+
+            @Override
+            public void lineDataRemoved(LineDataSelectorElement element) {
+            }
+
+            @Override
+            public void lineDataUpdated(LineDataSelectorElement element) {
+            }
+        });
+
         gc.gridx = 0;
         gc.gridy = 0;
         gc.weightx = 1;
@@ -110,7 +122,7 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
         jspContainer.add(jsp, BorderLayout.SOUTH);
-        this.add(jspContainer, gc);
+        add(jspContainer, gc);
 
         grid.setTableHeader(null);
         grid.setShowGrid(false);
@@ -118,7 +130,6 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
-        tableModel.addTableModelListener(this);
 
         grid.setBackground(Color.white);
         grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new LineDataVisibleCellRenderer());
@@ -197,6 +208,15 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         // grid.setDropMode(DropMode.INSERT_ROWS);
         // grid.setTransferHandler(new TableRowTransferHandler(grid));
 
+        grid.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    setOptionsPanel((LineDataSelectorElement) grid.getValueAt(grid.getSelectedRow(), 0));
+                }
+            }
+        });
+
         jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, getGridRowHeight() * 4 + 1));
         grid.setRowHeight(getGridRowHeight());
 
@@ -231,42 +251,6 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         revalidate();
         repaint();
-
-    }
-
-    @Override
-    public void tableChanged(TableModelEvent e) {
-        int n = tableModel.getRowCount();
-        if (n > 0) {
-            grid.setRowSelectionInterval(n - 1, n - 1);
-        }
-        checkOptionPanel();
-    }
-
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if (lastSelectedIndex > -1 && grid.getSelectedRow() == -1) {
-            if (tableModel.getRowCount() > lastSelectedIndex) {
-                grid.setRowSelectionInterval(lastSelectedIndex, lastSelectedIndex);
-            } else {
-                lastSelectedIndex = grid.getSelectedRow();
-            }
-        } else {
-            lastSelectedIndex = grid.getSelectedRow();
-        }
-    }
-
-    private void checkOptionPanel() {
-        int[] sr = grid.getSelectedRows();
-        if (sr.length > 0) {
-            setOptionsPanel((LineDataSelectorElement) tableModel.getValueAt(sr[0], 0));
-        } else {
-            if (tableModel.getRowCount() > 0) {
-                setOptionsPanel((LineDataSelectorElement) tableModel.getValueAt(0, 0));
-            } else {
-                setOptionsPanel(null);
-            }
-        }
     }
 
 }
