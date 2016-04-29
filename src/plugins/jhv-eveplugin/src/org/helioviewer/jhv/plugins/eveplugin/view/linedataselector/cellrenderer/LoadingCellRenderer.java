@@ -26,7 +26,6 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
 
             if (element.isDownloading()) {
                 downloadProgressBar.setIndeterminate(true);
-                downloadProgressBar.setVisible(element.isDownloading());
                 downloadProgressBar.setOpaque(true);
                 downloadProgressBar.setPreferredSize(new Dimension(20, downloadProgressBar.getPreferredSize().height));
                 downloadProgressBar.setBackground(label.getBackground());

@@ -39,7 +39,6 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
     private EventModel() {
         eventContainer = JHVEventContainer.getSingletonInstance();
         events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
-        isVisible = false;
         EVEPlugin.ldsm.addLineData(this);
     }
 

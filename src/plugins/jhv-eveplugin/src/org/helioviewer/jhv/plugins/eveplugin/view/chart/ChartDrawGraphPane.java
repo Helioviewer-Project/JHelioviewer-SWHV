@@ -527,7 +527,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 int rightYAxisNumber = (mouseX - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
                 int ct = -1;
                 for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-                    if (el.showYAxis() && rightYAxisNumber == ct) {
+                    if (rightYAxisNumber == ct && el.showYAxis()) {
                         el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
                         el.yaxisChanged();
                         drawController.fireRedrawRequest();
