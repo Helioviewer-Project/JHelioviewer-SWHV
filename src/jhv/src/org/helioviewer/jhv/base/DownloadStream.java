@@ -174,7 +174,7 @@ public class DownloadStream {
             in = connection.getInputStream();
         }
         // Setting the default output name
-        outputName = url.getFile().replace("/", "-");
+        outputName = url.getFile().replace('/', '-');
         String disposition = connection.getHeaderField("Content-Disposition");
         if (disposition != null) {
             Matcher m = Regex.ContentDispositionFilename.matcher(disposition);
