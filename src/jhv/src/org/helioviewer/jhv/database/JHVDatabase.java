@@ -127,7 +127,7 @@ public class JHVDatabase {
             HashMap<String, String> fields = eventType.getEventType().getAllDatabaseFields();
 
             for (Map.Entry<String, String> entry : fields.entrySet()) {
-                createtbl.append(entry.getKey()).append(" ").append(entry.getValue()).append(" DEFAULT NULL,");
+                createtbl.append(entry.getKey()).append(' ').append(entry.getValue()).append(" DEFAULT NULL,");
             }
             createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );");
             Statement statement = connection.createStatement();
@@ -326,7 +326,7 @@ public class JHVDatabase {
                             StringBuilder fieldString = new StringBuilder();
                             StringBuilder varString = new StringBuilder();
                             for (JHVDatabaseParam p : event2db.paramList) {
-                                fieldString.append(",").append(p.getParamName());
+                                fieldString.append(',').append(p.getParamName());
                                 varString.append(",?");
                             }
                             String full_statement = "INSERT INTO " + type.getSupplier().getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
@@ -548,7 +548,7 @@ public class JHVDatabase {
                     StringBuilder and = new StringBuilder();
                     for (SWEKParam p : params) {
                         if (!p.param.equals("provider")) {
-                            and.append("AND tp.").append(p.param).append(p.operand.getStringRepresentation()).append(p.value).append(" ");
+                            and.append("AND tp.").append(p.param).append(p.operand.getStringRepresentation()).append(p.value).append(' ');
                         }
                     }
                     String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e " + join + " WHERE e.start BETWEEN ? AND ? and e.type_id=? " + and + " order by e.start, e.end ";
@@ -678,12 +678,10 @@ public class JHVDatabase {
 
                     StringBuilder idList = new StringBuilder();
                     while (next) {
-                        idList.append(rs.getInt(1));
-                        idList.append(",");
-                        idList.append(rs.getInt(2));
+                        idList.append(rs.getInt(1)).append(',').append(rs.getInt(2));
                         next = rs.next();
                         if (next) {
-                            idList.append(",");
+                            idList.append(',');
                         }
                     }
                     rs.close();
