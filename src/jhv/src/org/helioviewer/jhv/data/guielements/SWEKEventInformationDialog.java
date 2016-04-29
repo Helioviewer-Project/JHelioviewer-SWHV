@@ -5,8 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -239,33 +238,34 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
                     for (JHVEvent ev : events) {
                         cache.add(ev);
                     }
-                    Set<JHVRelatedEvents> rEventsSet = new HashSet<JHVRelatedEvents>();
-                    for (JHVEvent jhvEvent : events) {
-                        if (jhvEvent.getUniqueID() != event.getUniqueID())
-                            rEventsSet.add(cache.getRelatedEvents(jhvEvent.getUniqueID()));
-                    }
+
                     ArrayList<JHVRelatedEvents> rEvents = new ArrayList<JHVRelatedEvents>();
-                    rEvents.addAll(rEventsSet);
+                    int id = event.getUniqueID();
+                    for (JHVEvent jhvEvent : events) {
+                        int jid = jhvEvent.getUniqueID();
+                        if (jid != id)
+                            rEvents.add(cache.getRelatedEvents(jid));
+                        else
+                            event = jhvEvent;
+                    }
 
                     if (!rEvents.isEmpty()) {
                         otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", rEvents);
-                        SWEKEventInformationDialog.this.repack();
-                        SWEKEventInformationDialog.this.repaint();
                     }
-                    JHVEvent t_event = JHVEventCache.getSingletonInstance().getEvent(event.getUniqueID());
-                    if (t_event != null) {
-                        event = t_event;
-                    }
+
                     allTablePanel.removeAll();
                     initParameterCollapsiblePanels();
-
                     setCollapsiblePanels();
+
+                    SWEKEventInformationDialog.this.repack();
+                    SWEKEventInformationDialog.this.repaint();
                 } catch (InterruptedException ignore) {
-                } catch (java.util.concurrent.ExecutionException e) {
+                } catch (ExecutionException e) {
                 }
 
             }
         };
         JHVGlobals.getExecutorService().execute(worker);
     }
+
 }
