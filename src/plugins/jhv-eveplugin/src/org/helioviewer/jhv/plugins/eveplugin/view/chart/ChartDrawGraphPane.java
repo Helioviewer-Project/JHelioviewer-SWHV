@@ -175,10 +175,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.fillRect(0, 0, graphSize.width, DrawConstants.GRAPH_TOP_SPACE);
         g.fillRect(0, graphArea.height + DrawConstants.GRAPH_TOP_SPACE, graphSize.width, DrawConstants.GRAPH_BOTTOM_SPACE);
         g.fillRect(0, 0, DrawConstants.GRAPH_LEFT_SPACE, graphSize.height);
-
+        Color c = DrawConstants.TICK_LINE_COLOR;
         TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
         int ct = 0;
-        Color c = DrawConstants.TICK_LINE_COLOR;
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 if (ct == 0) {
@@ -192,11 +191,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawNoData(g, graphArea);
             return;
         }
+        drawHorizontalLabels(g, graphArea, xAxis, c);
+    }
+
+    private void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Color c) {
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(xAxis.start)), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
-        final int tickTextHeight = (int) tickTextBounds.getHeight();
-        final int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        final long tickDifferenceHorizontal = (xAxis.end - xAxis.start) / (horizontalTickCount - 1);
+        int tickTextHeight = (int) tickTextBounds.getHeight();
+        int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
+        long tickDifferenceHorizontal = (xAxis.end - xAxis.start) / (horizontalTickCount - 1);
 
         long previousDate = Long.MIN_VALUE;
         for (int i = 0; i < horizontalTickCount; ++i) {
@@ -215,7 +218,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
                 }
             }
-
             g.setColor(c);
             g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
 
@@ -257,7 +259,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         } else {
             g.fillRect(graphArea.x + graphArea.width + (leftSide - 1) * DrawConstants.RIGHT_AXIS_WIDTH, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.RIGHT_AXIS_WIDTH, graphArea.height);
             axis_x_offset = graphArea.x + graphArea.width + (leftSide - 1) * DrawConstants.RIGHT_AXIS_WIDTH;
-
         }
         g.setColor(el.getDataColor());
 

@@ -138,7 +138,6 @@ public class RadioData implements LineDataSelectorElement {
         }
     }
 
-
     @Override
     public YAxis getYAxis() {
         return yAxis;
@@ -175,7 +174,7 @@ public class RadioData implements LineDataSelectorElement {
 
     @Override
     public Color getDataColor() {
-        return null;
+        return Color.BLACK;
     }
 
     @Override
