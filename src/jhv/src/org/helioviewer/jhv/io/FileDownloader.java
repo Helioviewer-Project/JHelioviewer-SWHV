@@ -75,7 +75,7 @@ public class FileDownloader {
         // if local file name doesn't exist, download file
         try {
             if (!downloadFile(sourceURI, new File(outFileName))) {
-                if (dialog.wasInterrupted == false) {
+                if (!dialog.wasInterrupted) {
                     Message.err("Download", "Unable to download from http", false);
                 }
                 // if the file was not loaded successfully
@@ -164,11 +164,10 @@ public class FileDownloader {
      * @throws URISyntaxException
      * */
     private boolean downloadFile(URI source, File dest) throws IOException {
-        final URI finalSource;
-        final File finalDest;
         if (source == null || dest == null)
             return false;
 
+        final URI finalSource;
         if (source.getScheme().equalsIgnoreCase("jpip")) {
             try {
                 finalSource = new URI(source.toString().replaceFirst("jpip://", "http://").replaceFirst(":" + source.getPort(), "/jp2"));
@@ -184,6 +183,7 @@ public class FileDownloader {
             return false;
         }
 
+        final File finalDest;
         if (dest.isDirectory()) {
             finalDest = new File(dest, finalSource.getPath().substring(Math.max(0, finalSource.getPath().lastIndexOf("/"))));
         } else {

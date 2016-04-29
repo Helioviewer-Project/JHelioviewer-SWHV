@@ -52,9 +52,9 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     private final JButton buttonCancel = new JButton(" Cancel ");
     private final JButton refresh = new JButton(" Connect ");
     private final JButton buttonShow = new JButton(" Advanced Options ");
-    private static DynamicModel treeModel;
-    private static JTree tree;
-    private static String chosenFile = "/";
+    private DynamicModel treeModel;
+    private JTree tree;
+    private String chosenFile = "/";
     private final JPanel connectPanel = new JPanel(new BorderLayout());
     private JScrollPane scrollPane = new JScrollPane();
     private static JCheckBox fromJPIP = new JCheckBox("Download From HTTP");
@@ -216,7 +216,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
      *
      */
     private void changeSource() {
-        if (fromJPIP.isSelected() == true) {
+        if (fromJPIP.isSelected()) {
             inputAddress.setEnabled(false);
         } else {
             inputAddress.setEnabled(true);
@@ -233,7 +233,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
      */
     private void show(ActionEvent arg) {
         this.setSize(this.getPreferredSize());
-        if (advancedOptions == true) {
+        if (advancedOptions) {
             connectPanel.setVisible(false);
             secondLabel.setText("Remote Image Path:");
             imageAddress.setText("");
@@ -364,7 +364,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                 return;
             }
         }
-        if (fromJPIP.isSelected() == true) {
+        if (fromJPIP.isSelected()) {
             downloadFromHTTP();
             return;
         }
@@ -381,7 +381,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         inputAddress.setText(srv);
         String img = "";
 
-        if (advancedOptions == true) {
+        if (advancedOptions) {
             img = chosenFile;
         } else {
             img = imageAddress.getText();
@@ -401,7 +401,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         try {
             LoadURITask uriTask = new LoadURITask(new URI(srv + img), new URI(httpPath));
             JHVGlobals.getExecutorService().execute(uriTask);
-            if (advancedOptions == false) {
+            if (!advancedOptions) {
                 Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());
             }
         } catch (URISyntaxException e) {

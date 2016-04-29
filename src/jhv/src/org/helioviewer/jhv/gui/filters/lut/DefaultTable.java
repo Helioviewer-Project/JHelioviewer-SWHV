@@ -74,20 +74,16 @@ public class DefaultTable {
         for (int i = 0; i < length; ++i) {
             try {
                 JSONObject rule = colorRules.getJSONObject(i);
-                if (rule.has("observatory")) {
-                    if (!rule.getString("observatory").equalsIgnoreCase(hvMetaData.getObservatory()))
+                if (rule.has("observatory") && !rule.getString("observatory").equalsIgnoreCase(hvMetaData.getObservatory())) {
                         continue;
                 }
-                if (rule.has("instrument")) {
-                    if (!rule.getString("instrument").equalsIgnoreCase(hvMetaData.getInstrument()))
+                if (rule.has("instrument") && !rule.getString("instrument").equalsIgnoreCase(hvMetaData.getInstrument())) {
                         continue;
                 }
-                if (rule.has("detector")) {
-                    if (!rule.getString("detector").equalsIgnoreCase(hvMetaData.getDetector()))
+                if (rule.has("detector") && !rule.getString("detector").equalsIgnoreCase(hvMetaData.getDetector())) {
                         continue;
                 }
-                if (rule.has("measurement")) {
-                    if (!rule.getString("measurement").equalsIgnoreCase(hvMetaData.getMeasurement()))
+                if (rule.has("measurement") && !rule.getString("measurement").equalsIgnoreCase(hvMetaData.getMeasurement())) {
                         continue;
                 }
                 return rule.getString("color");

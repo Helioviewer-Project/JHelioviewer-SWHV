@@ -354,11 +354,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             @Override
             public void actionPerformed(ActionEvent e) {
                 JRadioButton aButton = (JRadioButton) e.getSource();
-                if (aButton == loopButton)
+                if (aButton.equals(loopButton))
                     recordButton.setRecordMode(RecordMode.LOOP);
-                else if (aButton == shotButton)
+                else if (aButton.equals(shotButton))
                     recordButton.setRecordMode(RecordMode.SHOT);
-                else if (aButton == freeButton)
+                else if (aButton.equals(freeButton))
                     recordButton.setRecordMode(RecordMode.FREE);
             }
         };
@@ -480,26 +480,27 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == advancedButton) {
+        if (source.equals(advancedButton)) {
             setAdvanced(!isAdvanced);
             // Change animation speed or unit
-        } else if (source == speedSpinner || source == speedUnitComboBox) {
+        } else if (source.equals(speedSpinner) || source.equals(speedUnitComboBox)) {
             updateMovieSpeed();
             // Change animation mode
-        } else if (source == animationModeComboBox) {
+        } else if (source.equals(animationModeComboBox)) {
             Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
+        Object source = e.getSource();
         // Jump to different frame
-        if (e.getSource() == timeSlider) {
+        if (source.equals(timeSlider)) {
             int val = timeSlider.getValue();
             Layers.setFrame(val);
             frameNumberLabel.setText((val + 1) + "/" + (timeSlider.getMaximum() + 1));
             // Change animation speed
-        } else if (e.getSource() == speedSpinner) {
+        } else if (source.equals(speedSpinner)) {
             updateMovieSpeed();
         }
     }
