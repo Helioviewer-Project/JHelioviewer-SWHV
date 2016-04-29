@@ -39,8 +39,8 @@ public class RadioData implements LineDataSelectorElement {
     public static final int MAX_AMOUNT_OF_DAYS = 3;
     public static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 1;
 
-    private static IndexColorModel colorModel;
-    private static RadioOptionsPanel optionsPanel;
+    private final RadioOptionsPanel optionsPanel;
+    private IndexColorModel colorModel;
 
     public RadioData() {
         String cm = "Rainbow 2";
