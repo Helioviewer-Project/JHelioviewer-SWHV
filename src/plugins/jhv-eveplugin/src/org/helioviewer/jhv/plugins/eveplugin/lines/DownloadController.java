@@ -17,12 +17,13 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
-import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DownloadController {
+
+    private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
     private static final DownloadController singletonInstance = new DownloadController();
 
@@ -83,7 +84,7 @@ public class DownloadController {
 
         ArrayList<Interval> intervals = new ArrayList<Interval>();
         for (Interval i : missingIntervals) {
-            intervals.addAll(Interval.splitInterval(i, EVESettings.DOWNLOADER_MAX_DAYS_PER_BLOCK));
+            intervals.addAll(Interval.splitInterval(i, DOWNLOADER_MAX_DAYS_PER_BLOCK));
         }
 
         return intervals;

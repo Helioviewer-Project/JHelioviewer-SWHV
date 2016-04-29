@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 
@@ -26,7 +27,7 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
             LineDataSelectorElement ldse = (LineDataSelectorElement) value;
 
             Color c = ldse.getDataColor();
-            if (c != null) {
+            if (c != null && ldse instanceof Band) {
                 lineColorPanel.setLineColor(c);
                 lineColorPanel.setBackground(label.getBackground());
                 lineColorPanel.setBorder(LineDataSelectorTablePanel.commonBorder);

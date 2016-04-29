@@ -16,7 +16,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
-import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -25,8 +24,10 @@ import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
+    private static final int MAX_WORKER_THREADS = 12;
+    public static final String OBSERVATION_UI_NAME = "1D time series";
 
-    public static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("EVE", EVESettings.MAX_WORKER_THREADS);
+    public static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("EVE", MAX_WORKER_THREADS);
 
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
     private final PlotPanel plotOne = new PlotPanel();
@@ -62,7 +63,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
             @Override
             public void done() {
-                ObservationDialog.getInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
+                ObservationDialog.getInstance().addUserInterface(OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
             }
 
         };
@@ -77,7 +78,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         Layers.removeTimeListener(dc);
         Layers.removeLayersListener(dc);
 
-        ObservationDialog.getInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME);
+        ObservationDialog.getInstance().removeUserInterface(OBSERVATION_UI_NAME);
 
         ImageViewerGui.getMainContentPanel().removePlugin(this);
 
