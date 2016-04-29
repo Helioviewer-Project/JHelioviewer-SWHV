@@ -86,8 +86,9 @@ public class LineDataSelectorTablePanel extends JPanel {
 
             @Override
             public void lineDataRemoved(LineDataSelectorElement element) {
-                int i = tableModel.getRowCount() -  1;
-                grid.getSelectionModel().setSelectionInterval(i, i);
+                int i = tableModel.getRowCount() - 1;
+                if (i >= 0)
+                    grid.getSelectionModel().setSelectionInterval(i, i);
             }
 
             @Override
