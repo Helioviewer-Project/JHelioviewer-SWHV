@@ -67,10 +67,6 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
         return events;
     }
 
-    public JHVRelatedEvents getEventAtPosition(Point point) {
-        return null;
-    }
-
     @Override
     public void cacheUpdated() {
         TimeAxis xAxis = EVEPlugin.dc.selectedAxis;

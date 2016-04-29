@@ -371,7 +371,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
         mousePressedPosition = plotArea.contains(p) ? p : null;
-        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height && eventModel.getEventAtPosition(new Point(p.x - DrawConstants.GRAPH_LEFT_SPACE, p.y - DrawConstants.GRAPH_TOP_SPACE)) == null) {
+        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }
@@ -435,7 +435,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         } else {
             setCursor(Cursor.getDefaultCursor());
         }
-        if (mouseOverEvent && (eventModel.getEventAtPosition(mousePosition) == null)) {
+        if (mouseOverEvent) {
             mouseOverEvent = false;
         }
         redrawGraph();
@@ -526,15 +526,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 int rightYAxisNumber = (mouseX - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
                 int ct = -1;
                 for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-                    if (el.showYAxis()) {
-                        if (rightYAxisNumber == ct) {
-                            el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
-                            el.yaxisChanged();
-                            drawController.fireRedrawRequest();
-                            break;
-                        }
-                        ct++;
+                    if (el.showYAxis() && rightYAxisNumber == ct) {
+                        el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
+                        el.yaxisChanged();
+                        drawController.fireRedrawRequest();
+                        break;
                     }
+                    ct++;
                 }
             }
         }
