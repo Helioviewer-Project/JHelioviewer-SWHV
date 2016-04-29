@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -50,7 +51,7 @@ public class BandCache {
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
         double noelements = (timeAxis.end - timeAxis.start) / (elsz);
-        double graphWidth = EVEPlugin.dc.getGraphSize().width;
+        double graphWidth = EVEPlugin.dc.getGraphSize().width * GLInfo.pixelScaleFloat[0];
         while (level < MAX_LEVEL - 1 && noelements > graphWidth) {
             level++;
             factor *= FACTOR_STEP;

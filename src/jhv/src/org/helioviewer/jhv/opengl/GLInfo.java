@@ -12,7 +12,7 @@ public class GLInfo {
     public static final int GLSAMPLES = 4;
 
     public static int[] pixelScale = new int[] { 1, 1 };
-    static float[] pixelScaleFloat = new float[] { 1f, 1f };
+    public static float[] pixelScaleFloat = new float[] { 1f, 1f };
 
     static int maxTextureSize;
 

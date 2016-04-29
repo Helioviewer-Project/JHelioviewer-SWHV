@@ -285,7 +285,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             for (int i = 0; i < verticalTicks; i++) {
                 final int y = graphArea.y + graphArea.height - i * tickDifferenceVertical;
                 double tickValue = yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, y);
-                String tickText = DrawConstants.DECIMAL_FORMAT.format(tickValue);
+                String tickText = String.format("%.2f", tickValue);
                 final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
                 int x_str;
                 if (leftSide == 0) {
