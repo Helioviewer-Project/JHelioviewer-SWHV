@@ -13,7 +13,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -256,14 +255,9 @@ public class Layers {
 
         for (View v : layers) {
             if (v.getImageLayer().isVisible()) {
-                MetaData m;
-                ImageData d = v.getImageLayer().getImageData();
-                if (d == null) // not yet decoded
-                    m = v.getMetaData(new JHVDate(0));
-                else
-                    m = d.getMetaData();
-                newSize = m.getPhysicalRegion().height;
+                MetaData m = v.getImageLayer().getMetaData();
 
+                newSize = m.getPhysicalRegion().height;
                 if (newSize > size) {
                     size = newSize;
                 }
@@ -277,12 +271,7 @@ public class Layers {
 
         for (View v : layers) {
             if (v.getImageLayer().isVisible()) {
-                MetaData m;
-                ImageData d = v.getImageLayer().getImageData();
-                if (d == null) // not yet decoded
-                    m = v.getMetaData(new JHVDate(0));
-                else
-                    m = d.getMetaData();
+                MetaData m = v.getImageLayer().getMetaData();
                 double h = m.getPhysicalRegion().height;
                 double w = m.getPhysicalRegion().width;
 
