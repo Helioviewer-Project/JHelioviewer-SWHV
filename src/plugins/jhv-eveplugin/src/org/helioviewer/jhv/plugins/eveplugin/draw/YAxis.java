@@ -14,7 +14,6 @@ public class YAxis {
 
     public double start;
     public double end;
-    private final String label;
 
     private YAxisScale scale;
     protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
@@ -22,10 +21,9 @@ public class YAxis {
     private final static float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
     private final static float UNSCALED_MAX_BOUND = Float.MAX_VALUE;
 
-    public YAxis(double _start, double _end, String _label, boolean isLogScale) {
+    public YAxis(double _start, double _end, String label, boolean isLogScale) {
         start = _start;
         end = _end;
-        label = _label;
         if (isLogScale) {
             scale = new YAxisLogScale(label);
         } else {

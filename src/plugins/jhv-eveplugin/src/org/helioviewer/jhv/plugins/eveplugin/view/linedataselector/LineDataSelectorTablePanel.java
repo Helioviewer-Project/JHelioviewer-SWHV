@@ -48,20 +48,13 @@ public class LineDataSelectorTablePanel extends JPanel {
     private static final int LINECOLOR_COL = 3;
     private static final int REMOVE_COL = 4;
 
-    private final JTable grid;
-
-    private final LineDataSelectorModel tableModel;
     private final JPanel optionsPanelWrapper;
-    private final GridBagConstraints gc = new GridBagConstraints();
     private Component optionsPanel = new JPanel();
-
-    private int lastSelectedIndex = -1;
 
     public LineDataSelectorTablePanel() {
         setLayout(new GridBagLayout());
 
-        tableModel = EVEPlugin.ldsm;
-        grid = new JTable(tableModel) {
+        final JTable grid = new JTable(EVEPlugin.ldsm) {
             @Override
             public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
                 if (columnIndex == VISIBLE_COL || columnIndex == REMOVE_COL) {
@@ -77,16 +70,16 @@ public class LineDataSelectorTablePanel extends JPanel {
             }
         };
 
-        tableModel.addLineDataSelectorModelListener(new LineDataSelectorModelListener() {
+        EVEPlugin.ldsm.addLineDataSelectorModelListener(new LineDataSelectorModelListener() {
             @Override
             public void lineDataAdded(LineDataSelectorElement element) {
-                int i = tableModel.getRowIndex(element);
+                int i = EVEPlugin.ldsm.getRowIndex(element);
                 grid.getSelectionModel().setSelectionInterval(i, i);
             }
 
             @Override
             public void lineDataRemoved(LineDataSelectorElement element) {
-                int i = tableModel.getRowCount() - 1;
+                int i = EVEPlugin.ldsm.getRowCount() - 1;
                 if (i >= 0)
                     grid.getSelectionModel().setSelectionInterval(i, i);
             }
@@ -96,6 +89,7 @@ public class LineDataSelectorTablePanel extends JPanel {
             }
         });
 
+        GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
         gc.gridy = 0;
         gc.weightx = 1;
@@ -156,7 +150,6 @@ public class LineDataSelectorTablePanel extends JPanel {
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger()) {
@@ -220,8 +213,9 @@ public class LineDataSelectorTablePanel extends JPanel {
             }
         });
 
-        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, getGridRowHeight() * 4 + 1));
-        grid.setRowHeight(getGridRowHeight());
+        int h = getGridRowHeight(grid);
+        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, h * 4 + 1));
+        grid.setRowHeight(h);
 
         optionsPanelWrapper = new JPanel();
         optionsPanelWrapper.setLayout(new BorderLayout());
@@ -235,9 +229,9 @@ public class LineDataSelectorTablePanel extends JPanel {
 
     private int rowHeight = -1;
 
-    private int getGridRowHeight() {
+    private int getGridRowHeight(JTable table) {
         if (rowHeight == -1) {
-            rowHeight = grid.getRowHeight() + 4;
+            rowHeight = table.getRowHeight() + 4;
         }
         return rowHeight;
     }
