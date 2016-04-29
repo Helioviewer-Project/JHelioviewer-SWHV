@@ -157,6 +157,7 @@ public class RadioData implements LineDataSelectorElement {
     @Override
     public void setVisibility(boolean visible) {
         isVisible = visible;
+        clearCache();
         EVEPlugin.ldsm.lineDataElementUpdated(this);
         fetchData(EVEPlugin.dc.selectedAxis, EVEPlugin.dc.availableAxis);
         EVEPlugin.dc.fireRedrawRequest();
