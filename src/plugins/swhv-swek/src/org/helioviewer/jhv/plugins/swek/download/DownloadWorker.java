@@ -69,7 +69,7 @@ public class DownloadWorker implements Runnable {
                 SWEKParser parser = sourceManager.getParser(swekSource);
                 ArrayList<JsonEvent> eventList = JHVDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
                 for (JsonEvent event : eventList) {
-                    final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end);
+                    final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end, false);
                     EventQueue.invokeLater(new Runnable() {
                         @Override
                         public void run() {

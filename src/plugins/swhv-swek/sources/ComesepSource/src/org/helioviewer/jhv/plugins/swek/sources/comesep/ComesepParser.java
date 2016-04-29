@@ -12,7 +12,7 @@ import org.json.JSONObject;
 public class ComesepParser implements SWEKParser {
 
     @Override
-    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end) throws JSONException {
+    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
         JHVEvent currentEvent = new JHVEvent(type, id, start, end);
         currentEvent.initParams();
         if (!parseResult(json, currentEvent)) {
@@ -47,7 +47,7 @@ public class ComesepParser implements SWEKParser {
                   lowerkey.startsWith("liftoff"))) {
                 value = value.trim();
                 if (value.length() != 0)
-                    currentEvent.addParameter(keyString, value);
+                    currentEvent.addParameter(keyString, value, true);
             }
         }
     }

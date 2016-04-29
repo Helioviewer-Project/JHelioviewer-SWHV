@@ -219,4 +219,12 @@ public class JHVEventCache {
         }
     }
 
+    public JHVEvent getEvent(int uniqueID) {
+        JHVRelatedEvents rEvent = relEvents.get(uniqueID);
+        if (rEvent != null) {
+            return rEvent.get(uniqueID);
+        }
+        return null;
+    }
+
 }
