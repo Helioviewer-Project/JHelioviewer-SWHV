@@ -96,7 +96,7 @@ public class FileDownloader {
         if (source == null) {
             return null;
         }
-        return new File(JHVDirectory.REMOTEFILES.getPath() + source.getPath().substring(Math.max(0, source.getPath().lastIndexOf("/"))));
+        return new File(JHVDirectory.REMOTEFILES.getPath() + source.getPath().substring(Math.max(0, source.getPath().lastIndexOf('/'))));
     }
 
     /**
@@ -147,7 +147,7 @@ public class FileDownloader {
     public boolean get(URI source, File dest, JProgressBar progressBar) throws IOException {
         // set up progress bar and progress label
         this.progressBar = progressBar;
-        progressBar.setName("Downloading '" + source.getPath().substring(source.getPath().lastIndexOf("/") + 1) + "'...");
+        progressBar.setName("Downloading '" + source.getPath().substring(source.getPath().lastIndexOf('/') + 1) + "'...");
         // download the file
         return downloadFile(source, dest);
     }
@@ -185,7 +185,7 @@ public class FileDownloader {
 
         final File finalDest;
         if (dest.isDirectory()) {
-            finalDest = new File(dest, finalSource.getPath().substring(Math.max(0, finalSource.getPath().lastIndexOf("/"))));
+            finalDest = new File(dest, finalSource.getPath().substring(Math.max(0, finalSource.getPath().lastIndexOf('/'))));
         } else {
             finalDest = dest;
         }
@@ -254,7 +254,7 @@ public class FileDownloader {
      * 
      * The download can be interrupted using the provided button.
      */
-    @SuppressWarnings({"serial"})
+    @SuppressWarnings("serial")
     private class StandAloneDialog extends JWindow implements ActionListener {
 
         private boolean wasInterrupted;

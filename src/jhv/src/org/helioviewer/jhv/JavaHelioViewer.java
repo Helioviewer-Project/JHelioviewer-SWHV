@@ -64,7 +64,7 @@ public class JavaHelioViewer {
         // Information log message
         StringBuilder argString = new StringBuilder();
         for (int i = 0; i < args.length; ++i) {
-            argString.append(" ").append(args[i]);
+            argString.append(' ').append(args[i]);
         }
         Log.info("JHelioviewer started with command-line options:" + argString);
 

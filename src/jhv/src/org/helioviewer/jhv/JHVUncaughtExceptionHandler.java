@@ -139,9 +139,9 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         StringBuilder stackTrace = new StringBuilder();
-        stackTrace.append(e.getClass().getCanonicalName()).append("\n");
+        stackTrace.append(e.getClass().getCanonicalName()).append('\n');
         for (StackTraceElement el : e.getStackTrace()) {
-            stackTrace.append("at ").append(el).append("\n");
+            stackTrace.append("at ").append(el).append('\n');
         }
 
         String msg = "Uncaught Exception detected.\n\nConfiguration:\n";
@@ -173,7 +173,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
                     String line = null;
                     StringBuilder sb = new StringBuilder();
                     while ((line = input.readLine()) != null) {
-                        sb.append(line).append("\n");
+                        sb.append(line).append('\n');
                     }
                     msg += sb;
                 } finally {
