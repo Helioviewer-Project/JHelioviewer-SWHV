@@ -350,11 +350,10 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     private void moveSelectedInterval(final Point newMousePosition) {
         if (mousePressed != null) {
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
-            final int intervalWidthPixel = rightIntervalBorderPosition - leftIntervalBorderPosition;
             if (mousePressed.x > newMousePosition.x) {
-                EVEPlugin.dc.move(0, intervalWidthPixel, -diffPixel);
+                EVEPlugin.dc.move(-diffPixel);
             } else {
-                EVEPlugin.dc.move(0, intervalWidthPixel, diffPixel);
+                EVEPlugin.dc.move(diffPixel);
             }
             mousePressed = newMousePosition;
         }
@@ -382,7 +381,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         double middle = leftIntervalBorderPosition + 0.5 * intervalWidthPixel;
         double distance = point.getX() - middle;
         Rectangle graphArea = EVEPlugin.dc.getGraphArea();
-        EVEPlugin.dc.move(graphArea.x, graphArea.width, distance);
+        EVEPlugin.dc.move(distance);
     }
 
     @Override

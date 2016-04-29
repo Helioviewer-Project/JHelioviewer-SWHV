@@ -382,7 +382,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (mousePressedPosition != null && mouseDragPosition != null) {
             double distanceX = mousePressedPosition.x - p.x;
-            drawController.move(graphArea.x, graphArea.width, distanceX);
+            drawController.move(distanceX);
 
             double distanceY = p.y - mousePressedPosition.y;
             shiftAllAxes(distanceY);
@@ -408,23 +408,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(UIGlobals.closedHandCursor);
             double distanceX = mousePressedPosition.x - p.x;
             double distanceY = p.y - mousePressedPosition.y;
-            drawController.move(graphArea.x, graphArea.width, distanceX);
-            boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
-            boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
-            boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
-
-            int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
-            int ct = -1;
-            for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-                if (el.showYAxis()) {
-                    if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
-                        el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
-                        el.yaxisChanged();
-                        drawController.fireRedrawRequest();
-                    }
-                    ct++;
-                }
-            }
+            drawController.move(distanceX);
+            drawController.moveY(p, distanceY);
         }
         mousePressedPosition = p;
     }
@@ -503,33 +488,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             Point p = e.getPoint();
             int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
-            double zoomTimeFactor = 10;
-            boolean inGraphArea = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
-            boolean inXAxisOrAboveGraph = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height));
-            boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
-            boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
-            boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
-
-            if (inGraphArea || inXAxisOrAboveGraph) {
-                if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
-                    drawController.zoom(graphArea.x, graphArea.width, p.x, zoomTimeFactor * scrollDistance);
-                } else if (e.isShiftDown()) {
-                    drawController.move(graphArea.x, graphArea.width, zoomTimeFactor * scrollDistance);
-                }
-            }
-
-            int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
-            int ct = -1;
-            for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-                if (el.showYAxis()) {
-                    if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
-                        el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - p.y - graphArea.y, graphArea.height);
-                        el.yaxisChanged();
-                        drawController.fireRedrawRequest();
-                    }
-                    ct++;
-                }
-            }
+            drawController.zoomXY(p, scrollDistance, e.isShiftDown(), e.isAltDown());
         }
     }
 }

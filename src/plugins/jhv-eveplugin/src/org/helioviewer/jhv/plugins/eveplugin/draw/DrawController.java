@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.HashSet;
 
@@ -66,14 +67,65 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         setAvailableInterval();
     }
 
-    public void move(int x0, int w, double pixelDistance) {
-        selectedAxis.move(x0, w, pixelDistance);
+    public void move(double pixelDistance) {
+        selectedAxis.move(graphArea.x, graphArea.width, pixelDistance);
         setAvailableInterval();
     }
 
-    public void zoom(int x0, int w, int x, double factor) {
-        selectedAxis.zoom(x0, w, x, factor);
+    public void zoom(int x, double factor) {
+        selectedAxis.zoom(graphArea.x, graphArea.width, x, factor);
         setAvailableInterval();
+    }
+
+    public void moveY(Point p, double distanceY) {
+        boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
+        boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
+        boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
+        int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+        int ct = -1;
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            if (el.showYAxis()) {
+                if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                    el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
+                    el.yaxisChanged();
+                }
+                ct++;
+            }
+        }
+        fireRedrawRequest();
+    }
+
+    public void zoomY(Point p, int scrollDistance) {
+        boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
+        boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
+        boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
+        int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+        int ct = -1;
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            if (el.showYAxis()) {
+                if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                    el.getYAxis().zoomSelectedRange(scrollDistance, graphSize.height - p.y - graphArea.y, graphArea.height);
+                    el.yaxisChanged();
+                }
+                ct++;
+            }
+        }
+        fireRedrawRequest();
+    }
+
+    public void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt) {
+        double zoomTimeFactor = 10;
+        boolean inGraphArea = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
+        boolean inXAxisOrAboveGraph = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height));
+
+        if (inGraphArea || inXAxisOrAboveGraph) {
+            if ((!alt && !shift) || inXAxisOrAboveGraph) {
+                zoom(p.x, zoomTimeFactor * scrollDistance);
+            } else if (shift) {
+                move(zoomTimeFactor * scrollDistance);
+            }
+        }
+        zoomY(p, scrollDistance);
     }
 
     private void setAvailableInterval() {
