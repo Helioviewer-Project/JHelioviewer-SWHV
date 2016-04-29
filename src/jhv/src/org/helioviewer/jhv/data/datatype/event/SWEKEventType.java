@@ -112,8 +112,8 @@ public class SWEKEventType {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
 
                 for (SWEKRelatedOn swon : relon) {
-                    SWEKParameter p = swon.getParameterFrom();
-                    String dbtype = swon.getDatabaseType();
+                    SWEKParameter p = swon.parameterFrom;
+                    String dbtype = swon.dbType;
                     fields.put(p.getParameterName().intern(), dbtype);
                 }
             }
@@ -121,8 +121,8 @@ public class SWEKEventType {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
 
                 for (SWEKRelatedOn swon : relon) {
-                    SWEKParameter p = swon.getParameterWith();
-                    String dbtype = swon.getDatabaseType();
+                    SWEKParameter p = swon.parameterWith;
+                    String dbtype = swon.dbType;
                     fields.put(p.getParameterName().intern(), dbtype);
                 }
             }

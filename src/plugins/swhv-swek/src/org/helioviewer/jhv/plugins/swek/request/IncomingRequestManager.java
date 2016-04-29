@@ -47,8 +47,8 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
             if (re.getEvent() == evt) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
                 for (SWEKRelatedOn swon : relon) {
-                    String f = swon.getParameterFrom().getParameterName().toLowerCase();
-                    String w = swon.getParameterWith().getParameterName().toLowerCase();
+                    String f = swon.parameterFrom.getParameterName().toLowerCase();
+                    String w = swon.parameterWith.getParameterName().toLowerCase();
                     SWEKEventType reType = re.getRelatedWith();
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
                         JHVEventType othert = JHVEventType.getJHVEventType(reType, supplier);
@@ -59,8 +59,8 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
             if (re.getRelatedWith() == evt) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
                 for (SWEKRelatedOn swon : relon) {
-                    String f = swon.getParameterFrom().getParameterName().toLowerCase();
-                    String w = swon.getParameterWith().getParameterName().toLowerCase();
+                    String f = swon.parameterFrom.getParameterName().toLowerCase();
+                    String w = swon.parameterWith.getParameterName().toLowerCase();
                     SWEKEventType reType = re.getEvent();
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
                         JHVEventType fromt = JHVEventType.getJHVEventType(reType, supplier);
