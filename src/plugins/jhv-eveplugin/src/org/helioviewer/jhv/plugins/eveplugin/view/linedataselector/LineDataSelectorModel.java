@@ -10,7 +10,7 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
-import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
+import org.helioviewer.jhv.plugins.eveplugin.lines.BandType;
 
 public class LineDataSelectorModel implements TableModel {
 

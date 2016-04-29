@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.settings;
+package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.util.HashMap;
 
