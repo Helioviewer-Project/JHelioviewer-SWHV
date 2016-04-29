@@ -49,7 +49,7 @@ public class LineDataSelectorTablePanel extends JPanel {
     private static final int REMOVE_COL = 4;
 
     private final JPanel optionsPanelWrapper;
-    private Component optionsPanel = new JPanel();
+    private Component optionsPanel;
 
     public LineDataSelectorTablePanel() {
         setLayout(new GridBagLayout());
@@ -217,10 +217,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, h * 4 + 1));
         grid.setRowHeight(h);
 
-        optionsPanelWrapper = new JPanel();
-        optionsPanelWrapper.setLayout(new BorderLayout());
-
-        optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+        optionsPanelWrapper = new JPanel(new BorderLayout());
         optionsPanelWrapper.add(EVEPlugin.dc.getOptionsPanel(), BorderLayout.PAGE_END);
 
         gc.gridy = 1;
@@ -237,17 +234,12 @@ public class LineDataSelectorTablePanel extends JPanel {
     }
 
     private void setOptionsPanel(LineDataSelectorElement lineDataElement) {
-        optionsPanelWrapper.remove(optionsPanel);
-        optionsPanel = null;
-        if (lineDataElement != null) {
-            optionsPanel = lineDataElement.getOptionsPanel();
-        }
-        if (optionsPanel == null) {
-            optionsPanel = new JPanel();
-        }
-        optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+        if (optionsPanel != null)
+            optionsPanelWrapper.remove(optionsPanel);
+        optionsPanel = lineDataElement.getOptionsPanel();
+        if (optionsPanel != null)
+            optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         revalidate();
-        repaint();
     }
 
 }
