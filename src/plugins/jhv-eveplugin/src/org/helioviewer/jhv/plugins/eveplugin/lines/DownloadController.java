@@ -16,7 +16,6 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

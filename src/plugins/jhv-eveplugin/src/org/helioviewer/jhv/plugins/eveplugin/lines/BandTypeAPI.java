@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.settings;
+package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,15 +54,11 @@ public class BandTypeAPI {
         }
     }
 
-    private String getDatasetUrl() {
-        return this.baseUrl + "/datasets/index.php";
-    }
-
     private String readJSON() {
         String string = null;
         URI url = null;
         try {
-            url = new URI(this.getDatasetUrl());
+            url = new URI(baseUrl + "/datasets/index.php");
         } catch (URISyntaxException e) {
             Log.error("Malformed url", e);
         }

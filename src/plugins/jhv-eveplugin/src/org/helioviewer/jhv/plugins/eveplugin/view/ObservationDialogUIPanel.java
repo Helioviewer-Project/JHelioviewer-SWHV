@@ -17,10 +17,10 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
+import org.helioviewer.jhv.plugins.eveplugin.lines.BandGroup;
+import org.helioviewer.jhv.plugins.eveplugin.lines.BandType;
+import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.lines.DownloadController;
-import org.helioviewer.jhv.plugins.eveplugin.settings.BandGroup;
-import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
-import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
