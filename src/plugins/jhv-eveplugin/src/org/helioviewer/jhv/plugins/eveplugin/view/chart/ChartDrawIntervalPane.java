@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -351,9 +350,9 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         if (mousePressed != null) {
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
             if (mousePressed.x > newMousePosition.x) {
-                EVEPlugin.dc.move(-diffPixel);
+                EVEPlugin.dc.moveX(-diffPixel);
             } else {
-                EVEPlugin.dc.move(diffPixel);
+                EVEPlugin.dc.moveX(diffPixel);
             }
             mousePressed = newMousePosition;
         }
@@ -380,8 +379,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         final double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
         double middle = leftIntervalBorderPosition + 0.5 * intervalWidthPixel;
         double distance = point.getX() - middle;
-        Rectangle graphArea = EVEPlugin.dc.getGraphArea();
-        EVEPlugin.dc.move(distance);
+        EVEPlugin.dc.moveX(distance);
     }
 
     @Override
