@@ -47,8 +47,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
         PAN, ROTATE, ANNOTATE
     };
 
-    private static InteractionMode interactionMode;
-    private static DisplayMode displayMode;
+    private InteractionMode interactionMode;
+    private DisplayMode displayMode;
 
     private enum DisplayMode {
         ICONANDTEXT, ICONONLY, TEXTONLY

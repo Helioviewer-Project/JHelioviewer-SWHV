@@ -331,7 +331,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         // open the output stream where XML Document will be saved
         File xmlOutFile = new File(filename);
         FileOutputStream fos;
-        Transformer transformer;
         try {
             fos = new FileOutputStream(xmlOutFile);
         } catch (FileNotFoundException e) {
@@ -340,6 +339,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }
 
         // Use a Transformer for the purpose of output
+        Transformer transformer;
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         try {
             transformer = transformerFactory.newTransformer();

@@ -20,17 +20,15 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
  * This panel acts as a container for the GUI elements which are shown in the
  * main area of the application. Usually it contains the main image area. Below
  * the main image area plug-ins are able to display their GUI components.
- *
- * @author Stephan Pagel
  * */
 @SuppressWarnings("serial")
 public class MainContentPanel extends JPanel implements ActionListener {
 
     private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();
 
-    private static JSplitPane splitpane;
-    private static JPanel pluginContainer;
-    private static CollapsiblePane collapsiblePane;
+    private JSplitPane splitpane;
+    private JPanel pluginContainer;
+    private CollapsiblePane collapsiblePane;
 
     public MainContentPanel(Component mainComponent) {
         pluginContainer = new JPanel(new BorderLayout());
@@ -124,9 +122,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
         repaint();
     }
 
-    /**
-     * {@inheritDoc}
-     * */
     @Override
     public void actionPerformed(ActionEvent e) {
         updateLayout();
@@ -135,4 +130,5 @@ public class MainContentPanel extends JPanel implements ActionListener {
     public boolean mainContentPluginsActive() {
         return !collapsiblePane.isCollapsed();
     }
+
 }

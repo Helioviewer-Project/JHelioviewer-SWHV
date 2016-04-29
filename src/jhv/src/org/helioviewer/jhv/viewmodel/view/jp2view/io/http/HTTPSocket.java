@@ -109,24 +109,20 @@ public class HTTPSocket extends Socket {
      * @throws java.io.IOException
      */
     public HTTPMessage receive() throws IOException {
-        int code;
-        double ver;
-        String line;
-        String parts[];
-
         InputStream lineInput = getInputStream();
 
-        line = readLine(lineInput);
+        String line = readLine(lineInput);
         if (line == null)
             return null;
 
-        parts = line.split(" ", 3);
+        String parts[] = line.split(" ", 3);
         if (parts.length != 3) {
             throw new ProtocolException("Invalid HTTP message: " + line);
         }
 
         if (parts[0].startsWith("HTTP/")) {
             // Parses HTTP version
+            double ver;
             try {
                 ver = Double.parseDouble(parts[0].substring(5));
             } catch (NumberFormatException ex) {
@@ -136,6 +132,7 @@ public class HTTPSocket extends Socket {
                 throw new ProtocolException("HTTP version not supported");
 
             // Parses status code
+            int code;
             try {
                 code = Integer.parseInt(parts[1]);
             } catch (NumberFormatException ex) {
@@ -189,10 +186,8 @@ public class HTTPSocket extends Socket {
         int offset = 0;
         if (len > 0 && rawdata[len - 1] == '\n') {
             offset++;
-            if (len > 1) {
-                if (rawdata[len - 2] == '\r') {
-                    offset++;
-                }
+            if (len > 1 && rawdata[len - 2] == '\r') {
+                offset++;
             }
         }
         return new String(rawdata, 0, len - offset, "US-ASCII");

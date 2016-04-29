@@ -19,8 +19,8 @@ import org.helioviewer.jhv.opengl.GLInfo;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
-    private static Camera camera;
-    private static Component component;
+    private Camera camera;
+    private Component component;
 
     private boolean buttonDown = false;
 

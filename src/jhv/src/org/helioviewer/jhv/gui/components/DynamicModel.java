@@ -26,7 +26,7 @@ import org.helioviewer.jhv.base.DownloadStream;
  */
 public class DynamicModel implements TreeModel {
 
-    private Node root;
+    private final Node root;
 
     /**
      * constructor of a Dynamic Model
@@ -40,8 +40,10 @@ public class DynamicModel implements TreeModel {
      */
     public DynamicModel(String root) throws BadLocationException, IOException {
         if (root == null) {
+            this.root = null;
             return;
         }
+
         this.root = new Node(root);
         this.root.toShow = root;
         if ((getSubdirectories(this.root.name)).size() == 0) {
