@@ -29,17 +29,17 @@ import org.json.JSONObject;
 public class HEKParser implements SWEKParser {
 
     @Override
-    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end) throws JSONException {
+    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
         JHVEvent currentEvent = new JHVEvent(type, id, start, end);
         currentEvent.initParams();
-        if (!parseResult(json, currentEvent)) {
+        if (!parseResult(json, currentEvent, full)) {
             return null;
         }
         currentEvent.finishParams();
         return currentEvent;
     }
 
-    private static boolean parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
+    private static boolean parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
         List<Vec3> hgsBoundedBox = null;
         List<Vec3> hgsBoundCC = null;
         Vec3 hgsCentralPoint = null;
@@ -77,7 +77,7 @@ public class HEKParser implements SWEKParser {
                     } else {
                         value = value.trim();
                         if (value.length() != 0)
-                            currentEvent.addParameter(originalKeyString, value);
+                            currentEvent.addParameter(originalKeyString, value, full);
                     }
                 }
             }
@@ -121,7 +121,7 @@ public class HEKParser implements SWEKParser {
             }
         }
         if (ok) {
-            currentEvent.addParameter(new JHVEventParameter(type, type, url), true, true);
+            currentEvent.addParameter(new JHVEventParameter(type, type, url), true, true, true);
         }
     }
 

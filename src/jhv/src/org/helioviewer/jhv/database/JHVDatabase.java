@@ -70,6 +70,7 @@ public class JHVDatabase {
     private static final String SELECT_DATERANGE = "SELECT start, end FROM date_range where type_id=? order by start, end ";
     private static final String SELECT_LAST_EVENT = "SELECT end FROM events WHERE type_id=? order by end DESC LIMIT 1";
     private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link " + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id " + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id " + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
+    private static final String SELECT_EVENT_BY_ID = "SELECT e.id, e.start, e.end, e.data, event_type.name, event_type.supplier FROM events AS e LEFT JOIN event_type ON e.type_id = event_type.id WHERE e.id=?";
 
     private static HashMap<Object, PreparedStatement> statements = new HashMap<Object, PreparedStatement>();
 
@@ -696,6 +697,53 @@ public class JHVDatabase {
                 }
             }
             return new ArrayList<JsonEvent>();
+        }
+    }
+
+    public static JsonEvent event2Program(int event_id) {
+        FutureTask<JsonEvent> ft = new FutureTask<JsonEvent>(new Event2Program(event_id));
+        executor.execute(ft);
+        try {
+            return ft.get();
+        } catch (InterruptedException e) {
+            return null;
+        } catch (ExecutionException e) {
+            return null;
+        }
+    }
+
+    private static class Event2Program implements Callable<JsonEvent> {
+        private final int event_id;
+
+        public Event2Program(int _event_id) {
+            event_id = _event_id;
+        }
+
+        @Override
+        public JsonEvent call() {
+            Connection connection = ConnectionThread.getConnection();
+            if (connection == null) {
+                return null;
+            }
+
+            try {
+                PreparedStatement ps = getPreparedStatement(connection, SELECT_EVENT_BY_ID);
+                ps.setLong(1, event_id);
+                ResultSet rs = ps.executeQuery();
+                JsonEvent je = null;
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    long start = rs.getLong(2);
+                    long end = rs.getLong(3);
+                    byte[] json = rs.getBytes(4);
+                    je = new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end);
+                }
+                rs.close();
+                return je;
+            } catch (SQLException e) {
+                Log.error("Could not fetch associations " + e.getMessage());
+                return null;
+            }
         }
     }
 

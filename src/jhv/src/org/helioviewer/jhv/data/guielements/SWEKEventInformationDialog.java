@@ -41,7 +41,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     private DataCollapsiblePanel followingEventsPanel;
     private DataCollapsiblePanel otherRelatedEventsPanel;
 
-    private final JHVEvent event;
+    private JHVEvent event;
     private final JHVRelatedEvents rEvent;
 
     private final DataCollapsiblePanelModel model;
@@ -49,6 +49,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent event) {
         super(ImageViewerGui.getMainFrame(), revent.getJHVEventType().getEventType().getEventName());
         this.event = event;
+
         rEvent = revent;
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
@@ -240,7 +241,8 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
                     }
                     Set<JHVRelatedEvents> rEventsSet = new HashSet<JHVRelatedEvents>();
                     for (JHVEvent jhvEvent : events) {
-                        rEventsSet.add(cache.getRelatedEvents(jhvEvent.getUniqueID()));
+                        if (jhvEvent.getUniqueID() != event.getUniqueID())
+                            rEventsSet.add(cache.getRelatedEvents(jhvEvent.getUniqueID()));
                     }
                     ArrayList<JHVRelatedEvents> rEvents = new ArrayList<JHVRelatedEvents>();
                     rEvents.addAll(rEventsSet);
@@ -250,6 +252,14 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
                         SWEKEventInformationDialog.this.repack();
                         SWEKEventInformationDialog.this.repaint();
                     }
+                    JHVEvent t_event = JHVEventCache.getSingletonInstance().getEvent(event.getUniqueID());
+                    if (t_event != null) {
+                        event = t_event;
+                    }
+                    allTablePanel.removeAll();
+                    initParameterCollapsiblePanels();
+
+                    setCollapsiblePanels();
                 } catch (InterruptedException ignore) {
                 } catch (java.util.concurrent.ExecutionException e) {
                 }
@@ -258,5 +268,4 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         };
         JHVGlobals.getExecutorService().execute(worker);
     }
-
 }
