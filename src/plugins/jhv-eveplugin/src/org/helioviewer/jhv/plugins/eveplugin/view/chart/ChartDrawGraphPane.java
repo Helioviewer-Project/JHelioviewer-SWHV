@@ -403,9 +403,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseDragged(MouseEvent e) {
         Point p = e.getPoint();
-
         mouseDragPosition = p;
-
         if (mousePressedPosition != null) {
             setCursor(UIGlobals.closedHandCursor);
             double distanceX = mousePressedPosition.x - p.x;
@@ -413,22 +411,19 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawController.move(graphArea.x, graphArea.width, distanceX);
             boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
             boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
-            if (inRightYAxes) {
-                int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
-                int ct = -1;
-                for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-                    if (el.showYAxis()) {
-                        if (rightYAxisNumber == ct) {
-                            el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
-                            el.yaxisChanged();
-                            drawController.fireRedrawRequest();
-                            break;
-                        }
-                        ct++;
+            boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
+
+            int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+            int ct = -1;
+            for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+                if (el.showYAxis()) {
+                    if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                        el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
+                        el.yaxisChanged();
+                        drawController.fireRedrawRequest();
                     }
+                    ct++;
                 }
-            } else {
-                shiftAllAxes(distanceY);
             }
         }
         mousePressedPosition = p;
@@ -506,45 +501,33 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+            Point p = e.getPoint();
             int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
             double zoomTimeFactor = 10;
-            final int mouseX = e.getX();
-            final int mouseY = e.getY();
-            boolean inGraphArea = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
-            boolean inXAxisOrAboveGraph = (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && (mouseY <= graphArea.y || mouseY >= graphArea.y + graphArea.height));
-            boolean yAxisVerticalCondition = (mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height);
-            boolean inLeftYAxis = mouseX < graphArea.x && yAxisVerticalCondition;
-            boolean inRightYAxes = mouseX > graphArea.x + graphArea.width && yAxisVerticalCondition;
+            boolean inGraphArea = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
+            boolean inXAxisOrAboveGraph = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height));
+            boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
+            boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
+            boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
 
             if (inGraphArea || inXAxisOrAboveGraph) {
                 if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
-                    drawController.zoom(graphArea.x, graphArea.width, mouseX, zoomTimeFactor * scrollDistance);
+                    drawController.zoom(graphArea.x, graphArea.width, p.x, zoomTimeFactor * scrollDistance);
                 } else if (e.isShiftDown()) {
                     drawController.move(graphArea.x, graphArea.width, zoomTimeFactor * scrollDistance);
                 }
             }
-            if ((inGraphArea && ((e.isControlDown() || e.isAltDown()) && !e.isShiftDown())) || inLeftYAxis) {
-                for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-                    if (el.showYAxis()) {
-                        el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
+
+            int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+            int ct = -1;
+            for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+                if (el.showYAxis()) {
+                    if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                        el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - p.y - graphArea.y, graphArea.height);
                         el.yaxisChanged();
+                        drawController.fireRedrawRequest();
                     }
-                }
-                drawController.fireRedrawRequest();
-            }
-            if (inRightYAxes) {
-                int rightYAxisNumber = (mouseX - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
-                int ct = -1;
-                for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-                    if (el.showYAxis()) {
-                        if (rightYAxisNumber == ct) {
-                            el.getYAxis().zoomSelectedRange(scrollDistance, getHeight() - mouseY - graphArea.y, graphArea.height);
-                            el.yaxisChanged();
-                            drawController.fireRedrawRequest();
-                            break;
-                        }
-                        ct++;
-                    }
+                    ct++;
                 }
             }
         }
