@@ -9,7 +9,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKSource;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 
 /**

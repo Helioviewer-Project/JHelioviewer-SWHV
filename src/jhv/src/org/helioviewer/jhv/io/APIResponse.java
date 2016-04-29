@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.io.InputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -9,7 +8,6 @@ import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 class APIResponse {
 
