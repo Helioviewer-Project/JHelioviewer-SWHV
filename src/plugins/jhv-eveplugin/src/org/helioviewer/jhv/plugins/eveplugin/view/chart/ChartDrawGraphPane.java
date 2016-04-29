@@ -271,29 +271,52 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         // Vertical lines
         {
-            final int sizeSteps = graphArea.height / DrawConstants.MIN_VERTICAL_TICK_SPACE;
-            int verticalTicks = 3;
-            if (sizeSteps >= 4) {
-                verticalTicks = 5;
+            double start = yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, graphArea.y + graphArea.height);
+            double end = yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, graphArea.y);
+            if (start > end) {
+                double temp = start;
+                start = end;
+                end = temp;
             }
+            int decade = (int) Math.floor(Math.log10(end - start));
+            double step = Math.pow(10, decade);
+            double startv = (Math.floor(start / step)) * step;
+            double endv = (Math.ceil(end / step)) * step;
+            if ((endv - startv) / step < 5) {
+                step = step / 2;
+            }
+            double tick = startv;
+            int ct = 0;
+            drawHorizontalTickline(g, yAxis, start, axis_x_offset, leftSide, false);
+            while (tick <= endv && ct < 20) {
+                if (tick >= start && tick <= end)
+                    drawHorizontalTickline(g, yAxis, tick, axis_x_offset, leftSide, true);
+                tick += step;
+                ct++;
 
-            final int tickDifferenceVertical = (graphArea.height) / (verticalTicks - 1);
-            for (int i = 0; i < verticalTicks; i++) {
-                final int y = graphArea.y + graphArea.height - i * tickDifferenceVertical;
-                double tickValue = yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, y);
-                String tickText = String.format("%.2f", tickValue);
-                final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
-                int x_str;
-                if (leftSide == 0) {
-                    x_str = axis_x_offset - 6 - (int) bounds.getWidth();
-                    g.drawLine(axis_x_offset - 3, y, graphArea.x + graphArea.width, y);
-                } else {
-                    x_str = axis_x_offset;
-                }
-                g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
             }
+            drawHorizontalTickline(g, yAxis, end, axis_x_offset, leftSide, false);
         }
+    }
 
+    private void drawHorizontalTickline(Graphics g, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt) {
+        String tickText;
+        if (tick == (long) tick) {
+            tickText = String.format("%d", (long) tick);
+        } else {
+            tickText = String.format("%s", tick);
+        }
+        int y = yAxis.scaledvalue2pixel(graphArea.y, graphArea.height, tick);
+        final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
+        int x_str;
+        if (leftSide == 0) {
+            x_str = axis_x_offset - 6 - (int) bounds.getWidth();
+            g.drawLine(axis_x_offset - 3, y, graphArea.x + graphArea.width, y);
+        } else {
+            x_str = axis_x_offset;
+        }
+        if (needTxt)
+            g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
     }
 
     private void drawMovieLine(Graphics2D g) {
