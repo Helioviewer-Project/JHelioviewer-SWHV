@@ -381,23 +381,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
 
         if (mousePressedPosition != null && mouseDragPosition != null) {
-            double distanceX = mousePressedPosition.x - p.x;
-            drawController.move(distanceX);
-
-            double distanceY = p.y - mousePressedPosition.y;
-            shiftAllAxes(distanceY);
+            drawController.moveX(mousePressedPosition.x - p.x);
+            drawController.moveAllAxes(p.y - mousePressedPosition.y);
         }
 
         mousePressedPosition = null;
         mouseDragPosition = null;
-    }
-
-    private void shiftAllAxes(double distanceY) {
-        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-            if (el.showYAxis()) {
-                el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
-            }
-        }
     }
 
     @Override
@@ -406,10 +395,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mouseDragPosition = p;
         if (mousePressedPosition != null) {
             setCursor(UIGlobals.closedHandCursor);
-            double distanceX = mousePressedPosition.x - p.x;
-            double distanceY = p.y - mousePressedPosition.y;
-            drawController.move(distanceX);
-            drawController.moveY(p, distanceY);
+            drawController.moveX(mousePressedPosition.x - p.x);
+            drawController.moveY(p, p.y - mousePressedPosition.y);
         }
         mousePressedPosition = p;
     }
@@ -428,8 +415,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(Cursor.getDefaultCursor());
         }
 
-        redrawGraph();
         updateGraph();
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+            Point p = e.getPoint();
+            int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
+            drawController.zoomXY(p, scrollDistance, e.isShiftDown(), e.isAltDown());
+        }
     }
 
     @Override
@@ -483,12 +478,4 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void movieIntervalChanged(long start, long end) {
     }
 
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-            Point p = e.getPoint();
-            int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
-            drawController.zoomXY(p, scrollDistance, e.isShiftDown(), e.isAltDown());
-        }
-    }
 }
