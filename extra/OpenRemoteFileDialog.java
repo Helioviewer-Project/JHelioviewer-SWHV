@@ -111,7 +111,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                             return;
                         }
 
-                        String parsed = path.substring(path.indexOf(","), path.lastIndexOf(']'));
+                        String parsed = path.substring(path.indexOf(','), path.lastIndexOf(']'));
                         parsed = parsed.replace(",", "");
                         parsed = parsed.replace(" ", "");
 

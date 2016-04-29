@@ -31,7 +31,7 @@ public class PfssDataLoader implements Runnable {
     public void run() {
         InputStream in = null;
         try {
-            String cacheFileName = JHVDirectory.PLUGINSCACHE.getPath() + url.replace("/", "_");
+            String cacheFileName = JHVDirectory.PLUGINSCACHE.getPath() + url.replace('/', '_');
             boolean loadFromFile = false;
             File f = new File(cacheFileName);
             if (f.exists() && !f.isDirectory() && f.canRead()) {
