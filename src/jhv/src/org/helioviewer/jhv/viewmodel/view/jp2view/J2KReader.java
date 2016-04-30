@@ -195,9 +195,9 @@ class J2KReader implements Runnable {
         JPIPQuery query = new JPIPQuery();
         query.setField(JPIPRequestField.CONTEXT.toString(), "jpxl<" + iniLayer + "-" + endLayer + ">");
 
-        query.setField(JPIPRequestField.FSIZ.toString(), String.valueOf(currParams.resolution.width) + "," + String.valueOf(currParams.resolution.height) + "," + "closest");
-        query.setField(JPIPRequestField.ROFF.toString(), String.valueOf(currParams.subImage.x) + "," + String.valueOf(currParams.subImage.y));
-        query.setField(JPIPRequestField.RSIZ.toString(), String.valueOf(currParams.subImage.width) + "," + String.valueOf(currParams.subImage.height));
+        query.setField(JPIPRequestField.FSIZ.toString(), Integer.toString(currParams.resolution.width) + "," + Integer.toString(currParams.resolution.height) + "," + "closest");
+        query.setField(JPIPRequestField.ROFF.toString(), Integer.toString(currParams.subImage.x) + "," + Integer.toString(currParams.subImage.y));
+        query.setField(JPIPRequestField.RSIZ.toString(), Integer.toString(currParams.subImage.width) + "," + Integer.toString(currParams.subImage.height));
 
         return query;
     }
@@ -377,7 +377,7 @@ class J2KReader implements Runnable {
                                 }
 
                                 // update requested package size
-                                stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), String.valueOf(jpipRequestLen));
+                                stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), Integer.toString(jpipRequestLen));
 
                                 req.setQuery(stepQuerys[current_step]);
                                 // Log.debug(stepQuerys[current_step].toString());

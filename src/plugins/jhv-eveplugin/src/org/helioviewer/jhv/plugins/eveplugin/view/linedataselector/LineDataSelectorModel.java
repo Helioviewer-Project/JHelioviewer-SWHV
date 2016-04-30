@@ -109,7 +109,7 @@ public class LineDataSelectorModel implements TableModel {
 
     @Override
     public String getColumnName(int columnIndex) {
-        return String.valueOf(columnIndex);
+        return Integer.toString(columnIndex);
     }
 
     @Override

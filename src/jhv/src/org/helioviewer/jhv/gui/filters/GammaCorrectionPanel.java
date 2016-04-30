@@ -54,40 +54,22 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         double gamma = Math.exp(sliderValue * factor);
         image.setGamma((float) gamma);
 
-        String text = Double.toString(Math.round(gamma * 10.0) * 0.1);
-        if (sliderValue == 100) {
-            text = text.substring(0, 4);
-        } else {
-            text = text.substring(0, 3);
-        }
-        gammaLabel.setText(text);
+        gammaLabel.setText(String.format("%.1f", gamma));
         Displayer.display();
     }
 
-    /**
-     * {@inheritDoc} In this case, does nothing.
-     */
     @Override
     public void mouseClicked(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc} In this case, does nothing.
-     */
     @Override
     public void mouseEntered(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc} In this case, does nothing.
-     */
     @Override
     public void mouseExited(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc} In this case, does nothing.
-     */
     @Override
     public void mousePressed(MouseEvent e) {
     }

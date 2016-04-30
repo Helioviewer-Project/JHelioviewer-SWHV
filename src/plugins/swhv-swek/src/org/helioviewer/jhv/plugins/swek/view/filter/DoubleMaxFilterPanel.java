@@ -36,7 +36,6 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
             ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
             params.add(paramMax);
             filterManager.addFilter(eventType, parameter, params);
-
         } else {
             filterManager.removedFilter(eventType, parameter);
         }
