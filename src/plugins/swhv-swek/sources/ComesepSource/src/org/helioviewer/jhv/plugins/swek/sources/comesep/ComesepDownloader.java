@@ -12,7 +12,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
-import org.helioviewer.jhv.database.JHVDatabase;
+import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 import org.json.JSONArray;
@@ -33,7 +33,7 @@ public class ComesepDownloader extends SWEKDownloader {
     protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
         JSONArray results = eventJSON.getJSONArray("results");
         try {
-            ArrayList<JHVDatabase.Event2Db> event2db_list = new ArrayList<JHVDatabase.Event2Db>();
+            ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<EventDatabase.Event2Db>();
             for (int i = 0; i < results.length(); i++) {
                 JSONObject result = results.getJSONObject(i);
 
@@ -54,10 +54,10 @@ public class ComesepDownloader extends SWEKDownloader {
 
                 long archiv = start;
                 String uid = result.getString("alertid");
-                event2db_list.add(new JHVDatabase.Event2Db(compressed, start, end, archiv, uid, new ArrayList<JHVDatabaseParam>()));
+                event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, new ArrayList<JHVDatabaseParam>()));
             }
 
-            int id = JHVDatabase.dump_event2db(event2db_list, type);
+            int id = EventDatabase.dump_event2db(event2db_list, type);
             if (id == -1) {
                 Log.error("failed to dump to database");
                 return false;
@@ -78,7 +78,7 @@ public class ComesepDownloader extends SWEKDownloader {
             JSONObject asobj = associations.getJSONObject(i);
             assocs[i] = new Pair<String, String>(asobj.getString("parent"), asobj.getString("child"));
         }
-        return JHVDatabase.dump_association2db(assocs) != -1;
+        return EventDatabase.dump_association2db(assocs) != -1;
     }
 
     @Override

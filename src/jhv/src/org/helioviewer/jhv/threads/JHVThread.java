@@ -14,7 +14,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.database.JHVDatabase;
+import org.helioviewer.jhv.database.EventDatabase;
 
 public class JHVThread {
 
@@ -64,7 +64,7 @@ public class JHVThread {
                 PreparedStatement pstatement = connection.prepareStatement(sqlt);
                 pstatement.setQueryTimeout(30);
                 pstatement.setInt(1, CURRENT_VERSION_SCHEMA);
-                pstatement.setInt(2, JHVDatabase.config_hash);
+                pstatement.setInt(2, EventDatabase.config_hash);
 
                 pstatement.executeUpdate();
                 pstatement.close();
@@ -97,7 +97,7 @@ public class JHVThread {
                         }
                         rs.close();
                         pstatement.close();
-                        if (found_version != CURRENT_VERSION_SCHEMA || JHVDatabase.config_hash != found_hash) {
+                        if (found_version != CURRENT_VERSION_SCHEMA || EventDatabase.config_hash != found_hash) {
                             connection.close();
                             new File(filepath).delete();
                             connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);

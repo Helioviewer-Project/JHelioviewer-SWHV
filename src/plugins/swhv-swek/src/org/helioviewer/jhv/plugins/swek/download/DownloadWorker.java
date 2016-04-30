@@ -16,8 +16,8 @@ import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.helioviewer.jhv.data.datatype.event.SWEKSource;
-import org.helioviewer.jhv.database.JHVDatabase;
-import org.helioviewer.jhv.database.JHVDatabase.JsonEvent;
+import org.helioviewer.jhv.database.EventDatabase;
+import org.helioviewer.jhv.database.EventDatabase.JsonEvent;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 
@@ -56,7 +56,7 @@ public class DownloadWorker implements Runnable {
             SWEKDownloader downloader = sourceManager.getDownloader(swekSource);
             success = downloader.extern2db(jhvType, requestInterval.start, requestInterval.end, params);
             if (success) {
-                final ArrayList<JHVAssociation> associationList = JHVDatabase.associations2Program(requestInterval.start, requestInterval.end, jhvType);
+                final ArrayList<JHVAssociation> associationList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, jhvType);
                 EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -67,7 +67,7 @@ public class DownloadWorker implements Runnable {
                     }
                 });
                 SWEKParser parser = sourceManager.getParser(swekSource);
-                ArrayList<JsonEvent> eventList = JHVDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
+                ArrayList<JsonEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
                 for (JsonEvent event : eventList) {
                     final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end, false);
                     EventQueue.invokeLater(new Runnable() {
@@ -97,7 +97,7 @@ public class DownloadWorker implements Runnable {
                     SWEKDownloadManager.getSingletonInstance().workerFinished(DownloadWorker.this);
                 }
             });
-            JHVDatabase.addDaterange2db(requestInterval.start, requestInterval.end, jhvType);
+            EventDatabase.addDaterange2db(requestInterval.start, requestInterval.end, jhvType);
         }
     }
 
