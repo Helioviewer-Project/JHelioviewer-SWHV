@@ -81,7 +81,7 @@ public class HTTPSocket extends Socket {
 
             // Sets the content length header if it's a POST
             if (req.getMethod() == HTTPRequest.Method.POST)
-                req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), String.valueOf(msgBody.getBytes("UTF-8").length));
+                req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(msgBody.getBytes("UTF-8").length));
 
             // Adds the headers
             for (String key : req.getHeaders()) {

@@ -36,11 +36,9 @@ public class DoubleMinFilterPanel extends AbstractFilterPanel {
             ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
             params.add(paramMin);
             filterManager.addFilter(eventType, parameter, params);
-
         } else {
             filterManager.removedFilter(eventType, parameter);
         }
-
     }
 
     @Override

@@ -31,7 +31,6 @@ public class JPIPRequest extends HTTPRequest {
      */
     public JPIPRequest(Method _method, Object _query) {
         super(_method);
-
         query = _query.toString();
     }
 

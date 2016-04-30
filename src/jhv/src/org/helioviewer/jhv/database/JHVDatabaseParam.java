@@ -51,4 +51,5 @@ public class JHVDatabaseParam {
     public boolean isString() {
         return isString;
     }
+
 }

@@ -152,7 +152,7 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     @Override
     public String getColumnName(int columnIndex) {
-        return String.valueOf(columnIndex);
+        return Integer.toString(columnIndex);
     }
 
     @Override

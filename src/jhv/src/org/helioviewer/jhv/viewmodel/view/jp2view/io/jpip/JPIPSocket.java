@@ -158,7 +158,7 @@ public class JPIPSocket extends HTTPSocket {
             if (!_req.headerExists(HTTPHeaderKey.CONTENT_TYPE.toString()))
                 _req.setHeader(HTTPHeaderKey.CONTENT_TYPE.toString(), "application/x-www-form-urlencoded");
             if (!_req.headerExists(HTTPHeaderKey.CONTENT_LENGTH.toString()))
-                _req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), String.valueOf(queryStr.getBytes("UTF-8").length));
+                _req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(queryStr.getBytes("UTF-8").length));
         }
 
         StringBuilder str = new StringBuilder();

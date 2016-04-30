@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -319,13 +320,14 @@ public class APIRequestManager {
         }
 
         try {
-            if (downloadURI.toString().toLowerCase().endsWith(".fits") || downloadURI.toString().toLowerCase().endsWith(".fts")) {
+            String down = downloadURI.toString().toLowerCase(Locale.ENGLISH);
+            if (down.endsWith(".fits") || down.endsWith(".fts")) {
                 return new FITSView(uri);
-            } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
+            } else if (down.endsWith(".png") || down.endsWith(".jpg") || down.endsWith(".jpeg")) {
                  return new SimpleImageView(uri);
             } else {
                 JP2Image jp2Image;
-                if (downloadURI.toString().toLowerCase().contains("callisto"))
+                if (down.contains("callisto"))
                     jp2Image = new JP2ImageCallisto(uri, downloadURI);
                 else
                     jp2Image = new JP2Image(uri, downloadURI);
