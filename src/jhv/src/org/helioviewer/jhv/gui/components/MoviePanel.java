@@ -568,6 +568,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     private static class SliderListener implements ActionListener {
+
+        private int frameRate = -1;
+
         @Override
         public void actionPerformed(ActionEvent e) {
             if (cacheChanged) {
@@ -575,12 +578,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 timeSlider.repaint();
             }
 
-            View view = Layers.getActiveView();
-            if (view == null)
-                ImageViewerGui.getFramerateStatusPanel().update(0);
-            else
-                ImageViewerGui.getFramerateStatusPanel().update(view.getCurrentFramerate());
+            int f = 0;
+            if (Layers.isMoviePlaying()) {
+                f = (int) (Layers.getActiveView().getCurrentFramerate() + 0.5f);
+            }
+
+            if (f != frameRate) {
+                frameRate = f;
+                ImageViewerGui.getFramerateStatusPanel().update(f);
+            }
         }
+
     }
 
     private static AbstractAction playPauseAction = null;
