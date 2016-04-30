@@ -9,8 +9,8 @@ public class FramerateStatusPanel extends StatusPanel.StatusPlugin {
         update(0);
     }
 
-    public void update(float fps) {
-        setText(String.format("fps: % 2d", Math.round(fps * 100) / 100));
+    public void update(int fps) {
+        setText(String.format("fps: %d", fps));
     }
 
 }
