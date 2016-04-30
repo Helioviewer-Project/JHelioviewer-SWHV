@@ -5,11 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
-import javax.swing.border.BevelBorder;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
@@ -22,8 +21,8 @@ import org.helioviewer.jhv.viewmodel.view.View;
 @SuppressWarnings("serial")
 class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
 
-    private final JComboBox zoomComboBox;
-    final JToggleButton periodFromLayersButton;
+    private final JComboBox zoomCombo;
+    final JToggleButton lockButton;
     private boolean selectedIndexSetByProgram;
 
     private enum ZOOM {
@@ -31,40 +30,41 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
     };
 
     public DrawControllerOptionsPanel() {
-        zoomComboBox = new JComboBox(new DefaultComboBoxModel());
-        fillZoomComboBox();
-        zoomComboBox.addActionListener(this);
+        zoomCombo = new JComboBox(fillZoomCombo());
+        fillZoomCombo();
+        zoomCombo.addActionListener(this);
 
-        periodFromLayersButton = new JToggleButton(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
-        periodFromLayersButton.setToolTipText("Synchronize movie and time series display");
-        periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        periodFromLayersButton.setEnabled(Layers.getActiveView() != null);
-        periodFromLayersButton.addActionListener(this);
+        lockButton = new JToggleButton(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
+        lockButton.setBorderPainted(false);
+        lockButton.setFocusPainted(false);
+        lockButton.setContentAreaFilled(false);
+        lockButton.setToolTipText("Synchronize movie and time series display");
+        lockButton.setEnabled(Layers.getActiveView() != null);
+        lockButton.addActionListener(this);
 
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        add(zoomComboBox);
-        add(periodFromLayersButton);
+        add(zoomCombo);
+        add(lockButton);
 
         setSmall();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == periodFromLayersButton) {
-            EVEPlugin.dc.setLocked(periodFromLayersButton.isSelected());
-            if (periodFromLayersButton.isSelected()) {
-                periodFromLayersButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_LINK));
-                periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        Object source = e.getSource();
+        if (source.equals(lockButton)) {
+            EVEPlugin.dc.setLocked(lockButton.isSelected());
+            if (lockButton.isSelected()) {
+                lockButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_LINK));
             } else {
-                periodFromLayersButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
-                periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                lockButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
             }
-        } else if (e.getSource().equals(zoomComboBox)) {
+        } else if (source.equals(zoomCombo)) {
             if (selectedIndexSetByProgram) {
                 selectedIndexSetByProgram = false;
                 return;
             }
-            ZoomComboboxItem item = (ZoomComboboxItem) zoomComboBox.getSelectedItem();
+            ZoomComboboxItem item = (ZoomComboboxItem) zoomCombo.getSelectedItem();
             if (item != null) {
                 zoomTo(item.zoom, item.number);
             }
@@ -84,8 +84,8 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         return true;
     }
 
-    private void fillZoomComboBox() {
-        DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
+    private ComboBoxModel fillZoomCombo() {
+        DefaultComboBoxModel model = new DefaultComboBoxModel();
         model.removeAllElements();
         model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
@@ -100,6 +100,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         addElementToModel(model, 12, ZOOM.Hour);
         addElementToModel(model, 6, ZOOM.Hour);
         addElementToModel(model, 1, ZOOM.Hour);
+        return model;
     }
 
     private static class ZoomComboboxItem {
@@ -141,7 +142,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
 
     void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
         selectedIndexSetByProgram = true;
-        zoomComboBox.setSelectedIndex(0);
+        zoomCombo.setSelectedIndex(0);
     }
 
     private void zoomTo(ZOOM zoom, long value) {

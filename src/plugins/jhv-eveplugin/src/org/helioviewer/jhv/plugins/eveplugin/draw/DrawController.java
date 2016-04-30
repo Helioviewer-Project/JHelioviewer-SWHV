@@ -243,10 +243,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     public void activeLayerChanged(View view) {
         if (view == null) {
             fireRedrawRequestMovieFrameChanged(Long.MIN_VALUE);
-            optionsPanel.periodFromLayersButton.setEnabled(false);
+            optionsPanel.lockButton.setEnabled(false);
         } else {
             fireMovieIntervalChanged(view.getFirstTime().milli, view.getLastTime().milli);
-            optionsPanel.periodFromLayersButton.setEnabled(true);
+            optionsPanel.lockButton.setEnabled(true);
         }
     }
 
