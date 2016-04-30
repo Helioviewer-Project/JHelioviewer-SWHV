@@ -15,7 +15,7 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
-import org.helioviewer.jhv.database.JHVDatabase;
+import org.helioviewer.jhv.database.EventDatabase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,7 +24,7 @@ public abstract class SWEKDownloader {
     protected boolean overmax = true;
 
     public boolean extern2db(JHVEventType eventType, long start, long end, List<SWEKParam> params) {
-        ArrayList<Interval> range = JHVDatabase.db2daterange(eventType);
+        ArrayList<Interval> range = EventDatabase.db2daterange(eventType);
         for (Interval interval : range) {
             if (interval.start <= start && interval.end >= end) {
                 return true;

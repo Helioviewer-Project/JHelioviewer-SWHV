@@ -30,7 +30,7 @@ import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
-public class JHVDatabase {
+public class EventDatabase {
 
     public static class Event2Db {
         final byte[] compressedJson;

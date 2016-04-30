@@ -32,7 +32,7 @@ import org.helioviewer.jhv.data.datatype.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.datatype.event.SWEKSource;
 import org.helioviewer.jhv.data.datatype.event.SWEKSpatialRegion;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
-import org.helioviewer.jhv.database.JHVDatabase;
+import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
@@ -278,7 +278,7 @@ public class SWEKConfigurationManager {
     private boolean parseConfigFile() {
         try {
             JSONObject configJSON = JSONUtils.getJSONStream(configFileURL.openStream());
-            JHVDatabase.config_hash = Arrays.hashCode(configJSON.toString().toCharArray());
+            EventDatabase.config_hash = Arrays.hashCode(configJSON.toString().toCharArray());
             return parseJSONConfig(configJSON);
         } catch (IOException e) {
             Log.debug("Configuration file could not be parsed: " + e);
