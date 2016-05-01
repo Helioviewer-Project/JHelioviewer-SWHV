@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -31,8 +30,6 @@ public class DrawConstants {
 
     public static final Color MOVIE_FRAME_COLOR = Color.BLACK;
     public static final Color MOVIE_INTERVAL_COLOR = Color.LIGHT_GRAY;
-
-    public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###,##0.00");
 
     public static final SimpleDateFormat FULL_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd\nHH:mm:ss");
     public static final SimpleDateFormat FULL_DATE_TIME_FORMAT_NO_SEC = new SimpleDateFormat("yyyy-MM-dd\nHH:mm");
