@@ -40,7 +40,7 @@ public class Band implements LineDataSelectorElement {
 
         EVEPlugin.dc.fireRedrawRequest();
         EVEPlugin.ldsm.addLineData(this);
-        yAxis = new YAxis(Math.pow(10, -7), Math.pow(10, -3), bandType.getUnitLabel(), true);
+        yAxis = new YAxis(Math.pow(10, -7), Math.pow(10, -3), bandType.getUnitLabel(), bandType.isLogScale());
     }
 
     public final BandType getBandType() {

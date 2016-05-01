@@ -21,6 +21,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -47,6 +49,8 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 
 @SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
+
+    private static final DecimalFormat formatter = MathUtils.numberFormatter("0", 4);
 
     private final DrawController drawController;
     private long movieTimestamp = Long.MIN_VALUE;
@@ -300,14 +304,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawHorizontalTickline(Graphics g, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt) {
-        String tickText;
-        if (tick == (long) tick) {
-            tickText = String.format("%d", (long) tick);
-        } else {
-            tickText = String.format("%s", tick);
-        }
+        String tickText = formatter.format(tick);
         int y = yAxis.scaledvalue2pixel(graphArea.y, graphArea.height, tick);
-        final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
+        Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
         int x_str;
         if (leftSide == 0) {
             x_str = axis_x_offset - 6 - (int) bounds.getWidth();

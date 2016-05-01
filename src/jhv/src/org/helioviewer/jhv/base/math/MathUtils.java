@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.base.math;
 
+import java.text.DecimalFormat;
 
 /**
  * A collection of useful static methods.
@@ -82,6 +83,12 @@ public class MathUtils {
             x += 360;
 
         return x;
+    }
+
+    public static DecimalFormat numberFormatter(String pattern, int maxDigits) {
+        DecimalFormat f = new DecimalFormat(pattern /*, DecimalFormatSymbols.getInstance(Locale.ENGLISH)*/);
+        f.setMaximumFractionDigits(maxDigits);
+        return f;
     }
 
 }

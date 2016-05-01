@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
 import java.nio.FloatBuffer;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.scale.GridScale;
@@ -45,6 +47,9 @@ public class RenderableGrid extends AbstractRenderable {
 
     private static final float[] firstColor = new float[] { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f };
     private static final float[] secondColor = new float[] { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f };
+
+    private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
+    private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
     private float lonstepDegrees = 15f;
     private float latstepDegrees = 20f;
@@ -150,11 +155,11 @@ public class RenderableGrid extends AbstractRenderable {
                     continue;
                 }
                 float start = -w / 2 + i * w / FLAT_STEPS_THETA;
-                String label = formatStrip2(scale.getInterpolatedXValue(1. / FLAT_STEPS_THETA * i));
+                String label = formatter2.format(scale.getInterpolatedXValue(1. / FLAT_STEPS_THETA * i));
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
             for (int i = 0; i < (FLAT_STEPS_RADIAL + 1); ++i) {
-                String label = formatStrip2(scale.getInterpolatedYValue(1. / FLAT_STEPS_RADIAL * i));
+                String label = formatter2.format(scale.getInterpolatedYValue(1. / FLAT_STEPS_RADIAL * i));
                 float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
                 renderer.draw3D(label, 0, start, 0, textScaleFactor);
             }
@@ -366,24 +371,6 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glPopMatrix();
     }
 
-    private static String formatStrip(double v) {
-        String txt = String.format("%.1f", v);
-        if (txt.endsWith("0")) {
-            txt = txt.substring(0, txt.length() - 2);
-        }
-        return txt;
-    }
-
-    private static String formatStrip2(double v) {
-        String txt = String.format("%.2f", v);
-        if (txt.endsWith("00")) {
-            txt = txt.substring(0, txt.length() - 3);
-        } else if (txt.endsWith("0")) {
-            txt = txt.substring(0, txt.length() - 1);
-        }
-        return txt;
-    }
-
     private static class GridLabel {
         protected String txt;
         protected float x;
@@ -411,7 +398,7 @@ public class RenderableGrid extends AbstractRenderable {
 
         for (double phi = 0; phi < 360; phi += STEP_DEGREES) {
             double angle = -phi * Math.PI / 180.;
-            String txt = formatStrip(phi);
+            String txt = formatter1.format(phi);
             radialLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
         }
     }
@@ -426,7 +413,7 @@ public class RenderableGrid extends AbstractRenderable {
 
         for (double phi = 0; phi <= 90; phi += latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
-            String txt = formatStrip(phi);
+            String txt = formatter1.format(phi);
 
             latLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
             if (phi != 90) {
@@ -435,7 +422,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
         for (double phi = -latstepDegrees; phi >= -90; phi -= latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
-            String txt = formatStrip(phi);
+            String txt = formatter1.format(phi);
 
             latLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
             if (phi != -90) {
@@ -452,16 +439,16 @@ public class RenderableGrid extends AbstractRenderable {
 
         for (double theta = 0; theta <= 180.; theta += lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
-            txt = formatStrip(theta);
+            txt = formatter1.format(theta);
             lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
         for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
 
             if (gridChoice == GridChoiceType.CARRINGTON) {
-                txt = formatStrip(theta + 360);
+                txt = formatter1.format(theta + 360);
             } else {
-                txt = formatStrip(theta);
+                txt = formatter1.format(theta);
             }
             lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
