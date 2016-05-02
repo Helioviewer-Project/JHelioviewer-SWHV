@@ -160,12 +160,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         if (pi == null)
             return;
 
-        List<Vec3> points = pi.getBoundCC();
-        if (points == null || points.isEmpty()) {
-            points = pi.getBoundBox();
-            if (points == null || points.isEmpty()) {
-                return;
-            }
+        float[] points = pi.getBoundBox();
+        if (points.length == 0) {
+            return;
         }
 
         Color color = evtr.getColor();
@@ -175,16 +172,17 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         // draw bounds
         Vec3 pt = new Vec3();
-        Vec3 oldBoundaryPoint3d = null;
+        float[] oldBoundaryPoint3d = new float[0];
         Vec2 previous = null;
-        for (Vec3 point : points) {
+        int plen = points.length / 3;
+        for (int i = 0; i < plen; i++) {
             gl.glBegin(GL2.GL_LINE_STRIP);
-            if (oldBoundaryPoint3d != null) {
+            if (oldBoundaryPoint3d.length != 0) {
                 for (int j = 0; j <= DIVPOINTS; j++) {
                     double alpha = 1. - j / (double) DIVPOINTS;
-                    double xnew = alpha * oldBoundaryPoint3d.x + (1 - alpha) * point.x;
-                    double ynew = alpha * oldBoundaryPoint3d.y + (1 - alpha) * point.y;
-                    double znew = alpha * oldBoundaryPoint3d.z + (1 - alpha) * point.z;
+                    double xnew = alpha * oldBoundaryPoint3d[0] + (1 - alpha) * points[3 * i];
+                    double ynew = alpha * oldBoundaryPoint3d[1] + (1 - alpha) * points[3 * i + 1];
+                    double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
 
                     if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
@@ -198,7 +196,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 }
             }
             gl.glEnd();
-            oldBoundaryPoint3d = point;
+            oldBoundaryPoint3d = new float[] { points[3 * i], points[3 * i + 1], points[3 * i + 2] };
         }
     }
 
