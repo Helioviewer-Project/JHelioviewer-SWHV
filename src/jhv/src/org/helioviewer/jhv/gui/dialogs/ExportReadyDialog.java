@@ -19,21 +19,15 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 @SuppressWarnings("serial")
-public class NewVersionDialog extends JDialog implements ActionListener, ShowableDialog {
-
-    // setting for check.update.next
-    private int nextCheck = 0;
-
-    // suspended startups when clicked remindMeLater
-    private static final int suspendedStarts = 5;
+public class ExportReadyDialog extends JDialog implements ActionListener, ShowableDialog {
 
     private final JTextPane messagePane = new JTextPane();
 
-    public NewVersionDialog(boolean verbose) {
+    public ExportReadyDialog() {
         super(ImageViewerGui.getMainFrame(), false);
         setLayout(new BorderLayout());
         setResizable(false);
-        setTitle("New Version Available");
+        setTitle("Recording Ready");
 
         messagePane.setContentType("text/html");
         messagePane.setOpaque(false);
@@ -49,29 +43,9 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
         closeButtonContainer.add(closeButton);
         closeButton.addActionListener(this);
 
-        if (!verbose) {
-            JButton laterButton = new JButton("Remind me later");
-            closeButtonContainer.add(laterButton);
-            laterButton.addActionListener(this);
-            laterButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent arg) {
-                    nextCheck = suspendedStarts;
-                }
-            });
-        }
-
-        JButton downloadButton = new JButton("Download");
-        closeButtonContainer.add(downloadButton);
-        downloadButton.addActionListener(this);
-        downloadButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                JHVGlobals.openURL(JHVGlobals.downloadURL);
-            }
-        });
-
         add(closeButtonContainer, BorderLayout.SOUTH);
 
-        getRootPane().setDefaultButton(downloadButton);
+        getRootPane().setDefaultButton(closeButton);
         getRootPane().registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
@@ -94,10 +68,6 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
     @Override
     public void actionPerformed(ActionEvent a) {
         dispose();
-    }
-
-    public int getNextCheck() {
-        return nextCheck;
     }
 
 }

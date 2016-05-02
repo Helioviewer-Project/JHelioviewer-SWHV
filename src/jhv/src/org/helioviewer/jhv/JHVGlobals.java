@@ -18,6 +18,7 @@ import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.base.AlphanumComparator;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.gui.dialogs.ExportReadyDialog;
 import org.helioviewer.jhv.threads.JHVExecutor;
 
 /**
@@ -185,9 +186,12 @@ public class JHVGlobals {
         }
     }
 
-    public static void displayNotification(String msg, String openURL) {
+    public static void displayNotification(String moviePath) {
+        String openURL = new File(moviePath).toURI().toString();
+
         if (System.getProperty("jhv.os").equals("mac")) {
             try {
+                String msg = "Export of " + moviePath + " finished.";
                 File jarPath = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI());
                 String[] cmd = new String[] {
                     jarPath.getCanonicalFile().getParentFile().getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
@@ -197,11 +201,19 @@ public class JHVGlobals {
                 };
                 Log.info(">> displayNotification " + Arrays.toString(cmd));
                 Runtime.getRuntime().exec(cmd);
+                return;
             } catch (Exception e) {
                 StringWriter errors = new StringWriter();
                 e.printStackTrace(new PrintWriter(errors));
                 Log.error(">> displayNotification " + errors);
             }
+        }
+        // otherwise
+        try {
+            ExportReadyDialog dialog = new ExportReadyDialog();
+            dialog.init("Export of <a href=\"" + openURL + "\">" + moviePath + "</a> finished.");
+            dialog.showDialog();
+        } catch (Exception e) {
         }
     }
 
