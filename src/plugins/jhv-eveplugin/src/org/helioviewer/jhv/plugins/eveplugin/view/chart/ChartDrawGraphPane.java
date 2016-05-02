@@ -394,7 +394,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (overMovieLine(p)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
             dragMode = DragMode.MOVIELINE;
-        } else if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
+        } else {
             setCursor(UIGlobals.closedHandCursor);
             dragMode = DragMode.CHART;
         }
@@ -406,12 +406,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         switch (dragMode) {
         case CHART:
-            if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
-                setCursor(UIGlobals.openHandCursor);
-            } else {
-                setCursor(Cursor.getDefaultCursor());
-            }
-
+            setCursor(UIGlobals.openHandCursor);
             if (mousePressedPosition != null && mouseDragPosition != null) {
                 drawController.moveX(mousePressedPosition.x - p.x);
                 drawController.moveAllAxes(p.y - mousePressedPosition.y);
