@@ -49,6 +49,9 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 
 @SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
+    public enum DragMode {
+        MOVIELINE, CHART, NODRAG
+    }
 
     private static final DecimalFormat formatter = MathUtils.numberFormatter("0", 4);
 
@@ -71,6 +74,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private boolean movieLineRequest = false;
     private boolean forceRedrawGraph = false;
+    private DragMode dragMode = DragMode.NODRAG;
 
     public ChartDrawGraphPane() {
         setOpaque(true);
@@ -387,25 +391,39 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
         mousePressedPosition = p;
-        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
+        if (overMovieLine(p)) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+            dragMode = DragMode.MOVIELINE;
+        } else if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.closedHandCursor);
+            dragMode = DragMode.CHART;
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         Point p = e.getPoint();
-        if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
-            setCursor(UIGlobals.openHandCursor);
-        } else {
-            setCursor(Cursor.getDefaultCursor());
-        }
 
-        if (mousePressedPosition != null && mouseDragPosition != null) {
-            drawController.moveX(mousePressedPosition.x - p.x);
-            drawController.moveAllAxes(p.y - mousePressedPosition.y);
-        }
+        switch (dragMode) {
+        case CHART:
+            if (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y >= graphArea.y && p.y <= graphArea.y + graphArea.height) {
+                setCursor(UIGlobals.openHandCursor);
+            } else {
+                setCursor(Cursor.getDefaultCursor());
+            }
 
+            if (mousePressedPosition != null && mouseDragPosition != null) {
+                drawController.moveX(mousePressedPosition.x - p.x);
+                drawController.moveAllAxes(p.y - mousePressedPosition.y);
+            }
+            break;
+        case MOVIELINE:
+            setMovieFrameManually(p);
+            break;
+        default:
+            break;
+        }
+        dragMode = DragMode.NODRAG;
         mousePressedPosition = null;
         mouseDragPosition = null;
     }
@@ -415,18 +433,31 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Point p = e.getPoint();
         mouseDragPosition = p;
         if (mousePressedPosition != null) {
-            setCursor(UIGlobals.closedHandCursor);
-            drawController.moveX(mousePressedPosition.x - p.x);
-            drawController.moveY(p, p.y - mousePressedPosition.y);
+            switch (dragMode) {
+            case CHART:
+                setCursor(UIGlobals.closedHandCursor);
+                drawController.moveX(mousePressedPosition.x - p.x);
+                drawController.moveY(p, p.y - mousePressedPosition.y);
+                break;
+            case MOVIELINE:
+                setMovieFrameManually(p);
+                break;
+            default:
+                break;
+            }
         }
         mousePressedPosition = p;
     }
 
+    private boolean overMovieLine(Point p) {
+        Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
+        return movieLinePosition >= 0 && frame.contains(p);
+    }
+
     @Override
     public void mouseMoved(MouseEvent e) {
-        Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
         mousePosition = e.getPoint();
-        if (movieLinePosition >= 0 && frame.contains(mousePosition)) {
+        if (overMovieLine(mousePosition)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
         } else if (EventModel.getSingletonInstance().getEventUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
