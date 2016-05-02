@@ -21,6 +21,9 @@ public class YAxis {
     private final static float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
     private final static float UNSCALED_MAX_BOUND = Float.MAX_VALUE;
 
+    private final double scaledMinBound;
+    private final double scaledMaxBound;
+
     public YAxis(double _start, double _end, String label, boolean isLogScale) {
         start = _start;
         end = _end;
@@ -29,6 +32,8 @@ public class YAxis {
         } else {
             scale = new YAxisPositiveIdentityScale(label);
         }
+        scaledMinBound = scale(UNSCALED_MIN_BOUND);
+        scaledMaxBound = scale(UNSCALED_MAX_BOUND);
     }
 
     public void reset(double _start, double _end) {
@@ -64,13 +69,13 @@ public class YAxis {
         double shift = distanceY * ratioValue;
         double startValue = scaledMin + shift;
         double endValue = scaledMax + shift;
-        if (startValue < scale(UNSCALED_MIN_BOUND)) {
+        if (startValue < scaledMinBound) {
             double oldStart = startValue;
-            startValue = scale(UNSCALED_MIN_BOUND);
+            startValue = scaledMinBound;
             endValue = startValue + (endValue - oldStart);
-        } else if (endValue > scale(UNSCALED_MAX_BOUND)) {
+        } else if (endValue > scaledMaxBound) {
             double oldEnd = endValue;
-            endValue = scale(UNSCALED_MAX_BOUND);
+            endValue = scaledMaxBound;
             startValue = endValue - (oldEnd - startValue);
         }
         start = invScale(startValue);
@@ -86,8 +91,8 @@ public class YAxis {
         double newScaledMin = (1 + delta) * scaledMin - delta * scaled;
         double newScaledMax = (1 + delta) * scaledMax - delta * scaled;
 
-        newScaledMin = Math.max(scale(UNSCALED_MIN_BOUND), newScaledMin);
-        newScaledMax = Math.min(scale(UNSCALED_MAX_BOUND), newScaledMax);
+        newScaledMin = Math.max(scaledMinBound, newScaledMin);
+        newScaledMax = Math.min(scaledMaxBound, newScaledMax);
 
         start = invScale(newScaledMin);
         end = invScale(newScaledMax);
@@ -97,7 +102,7 @@ public class YAxis {
         return scale.scale(maxValue);
     }
 
-    public double invScale(double maxValue) {
+    private double invScale(double maxValue) {
         return scale.invScale(maxValue);
     }
 
