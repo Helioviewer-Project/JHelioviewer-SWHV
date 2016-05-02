@@ -22,7 +22,6 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 
@@ -39,8 +38,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     private int leftIntervalBorderPosition = -10;
     private int rightIntervalBorderPosition = -10;
 
-    private final EVEState eveState;
-
     public ChartDrawIntervalPane() {
         setPreferredSize(new Dimension(getPreferredSize().width, DrawConstants.INTERVAL_SELECTION_HEIGHT));
         setSize(getPreferredSize());
@@ -49,7 +46,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         addMouseMotionListener(this);
 
         EVEPlugin.dc.addDrawControllerListener(this);
-        eveState = EVEState.getSingletonInstance();
     }
 
     @Override
@@ -410,7 +406,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     public void mouseReleased(MouseEvent e) {
         Point p = e.getPoint();
 
-        eveState.setMouseTimeIntervalDragging(false);
         if (mouseOverInterval) {
             moveSelectedInterval(p);
             setCursor(UIGlobals.openHandCursor);
@@ -424,7 +419,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        eveState.setMouseTimeIntervalDragging(true);
         if (mouseOverInterval) {
             moveSelectedInterval(e.getPoint());
         }
