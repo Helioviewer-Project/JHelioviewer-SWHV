@@ -120,8 +120,7 @@ public class RadioData implements LineDataSelectorElement {
                 } else {
                     v.abolish();
                 }
-            }
-            else {
+            } else {
                 if (jpxData != null)
                     jpxData.downloadJPXFailed();
             }
@@ -150,8 +149,8 @@ public class RadioData implements LineDataSelectorElement {
 
     @Override
     public void removeLineData() {
-        clearCache();
-        EVEPlugin.ldsm.removeLineData(this);
+        //clearCache();
+        //EVEPlugin.ldsm.removeLineData(this);
     }
 
     @Override
