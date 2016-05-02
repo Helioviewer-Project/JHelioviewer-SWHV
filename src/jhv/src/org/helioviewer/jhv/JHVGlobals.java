@@ -171,13 +171,6 @@ public class JHVGlobals {
 
     }
 
-    /**
-     * Opens the specified web page in the default web browser
-     *
-     * @param url
-     *            A web address (URL) of a web page (e.g
-     *            "http://www.jhelioviewer.org/")
-     */
     public static void openURL(String url) {
         try {
             Desktop.getDesktop().browse(new URI(url));
