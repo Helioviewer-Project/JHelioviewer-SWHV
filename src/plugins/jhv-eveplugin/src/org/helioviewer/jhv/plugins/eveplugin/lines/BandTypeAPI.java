@@ -94,11 +94,12 @@ public class BandTypeAPI {
                 if (job.has("name")) {
                     bandtypes[i].setName((String) job.get("name"));
                 }
-                if (job.has("min")) {
-                    bandtypes[i].setMin(job.getDouble("min"));
-                }
-                if (job.has("max")) {
-                    bandtypes[i].setMax(job.getDouble("max"));
+                if (job.has("range")) {
+                    JSONArray rangeArray = job.getJSONArray("range");
+                    Double v0 = rangeArray.getDouble(0);
+                    Double v1 = rangeArray.getDouble(1);
+                    bandtypes[i].setMin(v0);
+                    bandtypes[i].setMax(v1);
                 }
                 if (job.has("unitLabel")) {
                     bandtypes[i].setUnitLabel((String) job.get("unitLabel"));
