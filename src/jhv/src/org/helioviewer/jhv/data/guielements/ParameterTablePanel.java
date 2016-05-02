@@ -52,7 +52,7 @@ public class ParameterTablePanel extends JPanel {
         table.setRowSorter(sorter);
 
         WrappedTextCellRenderer renderer = new WrappedTextCellRenderer();
-        table.setDefaultRenderer(String.class, renderer);
+        table.getColumnModel().getColumn(1).setCellRenderer(renderer);
         table.addMouseMotionListener(renderer);
         table.addMouseListener(renderer);
 
@@ -74,18 +74,20 @@ public class ParameterTablePanel extends JPanel {
             String str = "" + value;
 
             if (isRolloverCell(table, row, column) && isValueURL(value)) {
-                setText("<html><u><font color='blue'>" + str + "</font></u></html>");
+                setText("<u><font color='blue'>" + str + "</font></u>");
             } else if (isValueURL(value)) {
-                setText("<html><font color='blue'>" + str + "</font></u></html>");
+                setText("<font color='blue'>" + str + "</font></u>");
             } else {
                 setText(str);
             }
 
+            /*
             int h = getPreferredSize().height;
             setSize(table.getColumnModel().getColumn(column).getWidth(), h);
             if (table.getRowHeight(row) != h) {
                 table.setRowHeight(row, h);
             }
+            */
             return this;
         }
 

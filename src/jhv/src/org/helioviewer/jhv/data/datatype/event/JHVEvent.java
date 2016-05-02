@@ -69,7 +69,7 @@ public class JHVEvent {
     }
 
     public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured, boolean full) {
-        String keyString = parameter.getParameterName();
+        String keyString = parameter.getParameterName(); // interned
         if (!visible && !full)
             if (keyString != "cme_radiallinvel" && keyString != "event_coord1" && keyString != "cme_angularwidth") {
                 return;
@@ -113,4 +113,5 @@ public class JHVEvent {
         allParametersArray = new ArrayList<JHVEventParameter>();
         visibleParametersArray = new ArrayList<JHVEventParameter>();
     }
+
 }
