@@ -13,6 +13,9 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
 import org.helioviewer.jhv.base.AlphanumComparator;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.threads.JHVExecutor;
@@ -152,6 +155,19 @@ public class JHVGlobals {
                 f.mkdirs();
             }
         }
+    }
+
+    public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
+
+    private static class HyperOpenURL implements HyperlinkListener  {
+
+        @Override
+        public void hyperlinkUpdate(HyperlinkEvent e) {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                openURL(e.getURL().toString());
+            }
+        }
+
     }
 
     /**
