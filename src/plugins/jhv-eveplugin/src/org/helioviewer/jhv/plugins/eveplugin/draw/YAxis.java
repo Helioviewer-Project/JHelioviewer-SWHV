@@ -27,7 +27,7 @@ public class YAxis {
         if (isLogScale) {
             scale = new YAxisLogScale(label);
         } else {
-            scale = new YAxisIdentityScale(label);
+            scale = new YAxisPositiveIdentityScale(label);
         }
     }
 
@@ -133,16 +133,18 @@ public class YAxis {
         }
     }
 
-    private static class YAxisIdentityScale implements YAxisScale {
+    private static class YAxisPositiveIdentityScale implements YAxisScale {
 
         private final String label;
 
-        public YAxisIdentityScale(String _label) {
+        public YAxisPositiveIdentityScale(String _label) {
             label = _label.replace("^2", "\u00B2");
         }
 
         @Override
         public double scale(double val) {
+            if (val < 0)
+                return 0;
             return val;
         }
 
