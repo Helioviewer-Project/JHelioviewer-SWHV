@@ -110,7 +110,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             if (el.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
                     el.resetAxis();
-                } else {
+                } else if (!inRightYAxes && !inLeftYAxis) {
                     el.zoomToFitAxis();
                 }
                 ct++;
