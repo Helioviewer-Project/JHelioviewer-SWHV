@@ -63,29 +63,22 @@ public class JHVEventParameter {
      * Gets the parameter display value
      */
     public String getDisplayParameterValue() {
-        return beautifyParameterValue(parameterValue);
+        return beautifyValue(parameterValue);
     }
 
-    private String beautifyParameterValue(String parameterValue) {
-        if (isDouble(parameterValue) && !isInteger(parameterValue)) {
+    private String beautifyValue(String value) {
+        if (Regex.FloatingPoint.matcher(value).matches() &&
+            !Regex.Integer.matcher(value).matches()) {
             NumberFormat formatter = new DecimalFormat("0.###E0");
-            String result = formatter.format(Double.parseDouble(parameterValue));
+            String result = formatter.format(Double.parseDouble(value));
             if (result.contains("E0")) {
                 return result.substring(0, result.length() - 2);
             } else {
                 return result;
             }
         } else {
-            return parameterValue;
+            return value;
         }
-    }
-
-    private boolean isDouble(String value) {
-        return value != null && Regex.FloatingPoint.matcher(value).matches();
-    }
-
-    private boolean isInteger(String value) {
-        return value != null && Regex.Integer.matcher(value).matches();
     }
 
     @Override
