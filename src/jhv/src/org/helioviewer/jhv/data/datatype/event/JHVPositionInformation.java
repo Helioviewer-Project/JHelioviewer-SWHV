@@ -7,12 +7,13 @@ import org.helioviewer.jhv.base.math.Vec3;
 
 public class JHVPositionInformation {
 
-    private final float[] centralPoint;
+    private final Vec3 centralPoint;
     private final float[] boundBox;
     private final Position.Q earthPosition;
 
     public JHVPositionInformation(Vec3 _centralPoint, List<Vec3> _boundBox, List<Vec3> _boundBoxCC, Position.Q p) {
-        centralPoint = new float[] { (float) _centralPoint.x, (float) _centralPoint.y, (float) _centralPoint.z };
+        centralPoint = _centralPoint;
+
         List<Vec3> tempboundBox = _boundBoxCC;
         if (_boundBoxCC == null || _boundBoxCC.isEmpty()) {
             tempboundBox = _boundBox;
@@ -35,7 +36,7 @@ public class JHVPositionInformation {
     }
 
     public Vec3 centralPoint() {
-        return new Vec3(centralPoint[0], centralPoint[1], centralPoint[2]);
+        return centralPoint;
     }
 
     public float[] getBoundBox() {
