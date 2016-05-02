@@ -45,6 +45,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.events.EventModel;
+import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 @SuppressWarnings("serial")
@@ -163,7 +164,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (LineDataSelectorElement el : els) {
             el.draw(plotG, graphArea, leftAxisArea, drawController.selectedAxis, mousePosition);
         }
-        drawLabels(plotG, graphArea);
+        drawLabels(plotG, graphArea, drawController.selectedAxis);
     }
 
     private void updateDrawInformation() {
@@ -176,7 +177,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.fillRect(0, 0, getWidth(), getHeight());
     }
 
-    private void drawLabels(Graphics2D g, Rectangle graphArea) {
+    private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
         g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(0, 0, graphSize.width, DrawConstants.GRAPH_TOP_SPACE);
         g.fillRect(0, graphArea.height + DrawConstants.GRAPH_TOP_SPACE, graphSize.width, graphSize.height);
@@ -198,7 +199,46 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawNoData(g, graphArea);
             return;
         }
-        drawHorizontalLabels(g, graphArea, EVEPlugin.dc.selectedAxis, c);
+        drawHorizontalLabels(g, graphArea, timeAxis, c);
+
+        drawTimelineValues(g, timeAxis);
+    }
+
+    private void drawTimelineValues(Graphics2D g, TimeAxis timeAxis) {
+        if (mousePosition == null)
+            return;
+        long ts = timeAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
+        String lbl = "(" + TimeUtils.utcDateFormat.format(ts);
+        int currWidth = 0;
+        g.setColor(Color.BLACK);
+        g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
+        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
+        currWidth += (int) tickTextBounds.getWidth();
+
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            if (el.isVisible() && el instanceof Band) {
+                Band band = (Band) el;
+                lbl = ", ";
+                g.setColor(Color.BLACK);
+                g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
+                tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
+                currWidth += (int) tickTextBounds.getWidth();
+                float val = band.getValue(ts);
+                if (val == Float.MIN_VALUE) {
+                    lbl = "--";
+                } else {
+                    lbl = formatter.format(band.getValue(ts));
+                }
+                g.setColor(band.getDataColor());
+                g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
+                tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
+                currWidth += (int) tickTextBounds.getWidth();
+            }
+        }
+        g.setColor(Color.BLACK);
+        lbl = ")";
+        g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
+
     }
 
     private void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Color c) {
@@ -295,18 +335,18 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             }
             double tick = startv;
             int ct = 0;
-            drawHorizontalTickline(g, yAxis, start, axis_x_offset, leftSide, false);
+            drawHorizontalTickline(g, graphArea, yAxis, start, axis_x_offset, leftSide, false);
             while (tick <= endv && ct < 20) {
                 if (tick >= start && tick <= end)
-                    drawHorizontalTickline(g, yAxis, tick, axis_x_offset, leftSide, true);
+                    drawHorizontalTickline(g, graphArea, yAxis, tick, axis_x_offset, leftSide, true);
                 tick += step;
                 ct++;
             }
-            drawHorizontalTickline(g, yAxis, end, axis_x_offset, leftSide, false);
+            drawHorizontalTickline(g, graphArea, yAxis, end, axis_x_offset, leftSide, false);
         }
     }
 
-    private void drawHorizontalTickline(Graphics g, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt) {
+    private void drawHorizontalTickline(Graphics g, Rectangle graphArea, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt) {
         String tickText = formatter.format(tick);
         int y = yAxis.scaledvalue2pixel(graphArea.y, graphArea.height, tick);
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);

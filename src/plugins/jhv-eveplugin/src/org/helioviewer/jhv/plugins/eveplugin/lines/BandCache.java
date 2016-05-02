@@ -112,6 +112,21 @@ public class BandCache {
         }
     }
 
+    public float getValue(long ts) {
+        long key = date2key(ts);
+        DataChunk cache = cacheMap.get(key);
+        if (cache != null) {
+            long[] dates = cache.getDates(0);
+            int len = dates.length;
+            int idx = (int) (len * 1. * (ts - dates[0]) / (dates[len - 1] - dates[0]));
+
+            if (idx >= 0 && idx < len) {
+                return cache.getValues(0)[idx];
+            }
+        }
+        return Float.MIN_VALUE;
+    }
+
     private static class DataChunk {
         private final float[][] values = new float[MAX_LEVEL][];
         private final long[][] dates = new long[MAX_LEVEL][];

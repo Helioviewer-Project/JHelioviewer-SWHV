@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -121,6 +123,8 @@ public class Band implements LineDataSelectorElement {
         return isVisible;
     }
 
+    private static DecimalFormat formatter = MathUtils.numberFormatter("0", 4);
+
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
@@ -157,6 +161,13 @@ public class Band implements LineDataSelectorElement {
             graphPolylines.clear();
             bandCache.createPolyLines(timeAxis, yAxis, graphPolylines);
         }
+    }
+
+    public float getValue(long ts) {
+        float val = bandCache.getValue(ts);
+        if (val == Float.MIN_VALUE)
+            return val;
+        return (float) yAxis.scale(val);
     }
 
     private void setWarn(LinkedList<Integer> _warnLevels, LinkedList<String> _warnLabels) {
