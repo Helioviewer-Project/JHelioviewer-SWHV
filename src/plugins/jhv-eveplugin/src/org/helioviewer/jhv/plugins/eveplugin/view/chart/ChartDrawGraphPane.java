@@ -50,7 +50,8 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 
 @SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
-    public enum DragMode {
+
+    private enum DragMode {
         MOVIELINE, CHART, NODRAG
     }
 
@@ -238,7 +239,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.setColor(Color.BLACK);
         lbl = ")";
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
-
     }
 
     private void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Color c) {
@@ -274,8 +274,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 tickTextBounds = g.getFontMetrics().getStringBounds(line, g);
                 tickTextWidth = (int) tickTextBounds.getWidth();
                 int xl = x - (tickTextWidth / 2);
-                if (xl > getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth) {
-                    xl = getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth;
+
+                int xend = getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth;
+                if (xl > xend) {
+                    xl = xend;
                 }
                 g.drawString(line, xl, yl);
                 yl += g.getFontMetrics().getHeight() * 2 / 3;
@@ -404,13 +406,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        Point p = e.getPoint();
         if (e.getClickCount() == 2) {
-            doubleClicked(e);
+            doubleClicked(p);
             return;
         }
-        JHVRelatedEvents event = eventModel.getEventUnderMouse();
-        Point p = e.getPoint();
 
+        JHVRelatedEvents event = eventModel.getEventUnderMouse();
         if (event != null) {
             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(drawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x)));
             dialog.setLocation(e.getLocationOnScreen());
@@ -422,8 +424,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private void doubleClicked(MouseEvent e) {
-        drawController.resetAxis(e.getPoint());
+    private void doubleClicked(Point p) {
+        drawController.resetAxis(p);
     }
 
     @Override
