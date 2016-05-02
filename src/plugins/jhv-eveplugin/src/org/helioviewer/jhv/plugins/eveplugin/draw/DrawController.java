@@ -91,6 +91,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                     if (zoom)
                         el.getYAxis().zoomSelectedRange(scrollDistance, graphSize.height - p.y - graphArea.y, graphArea.height);
                     el.yaxisChanged();
+                } else if ((!inRightYAxes && !inLeftYAxis) && move) {
+                    el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
                 }
                 ct++;
             }

@@ -297,7 +297,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     drawHorizontalTickline(g, yAxis, tick, axis_x_offset, leftSide, true);
                 tick += step;
                 ct++;
-
             }
             drawHorizontalTickline(g, yAxis, end, axis_x_offset, leftSide, false);
         }
