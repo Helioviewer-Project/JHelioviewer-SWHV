@@ -41,4 +41,8 @@ public interface LineDataSelectorElement {
 
     public abstract void yaxisChanged();
 
+    public abstract void zoomToFitAxis();
+
+    public abstract void resetAxis();
+
 }
