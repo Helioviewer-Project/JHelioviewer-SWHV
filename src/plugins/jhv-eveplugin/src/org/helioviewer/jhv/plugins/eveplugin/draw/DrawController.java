@@ -72,7 +72,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         setAvailableInterval();
     }
 
-    public void zoomX(int x, double factor) {
+    private void zoomX(int x, double factor) {
         selectedAxis.zoom(graphArea.x, graphArea.width, x, factor);
         setAvailableInterval();
     }
@@ -123,7 +123,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         moveAndZoomY(p, distanceY, 0, false, true);
     }
 
-    public void zoomY(Point p, int scrollDistance) {
+    private void zoomY(Point p, int scrollDistance) {
         moveAndZoomY(p, 0, scrollDistance, true, false);
     }
 
