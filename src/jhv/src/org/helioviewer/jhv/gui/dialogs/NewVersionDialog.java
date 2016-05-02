@@ -13,15 +13,13 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 @SuppressWarnings("serial")
-public class NewVersionDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
+public class NewVersionDialog extends JDialog implements ActionListener, ShowableDialog {
 
     // setting for check.update.next
     private int nextCheck = 0;
@@ -40,7 +38,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
         messagePane.setContentType("text/html");
         messagePane.setOpaque(false);
         messagePane.setEditable(false);
-        messagePane.addHyperlinkListener(this);
+        messagePane.addHyperlinkListener(JHVGlobals.hyperOpenURL);
         messagePane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         messagePane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(messagePane, BorderLayout.CENTER);
@@ -74,12 +72,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
         add(closeButtonContainer, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(downloadButton);
-        getRootPane().registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     public void init(String message) {
@@ -98,12 +91,6 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
 
     public void actionPerformed(ActionEvent a) {
         dispose();
-    }
-
-    public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            JHVGlobals.openURL(e.getURL().toString());
-        }
     }
 
     public int getNextCheck() {

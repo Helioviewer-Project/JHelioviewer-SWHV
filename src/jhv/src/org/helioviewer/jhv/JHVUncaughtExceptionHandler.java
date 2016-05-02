@@ -20,8 +20,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.logging.LogSettings;
@@ -32,7 +30,7 @@ import org.helioviewer.jhv.gui.ClipBoardCopier;
  *
  * @author Malte Nuhn
  */
-public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler, HyperlinkListener {
+public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String BUG_URL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
     private static final String MAIL_URL = "swhv@sidc.be";
@@ -78,7 +76,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
         report.setEditable(false);
         report.setOpaque(false);
-        report.addHyperlinkListener(instance);
+        report.addHyperlinkListener(JHVGlobals.hyperOpenURL);
         objects.add(report);
 
         if (msg instanceof String) {
@@ -125,13 +123,6 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
         dialog.setVisible(true);
         if ("Quit JHelioviewer".equals(optionPane.getValue()))
             System.exit(1);
-    }
-
-    @Override
-    public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            JHVGlobals.openURL(e.getURL().toString());
-        }
     }
 
     // we do not use the logger here, since it should work even before logging
