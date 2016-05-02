@@ -244,9 +244,7 @@ public class ExportMovie implements FrameListener {
             try {
                 if (movieExporter != null) {
                     movieExporter.close();
-
-                    File path = new File(moviePath);
-                    JHVGlobals.displayNotification("Export of " + moviePath + " finished.", path.toURI().toString());
+                    JHVGlobals.displayNotification(moviePath);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -79,9 +79,11 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
         messagePane.setText(message);
     }
 
+    @Override
     public void init() {
     }
 
+    @Override
     public void showDialog() {
         pack();
         setSize(getPreferredSize());
@@ -89,6 +91,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
         setVisible(true);
     }
 
+    @Override
     public void actionPerformed(ActionEvent a) {
         dispose();
     }
