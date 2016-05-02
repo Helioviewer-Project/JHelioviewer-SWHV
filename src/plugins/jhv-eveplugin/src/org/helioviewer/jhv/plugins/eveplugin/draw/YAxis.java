@@ -31,6 +31,11 @@ public class YAxis {
         }
     }
 
+    public void reset(double _start, double _end) {
+        start = _start;
+        end = _end;
+    }
+
     public double pixel2ScaledValue(int y0, int h, int p) {
         double smin = scale(start);
         double smax = scale(end);

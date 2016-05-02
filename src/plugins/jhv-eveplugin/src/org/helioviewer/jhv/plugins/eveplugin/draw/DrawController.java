@@ -100,6 +100,25 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fireRedrawRequest();
     }
 
+    public void resetAxis(Point p) {
+        boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
+        boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
+        boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
+        int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+        int ct = -1;
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            if (el.showYAxis()) {
+                if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                    el.resetAxis();
+                } else {
+                    el.zoomToFitAxis();
+                }
+                ct++;
+            }
+        }
+        fireRedrawRequest();
+    }
+
     public void moveY(Point p, double distanceY) {
         moveAndZoomY(p, distanceY, 0, false, true);
     }

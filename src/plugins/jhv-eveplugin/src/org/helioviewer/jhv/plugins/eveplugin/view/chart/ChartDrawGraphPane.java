@@ -364,6 +364,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (e.getClickCount() == 2) {
+            doubleClicked(e);
+            return;
+        }
         JHVRelatedEvents event = eventModel.getEventUnderMouse();
         Point p = e.getPoint();
 
@@ -376,6 +380,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         } else if (graphArea.contains(p)) {
             setMovieFrameManually(p);
         }
+    }
+
+    private void doubleClicked(MouseEvent e) {
+        drawController.resetAxis(e.getPoint());
     }
 
     @Override

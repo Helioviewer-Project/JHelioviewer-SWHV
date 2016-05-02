@@ -279,4 +279,12 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
     }
 
+    @Override
+    public void zoomToFitAxis() {
+    }
+
+    @Override
+    public void resetAxis() {
+    }
+
 }

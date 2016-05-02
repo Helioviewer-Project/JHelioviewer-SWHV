@@ -43,6 +43,20 @@ public class Band implements LineDataSelectorElement {
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
     }
 
+    public void resetAxis() {
+        yAxis.reset(bandType.getMin(), bandType.getMax());
+        updateGraphsData();
+    }
+
+    public void zoomToFitAxis() {
+        float[] bounds = bandCache.getBounds(EVEPlugin.dc.selectedAxis);
+        if (bounds[0] != Float.MIN_VALUE && bounds[1] != Float.MIN_VALUE) {
+            yAxis.reset(bounds[0], bounds[1]);
+            updateGraphsData();
+        }
+
+    }
+
     public final BandType getBandType() {
         return bandType;
     }

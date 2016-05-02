@@ -294,4 +294,13 @@ public class RadioData implements LineDataSelectorElement {
     public void yaxisChanged() {
     }
 
+    @Override
+    public void zoomToFitAxis() {
+        yAxis.reset(400, 20);
+    }
+
+    @Override
+    public void resetAxis() {
+        yAxis.reset(400, 20);
+    }
 }

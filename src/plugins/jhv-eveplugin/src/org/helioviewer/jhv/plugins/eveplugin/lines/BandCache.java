@@ -44,6 +44,31 @@ public class BandCache {
 
     }
 
+    public float[] getBounds(TimeAxis timeAxis) {
+        float min = Float.MAX_VALUE;
+        float max = Float.MIN_VALUE;
+
+        long keyEnd = date2key(timeAxis.end);
+        long key = date2key(timeAxis.start);
+        while (key <= keyEnd) {
+            DataChunk cache = cacheMap.get(key);
+            key++;
+            if (cache == null)
+                continue;
+            float[] values = cache.getValues(0);
+            long[] dates = cache.getDates(0);
+
+            for (int i = 0; i < values.length; i++) {
+                float value = values[i];
+                if (value != Float.MIN_VALUE && timeAxis.start <= dates[i] && dates[i] <= timeAxis.end) {
+                    min = Math.min(value, min);
+                    max = Math.max(value, max);
+                }
+            }
+        }
+        return new float[] { min, max };
+    }
+
     void createPolyLines(TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines) {
         long keyEnd = date2key(timeAxis.end);
         long key = date2key(timeAxis.start);
@@ -147,4 +172,5 @@ public class BandCache {
             }
         }
     }
+
 }
