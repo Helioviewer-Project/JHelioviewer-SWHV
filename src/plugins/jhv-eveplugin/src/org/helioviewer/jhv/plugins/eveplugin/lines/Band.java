@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,7 +14,6 @@ import java.util.Map;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -45,11 +43,13 @@ public class Band implements LineDataSelectorElement {
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
     }
 
+    @Override
     public void resetAxis() {
         yAxis.reset(bandType.getMin(), bandType.getMax());
         updateGraphsData();
     }
 
+    @Override
     public void zoomToFitAxis() {
         float[] bounds = bandCache.getBounds(EVEPlugin.dc.selectedAxis);
         if (bounds[0] != Float.MIN_VALUE && bounds[1] != Float.MIN_VALUE) {
@@ -122,8 +122,6 @@ public class Band implements LineDataSelectorElement {
     public boolean showYAxis() {
         return isVisible;
     }
-
-    private static DecimalFormat formatter = MathUtils.numberFormatter("0", 4);
 
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
