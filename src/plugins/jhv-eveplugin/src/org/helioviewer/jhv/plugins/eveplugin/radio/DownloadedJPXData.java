@@ -147,15 +147,13 @@ class DownloadedJPXData implements ImageDataHandler {
     private boolean first = true;
     private boolean decodingNeeded = false;
     private double last_resolution = -1;
-    long last_padded_start = -1;
-    long last_padded_end = -1;
-    long last_roi_height = -1;
-    int last_y0 = -1;
-    int last_height = -1;
+    private long last_padded_start = -1;
+    private long last_padded_end = -1;
+    private long last_roi_height = -1;
+    private int last_y0 = -1;
+    private int last_height = -1;
 
     private Rectangle getROI(TimeAxis xAxis, YAxis yAxis) {
-        int imageFrequencySize = (int) (endFreq - startFreq);
-        double freqPerPix = 1.0 * imageFrequencySize / jp2Height;
         double visibleStartFreq = startFreq;
         double visibleEndFreq = endFreq;
         if (visibleStartFreq < yAxis.start) {
@@ -165,8 +163,9 @@ class DownloadedJPXData implements ImageDataHandler {
             visibleEndFreq = yAxis.end;
         }
 
-        int y0 = (int) Math.round((endFreq - visibleEndFreq) / freqPerPix);
-        int height = (int) Math.round((visibleEndFreq - visibleStartFreq) / freqPerPix);
+        double pixPerFreq = jp2Height / (endFreq - startFreq);
+        int y0 = (int) ((endFreq - visibleEndFreq) * pixPerFreq + 0.5);
+        int height = (int) ((visibleEndFreq - visibleStartFreq) * pixPerFreq + 0.5);
 
         long visibleStart = Math.max(startDate, xAxis.start);
         long visibleEnd = Math.min(endDate, xAxis.end);
@@ -181,8 +180,7 @@ class DownloadedJPXData implements ImageDataHandler {
         long ilen = xAxis.end - xAxis.start;
         long padded_start = xAxis.start - ilen;
         long padded_end = xAxis.end + ilen;
-        long imageTimesize = endDate - startDate;
-        double timePerPix = 1.0 * imageTimesize / jp2Width;
+
         long newVisibleStart = startDate;
         long newVisibleEnd = endDate;
         if (!first) {
@@ -191,8 +189,9 @@ class DownloadedJPXData implements ImageDataHandler {
         }
         first = false;
 
-        int x0 = (int) Math.round((newVisibleStart - startDate) / timePerPix);
-        int width = (int) Math.round((newVisibleEnd - newVisibleStart) / timePerPix);
+        double pixPerTime = jp2Width / (double) (endDate - startDate);
+        int x0 = (int) ((newVisibleStart - startDate) * pixPerTime + 0.5);
+        int width = (int) ((newVisibleEnd - newVisibleStart) * pixPerTime + 0.5);
 
         last_padded_end = newVisibleEnd;
         last_padded_start = newVisibleStart;
@@ -222,8 +221,7 @@ class DownloadedJPXData implements ImageDataHandler {
             int dy1 = yAxis.value2pixel(ga.y, ga.height, freqimEnd);
 
             g.drawImage(bufferedImage, dx0, dy0, dx1, dy1, sx0, sy0, sx1, sy1, null);
-        }
-        else {
+        } else {
             drawNoData(g, ga, xAxis);
         }
     }
