@@ -124,7 +124,7 @@ public class Band implements LineDataSelectorElement {
     }
 
     @Override
-    public void draw(Graphics2D g, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Graphics2D fullG, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }
