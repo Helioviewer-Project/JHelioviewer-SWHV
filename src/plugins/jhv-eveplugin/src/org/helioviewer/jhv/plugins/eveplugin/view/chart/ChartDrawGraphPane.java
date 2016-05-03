@@ -142,7 +142,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 lastWidth = width;
                 lastHeight = height;
             }
-
             final Graphics2D g = screenImage.createGraphics();
             AffineTransform tf = g.getTransform();
             tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
