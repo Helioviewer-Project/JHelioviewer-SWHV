@@ -13,6 +13,7 @@ import java.awt.image.Raster;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -115,17 +116,19 @@ class DownloadedJPXData implements ImageDataHandler {
     void requestData() {
         if (view != null) {
             JP2ImageCallisto image = view.getJP2Image();
-            Rectangle roi = getROI(EVEPlugin.dc.selectedAxis, EVEPlugin.rdm.getYAxis());
+            TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
+            Rectangle roi = getROI(xAxis, EVEPlugin.rdm.getYAxis());
 
             if (roi.width > 0 && roi.height > 0) {
                 image.setRegion(roi);
-                view.render(null, null, defineFactor(roi));
+                view.render(null, null, defineFactor(roi, xAxis));
             }
         }
     }
 
-    private double defineFactor(Rectangle roi) {
-        double visibleImagePercentage = roi.getWidth() * roi.getHeight() / (jp2Width * jp2Height);
+    private double defineFactor(Rectangle roi, TimeAxis xAxis) {
+        double pct = Math.min((xAxis.end - xAxis.start) / TimeUtils.DAY_IN_MILLIS, 1);
+        double visibleImagePercentage = pct * roi.getHeight() / jp2Height;
         if (visibleImagePercentage <= 0.03125) {
             return 1;
         } else if (visibleImagePercentage <= 0.0625) {
