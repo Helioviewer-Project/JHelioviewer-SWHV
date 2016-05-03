@@ -12,7 +12,6 @@ public class BandType {
     public HashMap<String, Double> warnLevels = new HashMap<String, Double>();
     private double min;
     private double max;
-    private String scale = "";
     private boolean isLog = false;
 
     @Override
@@ -85,12 +84,7 @@ public class BandType {
     }
 
     public void setScale(String scale) {
-        this.scale = scale;
         isLog = scale.equals("logarithmic");
-    }
-
-    public String getScale() {
-        return scale;
     }
 
     public boolean isLogScale() {
