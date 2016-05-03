@@ -75,7 +75,7 @@ public class BandCache {
         int level = 0;
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-        double noelements = (timeAxis.end - timeAxis.start) / (elsz);
+        double noelements = (timeAxis.end - timeAxis.start) / elsz;
         double graphWidth = EVEPlugin.dc.getGraphSize().width * GLInfo.pixelScaleFloat[0];
         while (level < MAX_LEVEL - 1 && noelements > graphWidth) {
             level++;
@@ -118,7 +118,7 @@ public class BandCache {
         if (cache != null) {
             long[] dates = cache.getDates(0);
             int len = dates.length;
-            int idx = (int) (len * 1. * (ts - dates[0]) / (dates[len - 1] - dates[0]));
+            int idx = (int) ((len - 1) * 1. * (ts - dates[0]) / (dates[len - 1] - dates[0]) + 0.5);
 
             if (idx >= 0 && idx < len) {
                 return cache.getValues(0)[idx];
