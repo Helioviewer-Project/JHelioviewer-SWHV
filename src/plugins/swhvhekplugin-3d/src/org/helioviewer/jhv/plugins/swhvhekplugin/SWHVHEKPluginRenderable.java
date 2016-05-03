@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
@@ -357,15 +356,13 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private final static int MOUSE_OFFSET_Y = 25;
 
     private void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, Point pt) {
-        JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
-        JHVEventParameter[] params = evt.getVisibleEventParameters();
         ArrayList<String> txts = new ArrayList<String>();
-
+        JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
+        JHVEventParameter[] params = evt.getSimpleVisibleEventParameters();
         for (JHVEventParameter p : params) {
             String name = p.getParameterName();
-            String value = p.getDisplayParameterValue();
-            if (!Regex.WEB_URL.matcher(value).matches() && !name.equals("event_description") && !name.equals("event_title")) {
-                txts.add(p.getParameterDisplayName() + " : " + value);
+            if (name != "event_description" && name != "event_title") { // interned
+                txts.add(p.getParameterDisplayName() + " : " + p.getDisplayParameterValue());
             }
         }
         if (!txts.isEmpty())
