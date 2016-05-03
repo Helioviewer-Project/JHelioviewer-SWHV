@@ -2,6 +2,8 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.util.ArrayList;
 
+import org.helioviewer.jhv.base.Regex;
+
 public class JHVEvent {
 
     public final long start;
@@ -11,8 +13,11 @@ public class JHVEvent {
 
     private JHVEventParameter[] allParameters;
     private JHVEventParameter[] visibleParameters;
-    private ArrayList<JHVEventParameter> visibleParametersArray;
+    private JHVEventParameter[] simpleVisibleParameters;
+
     private ArrayList<JHVEventParameter> allParametersArray;
+    private ArrayList<JHVEventParameter> visibleParametersArray;
+
     private final JHVEventType eventType;
     private JHVPositionInformation positionInformation = null;
     private Integer id;
@@ -29,6 +34,14 @@ public class JHVEvent {
         return allParameters;
     }
 
+    public JHVEventParameter[] getVisibleEventParameters() {
+        return visibleParameters;
+    }
+
+    public JHVEventParameter[] getSimpleVisibleEventParameters() {
+        return simpleVisibleParameters;
+    }
+
     public JHVEventParameter getParameter(String key) {
         int i = 0;
         while (i < allParameters.length) {
@@ -38,10 +51,6 @@ public class JHVEvent {
             i++;
         }
         return null;
-    }
-
-    public JHVEventParameter[] getVisibleEventParameters() {
-        return visibleParameters;
     }
 
     public String getName() {
@@ -106,6 +115,16 @@ public class JHVEvent {
         allParameters = allParametersArray.toArray(new JHVEventParameter[allParametersArray.size()]);
         allParametersArray = null;
         visibleParameters = visibleParametersArray.toArray(new JHVEventParameter[visibleParametersArray.size()]);
+
+        // maybe should be configured
+        ArrayList<JHVEventParameter> simpleVisibleParametersArray = new ArrayList<JHVEventParameter>();
+        for (JHVEventParameter param : visibleParametersArray) {
+            if (!Regex.WEB_URL.matcher(param.getParameterValue()).matches())
+                simpleVisibleParametersArray.add(param);
+        }
+        simpleVisibleParameters = simpleVisibleParametersArray.toArray(new JHVEventParameter[simpleVisibleParametersArray.size()]);
+        simpleVisibleParametersArray = null;
+
         visibleParametersArray = null;
     }
 
