@@ -21,7 +21,6 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +28,6 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -54,8 +52,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private enum DragMode {
         MOVIELINE, CHART, NODRAG
     }
-
-    private static final DecimalFormat formatter = MathUtils.numberFormatter("0", 4);
 
     private final DrawController drawController;
     private long movieTimestamp = Long.MIN_VALUE;
@@ -217,18 +213,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             if (el.isVisible() && el instanceof Band) {
-                Band band = (Band) el;
                 lbl = ", ";
                 g.setColor(Color.BLACK);
                 g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
                 tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
                 currWidth += (int) tickTextBounds.getWidth();
-                float val = band.getValue(ts);
-                if (val == Float.MIN_VALUE) {
-                    lbl = "--";
-                } else {
-                    lbl = formatter.format(band.getValue(ts));
-                }
+
+                Band band = (Band) el;
+                lbl = band.getStringValue(ts);
                 g.setColor(band.getDataColor());
                 g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
                 tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
@@ -348,7 +340,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawHorizontalTickline(Graphics g, Rectangle graphArea, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt) {
-        String tickText = formatter.format(tick);
+        String tickText = DrawConstants.valueFormatter.format(tick);
         int y = yAxis.scaledvalue2pixel(graphArea.y, graphArea.height, tick);
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
         int x_str;

@@ -125,7 +125,8 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     private double computeResolution(int height, TimeAxis xAxis) {
-        int width = (int) (jp2Width * (xAxis.end - xAxis.start) / (double) (endDate - startDate) + 0.5);
+        double pixPerTime = jp2Width / (double) (endDate - startDate);
+        int width = (int) ((xAxis.end - xAxis.start) * pixPerTime + 0.5);
         double pct = Math.min(width / (double) jp2Width, 1);
 
         double visibleImagePercentage = pct * height / jp2Height;
