@@ -82,7 +82,7 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
     }
 
     @Override
-    public void draw(Graphics2D g, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Graphics2D fullG, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }
@@ -135,14 +135,14 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
                 int spaceNeeded = spacePerLine * nrLines;
                 ImageIcon icon = eventType.getEventType().getEventIcon();
-                g.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+                fullG.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
                 previousLine += nrLines;
                 if (eventTypeNr != nrEventTypes - 1) {
                     g.setStroke(dashed);
                     g.setColor(Color.black);
                     int sepLinePos = previousLine * spacePerLine - spacePerLine / 4 + DrawConstants.EVENT_OFFSET;
-                    g.drawLine(0, sepLinePos, graphArea.width, sepLinePos);
+                    g.drawLine(graphArea.x, sepLinePos, graphArea.width, sepLinePos);
                     g.setStroke(normalStroke);
                 }
 

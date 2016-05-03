@@ -60,7 +60,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Point mouseDragPosition = null;
 
     private Rectangle graphArea = new Rectangle();
-    private Rectangle graphSize = new Rectangle();
     private BufferedImage screenImage = null;
     private final EventModel eventModel;
     private Rectangle leftAxisArea;
@@ -146,7 +145,17 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             g.setFont(DrawConstants.font);
-            drawData(g, graphArea, mousePosition);
+
+            BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, sx * graphArea.width, sy * graphArea.height);
+            Graphics2D gplotPart = plotPart.createGraphics();
+            AffineTransform plottf = new AffineTransform();
+            plottf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
+            plottf.translate(-graphArea.x, -graphArea.y);
+            gplotPart.setTransform(plottf);
+            gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            gplotPart.setFont(DrawConstants.font);
+
+            drawData(g, gplotPart, graphArea, mousePosition);
 
             g.dispose();
         }
@@ -155,12 +164,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         forceRedrawGraph = false;
     }
 
-    private void drawData(Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
+    private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
         List<LineDataSelectorElement> els = EVEPlugin.ldsm.getAllLineDataSelectorElements();
         for (LineDataSelectorElement el : els) {
-            el.draw(plotG, graphArea, leftAxisArea, drawController.selectedAxis, mousePosition);
+            el.draw(plotG, fullG, graphArea, leftAxisArea, drawController.selectedAxis, mousePosition);
         }
-        drawLabels(plotG, graphArea, drawController.selectedAxis);
+        drawLabels(fullG, graphArea, drawController.selectedAxis);
     }
 
     private void updateDrawInformation() {
@@ -175,10 +184,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
         g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
-        g.fillRect(0, 0, graphSize.width, DrawConstants.GRAPH_TOP_SPACE);
-        g.fillRect(0, graphArea.height + DrawConstants.GRAPH_TOP_SPACE, graphSize.width, graphSize.height);
-        g.fillRect(0, 0, DrawConstants.GRAPH_LEFT_SPACE, graphSize.height);
-        g.fillRect(graphArea.width + DrawConstants.GRAPH_LEFT_SPACE, 0, graphSize.width, graphSize.height);
 
         Color c = DrawConstants.TICK_LINE_COLOR;
         int ct = 0;
@@ -363,7 +368,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateGraphArea() {
-        graphSize = drawController.getGraphSize();
         graphArea = drawController.getGraphArea();
         leftAxisArea = drawController.getLeftAxisArea();
     }
