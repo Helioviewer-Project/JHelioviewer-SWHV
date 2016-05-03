@@ -37,7 +37,7 @@ public class RadioData implements LineDataSelectorElement {
     private static final String ROBserver = DataSources.ROBsettings.get("API.jp2images.path");
 
     public static final int MAX_AMOUNT_OF_DAYS = 3;
-    public static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 1;
+    public static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
     private final RadioOptionsPanel optionsPanel;
     private IndexColorModel colorModel;
@@ -75,12 +75,18 @@ public class RadioData implements LineDataSelectorElement {
         cache.clear();
     }
 
+    private long latest_cache_start = -1;
+    private long latest_cache_end = -1;
+
     public void requestAndOpenIntervals(long start, long end) {
+        if (latest_cache_start != -1 && latest_cache_end != -1 && start >= latest_cache_start && end <= latest_cache_end)
+            return;
+        latest_cache_start = start - start % TimeUtils.DAY_IN_MILLIS - 2 * TimeUtils.DAY_IN_MILLIS;
+        latest_cache_end = latest_cache_start + DAYS_IN_CACHE * TimeUtils.DAY_IN_MILLIS;
         ArrayList<Long> toDownloadStartDates = new ArrayList<Long>();
-        long startDate = start - start % TimeUtils.DAY_IN_MILLIS;
         ArrayList<Long> incomingStartDates = new ArrayList<Long>(DAYS_IN_CACHE);
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
-            incomingStartDates.add(startDate + i * TimeUtils.DAY_IN_MILLIS);
+            incomingStartDates.add(latest_cache_start + i * TimeUtils.DAY_IN_MILLIS);
         }
 
         Iterator<Entry<Long, DownloadedJPXData>> it = cache.entrySet().iterator();
