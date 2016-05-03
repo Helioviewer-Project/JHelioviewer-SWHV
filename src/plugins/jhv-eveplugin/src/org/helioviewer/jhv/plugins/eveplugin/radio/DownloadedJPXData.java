@@ -13,7 +13,6 @@ import java.awt.image.Raster;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -127,7 +126,11 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     private double defineFactor(Rectangle roi, TimeAxis xAxis) {
-        double pct = Math.min((xAxis.end - xAxis.start) / TimeUtils.DAY_IN_MILLIS, 1);
+        long imageTimesize = endDate - startDate;
+        double timePerPix = 1.0 * imageTimesize / jp2Width;
+        int width = (int) Math.round((xAxis.end - xAxis.start) / timePerPix);
+        double pct = Math.min(width / jp2Width, 1);
+
         double visibleImagePercentage = pct * roi.getHeight() / jp2Height;
         if (visibleImagePercentage <= 0.03125) {
             return 1;
