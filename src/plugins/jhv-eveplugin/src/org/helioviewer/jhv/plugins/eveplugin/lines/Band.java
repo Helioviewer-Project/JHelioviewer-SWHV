@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -56,7 +57,6 @@ public class Band implements LineDataSelectorElement {
             yAxis.reset(bounds[0], bounds[1]);
             updateGraphsData();
         }
-
     }
 
     public final BandType getBandType() {
@@ -161,11 +161,13 @@ public class Band implements LineDataSelectorElement {
         }
     }
 
-    public float getValue(long ts) {
+    public String getStringValue(long ts) {
         float val = bandCache.getValue(ts);
         if (val == Float.MIN_VALUE)
-            return val;
-        return (float) yAxis.scale(val);
+            return "--";
+        else
+            return DrawConstants.valueFormatter.format(yAxis.scale(val));
+        // if (bandType.getName().contains("XRS-B"))
     }
 
     private void setWarn(LinkedList<Integer> _warnLevels, LinkedList<String> _warnLabels) {

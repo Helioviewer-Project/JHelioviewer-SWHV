@@ -2,8 +2,10 @@ package org.helioviewer.jhv.plugins.eveplugin;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 public class DrawConstants {
@@ -47,5 +49,7 @@ public class DrawConstants {
     public static final Font font = UIGlobals.UIFontSmall;
 
     public static final String absentText = "No band / diode / line selected";
+
+    public static final DecimalFormat valueFormatter = MathUtils.numberFormatter("0", 4);
 
 }
