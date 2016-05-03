@@ -165,9 +165,21 @@ public class Band implements LineDataSelectorElement {
         float val = bandCache.getValue(ts);
         if (val == Float.MIN_VALUE)
             return "--";
-        else
+        else if (!bandType.getName().contains("XRSB"))
             return DrawConstants.valueFormatter.format(yAxis.scale(val));
-        // if (bandType.getName().contains("XRS-B"))
+        else {
+            double v = val * 1e8;
+            if (v < 1e1)
+                return String.format("A%.1f", v);
+            else if (v < 1e2)
+                return String.format("B%.1f", v * 1e-1);
+            else if (v < 1e3)
+                return String.format("C%.1f", v * 1e-2);
+            else if (v < 1e4)
+                return String.format("M%.1f", v * 1e-3);
+            else
+                return String.format("X%.1f", v * 1e-4);
+        }
     }
 
     private void setWarn(LinkedList<Integer> _warnLevels, LinkedList<String> _warnLabels) {
