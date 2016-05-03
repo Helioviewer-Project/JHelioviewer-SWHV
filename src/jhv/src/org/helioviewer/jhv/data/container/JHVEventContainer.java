@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
@@ -56,7 +57,7 @@ public class JHVEventContainer {
      *            the handler
      */
     public void requestForInterval(final long startDate, final long endDate, final JHVEventHandler handler) {
-        long deltaT = Math.max((long) ((endDate - startDate) * factor), 1000 * 60 * 60 * 24 * 5);
+        long deltaT = Math.max((long) ((endDate - startDate) * factor), TimeUtils.DAY_IN_MILLIS);
         long newStartDate = startDate - deltaT;
         long newEndDate = endDate + deltaT;
         cacheEventHandlers.add(handler);
