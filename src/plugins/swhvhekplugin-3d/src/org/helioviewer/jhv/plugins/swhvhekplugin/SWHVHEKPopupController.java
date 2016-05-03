@@ -147,7 +147,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 continue;
 
             if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
-                if (evt.getName().equals("Coronal Mass Ejection")) {
+                if (evt.getName() == "Coronal Mass Ejection") { // interned
                     double principalAngle = Math.toRadians(SWHVHEKData.readCMEPrincipalAngleDegree(evt));
                     double speed = SWHVHEKData.readCMESpeed(evt);
                     double distSun = 2.4;
@@ -174,7 +174,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
             } else {
                 Vec2 tf = null;
                 Vec2 mousepos = null;
-                if (evt.getName().equals("Coronal Mass Ejection")) {
+                if (evt.getName() == "Coronal Mass Ejection") { // interned
                     if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR) {
                         double principalAngle = SWHVHEKData.readCMEPrincipalAngleDegree(evt) - 90;
                         double speed = SWHVHEKData.readCMESpeed(evt);
