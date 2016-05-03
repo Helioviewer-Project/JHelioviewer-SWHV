@@ -13,7 +13,6 @@ import java.awt.event.WindowFocusListener;
 import java.util.List;
 
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
