@@ -375,7 +375,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             List<JHVRelatedEvents> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.getName().equals("Coronal Mass Ejection")) {
+                if (evt.getName() == "Coronal Mass Ejection") { // interned
                     drawCactusArc(gl, evtr, evt, controller.currentTime);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
@@ -396,7 +396,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             List<JHVRelatedEvents> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.getName().equals("Coronal Mass Ejection") && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) {
+                if (evt.getName() == "Coronal Mass Ejection" && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) { // interned
                     drawCactusArcScale(gl, evtr, evt, controller.currentTime, scale, vp);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);

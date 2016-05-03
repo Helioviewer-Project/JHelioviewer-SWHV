@@ -123,7 +123,6 @@ public class JHVEvent {
                 simpleVisibleParametersArray.add(param);
         }
         simpleVisibleParameters = simpleVisibleParametersArray.toArray(new JHVEventParameter[simpleVisibleParametersArray.size()]);
-        simpleVisibleParametersArray = null;
 
         visibleParametersArray = null;
     }
