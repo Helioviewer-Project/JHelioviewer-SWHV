@@ -117,21 +117,20 @@ class DownloadedJPXData implements ImageDataHandler {
             JP2ImageCallisto image = view.getJP2Image();
             TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
             Rectangle roi = getROI(xAxis, EVEPlugin.rdm.getYAxis());
-
-            if (roi.width > 0 && roi.height > 0) {
+            if (decodingNeeded && roi.width > 0 && roi.height > 0) {
                 image.setRegion(roi);
-                view.render(null, null, defineFactor(roi, xAxis));
+                view.render(null, null, last_resolution);
             }
         }
     }
 
-    private double defineFactor(Rectangle roi, TimeAxis xAxis) {
+    private double computeResolution(int height, TimeAxis xAxis) {
         long imageTimesize = endDate - startDate;
         double timePerPix = 1.0 * imageTimesize / jp2Width;
         int width = (int) Math.round((xAxis.end - xAxis.start) / timePerPix);
         double pct = Math.min(width / jp2Width, 1);
 
-        double visibleImagePercentage = pct * roi.getHeight() / jp2Height;
+        double visibleImagePercentage = pct * height / jp2Height;
         if (visibleImagePercentage <= 0.03125) {
             return 1;
         } else if (visibleImagePercentage <= 0.0625) {
@@ -148,25 +147,17 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     private boolean first = true;
+    private boolean decodingNeeded = false;
+    private double last_resolution = -1;
+    long last_padded_start = -1;
+    long last_padded_end = -1;
+    long last_roi_height = -1;
+    int last_y0 = -1;
+    int last_height = -1;
 
     private Rectangle getROI(TimeAxis xAxis, YAxis yAxis) {
-        long imageTimesize = endDate - startDate;
         int imageFrequencySize = (int) (endFreq - startFreq);
-        double timePerPix = 1.0 * imageTimesize / jp2Width;
         double freqPerPix = 1.0 * imageFrequencySize / jp2Height;
-
-        long visibleStart = startDate;
-        long visibleEnd = endDate;
-
-        if (!first) {
-            if (visibleStart <= xAxis.start)
-                visibleStart = xAxis.start;
-
-            if (visibleEnd >= xAxis.end)
-                visibleEnd = xAxis.end;
-        }
-        first = false;
-
         double visibleStartFreq = startFreq;
         double visibleEndFreq = endFreq;
         if (visibleStartFreq < yAxis.start) {
@@ -176,10 +167,41 @@ class DownloadedJPXData implements ImageDataHandler {
             visibleEndFreq = yAxis.end;
         }
 
-        int x0 = (int) Math.round((visibleStart - startDate) / timePerPix);
         int y0 = (int) Math.round((endFreq - visibleEndFreq) / freqPerPix);
-        int width = (int) Math.round((visibleEnd - visibleStart) / timePerPix);
         int height = (int) Math.round((visibleEndFreq - visibleStartFreq) / freqPerPix);
+
+        long visibleStart = Math.max(startDate, xAxis.start);
+        long visibleEnd = Math.min(endDate, xAxis.end);
+        double resolution = computeResolution(height, xAxis);
+
+        if (last_resolution == resolution && y0 == last_y0 && height == last_height && visibleStart >= last_padded_start && visibleEnd <= last_padded_end) {
+            decodingNeeded = false;
+            return new Rectangle(0, 0, -1, -1);
+        }
+        decodingNeeded = true;
+
+        long ilen = xAxis.end - xAxis.start;
+        long padded_start = xAxis.start - ilen;
+        long padded_end = xAxis.end + ilen;
+        long imageTimesize = endDate - startDate;
+        double timePerPix = 1.0 * imageTimesize / jp2Width;
+        long newVisibleStart = startDate;
+        long newVisibleEnd = endDate;
+        if (!first) {
+            newVisibleStart = Math.max(startDate, padded_start);
+            newVisibleEnd = Math.min(endDate, padded_end);
+        }
+        first = false;
+
+        int x0 = (int) Math.round((newVisibleStart - startDate) / timePerPix);
+        int width = (int) Math.round((newVisibleEnd - newVisibleStart) / timePerPix);
+
+        last_padded_end = newVisibleEnd;
+        last_padded_start = newVisibleStart;
+        last_y0 = y0;
+        last_height = height;
+        last_resolution = resolution;
+
         return new Rectangle(x0, y0, width, height);
     }
 
