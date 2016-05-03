@@ -202,10 +202,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
         drawHorizontalLabels(g, graphArea, timeAxis, c);
 
-        drawTimelineValues(g, timeAxis);
+        drawTimelineValues(g, graphArea, timeAxis);
     }
 
-    private void drawTimelineValues(Graphics2D g, TimeAxis timeAxis) {
+    private void drawTimelineValues(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
         if (mousePosition == null)
             return;
         long ts = timeAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
