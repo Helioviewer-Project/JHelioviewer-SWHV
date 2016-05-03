@@ -120,7 +120,7 @@ public class Camera {
         return cameraWidth;
     }
 
-    public void zoom(int wr) {
+    public void zoom(double wr) {
         setCameraFOV(fov * (1 + 0.015 * wr));
     }
 

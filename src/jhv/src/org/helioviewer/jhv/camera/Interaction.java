@@ -26,7 +26,7 @@ public class Interaction implements MouseWheelListener, MouseMotionListener, Mou
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        camera.zoom(e.getWheelRotation());
+        camera.zoom(Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL * e.getWheelRotation());
         Displayer.render(1);
     }
 
