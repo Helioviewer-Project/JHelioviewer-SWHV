@@ -99,7 +99,7 @@ public class ParameterTablePanel extends JPanel {
                 return;
             }
 
-            if (extractURL(table, col, row) != null) {
+            if (col == 1 && extractURL(table, col, row) != null) {
                 table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             } else {
                 table.setCursor(Cursor.getDefaultCursor());
