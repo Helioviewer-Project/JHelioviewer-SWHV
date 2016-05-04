@@ -28,6 +28,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
     private static final int suspendedStarts = 5;
 
     private final JTextPane messagePane = new JTextPane();
+    private final JButton downloadButton = new JButton("Download");
 
     public NewVersionDialog(boolean verbose) {
         super(ImageViewerGui.getMainFrame(), false);
@@ -60,18 +61,16 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
             });
         }
 
-        JButton downloadButton = new JButton("Download");
-        closeButtonContainer.add(downloadButton);
         downloadButton.addActionListener(this);
         downloadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 JHVGlobals.openURL(JHVGlobals.downloadURL);
             }
         });
+        closeButtonContainer.add(downloadButton);
 
         add(closeButtonContainer, BorderLayout.SOUTH);
 
-        getRootPane().setDefaultButton(downloadButton);
         getRootPane().registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
@@ -85,9 +84,11 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
 
     @Override
     public void showDialog() {
-        pack();
         setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
+
+        pack();
+        getRootPane().setDefaultButton(downloadButton);
         setVisible(true);
     }
 
