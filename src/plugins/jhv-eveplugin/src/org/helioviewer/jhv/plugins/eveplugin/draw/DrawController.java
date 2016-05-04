@@ -160,11 +160,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             availableAxis.end = availableInterval.end;
         }
 
-        fireRedrawRequest();
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             el.fetchData(selectedAxis, availableAxis);
         }
         optionsPanel.fetchData(selectedAxis, availableAxis);
+        fireRedrawRequest();
     }
 
     private void centraliseSelected(long time) {
