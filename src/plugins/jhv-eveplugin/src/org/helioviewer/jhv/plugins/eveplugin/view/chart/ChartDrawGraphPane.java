@@ -28,7 +28,6 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -84,7 +83,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addComponentListener(this);
         drawController.addDrawControllerListener(this);
         eventModel = EventModel.getSingletonInstance();
-        setChartInformation();
+        drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
 
         Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
         redrawTimer.start();
@@ -142,30 +141,20 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
             g.setTransform(tf);
             drawBackground(g);
-            if (sx * DrawConstants.GRAPH_LEFT_SPACE + sx * graphArea.width > width) {
-                Log.info("Current " + width + " " + height + " " + screenImage.getWidth() + " " + screenImage.getHeight());
-                Log.info(sx * DrawConstants.GRAPH_LEFT_SPACE + " " + sy * DrawConstants.GRAPH_TOP_SPACE + " " + sx * graphArea.width + " " + sy * graphArea.height);
-                drawData(g, g, graphArea, mousePosition);
-            } else {
-                try {
-                    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                    g.setFont(DrawConstants.font);
-                    BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, sx * graphArea.width, sy * graphArea.height);
-                    Graphics2D gplotPart = plotPart.createGraphics();
-                    AffineTransform plottf = new AffineTransform();
-                    plottf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
-                    plottf.translate(-graphArea.x, -graphArea.y);
-                    gplotPart.setTransform(plottf);
-                    gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                    gplotPart.setFont(DrawConstants.font);
-                    drawData(g, gplotPart, graphArea, mousePosition);
-                } catch (Exception e) {
-                    Log.info("Current " + width + " " + height + " " + screenImage.getWidth() + " " + screenImage.getHeight());
-                    Log.info(sx * DrawConstants.GRAPH_LEFT_SPACE + " " + sy * DrawConstants.GRAPH_TOP_SPACE + " " + sx * graphArea.width + " " + sy * graphArea.height);
-                    System.exit(1);
-                }
+            if (graphArea.width > 0 && graphArea.height > 0) {
+                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g.setFont(DrawConstants.font);
+                BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, sx * graphArea.width, sy * graphArea.height);
+                Graphics2D gplotPart = plotPart.createGraphics();
+                AffineTransform plottf = new AffineTransform();
+                plottf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
+                plottf.translate(-graphArea.x, -graphArea.y);
+                gplotPart.setTransform(plottf);
+                gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                gplotPart.setFont(DrawConstants.font);
+                drawData(g, gplotPart, graphArea, mousePosition);
+                gplotPart.dispose();
             }
-
             g.dispose();
         }
         this.repaint();
@@ -525,19 +514,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void componentMoved(ComponentEvent e) {
+        drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
     }
 
     @Override
     public void componentResized(ComponentEvent e) {
-        setChartInformation();
+        drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
     }
 
     @Override
     public void componentShown(ComponentEvent e) {
-        setChartInformation();
-    }
-
-    private void setChartInformation() {
         drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
     }
 
