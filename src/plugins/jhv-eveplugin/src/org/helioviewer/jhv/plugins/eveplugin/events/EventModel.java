@@ -82,7 +82,7 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
     }
 
     @Override
-    public void draw(Graphics2D g, Graphics2D fullG, Rectangle graphArea, Rectangle leftAxisArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }
@@ -135,7 +135,7 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
                 int spaceNeeded = spacePerLine * nrLines;
                 ImageIcon icon = eventType.getEventType().getEventIcon();
-                fullG.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+                fullG.drawImage(icon.getImage(), 0, graphArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 4, icon.getIconWidth() / 2, graphArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 4, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
                 previousLine += nrLines;
                 if (eventTypeNr != nrEventTypes - 1) {
