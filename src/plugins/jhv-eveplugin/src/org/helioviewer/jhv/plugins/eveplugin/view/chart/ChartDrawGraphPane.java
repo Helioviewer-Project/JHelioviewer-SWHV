@@ -417,6 +417,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseExited(MouseEvent e) {
         mousePosition = null;
+        drawController.fireRedrawRequest();
     }
 
     @Override
