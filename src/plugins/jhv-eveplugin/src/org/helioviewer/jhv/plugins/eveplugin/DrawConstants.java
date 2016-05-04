@@ -47,6 +47,7 @@ public class DrawConstants {
     public static final int EVENT_OFFSET = 3;
 
     public static final Font font = UIGlobals.UIFontSmall;
+    public static final Font fontBold = UIGlobals.UIFontSmallBold;
 
     public static final String absentText = "No band / diode / line selected";
 
