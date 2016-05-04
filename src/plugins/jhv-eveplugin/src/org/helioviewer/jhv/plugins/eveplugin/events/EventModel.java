@@ -16,6 +16,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -203,7 +204,7 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
 
     @Override
     public boolean hasData() {
-        return true;
+        return JHVEventCache.getSingletonInstance().hasData();
     }
 
     @Override
