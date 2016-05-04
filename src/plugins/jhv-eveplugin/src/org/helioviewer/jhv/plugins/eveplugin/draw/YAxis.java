@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
+import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
+
 /**
  * This class describes an Y-axis.
  *
@@ -115,7 +117,6 @@ public class YAxis {
     }
 
     private static class YAxisLogScale implements YAxisScale {
-
         private final String label;
 
         public YAxisLogScale(String _label) {
@@ -124,6 +125,10 @@ public class YAxis {
 
         @Override
         public double scale(double val) {
+            if (val < DrawConstants.DISCARD_LEVEL_LOW)
+                return Math.log10(DrawConstants.DISCARD_LEVEL_LOW);
+            if (val > DrawConstants.DISCARD_LEVEL_HIGH)
+                return Math.log10(DrawConstants.DISCARD_LEVEL_HIGH);
             return Math.log10(val);
         }
 
@@ -150,6 +155,8 @@ public class YAxis {
         public double scale(double val) {
             if (val < 0)
                 return 0;
+            if (val > DrawConstants.DISCARD_LEVEL_HIGH)
+                return DrawConstants.DISCARD_LEVEL_HIGH;
             return val;
         }
 
