@@ -32,7 +32,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private boolean isLocked;
     private long latestMovieTime;
     private Rectangle graphArea;
-    private Rectangle leftAxisArea;
 
     public DrawController() {
         graphSize = new Rectangle();
@@ -195,9 +194,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         int height = graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE);
         int noRightAxes = Math.max(0, (EVEPlugin.ldsm.getNumberOfAxes() - 1));
         int width = (graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + noRightAxes * DrawConstants.RIGHT_AXIS_WIDTH));
-
         graphArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, width, height);
-        leftAxisArea = new Rectangle(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE));
     }
 
     public Rectangle getGraphArea() {
@@ -206,10 +203,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public Rectangle getGraphSize() {
         return graphSize;
-    }
-
-    public Rectangle getLeftAxisArea() {
-        return leftAxisArea;
     }
 
     public boolean isLocked() {

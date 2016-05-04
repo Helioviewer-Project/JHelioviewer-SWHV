@@ -63,7 +63,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Rectangle graphArea = new Rectangle();
     private BufferedImage screenImage = null;
     private final EventModel eventModel;
-    private Rectangle leftAxisArea;
 
     private Point mousePosition;
     private int lastWidth;
@@ -171,7 +170,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
         List<LineDataSelectorElement> els = EVEPlugin.ldsm.getAllLineDataSelectorElements();
         for (LineDataSelectorElement el : els) {
-            el.draw(plotG, fullG, graphArea, leftAxisArea, drawController.selectedAxis, mousePosition);
+            el.draw(plotG, fullG, graphArea, drawController.selectedAxis, mousePosition);
         }
         drawLabels(fullG, graphArea, drawController.selectedAxis);
     }
@@ -373,7 +372,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void updateGraphArea() {
         graphArea = drawController.getGraphArea();
-        leftAxisArea = drawController.getLeftAxisArea();
     }
 
     private boolean updateMovieLineInformation() {
