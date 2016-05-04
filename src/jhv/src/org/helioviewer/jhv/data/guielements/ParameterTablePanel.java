@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -33,7 +32,6 @@ import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 public class ParameterTablePanel extends JPanel {
 
     public ParameterTablePanel(JHVEventParameter[] parameters) {
-        super();
         setLayout(new BorderLayout());
 
         ParameterTableModel parameterModel = new ParameterTableModel(parameters);
@@ -60,9 +58,6 @@ public class ParameterTablePanel extends JPanel {
     }
 
     private static class WrappedTextCellRenderer extends JTextPane implements TableCellRenderer, MouseListener, MouseMotionListener {
-        private int row = -1;
-        private int col = -1;
-        private boolean isRollover;
 
         public WrappedTextCellRenderer() {
             setContentType("text/html");
@@ -71,23 +66,7 @@ public class ParameterTablePanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            String str = "" + value;
-
-            if (isRolloverCell(table, row, column) && isValueURL(value)) {
-                setText("<u><font color='blue'>" + str + "</font></u>");
-            } else if (isValueURL(value)) {
-                setText("<font color='blue'>" + str + "</font></u>");
-            } else {
-                setText(str);
-            }
-
-            /*
-            int h = getPreferredSize().height;
-            setSize(table.getColumnModel().getColumn(column).getWidth(), h);
-            if (table.getRowHeight(row) != h) {
-                table.setRowHeight(row, h);
-            }
-            */
+            setText("" + value);
             return this;
         }
 
@@ -100,10 +79,6 @@ public class ParameterTablePanel extends JPanel {
             }
         }
 
-        protected boolean isRolloverCell(JTable table, int _row, int column) {
-            return row == _row && col == column && isRollover /* && !table.isEditing() */;
-        }
-
         private boolean isURLColumn(JTable table, int col, int row) {
             return isValueURL(table.getValueAt(row, col));
         }
@@ -111,46 +86,33 @@ public class ParameterTablePanel extends JPanel {
         @Override
         public void mouseMoved(MouseEvent e) {
             JTable table = (JTable) e.getComponent();
-            int prevRow = row;
-            int prevCol = col;
-            boolean prevRollover = isRollover;
-
             Point pt = e.getPoint();
-            row = table.rowAtPoint(pt);
-            col = table.columnAtPoint(pt);
-            if (row < 0 || col < 0) {
+
+            int row = table.rowAtPoint(pt);
+            int col = table.columnAtPoint(pt);
+            if (row < 0 || col != 1) {
                 return;
             }
 
-            isRollover = isURLColumn(table, col, row);
-            if (row == prevRow && col == prevCol && isRollover == prevRollover || !isRollover && !prevRollover) {
-                return;
-            }
-
-            Rectangle repaintRect;
-            if (isRollover) {
-                Rectangle r = table.getCellRect(row, col, false);
-                repaintRect = prevRollover ? r.union(table.getCellRect(prevRow, prevCol, false)) : r;
+            if (isURLColumn(table, col, row)) {
                 table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             } else {
-                repaintRect = table.getCellRect(prevRow, prevCol, false);
                 table.setCursor(Cursor.getDefaultCursor());
             }
-            table.repaint(repaintRect);
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            if (row < 0 || col < 0) {
+            JTable table = (JTable) e.getComponent();
+            Point pt = e.getPoint();
+
+            int row = table.rowAtPoint(pt);
+            int col = table.columnAtPoint(pt);
+            if (row < 0 || col != 1) {
                 return;
             }
 
-            JTable table = (JTable) e.getComponent();
             if (isURLColumn(table, col, row)) {
-                table.repaint(table.getCellRect(row, col, false));
-                row = -1;
-                col = -1;
-                isRollover = false;
                 table.setCursor(Cursor.getDefaultCursor());
             }
         }
@@ -158,16 +120,16 @@ public class ParameterTablePanel extends JPanel {
         @Override
         public void mouseClicked(MouseEvent e) {
             JTable table = (JTable) e.getComponent();
-
             Point pt = e.getPoint();
-            int ccol = table.columnAtPoint(pt);
-            int crow = table.rowAtPoint(pt);
-            if (ccol < 0 || crow < 0) {
+
+            int row = table.rowAtPoint(pt);
+            int col = table.columnAtPoint(pt);
+            if (row < 0 || col != 1) {
                 return;
             }
 
-            if (isURLColumn(table, ccol, crow)) {
-                JHVGlobals.openURL((String) table.getValueAt(crow, ccol));
+            if (isURLColumn(table, col, row)) {
+                JHVGlobals.openURL((String) table.getValueAt(row, col));
             }
         }
 
