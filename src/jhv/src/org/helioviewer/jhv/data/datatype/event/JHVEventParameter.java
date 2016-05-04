@@ -15,6 +15,8 @@ public class JHVEventParameter {
     /** The value of the parameter */
     private final String parameterValue;
 
+    private String parameterDisplayValue;
+
     /**
      * Creates a JHVEvent parameter with a parameter name, parameter display
      * name and parameter value.
@@ -63,7 +65,9 @@ public class JHVEventParameter {
      * Gets the parameter display value
      */
     public String getDisplayParameterValue() {
-        return beautifyValue(parameterValue);
+        if (parameterDisplayValue == null)
+            parameterDisplayValue = beautifyValue(parameterValue).intern();
+        return parameterDisplayValue;
     }
 
     private String beautifyValue(String value) {
