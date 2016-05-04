@@ -17,6 +17,8 @@ public class JHVEventParameter {
 
     private String parameterDisplayValue;
 
+    private String parameterSimpleDisplayValue;
+
     /**
      * Creates a JHVEvent parameter with a parameter name, parameter display
      * name and parameter value.
@@ -61,12 +63,21 @@ public class JHVEventParameter {
         return parameterValue;
     }
 
-    /**
-     * Gets the parameter display value
-     */
+    public String getSimpleDisplayParameterValue() {
+        if (parameterSimpleDisplayValue == null)
+            parameterSimpleDisplayValue = beautifyValue(parameterValue).intern();
+        return parameterSimpleDisplayValue;
+    }
+
     public String getDisplayParameterValue() {
-        if (parameterDisplayValue == null)
-            parameterDisplayValue = beautifyValue(parameterValue).intern();
+        if (parameterDisplayValue == null) {
+            parameterDisplayValue = getSimpleDisplayParameterValue();
+            if (parameterName == "ar_noaanum")
+                parameterDisplayValue = ("<a href=\"https://ui.adsabs.harvard.edu/#search/q=%22NOAA%20" +
+                                        parameterDisplayValue +
+                                        "%22&sort=date%20desc\">" +
+                                        parameterDisplayValue + "</a>").intern();
+        }
         return parameterDisplayValue;
     }
 
