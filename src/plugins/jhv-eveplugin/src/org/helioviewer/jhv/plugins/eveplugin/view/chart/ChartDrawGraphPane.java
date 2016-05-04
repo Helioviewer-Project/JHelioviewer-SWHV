@@ -199,7 +199,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawTimelineValues(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
-        if (mousePosition == null)
+        if (mousePosition == null || !graphArea.contains(mousePosition))
             return;
         long ts = timeAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
         String lbl = "(" + TimeUtils.utcDateFormat.format(ts);
