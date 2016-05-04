@@ -22,6 +22,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 public class ExportReadyDialog extends JDialog implements ActionListener, ShowableDialog {
 
     private final JTextPane messagePane = new JTextPane();
+    private final JButton closeButton = new JButton("Close");
 
     public ExportReadyDialog() {
         super(ImageViewerGui.getMainFrame(), false);
@@ -39,13 +40,11 @@ public class ExportReadyDialog extends JDialog implements ActionListener, Showab
 
         JPanel closeButtonContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        JButton closeButton = new JButton("Close");
         closeButtonContainer.add(closeButton);
         closeButton.addActionListener(this);
 
         add(closeButtonContainer, BorderLayout.SOUTH);
 
-        getRootPane().setDefaultButton(closeButton);
         getRootPane().registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
@@ -59,9 +58,11 @@ public class ExportReadyDialog extends JDialog implements ActionListener, Showab
 
     @Override
     public void showDialog() {
-        pack();
         setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
+
+        pack();
+        getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }
 
