@@ -23,7 +23,6 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
 
     private final JComboBox zoomCombo;
     final JToggleButton lockButton;
-    private boolean selectedIndexSetByProgram;
 
     private enum ZOOM {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
@@ -136,8 +135,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         }
     }
 
-    void updateSelectedInterval(TimeAxis availableAxis) {
-        selectedIndexSetByProgram = true;
+    void updateSelectedInterval(TimeAxis selectedAxis) {
         zoomCombo.setSelectedItem(zoomCombo.getItemAt(0));
     }
 
@@ -148,7 +146,6 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         switch (zoom) {
         case All:
             EVEPlugin.dc.setSelectedInterval(availableInterval.start, availableInterval.end);
-            selectedIndexSetByProgram = false;
             break;
         case Day:
             computeZoomInterval(selectedInterval.end, Calendar.DAY_OF_MONTH, value);
@@ -181,18 +178,15 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         if (view != null) {
             if (view.isMultiFrame()) {
                 EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
-                selectedIndexSetByProgram = false;
             }
             else {
                 long end = view.getFirstTime().milli + TimeUtils.DAY_IN_MILLIS / 2;
                 if (end > now)
                     end = now;
                 EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli - TimeUtils.DAY_IN_MILLIS / 2, end);
-                selectedIndexSetByProgram = false;
             }
         } else {
             EVEPlugin.dc.setSelectedInterval(now - TimeUtils.DAY_IN_MILLIS, now);
-            selectedIndexSetByProgram = false;
         }
     }
 
@@ -213,7 +207,6 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
 
         long startDate = endDate - differenceMilli;
         EVEPlugin.dc.setSelectedInterval(startDate, endDate);
-        selectedIndexSetByProgram = false;
     }
 
     private Long differenceInMilliseconds(int calendarField, long value) {

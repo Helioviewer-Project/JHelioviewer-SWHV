@@ -214,7 +214,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void lineDataRemoved(LineDataSelectorElement element) {
-        createGraphArea();
         fireRedrawRequest();
     }
 
@@ -224,7 +223,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void lineDataAdded(LineDataSelectorElement element) {
-        createGraphArea();
     }
 
     @Override
