@@ -70,6 +70,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         setAvailableInterval();
     }
 
+    public void moveXAvailableBased(int x0, int x1) {
+        long av_diff = availableAxis.pixel2value(0, graphSize.width, x1) - availableAxis.pixel2value(0, graphSize.width, x0);
+        selectedAxis.move(av_diff);
+        setAvailableInterval();
+    }
+
     private void zoomX(int x, double factor) {
         selectedAxis.zoom(graphArea.x, graphArea.width, x, factor);
         setAvailableInterval();

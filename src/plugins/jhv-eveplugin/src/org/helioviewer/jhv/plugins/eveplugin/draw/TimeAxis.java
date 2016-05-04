@@ -26,8 +26,12 @@ public class TimeAxis {
 
     void move(int x0, int w, double pixelDistance) {
         double diff = (double) (end - start) / w;
-        start = (long) (start + pixelDistance * diff);
-        end = (long) (end + pixelDistance * diff);
+        move(pixelDistance * diff);
+    }
+
+    void move(double diff) {
+        start = (long) (start + diff);
+        end = (long) (end + diff);
         adaptBounds();
     }
 
