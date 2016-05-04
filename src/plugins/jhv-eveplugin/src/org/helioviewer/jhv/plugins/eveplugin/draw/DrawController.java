@@ -243,6 +243,30 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     public void timeChanged(JHVDate date) {
         centraliseSelected(date.milli);
         fireRedrawRequestMovieFrameChanged(date.milli);
+        movieTimestamp = date.milli;
+    }
+
+    private long movieTimestamp = Long.MIN_VALUE;
+
+    public int getMovieLinePosition() {
+        int movieLinePosition = -1;
+        if (movieTimestamp == Long.MIN_VALUE) {
+            movieLinePosition = -1;
+        } else {
+            movieLinePosition = selectedAxis.value2pixel(graphArea.x, graphArea.width, movieTimestamp);
+            if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
+                movieLinePosition = -1;
+            }
+        }
+        return movieLinePosition;
+    }
+
+    public void setMovieFrame(Point point) {
+        if (movieTimestamp == Long.MIN_VALUE || !graphArea.contains(point)) {
+            return;
+        }
+        long millis = selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x);
+        Layers.setTime(new JHVDate(millis));
     }
 
     @Override
