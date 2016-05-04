@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.export;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -15,6 +13,7 @@ import javax.imageio.ImageIO;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.ImageUtils;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -80,13 +79,6 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    private static BufferedImage deepCopy(BufferedImage bi) {
-        ColorModel cm = bi.getColorModel();
-        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = bi.copyData(null);
-        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-    }
-
     public void handleMovieExport(GL2 gl) {
         if (!inited) {
             inited = true;
@@ -102,11 +94,11 @@ public class ExportMovie implements FrameListener {
         BufferedImage screenshot = grabber.renderFrame(gl);
         try {
             if (mode == RecordMode.SHOT) {
-                ImageIO.write(ExportUtils.pasteCanvases(screenshot, deepCopy(EVEImage), EVEMovieLinePosition, exportHeight), "png", new File(imagePath));
+                ImageIO.write(ExportUtils.pasteCanvases(screenshot, EVEImage, EVEMovieLinePosition, exportHeight), "png", new File(imagePath));
                 stop();
             } else {
                 try {
-                    executor.submit(new FrameConsumer(exporter, screenshot, deepCopy(EVEImage), EVEMovieLinePosition, exportHeight));
+                    executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition, exportHeight));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -219,7 +211,7 @@ public class ExportMovie implements FrameListener {
         public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition, int _height) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
-            eveImage = _eveImage;
+            eveImage = ImageUtils.deepCopy(_eveImage);
             movieLinePosition = _movieLinePosition;
             height = _height;
         }
