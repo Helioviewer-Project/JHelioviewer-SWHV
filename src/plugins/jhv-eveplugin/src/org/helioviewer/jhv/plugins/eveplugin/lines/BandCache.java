@@ -8,14 +8,13 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 
 public class BandCache {
 
-    private static final double DISCARD_LOG_LEVEL_LOW = 1e-10;
-    private static final double DISCARD_LOG_LEVEL_HIGH = 1e+4;
     private static long DAYS_PER_CHUNK = 8;
     private static final long MILLIS_PER_TICK = 60000;
     private static final long CHUNKED_SIZE = TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK;
@@ -45,7 +44,7 @@ public class BandCache {
                 cache = new DataChunk(key);
                 cacheMap.put(key, cache);
             }
-            if (values[i] > DISCARD_LOG_LEVEL_LOW && values[i] < DISCARD_LOG_LEVEL_HIGH) {
+            if (values[i] > DrawConstants.DISCARD_LEVEL_LOW && values[i] < DrawConstants.DISCARD_LEVEL_HIGH) {
                 cache.setValue((int) ((dates[i] % (MILLIS_PER_CHUNK)) / MILLIS_PER_TICK), values[i]);
             }
         }

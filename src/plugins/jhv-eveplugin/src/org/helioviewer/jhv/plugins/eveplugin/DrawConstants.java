@@ -52,4 +52,6 @@ public class DrawConstants {
 
     public static final DecimalFormat valueFormatter = MathUtils.numberFormatter("0", 4);
 
+    public static final double DISCARD_LEVEL_LOW = 1e-10;
+    public static final double DISCARD_LEVEL_HIGH = 1e+4;
 }
