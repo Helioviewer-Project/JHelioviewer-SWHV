@@ -5,8 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 
@@ -60,10 +60,6 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
                 lockButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
             }
         } else if (source.equals(zoomCombo)) {
-            if (selectedIndexSetByProgram) {
-                selectedIndexSetByProgram = false;
-                return;
-            }
             ZoomComboboxItem item = (ZoomComboboxItem) zoomCombo.getSelectedItem();
             if (item != null) {
                 zoomTo(item.zoom, item.number);
@@ -140,9 +136,9 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         }
     }
 
-    void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
+    void updateSelectedInterval(TimeAxis availableAxis) {
         selectedIndexSetByProgram = true;
-        zoomCombo.setSelectedIndex(0);
+        zoomCombo.setSelectedItem(zoomCombo.getItemAt(0));
     }
 
     private void zoomTo(ZOOM zoom, long value) {
@@ -152,6 +148,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         switch (zoom) {
         case All:
             EVEPlugin.dc.setSelectedInterval(availableInterval.start, availableInterval.end);
+            selectedIndexSetByProgram = false;
             break;
         case Day:
             computeZoomInterval(selectedInterval.end, Calendar.DAY_OF_MONTH, value);
@@ -172,7 +169,9 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
             computeMovieInterval();
             break;
         case CUSTOM:
+            break;
         default:
+            break;
         }
     }
 
@@ -180,16 +179,21 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         View view = Layers.getActiveView();
         long now = System.currentTimeMillis();
         if (view != null) {
-            if (view.isMultiFrame())
+            if (view.isMultiFrame()) {
                 EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
+                selectedIndexSetByProgram = false;
+            }
             else {
                 long end = view.getFirstTime().milli + TimeUtils.DAY_IN_MILLIS / 2;
                 if (end > now)
                     end = now;
                 EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli - TimeUtils.DAY_IN_MILLIS / 2, end);
+                selectedIndexSetByProgram = false;
             }
-        } else
+        } else {
             EVEPlugin.dc.setSelectedInterval(now - TimeUtils.DAY_IN_MILLIS, now);
+            selectedIndexSetByProgram = false;
+        }
     }
 
     private void computeCarringtonInterval(long end, long value) {
@@ -209,6 +213,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
 
         long startDate = endDate - differenceMilli;
         EVEPlugin.dc.setSelectedInterval(startDate, endDate);
+        selectedIndexSetByProgram = false;
     }
 
     private Long differenceInMilliseconds(int calendarField, long value) {
