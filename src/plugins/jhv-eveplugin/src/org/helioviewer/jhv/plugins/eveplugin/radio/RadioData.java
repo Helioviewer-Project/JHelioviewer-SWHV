@@ -200,7 +200,11 @@ public class RadioData implements LineDataSelectorElement {
 
     @Override
     public boolean hasData() {
-        return true;
+        for (DownloadedJPXData djpx : cache.values()) {
+            if (djpx.hasData())
+                return true;
+        }
+        return false;
     }
 
     @Override

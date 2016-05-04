@@ -227,4 +227,8 @@ public class JHVEventCache {
         return null;
     }
 
+    public boolean hasData() {
+        return !events.isEmpty();
+    }
+
 }

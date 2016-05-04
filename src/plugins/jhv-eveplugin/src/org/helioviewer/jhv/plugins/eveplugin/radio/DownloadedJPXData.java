@@ -262,4 +262,8 @@ class DownloadedJPXData implements ImageDataHandler {
         }
     }
 
+    public boolean hasData() {
+        return hasData;
+    }
+
 }
