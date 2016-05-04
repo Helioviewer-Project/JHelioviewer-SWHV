@@ -543,7 +543,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void drawMovieLineRequest(long time) {
+    public void drawMovieLineRequest() {
         updateGraph();
     }
 

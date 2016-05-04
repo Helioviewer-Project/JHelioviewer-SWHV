@@ -446,7 +446,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     }
 
     @Override
-    public void drawMovieLineRequest(long time) {
+    public void drawMovieLineRequest() {
     }
 
     @Override
