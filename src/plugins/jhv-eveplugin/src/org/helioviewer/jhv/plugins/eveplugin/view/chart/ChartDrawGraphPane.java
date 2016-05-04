@@ -66,7 +66,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private int lastHeight;
     private boolean updateRequestReceived;
 
-    private boolean movieLineRequest = false;
     private DragMode dragMode = DragMode.NODRAG;
 
     public ChartDrawGraphPane() {
@@ -121,7 +120,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int width = sx * getWidth();
         int height = sy * getHeight();
 
-        if (width > 0 && height > 0 && sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + 1) < height && sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + 1) < width && !movieLineRequest) {
+        if (width > 0 && height > 0 && sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + 1) < height && sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + 1) < width) {
             if (width != lastWidth || height != lastHeight) {
                 GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
                 GraphicsDevice device = env.getDefaultScreenDevice();
@@ -155,7 +154,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.dispose();
         }
         repaint();
-        movieLineRequest = false;
     }
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
