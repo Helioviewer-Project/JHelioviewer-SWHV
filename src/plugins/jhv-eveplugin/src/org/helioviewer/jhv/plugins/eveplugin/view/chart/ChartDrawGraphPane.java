@@ -380,7 +380,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private void drawMovieLine(Graphics2D g, Rectangle graphArea) {
         int movieLinePosition = getMovieLinePosition(graphArea);
         ExportMovie.EVEMovieLinePosition = movieLinePosition;
-        if (movieLinePosition < 0 || graphArea.height < 0) {
+        if (movieLinePosition < 0) {
             return;
         }
         g.setColor(DrawConstants.MOVIE_FRAME_COLOR);
