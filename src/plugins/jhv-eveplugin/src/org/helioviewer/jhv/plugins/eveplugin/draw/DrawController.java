@@ -91,6 +91,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                     el.yaxisChanged();
                 } else if ((!inRightYAxes && !inLeftYAxis) && move) {
                     el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
+                    el.yaxisChanged();
+                } else if ((!inRightYAxes && !inLeftYAxis) && zoom) {
+                    el.getYAxis().zoomSelectedRange(scrollDistance, graphSize.height - p.y - graphArea.y, graphArea.height);
+                    el.yaxisChanged();
                 }
                 ct++;
             }
@@ -125,7 +129,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         moveAndZoomY(p, 0, scrollDistance, true, false);
     }
 
-    public void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt) {
+    public void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
         double zoomTimeFactor = 10;
         boolean inGraphArea = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
         boolean inXAxisOrAboveGraph = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height));
@@ -137,7 +141,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                 moveX(zoomTimeFactor * scrollDistance);
             }
         }
-        zoomY(p, scrollDistance);
+        if ((inGraphArea && alt) || (inGraphArea && ctrl) || !inGraphArea) {
+            zoomY(p, scrollDistance);
+        }
     }
 
     public void moveAllAxes(double distanceY) {
