@@ -58,6 +58,7 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
     @Override
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
         this.events = events;
+        EVEPlugin.ldsm.downloadFinished(this);
         if (isVisible) {
             EVEPlugin.dc.fireRedrawRequest();
         }

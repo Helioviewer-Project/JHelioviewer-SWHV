@@ -97,9 +97,9 @@ class DownloadedJPXData implements ImageDataHandler {
             bufferedImage = createBufferedImage(w, h, data);
 
             if (!hasData) {
+                hasData = true;
                 EVEPlugin.ldsm.downloadFinished(EVEPlugin.rdm);
             }
-            hasData = true;
             EVEPlugin.dc.fireRedrawRequest();
         }
     }
