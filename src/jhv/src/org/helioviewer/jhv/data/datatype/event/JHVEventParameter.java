@@ -81,6 +81,8 @@ public class JHVEventParameter {
                 return result;
             }
         } else {
+            if ((Regex.WEB_URL.matcher(value).matches()))
+                return "<a href=\"" + value + "\">Open URL</a>";
             return value;
         }
     }

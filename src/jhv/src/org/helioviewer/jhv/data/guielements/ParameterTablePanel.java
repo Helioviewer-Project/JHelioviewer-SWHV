@@ -8,6 +8,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.regex.Matcher;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -70,17 +71,21 @@ public class ParameterTablePanel extends JPanel {
             return this;
         }
 
-        private boolean isValueURL(Object value) {
+        private String extractURL(JTable table, int col, int row) {
+            Object value = table.getValueAt(row, col);
             if (value instanceof String) {
                 String strValue = (String) value;
-                return Regex.WEB_URL.matcher(strValue).matches();
-            } else {
-                return false;
-            }
-        }
 
-        private boolean isURLColumn(JTable table, int col, int row) {
-            return isValueURL(table.getValueAt(row, col));
+                String url;
+                Matcher m = Regex.HREF.matcher(strValue);
+                if (m.find()) {
+                    url = m.group(1);
+                } else
+                    url = strValue;
+                return Regex.WEB_URL.matcher(url).matches() ? url : null;
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -90,11 +95,11 @@ public class ParameterTablePanel extends JPanel {
 
             int row = table.rowAtPoint(pt);
             int col = table.columnAtPoint(pt);
-            if (row < 0 || col != 1) {
+            if (row < 0 || col < 0) {
                 return;
             }
 
-            if (isURLColumn(table, col, row)) {
+            if (extractURL(table, col, row) != null) {
                 table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             } else {
                 table.setCursor(Cursor.getDefaultCursor());
@@ -104,17 +109,7 @@ public class ParameterTablePanel extends JPanel {
         @Override
         public void mouseExited(MouseEvent e) {
             JTable table = (JTable) e.getComponent();
-            Point pt = e.getPoint();
-
-            int row = table.rowAtPoint(pt);
-            int col = table.columnAtPoint(pt);
-            if (row < 0 || col != 1) {
-                return;
-            }
-
-            if (isURLColumn(table, col, row)) {
-                table.setCursor(Cursor.getDefaultCursor());
-            }
+            table.setCursor(Cursor.getDefaultCursor());
         }
 
         @Override
@@ -128,8 +123,9 @@ public class ParameterTablePanel extends JPanel {
                 return;
             }
 
-            if (isURLColumn(table, col, row)) {
-                JHVGlobals.openURL((String) table.getValueAt(row, col));
+            String url = extractURL(table, col, row);
+            if (url != null) {
+                JHVGlobals.openURL(url);
             }
         }
 
