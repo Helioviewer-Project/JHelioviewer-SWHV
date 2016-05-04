@@ -349,7 +349,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             if (highlight) {
                 Stroke s = g.getStroke();
                 g.setStroke(new BasicStroke(2));
-                g.setFont(UIGlobals.UIFontSmallBold);
+                g.setFont(DrawConstants.fontBold);
                 g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
                 g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
                 g.setStroke(s);
@@ -376,7 +376,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
         if (needTxt)
             if (highlight) {
-                g.setFont(UIGlobals.UIFontSmallBold);
+                g.setFont(DrawConstants.fontBold);
                 g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
                 g.setFont(DrawConstants.font);
             } else {
@@ -391,7 +391,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             movieLinePosition = -1;
         } else {
             movieLinePosition = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, movieTimestamp);
-
             if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
                 movieLinePosition = -1;
             }
@@ -544,11 +543,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void componentHidden(ComponentEvent e) {
+        // only resize called
     }
 
     @Override
     public void componentMoved(ComponentEvent e) {
-        drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
+        // only resize called
     }
 
     @Override
@@ -558,7 +558,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void componentShown(ComponentEvent e) {
-        drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
+        // only resize called
     }
 
     @Override
