@@ -67,7 +67,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean updateRequestReceived;
 
     private boolean movieLineRequest = false;
-    private boolean forceRedrawGraph = false;
     private DragMode dragMode = DragMode.NODRAG;
 
     public ChartDrawGraphPane() {
@@ -87,7 +86,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
         redrawTimer.start();
-
     }
 
     private class RedrawListener implements ActionListener {
@@ -123,7 +121,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int width = sx * getWidth();
         int height = sy * getHeight();
 
-        if (width > 0 && height > 0 && sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + 1) < height && sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + 1) < width && (!movieLineRequest || forceRedrawGraph)) {
+        if (width > 0 && height > 0 && sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + 1) < height && sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + 1) < width && !movieLineRequest) {
             if (width != lastWidth || height != lastHeight) {
                 GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
                 GraphicsDevice device = env.getDefaultScreenDevice();
@@ -156,9 +154,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             }
             g.dispose();
         }
-        this.repaint();
+        repaint();
         movieLineRequest = false;
-        forceRedrawGraph = false;
     }
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
@@ -183,7 +180,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int rightYAxisNumber = -1;
         boolean inLeftYAxis = false;
         boolean inRightYAxes = false;
-        if (this.mousePosition != null) {
+        if (mousePosition != null) {
             boolean yAxisVerticalCondition = (mousePosition.y > graphArea.y && mousePosition.y <= graphArea.y + graphArea.height);
             inRightYAxes = mousePosition.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
             inLeftYAxis = mousePosition.x < graphArea.x && yAxisVerticalCondition;
@@ -356,7 +353,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
                 g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
             }
-
         }
     }
 
@@ -538,13 +534,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawRequest() {
-        forceRedrawGraph = true;
-        updateGraph();
+        updateGraph(); // precies hetzelfde
     }
 
     @Override
     public void drawMovieLineRequest() {
-        updateGraph();
+        updateGraph(); // precies hetzelfde
     }
 
     @Override
