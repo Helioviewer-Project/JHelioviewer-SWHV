@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.export;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -78,6 +80,13 @@ public class ExportMovie implements FrameListener {
         }
     }
 
+    private static BufferedImage deepCopy(BufferedImage bi) {
+        ColorModel cm = bi.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = bi.copyData(null);
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    }
+
     public void handleMovieExport(GL2 gl) {
         if (!inited) {
             inited = true;
@@ -93,11 +102,11 @@ public class ExportMovie implements FrameListener {
         BufferedImage screenshot = grabber.renderFrame(gl);
         try {
             if (mode == RecordMode.SHOT) {
-                ImageIO.write(ExportUtils.pasteCanvases(screenshot, EVEImage, EVEMovieLinePosition, exportHeight), "png", new File(imagePath));
+                ImageIO.write(ExportUtils.pasteCanvases(screenshot, deepCopy(EVEImage), EVEMovieLinePosition, exportHeight), "png", new File(imagePath));
                 stop();
             } else {
                 try {
-                    executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition, exportHeight));
+                    executor.submit(new FrameConsumer(exporter, screenshot, deepCopy(EVEImage), EVEMovieLinePosition, exportHeight));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
