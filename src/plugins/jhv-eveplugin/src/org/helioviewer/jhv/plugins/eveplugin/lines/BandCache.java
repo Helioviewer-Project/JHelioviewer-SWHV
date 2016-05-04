@@ -22,6 +22,7 @@ public class BandCache {
     private static final long MILLIS_PER_CHUNK = TimeUtils.DAY_IN_MILLIS * DAYS_PER_CHUNK;
     private static int MAX_LEVEL = 12;
     private static int FACTOR_STEP = 2;
+    private boolean hasData = false;
 
     private final HashMap<Long, DataChunk> cacheMap = new HashMap<Long, DataChunk>();
 
@@ -29,7 +30,14 @@ public class BandCache {
         return date / MILLIS_PER_CHUNK;
     }
 
+    public boolean hasData() {
+        return hasData;
+    }
+
     void addToCache(final float[] values, final long[] dates) {
+        if (values.length != 0) {
+            hasData = true;
+        }
         for (int i = 0; i < values.length; i++) {
             long key = date2key(dates[i]);
             DataChunk cache = cacheMap.get(key);
