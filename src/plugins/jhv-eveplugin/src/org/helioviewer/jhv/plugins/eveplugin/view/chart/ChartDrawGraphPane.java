@@ -148,17 +148,23 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 Log.info(sx * DrawConstants.GRAPH_LEFT_SPACE + " " + sy * DrawConstants.GRAPH_TOP_SPACE + " " + sx * graphArea.width + " " + sy * graphArea.height);
                 drawData(g, g, graphArea, mousePosition);
             } else {
-                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                g.setFont(DrawConstants.font);
-                BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, sx * graphArea.width, sy * graphArea.height);
-                Graphics2D gplotPart = plotPart.createGraphics();
-                AffineTransform plottf = new AffineTransform();
-                plottf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
-                plottf.translate(-graphArea.x, -graphArea.y);
-                gplotPart.setTransform(plottf);
-                gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                gplotPart.setFont(DrawConstants.font);
-                drawData(g, gplotPart, graphArea, mousePosition);
+                try {
+                    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                    g.setFont(DrawConstants.font);
+                    BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, sx * graphArea.width, sy * graphArea.height);
+                    Graphics2D gplotPart = plotPart.createGraphics();
+                    AffineTransform plottf = new AffineTransform();
+                    plottf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
+                    plottf.translate(-graphArea.x, -graphArea.y);
+                    gplotPart.setTransform(plottf);
+                    gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                    gplotPart.setFont(DrawConstants.font);
+                    drawData(g, gplotPart, graphArea, mousePosition);
+                } catch (Exception e) {
+                    Log.info("Current " + width + " " + height + " " + screenImage.getWidth() + " " + screenImage.getHeight());
+                    Log.info(sx * DrawConstants.GRAPH_LEFT_SPACE + " " + sy * DrawConstants.GRAPH_TOP_SPACE + " " + sx * graphArea.width + " " + sy * graphArea.height);
+                    System.exit(1);
+                }
             }
 
             g.dispose();
