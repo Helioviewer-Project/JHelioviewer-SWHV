@@ -180,9 +180,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void centraliseSelected(long time) {
-        if (time != Long.MIN_VALUE && latestMovieTime != time && isLocked
-                && availableAxis.start <= time && availableAxis.end >= time) {
-            latestMovieTime = time;
+        if (time != Long.MIN_VALUE && isLocked && availableAxis.start <= time && availableAxis.end >= time) {
             long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
             selectedAxis.set(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)), false);
             fireRedrawRequest();
@@ -241,19 +239,21 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void timeChanged(JHVDate date) {
-        movieTimestamp = date.milli;
-        centraliseSelected(date.milli);
+        timeChanged(date.milli);
+    }
+
+    private void timeChanged(long milli) {
+        latestMovieTime = milli;
+        centraliseSelected(latestMovieTime);
         fireRedrawRequestMovieFrameChanged();
     }
 
-    private long movieTimestamp = Long.MIN_VALUE;
-
     public int getMovieLinePosition() {
         int movieLinePosition = -1;
-        if (movieTimestamp == Long.MIN_VALUE) {
+        if (latestMovieTime == Long.MIN_VALUE) {
             movieLinePosition = -1;
         } else {
-            movieLinePosition = selectedAxis.value2pixel(graphArea.x, graphArea.width, movieTimestamp);
+            movieLinePosition = selectedAxis.value2pixel(graphArea.x, graphArea.width, latestMovieTime);
             if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
                 movieLinePosition = -1;
             }
@@ -262,7 +262,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void setMovieFrame(Point point) {
-        if (movieTimestamp == Long.MIN_VALUE || !graphArea.contains(point)) {
+        if (latestMovieTime == Long.MIN_VALUE || !graphArea.contains(point)) {
             return;
         }
         long millis = selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x);
@@ -282,8 +282,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     @Override
     public void activeLayerChanged(View view) {
         if (view == null) {
-            movieTimestamp = Long.MIN_VALUE;
-            fireRedrawRequestMovieFrameChanged();
+            timeChanged(Long.MIN_VALUE);
             optionsPanel.lockButton.setEnabled(false);
         } else {
             fireMovieIntervalChanged(view.getFirstTime().milli, view.getLastTime().milli);
