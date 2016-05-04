@@ -56,7 +56,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private final DrawController drawController;
     private long movieTimestamp = Long.MIN_VALUE;
-    private final int movieLinePosition = -1;
     private Point mousePressedPosition = null;
     private Point mouseDragPosition = null;
 
@@ -364,7 +363,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
     }
 
-    private void drawMovieLine(Graphics2D g, Rectangle graphArea) {
+    private int getMovieLinePosition(Rectangle graphArea) {
         int movieLinePosition = -1;
         if (movieTimestamp == Long.MIN_VALUE) {
             movieLinePosition = -1;
@@ -375,6 +374,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 movieLinePosition = -1;
             }
         }
+        return movieLinePosition;
+    }
+
+    private void drawMovieLine(Graphics2D g, Rectangle graphArea) {
+        int movieLinePosition = getMovieLinePosition(graphArea);
         ExportMovie.EVEMovieLinePosition = movieLinePosition;
         if (movieLinePosition < 0 || graphArea.height < 0) {
             return;
@@ -484,6 +488,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private boolean overMovieLine(Point p, Rectangle graphArea) {
+        int movieLinePosition = getMovieLinePosition(graphArea);
         Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
         return movieLinePosition >= 0 && frame.contains(p);
     }
