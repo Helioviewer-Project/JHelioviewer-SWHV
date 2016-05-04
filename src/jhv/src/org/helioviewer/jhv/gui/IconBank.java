@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -9,7 +8,6 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.ImageUtils;
 
 /**
  * This class provides access to all images, icons and cursors which are used by
@@ -135,51 +133,6 @@ public class IconBank {
             return bi;
         }
         return null;
-    }
-
-    public static Color getAverageColor(BufferedImage bufImg) {
-        long sumRed = 0;
-        long sumGreen = 0;
-        long sumBlue = 0;
-
-        for (int x = 0; x < bufImg.getWidth(); x++) {
-            for (int y = 0; y < bufImg.getHeight(); y++) {
-                Color curColor = new Color(bufImg.getRGB(x, y), true);
-                sumRed += curColor.getRed();
-                sumGreen += curColor.getGreen();
-                sumBlue += curColor.getBlue();
-            }
-        }
-
-        int totalPixels = bufImg.getWidth() * bufImg.getHeight();
-        float red = (sumRed / totalPixels) / 255.0f;
-        float green = (sumGreen / totalPixels) / 255.0f;
-        float blue = (sumBlue / totalPixels) / 255.0f;
-
-        return new Color(red, green, blue);
-    }
-
-    public static BufferedImage stackImages(BufferedImage[] bufImgs, double horizontal, double vertical) {
-        // exit if no real image data is available
-        if (bufImgs.length == 0 || bufImgs[0] == null) {
-            return null;
-        }
-
-        // the first layer is strictly copied
-        BufferedImage result = ImageUtils.deepCopy(bufImgs[0]);
-        int width = result.getWidth();
-        int height = result.getHeight();
-
-        Graphics2D g = result.createGraphics();
-        for (int i = 1; i < bufImgs.length; i++) {
-            BufferedImage currentImg = bufImgs[i];
-            int offsetX = (int) (horizontal * (width - currentImg.getWidth()));
-            int offsetY = (int) (vertical * (height - currentImg.getHeight()));
-            g.drawImage(currentImg, null, offsetX, offsetY);
-        }
-        g.dispose();
-
-        return result;
     }
 
 }
