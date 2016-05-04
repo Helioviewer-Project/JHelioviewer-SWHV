@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.chart;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -10,6 +11,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -179,21 +181,32 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
 
         Color c = DrawConstants.TICK_LINE_COLOR;
-        int ct = 0;
+        drawHorizontalLabels(g, graphArea, timeAxis, c);
+
+        int rightYAxisNumber = -1;
+        boolean inLeftYAxis = false;
+        boolean inRightYAxes = false;
+        if (this.mousePosition != null) {
+            boolean yAxisVerticalCondition = (mousePosition.y > graphArea.y && mousePosition.y <= graphArea.y + graphArea.height);
+            inRightYAxes = mousePosition.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
+            inLeftYAxis = mousePosition.x < graphArea.x && yAxisVerticalCondition;
+            rightYAxisNumber = (mousePosition.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+        }
+        int ct = -1;
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
-                if (ct == 0) {
-                    c = el.getDataColor();
+                if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                    drawVerticalLabels(g, graphArea, el, ct, true);
+                } else {
+                    drawVerticalLabels(g, graphArea, el, ct, false);
                 }
-                drawVerticalLabels(g, graphArea, el, ct);
                 ct++;
             }
         }
-        if (ct == 0) {
+        if (ct == -1) {
             drawNoData(g, graphArea);
             return;
         }
-        drawHorizontalLabels(g, graphArea, timeAxis, c);
 
         drawTimelineValues(g, graphArea, timeAxis);
     }
@@ -286,27 +299,17 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.drawString(text, x, y);
     }
 
-    private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, LineDataSelectorElement el, int leftSide) {
+    private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, LineDataSelectorElement el, int leftSide, boolean highlight) {
         int axis_x_offset;
         g.setColor(Color.WHITE);
-        if (leftSide == 0) {
+        if (leftSide == -1) {
             axis_x_offset = graphArea.x;
         } else {
-            axis_x_offset = graphArea.x + graphArea.width + (leftSide - 1) * DrawConstants.RIGHT_AXIS_WIDTH;
+            axis_x_offset = graphArea.x + graphArea.width + (leftSide) * DrawConstants.RIGHT_AXIS_WIDTH;
         }
-        g.setColor(el.getDataColor());
 
+        g.setColor(el.getDataColor());
         YAxis yAxis = el.getYAxis();
-        // Label and axis
-        {
-            String verticalLabel = yAxis.getLabel();
-            final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
-            int vWidth = (int) verticalLabelBounds.getWidth();
-            int vHeight = (int) verticalLabelBounds.getHeight();
-            int labelCompensation = vWidth / 2;
-            g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
-            g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
-        }
 
         // Vertical lines
         {
@@ -326,30 +329,60 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             }
             double tick = startv;
             int ct = 0;
-            drawHorizontalTickline(g, graphArea, yAxis, start, axis_x_offset, leftSide, false);
+            drawHorizontalTickline(g, graphArea, yAxis, start, axis_x_offset, leftSide, false, highlight);
             while (tick <= endv && ct < 20) {
                 if (tick >= start && tick <= end)
-                    drawHorizontalTickline(g, graphArea, yAxis, tick, axis_x_offset, leftSide, true);
+                    drawHorizontalTickline(g, graphArea, yAxis, tick, axis_x_offset, leftSide, true, highlight);
                 tick += step;
                 ct++;
             }
-            drawHorizontalTickline(g, graphArea, yAxis, end, axis_x_offset, leftSide, false);
+            drawHorizontalTickline(g, graphArea, yAxis, end, axis_x_offset, leftSide, false, highlight);
+        }
+
+        // Label and axis
+        {
+            String verticalLabel = yAxis.getLabel();
+            final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
+            int vWidth = (int) verticalLabelBounds.getWidth();
+            int vHeight = (int) verticalLabelBounds.getHeight();
+            int labelCompensation = vWidth / 2;
+            if (highlight) {
+                Stroke s = g.getStroke();
+                g.setStroke(new BasicStroke(2));
+                g.setFont(UIGlobals.UIFontSmallBold);
+                g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
+                g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
+                g.setStroke(s);
+                g.setFont(DrawConstants.font);
+
+            } else {
+                g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
+                g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
+            }
+
         }
     }
 
-    private void drawHorizontalTickline(Graphics g, Rectangle graphArea, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt) {
+    private void drawHorizontalTickline(Graphics g, Rectangle graphArea, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt, boolean highlight) {
         String tickText = DrawConstants.valueFormatter.format(tick);
         int y = yAxis.scaledvalue2pixel(graphArea.y, graphArea.height, tick);
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
         int x_str;
-        if (leftSide == 0) {
+        if (leftSide == -1) {
             x_str = axis_x_offset - 6 - (int) bounds.getWidth();
             g.drawLine(axis_x_offset - 3, y, graphArea.x + graphArea.width, y);
         } else {
             x_str = axis_x_offset;
         }
         if (needTxt)
-            g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
+            if (highlight) {
+                g.setFont(UIGlobals.UIFontSmallBold);
+                g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
+                g.setFont(DrawConstants.font);
+            } else {
+                g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
+            }
+
     }
 
     private int getMovieLinePosition(Rectangle graphArea) {
