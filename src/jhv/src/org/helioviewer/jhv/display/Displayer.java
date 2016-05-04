@@ -226,7 +226,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static void render(double f) {
-        if (Layers.getActiveView() == null)
+        if (Layers.getActiveView() == null || Layers.getNumVisibleLayers() == 0)
             toDisplay = true;
         else
             renderFactor = f;
