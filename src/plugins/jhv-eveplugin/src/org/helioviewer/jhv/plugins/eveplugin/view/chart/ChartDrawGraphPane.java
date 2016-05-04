@@ -28,6 +28,7 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -86,11 +87,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addComponentListener(this);
         drawController.addDrawControllerListener(this);
         eventModel = EventModel.getSingletonInstance();
+        setChartInformation();
 
         Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
         redrawTimer.start();
 
-        setChartInformation();
     }
 
     private class RedrawListener implements ActionListener {
@@ -142,20 +143,23 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
             g.setTransform(tf);
             drawBackground(g);
-
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            g.setFont(DrawConstants.font);
-
-            BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, sx * graphArea.width, sy * graphArea.height);
-            Graphics2D gplotPart = plotPart.createGraphics();
-            AffineTransform plottf = new AffineTransform();
-            plottf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
-            plottf.translate(-graphArea.x, -graphArea.y);
-            gplotPart.setTransform(plottf);
-            gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            gplotPart.setFont(DrawConstants.font);
-
-            drawData(g, gplotPart, graphArea, mousePosition);
+            if (sx * DrawConstants.GRAPH_LEFT_SPACE + sx * graphArea.width > width) {
+                Log.info("Current " + width + " " + height + " " + screenImage.getWidth() + " " + screenImage.getHeight());
+                Log.info(sx * DrawConstants.GRAPH_LEFT_SPACE + " " + sy * DrawConstants.GRAPH_TOP_SPACE + " " + sx * graphArea.width + " " + sy * graphArea.height);
+                drawData(g, g, graphArea, mousePosition);
+            } else {
+                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g.setFont(DrawConstants.font);
+                BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, sx * graphArea.width, sy * graphArea.height);
+                Graphics2D gplotPart = plotPart.createGraphics();
+                AffineTransform plottf = new AffineTransform();
+                plottf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
+                plottf.translate(-graphArea.x, -graphArea.y);
+                gplotPart.setTransform(plottf);
+                gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                gplotPart.setFont(DrawConstants.font);
+                drawData(g, gplotPart, graphArea, mousePosition);
+            }
 
             g.dispose();
         }
@@ -539,6 +543,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void setChartInformation() {
         drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
+        updateGraphArea();
     }
 
     @Override
