@@ -241,9 +241,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void timeChanged(JHVDate date) {
-        centraliseSelected(date.milli);
-        fireRedrawRequestMovieFrameChanged(date.milli);
         movieTimestamp = date.milli;
+        centraliseSelected(date.milli);
+        fireRedrawRequestMovieFrameChanged();
     }
 
     private long movieTimestamp = Long.MIN_VALUE;
@@ -282,7 +282,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     @Override
     public void activeLayerChanged(View view) {
         if (view == null) {
-            fireRedrawRequestMovieFrameChanged(Long.MIN_VALUE);
+            movieTimestamp = Long.MIN_VALUE;
+            fireRedrawRequestMovieFrameChanged();
             optionsPanel.lockButton.setEnabled(false);
         } else {
             fireMovieIntervalChanged(view.getFirstTime().milli, view.getLastTime().milli);
@@ -296,9 +297,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private void fireRedrawRequestMovieFrameChanged(long time) {
+    private void fireRedrawRequestMovieFrameChanged() {
         for (DrawControllerListener l : listeners) {
-            l.drawMovieLineRequest(time);
+            l.drawMovieLineRequest();
         }
     }
 
