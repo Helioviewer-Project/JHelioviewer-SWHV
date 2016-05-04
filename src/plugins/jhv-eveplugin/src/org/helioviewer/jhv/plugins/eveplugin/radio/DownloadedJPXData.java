@@ -150,7 +150,6 @@ class DownloadedJPXData implements ImageDataHandler {
     private double last_resolution = -1;
     private long last_padded_start = -1;
     private long last_padded_end = -1;
-    private long last_roi_height = -1;
     private int last_y0 = -1;
     private int last_height = -1;
 
