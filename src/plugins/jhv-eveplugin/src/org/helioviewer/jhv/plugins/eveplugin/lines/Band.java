@@ -110,7 +110,7 @@ public class Band implements LineDataSelectorElement {
 
     @Override
     public boolean hasData() {
-        return true;
+        return bandCache.hasData();
     }
 
     @Override
