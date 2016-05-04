@@ -29,6 +29,8 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
     };
 
     public DrawControllerOptionsPanel() {
+        setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+
         zoomCombo = new JComboBox(fillZoomCombo());
         fillZoomCombo();
         zoomCombo.addActionListener(this);
@@ -41,7 +43,6 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         lockButton.setEnabled(Layers.getActiveView() != null);
         lockButton.addActionListener(this);
 
-        setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         add(zoomCombo);
         add(lockButton);
 
