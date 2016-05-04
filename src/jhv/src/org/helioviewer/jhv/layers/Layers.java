@@ -35,6 +35,14 @@ public class Layers {
         return layers.size();
     }
 
+    public static int getNumVisibleLayers() {
+        int ct = 0;
+        for (View v : layers)
+            if (v.getImageLayer().isVisible())
+                ct++;
+        return ct;
+    }
+
     public static View getActiveView() {
         return activeView;
     }
