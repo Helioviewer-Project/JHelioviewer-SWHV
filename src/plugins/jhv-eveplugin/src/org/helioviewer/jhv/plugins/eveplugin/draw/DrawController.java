@@ -201,10 +201,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return graphArea;
     }
 
-    public Rectangle getGraphSize() {
-        return graphSize;
-    }
-
     public boolean isLocked() {
         return isLocked;
     }

@@ -56,11 +56,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private final DrawController drawController;
     private long movieTimestamp = Long.MIN_VALUE;
-    private int movieLinePosition = -1;
+    private final int movieLinePosition = -1;
     private Point mousePressedPosition = null;
     private Point mouseDragPosition = null;
 
-    private Rectangle graphArea = new Rectangle();
     private BufferedImage screenImage = null;
     private final EventModel eventModel;
 
@@ -98,7 +97,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         public void actionPerformed(ActionEvent e) {
             if (updateRequestReceived) {
                 updateRequestReceived = false;
-                updateDrawInformation();
                 redrawGraph();
             }
         }
@@ -112,7 +110,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (screenImage != null) {
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
-            drawMovieLine(g);
+            Rectangle graphArea = drawController.getGraphArea();
+            drawMovieLine(g, graphArea);
         }
     }
 
@@ -121,6 +120,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void redrawGraph() {
+        Rectangle graphArea = drawController.getGraphArea();
+
         int sx = GLInfo.pixelScale[0], sy = GLInfo.pixelScale[1];
         int width = sx * getWidth();
         int height = sy * getHeight();
@@ -173,11 +174,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             el.draw(plotG, fullG, graphArea, drawController.selectedAxis, mousePosition);
         }
         drawLabels(fullG, graphArea, drawController.selectedAxis);
-    }
-
-    private void updateDrawInformation() {
-        updateGraphArea();
-        updateMovieLineInformation();
     }
 
     private void drawBackground(Graphics2D g) {
@@ -362,39 +358,28 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
     }
 
-    private void drawMovieLine(Graphics2D g) {
+    private void drawMovieLine(Graphics2D g, Rectangle graphArea) {
+        int movieLinePosition = -1;
+        if (movieTimestamp == Long.MIN_VALUE) {
+            movieLinePosition = -1;
+        } else {
+            movieLinePosition = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, movieTimestamp);
+
+            if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
+                movieLinePosition = -1;
+            }
+        }
+        ExportMovie.EVEMovieLinePosition = movieLinePosition;
         if (movieLinePosition < 0 || graphArea.height < 0) {
             return;
         }
         g.setColor(DrawConstants.MOVIE_FRAME_COLOR);
-        g.drawLine(movieLinePosition, graphArea.y, movieLinePosition, graphArea.y + graphArea.height);
-    }
-
-    private void updateGraphArea() {
-        graphArea = drawController.getGraphArea();
-    }
-
-    private boolean updateMovieLineInformation() {
-        int newMovieLine = -1;
-        if (movieTimestamp == Long.MIN_VALUE) {
-            newMovieLine = -1;
-        } else {
-            newMovieLine = drawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, movieTimestamp);
-
-            if (newMovieLine < graphArea.x || newMovieLine > (graphArea.x + graphArea.width)) {
-                newMovieLine = -1;
-            }
-        }
-        if (newMovieLine != movieLinePosition) {
-            movieLinePosition = newMovieLine;
-            ExportMovie.EVEMovieLinePosition = movieLinePosition;
-            return true;
-        }
-        return false;
+        g.drawLine(movieLinePosition, 0, movieLinePosition, getHeight());
     }
 
     private void setMovieFrameManually(Point point) {
-        if (movieTimestamp == Long.MIN_VALUE) {
+        Rectangle graphArea = drawController.getGraphArea();
+        if (movieTimestamp == Long.MIN_VALUE || !graphArea.contains(point)) {
             return;
         }
         long millis = drawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x);
@@ -411,12 +396,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         JHVRelatedEvents event = eventModel.getEventUnderMouse();
         if (event != null) {
+            Rectangle graphArea = drawController.getGraphArea();
             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(drawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x)));
             dialog.setLocation(e.getLocationOnScreen());
             dialog.validate();
             dialog.pack();
             dialog.setVisible(true);
-        } else if (graphArea.contains(p)) {
+        } else {
             setMovieFrameManually(p);
         }
     }
@@ -438,7 +424,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
         mousePressedPosition = p;
-        if (overMovieLine(p)) {
+        if (overMovieLine(p, drawController.getGraphArea())) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
             dragMode = DragMode.MOVIELINE;
         } else {
@@ -491,15 +477,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePressedPosition = p;
     }
 
-    private boolean overMovieLine(Point p) {
+    private boolean overMovieLine(Point p, Rectangle graphArea) {
         Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
         return movieLinePosition >= 0 && frame.contains(p);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        Rectangle graphArea = drawController.getGraphArea();
         mousePosition = e.getPoint();
-        if (overMovieLine(mousePosition)) {
+        if (overMovieLine(mousePosition, graphArea)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
         } else if (EventModel.getSingletonInstance().getEventUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -541,7 +528,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void setChartInformation() {
         drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
-        updateGraphArea();
     }
 
     @Override
@@ -552,21 +538,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawMovieLineRequest(long time) {
-        if (movieTimestamp == Long.MIN_VALUE || movieTimestamp != time) {
-            movieTimestamp = time;
-            if (!drawController.isLocked()) {
-                if (updateMovieLineInformation()) {
-                    movieLineRequest = true;
-                    updateGraph();
-                }
-            }
-        }
-        if (time == Long.MIN_VALUE) {
-            movieTimestamp = Long.MIN_VALUE;
-            if (updateMovieLineInformation()) {
-                updateGraph();
-            }
-        }
+        movieTimestamp = time;
+        updateGraph();
     }
 
     @Override
