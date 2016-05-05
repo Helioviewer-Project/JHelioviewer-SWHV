@@ -138,7 +138,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             AffineTransform tf = g.getTransform();
             tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
             g.setTransform(tf);
-            drawBackground(g);
+            drawBackground(g, (int) graphSize.getWidth(), (int) graphSize.getHeight());
             if (graphArea.width > 0 && graphArea.height > 0) {
                 g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 g.setFont(DrawConstants.font);
@@ -165,16 +165,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         drawLabels(fullG, graphArea, drawController.selectedAxis);
     }
 
-    private void drawBackground(Graphics2D g) {
+    private void drawBackground(Graphics2D g, int width, int height) {
         g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
-        g.fillRect(0, 0, getWidth(), getHeight());
+        g.fillRect(0, 0, width, height);
     }
 
     private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
-        g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
-
-        Color c = DrawConstants.TICK_LINE_COLOR;
-        drawHorizontalLabels(g, graphArea, timeAxis, c);
+        drawHorizontalLabels(g, graphArea, timeAxis);
 
         int rightYAxisNumber = -1;
         boolean inLeftYAxis = false;
@@ -236,7 +233,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
     }
 
-    private void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Color c) {
+    private void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis) {
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(xAxis.start)), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight();
@@ -260,7 +257,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
                 }
             }
-            g.setColor(c);
+            g.setColor(DrawConstants.TICK_LINE_COLOR);
             g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
 
             g.setColor(Color.BLACK);
@@ -270,7 +267,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 tickTextWidth = (int) tickTextBounds.getWidth();
                 int xl = x - (tickTextWidth / 2);
 
-                int xend = getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth;
+                int xend = (int) drawController.getGraphSize().getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth;
                 if (xl > xend) {
                     xl = xend;
                 }
@@ -383,7 +380,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
         g.setColor(DrawConstants.MOVIE_FRAME_COLOR);
-        g.drawLine(movieLinePosition, 0, movieLinePosition, getHeight());
+        g.drawLine(movieLinePosition, 0, movieLinePosition, (int) drawController.getGraphSize().getHeight());
     }
 
     @Override
