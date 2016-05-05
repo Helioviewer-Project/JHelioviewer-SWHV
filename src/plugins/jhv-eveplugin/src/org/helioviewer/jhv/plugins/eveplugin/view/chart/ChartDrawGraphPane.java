@@ -27,13 +27,14 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.JComponent;
-import javax.swing.Timer;
+//import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
@@ -84,8 +85,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         eventModel = EventModel.getSingletonInstance();
         drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
 
-        Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
-        redrawTimer.start();
+        // Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
+        // redrawTimer.start();
+        Displayer.displayTimer.addActionListener(new RedrawListener());
     }
 
     private class RedrawListener implements ActionListener {
