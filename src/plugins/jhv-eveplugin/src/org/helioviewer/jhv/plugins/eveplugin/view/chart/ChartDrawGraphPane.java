@@ -93,14 +93,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         public void actionPerformed(ActionEvent e) {
             if (toRedraw) {
                 toRedraw = false;
-                redrawGraph();
+                repaint();
             }
         }
     }
 
     @Override
     protected void paintComponent(Graphics g1) {
-        super.paintComponent(g1);
+        redrawGraph();
 
         Graphics2D g = (Graphics2D) g1;
         if (screenImage != null) {
@@ -155,7 +155,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             }
             g.dispose();
         }
-        repaint();
     }
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
