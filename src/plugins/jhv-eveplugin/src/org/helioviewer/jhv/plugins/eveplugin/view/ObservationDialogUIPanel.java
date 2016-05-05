@@ -5,6 +5,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -13,7 +16,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
@@ -73,11 +78,11 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     private void initGroups() {
-        final List<BandGroup> groups = BandTypeAPI.getSingletonInstance().getOrderedGroups();
-        final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxGroup.getModel();
+        DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxGroup.getModel();
         model.removeAllElements();
 
-        for (final BandGroup group : groups) {
+        List<BandGroup> groups = BandTypeAPI.getSingletonInstance().getOrderedGroups();
+        for (BandGroup group : groups) {
             model.addElement(group);
         }
     }
@@ -89,7 +94,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
         model.removeAllElements();
 
-        for (final BandType value : values) {
+        for (BandType value : values) {
             if (!EVEPlugin.ldsm.containsBandType(value)) {
                 model.addElement(value);
             }
@@ -108,6 +113,54 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         return true;
     }
 
+    private void updateDrawController() {
+        Interval interval = defineInterval(getDate());
+        EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
+    }
+
+    private Interval defineInterval(Date date) {
+        JHVDate start = Layers.getStartDate();
+        JHVDate end = Layers.getEndDate();
+        if (start != null && end != null) {
+            Interval movieInterval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
+
+            if (movieInterval.containsPointInclusive(date.getTime())) {
+                return movieInterval;
+            }
+        }
+        GregorianCalendar gce = new GregorianCalendar();
+        gce.clear();
+        gce.setTime(date);
+        gce.set(Calendar.HOUR, 0);
+        gce.set(Calendar.MINUTE, 0);
+        gce.set(Calendar.SECOND, 0);
+        gce.set(Calendar.MILLISECOND, 0);
+        gce.add(Calendar.DAY_OF_MONTH, 1);
+        Date endDate = gce.getTime();
+
+        if (endDate.after(new Date())) {
+            gce.clear();
+            gce.setTime(new Date());
+            gce.set(Calendar.HOUR, 0);
+            gce.set(Calendar.MINUTE, 0);
+            gce.set(Calendar.SECOND, 0);
+            gce.set(Calendar.MILLISECOND, 0);
+            endDate = gce.getTime();
+        }
+
+        GregorianCalendar gcs = new GregorianCalendar();
+        gcs.clear();
+        gcs.setTime(endDate);
+        gcs.set(Calendar.HOUR, 0);
+        gcs.set(Calendar.MINUTE, 0);
+        gcs.set(Calendar.SECOND, 0);
+        gcs.set(Calendar.MILLISECOND, 0);
+        gcs.add(Calendar.DAY_OF_MONTH, -2);
+        Date startDate = gcs.getTime();
+
+        return new Interval(startDate.getTime(), endDate.getTime());
+    }
+
     @Override
     public boolean loadButtonPressed() {
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
@@ -118,7 +171,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     @Override
-    public void actionPerformed(final ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(comboBoxGroup)) {
             updateGroupValues();
         }

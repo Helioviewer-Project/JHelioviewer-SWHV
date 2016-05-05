@@ -2,16 +2,12 @@ package org.helioviewer.jhv.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
@@ -20,7 +16,6 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
@@ -62,74 +57,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     public Date getDate() {
         return calendarStartDate.getDate();
-    }
-
-    protected void updateDrawController() {
-        Interval interval = defineInterval(getDate());
-        EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
-    }
-
-    private Interval defineInterval(Date date) {
-        JHVDate start = Layers.getStartDate();
-        JHVDate end = Layers.getEndDate();
-        if (start != null && end != null) {
-            Interval movieInterval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
-
-            if (movieInterval.containsPointInclusive(date.getTime())) {
-                return movieInterval;
-            }
-        }
-        GregorianCalendar gce = new GregorianCalendar();
-        gce.clear();
-        gce.setTime(date);
-        gce.set(Calendar.HOUR, 0);
-        gce.set(Calendar.MINUTE, 0);
-        gce.set(Calendar.SECOND, 0);
-        gce.set(Calendar.MILLISECOND, 0);
-        gce.add(Calendar.DAY_OF_MONTH, 1);
-        Date endDate = gce.getTime();
-
-        if (endDate.after(new Date())) {
-            gce.clear();
-            gce.setTime(new Date());
-            gce.set(Calendar.HOUR, 0);
-            gce.set(Calendar.MINUTE, 0);
-            gce.set(Calendar.SECOND, 0);
-            gce.set(Calendar.MILLISECOND, 0);
-            endDate = gce.getTime();
-        }
-
-        GregorianCalendar gcs = new GregorianCalendar();
-        gcs.clear();
-        gcs.setTime(endDate);
-        gcs.set(Calendar.HOUR, 0);
-        gcs.set(Calendar.MINUTE, 0);
-        gcs.set(Calendar.SECOND, 0);
-        gcs.set(Calendar.MILLISECOND, 0);
-        gcs.add(Calendar.DAY_OF_MONTH, -2);
-        Date startDate = gcs.getTime();
-
-        return new Interval(startDate.getTime(), endDate.getTime());
-    }
-
-    private void startRadioDownload() {
-        Interval selectedInterval = EVEPlugin.dc.getSelectedInterval();
-        Calendar end = Calendar.getInstance();
-        end.setTime(new Date(selectedInterval.end));
-        end.set(Calendar.HOUR_OF_DAY, 23);
-        end.set(Calendar.MINUTE, 59);
-        end.set(Calendar.SECOND, 59);
-        EVEPlugin.rdm.requestAndOpenIntervals(selectedInterval.start, end.getTimeInMillis());
-        EVEPlugin.ldsm.addLineData(EVEPlugin.rdm);
-        EVEPlugin.dc.fireRedrawRequest();
-    }
-
-    @Override
-    public boolean loadButtonPressed() {
-        ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
-        updateDrawController();
-        startRadioDownload();
-        return true;
     }
 
     // JHV Calendar Listener
