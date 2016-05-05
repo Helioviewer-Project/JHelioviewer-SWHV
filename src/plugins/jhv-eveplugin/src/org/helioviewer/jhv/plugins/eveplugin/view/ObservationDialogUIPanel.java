@@ -31,8 +31,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     private final JComboBox comboBoxData;
 
     public ObservationDialogUIPanel() {
-        super();
-
         JLabel labelGroup = new JLabel("Group", JLabel.RIGHT);
         JLabel labelData = new JLabel("Dataset", JLabel.RIGHT);
 
@@ -100,11 +98,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         if (model.getSize() > 0) {
             comboBoxData.setSelectedIndex(0);
         }
-    }
-
-    private void updateDrawController() {
-        Interval interval = defineInterval(getDate());
-        EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
     }
 
     private boolean updateBandController() {
