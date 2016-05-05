@@ -61,6 +61,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private BufferedImage screenImage = null;
     private final EventModel eventModel;
 
+    private final Stroke boldStroke = new BasicStroke(2);
     private Point mousePosition;
     private int lastWidth;
     private int lastHeight;
@@ -340,13 +341,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             int labelCompensation = vWidth / 2;
             if (highlight) {
                 Stroke s = g.getStroke();
-                g.setStroke(new BasicStroke(2));
+                g.setStroke(boldStroke);
                 g.setFont(DrawConstants.fontBold);
                 g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
                 g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
                 g.setStroke(s);
                 g.setFont(DrawConstants.font);
-
             } else {
                 g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
                 g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
@@ -365,7 +365,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         } else {
             x_str = axis_x_offset;
         }
-        if (needTxt)
+        if (needTxt) {
             if (highlight) {
                 g.setFont(DrawConstants.fontBold);
                 g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
@@ -373,7 +373,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             } else {
                 g.drawString(tickText, x_str, y + (int) (bounds.getHeight() / 2));
             }
-
+        }
     }
 
     private void drawMovieLine(Graphics2D g) {
@@ -425,8 +425,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
         mousePressedPosition = p;
-        if (overMovieLine(p, drawController.getGraphArea())) {
-            setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+        if (overMovieLine(p/*, drawController.getGraphArea()*/)) {
+            // setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
             dragMode = DragMode.MOVIELINE;
         } else {
             setCursor(UIGlobals.closedHandCursor);
@@ -478,17 +478,17 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePressedPosition = p;
     }
 
-    private boolean overMovieLine(Point p, Rectangle graphArea) {
+    private boolean overMovieLine(Point p/*, Rectangle graphArea*/) {
         int movieLinePosition = drawController.getMovieLinePosition();
-        Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
-        return movieLinePosition >= 0 && frame.contains(p);
+        // Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
+        return movieLinePosition >= 0 && movieLinePosition - 3 <= p.x && p.x <= movieLinePosition + 3;
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
         Rectangle graphArea = drawController.getGraphArea();
         mousePosition = e.getPoint();
-        if (overMovieLine(mousePosition, graphArea)) {
+        if (overMovieLine(mousePosition/*, graphArea*/)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
         } else if (EventModel.getSingletonInstance().getEventUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
