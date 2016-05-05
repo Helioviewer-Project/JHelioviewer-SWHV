@@ -64,10 +64,6 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
         }
     }
 
-    public Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> getEvents() {
-        return events;
-    }
-
     @Override
     public void cacheUpdated() {
         TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
