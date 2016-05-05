@@ -11,6 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -27,9 +28,8 @@ public class CollapsiblePane extends JComponent implements ActionListener {
     private static final ImageIcon expandedIcon = IconBank.getIcon(JHVIcon.DOWN2);
     private static final ImageIcon collapsedIcon = IconBank.getIcon(JHVIcon.RIGHT2);
 
-    protected CollapsiblePaneButton toggleButton;
+    protected final CollapsiblePaneButton toggleButton;
     private final JPanel component;
-    protected JPanel topButtonsPanel;
 
     public CollapsiblePane(String title, Component managed, boolean startExpanded) {
         setLayout(new BorderLayout());
@@ -49,10 +49,10 @@ public class CollapsiblePane extends JComponent implements ActionListener {
 
         component = new JPanel(new BorderLayout());
         component.add(managed);
-        component.setVisible(startExpanded);
+        ComponentUtils.setVisible(component, startExpanded);
         add(component, BorderLayout.CENTER);
 
-        topButtonsPanel = new JPanel(new BorderLayout());
+        JPanel topButtonsPanel = new JPanel(new BorderLayout());
         topButtonsPanel.add(toggleButton, BorderLayout.NORTH);
         add(topButtonsPanel, BorderLayout.PAGE_START);
     }
@@ -63,13 +63,13 @@ public class CollapsiblePane extends JComponent implements ActionListener {
 
     private void expand() {
         toggleButton.setSelected(true);
-        component.setVisible(true);
+        ComponentUtils.setVisible(component, true);
         toggleButton.setIcon(expandedIcon);
     }
 
     private void collapse() {
         toggleButton.setSelected(false);
-        component.setVisible(false);
+        ComponentUtils.setVisible(component, false);
         toggleButton.setIcon(collapsedIcon);
     }
 

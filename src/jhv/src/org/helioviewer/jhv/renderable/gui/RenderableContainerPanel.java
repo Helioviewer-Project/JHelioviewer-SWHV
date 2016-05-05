@@ -252,7 +252,7 @@ public class RenderableContainerPanel extends JPanel {
     private void setOptionsPanel(Renderable renderable) {
         Component optionsPanel = renderable.getOptionsPanel();
         if (optionsPanel != null) {
-            ComponentUtils.enableComponents(optionsPanel, renderable.isVisible());
+            ComponentUtils.setEnabled(optionsPanel, renderable.isVisible());
         }
         setOptionsComponent(optionsPanel);
     }

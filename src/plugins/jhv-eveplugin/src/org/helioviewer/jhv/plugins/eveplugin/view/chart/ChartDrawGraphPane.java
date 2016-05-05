@@ -93,7 +93,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private class RedrawListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (toRedraw) {
+            if (toRedraw && isVisible()) {
                 toRedraw = false;
                 repaint();
             }

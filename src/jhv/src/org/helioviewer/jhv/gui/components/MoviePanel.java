@@ -399,7 +399,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void recordPanelSetEnabled(boolean enabled) {
-        ComponentUtils.enableComponents(recordPanel, enabled);
+        ComponentUtils.setEnabled(recordPanel, enabled);
     }
 
     private static class RecordButton extends JToggleButton implements ActionListener {
