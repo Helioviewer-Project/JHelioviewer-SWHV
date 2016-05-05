@@ -5,8 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 
@@ -31,8 +29,21 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
     public DrawControllerOptionsPanel() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
-        zoomCombo = new JComboBox(fillZoomCombo());
-        fillZoomCombo();
+        ZoomComboboxItem[] items = new ZoomComboboxItem[] {
+            new ZoomComboboxItem(ZOOM.CUSTOM, 0),
+            new ZoomComboboxItem(ZOOM.All, 0),
+            new ZoomComboboxItem(ZOOM.Movie, 0),
+            new ZoomComboboxItem(ZOOM.Year, 1),
+            new ZoomComboboxItem(ZOOM.Month, 6),
+            new ZoomComboboxItem(ZOOM.Month, 3),
+            new ZoomComboboxItem(ZOOM.Carrington, 1),
+            new ZoomComboboxItem(ZOOM.Day, 7),
+            new ZoomComboboxItem(ZOOM.Day, 3),
+            new ZoomComboboxItem(ZOOM.Hour, 12),
+            new ZoomComboboxItem(ZOOM.Hour, 6),
+            new ZoomComboboxItem(ZOOM.Hour, 1)
+        };
+        zoomCombo = new JComboBox(items);
         zoomCombo.addActionListener(this);
 
         lockButton = new JToggleButton(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
@@ -67,38 +78,6 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         }
     }
 
-    private void addCarringtonRotationToModel(DefaultComboBoxModel model, int numberOfRotations) {
-        model.addElement(new ZoomComboboxItem(ZOOM.Carrington, numberOfRotations));
-    }
-
-    private void addMovieToModel(DefaultComboBoxModel model) {
-        model.addElement(new ZoomComboboxItem(ZOOM.Movie, 0));
-    }
-
-    private boolean addElementToModel(DefaultComboBoxModel model, int calendarValue, ZOOM zoom) {
-        model.addElement(new ZoomComboboxItem(zoom, calendarValue));
-        return true;
-    }
-
-    private ComboBoxModel fillZoomCombo() {
-        DefaultComboBoxModel model = new DefaultComboBoxModel();
-        model.removeAllElements();
-        model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
-        model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
-        addMovieToModel(model);
-        addElementToModel(model, 1, ZOOM.Year);
-        addElementToModel(model, 6, ZOOM.Month);
-        addElementToModel(model, 3, ZOOM.Month);
-        addCarringtonRotationToModel(model, 1);
-
-        addElementToModel(model, 7, ZOOM.Day);
-        addElementToModel(model, 3, ZOOM.Day);
-        addElementToModel(model, 12, ZOOM.Hour);
-        addElementToModel(model, 6, ZOOM.Hour);
-        addElementToModel(model, 1, ZOOM.Hour);
-        return model;
-    }
-
     private static class ZoomComboboxItem {
 
         private final ZOOM zoom;
@@ -131,7 +110,6 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
             default:
                 break;
             }
-
             return "Custom interval";
         }
     }
@@ -167,7 +145,6 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
             computeMovieInterval();
             break;
         case CUSTOM:
-            break;
         default:
             break;
         }
@@ -210,7 +187,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         EVEPlugin.dc.setSelectedInterval(startDate, endDate);
     }
 
-    private Long differenceInMilliseconds(int calendarField, long value) {
+    private long differenceInMilliseconds(int calendarField, long value) {
         switch (calendarField) {
         case Calendar.YEAR:
             return value * 365 * TimeUtils.DAY_IN_MILLIS;
@@ -231,7 +208,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         case Calendar.MILLISECOND:
             return value * 1l;
         default:
-            return null;
+            return 0;
         }
     }
 

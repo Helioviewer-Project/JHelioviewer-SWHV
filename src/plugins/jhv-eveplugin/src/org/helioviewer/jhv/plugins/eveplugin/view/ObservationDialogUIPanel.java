@@ -30,7 +30,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
-public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements ActionListener, LineDataSelectorModelListener {
+public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements LineDataSelectorModelListener {
 
     private final JComboBox comboBoxGroup;
     private final JComboBox comboBoxData;
@@ -43,7 +43,12 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         comboBoxData = new JComboBox(new DefaultComboBoxModel());
         JPanel dataPane = new JPanel();
 
-        comboBoxGroup.addActionListener(this);
+        comboBoxGroup.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGroupValues();
+            }
+        });
 
         JPanel container = new JPanel();
         container.setLayout(new BorderLayout());
@@ -105,12 +110,11 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         }
     }
 
-    private boolean updateBandController() {
+    private void updateBandController() {
         BandType bandType = (BandType) comboBoxData.getSelectedItem();
         Band band = new Band(bandType);
         band.setDataColor(BandColors.getNextColor());
         DownloadController.getSingletonInstance().updateBand(band, EVEPlugin.dc.availableAxis.start, EVEPlugin.dc.availableAxis.end);
-        return true;
     }
 
     private void updateDrawController() {
@@ -164,17 +168,9 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     @Override
     public boolean loadButtonPressed() {
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
-        if (updateBandController()) {
-            updateDrawController();
-        }
+        updateBandController();
+        updateDrawController();
         return true;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource().equals(comboBoxGroup)) {
-            updateGroupValues();
-        }
     }
 
     @Override
