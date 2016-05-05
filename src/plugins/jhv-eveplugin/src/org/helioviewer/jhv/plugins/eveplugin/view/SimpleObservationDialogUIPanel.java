@@ -64,12 +64,12 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         return calendarStartDate.getDate();
     }
 
-    private void updateDrawController() {
+    protected void updateDrawController() {
         Interval interval = defineInterval(getDate());
         EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
     }
 
-    protected Interval defineInterval(Date date) {
+    private Interval defineInterval(Date date) {
         JHVDate start = Layers.getStartDate();
         JHVDate end = Layers.getEndDate();
         if (start != null && end != null) {
