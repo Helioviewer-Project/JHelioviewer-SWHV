@@ -63,9 +63,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private final Stroke boldStroke = new BasicStroke(2);
     private Point mousePosition;
-    private int lastWidth;
-    private int lastHeight;
-    private boolean updateRequestReceived;
+    private int lastWidth = -1;
+    private int lastHeight = -1;
+    private boolean toRedraw;
 
     private DragMode dragMode = DragMode.NODRAG;
 
@@ -73,7 +73,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         setOpaque(true);
         setDoubleBuffered(false);
 
-        updateRequestReceived = false;
+        toRedraw = false;
         drawController = EVEPlugin.dc;
 
         addMouseListener(this);
@@ -91,8 +91,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private class RedrawListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (updateRequestReceived) {
-                updateRequestReceived = false;
+            if (toRedraw) {
+                toRedraw = false;
                 redrawGraph();
             }
         }
@@ -111,15 +111,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateGraph() {
-        updateRequestReceived = true;
+        toRedraw = true;
     }
 
     private void redrawGraph() {
+        Rectangle graphSize = drawController.getGraphSize();
         Rectangle graphArea = drawController.getGraphArea();
 
         int sx = GLInfo.pixelScale[0], sy = GLInfo.pixelScale[1];
-        int width = sx * getWidth();
-        int height = sy * getHeight();
+        int width = sx * (int) graphSize.getWidth();
+        int height = sy * (int) graphSize.getHeight();
 
         if (width > 0 && height > 0 && sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + 1) < height && sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + 1) < width) {
             if (width != lastWidth || height != lastHeight) {
@@ -532,12 +533,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawRequest() {
-        updateGraph(); // precies hetzelfde
+        updateGraph();
     }
 
     @Override
     public void drawMovieLineRequest() {
-        updateGraph(); // precies hetzelfde
+        updateGraph();
     }
 
     @Override
