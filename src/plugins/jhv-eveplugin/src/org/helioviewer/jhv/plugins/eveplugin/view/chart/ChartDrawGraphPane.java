@@ -65,12 +65,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Point mousePosition;
     private int lastWidth = -1;
     private int lastHeight = -1;
+
     private boolean toRedraw;
+    private boolean forceRedrawGraph;
 
     private DragMode dragMode = DragMode.NODRAG;
-
-    private boolean movieLineRequest = false;
-    private boolean forceRedrawGraph = false;
 
     private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
 
@@ -79,6 +78,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         setDoubleBuffered(false);
 
         toRedraw = false;
+        forceRedrawGraph = false;
         drawController = EVEPlugin.dc;
 
         addMouseListener(this);
@@ -113,8 +113,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     protected void paintComponent(Graphics g1) {
-        if (forceRedrawGraph || !movieLineRequest)
+        if (forceRedrawGraph) {
             redrawGraph();
+            forceRedrawGraph = false;
+        }
 
         Graphics2D g = (Graphics2D) g1;
         if (screenImage != null) {
@@ -122,8 +124,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
             drawMovieLine(g);
         }
-        movieLineRequest = false;
-        forceRedrawGraph = false;
     }
 
     private void updateGraph() {
@@ -551,7 +551,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawMovieLineRequest() {
-        movieLineRequest = true;
         updateGraph();
     }
 
