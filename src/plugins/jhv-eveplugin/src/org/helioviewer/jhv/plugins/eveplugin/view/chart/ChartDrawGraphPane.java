@@ -69,6 +69,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private DragMode dragMode = DragMode.NODRAG;
 
+    private boolean movieLineRequest = false;
+    private boolean forceRedrawGraph = false;
+
     private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
 
     public ChartDrawGraphPane() {
@@ -110,7 +113,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     protected void paintComponent(Graphics g1) {
-        redrawGraph();
+        if (forceRedrawGraph || !movieLineRequest)
+            redrawGraph();
 
         Graphics2D g = (Graphics2D) g1;
         if (screenImage != null) {
@@ -118,6 +122,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
             drawMovieLine(g);
         }
+        movieLineRequest = false;
+        forceRedrawGraph = false;
     }
 
     private void updateGraph() {
@@ -539,11 +545,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawRequest() {
+        forceRedrawGraph = true;
         updateGraph();
     }
 
     @Override
     public void drawMovieLineRequest() {
+        movieLineRequest = true;
         updateGraph();
     }
 
