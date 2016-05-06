@@ -27,14 +27,13 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.JComponent;
-//import javax.swing.Timer;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
@@ -70,6 +69,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private DragMode dragMode = DragMode.NODRAG;
 
+    private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
+
     public ChartDrawGraphPane() {
         setOpaque(true);
         setDoubleBuffered(false);
@@ -85,19 +86,26 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         eventModel = EventModel.getSingletonInstance();
         drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
 
-        // Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
-        // redrawTimer.start();
-        Displayer.displayTimer.addActionListener(new RedrawListener());
+        redrawTimer.start();
     }
 
     private class RedrawListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (toRedraw && isVisible()) {
+            if (toRedraw) {
                 toRedraw = false;
                 repaint();
             }
         }
+    }
+
+    @Override
+    public void setVisible(boolean flag) {
+        super.setVisible(flag);
+        if (flag == true)
+            redrawTimer.start();
+        else
+            redrawTimer.stop();
     }
 
     @Override
@@ -417,7 +425,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseExited(MouseEvent e) {
         mousePosition = null;
-        drawController.fireRedrawRequest();
+        updateGraph();
     }
 
     @Override

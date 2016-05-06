@@ -375,7 +375,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         } else {
             setCursor(Cursor.getDefaultCursor());
         }
-        repaint();
+        // repaint();
     }
 
     @Override
