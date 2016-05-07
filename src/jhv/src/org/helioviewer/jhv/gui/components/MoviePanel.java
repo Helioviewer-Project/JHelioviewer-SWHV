@@ -448,7 +448,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         advancedButton.setEnabled(enabled);
     }
 
-    private static void setAdvanced(boolean advanced) {
+    public static void setAdvanced(boolean advanced) {
         isAdvanced = advanced;
 
         advancedButton.setIcon(advanced ? closeIcon : openIcon);
