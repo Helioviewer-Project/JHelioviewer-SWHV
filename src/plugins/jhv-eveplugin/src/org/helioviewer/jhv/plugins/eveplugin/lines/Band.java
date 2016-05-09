@@ -216,4 +216,9 @@ public class Band extends AbstractLineDataSelectorElement {
         EVEPlugin.dc.fireRedrawRequest();
     }
 
+    @Override
+    public boolean highLightChanged(Point p) {
+        return false;
+    }
+
 }

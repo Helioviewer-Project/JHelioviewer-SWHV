@@ -297,4 +297,10 @@ public class RadioData extends AbstractLineDataSelectorElement {
     public void resetAxis() {
         yAxis.reset(400, 20);
     }
+
+    @Override
+    public boolean highLightChanged(Point p) {
+        return false;
+    }
+
 }
