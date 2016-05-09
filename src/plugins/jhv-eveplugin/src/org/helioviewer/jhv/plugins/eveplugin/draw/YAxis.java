@@ -25,6 +25,7 @@ public class YAxis {
 
     private final double scaledMinBound;
     private final double scaledMaxBound;
+    private boolean highlighted = false;
 
     public YAxis(double _start, double _end, String label, boolean isLogScale) {
         start = _start;
@@ -41,6 +42,14 @@ public class YAxis {
     public void reset(double _start, double _end) {
         start = _start;
         end = _end;
+    }
+
+    public void setHighlighted(boolean _highlighted) {
+        highlighted = _highlighted;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
     }
 
     public double pixel2ScaledValue(int y0, int h, int p) {

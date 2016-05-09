@@ -125,11 +125,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
-                    toggled = toggled || !el.isHighlighted();
-                    el.setHighlighted(true);
+                    toggled = toggled || !el.getYAxis().isHighlighted();
+                    el.getYAxis().setHighlighted(true);
                 } else {
-                    toggled = toggled || el.isHighlighted();
-                    el.setHighlighted(false);
+                    toggled = toggled || el.getYAxis().isHighlighted();
+                    el.getYAxis().setHighlighted(false);
                 }
                 ct++;
             }
@@ -222,7 +222,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int ct = -1;
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
-                drawVerticalLabels(g, graphArea, el, ct, el.isHighlighted());
+                drawVerticalLabels(g, graphArea, el, ct, el.getYAxis().isHighlighted());
                 ct++;
             }
         }
