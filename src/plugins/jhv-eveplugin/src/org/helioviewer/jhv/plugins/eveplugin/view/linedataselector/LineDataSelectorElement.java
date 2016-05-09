@@ -43,10 +43,6 @@ public interface LineDataSelectorElement {
 
     public void resetAxis();
 
-    public void setHighlighted(boolean highlighted);
-
-    public boolean isHighlighted();
-
     public boolean highLightChanged(Point p);
 
 }
