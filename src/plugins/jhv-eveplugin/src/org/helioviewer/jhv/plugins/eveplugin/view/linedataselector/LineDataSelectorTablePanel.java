@@ -83,10 +83,6 @@ public class LineDataSelectorTablePanel extends JPanel {
                 if (i >= 0)
                     grid.getSelectionModel().setSelectionInterval(i, i);
             }
-
-            @Override
-            public void lineDataUpdated(LineDataSelectorElement element) {
-            }
         });
 
         GridBagConstraints gc = new GridBagConstraints();

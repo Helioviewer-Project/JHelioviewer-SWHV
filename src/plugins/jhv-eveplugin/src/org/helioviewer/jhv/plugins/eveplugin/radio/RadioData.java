@@ -23,15 +23,13 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 
-public class RadioData implements LineDataSelectorElement {
+public class RadioData extends AbstractLineDataSelectorElement {
 
-    private YAxis yAxis;
-
-    private boolean isVisible = false;
+    private final YAxis yAxis;
 
     private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();;
     private static final String ROBserver = DataSources.ROBsettings.get("API.jp2images.path");
@@ -43,10 +41,11 @@ public class RadioData implements LineDataSelectorElement {
     private IndexColorModel colorModel;
 
     public RadioData() {
+        isVisible = false;
+
         String cm = "Rainbow 2";
         colorModel = createIndexColorModelFromLUT(LUT.getStandardList().get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
-
         yAxis = new YAxis(400, 20, "Mhz", false);
         EVEPlugin.ldsm.addLineData(this);
     }
@@ -133,10 +132,6 @@ public class RadioData implements LineDataSelectorElement {
         }
     }
 
-    public void radioDataVisibilityChanged() {
-        EVEPlugin.ldsm.lineDataElementUpdated(this);
-    }
-
     void requestForData() {
         for (DownloadedJPXData jpxData : cache.values()) {
             jpxData.requestData();
@@ -163,14 +158,8 @@ public class RadioData implements LineDataSelectorElement {
     public void setVisibility(boolean visible) {
         isVisible = visible;
         clearCache();
-        EVEPlugin.ldsm.lineDataElementUpdated(this);
         fetchData(EVEPlugin.dc.selectedAxis, EVEPlugin.dc.availableAxis);
         EVEPlugin.dc.fireRedrawRequest();
-    }
-
-    @Override
-    public boolean isVisible() {
-        return isVisible;
     }
 
     @Override
@@ -253,11 +242,6 @@ public class RadioData implements LineDataSelectorElement {
             g.drawString(text1, x1, y1);
             g.drawString(text2, x2, y2);
         }
-    }
-
-    @Override
-    public void setYAxis(YAxis _yAxis) {
-        yAxis = _yAxis;
     }
 
     private class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {

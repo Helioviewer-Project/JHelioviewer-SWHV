@@ -19,16 +19,15 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandCache.GraphPolyline;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
 
-public class Band implements LineDataSelectorElement {
+public class Band extends AbstractLineDataSelectorElement {
 
     private final BandType bandType;
     private final LineOptionPanel optionsPanel;
 
-    private boolean isVisible = true;
     private Color graphColor = Color.BLACK;
-    private YAxis yAxis;
+    private final YAxis yAxis;
     private final ArrayList<BandCache.GraphPolyline> graphPolylines = new ArrayList<BandCache.GraphPolyline>();
     private final RequestCache requestCache = new RequestCache();
     private int[] warnLevels;
@@ -64,19 +63,8 @@ public class Band implements LineDataSelectorElement {
     }
 
     @Override
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    @Override
     public void removeLineData() {
         EVEPlugin.ldsm.removeLineData(this);
-    }
-
-    @Override
-    public void setVisibility(boolean visible) {
-        isVisible = visible;
-        EVEPlugin.dc.fireRedrawRequest();
     }
 
     @Override
@@ -196,11 +184,6 @@ public class Band implements LineDataSelectorElement {
             warnLabels[counter] = warnLabel;
             counter++;
         }
-    }
-
-    @Override
-    public void setYAxis(YAxis _yAxis) {
-        yAxis = _yAxis;
     }
 
     @Override

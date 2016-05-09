@@ -11,38 +11,40 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 
 public interface LineDataSelectorElement {
 
-    public abstract void removeLineData();
+    public void removeLineData();
 
-    public abstract void setVisibility(boolean visible);
+    public void setVisibility(boolean visible);
 
-    public abstract boolean isVisible();
+    public boolean isVisible();
 
-    public abstract String getName();
+    public String getName();
 
-    public abstract Color getDataColor();
+    public Color getDataColor();
 
-    public abstract boolean isDownloading();
+    public boolean isDownloading();
 
-    public abstract boolean hasData();
+    public boolean hasData();
 
-    public abstract Component getOptionsPanel();
+    public Component getOptionsPanel();
 
-    public abstract boolean isDeletable();
+    public boolean isDeletable();
 
-    boolean showYAxis();
+    public boolean showYAxis();
 
-    public abstract void draw(Graphics2D graphG, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+    public void draw(Graphics2D graphG, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
-    public abstract void setYAxis(YAxis yAxis);
-
-    public abstract YAxis getYAxis();
+    public YAxis getYAxis();
 
     public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis);
 
-    public abstract void yaxisChanged();
+    public void yaxisChanged();
 
-    public abstract void zoomToFitAxis();
+    public void zoomToFitAxis();
 
-    public abstract void resetAxis();
+    public void resetAxis();
+
+    public void setHighlighted(boolean highlighted);
+
+    public boolean isHighlighted();
 
 }

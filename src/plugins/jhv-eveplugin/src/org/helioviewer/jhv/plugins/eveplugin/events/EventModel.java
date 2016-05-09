@@ -24,13 +24,12 @@ import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
 
-public class EventModel implements JHVEventHandler, LineDataSelectorElement {
+public class EventModel extends AbstractLineDataSelectorElement implements JHVEventHandler {
 
     private static EventModel instance;
     private final JHVEventContainer eventContainer;
-    private boolean isVisible = true;
     private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
     private static final float dash1[] = { 10f };
     private static final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
@@ -154,10 +153,6 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
     }
 
     @Override
-    public void setYAxis(YAxis yAxis) {
-    }
-
-    @Override
     public YAxis getYAxis() {
         return null;
     }
@@ -165,18 +160,6 @@ public class EventModel implements JHVEventHandler, LineDataSelectorElement {
     @Override
     public void removeLineData() {
         isVisible = false;
-    }
-
-    @Override
-    public void setVisibility(boolean visible) {
-        isVisible = visible;
-        EVEPlugin.dc.fireRedrawRequest();
-        EVEPlugin.ldsm.lineDataElementUpdated(this);
-    }
-
-    @Override
-    public boolean isVisible() {
-        return isVisible;
     }
 
     @Override
