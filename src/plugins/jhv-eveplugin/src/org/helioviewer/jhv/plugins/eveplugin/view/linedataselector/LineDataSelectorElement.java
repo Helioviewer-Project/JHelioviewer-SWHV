@@ -47,4 +47,6 @@ public interface LineDataSelectorElement {
 
     public boolean isHighlighted();
 
+    public boolean highLightChanged(Point p);
+
 }

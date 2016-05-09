@@ -34,7 +34,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     private static final float dash1[] = { 10f };
     private static final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
 
-    private JHVRelatedEvents eventUnderMouse;
+    private EventPlotConfiguration eventUnderMouse;
 
     private EventModel() {
         eventContainer = JHVEventContainer.getSingletonInstance();
@@ -71,10 +71,12 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     public JHVRelatedEvents getEventUnderMouse() {
-        return eventUnderMouse;
+        if (eventUnderMouse == null)
+            return null;
+        return eventUnderMouse.event;
     }
 
-    public void setEventUnderMouse(JHVRelatedEvents event) {
+    public void setEventUnderMouse(EventPlotConfiguration event) {
         eventUnderMouse = event;
     }
 
@@ -90,8 +92,9 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             int previousLine = 0;
 
             Stroke normalStroke = g.getStroke();
-            JHVRelatedEvents highlightedEvent = null;
             int spacePerLine = 6;
+            JHVRelatedEvents highlightedEvent = null;
+            EventPlotConfiguration shouldRedraw = null;
 
             ArrayList<Long> endDates = new ArrayList<Long>();
 
@@ -102,7 +105,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                 endDates.clear();
 
                 int nrLines = 0;
-                EventPlotConfiguration shouldRedraw = null;
 
                 for (JHVRelatedEvents event : eventMap.values()) {
                     int i = 0;
@@ -145,7 +147,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
                 eventTypeNr++;
             }
-            setEventUnderMouse(highlightedEvent);
+            setEventUnderMouse(shouldRedraw);
             if (mousePosition != null) {
                 JHVEventContainer.highlight(highlightedEvent);
             }
@@ -257,7 +259,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             }
             return false;
         }
-
     }
 
     @Override
@@ -268,4 +269,12 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     public void resetAxis() {
     }
 
+    @Override
+    public boolean highLightChanged(Point p) {
+        if (!isVisible || events.isEmpty())
+            return false;
+        if (eventUnderMouse == null)
+            return true;
+        return !(eventUnderMouse.x0 <= p.x && p.x <= eventUnderMouse.x1 && eventUnderMouse.yPosition - 4 <= p.y && p.y <= eventUnderMouse.yPosition + 5);
+    }
 }

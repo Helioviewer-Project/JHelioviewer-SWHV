@@ -513,6 +513,17 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         return movieLinePosition >= 0 && movieLinePosition - 3 <= p.x && p.x <= movieLinePosition + 3;
     }
 
+    public boolean highlightChanged() {
+        if (mousePosition == null) {
+            return false;
+        }
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            if (el.highLightChanged(this.mousePosition))
+                return true;
+        }
+        return false;
+    }
+
     @Override
     public void mouseMoved(MouseEvent e) {
         Rectangle graphArea = drawController.getGraphArea();
@@ -526,8 +537,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         } else {
             setCursor(Cursor.getDefaultCursor());
         }
-
-        updateGraph();
+        if (highlightChanged()) {
+            redrawGraph();
+        }
+        else {
+            updateGraph();
+        }
     }
 
     @Override
