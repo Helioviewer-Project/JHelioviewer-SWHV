@@ -233,10 +233,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void lineDataUpdated(LineDataSelectorElement element) {
-    }
-
-    @Override
     public void lineDataAdded(LineDataSelectorElement element) {
         createGraphArea();
     }

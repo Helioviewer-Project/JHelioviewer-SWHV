@@ -30,7 +30,6 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -111,9 +110,37 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             redrawTimer.stop();
     }
 
+    private boolean axisHightlightToggled(Rectangle graphArea) {
+        boolean inLeftYAxis = false;
+        boolean inRightYAxes = false;
+        int rightYAxisNumber = -2;
+        if (mousePosition != null) {
+            boolean yAxisVerticalCondition = (mousePosition.y > graphArea.y && mousePosition.y <= graphArea.y + graphArea.height);
+            inRightYAxes = mousePosition.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
+            inLeftYAxis = mousePosition.x < graphArea.x && yAxisVerticalCondition;
+            rightYAxisNumber = (mousePosition.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+        }
+        boolean toggled = false;
+        int ct = -1;
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            if (el.showYAxis()) {
+                if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                    toggled = toggled || !el.isHighlighted();
+                    el.setHighlighted(true);
+                } else {
+                    toggled = toggled || el.isHighlighted();
+                    el.setHighlighted(false);
+                }
+                ct++;
+            }
+        }
+        return toggled;
+    }
+
     @Override
     protected void paintComponent(Graphics g1) {
-        if (forceRedrawGraph) {
+        Rectangle graphArea = drawController.getGraphArea();
+        if (forceRedrawGraph || axisHightlightToggled(graphArea)) {
             redrawGraph();
             forceRedrawGraph = false;
         }
@@ -121,8 +148,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Graphics2D g = (Graphics2D) g1;
         if (screenImage != null) {
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g.setFont(DrawConstants.font);
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
             drawMovieLine(g);
+            drawTimelineValues(g, graphArea, drawController.selectedAxis);
         }
     }
 
@@ -189,23 +219,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
         drawHorizontalLabels(g, graphArea, timeAxis);
 
-        int rightYAxisNumber = -1;
-        boolean inLeftYAxis = false;
-        boolean inRightYAxes = false;
-        if (mousePosition != null) {
-            boolean yAxisVerticalCondition = (mousePosition.y > graphArea.y && mousePosition.y <= graphArea.y + graphArea.height);
-            inRightYAxes = mousePosition.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
-            inLeftYAxis = mousePosition.x < graphArea.x && yAxisVerticalCondition;
-            rightYAxisNumber = (mousePosition.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
-        }
         int ct = -1;
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
-                if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
-                    drawVerticalLabels(g, graphArea, el, ct, true);
-                } else {
-                    drawVerticalLabels(g, graphArea, el, ct, false);
-                }
+                drawVerticalLabels(g, graphArea, el, ct, el.isHighlighted());
                 ct++;
             }
         }
@@ -214,7 +231,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
 
-        drawTimelineValues(g, graphArea, timeAxis);
     }
 
     private void drawTimelineValues(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
@@ -511,7 +527,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(Cursor.getDefaultCursor());
         }
 
-        drawRequest();
+        updateGraph();
     }
 
     @Override

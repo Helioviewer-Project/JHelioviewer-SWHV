@@ -59,10 +59,6 @@ public class LineDataSelectorModel implements TableModel {
         fireListeners();
     }
 
-    public void lineDataElementUpdated(LineDataSelectorElement element) {
-        fireLineDataSelectorElementUpdated(element);
-    }
-
     public boolean atLeastOneDownloading() {
         for (LineDataSelectorElement el : elements) {
             if (el.isDownloading()) {
@@ -88,12 +84,6 @@ public class LineDataSelectorModel implements TableModel {
     private void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataAdded(element);
-        }
-    }
-
-    private void fireLineDataSelectorElementUpdated(LineDataSelectorElement element) {
-        for (LineDataSelectorModelListener listener : listeners) {
-            listener.lineDataUpdated(element);
         }
     }
 
