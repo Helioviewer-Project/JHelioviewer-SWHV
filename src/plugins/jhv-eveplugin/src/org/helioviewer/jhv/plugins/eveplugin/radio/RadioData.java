@@ -72,6 +72,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
             jpxData.remove();
         }
         cache.clear();
+        latest_cache_start = -1;
+        latest_cache_end = -1;
     }
 
     private long latest_cache_start = -1;
