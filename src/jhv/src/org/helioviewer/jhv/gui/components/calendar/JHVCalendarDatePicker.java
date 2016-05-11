@@ -279,8 +279,11 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      * @param date
      */
     public void setDate(Date date) {
-        if (date != null && date.after(startDate) && date.before(endDate)) {
-            calendar.setTime(date);
+        if (date != null) {
+            long milli = date.getTime();
+            if (milli > TimeUtils.MINIMAL_DATE.milli && milli < TimeUtils.MAXIMAL_DATE.milli) {
+                calendar.setTime(date);
+            }
         }
         textField.setText(dateFormat.format(calendar.getTime()));
     }
