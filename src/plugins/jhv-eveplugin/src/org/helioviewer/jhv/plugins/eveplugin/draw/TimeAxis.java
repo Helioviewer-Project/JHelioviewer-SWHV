@@ -53,6 +53,7 @@ public class TimeAxis {
     private void adaptBounds() {
         long now = System.currentTimeMillis();
         long intervalLength = end - start;
+        intervalLength = Math.min(intervalLength, now - TimeUtils.MINIMAL_DATE.milli);
         if (intervalLength == 0) {
             end = start + TimeUtils.MINUTE_IN_MILLIS;
             intervalLength = TimeUtils.MINUTE_IN_MILLIS;
@@ -60,6 +61,10 @@ public class TimeAxis {
         if (end > now) {
             start = now - intervalLength;
             end = now;
+        }
+        if (start < TimeUtils.MINIMAL_DATE.milli) {
+            start = TimeUtils.MINIMAL_DATE.milli;
+            end = TimeUtils.MINIMAL_DATE.milli + intervalLength;
         }
     }
 }
