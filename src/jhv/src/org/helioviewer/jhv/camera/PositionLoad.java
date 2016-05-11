@@ -78,16 +78,15 @@ public class PositionLoad {
                 URL url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + beginDate + "&utc_end=" + endDate + "&deltat=" + deltat +
                                             "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
                 DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
-                if (!ds.getResponse400()) {
-                    result = JSONUtils.getJSONStream(ds.getInput());
-                    ret = parseData(result);
-                } else {
-                    JSONObject jsonObject = JSONUtils.getJSONStream(ds.getInput());
-                    if (jsonObject.has("faultstring")) {
-                        report = jsonObject.getString("faultstring");
-                    } else {
+
+                result = JSONUtils.getJSONStream(ds.getInput());
+                if (ds.isResponse400()) {
+                    if (result.has("faultstring"))
+                        report = result.getString("faultstring");
+                    else
                         report = "Invalid network response";
-                    }
+                } else {
+                    ret = parseData(result);
                 }
             } catch (MalformedURLException e) {
                 Log.error("Wrong URL", e);
