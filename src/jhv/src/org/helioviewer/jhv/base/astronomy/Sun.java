@@ -15,13 +15,20 @@ public class Sun {
 
     public static final double Radius = 1;
     public static final double Radius2 = Radius * Radius;
-    public static final double RadiusMeter = 695700000; // photospheric, IAU 2015 Resolution B3
-    public static final double RadiusFactor_171 = (695489200 + 7146 * 1000) / RadiusMeter; // 10.1051/0004-6361:20078118
-    public static final double RadiusFactor_304 = (695489200 + 5710 * 1000) / RadiusMeter;
+    public static final double RadiusMeter = 695700 * 1e3; // photospheric, IAU 2015 Resolution B3
 
-    public static final double MeanEarthDistanceMeter = 149597870700.;
+    public static final double MeanEarthDistanceMeter = 149597870.7 * 1e3;
     public static final double MeanEarthDistance = MeanEarthDistanceMeter / RadiusMeter;
     public static final double MeanEarthDistanceInv = RadiusMeter / MeanEarthDistanceMeter;
+
+    // doi:10.1088/0004-637X/812/2/91
+    public static final double RadiusFactor_171 = MeanEarthDistance * Math.tan(969.54 / 3600 * Math.PI / 180);
+    public static final double RadiusFactor_304 = MeanEarthDistance * Math.tan(967.56 / 3600 * Math.PI / 180);
+    public static final double RadiusFactor_1600 = MeanEarthDistance * Math.tan(963.04 / 3600 * Math.PI / 180);
+    public static final double RadiusFactor_1700 = MeanEarthDistance * Math.tan(961.76 / 3600 * Math.PI / 180);
+    public static final double RadiusFactor_5000 = MeanEarthDistance * Math.tan(959.63 / 3600 * Math.PI / 180);
+    public static final double RadiusFactor_6173 = MeanEarthDistance * Math.tan(959.57 / 3600 * Math.PI / 180);
+    public static final double RadiusFactor_6562 = MeanEarthDistance * Math.tan(960.017 / 3600 * Math.PI / 180);
 
     public static final Position.L EpochEarthL;
     public static final Position.Q EpochEarthQ;

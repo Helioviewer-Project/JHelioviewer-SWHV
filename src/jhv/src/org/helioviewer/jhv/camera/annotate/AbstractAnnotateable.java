@@ -65,6 +65,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
     protected void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
         if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
             gl.glBegin(GL2.GL_LINE_STRIP);
+
             Vec2 previous = null;
             for (double i = 0; i <= subdivisions; i++) {
                 double t = i / subdivisions;
@@ -74,8 +75,8 @@ public abstract class AbstractAnnotateable implements Annotateable {
                 p0.y = -p0.y;
                 previous = GLHelper.drawVertex(camera, vp, gl, p0, previous);
             }
-            gl.glEnd();
 
+            gl.glEnd();
         } else {
             gl.glBegin(GL2.GL_QUAD_STRIP);
 
@@ -112,8 +113,9 @@ public abstract class AbstractAnnotateable implements Annotateable {
                 }
 
             }
-            gl.glEnd();
 
+            gl.glEnd();
         }
     }
+
 }
