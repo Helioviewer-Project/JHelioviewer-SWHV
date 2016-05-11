@@ -25,7 +25,7 @@ public class LineDataSelectorElementRenderer extends DefaultTableCellRenderer {
                 label.setText(layerName);
                 label.setToolTipText(layerName);
             } else {
-                label.setText("<html><font color='red'>" + layerName);
+                label.setText("<html><font color='gray'>" + layerName);
                 label.setToolTipText(layerName + ": No data for selected interval");
             }
             label.setBorder(LineDataSelectorTablePanel.commonBorder);
