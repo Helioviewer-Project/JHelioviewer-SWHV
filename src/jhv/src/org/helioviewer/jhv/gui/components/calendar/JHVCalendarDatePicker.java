@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
-import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
@@ -51,8 +51,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     private static final Icon icon = IconBank.getIcon(JHVIcon.DATE);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private static final Date startDate = JHVDate.parseDateTime("1970-01-01T00:00:00").getDate();
-    private static final Date endDate = JHVDate.parseDateTime("2050-01-01T00:00:00").getDate();
 
     public JTextField getTextField() {
         return textField;
