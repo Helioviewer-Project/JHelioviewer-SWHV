@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
@@ -42,6 +44,20 @@ class LineOptionPanel extends SmallPanel {
             }
         });
         add(pickColor, c);
+
+        c.gridx = 1;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.EAST;
+        JButton availabilityButton = new JButton("Available data");
+        availabilityButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
+                url += "#" + band.getBandType().getName();
+                JHVGlobals.openURL(url);
+            }
+        });
+        add(availabilityButton, c);
 
         setSmall();
     }
