@@ -2,11 +2,9 @@ package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.jhv.base.math.Vec2;
+import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
@@ -21,38 +19,12 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     private void drawCross(Viewport vp, GL2 gl, Vec3 bp) {
         double delta = Math.PI * 2.5 / 180;
-        Vec3 p1 = new Vec3(radius, bp.y - delta, bp.z);
-        Vec3 p2 = new Vec3(radius, bp.y + delta, bp.z);
-        Vec3 p3 = new Vec3(radius, bp.y, bp.z - delta);
-        Vec3 p4 = new Vec3(radius, bp.y, bp.z + delta);
-
-        gl.glBegin(GL2.GL_LINE_STRIP);
-        interpolatedDraw(vp, gl, p1, p2);
-        gl.glEnd();
-
-        gl.glBegin(GL2.GL_LINE_STRIP);
-        interpolatedDraw(vp, gl, p3, p4);
-        gl.glEnd();
-    }
-
-    private void interpolatedDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
-        int subdivisions = 2;
-        for (double i = 0; i <= subdivisions; i++) {
-            double t = i / subdivisions;
-            double y = (1 - t) * p1s.y + t * p2s.y;
-            double z = (1 - t) * p1s.z + t * p2s.z;
-            Vec3 pc = toCart(radius, y, z);
-
-            if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
-                pc.y = -pc.y;
-                Vec3 pt = camera.getViewpoint().orientation.rotateVector(pc);
-                Vec2 tf = GridScale.current.transform(pt);
-
-                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
-            } else {
-                gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
-            }
-        }
+        Vec3 p1 = new Vec3(Sun.Radius, bp.y + delta, bp.z);
+        Vec3 p2 = new Vec3(Sun.Radius, bp.y - delta, bp.z);
+        Vec3 p3 = new Vec3(Sun.Radius, bp.y, bp.z + delta);
+        Vec3 p4 = new Vec3(Sun.Radius, bp.y, bp.z - delta);
+        interpolatedLineDraw(vp, gl, p1, p2, 2);
+        interpolatedLineDraw(vp, gl, p3, p4, 2);
     }
 
     @Override
