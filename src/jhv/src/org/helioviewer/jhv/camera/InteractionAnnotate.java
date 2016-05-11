@@ -47,6 +47,7 @@ public class InteractionAnnotate extends Interaction {
     @Override
     public void drawInteractionFeedback(Viewport vp, GL2 gl) {
         Annotateable activeAnnotatable = null;
+        gl.glDisable(GL2.GL_DEPTH_TEST);
         if (activeIndex >= 0)
             activeAnnotatable = annotateables.get(activeIndex);
         for (Annotateable ann : annotateables) {
@@ -55,6 +56,7 @@ public class InteractionAnnotate extends Interaction {
         if (newAnnotatable != null) {
             newAnnotatable.render(vp, gl, false);
         }
+        gl.glEnable(GL2.GL_DEPTH_TEST);
     }
 
     @Override
