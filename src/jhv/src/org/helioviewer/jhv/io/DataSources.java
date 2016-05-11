@@ -284,6 +284,18 @@ public class DataSources {
         return new Item[0];
     }
 
+    public static int getSourceID(String observatory, String instrument, String detector, String measurement) {
+        try {
+            return jsonResult.getJSONObject(observatory).getJSONObject("children").
+                              getJSONObject(instrument).getJSONObject("children").
+                              getJSONObject(detector).getJSONObject("children").
+                              getJSONObject(measurement).getInt("sourceId");
+        } catch (JSONException e) {
+            Log.error("Cannot find sourceID " + e);
+        }
+        return -1;
+    }
+
     /**
      * Resolve the available observatories
      *
