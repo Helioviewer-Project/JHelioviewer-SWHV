@@ -96,8 +96,8 @@ public class DownloadStream {
         this.connectTimeout = connectTimeout;
     }
 
-    public boolean getResponse400() {
-        return this.response400;
+    public boolean isResponse400() {
+        return response400;
     }
 
     private InputStream getEncodedStream(String encoding, InputStream httpStream) throws IOException {
@@ -154,13 +154,15 @@ public class DownloadStream {
                 throw new IOException("Error opening http connection to " + url + " Response code: " + code);
             }
 
-            String encoding = httpC.getContentEncoding();
+            InputStream strm;
             if (code == 400) {
                 response400 = true;
-                in = getEncodedStream(encoding, httpC.getErrorStream());
+                strm = httpC.getErrorStream();
             } else {
-                in = getEncodedStream(encoding, httpC.getInputStream());
+                strm = httpC.getInputStream();
             }
+
+            in = getEncodedStream(httpC.getContentEncoding(), strm);
         } else {
             // Not an http connection
             // Write post data if necessary
@@ -219,7 +221,7 @@ public class DownloadStream {
      * @return the connect timeout
      */
     public int getConnectTimeout() {
-        return readTimeout;
+        return connectTimeout;
     }
 
     /**
