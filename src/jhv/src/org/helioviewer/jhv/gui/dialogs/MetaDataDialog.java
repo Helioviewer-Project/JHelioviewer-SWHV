@@ -93,11 +93,13 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(exportFitsButton);
         bottomPanel.add(closeButton);
-        prepareList(basicBox);
-        prepareList(jhBox);
+
+        basicBox.setCellRenderer(new WrappedTextCellRenderer(80));
+        jhBox.setCellRenderer(new WrappedTextCellRenderer(80));
 
         JTable fTable = new JTable(fitsModel);
-        prepareTable(fTable);
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(fitsModel);
+        fTable.setRowSorter(sorter);
 
         JPanel sp = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -134,23 +136,21 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
-    private void prepareList(JList l) {
-        l.setFont(UIGlobals.UIFontMono);
-        l.setCellRenderer(new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                JTextArea textArea = new JTextArea(value.toString().trim());
-                textArea.setLineWrap(true);
-                textArea.setWrapStyleWord(true);
-                textArea.setFont(list.getFont());
-                return textArea;
-            }
-        });
-    }
+    private static class WrappedTextCellRenderer extends JTextArea implements ListCellRenderer {
 
-    private void prepareTable(JTable t) {
-        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(t.getModel());
-        t.setRowSorter(sorter);
+        public WrappedTextCellRenderer(int width) {
+            setLineWrap(true);
+            setWrapStyleWord(true);
+            setFont(UIGlobals.UIFontMono);
+            setColumns(width);
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            setText("" + value.toString().trim());
+            return this;
+        }
+
     }
 
     private void resetData() {
@@ -160,20 +160,20 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             exportFitsButton.setEnabled(true);
         }
     }
-
+/*
     private void addDataItem(String key, String value) {
-        basicList.add(basicList.getSize(), key + ": " + value + "\n");
+        basicList.addElement(key + ": " + value + "\n");
     }
-
+*/
     private void addDataItem(String key, DefaultListModel model) {
-        model.add(model.getSize(), key + "\n");
+        model.addElement(key + "\n");
     }
 
     private void addDataItem(String nodeName, String nodeValue, boolean isFits) {
         if (isFits)
             fitsModel.addRow(new Object[] { nodeName, nodeValue });
         else
-            jhList.add(jhList.getSize(), nodeName + ": " + nodeValue + "\n");
+            jhList.addElement(nodeName + ": " + nodeValue + "\n");
     }
 
     @Override
