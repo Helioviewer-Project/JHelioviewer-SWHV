@@ -214,7 +214,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
                 Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
-            double radiusSunInArcsec = Math.atan2(Sun.Radius, viewpoint.distance) * MathUtils.radeg * 3600;
+
+            double radiusSunInArcsec = Math.atan2(Sun.Radius * getEUVSolarRadiusFactor(), viewpoint.distance) * MathUtils.radeg * 3600;
             double solarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
             unitPerPixel = Sun.Radius / solarPixelRadius;
 
@@ -228,6 +229,17 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         } else { // pixel based
             region = new Region(0, 0, pixelWidth, pixelHeight);
         }
+    }
+
+    private double getEUVSolarRadiusFactor() {
+        if (instrument.equals("AIA") || instrument.equals("SWAP") || instrument.equals("EIT") || detector.equals("EUVI")) {
+            int wv = Integer.parseInt(measurement);
+            if (wv < 304)
+                return Sun.RadiusFactor_171;
+            else if (wv < 1000)
+                return Sun.RadiusFactor_304;
+        }
+        return 1;
     }
 
     public Region roiToRegion(SubImage roi, double factorX, double factorY) {

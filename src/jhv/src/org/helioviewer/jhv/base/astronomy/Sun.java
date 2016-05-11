@@ -16,6 +16,8 @@ public class Sun {
     public static final double Radius = 1;
     public static final double Radius2 = Radius * Radius;
     public static final double RadiusMeter = 695700000; // photospheric, IAU 2015 Resolution B3
+    public static final double RadiusFactor_171 = (695489200 + 7146 * 1000) / RadiusMeter; // 10.1051/0004-6361:20078118
+    public static final double RadiusFactor_304 = (695489200 + 5710 * 1000) / RadiusMeter;
 
     public static final double MeanEarthDistanceMeter = 149597870700.;
     public static final double MeanEarthDistance = MeanEarthDistanceMeter / RadiusMeter;
