@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
+import java.util.Locale;
+
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
@@ -125,7 +127,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         } else if (instrument.contains("HMI")) {
             measurement = m.get("CONTENT");
             String str[] = measurement.split(" ", 2);
-            fullName = "HMI " + str[0].toLowerCase();
+            fullName = "HMI " + str[0].toLowerCase(Locale.ENGLISH);
         } else if (detector.equals("C2") || detector.equals("C3")) {
             String measurement1 = m.get("FILTER");
             String measurement2 = m.get("POLAR");
@@ -133,7 +135,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             fullName = "LASCO " + detector;
         } else if (instrument.equals("MDI")) {
             measurement = m.get("DPC_OBSR");
-            fullName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase();
+            fullName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase(Locale.ENGLISH);
         } else if (detector.equals("COR1") || detector.equals("COR2")) {
             observatory = m.get("OBSRVTRY");
             fullName = observatory + " " + detector;
@@ -215,7 +217,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
                 Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
 
-            double radiusSunInArcsec = Math.atan2(Sun.Radius * getEUVSolarRadiusFactor(), viewpoint.distance) * MathUtils.radeg * 3600;
+            double radiusSunInArcsec = Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance) * MathUtils.radeg * 3600;
             double solarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
             unitPerPixel = Sun.Radius / solarPixelRadius;
 
@@ -231,13 +233,32 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         }
     }
 
-    private double getEUVSolarRadiusFactor() {
-        if (instrument.equals("AIA") || instrument.equals("SWAP") || instrument.equals("EIT") || detector.equals("EUVI")) {
-            int wv = Integer.parseInt(measurement);
+    private double getSolarRadiusFactor() {
+        if (measurement.toLowerCase(Locale.ENGLISH).contains("continuum"))
+            return Sun.RadiusFactor_6173;
+
+        int wv;
+        try {
+            wv = Integer.parseInt(measurement);
+        } catch (Exception e) {
+            return 1;
+        }
+
+        if (wv != 0) {
             if (wv < 304)
-                return Sun.RadiusFactor_171;
-            else if (wv < 1000)
+                return Sun.RadiusFactor_304; // better match than 171;
+            else if (wv < 1600)
                 return Sun.RadiusFactor_304;
+            else if (wv < 1700)
+                return Sun.RadiusFactor_1600;
+            else if (wv < 4500)
+                return Sun.RadiusFactor_1700;
+            else if (wv < 6173)
+                return 1;
+            else if (wv < 6562)
+                return Sun.RadiusFactor_6173;
+            else
+                return Sun.RadiusFactor_6562;
         }
         return 1;
     }
