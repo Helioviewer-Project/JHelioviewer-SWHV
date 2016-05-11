@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio;
 
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -17,7 +18,14 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 class RadioOptionsPanel extends SmallPanel {
 
     public RadioOptionsPanel(String selected) {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.NONE;
 
         final JComboBox lutBox = new JComboBox(LUT.getStandardList().keySet().toArray());
         lutBox.setSelectedItem(selected);
@@ -37,8 +45,11 @@ class RadioOptionsPanel extends SmallPanel {
             }
         });
 
-        add(lutBox);
-        add(availabilityButton);
+        add(lutBox, c);
+        c.anchor = GridBagConstraints.EAST;
+        c.gridx = 1;
+        c.gridy = 0;
+        add(availabilityButton, c);
 
         setSmall();
     }
