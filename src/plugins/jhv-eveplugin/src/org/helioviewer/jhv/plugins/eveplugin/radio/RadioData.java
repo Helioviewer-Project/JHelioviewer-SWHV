@@ -166,7 +166,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
     @Override
     public String getName() {
-        return "Callisto radiogram";
+        return "Callisto Radiogram";
     }
 
     @Override
