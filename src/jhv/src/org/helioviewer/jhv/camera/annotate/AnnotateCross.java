@@ -23,8 +23,10 @@ public class AnnotateCross extends AbstractAnnotateable {
         Vec3 p2 = new Vec3(Sun.Radius, bp.y - delta, bp.z);
         Vec3 p3 = new Vec3(Sun.Radius, bp.y, bp.z + delta);
         Vec3 p4 = new Vec3(Sun.Radius, bp.y, bp.z - delta);
+        gl.glDisable(GL2.GL_DEPTH_TEST);
         interpolatedLineDraw(vp, gl, p1, p2, 2);
         interpolatedLineDraw(vp, gl, p3, p4, 2);
+        gl.glEnable(GL2.GL_DEPTH_TEST);
     }
 
     @Override
