@@ -101,6 +101,11 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
                 String str = (String) (uiSelectionComboBox.getSelectedItem());
                 if (str.equals("Image data")) {
                     String url = Settings.getSingletonInstance().getProperty("availability.images.url");
+                    int id = DataSources.getSourceID(imageObservationPanel.getObservatory(), imageObservationPanel.getInstrument(),
+                                                     imageObservationPanel.getDetector(), imageObservationPanel.getMeasurement());
+                    if (id != -1)
+                        url += "#IID" + id;
+
                     JHVGlobals.openURL(url);
                 } else if (str.equals("1D time series")) {
                     String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
