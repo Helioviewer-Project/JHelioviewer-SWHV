@@ -200,8 +200,8 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
-        DownloadController.getSingletonInstance().updateBand(this, availableAxis.start, availableAxis.end);
+    public void fetchData(TimeAxis selectedAxis) {
+        DownloadController.getSingletonInstance().updateBand(this, selectedAxis.start, selectedAxis.end);
         updateGraphsData();
     }
 
