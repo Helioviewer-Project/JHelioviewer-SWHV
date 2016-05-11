@@ -35,7 +35,7 @@ public interface LineDataSelectorElement {
 
     public YAxis getYAxis();
 
-    public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis);
+    public void fetchData(TimeAxis selectedAxis);
 
     public void yaxisChanged();
 

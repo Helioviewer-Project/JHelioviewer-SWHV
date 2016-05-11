@@ -160,7 +160,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     public void setVisibility(boolean visible) {
         isVisible = visible;
         clearCache();
-        fetchData(EVEPlugin.dc.selectedAxis, EVEPlugin.dc.availableAxis);
+        fetchData(EVEPlugin.dc.selectedAxis);
         EVEPlugin.dc.fireRedrawRequest();
     }
 
@@ -204,7 +204,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
+    public void fetchData(TimeAxis selectedAxis) {
         if (isVisible) {
             boolean timediffCond = selectedAxis.end - selectedAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
             if (timediffCond) {

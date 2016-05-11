@@ -50,8 +50,8 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     @Override
-    public void fetchData(TimeAxis selectedAxis, TimeAxis availableAxis) {
-        eventContainer.requestForInterval(availableAxis.start, availableAxis.end, EventModel.this);
+    public void fetchData(TimeAxis selectedAxis) {
+        eventContainer.requestForInterval(selectedAxis.start, selectedAxis.end, EventModel.this);
     }
 
     @Override
