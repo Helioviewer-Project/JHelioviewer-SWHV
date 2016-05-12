@@ -84,7 +84,9 @@ public class DynamicModel implements TreeModel {
             if (link.charAt(link.length() - 1) == '/' && link.charAt(0) != '/') {
                 returnlist.add(urlString + (String) iter.getAttributes().getAttribute(HTML.Attribute.HREF));
             }
-            if (link.toLowerCase().endsWith(".jp2") || link.toLowerCase().endsWith(".jpx")) {
+
+            String lower = link.toLowerCase();
+            if (lower.endsWith(".jp2") || lower.endsWith(".jpx")) {
                 returnlist.add(urlString + link);
             }
             iter.next();
@@ -113,7 +115,6 @@ public class DynamicModel implements TreeModel {
         try {
             return node.getChild(index);
         } catch (Exception e) {
-
             e.printStackTrace();
             return null;
         }
@@ -142,7 +143,7 @@ public class DynamicModel implements TreeModel {
             return true;
 
         String link = ((Node) node).toString().toLowerCase();
-        if (link.toLowerCase().endsWith(".jp2") || link.toLowerCase().endsWith(".jpx")) {
+        if (link.endsWith(".jp2") || link.endsWith(".jpx")) {
             return true;
         }
         return false;

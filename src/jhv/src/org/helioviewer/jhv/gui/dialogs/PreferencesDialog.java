@@ -95,7 +95,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             }
         });
 
-        if (System.getProperty("os.name").toUpperCase().contains("WIN")) {
+        if (System.getProperty("jhv.os").equals("windows")) {
             btnPanel.add(acceptBtn);
             btnPanel.add(cancelBtn);
         } else {

@@ -516,9 +516,10 @@ public class SWEKConfigurationManager {
         String color = object.getString("color");
         try {
             URI colorURI = new URI(color);
-            if (colorURI.getScheme().toLowerCase().equals("colorname")) {
+            String colorScheme = colorURI.getScheme().toLowerCase();
+            if (colorScheme.equals("colorname")) {
                 return parseColorName(colorURI.getHost());
-            } else if (colorURI.getScheme().toLowerCase().equals("colorcode")) {
+            } else if (colorScheme.equals("colorcode")) {
                 return parseColorCode(colorURI.getHost());
             } else {
                 Log.info("Could not understand: " + color + ", black returned");
