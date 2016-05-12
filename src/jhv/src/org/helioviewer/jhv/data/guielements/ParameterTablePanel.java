@@ -38,7 +38,7 @@ public class ParameterTablePanel extends JPanel {
                 updateRowHeights();
             }
 
-            // table never changes
+            // don't delete
             // @Override
             // public void tableChanged(TableModelEvent e) {
             //     updateRowHeights();
@@ -71,7 +71,7 @@ public class ParameterTablePanel extends JPanel {
         int rows = table.getRowCount();
         for (int i = 0; i < rows; i++) {
             Component comp = table.prepareRenderer(table.getCellRenderer(i, 1), i, 1);
-            table.setRowHeight(i, Math.max(rowHeight, comp.getPreferredSize().height) + rowMargin);
+            table.setRowHeight(i, Math.max(rowHeight, comp.getPreferredSize().height + rowMargin));
         }
     }
 
@@ -79,7 +79,7 @@ public class ParameterTablePanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            setText(String.format("<html><div WIDTH=%d>%s</div><html>", table.getColumnModel().getColumn(column).getWidth(), value));
+            setText(String.format("<html><div width=%d>%s</div><html>", table.getColumnModel().getColumn(column).getWidth(), value));
             return this;
         }
 
@@ -103,10 +103,9 @@ public class ParameterTablePanel extends JPanel {
         @Override
         public void mouseMoved(MouseEvent e) {
             JTable table = (JTable) e.getComponent();
-            Point pt = e.getPoint();
-
-            int row = table.rowAtPoint(pt);
-            int col = table.columnAtPoint(pt);
+            Point p = e.getPoint();
+            int row = table.rowAtPoint(p);
+            int col = table.columnAtPoint(p);
             if (row < 0 || col < 0) {
                 return;
             }
@@ -127,10 +126,9 @@ public class ParameterTablePanel extends JPanel {
         @Override
         public void mouseClicked(MouseEvent e) {
             JTable table = (JTable) e.getComponent();
-            Point pt = e.getPoint();
-
-            int row = table.rowAtPoint(pt);
-            int col = table.columnAtPoint(pt);
+            Point p = e.getPoint();
+            int row = table.rowAtPoint(p);
+            int col = table.columnAtPoint(p);
             if (row < 0 || col != 1) {
                 return;
             }
