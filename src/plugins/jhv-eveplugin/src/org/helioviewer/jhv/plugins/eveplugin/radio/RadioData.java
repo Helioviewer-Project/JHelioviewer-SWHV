@@ -161,7 +161,12 @@ public class RadioData extends AbstractLineDataSelectorElement {
         isVisible = visible;
         clearCache();
         fetchData(EVEPlugin.dc.selectedAxis);
-        EVEPlugin.dc.fireRedrawRequest();
+        // EVEPlugin.dc.fireRedrawRequest();
+
+        if (isVisible)
+            EVEPlugin.ldsm.fireLineDataSelectorElementAdded(this);
+        else
+            EVEPlugin.ldsm.fireLineDataSelectorElementRemoved(this);
     }
 
     @Override
