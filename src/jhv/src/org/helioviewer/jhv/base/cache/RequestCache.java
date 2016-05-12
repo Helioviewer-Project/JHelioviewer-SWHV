@@ -34,7 +34,7 @@ public class RequestCache {
         cache = merge(cache);
     }
 
-    public void removeRequestedIntervals(Interval ri) {
+    public void removeRequestedInterval(Interval ri) {
         cache = remove(cache, ri);
     }
 
