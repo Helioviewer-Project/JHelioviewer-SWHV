@@ -490,8 +490,8 @@ public class RenderableGrid extends AbstractRenderable {
         FloatBuffer colorBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 3);
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            positionBuffer.put((float) Math.cos(2 * Math.PI * i / SUBDIVISIONS));
-            positionBuffer.put((float) Math.sin(2 * Math.PI * i / SUBDIVISIONS));
+            positionBuffer.put((float) (Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS)));
+            positionBuffer.put((float) (Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS)));
             if (i % 2 == 0) {
                 colorBuffer.put(firstColor);
             } else {
