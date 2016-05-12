@@ -56,20 +56,13 @@ public class RequestCache {
             newCache.add(new Interval(Long.MIN_VALUE, Long.MAX_VALUE));
             return newCache;
         }
-        int i = 0;
-        Interval interval;
-        long currend;
 
-        interval = toInvert.get(0);
-        if (Long.MIN_VALUE != interval.start) {
-            newCache.add(new Interval(Long.MIN_VALUE, interval.start));
-        }
-        currend = interval.end;
-        i++;
-
-        while (i < len) {
-            interval = toInvert.get(i);
-            newCache.add(new Interval(currend, interval.start));
+        long currend = Long.MIN_VALUE;
+        for (int i = 0; i < len; i++) {
+            Interval interval = toInvert.get(i);
+            if (currend != interval.start) {
+                newCache.add(new Interval(currend, interval.start));
+            }
             currend = interval.end;
             i++;
         }
