@@ -79,7 +79,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     private long latest_cache_start = -1;
     private long latest_cache_end = -1;
 
-    public void requestAndOpenIntervals(long start, long end) {
+    private void requestAndOpenIntervals(long start, long end) {
         if (latest_cache_start != -1 && latest_cache_end != -1 && start >= latest_cache_start && end <= latest_cache_end)
             return;
         latest_cache_start = start - start % TimeUtils.DAY_IN_MILLIS - 2 * TimeUtils.DAY_IN_MILLIS;
