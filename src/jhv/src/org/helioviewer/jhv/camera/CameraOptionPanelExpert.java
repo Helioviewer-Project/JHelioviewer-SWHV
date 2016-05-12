@@ -164,11 +164,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     @Override
     public void activeLayerChanged(View view) {
-        if (view != null) {
-            positionLoad.setBeginDate(view.getFirstTime().getDate(), false);
-            positionLoad.setEndDate(view.getLastTime().getDate(), true);
-            // Displayer.render();
-        }
+        syncWithLayer();
+        // Displayer.render();
     }
 
     private void addObjectCombobox(GridBagConstraints c) {
