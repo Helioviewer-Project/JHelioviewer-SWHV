@@ -161,7 +161,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         isVisible = visible;
         clearCache();
         fetchData(EVEPlugin.dc.selectedAxis);
-        // radio doesn't need fireRedrawRequest() as it destroys its cache on invisibility
+        EVEPlugin.dc.fireRedrawRequest();
     }
 
     @Override
