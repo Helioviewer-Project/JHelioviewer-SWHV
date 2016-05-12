@@ -9,11 +9,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 
 public class RequestCache {
 
-    private ArrayList<Interval> cache;
-
-    public RequestCache() {
-        cache = new ArrayList<Interval>();
-    }
+    private ArrayList<Interval> cache = new ArrayList<Interval>();
 
     public List<Interval> adaptRequestCache(long startDate, long endDate) {
         ArrayList<Interval> missingIntervals = new ArrayList<Interval>();
