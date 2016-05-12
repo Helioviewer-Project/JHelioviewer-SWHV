@@ -31,13 +31,11 @@ public class DownloadWorker implements Runnable {
 
     private static final SWEKSourceManager sourceManager = SWEKSourceManager.getSingletonInstance();
     private final JHVEventType jhvType;
-    private volatile boolean isStopped;
     private final JHVEventContainer eventContainer;
     private final List<SWEKParam> params;
     private final Interval requestInterval;
 
     public DownloadWorker(JHVEventType jhvType, Interval interval, List<SWEKParam> params) {
-        isStopped = false;
         requestInterval = interval;
         this.jhvType = jhvType;
         eventContainer = JHVEventContainer.getSingletonInstance();
@@ -45,7 +43,6 @@ public class DownloadWorker implements Runnable {
     }
 
     public void stopWorker() {
-        isStopped = true;
         SWEKDownloadManager.getSingletonInstance().workerForcedToStop(this);
     }
 
