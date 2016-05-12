@@ -23,7 +23,7 @@ public class TimeUtils {
     public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
     public static final FastDateFormat dateFormat = FastDateFormat.getInstance("yyyy-MM-dd");
 
-    public static final JHVDate Epoch = JHVDate.parseDateTime("2000-01-01T00:00:00");
+    public static final JHVDate EPOCH = JHVDate.parseDateTime("2000-01-01T00:00:00");
     public static final JHVDate MINIMAL_DATE = JHVDate.parseDateTime("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = JHVDate.parseDateTime("2050-01-01T00:00:00");
 
