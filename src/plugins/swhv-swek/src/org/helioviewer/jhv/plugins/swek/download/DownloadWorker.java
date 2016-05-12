@@ -46,6 +46,7 @@ public class DownloadWorker implements Runnable {
 
     public void stopWorker() {
         isStopped = true;
+        SWEKDownloadManager.getSingletonInstance().workerForcedToStop(this);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class DownloadWorker implements Runnable {
             }
         }
 
-        if (isStopped || !success) {
+        if (!success) {
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
