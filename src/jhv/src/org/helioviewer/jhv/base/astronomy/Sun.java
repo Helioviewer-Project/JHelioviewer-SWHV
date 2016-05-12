@@ -22,8 +22,10 @@ public class Sun {
     public static final double MeanEarthDistanceInv = RadiusMeter / MeanEarthDistanceMeter;
 
     // doi:10.1088/0004-637X/812/2/91
-    public static final double RadiusFactor_171 = MeanEarthDistance * Math.tan(969.54 / 3600 * Math.PI / 180);
-    public static final double RadiusFactor_304 = MeanEarthDistance * Math.tan(967.56 / 3600 * Math.PI / 180);
+    public static final double RadiusFactor_171 = 7.01 * 1e5 * 1e3 / RadiusMeter; // Frédéric Auchère, personal communication
+    public static final double RadiusFactor_304 = 7.01 * 1e5 * 1e3 / RadiusMeter; // for visualisation better use same
+    // public static final double RadiusFactor_171 = MeanEarthDistance * Math.tan(969.54 / 3600 * Math.PI / 180);
+    // public static final double RadiusFactor_304 = MeanEarthDistance * Math.tan(967.56 / 3600 * Math.PI / 180);
     public static final double RadiusFactor_1600 = MeanEarthDistance * Math.tan(963.04 / 3600 * Math.PI / 180);
     public static final double RadiusFactor_1700 = MeanEarthDistance * Math.tan(961.76 / 3600 * Math.PI / 180);
     public static final double RadiusFactor_5000 = MeanEarthDistance * Math.tan(959.63 / 3600 * Math.PI / 180);
@@ -34,7 +36,7 @@ public class Sun {
     public static final Position.Q EpochEarthQ;
 
     static {
-        EpochEarthL = getEarth(TimeUtils.Epoch);
+        EpochEarthL = getEarth(TimeUtils.EPOCH);
         EpochEarthQ = new Position.Q(EpochEarthL.time, EpochEarthL.rad, new Quat(EpochEarthL.lat, EpochEarthL.lon));
     }
 
@@ -104,7 +106,7 @@ public class Sun {
         return flon + (int) cr;
     }
 
-    private static final double theta0 = sunRot(milli2mjd(TimeUtils.Epoch.milli));
+    private static final double theta0 = sunRot(milli2mjd(TimeUtils.EPOCH.milli));
 
     public static Quat getHCI(JHVDate time) {
         // 1.7381339560109783

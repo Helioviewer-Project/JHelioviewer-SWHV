@@ -165,7 +165,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if (observedDate != null)
             return JHVDate.parseDateTime(observedDate);
         else
-            return TimeUtils.Epoch;
+            return TimeUtils.EPOCH;
     }
 
     private void retrievePosition(MetaDataContainer m, JHVDate dateObs) {
@@ -246,7 +246,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         if (wv != 0) {
             if (wv < 304)
-                return Sun.RadiusFactor_304; // better match than 171;
+                return Sun.RadiusFactor_171;
             else if (wv < 1600)
                 return Sun.RadiusFactor_304;
             else if (wv < 1700)
