@@ -10,10 +10,11 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.regex.Matcher;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
@@ -22,21 +23,27 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 
-/**
- * Represents a panel with a table containing all the parameters from the given
- * list.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
 @SuppressWarnings("serial")
 public class ParameterTablePanel extends JPanel {
+
+    private final JTable table;
 
     public ParameterTablePanel(JHVEventParameter[] parameters) {
         setLayout(new BorderLayout());
 
         ParameterTableModel parameterModel = new ParameterTableModel(parameters);
-        JTable table = new JTable(parameterModel);
+        table = new JTable(parameterModel) {
+            @Override
+            public void columnMarginChanged(ChangeEvent e) {
+                updateRowHeights();
+            }
+
+            // table never changes
+            // @Override
+            // public void tableChanged(TableModelEvent e) {
+            //     updateRowHeights();
+            // }
+        };
 
         table.setAutoCreateRowSorter(true);
         table.getColumnModel().getColumn(0).setResizable(false);
@@ -58,16 +65,21 @@ public class ParameterTablePanel extends JPanel {
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
 
-    private static class WrappedTextCellRenderer extends JTextPane implements TableCellRenderer, MouseListener, MouseMotionListener {
-
-        public WrappedTextCellRenderer() {
-            setContentType("text/html");
-            putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+    private void updateRowHeights()  {
+        int rowMargin = table.getRowMargin();
+        int rowHeight = table.getRowHeight();
+        int rows = table.getRowCount();
+        for (int i = 0; i < rows; i++) {
+            Component comp = table.prepareRenderer(table.getCellRenderer(i, 1), i, 1);
+            table.setRowHeight(i, Math.max(rowHeight, comp.getPreferredSize().height) + rowMargin);
         }
+    }
+
+    private static class WrappedTextCellRenderer extends JLabel implements TableCellRenderer, MouseListener, MouseMotionListener {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            setText("" + value);
+            setText(String.format("<html><div WIDTH=%d>%s</div><html>", table.getColumnModel().getColumn(column).getWidth(), value));
             return this;
         }
 
