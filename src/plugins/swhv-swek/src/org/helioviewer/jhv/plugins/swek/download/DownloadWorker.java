@@ -52,34 +52,30 @@ public class DownloadWorker implements Runnable {
     @Override
     public void run() {
         boolean success = false;
-        if (!isStopped) {
-            SWEKSource swekSource = jhvType.getSupplier().getSource();
-            SWEKDownloader downloader = sourceManager.getDownloader(swekSource);
-            success = downloader.extern2db(jhvType, requestInterval.start, requestInterval.end, params);
-            if (success) {
-                final ArrayList<JHVAssociation> associationList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, jhvType);
+        SWEKSource swekSource = jhvType.getSupplier().getSource();
+        SWEKDownloader downloader = sourceManager.getDownloader(swekSource);
+        success = downloader.extern2db(jhvType, requestInterval.start, requestInterval.end, params);
+        if (success) {
+            final ArrayList<JHVAssociation> associationList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, jhvType);
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    for (JHVAssociation assoc : associationList) {
+                        JHVEventCache.getSingletonInstance().add(assoc);
+                    }
+
+                }
+            });
+            SWEKParser parser = sourceManager.getParser(swekSource);
+            ArrayList<JsonEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
+            for (JsonEvent event : eventList) {
+                final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end, false);
                 EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        for (JHVAssociation assoc : associationList) {
-                            JHVEventCache.getSingletonInstance().add(assoc);
-                        }
-
+                        JHVEventCache.getSingletonInstance().add(ev);
                     }
                 });
-                SWEKParser parser = sourceManager.getParser(swekSource);
-                ArrayList<JsonEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
-                for (JsonEvent event : eventList) {
-                    final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end, false);
-                    EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!isStopped) {
-                                JHVEventCache.getSingletonInstance().add(ev);
-                            }
-                        }
-                    });
-                }
             }
         }
 
