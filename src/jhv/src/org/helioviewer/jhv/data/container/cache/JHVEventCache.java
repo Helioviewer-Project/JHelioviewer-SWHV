@@ -49,7 +49,7 @@ public class JHVEventCache {
         @Override
         public int hashCode() {
             assert false : "hashCode not designed";
-        return 42;
+            return 42;
         }
 
         @Override
@@ -200,7 +200,7 @@ public class JHVEventCache {
     }
 
     public void removeRequestedIntervals(JHVEventType eventType, Interval interval) {
-        downloadedCache.get(eventType).removeRequestedIntervals(interval);
+        downloadedCache.get(eventType).removeRequestedInterval(interval);
     }
 
     public void eventTypeActivated(JHVEventType eventType) {
