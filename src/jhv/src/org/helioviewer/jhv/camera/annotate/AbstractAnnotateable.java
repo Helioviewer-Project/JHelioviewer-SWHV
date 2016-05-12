@@ -78,7 +78,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
 
             gl.glEnd();
         } else {
-            gl.glBegin(GL2.GL_QUAD_STRIP);
+            gl.glBegin(GL2.GL_TRIANGLE_STRIP);
 
             for (double i = 0; i < subdivisions; i++) {
                 double t = i / subdivisions;
