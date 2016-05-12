@@ -46,8 +46,10 @@ public class Camera {
     public void reset() {
         currentTranslation.clear();
         currentDragRotation.clear();
+
+        updateCamera(Layers.getLastUpdatedTimestamp());
         CameraHelper.zoomToFit(this);
-        refresh();
+        Displayer.render(1);
     }
 
     private Position.Q saveViewpoint = null;
