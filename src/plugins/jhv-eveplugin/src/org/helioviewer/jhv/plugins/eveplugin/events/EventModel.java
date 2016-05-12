@@ -128,11 +128,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                         highlightedEvent = rEvent;
                     }
                 }
-
-                if (shouldRedraw != null) {
-                    shouldRedraw.draw(graphArea, g, previousLine, mousePosition);
-                }
-
                 int spaceNeeded = spacePerLine * nrLines;
                 ImageIcon icon = eventType.getEventType().getEventIcon();
                 fullG.drawImage(icon.getImage(), 0, graphArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 4, icon.getIconWidth() / 2, graphArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 4, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
@@ -148,6 +143,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
                 eventTypeNr++;
             }
+
             setEventUnderMouse(shouldRedraw);
             if (mousePosition != null) {
                 JHVEventContainer.highlight(highlightedEvent);
