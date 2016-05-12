@@ -141,7 +141,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     protected void paintComponent(Graphics g1) {
         Rectangle graphArea = drawController.getGraphArea();
         if (forceRedrawGraph || axisHightlightToggled(graphArea)) {
-            redrawGraph();
+            redrawGraph(graphArea);
             forceRedrawGraph = false;
         }
 
@@ -160,10 +160,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         toRedraw = true;
     }
 
-    private void redrawGraph() {
+    private void redrawGraph(Rectangle graphArea) {
         Rectangle graphSize = drawController.getGraphSize();
-        Rectangle graphArea = drawController.getGraphArea();
-
         int sx = GLInfo.pixelScale[0], sy = GLInfo.pixelScale[1];
         int width = sx * (int) graphSize.getWidth();
         int height = sy * (int) graphSize.getHeight();
@@ -447,7 +445,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseExited(MouseEvent e) {
         mousePosition = null;
-        drawRequest();
+        updateGraph();
     }
 
     @Override
@@ -513,7 +511,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         return movieLinePosition >= 0 && movieLinePosition - 3 <= p.x && p.x <= movieLinePosition + 3;
     }
 
-    public boolean highlightChanged() {
+    private boolean highlightChanged() {
         if (mousePosition == null) {
             return false;
         }
@@ -537,11 +535,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         } else {
             setCursor(Cursor.getDefaultCursor());
         }
+
         if (highlightChanged()) {
-            redrawGraph();
-        }
-        else {
-            updateGraph();
+            drawRequest();
+        } else {
+            updateGraph(); // for timeline values
         }
     }
 
