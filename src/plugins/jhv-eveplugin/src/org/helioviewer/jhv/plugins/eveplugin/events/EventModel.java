@@ -14,6 +14,7 @@ import java.util.SortedMap;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
@@ -51,7 +52,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        eventContainer.requestForInterval(selectedAxis.start, selectedAxis.end, EventModel.this);
+        eventContainer.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, EventModel.this);
     }
 
     @Override
