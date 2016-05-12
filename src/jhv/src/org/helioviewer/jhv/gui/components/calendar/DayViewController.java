@@ -94,7 +94,7 @@ public class DayViewController implements CalendarViewController {
         // put all days at correct position in grid data
         Object[][] data = new Object[6][7];
 
-        boolean win = System.getProperty("os.name").toLowerCase().contains("win");
+        boolean win = System.getProperty("jhv.os").equals("windows");
         cal.set(Calendar.DAY_OF_MONTH, 1);
 
         // the calendar returns sometimes index 0 and sometimes index 1 for

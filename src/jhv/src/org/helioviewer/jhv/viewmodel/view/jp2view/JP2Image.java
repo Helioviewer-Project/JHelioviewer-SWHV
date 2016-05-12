@@ -54,7 +54,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 public class JP2Image {
 
     /** An array of the file extensions this class currently supports */
-    private static final String[] SUPPORTED_EXTENSIONS = { ".JP2", ".JPX" };
+    private static final String[] SUPPORTED_EXTENSIONS = { ".jp2", ".jpx" };
 
     /** This is the URI that uniquely identifies the image. */
     private final URI uri;
@@ -114,7 +114,7 @@ public class JP2Image {
         uri = _uri;
         downloadURI = _downloadURI;
 
-        String name = uri.getPath().toUpperCase();
+        String name = uri.getPath().toLowerCase();
         boolean supported = false;
         for (String ext : SUPPORTED_EXTENSIONS)
             if (name.endsWith(ext))
@@ -123,14 +123,14 @@ public class JP2Image {
             throw new JHV_KduException("File extension not supported");
 
         try {
-            String scheme = uri.getScheme().toUpperCase();
-            if (scheme.equals("JPIP")) {
+            String scheme = uri.getScheme().toLowerCase();
+            if (scheme.equals("jpip")) {
                 cacheReader = new JHV_Kdu_cache();
                 cacheRender = new Kdu_cache();
                 cacheRender.Attach_to(cacheReader);
                 // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
                 initRemote(cacheReader);
-            } else if (scheme.equals("FILE")) {
+            } else if (scheme.equals("file")) {
                 // nothing
             } else
                 throw new JHV_KduException(scheme + " scheme not supported!");
