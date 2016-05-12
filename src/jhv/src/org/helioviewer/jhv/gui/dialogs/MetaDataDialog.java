@@ -7,6 +7,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -94,8 +97,18 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         bottomPanel.add(exportFitsButton);
         bottomPanel.add(closeButton);
 
-        basicBox.setCellRenderer(new WrappedTextCellRenderer(80));
-        jhBox.setCellRenderer(new WrappedTextCellRenderer(80));
+        basicBox.setCellRenderer(new WrappedTextCellRenderer());
+        jhBox.setCellRenderer(new WrappedTextCellRenderer());
+
+        ComponentListener cl = new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // force cache invalidation by temporarily setting fixed height
+                ((JList) e.getComponent()).setFixedCellHeight(10);
+                ((JList) e.getComponent()).setFixedCellHeight(-1);
+            }
+        };
+        jhBox.addComponentListener(cl);
 
         JTable fTable = new JTable(fitsModel);
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(fitsModel);
@@ -138,16 +151,18 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
     private static class WrappedTextCellRenderer extends JTextArea implements ListCellRenderer {
 
-        public WrappedTextCellRenderer(int width) {
+        public WrappedTextCellRenderer() {
             setLineWrap(true);
             setWrapStyleWord(true);
             setFont(UIGlobals.UIFontMono);
-            setColumns(width);
         }
 
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             setText("" + value.toString().trim());
+            int width = list.getWidth();
+            if (width > 0)
+                setSize(width, Short.MAX_VALUE);
             return this;
         }
 
@@ -160,20 +175,16 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             exportFitsButton.setEnabled(true);
         }
     }
-/*
-    private void addDataItem(String key, String value) {
-        basicList.addElement(key + ": " + value + "\n");
-    }
-*/
+
     private void addDataItem(String key, DefaultListModel model) {
-        model.addElement(key + "\n");
+        model.addElement(key);
     }
 
     private void addDataItem(String nodeName, String nodeValue, boolean isFits) {
         if (isFits)
             fitsModel.addRow(new Object[] { nodeName, nodeValue });
         else
-            jhList.addElement(nodeName + ": " + nodeValue + "\n");
+            jhList.addElement(nodeName + ": " + nodeValue);
     }
 
     @Override
@@ -214,7 +225,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         if (!(metaData instanceof HelioviewerMetaData)) {
             metaDataOK = false;
             resetData();
-            addDataItem("error", "No metadata is available.");
+            addDataItem("Error: No metadata is available.", basicList);
         } else {
             HelioviewerMetaData m = (HelioviewerMetaData) metaData;
             metaDataOK = true;
@@ -222,11 +233,11 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             addDataItem("-------------------------------", basicList);
             addDataItem("       Basic Information       ", basicList);
             addDataItem("-------------------------------", basicList);
-            addDataItem("Observatory", m.getObservatory());
-            addDataItem("Instrument", m.getInstrument());
-            addDataItem("Detector", m.getDetector());
-            addDataItem("Measurement", m.getMeasurement());
-            addDataItem("Observation Date", m.getViewpoint().time.toString());
+            addDataItem("Observatory: " + m.getObservatory(), basicList);
+            addDataItem("Instrument: " + m.getInstrument(), basicList);
+            addDataItem("Detector: " + m.getDetector(), basicList);
+            addDataItem("Measurement: " + m.getMeasurement(), basicList);
+            addDataItem("Observation Date: " + m.getViewpoint().time, basicList);
 
             String xmlText = null;
             if (v instanceof JP2View) {
