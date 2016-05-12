@@ -183,7 +183,13 @@ public class LineDataSelectorTablePanel extends JPanel {
 
                 if (col == VISIBLE_COL) {
                     LineDataSelectorElement renderable = (LineDataSelectorElement) model.getValueAt(row, col);
-                    renderable.setVisibility(!renderable.isVisible());
+
+                    boolean vis = !renderable.isVisible();
+                    renderable.setVisibility(vis);
+                    if (vis)
+                        model.fireLineDataSelectorElementAdded(renderable);
+                    else
+                        model.fireLineDataSelectorElementRemoved(renderable);
                 }
                 if (col == TITLE_COL || col == LOADING_COL || col == LINECOLOR_COL) {
                     LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);

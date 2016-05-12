@@ -75,13 +75,13 @@ public class LineDataSelectorModel implements TableModel {
         }
     }
 
-    public void fireLineDataSelectorElementRemoved(LineDataSelectorElement element) {
+    void fireLineDataSelectorElementRemoved(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataRemoved(element);
         }
     }
 
-    public void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
+    void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataAdded(element);
         }
