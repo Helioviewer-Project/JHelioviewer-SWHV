@@ -50,8 +50,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private final JCheckBox exactDateCheckBox;
 
-    private boolean firstComboChanged;
-
     private final PositionLoad positionLoad;
 
     CameraOptionPanelExpert(PositionLoad _positionLoad) {
@@ -175,24 +173,18 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private void addObjectCombobox(GridBagConstraints c) {
         JSeparatorComboBox objectCombobox = new JSeparatorComboBox(SpaceObject.getObjectList().toArray());
+        objectCombobox.setSelectedItem(SpaceObject.earth);
         objectCombobox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent event) {
-                if (event.getStateChange() == ItemEvent.SELECTED && firstComboChanged) {
-                    SpaceObject object = (SpaceObject) event.getItem();
-                    if (object != null) {
-                        positionLoad.setObserver(object.getUrlName(), true);
-                        // revalidate();
-                        // Displayer.render();
-                    }
-                }
-                if (event.getStateChange() == ItemEvent.SELECTED && !firstComboChanged) {
-                    firstComboChanged = true;
+                if (event.getStateChange() == ItemEvent.SELECTED) {
+                    String object = ((SpaceObject) event.getItem()).getUrlName();
+                    positionLoad.setObserver(object, true);
+                    // Displayer.render();
                 }
             }
         });
         add(objectCombobox, c);
-        objectCombobox.setSelectedItem(SpaceObject.earth);
     }
 
     private void addBeginDatePanel(GridBagConstraints c) {
