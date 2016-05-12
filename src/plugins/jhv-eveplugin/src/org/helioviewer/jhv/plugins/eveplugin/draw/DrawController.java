@@ -238,6 +238,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
+    public void lineDataVisibility(LineDataSelectorElement element, boolean flag) {
+        createGraphArea();
+    }
+
+    @Override
     public void timeChanged(JHVDate date) {
         timeChanged(date.milli);
     }

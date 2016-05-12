@@ -6,4 +6,6 @@ public interface LineDataSelectorModelListener {
 
     public abstract void lineDataRemoved(LineDataSelectorElement element);
 
+    public abstract void lineDataVisibility(LineDataSelectorElement element, boolean flag);
+
 }

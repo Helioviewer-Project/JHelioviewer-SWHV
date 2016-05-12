@@ -183,4 +183,8 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         updateGroupValues();
     }
 
+    @Override
+    public void lineDataVisibility(LineDataSelectorElement element, boolean flag) {
+    }
+
 }

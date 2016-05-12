@@ -55,6 +55,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         setLayout(new GridBagLayout());
 
         final JTable grid = new JTable(EVEPlugin.ldsm) {
+
             @Override
             public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
                 if (columnIndex == VISIBLE_COL || columnIndex == REMOVE_COL) {
@@ -68,9 +69,11 @@ public class LineDataSelectorTablePanel extends JPanel {
             public void clearSelection() {
                 // prevent losing selection
             }
+
         };
 
         EVEPlugin.ldsm.addLineDataSelectorModelListener(new LineDataSelectorModelListener() {
+
             @Override
             public void lineDataAdded(LineDataSelectorElement element) {
                 int i = EVEPlugin.ldsm.getRowIndex(element);
@@ -83,6 +86,11 @@ public class LineDataSelectorTablePanel extends JPanel {
                 if (i >= 0)
                     grid.getSelectionModel().setSelectionInterval(i, i);
             }
+
+            @Override
+            public void lineDataVisibility(LineDataSelectorElement element, boolean flag) {
+            }
+
         });
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -186,10 +194,7 @@ public class LineDataSelectorTablePanel extends JPanel {
 
                     boolean vis = !renderable.isVisible();
                     renderable.setVisibility(vis);
-                    if (vis)
-                        model.fireLineDataSelectorElementAdded(renderable);
-                    else
-                        model.fireLineDataSelectorElementRemoved(renderable);
+                    model.fireLineDataSelectorElementVisibility(renderable, vis);
                 }
                 if (col == TITLE_COL || col == LOADING_COL || col == LINECOLOR_COL) {
                     LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
