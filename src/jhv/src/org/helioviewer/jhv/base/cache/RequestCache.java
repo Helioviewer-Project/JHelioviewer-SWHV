@@ -42,6 +42,13 @@ public class RequestCache {
         return cache;
     }
 
+    public ArrayList<Interval> getMissingIntervals(long start, long end) {
+        ArrayList<Interval> localCache = getInvertedCache(cache);
+        localCache = remove(localCache, new Interval(Long.MIN_VALUE, start));
+        localCache = remove(localCache, new Interval(end, Long.MAX_VALUE));
+        return localCache;
+    }
+
     private static ArrayList<Interval> getInvertedCache(ArrayList<Interval> toInvert) {
         ArrayList<Interval> newCache = new ArrayList<Interval>();
         int len = toInvert.size();
@@ -99,13 +106,6 @@ public class RequestCache {
         icache.add(ri);
         icache = merge(icache);
         return getInvertedCache(icache);
-    }
-
-    public ArrayList<Interval> getMissingIntervals(long start, long end) {
-        ArrayList<Interval> localCache = getInvertedCache(cache);
-        localCache = remove(localCache, new Interval(Long.MIN_VALUE, start));
-        localCache = remove(localCache, new Interval(end, Long.MAX_VALUE));
-        return localCache;
     }
 
     private static class IntervalComparator implements Comparator<Interval> {
