@@ -75,7 +75,7 @@ public class JHVGlobals {
         File jarPath;
         try {
             jarPath = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            Log.info(">> JHVGlobals.determineVersionAndRevision() > Look for jar file: " + jarPath.getAbsolutePath());
+            // Log.info(">> JHVGlobals.determineVersionAndRevision() > Look for jar file: " + jarPath.getAbsolutePath());
         } catch (URISyntaxException e1) {
             Log.error(">> JHVGlobals.determineVersionAndRevision() > Could not open code source location: " + JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation());
             Log.warn(">> JHVGlobals.determineVersionAndRevision() > Set version and revision to null.");
@@ -96,6 +96,7 @@ public class JHVGlobals {
 
                 System.setProperty("jhv.version", version);
                 System.setProperty("jhv.revision", revision);
+                Log.info(">> Running " + version + " " + revision);
             } catch (IOException e) {
                 Log.error(">> JHVGlobals.determineVersionAndRevision() > Error while reading version and revision from manifest in jar file: " + jarPath, e);
             } finally {

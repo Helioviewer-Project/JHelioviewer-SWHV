@@ -69,7 +69,6 @@ public class JavaHelioViewer {
         Log.info("JHelioviewer started with command-line options:" + argString);
 
         // This attempts to create the necessary directories for the application
-        Log.info("Create directories...");
         JHVGlobals.createDirs();
 
         // Save the log settings. Must be done AFTER the directories are created
@@ -82,8 +81,7 @@ public class JavaHelioViewer {
         // Load settings from file but do not apply them yet
         // The settings must not be applied before the kakadu engine has been
         // initialized
-        Log.info("Load settings");
-        Settings.getSingletonInstance().load();
+        Settings.getSingletonInstance().load(false);
 
         // Set the platform system properties
         SystemProperties.setPlatform();
