@@ -47,10 +47,6 @@ public class JPIPDataSegment implements Cloneable {
     /** Indicates if this data segment is a complete data bin */
     public boolean isComplete;
 
-    /** Default constructor */
-    public JPIPDataSegment() {
-    }
-
     /** Returns a completely disjoint clone of the JPIPDataSegment */
     @Override
     public JPIPDataSegment clone() throws CloneNotSupportedException {

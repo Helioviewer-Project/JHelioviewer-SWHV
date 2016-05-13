@@ -59,7 +59,7 @@ import sun.awt.AppContext;
     }
 */
 
-    public static synchronized ExecutorService getJHVWorkersExecutorService(String name, int MAX_WORKER_THREADS) {
+    public static ExecutorService getJHVWorkersExecutorService(String name, int MAX_WORKER_THREADS) {
         ExecutorService executorService = new ThreadPoolExecutor(MAX_WORKER_THREADS / 2, MAX_WORKER_THREADS,
                 10L, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("JHVWorker-" + name));
         shutdownOnDisposal(executorService);

@@ -26,9 +26,9 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
     private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();
 
-    private JSplitPane splitpane;
-    private JPanel pluginContainer;
-    private CollapsiblePane collapsiblePane;
+    private final JSplitPane splitpane;
+    private final JPanel pluginContainer;
+    private final CollapsiblePane collapsiblePane;
 
     public MainContentPanel(Component mainComponent) {
         pluginContainer = new JPanel(new BorderLayout());
