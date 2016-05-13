@@ -159,10 +159,12 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            setText("" + value.toString().trim());
-            int width = list.getWidth();
-            if (width > 0)
-                setSize(width, Short.MAX_VALUE);
+            if (value != null) {
+                setText(value.toString().trim());
+                int width = list.getWidth();
+                if (width > 0)
+                    setSize(width, Short.MAX_VALUE);
+            }
             return this;
         }
 

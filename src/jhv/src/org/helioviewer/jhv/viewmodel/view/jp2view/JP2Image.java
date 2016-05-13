@@ -201,7 +201,7 @@ public class JP2Image {
             Timer timer = new Timer("WaitForCloseSocket");
             timer.schedule(new TimerTask() {
                 @Override
-                public synchronized void run() {
+                public void run() {
                     if (socket != null) {
                         try {
                             socket.close();
