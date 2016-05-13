@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.components;
 
+import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
@@ -103,7 +104,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         gl.glMultMatrixd(matrix, 0);
         {
             gl.glColor3f(0, 0, 0);
-            GLHelper.drawCircleFront(gl, 0, 0, 0.98, 30);
+            GLHelper.drawCircleFront(gl, 0, 0, 0.98 * Sun.Radius, 30);
         }
         gl.glPopMatrix();
     }
