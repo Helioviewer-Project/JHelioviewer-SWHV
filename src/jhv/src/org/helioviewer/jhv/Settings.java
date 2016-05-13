@@ -79,14 +79,38 @@ public class Settings {
      * This method saves all the values in the user properties file.
      */
     public void save() {
+        save(userProperties);
+    }
+
+    private void save(Properties props) {
         try {
             propFile.createNewFile();
             FileOutputStream fileOutput = new FileOutputStream(propFile);
-            userProperties.store(fileOutput, null);
+            props.store(fileOutput, null);
             fileOutput.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void save(String key) {
+        Properties props = loadCopyUser();
+        props.setProperty(key, getProperty(key));
+        save(props);
+    }
+
+    private Properties loadCopyUser() {
+        Properties props = new Properties();
+        try {
+            if (propFile.exists()) {
+                FileInputStream fileInput = new FileInputStream(propFile);
+                props.load(fileInput);
+                fileInput.close();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return props;
     }
 
     /**
@@ -155,14 +179,6 @@ public class Settings {
         }
         // ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         // JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-    }
-
-    /**
-     * The values are saved to disk only if there have been a modification.
-     */
-    @Override
-    protected void finalize() {
-        save();
     }
 
 }

@@ -69,7 +69,7 @@ public class JHVUpdate implements Runnable {
                 if (n > 0) {
                     n -= 1;
                     Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(n));
-                    Settings.getSingletonInstance().save();
+                    Settings.getSingletonInstance().save("update.check.next");
                 }
                 if (n != 0) {
                     Log.info("Update check suspended for this startup");
@@ -104,7 +104,7 @@ public class JHVUpdate implements Runnable {
                         dialog.showDialog();
                         if (!verbose) {
                             Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(dialog.getNextCheck()));
-                            Settings.getSingletonInstance().save();
+                            Settings.getSingletonInstance().save("update.check.next");
                         }
                     } else {
                         Log.info("Running the newest version of JHelioviewer");

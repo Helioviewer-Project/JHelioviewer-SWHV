@@ -85,7 +85,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private void setActiveInteractionMode(InteractionMode mode) {
         interactionMode = mode;
         Settings.getSingletonInstance().setProperty("display.interaction", mode.toString().toLowerCase());
-        Settings.getSingletonInstance().save();
+        Settings.getSingletonInstance().save("display.interaction");
 
         switch (mode) {
         case PAN:
@@ -346,7 +346,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         if (mode != null) {
             displayMode = mode;
             Settings.getSingletonInstance().setProperty("display.toolbar", mode.toString().toLowerCase());
-            Settings.getSingletonInstance().save();
+            Settings.getSingletonInstance().save("display.toolbar");
         }
 
         createNewToolBar();
