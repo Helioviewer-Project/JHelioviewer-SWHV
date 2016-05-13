@@ -2,6 +2,7 @@ package org.helioviewer.jhv.viewmodel.metadata;
 
 import java.util.Locale;
 
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
@@ -14,6 +15,8 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 
 public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData {
+
+    private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("display.normalize"));
 
     private String instrument = "";
     private String detector = "";
@@ -234,6 +237,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private double getSolarRadiusFactor() {
+        if (!normalizeRadius)
+            return 1;
+
         if (measurement.toLowerCase(Locale.ENGLISH).contains("continuum"))
             return Sun.RadiusFactor_6173;
 

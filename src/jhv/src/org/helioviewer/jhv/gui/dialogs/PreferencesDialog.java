@@ -11,14 +11,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -34,28 +33,19 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
  * Dialog that allows the user to change default preferences and settings.
- *
- * @author Desmond Amadigwe
- * @author Benjamin Wamsler
- * @author Juan Pablo
- * @author Markus Langenberg
- * @author Andre Dau
  */
 @SuppressWarnings("serial")
 public class PreferencesDialog extends JDialog implements ShowableDialog {
 
-    private JRadioButton loadDefaultMovieOnStartUp;
-    private JRadioButton doNothingOnStartUp;
+    private JCheckBox loadDefaultMovie;
+    private JCheckBox normalizeRadius;
     private DefaultsSelectionPanel defaultsPanel;
-
-    private final Settings settings = Settings.getSingletonInstance();
 
     private final JButton acceptBtn;
 
-    /**
-     * The private constructor that sets the fields and the dialog.
-     */
-    public PreferencesDialog() {
+    private final Settings settings = Settings.getSingletonInstance();
+
+    private PreferencesDialog() {
         super(ImageViewerGui.getMainFrame(), "Preferences", true);
         setResizable(false);
 
@@ -109,22 +99,13 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         getRootPane().registerKeyboardAction(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cancelPressed();
+                dispose();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
-    private void cancelPressed() {
-        dispose();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showDialog() {
-        loadSettings();
-
         //setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
@@ -134,32 +115,14 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     }
 
     /**
-     * Loads the settings.
-     *
-     * Reads the informations from {@link org.helioviewer.jhv.Settings} and sets
-     * all gui elements according to them.
-     */
-    private void loadSettings() {
-        // In principle the settings have been previously loaded
-        // settings.load();
-        // Start up
-        loadDefaultMovieOnStartUp.setSelected(Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
-        doNothingOnStartUp.setSelected(!Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
-
-        // Default values
-        defaultsPanel.loadSettings();
-    }
-
-    /**
      * Saves the settings.
      *
      * Writes the informations to {@link org.helioviewer.jhv.Settings}.
      */
     private void saveSettings() {
-        // Start up
-        settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovieOnStartUp.isSelected()));
+        settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovie.isSelected()));
+        settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected()));
 
-        // Default values
         defaultsPanel.saveSettings();
         settings.save();
     }
@@ -180,17 +143,13 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         paramsPanel.add(row_1);
 
         JPanel row0 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row0.add(new JLabel("At start-up"));
 
-        loadDefaultMovieOnStartUp = new JRadioButton("Load default movie", true);
-        doNothingOnStartUp = new JRadioButton("Do nothing", false);
+        loadDefaultMovie = new JCheckBox("Load default movie at start-up", Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
+        row0.add(loadDefaultMovie);
 
-        ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(loadDefaultMovieOnStartUp);
-        buttonGroup.add(doNothingOnStartUp);
+        normalizeRadius = new JCheckBox("Normalize solar radius (needs restart)", Boolean.parseBoolean(settings.getProperty("display.normalize")));
+        row0.add(normalizeRadius);
 
-        row0.add(loadDefaultMovieOnStartUp);
-        row0.add(doNothingOnStartUp);
         paramsPanel.add(row0);
 
         return paramsPanel;
@@ -206,6 +165,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         panel.setBorder(BorderFactory.createTitledBorder(" Locations "));
 
         defaultsPanel = new DefaultsSelectionPanel();
+        defaultsPanel.loadSettings();
         defaultsPanel.setPreferredSize(new Dimension(450, 100));
         defaultsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
