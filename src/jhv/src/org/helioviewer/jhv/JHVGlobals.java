@@ -75,10 +75,10 @@ public class JHVGlobals {
         File jarPath;
         try {
             jarPath = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            // Log.info(">> JHVGlobals.determineVersionAndRevision() > Look for jar file: " + jarPath.getAbsolutePath());
+            // Log.info("JHVGlobals.determineVersionAndRevision() > Look for jar file: " + jarPath.getAbsolutePath());
         } catch (URISyntaxException e1) {
-            Log.error(">> JHVGlobals.determineVersionAndRevision() > Could not open code source location: " + JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation());
-            Log.warn(">> JHVGlobals.determineVersionAndRevision() > Set version and revision to null.");
+            Log.error("JHVGlobals.determineVersionAndRevision() > Could not open code source location: " + JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation());
+            Log.warn("JHVGlobals.determineVersionAndRevision() > Set version and revision to null.");
             return;
         }
         JarFile jarFile = null;
@@ -96,20 +96,20 @@ public class JHVGlobals {
 
                 System.setProperty("jhv.version", version);
                 System.setProperty("jhv.revision", revision);
-                Log.info(">> Running " + version + " " + revision);
+                Log.info("Running " + version + " " + revision);
             } catch (IOException e) {
-                Log.error(">> JHVGlobals.determineVersionAndRevision() > Error while reading version and revision from manifest in jar file: " + jarPath, e);
+                Log.error("JHVGlobals.determineVersionAndRevision() > Error while reading version and revision from manifest in jar file: " + jarPath, e);
             } finally {
                 if (jarFile != null) {
                     try {
                         jarFile.close();
                     } catch (IOException e) {
-                        Log.error(">> JHVGlobals.determineVersionAndRevision() > Error while closing stream to jar file: " + jarFile.getName(), e);
+                        Log.error("JHVGlobals.determineVersionAndRevision() > Error while closing stream to jar file: " + jarFile.getName(), e);
                     }
                 }
             }
         } else {
-            Log.warn(">> JHVGlobals.determineVersionAndRevision() > Classes are not within a jar file. Set version and revision to null.");
+            Log.warn("JHVGlobals.determineVersionAndRevision() > Classes are not within a jar file. Set version and revision to null.");
         }
     }
 
@@ -193,13 +193,13 @@ public class JHVGlobals {
                     "-execute", "open " + "\"" + openURL + "\"",
                     "-title", "JHelioviewer"
                 };
-                Log.info(">> displayNotification " + Arrays.toString(cmd));
+                Log.info("JHVGlobals.displayNotification " + Arrays.toString(cmd));
                 Runtime.getRuntime().exec(cmd);
                 return;
             } catch (Exception e) {
                 StringWriter errors = new StringWriter();
                 e.printStackTrace(new PrintWriter(errors));
-                Log.error(">> displayNotification " + errors);
+                Log.error("JHVGlobals.displayNotification " + errors);
             }
         }
         // otherwise

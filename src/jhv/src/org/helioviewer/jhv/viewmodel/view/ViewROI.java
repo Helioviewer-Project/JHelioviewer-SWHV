@@ -2,6 +2,7 @@ package org.helioviewer.jhv.viewmodel.view;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
@@ -84,7 +85,7 @@ public class ViewROI {
                 newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
             } else {
                 newRegion = new Region(minPhysicalX, minPhysicalY, 0, 0);
-                System.out.println(">> empty ROI");
+                Log.info("ViewROI.updateROI: empty ROI");
             }
         } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
             newRegion = unitRadius;

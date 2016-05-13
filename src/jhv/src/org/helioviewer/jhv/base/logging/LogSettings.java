@@ -209,7 +209,7 @@ public class LogSettings {
      */
     public void update() {
         if (modified && (settings != null)) {
-            Log.debug(">> LogSettings.update() > Log settings modified. Update changes.");
+            Log.debug("LogSettings.update() > Log settings modified. Update changes.");
             PropertyConfigurator.configure(settings);
             modified = false;
             Log.info("Store log settings to " + logSettingsPath);

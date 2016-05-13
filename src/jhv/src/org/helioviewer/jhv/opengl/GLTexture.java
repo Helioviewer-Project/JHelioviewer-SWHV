@@ -70,7 +70,7 @@ public class GLTexture {
         int w = source.getWidth();
         int h = source.getHeight();
         if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
-            Log.error(">> copyImageData2D: w= " + w + " h=" + h);
+            Log.error("GLTexture.copyImageData2D: w= " + w + " h=" + h);
             return;
         }
 
@@ -98,7 +98,7 @@ public class GLTexture {
         int w = source.getWidth();
         int h = source.getHeight();
         if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
-            Log.error(">> copyBufferedImage2D: w= " + w + " h=" + h);
+            Log.error("GLTexture.copyBufferedImage2D: w= " + w + " h=" + h);
             return;
         }
 

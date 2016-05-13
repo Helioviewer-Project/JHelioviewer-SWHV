@@ -145,12 +145,12 @@ public class DownloadStream {
             // Check the connection code
             int code = httpC.getResponseCode();
             if (code > 400) {
-                Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + code);
+                Log.error("DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + code);
                 throw new IOException("Error opening http connection to " + url + " Response code: " + code);
             }
 
             if (!ignore400 && code == 400) {
-                Log.error(">> DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + code);
+                Log.error("DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + code);
                 throw new IOException("Error opening http connection to " + url + " Response code: " + code);
             }
 

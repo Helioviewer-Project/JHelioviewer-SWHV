@@ -266,7 +266,7 @@ class J2KReader implements Runnable {
                         try {
                             socket.close();
                         } catch (IOException ioe) {
-                            Log.error(">> J2KReader.run() > Error closing socket", ioe);
+                            Log.error("J2KReader.run() > Error closing socket", ioe);
                         }
                         // Send signal to try again
                         readerSignal.signal(currParams);
@@ -492,7 +492,7 @@ class J2KReader implements Runnable {
                             try {
                                 socket.close();
                             } catch (IOException ioe) {
-                                Log.error(">> J2KReader.run() > Error closing socket", ioe);
+                                Log.error("J2KReader.run() > Error closing socket", ioe);
                                 if (ioe instanceof SocketException && ioe.getMessage().contains("Broken pipe")) {
                                     Message.err("Broken pipe error", "Broken pipe error! This error is a known bug. It occurs when too many movies with too many frames are loaded. Movie playback might not work or will be very slow. Try removing the current layers and load shorter movies or select a larger movie cadence. We are sorry for this inconvenience and are working on the problem.", false);
                                 }

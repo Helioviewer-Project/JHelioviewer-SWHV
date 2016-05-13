@@ -48,7 +48,7 @@ public class Settings {
             defaultProperties.load(defaultPropStream);
             defaultPropStream.close();
             if (verbose) {
-                Log.debug(">> Settings.load() > Load default system settings: " + defaultProperties);
+                Log.debug("Settings.load() > Load default system settings: " + defaultProperties);
             }
             if (propFile.exists()) {
                 FileInputStream fileInput = new FileInputStream(propFile);
@@ -64,7 +64,7 @@ public class Settings {
             }
         } catch (Exception ex) {
             if (verbose) {
-                Log.error(">> Settings.load(boolean) > Could not load settings", ex);
+                Log.error("Settings.load() > Could not load settings", ex);
             } else {
                 ex.printStackTrace();
             }

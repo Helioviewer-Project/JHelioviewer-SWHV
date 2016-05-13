@@ -206,7 +206,7 @@ public class JP2Image {
                         try {
                             socket.close();
                         } catch (IOException e) {
-                            Log.error(">> JP2Image.initRemote() > Error closing socket.", e);
+                            Log.error("JP2Image.initRemote() > Error closing socket.", e);
                         }
                         socket = null;
                     }

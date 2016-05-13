@@ -215,13 +215,13 @@ public class PluginManager {
             }
 
         } catch (InstantiationException e) {
-            Log.error(">> PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
+            Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         } catch (IllegalAccessException e) {
-            Log.error(">> PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
+            Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         } catch (ClassNotFoundException e) {
-            Log.error(">> PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
+            Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         } catch (IOException e) {
-            Log.error(">> PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
+            Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         }
 
         return false;
