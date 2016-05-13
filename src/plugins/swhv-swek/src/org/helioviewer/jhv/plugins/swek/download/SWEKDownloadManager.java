@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -60,32 +61,27 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     private void stopDownloadingEventType(SWEKEventType eventType, boolean keepActive) {
-        if (dwMap.containsKey(eventType)) {
-            ArrayList<DownloadWorker> dwMapList = dwMap.get(eventType);
-            for (DownloadWorker dw : dwMapList) {
-                dw.stopWorker();
-            }
-        }
-        treeModel.setStopLoading(eventType);
-        dwMap.remove(eventType);
-
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
-            eventContainer.removeEvents(JHVEventType.getJHVEventType(eventType, supplier), keepActive);
+            stopDownloadingEventType(eventType, supplier, keepActive);
         }
     }
 
     private void stopDownloadingEventType(SWEKEventType eventType, SWEKSupplier supplier, boolean keepActive) {
         if (dwMap.containsKey(eventType)) {
             ArrayList<DownloadWorker> dwMapOnDate = dwMap.get(eventType);
-            for (DownloadWorker dw : dwMapOnDate) {
+            for (Iterator<DownloadWorker> it = dwMapOnDate.iterator(); it.hasNext();) {
+                DownloadWorker dw = it.next();
                 if (dw.getJHVEventType().getSupplier().equals(supplier)) {
                     dw.stopWorker();
+                    JHVEventContainer.getSingletonInstance().intervalsNotDownloaded(dw.getJHVEventType(), dw.getRequestInterval());
+                    it.remove();
                 }
             }
+            if (dwMap.get(eventType).isEmpty()) {
+                treeModel.setStopLoading(eventType);
+                dwMap.remove(eventType);
+            }
         }
-        treeModel.setStopLoading(eventType);
-
-        dwMap.remove(eventType);
         eventContainer.removeEvents(JHVEventType.getJHVEventType(eventType, supplier), keepActive);
     }
 
