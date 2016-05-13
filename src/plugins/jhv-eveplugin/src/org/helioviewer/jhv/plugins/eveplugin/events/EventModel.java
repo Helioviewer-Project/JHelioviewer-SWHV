@@ -118,7 +118,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                         endDates.set(i, event.getEnd());
                     }
                     int eventPosition = i;
-                    nrLines = endDates.size();
+                    nrLines = Math.max(nrLines, endDates.size());
 
                     int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
                     int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
@@ -136,7 +136,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                 if (eventTypeNr != nrEventTypes - 1) {
                     g.setStroke(dashed);
                     g.setColor(Color.black);
-                    int sepLinePos = previousLine * spacePerLine - spacePerLine / 4 + DrawConstants.EVENT_OFFSET;
+                    int sepLinePos = graphArea.y + previousLine * spacePerLine - spacePerLine / 4 + DrawConstants.EVENT_OFFSET;
                     g.drawLine(graphArea.x, sepLinePos, graphArea.width, sepLinePos);
                     g.setStroke(normalStroke);
                 }
