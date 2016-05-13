@@ -110,7 +110,7 @@ public class ImageViewerGui {
         leftPane = new SideContentPane();
         // Movie control
         leftPane.add("Movie Controls", MoviePanel.getInstance(), true);
-        MoviePanel.getInstance().setAdvanced(false);
+        MoviePanel.setAdvanced(false);
 
         // Layer control
         renderableContainer = new RenderableContainer();
