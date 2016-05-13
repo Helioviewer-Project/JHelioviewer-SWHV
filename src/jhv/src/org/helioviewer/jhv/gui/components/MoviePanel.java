@@ -389,7 +389,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         recordPanel.setSmall();
 
         setEnabledState(false);
-        setAdvanced(isAdvanced);
         sliderTimer.start();
     }
 
