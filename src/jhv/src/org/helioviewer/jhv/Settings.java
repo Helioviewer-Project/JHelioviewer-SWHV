@@ -36,10 +36,6 @@ public class Settings {
     /** The properties file */
     private final File propFile = new File(JHVDirectory.SETTINGS.getPath() + "user.properties");
 
-    public void load() {
-        load(true);
-    }
-
     /**
      * Method loads the settings from a user file or the default settings file
      * */
