@@ -43,7 +43,7 @@ public class DownloadWorker implements Runnable {
     }
 
     public void stopWorker() {
-        SWEKDownloadManager.getSingletonInstance().workerForcedToStop(this);
+        //TBD
     }
 
     @Override
