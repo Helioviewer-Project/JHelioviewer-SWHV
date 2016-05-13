@@ -36,7 +36,7 @@ public class InteractionAnnotate extends Interaction {
     }
 
     private final ArrayList<Annotateable> annotateables = new ArrayList<Annotateable>();
-    private Annotateable newAnnotatable = null;
+    private Annotateable newAnnotateable = null;
     private AnnotationMode mode = AnnotationMode.RECTANGLE;
     private int activeIndex = -1;
 
@@ -46,22 +46,22 @@ public class InteractionAnnotate extends Interaction {
 
     @Override
     public void drawInteractionFeedback(Viewport vp, GL2 gl) {
-        Annotateable activeAnnotatable = null;
+        Annotateable activeAnnotateable = null;
         if (activeIndex >= 0)
-            activeAnnotatable = annotateables.get(activeIndex);
+            activeAnnotateable = annotateables.get(activeIndex);
         for (Annotateable ann : annotateables) {
-            ann.render(vp, gl, ann == activeAnnotatable);
+            ann.render(vp, gl, ann == activeAnnotateable);
         }
-        if (newAnnotatable != null) {
-            newAnnotatable.render(vp, gl, false);
+        if (newAnnotateable != null) {
+            newAnnotateable.render(vp, gl, false);
         }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        newAnnotatable = mode.generateAnnotateable(camera);
-        newAnnotatable.mousePressed(e);
-        if (!newAnnotatable.isDraggable()) {
+        newAnnotateable = mode.generateAnnotateable(camera);
+        newAnnotateable.mousePressed(e);
+        if (!newAnnotateable.isDraggable()) {
             finishAnnotateable(e);
         }
         Displayer.display();
@@ -69,19 +69,19 @@ public class InteractionAnnotate extends Interaction {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (newAnnotatable != null && newAnnotatable.isDraggable()) {
-            newAnnotatable.mouseDragged(e);
+        if (newAnnotateable != null && newAnnotateable.isDraggable()) {
+            newAnnotateable.mouseDragged(e);
             Displayer.display();
         }
     }
 
     private void finishAnnotateable(MouseEvent e) {
-        if (newAnnotatable != null && newAnnotatable.beingDragged()) {
-            newAnnotatable.mouseReleased(e);
-            annotateables.add(newAnnotatable);
+        if (newAnnotateable != null && newAnnotateable.beingDragged()) {
+            newAnnotateable.mouseReleased(e);
+            annotateables.add(newAnnotateable);
             activeIndex = annotateables.size() - 1;
         }
-        newAnnotatable = null;
+        newAnnotateable = null;
         Displayer.display();
     }
 
