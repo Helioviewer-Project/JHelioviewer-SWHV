@@ -50,7 +50,7 @@ public class BandTypeAPI {
             defaultProperties.load(defaultPropStream);
             defaultPropStream.close();
         } catch (IOException ex) {
-            Log.error(">> Settings.load(boolean) > Could not load settings", ex);
+            Log.error("BandTypeAPI.loadSettings() > Could not load settings", ex);
         }
     }
 

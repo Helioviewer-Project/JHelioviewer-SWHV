@@ -26,26 +26,18 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
  * @author Stephan Pagel
  */
 @SuppressWarnings("serial")
-public class PluginAboutDialog extends JDialog implements ActionListener, HyperlinkListener {
+public class PluginAboutDialog extends JDialog implements HyperlinkListener {
 
     private static final Dimension DIALOG_SIZE = new Dimension(500, 350);
 
     private final Plugin plugin;
 
-    private final JPanel contentPane = new JPanel();
-    private final JButton closeButton = new JButton("Close");
-
-    private PluginAboutDialog(final Plugin plugin) {
+    private PluginAboutDialog(Plugin plugin) {
         super(ImageViewerGui.getMainFrame(), "About...", true);
         this.plugin = plugin;
-        initVisualComponents();
-    }
 
-    /**
-     * Initialize the visual parts of the component.
-     */
-    private void initVisualComponents() {
         // dialog
+        JPanel contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);
 
         setMinimumSize(DIALOG_SIZE);
@@ -53,37 +45,37 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
         setSize(DIALOG_SIZE);
 
         // content
-        final JPanel topPane = new JPanel();
-        final JPanel centerPane = new JPanel();
-        final JPanel bottomPane = new JPanel();
+        JPanel topPane = new JPanel(new BorderLayout());
+        JPanel centerPane = new JPanel(new BorderLayout());
+        JPanel bottomPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        contentPane.setLayout(new BorderLayout());
         contentPane.add(topPane, BorderLayout.PAGE_START);
         contentPane.add(centerPane, BorderLayout.CENTER);
         contentPane.add(bottomPane, BorderLayout.PAGE_END);
 
         // header
-        topPane.setLayout(new BorderLayout());
         topPane.add(getTextArea(getHeaderText()), BorderLayout.CENTER);
-
         // main part
-        final JScrollPane scrollPane = new JScrollPane(getTextArea(getContentText()), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-        centerPane.setLayout(new BorderLayout());
+        JScrollPane scrollPane = new JScrollPane(getTextArea(getContentText()), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         centerPane.add(scrollPane, BorderLayout.CENTER);
 
         // footer
-        bottomPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        JButton closeButton = new JButton("Close");
         bottomPane.add(closeButton);
 
-        closeButton.addActionListener(this);
+        closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
     }
 
     /**
      * Creates a new JEditorPane in order to display information.
      * */
-    private JEditorPane getTextArea(final String text) {
-        final JEditorPane pane = new JEditorPane("text/html", text);
+    private JEditorPane getTextArea(String text) {
+        JEditorPane pane = new JEditorPane("text/html", text);
         pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         pane.setEditable(false);
         pane.setOpaque(false);
@@ -96,8 +88,8 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
      * Creates the header text of the dialog.
      * */
     private String getHeaderText() {
-        final String pluginName = plugin.getName() == null ? "Unknown plug-in name" : plugin.getName();
-        final StringBuilder headerText = new StringBuilder();
+        String pluginName = plugin.getName() == null ? "Unknown plug-in name" : plugin.getName();
+        StringBuilder headerText = new StringBuilder();
         headerText.append("<html><center>");
         headerText.append("<font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + (getFont().getSize() + 2) + ";\">");
         headerText.append("<b>" + pluginName + "</b>");
@@ -110,10 +102,10 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
      * Creates the text containing information about the plug-in and license.
      * */
     private String getContentText() {
-        final String pluginDesc = plugin.getDescription() == null ? "No description available" : plugin.getDescription();
-        final String pluginLicense = plugin.getAboutLicenseText() == null ? " " : plugin.getAboutLicenseText();
+        String pluginDesc = plugin.getDescription() == null ? "No description available" : plugin.getDescription();
+        String pluginLicense = plugin.getAboutLicenseText() == null ? " " : plugin.getAboutLicenseText();
 
-        final StringBuilder contentText = new StringBuilder();
+        StringBuilder contentText = new StringBuilder();
         contentText.append("<html><center>");
         contentText.append("<font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">");
         contentText.append("<p><b>Plug-in description</b><br>" + pluginDesc + "</p>");
@@ -123,39 +115,11 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
         return contentText.toString();
     }
 
-    // /**
-    // * Formats the version and revision string
-    // *
-    // * @return the formatted version and revision string
-    // */
-    // private String getVersionString() {
-    // //TODO: Get version of plug-in
-    // String versionString = null;
-    // String revisionString = null;
-    //
-    // if (versionString == null) {
-    // Log.warn(">> PluginAboutDialog.getVersionString() > No version found. Use default version and revision strings.");
-    // versionString = "?.?.?";
-    // }
-    //
-    // if (revisionString == null) {
-    // Log.warn(">> PluginAboutDialog.getVersionString() > No revision found. Use default version and revision strings.");
-    // revisionString = "?";
-    // }
-    // return versionString + " - Revision " + revisionString;
-    // }
-
-    /**
-     * Brings up the dialog.
-     * */
-    public static void showDialog(final Plugin plugin) {
-        final PluginAboutDialog dialog = new PluginAboutDialog(plugin);
+    public static void showDialog(Plugin plugin) {
+        PluginAboutDialog dialog = new PluginAboutDialog(plugin);
         dialog.showDialog();
     }
 
-    /**
-     * Brings up the dialog.
-     * */
     private void showDialog() {
         pack();
         setSize(getPreferredSize());
@@ -164,26 +128,14 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
         setVisible(true);
     }
 
-    // Action Listener
-
-    /**
-     * {@inheritDoc}
-     * */
-    public void actionPerformed(final ActionEvent arg0) {
-        if (arg0.getSource().equals(closeButton)) {
-            dispose();
-        }
-    }
-
-    // Action Listener
-
     /**
      * Opens a browser or email client after clicking on a hyperlink.
      */
-    public void hyperlinkUpdate(final HyperlinkEvent e) {
+    @Override
+    public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
-                final TextDialog textDialog = new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')), ImageViewerGui.class.getResource("/licenses/" + e.getDescription()));
+                TextDialog textDialog = new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')), ImageViewerGui.class.getResource("/licenses/" + e.getDescription()));
                 textDialog.showDialog();
             } else {
                 JHVGlobals.openURL(e.getURL().toString());
