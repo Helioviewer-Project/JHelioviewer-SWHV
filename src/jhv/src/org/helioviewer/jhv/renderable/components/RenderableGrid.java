@@ -42,7 +42,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     // height of text in solar radii
-    private static final float textScale = 0.08f;
+    private static final float textScale = (float) (0.08 * Sun.Radius);
     private static final int SUBDIVISIONS = 360;
 
     private static final float[] firstColor = new float[] { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f };
@@ -211,17 +211,20 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
+    private static final float AXIS_START = (float) (1. * Sun.Radius);
+    private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
+
     private void drawAxes(GL2 gl) {
         gl.glLineWidth(2);
 
         gl.glBegin(GL2.GL_LINES);
         {
             gl.glColor3f(0, 0, 1);
-            gl.glVertex3f(0, -1.2f, 0);
-            gl.glVertex3f(0, -1, 0);
+            gl.glVertex3f(0, -AXIS_STOP, 0);
+            gl.glVertex3f(0, -AXIS_START, 0);
             gl.glColor3f(1, 0, 0);
-            gl.glVertex3f(0, 1.2f, 0);
-            gl.glVertex3f(0, 1, 0);
+            gl.glVertex3f(0, AXIS_STOP, 0);
+            gl.glVertex3f(0, AXIS_START, 0);
         }
         gl.glEnd();
     }
@@ -342,7 +345,7 @@ public class RenderableGrid extends AbstractRenderable {
                 while (rotation < 90) {
                     gl.glPushMatrix();
                     {
-                        gl.glTranslatef(0, 0, (float) Math.sin(Math.PI / 180. * rotation));
+                        gl.glTranslatef(0, 0, (float) (Sun.Radius * Math.sin(Math.PI / 180. * rotation)));
                         scale = (float) Math.cos(Math.PI / 180. * rotation);
                         gl.glScalef(scale, scale, scale);
                         gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
@@ -355,7 +358,7 @@ public class RenderableGrid extends AbstractRenderable {
                 while (rotation < 90) {
                     gl.glPushMatrix();
                     {
-                        gl.glTranslatef(0, 0, -(float) Math.sin(Math.PI / 180. * rotation));
+                        gl.glTranslatef(0, 0, -(float) (Sun.Radius * Math.sin(Math.PI / 180. * rotation)));
                         scale = (float) Math.cos(Math.PI / 180. * rotation);
                         gl.glScalef(scale, scale, scale);
                         gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
