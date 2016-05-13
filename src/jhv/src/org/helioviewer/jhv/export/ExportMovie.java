@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.export;
 
+import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
@@ -95,6 +96,7 @@ public class ExportMovie implements FrameListener {
         try {
             if (mode == RecordMode.SHOT) {
                 ImageIO.write(ExportUtils.pasteCanvases(screenshot, EVEImage, EVEMovieLinePosition, exportHeight), "png", new File(imagePath));
+                JHVGlobals.displayNotification(imagePath);
                 stop();
             } else {
                 try {
@@ -245,7 +247,15 @@ public class ExportMovie implements FrameListener {
             try {
                 if (movieExporter != null) {
                     movieExporter.close();
-                    JHVGlobals.displayNotification(moviePath);
+
+                    if (moviePath != null && keep) {
+                        EventQueue.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                JHVGlobals.displayNotification(moviePath);
+                            }
+                        });
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
