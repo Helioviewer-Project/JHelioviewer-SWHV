@@ -48,7 +48,7 @@ public class OpenLocalFileAction extends AbstractAction {
             if (selectedFile.exists() && selectedFile.isFile()) {
                 // remember the current directory for future
                 Settings.getSingletonInstance().setProperty("default.local.path", directory);
-                Settings.getSingletonInstance().save();
+                Settings.getSingletonInstance().save("default.local.path");
 
                 URI uri = selectedFile.toURI();
                 LoadURITask uriTask = new LoadURITask(uri, uri);
