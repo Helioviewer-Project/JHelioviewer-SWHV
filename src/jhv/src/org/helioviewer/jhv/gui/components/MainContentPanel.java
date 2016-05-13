@@ -45,7 +45,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
         splitpane.setTopComponent(container);
         splitpane.setResizeWeight(0.66);
         splitpane.setOneTouchExpandable(false);
-        splitpane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
+        splitpane.setDividerSize(0);
 
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension());
@@ -88,8 +88,13 @@ public class MainContentPanel extends JPanel implements ActionListener {
     private void updateLayout() {
         splitpane.remove(collapsiblePane);
         remove(collapsiblePane);
-
         splitpane.setDividerSize(0);
+
+        if (pluginList.isEmpty()) {
+            revalidate();
+            repaint();
+            return;
+        }
 
         if (collapsiblePane.toggleButton.isSelected()) {
             pluginContainer.removeAll();
