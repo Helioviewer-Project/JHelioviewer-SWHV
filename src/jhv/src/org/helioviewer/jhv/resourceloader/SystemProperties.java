@@ -34,7 +34,7 @@ public class SystemProperties {
                 else if (arch.indexOf("86") != -1)
                     System.setProperty("jhv.arch", "x86-32");
                 else {
-                    Log.error(">> Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
+                    Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
                 }
             } else if (os.indexOf("linux") != -1) {
                 System.setProperty("jhv.os", "linux");
@@ -43,7 +43,7 @@ public class SystemProperties {
                 else if (arch.indexOf("86") != -1)
                     System.setProperty("jhv.arch", "x86-32");
                 else {
-                    Log.error(">> Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
+                    Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
                 }
             } else if (os.indexOf("mac os x") != -1) {
                 System.setProperty("jhv.os", "mac");
@@ -54,13 +54,13 @@ public class SystemProperties {
                 else if (arch.indexOf("86") != -1)
                     System.setProperty("jhv.arch", "x86-32");
                 else {
-                    Log.error(">> Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
+                    Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
                 }
             } else {
-                Log.error(">> Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
+                Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
             }
         } else {
-            Log.error(">> Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
+            Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
         }
     }
 

@@ -18,20 +18,20 @@ public class GLInfo {
 
     public static void update(GL2 gl) {
         String version = gl.glGetString(GL2.GL_VERSION);
-        Log.debug(">> GLInfo > Version string: " + version);
+        Log.debug("GLInfo > Version string: " + version);
         String extensionStr = gl.glGetString(GL2.GL_EXTENSIONS);
-        Log.debug(">> GLInfo.update(GL) > Extensions: " + extensionStr);
+        Log.debug("GLInfo.update(GL) > Extensions: " + extensionStr);
 
         if (!gl.isExtensionAvailable("GL_VERSION_2_1")) {
             String err = "OpenGL 2.1 not supported. JHelioviewer is not able to run.";
-            Log.error(">> GLInfo.update(GL) > " + err);
+            Log.error("GLInfo.update(GL) > " + err);
             throw new GLException(err);
         }
 
         int[] out = new int[] { 0 };
         gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, out, 0);
         maxTextureSize = out[0];
-        Log.debug(">> GLInfo > max texture size: " + out[0]);
+        Log.debug("GLInfo > max texture size: " + out[0]);
     }
 
     public static void updatePixelScale(ScalableSurface surface) {

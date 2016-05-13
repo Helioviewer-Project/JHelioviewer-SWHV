@@ -213,11 +213,11 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             double arcsecPerPixelX = m.tryGetDouble("CDELT1");
             double arcsecPerPixelY = m.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX) || Double.isNaN(arcsecPerPixelY)) {
-                Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 or CDELT2 are NaN. Use 0.6 as default value.");
+                Log.warn("HelioviewerMetaData.retrievePixelParameters() > CDELT1 or CDELT2 are NaN. Use 0.6 as default value.");
                 arcsecPerPixelX = arcsecPerPixelY = 0.6;
             }
             if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
-                Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
+                Log.warn("HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
 
             double radiusSunInArcsec = Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance) * MathUtils.radeg * 3600;

@@ -188,7 +188,7 @@ public class ImageViewerGui {
                 Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", Window.class, boolean.class);
                 setWindowCanFullScreen.invoke(fullScreenUtilities, window, true);
             } catch (Exception e) {
-                Log.error(">> FullScreen utilities not available");
+                Log.error("Fullscreen utilities not available");
                 e.printStackTrace();
             }
         }

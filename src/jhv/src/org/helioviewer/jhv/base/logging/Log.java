@@ -28,7 +28,7 @@ public class Log {
         } else if (logLevel.equals(Level.FATAL)) {
             Log.fatal(message, error);
         } else {
-            Log.error(">> Log.log(" + logLevel + ", " + message + ", " + error + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
+            Log.error("Log.log(" + logLevel + ", " + message + ", " + error + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
         }
     }
 
@@ -46,7 +46,7 @@ public class Log {
         } else if (logLevel.equals(Level.FATAL)) {
             Log.fatal(message);
         } else {
-            Log.error(">> Log.log(" + logLevel + ", " + message + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
+            Log.error("Log.log(" + logLevel + ", " + message + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
         }
     }
 
