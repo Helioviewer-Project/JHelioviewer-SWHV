@@ -4,8 +4,6 @@ import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
@@ -96,7 +94,6 @@ public class JP2Image {
     /**
      * Constructor
      *
-     * <p>
      * To open an image an URI must be given and this should be made unique. All
      * initialization for this object is done in the constructor or in methods
      * called by the constructor. Either the constructor throws an exception or
@@ -154,9 +151,9 @@ public class JP2Image {
             } else {
                 imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader.getCompositor(), getMaximumFrameNumber());
             }
-        } catch (KduException ex) {
-            ex.printStackTrace();
-            throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
+        } catch (KduException e) {
+            e.printStackTrace();
+            throw new JHV_KduException("Failed to create Kakadu machinery: " + e.getMessage(), e);
         }
     }
 
@@ -194,24 +191,22 @@ public class JP2Image {
                 }
             } while (!initialDataLoaded && numTries < 5);
         } catch (SocketTimeoutException e) {
-            throw new JHV_KduException("Timeout while communicating with the server:" + System.getProperty("line.separator") + e.getMessage(), e);
+            initCloseSocket();
+            throw new JHV_KduException("Timeout while communicating with the server: " + e.getMessage(), e);
         } catch (IOException e) {
-            throw new JHV_KduException("Error in the server communication:" + System.getProperty("line.separator") + e.getMessage(), e);
-        } finally {
-            Timer timer = new Timer("WaitForCloseSocket");
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (socket != null) {
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            Log.error("JP2Image.initRemote() > Error closing socket.", e);
-                        }
-                        socket = null;
-                    }
-                }
-            }, 5000);
+            initCloseSocket();
+            throw new JHV_KduException("Error in the server communication: " + e.getMessage(), e);
+        }
+    }
+
+    private void initCloseSocket() {
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                Log.error("JP2Image.initRemote() > Error closing socket.", e);
+            }
+            socket = null;
         }
     }
 
