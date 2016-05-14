@@ -14,7 +14,7 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class ViewROI {
 
-    private static final double extraSize = 0.02;
+    private static final double extraSize = 0.05;
     private static final int resolution = 3;
     private static final Vec2[] pointlist = new Vec2[(resolution + 1) * 2 * 2];
     private static final Vec2[] dePoints = new Vec2[pointlist.length];
