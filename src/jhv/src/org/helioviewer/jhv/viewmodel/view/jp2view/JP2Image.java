@@ -83,7 +83,7 @@ public class JP2Image {
 
     // Reader
     public enum ReaderMode {
-        NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
+        NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA
     }
 
     private J2KReader reader;
@@ -293,16 +293,10 @@ public class JP2Image {
     /**
      * Sets the reader mode.
      *
-     * <p>
      * The options are:
-     * <ul>
-     * <li>NEVERFIRE: The reader basically is disabled and never fires a
-     * ChangeEvent.</li>
-     * <li>ONLYFIREONCOMPLETE: The reader only fires a ChangeEvent, when the
-     * current frame is loaded completely.</li>
-     * <li>ALWAYSFIREONNEWDATA: Whenever new data is received, the reader fires
-     * a ChangeEvent. This is the default value.</li>
-     * </ul>
+     * NEVERFIRE: The reader basically is disabled and never fires
+     * ONLYFIREONCOMPLETE: The reader only fires when the current frame is loaded completely
+     * ALWAYSFIREONNEWDATA: Whenever new data is received the reader fires. This is the default value.
      *
      * @param readerMode
      * @see #getReaderMode()

@@ -239,12 +239,7 @@ class J2KReader implements Runnable {
             }
 
             ReaderMode readerMode = parentImageRef.getReaderMode();
-            if (readerMode == ReaderMode.NEVERFIRE) {
-                // nothing
-            } else if (readerMode == ReaderMode.SIGNAL_RENDER_ONCE) {
-                parentImageRef.setReaderMode(ReaderMode.NEVERFIRE);
-                signalRender(currParams.factor);
-            } else {
+            if (readerMode != ReaderMode.NEVERFIRE) {
                 // check whether view parameters have changed
                 viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
 
@@ -302,14 +297,11 @@ class J2KReader implements Runnable {
                             // build queries
                             JPIPQuery[] stepQuerys;
 
-                            // Decide, what cache strategy to use:
-                            // - If this is not the main view, chose
-                            // FIRSTFRAMEONLY
-                            // - If this is not a movie, chose FIRSTFRAMEONLY
-                            // - If the image has been zoomed, chose
-                            // CURRENTFRAMEFIRST
-                            // - If the meta data is not complete yet, chose
-                            // MISSINGFRAMESFIRST
+                            // Decide what cache strategy to use:
+                            // - If this is not the main view, choose FIRSTFRAMEONLY
+                            // - If this is not a movie, choose FIRSTFRAMEONLY
+                            // - If the image has been zoomed, choose CURRENTFRAMEFIRST
+                            // - If the meta data is not complete yet, choose MISSINGFRAMESFIRST
                             // - In any other case, choose ALLFRAMESEQUALLY
                             CacheStrategy strategy;
 
