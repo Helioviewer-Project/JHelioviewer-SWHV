@@ -2,10 +2,8 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.net.SocketException;
 
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
@@ -485,9 +483,6 @@ class J2KReader implements Runnable {
                             socket.close();
                         } catch (IOException ioe) {
                             Log.error("J2KReader.run() > Error closing socket", ioe);
-                            if (ioe instanceof SocketException && ioe.getMessage().contains("Broken pipe")) {
-                                Message.err("Broken pipe error", "Broken pipe error! This error is a known bug. It occurs when too many movies with too many frames are loaded. Movie playback might not work or will be very slow. Try removing the current layers and load shorter movies or select a larger movie cadence. We are sorry for this inconvenience and are working on the problem.", false);
-                            }
                         }
                     }
                     // send signal to try again
