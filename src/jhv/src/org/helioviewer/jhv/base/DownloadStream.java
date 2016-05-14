@@ -59,7 +59,7 @@ public class DownloadStream {
     private boolean response400;
 
     /**
-     * Creates d download object for a given uri, assuming a file if not given a
+     * Creates a download object for a given uri, assuming a file if not given a
      * scheme
      *
      * @param uri
@@ -94,6 +94,10 @@ public class DownloadStream {
         this.url = url;
         this.readTimeout = readTimeout;
         this.connectTimeout = connectTimeout;
+    }
+
+    public DownloadStream(URL url) {
+        this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
     }
 
     public boolean isResponse400() {

@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -183,21 +182,17 @@ public class DownloadController {
         }
 
         private void requestData() {
-            URL url = null;
+            URL url;
 
             try {
                 url = buildRequestURL(interval, band.getBandType());
             } catch (MalformedURLException e) {
-                Log.error("Error Creating the EVE URL.", e);
-            }
-
-            if (url == null) {
+                Log.error("Error creating EVE URL: ", e);
                 return;
             }
 
             try {
-                DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-                JSONObject json = JSONUtils.getJSONStream(ds.getInput());
+                JSONObject json = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
 
                 double multiplier = 1.0;
                 if (json.has("multiplier")) {

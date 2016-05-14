@@ -47,7 +47,7 @@ class J2KReader implements Runnable {
     private volatile Thread myThread;
 
     /** A boolean flag used for stopping the thread. */
-    volatile boolean stop;
+    private volatile boolean stop;
 
     /** A reference to the JP2Image this object is owned by. */
     private final JP2Image parentImageRef;

@@ -7,7 +7,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -33,21 +32,20 @@ public abstract class SWEKDownloader {
 
         try {
             int page = 0;
-            boolean succes = true;
-            while (overmax && succes) {
+            boolean success = true;
+            while (overmax && success) {
                 String urlString = createURL(eventType.getEventType(), start, end, params, page);
-                DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-                succes = parseStream(ds.getInput(), eventType);
+                DownloadStream ds = new DownloadStream(new URL(urlString));
+                success = parseStream(ds.getInput(), eventType);
                 page++;
             }
-            return succes;
+            return success;
         } catch (MalformedURLException e) {
             Log.error("Could not create URL from given string error : " + e);
-            return false;
         } catch (IOException e) {
             Log.error("Could not create input stream for given URL error : " + e);
-            return false;
         }
+        return false;
     }
 
     private boolean parseStream(InputStream stream, JHVEventType type) {
