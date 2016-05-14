@@ -14,9 +14,10 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class ViewROI {
 
-    private static final double extraSize = 0.05;
-    private static final int resolution = 5;
+    private static final double extraSize = 0.02;
+    private static final int resolution = 3;
     private static final Vec2[] pointlist = new Vec2[(resolution + 1) * 2 * 2];
+    private static final Vec2[] dePoints = new Vec2[pointlist.length];
 
     private static final Region unitRadius = new Region(-1, -1, 2, 2);
 
@@ -27,12 +28,14 @@ public class ViewROI {
         for (int i = 0; i <= resolution; i++) {
             for (int j = 0; j <= 1; j++) {
                 pointlist[count] = new Vec2(2. * (i / (double) resolution - 0.5), -2. * (j - 0.5));
+                dePoints[count] = new Vec2();
                 count++;
             }
         }
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= resolution; j++) {
                 pointlist[count] = new Vec2(2. * (i - 0.5), -2. * (j / (double) resolution - 0.5));
+                dePoints[count] = new Vec2();
                 count++;
             }
         }
@@ -47,12 +50,25 @@ public class ViewROI {
             double maxPhysicalX = Double.MIN_VALUE;
             double maxPhysicalY = Double.MIN_VALUE;
 
+            for (int i = 0; i < pointlist.length; i++) {
+                dePoints[i].x = CameraHelper.deNormalizeX(vp, pointlist[i].x);
+                dePoints[i].y = CameraHelper.deNormalizeY(vp, pointlist[i].y);
+            }
+
             camera.push(p);
 
             Quat camDiff = Quat.rotateWithConjugate(camera.getRotation(), m.getViewpoint().orientation);
             for (int i = 0; i < pointlist.length; i++) {
-                Vec2 pl = pointlist[i];
-                Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, CameraHelper.deNormalizeX(vp, pl.x), CameraHelper.deNormalizeY(vp, pl.y), camDiff);
+                Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
+                minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+            }
+
+            camDiff = Quat.rotate(camera.getRotation(), m.getViewpoint().orientation);
+            for (int i = 0; i < pointlist.length; i++) {
+                Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
                 minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                 minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                 maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
