@@ -338,9 +338,8 @@ public class DataSources {
             protected Void backgroundWork() {
                 while (true) {
                     try {
-                        String queryString = Settings.getSingletonInstance().getProperty("API.dataSources.path");
-                        DownloadStream ds = new DownloadStream(new URL(queryString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-                        newJsonResult = JSONUtils.getJSONStream(ds.getInput());
+                        URL url = new URL(Settings.getSingletonInstance().getProperty("API.dataSources.path"));
+                        newJsonResult = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
                         break;
                     } catch (MalformedURLException e) {
                         Log.error("Invalid url to retrieve data source", e);

@@ -12,7 +12,6 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.EventDispatchQueue;
@@ -210,8 +209,7 @@ public class APIRequestManager {
      */
     private static View requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
-            DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-            APIResponse response = new APIResponse(ds.getInput());
+            APIResponse response = new APIResponse(new DownloadStream(jpipRequest).getInput());
 
             // Could we handle the answer from the server
             if (!response.hasData()) {
