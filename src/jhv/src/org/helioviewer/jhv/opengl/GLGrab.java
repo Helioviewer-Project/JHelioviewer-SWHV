@@ -43,7 +43,7 @@ public class GLGrab {
         BufferedImage screenshot;
 
         int _x = Displayer.fullViewport.x;
-        int _y = Displayer.fullViewport.y;
+        int _y = Displayer.fullViewport.yGL;
         int _w = Displayer.fullViewport.width;
         int _h = Displayer.fullViewport.height;
 

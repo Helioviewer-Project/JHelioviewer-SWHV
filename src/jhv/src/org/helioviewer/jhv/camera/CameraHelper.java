@@ -91,9 +91,9 @@ public class CameraHelper {
         return camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
     }
 
-    public static Vec3 getVectorFromSphere(Camera camera, Viewport vp, double screenx, double screeny, Quat rotation, boolean correctDrag) {
-        double up1x = computeUpX(camera, vp, screenx);
-        double up1y = computeUpY(camera, vp, screeny);
+    public static Vec3 getVectorFromSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
+        double up1x = computeUpX(camera, vp, screenX);
+        double up1y = computeUpY(camera, vp, screenY);
 
         Vec3 hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
