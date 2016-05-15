@@ -181,7 +181,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         {
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
-            shader.setViewport(vp.x, vp.y, vp.width, vp.height);
+            shader.setViewport(vp.x, vp.yGL, vp.width, vp.height);
             if (!RenderableImageLayer.showCorona) {
                 shader.setOuterCutOffRadius(1.);
             }
