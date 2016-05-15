@@ -80,7 +80,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         addWindowListener(this);
 
         // header
-        JLabel headerLabel = new JLabel("You can import, enable or disable JHelioviewer plug-ins.");
+        JLabel headerLabel = new JLabel("You can enable or disable JHelioviewer plug-ins.");
         headerLabel.setBorder(BorderFactory.createEmptyBorder(3, 3, 6, 3));
 
         // center - installed plug-ins
@@ -107,7 +107,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
         final JPanel installedButtonPane = new JPanel();
         installedButtonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        installedButtonPane.add(addButton);
+        // installedButtonPane.add(addButton);
         // installedButtonPane(downloadButton); //TODO SP: add
 
         addButton.setToolTipText("Add a new plug-in to JHelioviewer");
