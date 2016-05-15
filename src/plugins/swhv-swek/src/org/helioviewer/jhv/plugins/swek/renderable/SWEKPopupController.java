@@ -28,7 +28,7 @@ import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 
-public class SWHVHEKPopupController implements MouseListener, MouseMotionListener, InputControllerPlugin, TimeListener {
+public class SWEKPopupController implements MouseListener, MouseMotionListener, InputControllerPlugin, TimeListener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
@@ -130,7 +130,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        ArrayList<JHVRelatedEvents> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
+        ArrayList<JHVRelatedEvents> eventsToDraw = SWEKData.getSingletonInstance().getActiveEvents(currentTime);
         if (eventsToDraw.isEmpty())
             return;
 
@@ -148,8 +148,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
 
             if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
                 if (evt.getName() == "Coronal Mass Ejection") { // interned
-                    double principalAngle = Math.toRadians(SWHVHEKData.readCMEPrincipalAngleDegree(evt));
-                    double speed = SWHVHEKData.readCMESpeed(evt);
+                    double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
+                    double speed = SWEKData.readCMESpeed(evt);
                     double distSun = 2.4;
                     distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
 
@@ -176,8 +176,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 Vec2 mousepos = null;
                 if (evt.getName() == "Coronal Mass Ejection") { // interned
                     if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR) {
-                        double principalAngle = SWHVHEKData.readCMEPrincipalAngleDegree(evt) - 90;
-                        double speed = SWHVHEKData.readCMESpeed(evt);
+                        double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
+                        double speed = SWEKData.readCMESpeed(evt);
                         double distSun = 2.4;
                         distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
                         GridScale scale = GridScale.current;
