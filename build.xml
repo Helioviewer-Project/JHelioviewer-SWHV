@@ -144,7 +144,6 @@
             <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="EVEPlugin.jar"/>
             <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="PfssPlugin.jar"/>
             <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="SWEKPlugin.jar"/>
-            <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="SWHVHEKPlugin.jar"/>
 
             <zipgroupfileset dir="${lib}" excludes="*natives*.jar"/>
         </jar>

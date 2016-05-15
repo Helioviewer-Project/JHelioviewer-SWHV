@@ -6,7 +6,10 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
+import org.helioviewer.jhv.plugins.swek.renderable.SWHVHEKData;
+import org.helioviewer.jhv.plugins.swek.renderable.SWHVHEKPluginRenderable;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
@@ -35,6 +38,8 @@ public class SWEKPlugin implements Plugin {
     /** instance of the event container */
     private final JHVEventContainer eventContainer;
 
+    private final SWHVHEKPluginRenderable renderable;
+
     private final boolean loadExternalJars;
 
     public SWEKPlugin() {
@@ -46,6 +51,7 @@ public class SWEKPlugin implements Plugin {
 
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventContainer = JHVEventContainer.getSingletonInstance();
+        renderable = new SWHVHEKPluginRenderable();
     }
 
     /**
@@ -63,6 +69,7 @@ public class SWEKPlugin implements Plugin {
 
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventContainer = JHVEventContainer.getSingletonInstance();
+        renderable = new SWHVHEKPluginRenderable();
     }
 
     @Override
@@ -82,6 +89,10 @@ public class SWEKPlugin implements Plugin {
                 eventContainer.registerHandler(incomingRequestManager);
                 ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), true);
                 ImageViewerGui.getLeftContentPane().revalidate();
+
+                SWHVHEKData.getSingletonInstance().requestEvents();
+                Layers.addLayersListener(SWHVHEKData.getSingletonInstance());
+                ImageViewerGui.getRenderableContainer().addRenderable(renderable);
             }
 
         };
@@ -91,6 +102,10 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
+        ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
+        Layers.removeLayersListener(SWHVHEKData.getSingletonInstance());
+        SWHVHEKData.getSingletonInstance().reset();
+
         ImageViewerGui.getLeftContentPane().remove(SWEKPluginPanel.getSWEKPluginPanelInstance());
         ImageViewerGui.getLeftContentPane().revalidate();
     }

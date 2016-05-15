@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swhvhekplugin;
+package org.helioviewer.jhv.plugins.swek.renderable;
 
 import java.awt.Color;
 import java.awt.Component;
