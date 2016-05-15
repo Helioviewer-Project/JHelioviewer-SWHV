@@ -129,7 +129,6 @@ public class JavaHelioViewer {
                         JHVLoader.loadBundledPlugin("EVEPlugin.jar");
                         JHVLoader.loadBundledPlugin("SWEKPlugin.jar");
                         JHVLoader.loadBundledPlugin("PfssPlugin.jar");
-                        JHVLoader.loadBundledPlugin("SWHVHEKPlugin.jar");
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

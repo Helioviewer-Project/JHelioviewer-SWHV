@@ -11,9 +11,6 @@
             <file srcName="SWEKPlugin.jar" srcDir="default-plugins/" destName="SWEKPlugin.jar" destDir="./" loadLibrary="false" md5="md5swek"/>
         </files>
         <files>
-            <file srcName="SWHVHEKPlugin.jar" srcDir="default-plugins/" destName="SWHVHEKPlugin.jar" destDir="./" loadLibrary="false" md5="md5swhvhek"/>
-        </files>
-        <files>
             <file srcName="EVEPlugin.jar" srcDir="default-plugins/" destName="EVEPlugin.jar" destDir="./" loadLibrary="false" md5="md5eve"/>
         </files>
     </configuration>
