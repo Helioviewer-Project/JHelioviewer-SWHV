@@ -1,27 +1,16 @@
 package org.helioviewer.jhv;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
-import org.helioviewer.jhv.resourceloader.ResourceLoader;
 
 public class JHVLoader {
 
-    public static void loadBundledPlugin(String name) throws IOException, InterruptedException, InvocationTargetException {
+    public static void loadBundledPlugin(String name) throws IOException {
         InputStream is = JavaHelioViewer.class.getResourceAsStream("/plugins/" + name);
         String path = JHVDirectory.PLUGINS.getPath() + name;
         File f = new File(path);
@@ -74,71 +63,6 @@ public class JHVLoader {
 
             FileUtils.save(is, f);
             System.load(f.getAbsolutePath());
-        }
-    }
-
-    public static void loadRemotePlugins(String[] args) {
-        // Directories where to search for lib config files
-        //URI libs = JHVDirectory.LIBS.getFile().toURI();
-        URI defaultPlugins = JHVDirectory.PLUGINS.getFile().toURI();
-        URI defaultPluginsBackup = JHVDirectory.PLUGINS_LAST_CONFIG.getFile().toURI();
-        //URI libsBackup = JHVDirectory.LIBS_LAST_CONFIG.getFile().toURI();
-        URI libsRemote = null;
-
-        try {
-            Log.warn(Settings.getSingletonInstance().getProperty("default.remote.lib.path"));
-            libsRemote = new URI(Settings.getSingletonInstance().getProperty("default.remote.lib.path"));
-        } catch (URISyntaxException e1) {
-            Log.error("Invalid uri for remote library server");
-        }
-
-        final File tmpFile = new File(JHVDirectory.PLUGINS.getPath() + JHVGlobals.TEMP_FILENAME_DELETE_PLUGIN_FILES);
-        if (tmpFile.exists()) {
-            try {
-                final BufferedReader in = new BufferedReader(new FileReader(tmpFile));
-
-                String line = null;
-                StringBuilder content = new StringBuilder();
-                while ((line = in.readLine()) != null) {
-                    content.append(line);
-                }
-                in.close();
-
-                final StringTokenizer st = new StringTokenizer(content.toString(), ";");
-                while (st.hasMoreElements()) {
-                    final File delFile = new File(st.nextToken());
-                    delFile.delete();
-                }
-
-                tmpFile.delete();
-            } catch (final Exception e) {
-            }
-        }
-
-        Set<String> deactivedPlugins = new HashSet<String>();
-
-        for (int i = 0; i < args.length - 1; ++i) {
-            if (args[i].equals("--deactivate-plugin")) {
-                deactivedPlugins.add(args[i + 1]);
-            }
-        }
-
-        Log.info("Download default plugins");
-        if (null == ResourceLoader.getSingletonInstance().loadResource("default-plugins", libsRemote, defaultPlugins, defaultPlugins, defaultPluginsBackup, System.getProperties())) {
-            Log.error("Error fetching default plugins");
-            Message.err("Error fetching default plugins", "Could not download default plugins. You can try to download them from their respective website.", false);
-        } else {
-            Log.info("Successfully downloaded default plugins.");
-        }
-
-        try {
-            Log.info("Search for plugins in " + JHVDirectory.PLUGINS.getPath());
-            PluginManager.getSingletonInstance().searchForPlugins(JHVDirectory.PLUGINS.getFile(), true, deactivedPlugins);
-        } catch (IOException e) {
-            String title = "An error occured while loading the plugin files. At least one plugin file is corrupt!";
-            String message = "The following files are affected:\n" + e.getMessage();
-            Log.error(title + " " + message, e);
-            Message.warn(title, message);
         }
     }
 
