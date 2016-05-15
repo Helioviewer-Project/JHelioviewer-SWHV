@@ -21,8 +21,6 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.message.Message;
-//import org.helioviewer.jhv.gui.IconBank;
-//import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
@@ -95,10 +93,11 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         uiSelectionPane.add(uiSelectionComboBox);
         availabilityButton = new JButton("Available data");
         uiSelectionPane.add(availabilityButton);
+
         availabilityButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String str = (String) (uiSelectionComboBox.getSelectedItem());
+                String str = (String) uiSelectionComboBox.getSelectedItem();
                 if (str.equals("Image data")) {
                     String url = Settings.getSingletonInstance().getProperty("availability.images.url");
                     int id = DataSources.getSourceID(imageObservationPanel.getObservatory(), imageObservationPanel.getInstrument(),
@@ -119,13 +118,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         buttonPane.add(btnClose);
         buttonPane.add(btnImages);
 
-        // btnImages.setIcon(IconBank.getIcon(JHVIcon.ADD));
-        // btnImages.setToolTipText("Request the selected data and display it");
-
-        // btnClose.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-        // btnClose.setToolTipText("Close this dialog");
-
-        final int btnWidth = Math.max(btnClose.getPreferredSize().getSize().width, btnImages.getPreferredSize().getSize().width);
+        int btnWidth = Math.max(btnClose.getPreferredSize().getSize().width, btnImages.getPreferredSize().getSize().width);
 
         btnImages.setPreferredSize(new Dimension(btnWidth, 25));
         btnImages.addActionListener(this);
@@ -136,7 +129,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         getRootPane().registerKeyboardAction(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                closePressed();
+                closeDialog();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
@@ -144,7 +137,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     /**
      * Deactivates and activates the old and new displayed panel.
      * */
-    private void setUIContainerPane(final String name) {
+    private void setUIContainerPane(String name) {
         if (selectedPane != null) {
             selectedPane = null;
         }
@@ -176,7 +169,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
      * Allows a component or plug-in to add its panel to the dialog in order to
      * select the corresponding data.
      * */
-    public void addUserInterface(final String name, final ObservationDialogPanel userInterface) {
+    public void addUserInterface(String name, ObservationDialogPanel userInterface) {
         uiMap.put(name, userInterface);
         uiSelectionComboBox.addItem(name);
     }
@@ -184,7 +177,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     /**
      * Allows a component or plug-in to remove its panel from the dialog.
      * */
-    public void removeUserInterface(final String name) {
+    public void removeUserInterface(String name) {
         uiMap.remove(name);
         uiSelectionComboBox.removeItem(name);
     }
@@ -192,7 +185,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     /**
      * Returns the panel which is connected with the given name.
      * */
-    public ObservationDialogPanel getUserInterface(final String name) {
+    public ObservationDialogPanel getUserInterface(String name) {
         return uiMap.get(name);
     }
 
@@ -200,7 +193,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
      * Shows up the dialog and initializes the UI with the panel of the given
      * name.
      * */
-    public void showDialog(final String dataSourceName) {
+    public void showDialog(String dataSourceName) {
         if (uiMap.isEmpty()) {
             Message.err("Error", "There are no data sources available!", false);
             return;
@@ -219,18 +212,12 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         setVisible(true);
     }
 
-    /**
-     * Closes the dialog.
-     * */
     private void closeDialog() {
         setVisible(false);
         // dispose();
     }
 
     // Showable Dialog
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showDialog() {
         showDialog(null);
@@ -247,10 +234,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         }
     }
 
-    private void closePressed() {
-        closeDialog();
-    }
-
     public void setAvailabilityStatus(String server) {
         if (server.equals("ROB"))
             availabilityButton.setEnabled(true);
@@ -262,20 +245,19 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
      * Reacts on user input.
      * */
     @Override
-    public void actionPerformed(final ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(uiSelectionComboBox)) {
-            setUIContainerPane((String) uiSelectionComboBox.getSelectedItem());
+            String str = (String) uiSelectionComboBox.getSelectedItem();
+            setUIContainerPane(str);
 
-            String str = (String) (uiSelectionComboBox.getSelectedItem());
-            if (str.equals("Image data")) {
+            if (str.equals("Image data"))
                 setAvailabilityStatus(DataSources.getSelectedServer());
-            } else
+            else
                 availabilityButton.setEnabled(true);
-
         } else if (e.getSource().equals(btnImages)) {
             addPressed();
         } else if (e.getSource().equals(btnClose)) {
-            closePressed();
+            closeDialog();
         }
     }
 
