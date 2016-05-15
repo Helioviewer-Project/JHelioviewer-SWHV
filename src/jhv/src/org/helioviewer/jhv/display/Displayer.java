@@ -221,6 +221,7 @@ public class Displayer implements JHVEventHighlightListener {
     private static final Timer displayTimer = new Timer(1000 / 60, new DisplayTimerListener());
 
     private Displayer() {
+        JHVRelatedEvents.addHighlightListener(this);
         displayTimer.setCoalesce(true);
         displayTimer.start();
     }
