@@ -12,11 +12,11 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 
 @SuppressWarnings("serial")
-public class SWHVHEKPluginPanel extends SmallPanel {
+public class SWEKRenderableOptionsPanel extends SmallPanel {
 
     protected boolean icons = true;
 
-    public SWHVHEKPluginPanel() {
+    public SWEKRenderableOptionsPanel() {
         GridBagLayout gridBagLayout = new GridBagLayout();
         setLayout(gridBagLayout);
 

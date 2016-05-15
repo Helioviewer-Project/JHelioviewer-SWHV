@@ -36,10 +36,10 @@ import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.opengl.GL2;
 
-public class SWHVHEKPluginRenderable extends AbstractRenderable {
+public class SWEKRenderable extends AbstractRenderable {
 
-    private static final SWHVHEKPluginPanel optionsPanel = new SWHVHEKPluginPanel();
-    private static final SWHVHEKPopupController controller = new SWHVHEKPopupController();
+    private static final SWEKRenderableOptionsPanel optionsPanel = new SWEKRenderableOptionsPanel();
+    private static final SWEKPopupController controller = new SWEKPopupController();
 
     private static final int DIVPOINTS = 10;
     private static final float LINEWIDTH = 1;
@@ -89,11 +89,11 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
     private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
-        double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(evt);
+        double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
-        double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(evt);
+        double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
         double principalAngle = Math.toRadians(principalAngleDegree);
-        double speed = SWHVHEKData.readCMESpeed(evt);
+        double speed = SWEKData.readCMESpeed(evt);
         double factor = Sun.RadiusMeter;
         double distSunBegin = 2.4;
         double distSun = distSunBegin + speed * (timestamp - evt.start) / factor;
@@ -256,9 +256,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale, Viewport vp) {
-        double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(evt);
-        double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(evt) - 90;
-        double speed = SWHVHEKData.readCMESpeed(evt);
+        double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
+        double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
+        double speed = SWEKData.readCMESpeed(evt);
         double factor = Sun.RadiusMeter;
         double distSunBegin = 2.4;
         double distSun = distSunBegin + speed * (timestamp - evt.start) / factor;
@@ -372,7 +372,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            List<JHVRelatedEvents> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            List<JHVRelatedEvents> eventsToDraw = SWEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.getName() == "Coronal Mass Ejection") { // interned
@@ -393,7 +393,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         if (isVisible[vp.idx]) {
-            List<JHVRelatedEvents> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            List<JHVRelatedEvents> eventsToDraw = SWEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.getName() == "Coronal Mass Ejection" && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) { // interned
@@ -413,8 +413,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
-        if (SWHVHEKPopupController.mouseOverJHVEvent != null) {
-            drawText(gl, vp, SWHVHEKPopupController.mouseOverJHVEvent, SWHVHEKPopupController.mouseOverPosition);
+        if (SWEKPopupController.mouseOverJHVEvent != null) {
+            drawText(gl, vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverPosition);
         }
     }
 

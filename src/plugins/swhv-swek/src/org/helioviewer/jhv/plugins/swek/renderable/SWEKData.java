@@ -26,18 +26,18 @@ import org.helioviewer.jhv.viewmodel.view.View;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-public class SWHVHEKData implements LayersListener, JHVEventHandler {
+public class SWEKData implements LayersListener, JHVEventHandler {
 
-    private static SWHVHEKData instance;
+    private static SWEKData instance;
     private JHVDate beginDate = null;
     private JHVDate endDate = null;
 
-    private SWHVHEKData() {
+    private SWEKData() {
     }
 
-    public static SWHVHEKData getSingletonInstance() {
+    public static SWEKData getSingletonInstance() {
         if (instance == null) {
-            instance = new SWHVHEKData();
+            instance = new SWEKData();
         }
         return instance;
     }
@@ -66,7 +66,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         }
 
         if (request && endDate != null && beginDate != null) {
-            JHVEventContainer.getSingletonInstance().requestForInterval(beginDate.milli, endDate.milli, SWHVHEKData.this);
+            JHVEventContainer.getSingletonInstance().requestForInterval(beginDate.milli, endDate.milli, SWEKData.this);
         }
     }
 
