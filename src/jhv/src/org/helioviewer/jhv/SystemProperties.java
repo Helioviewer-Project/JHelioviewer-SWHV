@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.resourceloader;
+package org.helioviewer.jhv;
 
 import org.helioviewer.jhv.base.logging.Log;
 

@@ -18,7 +18,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
 /**
@@ -121,9 +120,6 @@ public class JavaHelioViewer {
                 try {
                     if (theArgs.length != 0 && theArgs[0].equals("--exclude-plugins")) {
                         Log.info("Do not load plugins");
-                    } else if (theArgs.length != 0 && theArgs[0].equals("--remote-plugins")) {
-                        Log.info("Load remote plugins -- not recommended");
-                        JHVLoader.loadRemotePlugins(theArgs);
                     } else {
                         Log.info("Load bundled plugins");
                         JHVLoader.loadBundledPlugin("EVEPlugin.jar");
