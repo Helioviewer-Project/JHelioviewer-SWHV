@@ -8,7 +8,9 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import org.helioviewer.jhv.base.FileUtils;
@@ -173,8 +175,8 @@ public class Settings {
                 ex.printStackTrace();
             }
         }
-        // ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-        // JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+        ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+        JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     }
 
 }
