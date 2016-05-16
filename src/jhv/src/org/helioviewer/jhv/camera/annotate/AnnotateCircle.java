@@ -35,21 +35,24 @@ public class AnnotateCircle extends AbstractAnnotateable {
         u.normalize();
         Vec3 v = Vec3.cross(bp, u);
 
-        gl.glBegin(GL2.GL_LINE_STRIP);
         int subdivs = 90;
         Vec2 previous = null;
+        Vec3 vx = new Vec3();
+
+        gl.glBegin(GL2.GL_LINE_STRIP);
         for (int i = 0; i <= subdivs; i++) {
             double t = i * 2. * Math.PI / subdivs;
             double cosr = Math.cos(t) * r;
             double sinr = Math.sin(t) * r;
-            float x = (float) (center.x + cosr * u.x + sinr * v.x);
-            float y = (float) (center.y + cosr * u.y + sinr * v.y);
-            float z = (float) (center.z + cosr * u.z + sinr * v.z);
+            vx.x = center.x + cosr * u.x + sinr * v.x;
+            vx.y = center.y + cosr * u.y + sinr * v.y;
+            vx.z = center.z + cosr * u.z + sinr * v.z;
 
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
-                previous = GLHelper.drawVertex(camera, vp, gl, new Vec3(x, -y, z), previous);
+                vx.y = -vx.y;
+                previous = GLHelper.drawVertex(camera, vp, gl, vx, previous);
             } else {
-                gl.glVertex3f(x, y, z);
+                gl.glVertex3f((float) vx.x, (float) vx.y, (float) vx.z);
             }
         }
         gl.glEnd();
