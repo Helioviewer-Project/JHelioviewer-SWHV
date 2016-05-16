@@ -36,7 +36,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         Vec3 v = Vec3.cross(bp, u);
 
         gl.glBegin(GL2.GL_LINE_STRIP);
-        int subdivs = 100;
+        int subdivs = 90;
         Vec2 previous = null;
         for (int i = 0; i <= subdivs; i++) {
             double t = i * 2. * Math.PI / subdivs;

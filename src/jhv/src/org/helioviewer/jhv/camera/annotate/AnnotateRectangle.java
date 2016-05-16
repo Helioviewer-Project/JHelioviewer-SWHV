@@ -52,8 +52,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     private void interpolatedDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
         double delta = Math.PI * 2.5 / 180;
         int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
-        Vec2 previous = null;
+        subdivisions = Math.max(1, subdivisions);
 
+        Vec2 previous = null;
         for (double i = 0; i <= subdivisions; i++) {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
