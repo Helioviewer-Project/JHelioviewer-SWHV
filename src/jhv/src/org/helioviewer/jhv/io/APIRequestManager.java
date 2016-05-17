@@ -61,7 +61,7 @@ public class APIRequestManager {
 
         try {
             String server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
-            view = loadImage(server, observatory, instrument, detector, measurement, TimeUtils.apiDateFormat.format(timestamp), message);
+            view = loadImage(server, observatory, instrument, detector, measurement, timestamp, message);
             if (view != null) {
                 timestamp = view.getFirstTime().milli;
                 readDate = true;
@@ -115,8 +115,12 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static View loadImage(String server, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws IOException {
-        String fileRequest = server + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
+    private static View loadImage(String server, String observatory, String instrument, String detector, String measurement, long startTime, boolean message) throws IOException {
+        String fileRequest = server + "?action=getJP2Image&observatory=" + observatory +
+                                      "&instrument=" + instrument +
+                                      "&detector=" + detector +
+                                      "&measurement=" + measurement +
+                                      "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
         // get URL from server where file with image series is located
@@ -160,8 +164,13 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static View loadImageSeries(String server, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws IOException {
-        String fileRequest = server + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
+    private static View loadImageSeries(String server, String observatory, String instrument, String detector, String measurement, long startTime, long endTime, String cadence, boolean message) throws IOException {
+        String fileRequest = server + "?action=getJPX&observatory=" + observatory +
+                                      "&instrument=" + instrument +
+                                      "&detector=" + detector +
+                                      "&measurement=" + measurement +
+                                      "&startTime=" + TimeUtils.apiDateFormat.format(startTime) +
+                                      "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
         if (cadence != null) {
             fileRequest += "&cadence=" + cadence;
         }
@@ -284,11 +293,11 @@ public class APIRequestManager {
      * @return new view
      * @throws IOException
      */
-    public static View requestAndOpenRemoteFile(String server, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
+    public static View requestAndOpenRemoteFile(String server, String cadence, long startTime, long endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
         if (server == null) // use default
             server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
 
-        if (endTime.equals("")) {
+        if (startTime == endTime) {
             return loadImage(server, observatory, instrument, detector, measurement, startTime, message);
         } else {
             return loadImageSeries(server, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
