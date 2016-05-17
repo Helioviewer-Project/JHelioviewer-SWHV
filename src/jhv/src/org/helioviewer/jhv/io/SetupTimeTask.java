@@ -45,7 +45,7 @@ public class SetupTimeTask extends JHVWorker<Long, Void> {
             idp.setStartDate(gregorianCalendar.getTime(), false);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")))
-                idp.loadRemote(false);
+                idp.loadRemote();
         } catch (Exception e) {
             e.printStackTrace();
         }
