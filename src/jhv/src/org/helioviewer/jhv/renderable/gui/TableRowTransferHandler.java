@@ -50,7 +50,9 @@ public class TableRowTransferHandler extends TransferHandler {
 
     @Override
     protected Transferable createTransferable(JComponent c) {
-        assert (c == grid);
+        if (c != grid)
+            return null;
+
         int row = grid.getSelectedRow();
         Object el = grid.getModel().getValueAt(row, 0);
         if (!(el instanceof RenderableImageLayer)) {
