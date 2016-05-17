@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.actions;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
@@ -34,11 +33,11 @@ public class NewLayerAction extends AbstractAction {
             JHVDate start = view.getFirstTime();
             JHVDate end = view.getLastTime();
 
-            Date obsStartDate = new Date(ObservationDialog.getInstance().getObservationImagePane().getStartTime());
-            Date obsEndDate = new Date(ObservationDialog.getInstance().getObservationImagePane().getEndTime());
+            long obsStartDate = ObservationDialog.getInstance().getObservationImagePane().getStartTime();
+            long obsEndDate = ObservationDialog.getInstance().getObservationImagePane().getEndTime();
             // only updates if it's really necessary with a tolerance of an hour
-            final int tolerance = 60 * 60 * 1000;
-            if (Math.abs(start.milli - obsStartDate.getTime()) > tolerance || Math.abs(end.milli - obsEndDate.getTime()) > tolerance) {
+            int tolerance = 60 * 60 * 1000;
+            if (Math.abs(start.milli - obsStartDate) > tolerance || Math.abs(end.milli - obsEndDate) > tolerance) {
                 if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
                     ObservationDialogDateModel.getInstance().setStartDate(start.getDate(), false);
                 }
