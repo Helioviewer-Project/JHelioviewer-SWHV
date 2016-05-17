@@ -18,7 +18,7 @@ public class TimeUtils {
     public static final FastDateFormat utcDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss", UTC);
     public static final FastDateFormat sqlDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss", UTC);
     public static final FastDateFormat utcFullDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS", UTC);
-    public static final FastDateFormat apiDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    public static final FastDateFormat apiDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'", UTC);
     public static final FastDateFormat filenameDateFormat = FastDateFormat.getInstance("yyyy-MM-dd_HH.mm.ss");
     public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
     public static final FastDateFormat dateFormat = FastDateFormat.getInstance("yyyy-MM-dd");
@@ -43,8 +43,8 @@ public class TimeUtils {
             endDate = now;
         }
 
-        long new_start = start - start % TimeUtils.DAY_IN_MILLIS;
-        long new_end = endDate - endDate % TimeUtils.DAY_IN_MILLIS + TimeUtils.DAY_IN_MILLIS;
+        long new_start = start - start % DAY_IN_MILLIS;
+        long new_end = endDate - endDate % DAY_IN_MILLIS + DAY_IN_MILLIS;
 
         return new Interval(new_start, new_end);
     }

@@ -6,11 +6,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -82,7 +79,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
      *
      * @return selected start time.
      * */
-    public String getStartTime() {
+    public long getStartTime() {
         return timeSelectionPanel.getStartTime();
     }
 
@@ -91,7 +88,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
      *
      * @return seleted end time.
      */
-    public String getEndTime() {
+    public long getEndTime() {
         return timeSelectionPanel.getEndTime();
     }
 
@@ -164,10 +161,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * Loads an image series from the Helioviewer server and adds a new layer to
      * the GUI which represents the image series.
      * */
-    public void loadRemote(boolean isImage) {
+    public void loadRemote() {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
-        LoadRemoteTask remoteTask = new LoadRemoteTask(isImage, getCadence(), getStartTime(), getEndTime(), getObservatory(), getInstrument(), getDetector(), getMeasurement());
+        LoadRemoteTask remoteTask = new LoadRemoteTask(getCadence(), getStartTime(), getEndTime(), getObservatory(), getInstrument(), getDetector(), getMeasurement());
         JHVGlobals.getExecutorService().execute(remoteTask);
     }
 
@@ -181,12 +178,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        try {
-            ObservationDialogDateModel.getInstance().setStartDate(TimeUtils.apiDateFormat.parse(timeSelectionPanel.getStartTime()), true);
-            ObservationDialogDateModel.getInstance().setEndDate(TimeUtils.apiDateFormat.parse(timeSelectionPanel.getEndTime()), true);
-        } catch (ParseException e) {
-            Log.debug("Date could not be parsed" + e);
-        }
+        ObservationDialogDateModel.getInstance().setStartDate(new Date(timeSelectionPanel.getStartTime()), true);
+        ObservationDialogDateModel.getInstance().setEndDate(new Date(timeSelectionPanel.getEndTime()), true);
 
         // check if start date is before end date -> if not show message
         if (!timeSelectionPanel.isStartDateBeforeEndDate()) {
@@ -194,7 +187,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        loadRemote(timeSelectionPanel.getStartTime().equals(timeSelectionPanel.getEndTime()));
+        loadRemote();
         return true;
     }
 
@@ -298,21 +291,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
         @Override
         public void actionPerformed(JHVCalendarEvent e) {
             if (e.getSource() == calendarStartDate) {
-                GregorianCalendar calendar = new GregorianCalendar();
-                try {
-                    calendar.setTime(TimeUtils.apiDateFormat.parse(getStartTime()));
-                    setStartDate(calendar.getTime(), true);
-                } catch (ParseException e1) {
-                    Log.error("Could not parse start date " + getStartTime());
-                }
+                setStartDate(new Date(getStartTime()), true);
             } else if (e.getSource() == calendarEndDate) {
-                GregorianCalendar calendar = new GregorianCalendar();
-                try {
-                    calendar.setTime(TimeUtils.apiDateFormat.parse(getEndTime()));
-                    setEndDate(calendar.getTime(), true);
-                } catch (ParseException e1) {
-                    Log.error("Could not parse end date " + getEndTime());
-                }
+                setEndDate(new Date(getEndTime()), true);
             }
         }
 
@@ -331,9 +312,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *
          * @return selected start time.
          * */
-        public String getStartTime() {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'");
-            return dateFormat.format(calendarStartDate.getDate()) + textStartTime.getFormattedInput() + "Z";
+        public long getStartTime() {
+            return (calendarStartDate.getDate().getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textEndTime.getValue().getTime();
         }
 
         /**
@@ -341,9 +321,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *
          * @return selected end time.
          */
-        public String getEndTime() {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'");
-            return dateFormat.format(calendarEndDate.getDate()) + textEndTime.getFormattedInput() + "Z";
+        public long getEndTime() {
+            return (calendarEndDate.getDate().getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textEndTime.getValue().getTime();
         }
 
         @Override

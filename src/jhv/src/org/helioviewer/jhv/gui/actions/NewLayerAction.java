@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.actions;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.text.ParseException;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -11,7 +10,6 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
@@ -35,22 +33,18 @@ public class NewLayerAction extends AbstractAction {
         if (view != null && view.isMultiFrame()) {
             JHVDate start = view.getFirstTime();
             JHVDate end = view.getLastTime();
-            try {
-                Date obsStartDate = TimeUtils.apiDateFormat.parse(ObservationDialog.getInstance().getObservationImagePane().getStartTime());
-                Date obsEndDate = TimeUtils.apiDateFormat.parse(ObservationDialog.getInstance().getObservationImagePane().getEndTime());
-                // only updates if it's really necessary with a tolerance of an hour
-                final int tolerance = 60 * 60 * 1000;
-                if (Math.abs(start.milli - obsStartDate.getTime()) > tolerance || Math.abs(end.milli - obsEndDate.getTime()) > tolerance) {
-                    if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
-                        ObservationDialogDateModel.getInstance().setStartDate(start.getDate(), false);
-                    }
-                    if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
-                        ObservationDialogDateModel.getInstance().setEndDate(end.getDate(), false);
-                    }
+
+            Date obsStartDate = new Date(ObservationDialog.getInstance().getObservationImagePane().getStartTime());
+            Date obsEndDate = new Date(ObservationDialog.getInstance().getObservationImagePane().getEndTime());
+            // only updates if it's really necessary with a tolerance of an hour
+            final int tolerance = 60 * 60 * 1000;
+            if (Math.abs(start.milli - obsStartDate.getTime()) > tolerance || Math.abs(end.milli - obsEndDate.getTime()) > tolerance) {
+                if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
+                    ObservationDialogDateModel.getInstance().setStartDate(start.getDate(), false);
                 }
-            } catch (ParseException ex) {
-                // Should not happen
-                Log.error("Cannot update observation dialog", ex);
+                if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
+                    ObservationDialogDateModel.getInstance().setEndDate(end.getDate(), false);
+                }
             }
         }
         // Show dialog

@@ -49,31 +49,9 @@ public class TimeTextField extends JTextField {
              */
             @Override
             public void focusLost(FocusEvent arg0) {
-                setText(getFormattedInput());
+                setText(TimeUtils.timeDateFormat.format(getValue()));
             }
         });
-    }
-
-    /**
-     * Gives the formatted input (normalized, e.g. 0:61 becomes 1:01)
-     *
-     * @return formatted input or default time if its not valid
-     */
-    public String getFormattedInput() {
-        String time = getText();
-        try {
-            return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time));
-        } catch (ParseException e) {
-            try {
-                return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time + ":00"));
-            } catch (ParseException e2) {
-                try {
-                    return TimeUtils.timeDateFormat.format(TimeUtils.timeDateFormat.parse(time + ":00:00"));
-                } catch (ParseException e3) {
-                    return defaultTime;
-                }
-            }
-        }
     }
 
     /**
