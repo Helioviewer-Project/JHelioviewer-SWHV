@@ -227,18 +227,14 @@ public class RadioData extends AbstractLineDataSelectorElement {
         } else {
             String text1 = "The selected interval is too big.";
             Rectangle2D r1 = g.getFontMetrics().getStringBounds(text1, g);
-            int t1Width = (int) r1.getWidth();
-            int t1Height = (int) r1.getHeight();
 
             String text2 = "Reduce the interval to see the radio spectrograms.";
             Rectangle2D r2 = g.getFontMetrics().getStringBounds(text2, g);
-            int t2Width = (int) r2.getWidth();
-            int t2Height = (int) r2.getHeight();
 
-            int x1 = graphArea.x + (graphArea.width / 2) - (t1Width / 2);
-            int y1 = (int) (graphArea.y + (graphArea.height / 2) - 1.5 * t1Height);
-            int x2 = graphArea.x + (graphArea.width / 2) - (t2Width / 2);
-            int y2 = (int) (graphArea.y + graphArea.height / 2 + 0.5 * t2Height);
+            int x1 = (int) (graphArea.x + 0.5 * graphArea.width - 0.5 * r1.getWidth());
+            int y1 = (int) (graphArea.y + 0.5 * graphArea.height - 1.5 * r1.getHeight());
+            int x2 = (int) (graphArea.x + 0.5 * graphArea.width - 0.5 * r2.getWidth());
+            int y2 = (int) (graphArea.y + 0.5 * graphArea.height + 0.5 * r2.getHeight());
 
             g.setColor(Color.black);
             g.drawString(text1, x1, y1);
