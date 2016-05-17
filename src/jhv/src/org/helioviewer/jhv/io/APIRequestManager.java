@@ -164,15 +164,15 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static View loadImageSeries(String server, String observatory, String instrument, String detector, String measurement, long startTime, long endTime, String cadence, boolean message) throws IOException {
+    private static View loadImageSeries(String server, String observatory, String instrument, String detector, String measurement, long startTime, long endTime, int cadence, boolean message) throws IOException {
         String fileRequest = server + "?action=getJPX&observatory=" + observatory +
                                       "&instrument=" + instrument +
                                       "&detector=" + detector +
                                       "&measurement=" + measurement +
                                       "&startTime=" + TimeUtils.apiDateFormat.format(startTime) +
                                       "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
-        if (cadence != null) {
-            fileRequest += "&cadence=" + cadence;
+        if (cadence != -100) {
+            fileRequest += "&cadence=" + Integer.toString(cadence);
         }
         String jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
         // Log.debug("APIRequestManager.loadImageSeries() > request url: " + jpipRequest);
@@ -293,7 +293,7 @@ public class APIRequestManager {
      * @return new view
      * @throws IOException
      */
-    public static View requestAndOpenRemoteFile(String server, String cadence, long startTime, long endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
+    public static View requestAndOpenRemoteFile(String server, String observatory, String instrument, String detector, String measurement, long startTime, long endTime, int cadence, boolean message) throws IOException {
         if (server == null) // use default
             server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
 

@@ -164,7 +164,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     public void loadRemote() {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
-        LoadRemoteTask remoteTask = new LoadRemoteTask(getCadence(), getStartTime(), getEndTime(), getObservatory(), getInstrument(), getDetector(), getMeasurement());
+        LoadRemoteTask remoteTask = new LoadRemoteTask(getObservatory(), getInstrument(), getDetector(), getMeasurement(), getStartTime(), getEndTime(), getCadence());
         JHVGlobals.getExecutorService().execute(remoteTask);
     }
 
