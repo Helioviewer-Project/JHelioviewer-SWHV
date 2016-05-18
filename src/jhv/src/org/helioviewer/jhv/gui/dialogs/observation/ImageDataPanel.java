@@ -162,8 +162,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * the GUI which represents the image series.
      * */
     public void loadRemote() {
-        // download and open the requested movie in a separated thread and hide
-        // loading animation when finished
         LoadRemoteTask remoteTask = new LoadRemoteTask(getObservatory(), getInstrument(), getDetector(), getMeasurement(), getStartTime(), getEndTime(), getCadence());
         JHVGlobals.getExecutorService().execute(remoteTask);
     }
@@ -172,7 +170,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     @Override
     public boolean loadButtonPressed() {
-        // Add some data if its nice
         if (!instrumentsPanel.validSelection()) {
             Message.err("Data is not selected", "There is no information on what to add", false);
             return false;
@@ -206,7 +203,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
         private boolean setFromOutside = false;
 
         public TimeSelectionPanel() {
-            // set up the visual components (GUI)
             ObservationDialogDateModel.getInstance().addListener(this);
 
             setLayout(new GridLayout(2, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
@@ -456,15 +452,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
             comboInstrument.setEnabled(false);
             comboDetectorMeasurement.setEnabled(false);
 
-            // Advanced rendering with tooltips for the items
-            final ListCellRenderer itemRenderer = new DefaultListCellRenderer() {
-                /**
-                 * Override display component to show tooltip
-                 *
-                 * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList,
-                 *      java.lang.Object, int, boolean, boolean)
-                 */
-
+            ListCellRenderer itemRenderer = new DefaultListCellRenderer() {
+                // Override to show tooltip
                 @Override
                 public Component getListCellRendererComponent(JList list, Object value, int arg2, boolean arg3, boolean arg4) {
                     JLabel result = (JLabel) super.getListCellRendererComponent(list, value, arg2, arg3, arg4);
@@ -486,15 +475,15 @@ public class ImageDataPanel extends ObservationDialogPanel {
             comboObservatory.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
-                    setComboBox(comboInstrument, DataSources.getSingletonInstance().getInstruments(InstrumentsPanel.this.getObservatory()));
+                    setComboBox(comboInstrument, DataSources.getSingletonInstance().getInstruments(getObservatory()));
                 }
             });
 
             comboInstrument.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
-                    String obs = InstrumentsPanel.this.getObservatory();
-                    String ins = InstrumentsPanel.this.getInstrument();
+                    String obs = getObservatory();
+                    String ins = getInstrument();
 
                     ArrayList<ItemPair> values = new ArrayList<ItemPair>();
                     Item[] detectors = DataSources.getSingletonInstance().getDetectors(obs, ins);
@@ -521,7 +510,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
 
         public void setupSources(DataSources source) {
-            InstrumentsPanel.this.setComboBox(comboObservatory, source.getObservatories());
+            setComboBox(comboObservatory, source.getObservatories());
         }
 
         /**
