@@ -14,8 +14,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
-public class SDOCutOutAction extends AbstractAction
-{
+public class SDOCutOutAction extends AbstractAction {
 
     private static final String URL = "http://www.lmsal.com/get_aia_data/?";
 
