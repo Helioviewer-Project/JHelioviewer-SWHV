@@ -289,9 +289,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if (view == null) {
             timeChanged(Long.MIN_VALUE);
             optionsPanel.lockButton.setEnabled(false);
+            long now = System.currentTimeMillis();
+            fireMovieIntervalChanged(now, now); // remove movie interval
         } else {
-            fireMovieIntervalChanged(view.getFirstTime().milli, view.getLastTime().milli);
             optionsPanel.lockButton.setEnabled(true);
+            fireMovieIntervalChanged(view.getFirstTime().milli, view.getLastTime().milli);
         }
     }
 
