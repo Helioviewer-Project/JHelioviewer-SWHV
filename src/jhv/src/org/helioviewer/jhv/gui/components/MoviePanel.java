@@ -442,6 +442,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         playButton.setEnabled(enabled);
         nextFrameButton.setEnabled(enabled);
         previousFrameButton.setEnabled(enabled);
+        recordButton.setEnabled(enabled);
         speedSpinner.setEnabled(enabled);
         speedUnitComboBox.setEnabled(enabled);
         advancedButton.setEnabled(enabled);

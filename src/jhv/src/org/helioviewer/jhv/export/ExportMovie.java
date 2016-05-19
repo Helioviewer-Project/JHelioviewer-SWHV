@@ -10,8 +10,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.imageio.ImageIO;
-
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.ImageUtils;
@@ -93,20 +91,20 @@ public class ExportMovie implements FrameListener {
         }
 
         BufferedImage screenshot = grabber.renderFrame(gl);
-        try {
-            if (mode == RecordMode.SHOT) {
-                ImageIO.write(ExportUtils.pasteCanvases(screenshot, EVEImage, EVEMovieLinePosition, exportHeight), "png", new File(imagePath));
+        if (mode == RecordMode.SHOT) {
+            try {
+                ImageUtils.writePNG(ExportUtils.pasteCanvases(screenshot, EVEImage, EVEMovieLinePosition, exportHeight), imagePath);
                 JHVGlobals.displayNotification(imagePath);
-                stop();
-            } else {
-                try {
-                    executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition, exportHeight));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                 e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            stop();
+        } else {
+            try {
+                executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition, exportHeight));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
