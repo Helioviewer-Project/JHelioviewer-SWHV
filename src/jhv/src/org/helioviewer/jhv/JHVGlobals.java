@@ -29,13 +29,13 @@ import org.helioviewer.jhv.threads.JHVExecutor;
  */
 public class JHVGlobals {
 
-    public static final String TEMP_FILENAME_DELETE_PLUGIN_FILES = "delete-plugins.tmp";
-
+    public static final String programName = "ESA JHelioviewer";
     public static final String downloadURL = "http://swhv.oma.be/download/";
+
+    public static final String TEMP_FILENAME_DELETE_PLUGIN_FILES = "delete-plugins.tmp";
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator();
 
-    private static final String name = "ESA JHelioviewer";
     private static String version = "";
     private static String revision = "";
     private static String agent = "JHV/SWHV-";
@@ -138,11 +138,6 @@ public class JHVGlobals {
     public static String getUserAgent() {
         return agent;
     }
-
-    public static String getProgramName() {
-        return name;
-    }
-
     /**
      * Attempts to create the necessary directories if they do not exist. It
      * gets its list of directories to create from the JHVDirectory class.
