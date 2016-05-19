@@ -45,7 +45,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     private final Settings settings = Settings.getSingletonInstance();
 
-    private PreferencesDialog() {
+    public PreferencesDialog() {
         super(ImageViewerGui.getMainFrame(), "Preferences", true);
         setResizable(false);
 

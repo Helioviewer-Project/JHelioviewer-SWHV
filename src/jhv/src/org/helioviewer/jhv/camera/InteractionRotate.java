@@ -21,6 +21,9 @@ public class InteractionRotate extends Interaction {
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        if (currentRotationStartPoint == null) // freak crash
+            return;
+
         Vec3 currentRotationEndPoint = CameraHelper.getVectorFromSphereTrackball(camera, Displayer.getActiveViewport(), e.getPoint());
         camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint));
         Displayer.render(0.5);
