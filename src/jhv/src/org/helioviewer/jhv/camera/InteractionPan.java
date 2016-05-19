@@ -21,6 +21,9 @@ public class InteractionPan extends Interaction {
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        if (lastMousePoint == null) // freak crash
+            return;
+
         Point p = e.getPoint();
         int x = p.x - lastMousePoint.x;
         int y = p.y - lastMousePoint.y;
