@@ -102,9 +102,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void setVisible(boolean flag) {
-        super.setVisible(flag);
-        if (flag == true)
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (visible)
             redrawTimer.start();
         else
             redrawTimer.stop();

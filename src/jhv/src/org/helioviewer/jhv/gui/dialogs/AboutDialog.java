@@ -201,7 +201,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
             Log.warn("AboutDialog.getVersionString() > No revision found. Use default version and revision strings.");
             revisionString = "-1";
         }
-        return JHVGlobals.getProgramName() + " " + versionString + " - Revision " + revisionString;
+        return JHVGlobals.programName + " " + versionString + " - Revision " + revisionString;
     }
 
     @Override

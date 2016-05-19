@@ -308,7 +308,7 @@ public class JP2View extends AbstractView {
 
     protected void signalRender(JP2Image jp2Image, double factor) {
         // from reader on EDT, might come after abolish
-        if (stopRender == true || jp2Image == null) {
+        if (stopRender || jp2Image == null) {
             return;
         }
 

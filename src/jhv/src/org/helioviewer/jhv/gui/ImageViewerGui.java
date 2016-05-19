@@ -157,7 +157,7 @@ public class ImageViewerGui {
     }
 
     private static JFrame createMainFrame() {
-        JFrame frame = new JFrame(JHVGlobals.getProgramName());
+        JFrame frame = new JFrame(JHVGlobals.programName);
 
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {

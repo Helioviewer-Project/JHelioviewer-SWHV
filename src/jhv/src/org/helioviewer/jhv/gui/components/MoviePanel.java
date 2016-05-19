@@ -619,7 +619,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
-    private static class PlayPauseAction extends AbstractAction implements ActionListener {
+    private static class PlayPauseAction extends AbstractAction {
 
         public PlayPauseAction() {
             super("Play/Pause Movie");
@@ -641,7 +641,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
-    private static class PreviousFrameAction extends AbstractAction implements ActionListener {
+    private static class PreviousFrameAction extends AbstractAction {
 
         public PreviousFrameAction() {
             super("Step to Previous Frame");
@@ -664,7 +664,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
-    private static class NextFrameAction extends AbstractAction implements ActionListener {
+    private static class NextFrameAction extends AbstractAction {
 
         public NextFrameAction() {
             super("Step to Next Frame");
