@@ -12,6 +12,7 @@ public class JCodecExporter implements MovieExporter {
     @Override
     public void open(String path, int w, int h, int fps) throws Exception {
         encoder = AWTSequenceEncoder8Bit.createSequenceEncoder8Bit(new File(path), fps);
+        encoder.getEncoder().setKeyInterval(fps);
     }
 
     @Override
