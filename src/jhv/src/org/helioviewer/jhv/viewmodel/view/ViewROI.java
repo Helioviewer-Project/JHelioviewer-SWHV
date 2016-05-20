@@ -15,7 +15,7 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 public class ViewROI {
 
     private static final double extraSize = 0.05;
-    private static final int resolution = 5;
+    private static final int resolution = 3;
     private static final Vec2[] pointlist = new Vec2[(resolution + 1) * 2 * 2];
     private static final Vec2[] dePoints = new Vec2[pointlist.length];
 
@@ -66,7 +66,7 @@ public class ViewROI {
                 maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
             }
 
-            camDiff = Quat.rotate(camera.getRotation(), m.getViewpoint().orientation);
+            camDiff = Quat.rotateWithConjugate(camDiff, Quat.createRotation(Math.PI, m.getViewpoint().orientation.getRotationAxis()));
             for (int i = 0; i < pointlist.length; i++) {
                 Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
                 minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
