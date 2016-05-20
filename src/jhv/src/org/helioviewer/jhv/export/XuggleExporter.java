@@ -19,7 +19,7 @@ public class XuggleExporter implements MovieExporter {
 
     private IMediaWriter movieWriter;
     private IConverter converter;
-    private long frameNo = 0;
+    private long frameNo;
     private double deltat;
 
     @Override
@@ -42,6 +42,8 @@ public class XuggleExporter implements MovieExporter {
         coder.setGlobalQuality(0);
         // coder.setNumPicturesInGroupOfPictures(fps);
         coder.setPixelType(pixFmt);
+
+        frameNo = 0;
     }
 
     @Override
