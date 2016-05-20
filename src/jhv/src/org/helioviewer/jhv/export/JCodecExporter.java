@@ -4,26 +4,25 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import org.helioviewer.jhv.base.FileUtils;
-import org.jcodec.api.awt.AWTSequenceEncoder8Bit;
 import org.jcodec.containers.mp4.MP4Util;
 import org.jcodec.containers.mp4.boxes.MovieBox;
 import org.jcodec.movtool.Flattern;
+import org.jcodec.scale.AWTUtil;
 
 public class JCodecExporter implements MovieExporter {
 
-    private AWTSequenceEncoder8Bit encoder;
+    private JHVSequenceEncoder encoder;
     private String path;
 
     @Override
     public void open(String path, int w, int h, int fps) throws Exception {
         this.path = path;
-        encoder = AWTSequenceEncoder8Bit.createSequenceEncoder8Bit(new File(path), fps);
-        encoder.getEncoder().setKeyInterval(fps);
+        encoder = new JHVSequenceEncoder(new File(path), w, h, fps);
     }
 
     @Override
     public void encode(BufferedImage image) throws Exception {
-        encoder.encodeImage(image);
+        encoder.encodeNativeFrame(AWTUtil.fromBufferedImage(image));
     }
 
     @Override
@@ -34,7 +33,7 @@ public class JCodecExporter implements MovieExporter {
 
     private void prepareStream() throws Exception {
         File orig = new File(path);
-        MovieBox movie = MP4Util.createRefMovieFromFile(orig);
+        MovieBox movie = MP4Util.createRefMovie(orig);
 
         File optim = new File(path + "_optim");
         new Flattern().flattern(movie, optim);
