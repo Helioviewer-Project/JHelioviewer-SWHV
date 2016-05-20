@@ -204,8 +204,8 @@ public class ExportMovie implements FrameListener {
     private static class FrameConsumer implements Runnable {
 
         private final MovieExporter movieExporter;
-        private final BufferedImage mainImage;
-        private final BufferedImage eveImage;
+        private BufferedImage mainImage;
+        private BufferedImage eveImage;
         private final int movieLinePosition;
         private final int height;
 
@@ -226,6 +226,8 @@ public class ExportMovie implements FrameListener {
         public void run() {
             try {
                 movieExporter.encode(ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, height));
+                mainImage = null;
+                eveImage = null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
