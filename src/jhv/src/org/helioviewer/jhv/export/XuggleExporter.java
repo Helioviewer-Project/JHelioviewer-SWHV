@@ -47,8 +47,8 @@ public class XuggleExporter implements MovieExporter {
     }
 
     @Override
-    public void encode(BufferedImage im) throws Exception {
-        IVideoPicture frame = converter.toPicture(im, (long) (frameNo * deltat));
+    public void encode(BufferedImage image) throws Exception {
+        IVideoPicture frame = converter.toPicture(image, (long) (frameNo * deltat));
         frame.setQuality(0);
 
         movieWriter.encodeVideo(0, frame);

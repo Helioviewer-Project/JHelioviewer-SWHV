@@ -162,8 +162,9 @@ public class ExportMovie implements FrameListener {
             Displayer.display();
         } else {
             try {
-                exporter = new XuggleExporter();
-                //exporter = new HumbleExporter();
+                // exporter = new XuggleExporter();
+                // exporter = new HumbleExporter();
+                exporter = new JCodecExporter();
                 exporter.open(moviePath, canvasWidth, exportHeight, fps);
             } catch (Exception e) {
                 e.printStackTrace();
