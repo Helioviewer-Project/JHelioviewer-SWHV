@@ -211,7 +211,12 @@ public class ExportMovie implements FrameListener {
         public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition, int _height) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
-            eveImage = ImageUtils.deepCopy(_eveImage);
+
+            if (_eveImage == null)
+                eveImage = null;
+            else
+                eveImage = ImageUtils.deepCopy(_eveImage);
+
             movieLinePosition = _movieLinePosition;
             height = _height;
         }
