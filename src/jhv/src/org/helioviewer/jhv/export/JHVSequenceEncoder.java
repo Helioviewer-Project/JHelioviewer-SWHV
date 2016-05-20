@@ -86,6 +86,9 @@ public class JHVSequenceEncoder {
         outTrack.addFrame(new MP4Packet(result, frameNo, fps, 1, frameNo, true, null, frameNo, 0));
 
         frameNo++;
+
+        if (frameNo / 10 == 9)
+            System.gc();
     }
 
     public void finish() throws IOException {
@@ -95,5 +98,6 @@ public class JHVSequenceEncoder {
         // Write MP4 header and finalize recording
         muxer.writeHeader();
         NIOUtils.closeQuietly(ch);
+        System.gc();
     }
 }
