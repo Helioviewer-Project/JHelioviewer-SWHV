@@ -119,7 +119,7 @@ public class ExportMovie implements FrameListener {
     public static void start(int _w, int _h, boolean isInternal, int fps, RecordMode _mode) {
         int scrw = 1;
         int scrh = 0;
-        if (EVEImage != null && ImageViewerGui.getMainContentPanel().mainContentPluginsActive()) {
+        if (EVEImage != null) {
             scrw = Math.max(1, EVEImage.getWidth());
             scrh = EVEImage.getHeight();
         }

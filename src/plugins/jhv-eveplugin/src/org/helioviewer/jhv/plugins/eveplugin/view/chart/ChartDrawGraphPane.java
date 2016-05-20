@@ -104,10 +104,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
-        if (visible)
+        if (visible) {
+            ExportMovie.EVEImage = screenImage;
             redrawTimer.start();
-        else
+        } else {
+            ExportMovie.EVEImage = null;
             redrawTimer.stop();
+        }
     }
 
     private boolean axisHightlightToggled(Rectangle graphArea) {

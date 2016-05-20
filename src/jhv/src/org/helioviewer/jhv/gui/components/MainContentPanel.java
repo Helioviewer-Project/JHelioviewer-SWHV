@@ -132,8 +132,4 @@ public class MainContentPanel extends JPanel implements ActionListener {
         updateLayout();
     }
 
-    public boolean mainContentPluginsActive() {
-        return !collapsiblePane.isCollapsed();
-    }
-
 }
