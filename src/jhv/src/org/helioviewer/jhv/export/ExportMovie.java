@@ -225,7 +225,9 @@ public class ExportMovie implements FrameListener {
         @Override
         public void run() {
             try {
-                movieExporter.encode(ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, height));
+                BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, height);
+                movieExporter.encode(composite);
+                composite = null;
                 mainImage = null;
                 eveImage = null;
             } catch (Exception e) {
