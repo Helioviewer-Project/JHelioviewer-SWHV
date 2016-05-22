@@ -17,7 +17,7 @@ import org.helioviewer.jhv.layers.Layers;
 
 public class ExitHooks {
 
-    static Thread finishMovieThread = new Thread() {
+    private static Thread finishMovieThread = new Thread() {
         @Override
         public void run() {
             try {
@@ -41,6 +41,7 @@ public class ExitHooks {
             }
         }
 
+/*
         final ExecutorService executor = Executors.newFixedThreadPool(4);
         Future<?> futureFileDelete = executor.submit(new Runnable() {
             @Override
@@ -64,6 +65,7 @@ public class ExitHooks {
             futureFileDelete.cancel(true);
             Log.warn("Timeout upon deleting temporary files");
         }
+*/
 
         System.exit(0);
         return true;
