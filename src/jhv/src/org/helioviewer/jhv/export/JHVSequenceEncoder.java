@@ -79,9 +79,6 @@ public class JHVSequenceEncoder {
         outTrack.addFrame(new MP4Packet(result, frameNo, fps, 1, frameNo, true, null, frameNo, 0));
 
         frameNo++;
-
-        if (frameNo / 10 == 0)
-            System.gc();
     }
 
     public void finish() throws IOException {

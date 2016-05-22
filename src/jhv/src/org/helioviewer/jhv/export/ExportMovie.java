@@ -44,13 +44,15 @@ public class ExportMovie implements FrameListener {
 
     public void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
+            Runnable runnable = new CloseWriter(exporter, moviePath, keep);
             if (keep) {
                 if (frameQueue.remainingCapacity() == 0)
                     frameQueue.poll();
+                executor.submit(runnable);
             } else {
-                while (frameQueue.poll() != null) ;
+                executor.shutdownNow();
+                runnable.run();
             }
-            executor.submit(new CloseWriter(exporter, moviePath, keep));
             exporter = null;
         }
     }
@@ -152,8 +154,6 @@ public class ExportMovie implements FrameListener {
             Displayer.display();
         } else {
             try {
-                // exporter = new XuggleExporter();
-                // exporter = new HumbleExporter();
                 exporter = new JCodecExporter();
                 exporter.open(moviePath, canvasWidth, exportHeight, fps);
             } catch (Exception e) {
@@ -216,10 +216,10 @@ public class ExportMovie implements FrameListener {
         public void run() {
             try {
                 BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, height);
-                movieExporter.encode(composite);
-                composite = null;
                 mainImage = null;
                 eveImage = null;
+                movieExporter.encode(composite);
+                composite = null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -230,12 +230,12 @@ public class ExportMovie implements FrameListener {
     private static class CloseWriter implements Runnable {
 
         private final MovieExporter movieExporter;
-        private final String moviePath;
+        private final String path;
         private final boolean keep;
 
         public CloseWriter(MovieExporter _movieExporter, String _moviePath, boolean _keep) {
             movieExporter = _movieExporter;
-            moviePath = _moviePath;
+            path = _moviePath;
             keep = _keep;
         }
 
@@ -243,24 +243,22 @@ public class ExportMovie implements FrameListener {
         public void run() {
             boolean failed = false;
             try {
-                if (movieExporter != null) {
+                if (movieExporter != null && keep) {
                     movieExporter.close();
 
-                    if (moviePath != null && keep) {
-                        EventQueue.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                JHVGlobals.displayNotification(moviePath);
-                            }
-                        });
-                    }
+                    EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            JHVGlobals.displayNotification(path);
+                        }
+                    });
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 failed = true;
             }
-            if (moviePath != null && (!keep || failed)) {
-                File f = new File(moviePath);
+            if (!keep || failed) {
+                File f = new File(path);
                 f.delete();
             }
         }
