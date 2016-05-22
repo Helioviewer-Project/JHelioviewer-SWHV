@@ -5,8 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -38,29 +36,21 @@ public class ExportMovie implements FrameListener {
     private static boolean inited = false;
     private static boolean stopped = false;
 
-    private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
-    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Export Movie"), new ThreadPoolExecutor.DiscardPolicy());
+    private final ArrayBlockingQueue<Runnable> frameQueue = new ArrayBlockingQueue<Runnable>(512);
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, frameQueue, new JHVThread.NamedThreadFactory("Export Movie"), new ThreadPoolExecutor.DiscardPolicy());
 
     public static BufferedImage EVEImage = null;
     public static int EVEMovieLinePosition = -1;
 
     public void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
-            blockingQueue.poll();
             if (keep) {
-                executor.submit(new CloseWriter(exporter, moviePath, keep));
+                if (frameQueue.remainingCapacity() == 0)
+                    frameQueue.poll();
             } else {
-                while (blockingQueue.poll() != null) {
-                }
-                Future<?> f = executor.submit(new CloseWriter(exporter, moviePath, keep));
-                try {
-                    f.get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
+                while (frameQueue.poll() != null) ;
             }
+            executor.submit(new CloseWriter(exporter, moviePath, keep));
             exporter = null;
         }
     }
