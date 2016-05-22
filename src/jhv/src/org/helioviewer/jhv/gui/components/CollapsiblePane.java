@@ -82,8 +82,4 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         }
     }
 
-    public boolean isCollapsed() {
-        return !component.isVisible();
-    }
-
 }
