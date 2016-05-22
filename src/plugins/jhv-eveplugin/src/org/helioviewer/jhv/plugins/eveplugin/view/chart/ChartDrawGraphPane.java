@@ -70,7 +70,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private DragMode dragMode = DragMode.NODRAG;
 
-    private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
+    private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener()); // will start on setVisible
 
     public ChartDrawGraphPane() {
         setOpaque(true);
@@ -87,8 +87,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         drawController.addDrawControllerListener(this);
         eventModel = EventModel.getSingletonInstance();
         drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
-
-        redrawTimer.start();
     }
 
     private class RedrawListener implements ActionListener {

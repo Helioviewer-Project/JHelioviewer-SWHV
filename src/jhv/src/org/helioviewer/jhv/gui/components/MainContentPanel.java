@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 
@@ -63,6 +64,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
         if (plugin == null || pluginList.contains(plugin)) {
             return;
         }
+        ComponentUtils.setVisible(plugin.getVisualInterfaces().get(0), true);
         pluginList.add(plugin);
         updateLayout();
     }
@@ -75,6 +77,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
      * */
     public void removePlugin(MainContentPanelPlugin plugin) {
         if (pluginList.remove(plugin)) {
+            ComponentUtils.setVisible(plugin.getVisualInterfaces().get(0), false);
             updateLayout();
         }
     }
