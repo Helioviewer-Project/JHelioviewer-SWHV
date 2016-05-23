@@ -24,6 +24,7 @@ import javax.swing.border.MatteBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -190,11 +191,11 @@ public class LineDataSelectorTablePanel extends JPanel {
                 LineDataSelectorModel model = (LineDataSelectorModel) grid.getModel();
 
                 if (col == VISIBLE_COL) {
-                    LineDataSelectorElement renderable = (LineDataSelectorElement) model.getValueAt(row, col);
+                    LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
+                    boolean visible = !lineDataElement.isVisible();
 
-                    boolean vis = !renderable.isVisible();
-                    renderable.setVisibility(vis);
-                    model.fireLineDataSelectorElementVisibility(renderable, vis);
+                    lineDataElement.setVisibility(visible);
+                    model.fireLineDataSelectorElementVisibility(lineDataElement, visible);
                 }
                 if (col == TITLE_COL || col == LOADING_COL || col == LINECOLOR_COL) {
                     LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
@@ -244,9 +245,12 @@ public class LineDataSelectorTablePanel extends JPanel {
         if (optionsPanel != null)
             optionsPanelWrapper.remove(optionsPanel);
         optionsPanel = lineDataElement.getOptionsPanel();
-        if (optionsPanel != null)
+        if (optionsPanel != null) {
+            ComponentUtils.setEnabled(optionsPanel, lineDataElement.isVisible());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+        }
         revalidate();
+        repaint();
     }
 
 }

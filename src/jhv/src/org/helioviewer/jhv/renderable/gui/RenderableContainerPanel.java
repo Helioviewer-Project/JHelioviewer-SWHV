@@ -250,20 +250,14 @@ public class RenderableContainerPanel extends JPanel {
     }
 
     private void setOptionsPanel(Renderable renderable) {
+        optionsPanelWrapper.removeAll();
         Component optionsPanel = renderable.getOptionsPanel();
         if (optionsPanel != null) {
             ComponentUtils.setEnabled(optionsPanel, renderable.isVisible());
-        }
-        setOptionsComponent(optionsPanel);
-    }
-
-    private void setOptionsComponent(Component cmp) {
-        optionsPanelWrapper.removeAll();
-        if (cmp != null) {
-            optionsPanelWrapper.add(cmp, BorderLayout.CENTER);
-            cmp.repaint();
+            optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         }
         revalidate();
+        repaint();
     }
 
 }
