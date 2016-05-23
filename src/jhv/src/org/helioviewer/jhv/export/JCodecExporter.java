@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.export.jcodec.JHVSequenceEncoder;
 import org.jcodec.containers.mp4.MP4Util;
 import org.jcodec.containers.mp4.boxes.MovieBox;
 import org.jcodec.movtool.Flattern;

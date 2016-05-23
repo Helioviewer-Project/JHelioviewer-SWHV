@@ -28,7 +28,7 @@ public class ExportReadyDialog extends JDialog implements ActionListener, Showab
         super(ImageViewerGui.getMainFrame(), false);
         setLayout(new BorderLayout());
         setResizable(false);
-        setTitle("Recording Ready");
+        setTitle("Export Ready");
 
         messagePane.setContentType("text/html");
         messagePane.setOpaque(false);
