@@ -1,8 +1,9 @@
 package org.helioviewer.jhv.export;
 
+import java.io.File;
 import java.awt.image.BufferedImage;
 
-import org.helioviewer.jhv.base.ImageUtils;
+import javax.imageio.ImageIO;
 
 public class PNGExporter implements MovieExporter {
 
@@ -23,7 +24,8 @@ public class PNGExporter implements MovieExporter {
 
     @Override
     public void close() throws Exception {
-        ImageUtils.writePNG(image, path);
+        // ImageUtils.writePNG(image, path);
+        ImageIO.write(image, "png", new File(path));
     }
 
     @Override
