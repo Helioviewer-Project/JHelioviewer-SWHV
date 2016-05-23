@@ -29,7 +29,6 @@ public class ExportMovie implements FrameListener {
     private static GLGrab grabber;
 
     private static RecordMode mode;
-    private static boolean inited = false;
     private static boolean stopped = false;
 
     private final ArrayBlockingQueue<Runnable> frameQueue = new ArrayBlockingQueue<Runnable>(512);
@@ -67,14 +66,8 @@ public class ExportMovie implements FrameListener {
     }
 
     public void handleMovieExport(GL2 gl) {
-        if (!inited) {
-            inited = true;
-            grabber.init(gl);
-        }
-
         if (stopped) {
             exportMovieFinish(gl);
-            inited = false;
             return;
         }
 
