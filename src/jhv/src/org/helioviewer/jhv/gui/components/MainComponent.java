@@ -92,6 +92,10 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         exporter = null;
     }
 
+    public boolean isRecording() {
+        return exporter != null;
+    }
+
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         Displayer.setGLSize(x, y, width, height);

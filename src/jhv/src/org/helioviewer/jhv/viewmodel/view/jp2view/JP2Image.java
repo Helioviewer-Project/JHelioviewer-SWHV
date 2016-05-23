@@ -16,7 +16,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.export.ExportMovie;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.io.APIResponseDump;
@@ -270,7 +270,7 @@ public class JP2Image {
         }
         factor = Math.min(factor, adj);
 
-        if (ExportMovie.isRecording())
+        if (ImageViewerGui.getMainComponent().isRecording())
             factor = 1;
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.width, res.height);
