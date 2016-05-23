@@ -31,7 +31,8 @@ public class ExportMovie implements FrameListener {
     private static RecordMode mode;
     private static boolean stopped = false;
 
-    private final ArrayBlockingQueue<Runnable> frameQueue = new ArrayBlockingQueue<Runnable>(512);
+    private final int NUM_FRAMES = 512;
+    private final ArrayBlockingQueue<Runnable> frameQueue = new ArrayBlockingQueue<Runnable>(2 * NUM_FRAMES);
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, frameQueue, new JHVThread.NamedThreadFactory("Export Movie"), new ThreadPoolExecutor.DiscardPolicy());
 
     public static BufferedImage EVEImage = null;
@@ -41,8 +42,6 @@ public class ExportMovie implements FrameListener {
         if (exporter != null) {
             Runnable runnable = new CloseWriter(exporter, keep);
             if (keep) {
-                if (frameQueue.remainingCapacity() == 0)
-                    frameQueue.poll();
                 executor.submit(runnable);
             } else {
                 executor.shutdownNow();
@@ -72,7 +71,8 @@ public class ExportMovie implements FrameListener {
 
         BufferedImage screenshot = grabber.renderFrame(gl);
         try {
-            executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
+            if (mode == RecordMode.SHOT || frameQueue.size() <= NUM_FRAMES)
+                executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -115,19 +115,16 @@ public class ExportMovie implements FrameListener {
         stopped = false;
         currentFrame = 0;
 
-        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(new Date());
-        String moviePath = prefix + ".mp4";
-        String imagePath = prefix + ".png";
-
         MoviePanel.recordPanelSetEnabled(false);
 
         grabber = new GLGrab(canvasWidth, canvasHeight);
         ImageViewerGui.getMainComponent().attachExport(instance);
 
+        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(new Date());
         if (mode == RecordMode.SHOT) {
             try {
                 exporter = new PNGExporter();
-                exporter.open(imagePath, canvasWidth, exportHeight, fps);
+                exporter.open(prefix + ".png", canvasWidth, exportHeight, fps);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -136,7 +133,7 @@ public class ExportMovie implements FrameListener {
         } else {
             try {
                 exporter = new JCodecExporter();
-                exporter.open(moviePath, canvasWidth, exportHeight, fps);
+                exporter.open(prefix + ".mp4", canvasWidth, exportHeight, fps);
             } catch (Exception e) {
                 e.printStackTrace();
             }
