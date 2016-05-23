@@ -31,7 +31,6 @@ public class ExportMovie implements FrameListener {
     private static int exportHeight;
 
     private static RecordMode mode;
-    private static String moviePath;
     private static String imagePath;
     private static boolean inited = false;
     private static boolean stopped = false;
@@ -44,7 +43,7 @@ public class ExportMovie implements FrameListener {
 
     public void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
-            Runnable runnable = new CloseWriter(exporter, moviePath, keep);
+            Runnable runnable = new CloseWriter(exporter, keep);
             if (keep) {
                 if (frameQueue.remainingCapacity() == 0)
                     frameQueue.poll();
@@ -141,7 +140,7 @@ public class ExportMovie implements FrameListener {
         currentFrame = 0;
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(new Date());
-        moviePath = prefix + ".mp4";
+        String moviePath = prefix + ".mp4";
         imagePath = prefix + ".png";
 
         MoviePanel.recordPanelSetEnabled(false);
@@ -230,12 +229,10 @@ public class ExportMovie implements FrameListener {
     private static class CloseWriter implements Runnable {
 
         private final MovieExporter movieExporter;
-        private final String path;
         private final boolean keep;
 
-        public CloseWriter(MovieExporter _movieExporter, String _moviePath, boolean _keep) {
+        public CloseWriter(MovieExporter _movieExporter, boolean _keep) {
             movieExporter = _movieExporter;
-            path = _moviePath;
             keep = _keep;
         }
 
@@ -243,13 +240,13 @@ public class ExportMovie implements FrameListener {
         public void run() {
             boolean failed = false;
             try {
-                if (movieExporter != null && keep) {
+                if (keep) {
                     movieExporter.close();
 
                     EventQueue.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            JHVGlobals.displayNotification(path);
+                            JHVGlobals.displayNotification(movieExporter.getPath());
                         }
                     });
                 }
@@ -258,7 +255,7 @@ public class ExportMovie implements FrameListener {
                 failed = true;
             }
             if (!keep || failed) {
-                File f = new File(path);
+                File f = new File(movieExporter.getPath());
                 f.delete();
             }
         }

@@ -10,4 +10,6 @@ public interface MovieExporter {
 
     public void close() throws Exception;
 
+    public String getPath();
+
 }
