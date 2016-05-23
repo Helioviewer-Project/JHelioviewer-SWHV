@@ -12,4 +12,6 @@ public interface MovieExporter {
 
     public String getPath();
 
+    public int getHeight();
+
 }

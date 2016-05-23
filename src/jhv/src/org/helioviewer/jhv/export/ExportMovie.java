@@ -28,10 +28,7 @@ public class ExportMovie implements FrameListener {
     private static MovieExporter exporter;
     private static GLGrab grabber;
 
-    private static int exportHeight;
-
     private static RecordMode mode;
-    private static String imagePath;
     private static boolean inited = false;
     private static boolean stopped = false;
 
@@ -84,15 +81,18 @@ public class ExportMovie implements FrameListener {
         BufferedImage screenshot = grabber.renderFrame(gl);
         if (mode == RecordMode.SHOT) {
             try {
-                ImageUtils.writePNG(ExportUtils.pasteCanvases(screenshot, EVEImage, EVEMovieLinePosition, exportHeight), imagePath);
-                JHVGlobals.displayNotification(imagePath);
+                BufferedImage composite = ExportUtils.pasteCanvases(screenshot, EVEImage, EVEMovieLinePosition, exporter.getHeight());
+                exporter.encode(composite);
+                exporter.close();
+                JHVGlobals.displayNotification(exporter.getPath());
+                exporter = null;
             } catch (Exception e) {
                  e.printStackTrace();
             }
             stop();
         } else {
             try {
-                executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition, exportHeight));
+                executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -115,7 +115,7 @@ public class ExportMovie implements FrameListener {
             scrh = EVEImage.getHeight();
         }
 
-        int canvasWidth, canvasHeight;
+        int canvasWidth, canvasHeight, exportHeight;
 
         mode = _mode;
         if (mode == RecordMode.SHOT)
@@ -141,7 +141,7 @@ public class ExportMovie implements FrameListener {
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(new Date());
         String moviePath = prefix + ".mp4";
-        imagePath = prefix + ".png";
+        String imagePath = prefix + ".png";
 
         MoviePanel.recordPanelSetEnabled(false);
 
@@ -150,6 +150,13 @@ public class ExportMovie implements FrameListener {
         _isRecording = true;
 
         if (mode == RecordMode.SHOT) {
+            try {
+                exporter = new PNGExporter();
+                exporter.open(imagePath, canvasWidth, exportHeight, fps);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             Displayer.display();
         } else {
             try {
@@ -196,9 +203,8 @@ public class ExportMovie implements FrameListener {
         private BufferedImage mainImage;
         private BufferedImage eveImage;
         private final int movieLinePosition;
-        private final int height;
 
-        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition, int _height) {
+        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
 
@@ -208,13 +214,12 @@ public class ExportMovie implements FrameListener {
                 eveImage = ImageUtils.deepCopy(_eveImage);
 
             movieLinePosition = _movieLinePosition;
-            height = _height;
         }
 
         @Override
         public void run() {
             try {
-                BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, height);
+                BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, movieExporter.getHeight());
                 mainImage = null;
                 eveImage = null;
                 movieExporter.encode(composite);
