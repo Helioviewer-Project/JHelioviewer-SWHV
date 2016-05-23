@@ -15,10 +15,10 @@ import com.jogamp.opengl.GL2;
 
 public class GLGrab {
 
-    private final FBObject fbo = new FBObject();
-    private TextureAttachment fboTex;
     private final int w;
     private final int h;
+    private FBObject fbo;
+    private TextureAttachment fboTex;
 
     public GLGrab(int _w, int _h) {
         w = _w;
@@ -26,6 +26,7 @@ public class GLGrab {
     }
 
     public void init(GL2 gl) {
+        fbo = new FBObject();
         fbo.init(gl, w, h, 0);
         fboTex = fbo.attachTexture2D(gl, 0, true);
 
@@ -40,6 +41,9 @@ public class GLGrab {
     }
 
     public BufferedImage renderFrame(GL2 gl) {
+        if (fbo == null)
+            init(gl);
+
         BufferedImage screenshot;
 
         int _x = Displayer.fullViewport.x;
