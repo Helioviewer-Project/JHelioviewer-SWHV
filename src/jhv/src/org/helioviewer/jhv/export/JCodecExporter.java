@@ -40,4 +40,9 @@ public class JCodecExporter implements MovieExporter {
         optim.delete();
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
+
 }
