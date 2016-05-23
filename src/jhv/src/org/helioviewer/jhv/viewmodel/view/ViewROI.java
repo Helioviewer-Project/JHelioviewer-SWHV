@@ -57,7 +57,10 @@ public class ViewROI {
 
             camera.push(p);
 
-            Quat camDiff = Quat.rotateWithConjugate(camera.getRotation(), m.getViewpoint().orientation);
+            Quat cameraRotation = camera.getRotation();
+            Quat imageRotation = m.getViewpoint().orientation;
+
+            Quat camDiff = Quat.rotateWithConjugate(cameraRotation, imageRotation);
             for (int i = 0; i < pointlist.length; i++) {
                 Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
                 minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
@@ -66,13 +69,27 @@ public class ViewROI {
                 maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
             }
 
-            camDiff = Quat.rotateWithConjugate(camDiff, Quat.createRotation(Math.PI, m.getViewpoint().orientation.getRotationAxis()));
-            for (int i = 0; i < pointlist.length; i++) {
-                Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
-                minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-                minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-                maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-                maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+            Vec3 startPoint, endPoint, rotationAxis;
+
+            startPoint = cameraRotation.rotateVector(Vec3.ZAxis);
+            endPoint = imageRotation.rotateVector(Vec3.ZAxis);
+            rotationAxis = Vec3.cross(startPoint, endPoint);
+            double rotationAngleZ = Math.abs(Math.atan2(rotationAxis.length(), Vec3.dot(startPoint, endPoint)));
+
+            startPoint = cameraRotation.rotateVector(Vec3.YAxis);
+            endPoint = imageRotation.rotateVector(Vec3.YAxis);
+            rotationAxis = Vec3.cross(startPoint, endPoint);
+            double rotationAngleY = Math.abs(Math.atan2(rotationAxis.length(), Vec3.dot(startPoint, endPoint)));
+
+            if (Math.max(rotationAngleZ, rotationAngleY) > Math.PI / 2) {
+                camDiff = Quat.rotateWithConjugate(camDiff, Quat.createRotation(Math.PI, imageRotation.getRotationAxis()));
+                for (int i = 0; i < pointlist.length; i++) {
+                    Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
+                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                }
             }
 
             camera.pop();
