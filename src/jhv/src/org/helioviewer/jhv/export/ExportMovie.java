@@ -79,23 +79,13 @@ public class ExportMovie implements FrameListener {
         }
 
         BufferedImage screenshot = grabber.renderFrame(gl);
+        try {
+            executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (mode == RecordMode.SHOT) {
-            try {
-                BufferedImage composite = ExportUtils.pasteCanvases(screenshot, EVEImage, EVEMovieLinePosition, exporter.getHeight());
-                exporter.encode(composite);
-                exporter.close();
-                JHVGlobals.displayNotification(exporter.getPath());
-                exporter = null;
-            } catch (Exception e) {
-                 e.printStackTrace();
-            }
             stop();
-        } else {
-            try {
-                executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 
