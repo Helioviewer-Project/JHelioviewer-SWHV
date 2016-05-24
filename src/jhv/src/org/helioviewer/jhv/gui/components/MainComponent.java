@@ -101,6 +101,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         Displayer.setGLSize(x, y, width, height);
         Displayer.reshapeAll();
         ImageViewerGui.getRenderableMiniview().reshapeViewport();
+        Displayer.render(1);
     }
 
     private static void renderBlackCircle(GL2 gl, double[] matrix) {
