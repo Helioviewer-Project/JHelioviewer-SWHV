@@ -263,17 +263,24 @@ public class JP2Image {
         int imagePositionX = +(int) Math.round((r.ulx - mr.ulx) / mr.width * res.width);
         int imagePositionY = -(int) Math.round((r.uly - mr.uly) / mr.height * res.height);
 
-        int maxDim = Math.max(imageWidth, imageHeight);
+        SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.width, res.height);
+
+        int maxDim = Math.max(subImage.width, subImage.height);
         double adj = 1;
-        if (maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying()) {
+        if (maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying() && !ImageViewerGui.getMainComponent().isRecording()) {
             adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
+            if (adj > 0.5)
+                adj = 1;
+            else if (adj > 0.25)
+                adj = 0.5;
+            else if (adj > 0.125)
+                adj = 0.25;
+            else if (adj > 0.0625)
+                adj = 0.125;
+            else if (adj > 0.03125)
+                adj = 0.0625;
         }
         factor = Math.min(factor, adj);
-
-        if (ImageViewerGui.getMainComponent().isRecording())
-            factor = 1;
-
-        SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.width, res.height);
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, factor);
 
