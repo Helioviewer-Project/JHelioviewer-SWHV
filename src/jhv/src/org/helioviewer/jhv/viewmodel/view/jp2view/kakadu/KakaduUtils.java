@@ -111,7 +111,7 @@ public class KakaduUtils {
      */
     public static void downloadInitialData(JPIPSocket socket, JHV_Kdu_cache cache, ImageCacheStatus status) throws IOException, JHV_KduException {
         JPIPResponse res = null;
-        JPIPRequest req = new JPIPRequest(JPIPRequest.Method.GET, new JPIPQuery("stream", "0", "metareq", "[*]!!", "len", Integer.toString(JPIPConstants.MAX_REQUEST_LEN)));
+        JPIPRequest req = new JPIPRequest(JPIPRequest.Method.GET, new JPIPQuery("stream", "0", "metareq", "[*]!!", "len", Integer.toString(JPIPConstants.META_REQUEST_LEN)));
 
         try {
             do {
