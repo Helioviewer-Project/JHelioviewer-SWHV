@@ -91,4 +91,23 @@ public class MathUtils {
         return f;
     }
 
+    public static int clip(int val, int from, int to) {
+        return val < from ? from : (val > to ? to : val);
+    }
+
+    public static int clip(int val, int max) {
+        return val < max ? val : max;
+    }
+
+    public static int nextPowerOfTwo(int n) {
+        n = n - 1;
+        n = n | (n >> 1);
+        n = n | (n >> 2);
+        n = n | (n >> 4);
+        n = n | (n >> 8);
+        n = n | (n >> 16);
+        n = n + 1;
+        return n;
+    }
+
 }
