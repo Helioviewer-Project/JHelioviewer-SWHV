@@ -437,10 +437,10 @@ class J2KReader implements Runnable {
                                         signalRender(currParams.factor);
                                         break;
                                     default:
-                                        /*! not good for on the fly resolution update
-                                            if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
+                                        /*! not good for on the fly resolution update ? */
+                                        if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
                                             signalRender(currParams.factor);
-                                        } */
+                                        }
                                     }
                                 }
                             }
@@ -456,9 +456,6 @@ class J2KReader implements Runnable {
                             default:
                                 break;
                             }
-
-                            // let others do their work, too
-                            Thread.yield();
 
                             // check whether caching has to be interrupted
                             if (readerSignal.isSignaled() || Thread.interrupted()) {

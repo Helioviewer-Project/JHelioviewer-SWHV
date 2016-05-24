@@ -15,8 +15,8 @@ public class SubImage {
     public SubImage(int x, int y, int w, int h, int fwidth, int fheight) {
         x = MathUtils.roundDownTo(x, QUANTA);
         y = MathUtils.roundDownTo(y, QUANTA);
-        w = MathUtils.roundUpTo(w, QUANTA) + QUANTA;
-        h = MathUtils.roundUpTo(h, QUANTA) + QUANTA;
+        w = MathUtils.roundUpTo(w + QUANTA, QUANTA);
+        h = MathUtils.roundUpTo(h + QUANTA, QUANTA);
 
         x = MathUtils.clip(x, 0, fwidth - 1);
         y = MathUtils.clip(y, 0, fheight - 1);
