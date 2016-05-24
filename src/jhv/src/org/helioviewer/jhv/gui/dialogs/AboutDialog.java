@@ -87,7 +87,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
         text.append("<p>This software uses the <a href=\"https://jogamp.org\">JogAmp</a>, the Java high performance libraries for 3D Graphics, Multimedia and Processing,<br>").append('\u00A9').append(" JogAmp Community and others<br>");
         text.append("<p>This software uses <a href=\"https://commons.apache.org\">Apache Commons</a>,<br>").append('\u00A9').append(" 2001-2015, The Apache Software Foundation<br>");
         text.append("<p>This software uses <a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> from the Apache Logging Services Project,<br>" + '\u00A9' + " 2010, The Apache Software Foundation, <a href=log4j.txt>(License)</a><br>");
-        text.append("<p>This software uses <a href=\"http://www.xuggle.com\">Xuggler</a>, licensed under the LGPL.<br>");
+        text.append("<p>This software uses <a href=\"http://jcodec.org\">JCodec</a>, licensed under the FreeBSD License.<br>");
         text.append("<p>This software uses the <a href=\"http://www.davekoelle.com/alphanum.html\">Alphanum Algorithm</a>, licensed under the LGPLv2.1.<br> Its source code can be downloaded <a href=\"http://jhelioviewer.org/libjhv/external/AlphanumComparator.java\">here</a>.<br>");
 
         for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {
