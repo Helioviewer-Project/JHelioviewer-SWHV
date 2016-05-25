@@ -260,11 +260,13 @@ public class JP2Image {
         ResolutionLevel res = imageCacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
 
         double currentMeterPerPixel = mr.width / res.width;
-        int imageWidth = (int) Math.round(r.width / currentMeterPerPixel);
-        int imageHeight = (int) Math.round(r.height / currentMeterPerPixel);
+        int imageWidth = (int) Math.ceil(r.width / currentMeterPerPixel + 1); // +1 account for floor
+        int imageHeight = (int) Math.ceil(r.height / currentMeterPerPixel + 1);
 
-        int imagePositionX = +(int) Math.round((r.ulx - mr.ulx) / mr.width * res.width);
-        int imagePositionY = -(int) Math.round((r.uly - mr.uly) / mr.height * res.height);
+        double posX = (r.ulx - mr.ulx) / mr.width * res.width;
+        double posY = (r.uly - mr.uly) / mr.height * res.height + 1;
+        int imagePositionX = (int) Math.floor(+posX);
+        int imagePositionY = (int) Math.floor(-posY);
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.width, res.height);
 
