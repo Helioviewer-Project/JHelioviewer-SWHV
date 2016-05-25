@@ -6,12 +6,11 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DragSource;
 import java.awt.image.BufferedImage;
 
-import javax.activation.ActivationDataFlavor;
-import javax.activation.DataHandler;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
@@ -19,13 +18,10 @@ import javax.swing.TransferHandler;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 
-/**
- * Handles drag & drop row reordering
- */
+// Handles DnD row reordering
 @SuppressWarnings("serial")
 public class TableRowTransferHandler extends TransferHandler {
 
-    private final DataFlavor integerObjectFlavor = new ActivationDataFlavor(Integer.class, "Integer Row Index");
     private final JTable grid;
     private BufferedImage image;
 
@@ -59,14 +55,13 @@ public class TableRowTransferHandler extends TransferHandler {
             return null;
         }
         createImageOfRow(row);
-        return new DataHandler(Integer.valueOf(grid.getSelectedRow()), integerObjectFlavor.getMimeType());
+        return new StringSelection(Integer.toString(row));
     }
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport info) {
-        boolean b = info.getComponent() == grid && info.isDrop() && info.isDataFlavorSupported(integerObjectFlavor);
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Cursor mcursor = toolkit.createCustomCursor(image, new Point(10, 10), "DnD");
+        boolean b = info.getComponent() == grid && info.isDrop() && info.isDataFlavorSupported(DataFlavor.stringFlavor);
+        Cursor mcursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(10, 10), "DnD");
         grid.setCursor(b ? mcursor : DragSource.DefaultMoveNoDrop);
         return b;
     }
@@ -87,9 +82,8 @@ public class TableRowTransferHandler extends TransferHandler {
             index = max;
         target.setCursor(Cursor.getDefaultCursor());
         try {
-            Object obj = info.getTransferable().getTransferData(integerObjectFlavor);
-            Integer rowFrom = (Integer) obj;
-
+            Object obj = info.getTransferable().getTransferData(DataFlavor.stringFlavor);
+            int rowFrom = Integer.parseInt((String) obj);
             if (rowFrom != -1 && rowFrom != index) {
                 ((Reorderable) grid.getModel()).reorder(rowFrom, index);
                 // if (index > rowFrom)
