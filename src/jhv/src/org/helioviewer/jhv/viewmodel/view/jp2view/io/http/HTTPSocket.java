@@ -42,7 +42,9 @@ public class HTTPSocket extends Socket {
     public Object connect(URI _uri) throws IOException {
         lastUsedPort = _uri.getPort() <= 0 ? PORT : _uri.getPort();
         lastUsedHost = _uri.getHost();
-        super.setSoTimeout(10000);
+        super.setReceiveBufferSize(Math.max(262144, 2 * getReceiveBufferSize()));
+        super.setTrafficClass(0x08 | 0x10);
+        super.setSoTimeout(20000);
         super.setKeepAlive(true);
         super.setTcpNoDelay(true);
         super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), 10000);
