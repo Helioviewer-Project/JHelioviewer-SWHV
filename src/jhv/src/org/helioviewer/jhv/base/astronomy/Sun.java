@@ -96,14 +96,23 @@ public class Sun {
     }
 
     // derived from tim2carr
-    public static double getCarringtonRotation(JHVDate time) {
+    public static double time2Carrington(JHVDate time) {
         double mjd = milli2mjd(time.milli);
         double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / TimeUtils.CARRINGTON_SYNODIC + 1.;
 
         Position.L p = getEarth(time);
-        double flon = 1. + p.lon / (2 * Math.PI);
+        double flon = p.lon / (2 * Math.PI);
 
-        return flon + (int) cr;
+        int icr = (int) cr;
+        double fcr = cr - icr;
+        if (Math.abs(fcr - flon) > 12 / 360.) {
+            if (fcr > flon)
+                icr++;
+            else if (fcr < flon)
+                icr--;
+        }
+
+        return flon + icr;
     }
 
     private static final double theta0 = sunRot(milli2mjd(TimeUtils.EPOCH.milli));

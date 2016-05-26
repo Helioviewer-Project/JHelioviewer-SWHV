@@ -13,7 +13,7 @@ public class CarringtonStatusPanel extends StatusPanel.StatusPlugin {
     }
 
     public void update(JHVDate time) {
-        setText(String.format("CR: %.2f", Sun.getCarringtonRotation(time)));
+        setText(String.format("CR: %.2f", Sun.time2Carrington(time)));
     }
 
 }
