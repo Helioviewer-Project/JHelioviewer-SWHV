@@ -12,9 +12,6 @@ public class TimeUtils {
     public static final long DAY_IN_MILLIS = 86400000;
     public static final long MINUTE_IN_MILLIS = 60000;
 
-    public static final double CARRINGTON_SYNODIC = 27.2753; // days
-    public static final double CARRINGTON_SIDEREAL = 25.38;
-
     public static final FastDateFormat utcDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss", UTC);
     public static final FastDateFormat sqlDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss", UTC);
     public static final FastDateFormat utcFullDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS", UTC);

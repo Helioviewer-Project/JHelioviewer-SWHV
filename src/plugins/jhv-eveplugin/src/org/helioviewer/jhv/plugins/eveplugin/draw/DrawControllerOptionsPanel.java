@@ -8,6 +8,7 @@ import java.util.Calendar;
 import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 
+import org.helioviewer.jhv.base.astronomy.Carrington;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.IconBank;
@@ -169,7 +170,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
     }
 
     private void computeCarringtonInterval(long end, long value) {
-        computeZoomForMilliSeconds(end, (long) (TimeUtils.CARRINGTON_SYNODIC * TimeUtils.DAY_IN_MILLIS * value));
+        computeZoomForMilliSeconds(end, (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
     }
 
     private void computeZoomInterval(long end, int calendarField, long difference) {
