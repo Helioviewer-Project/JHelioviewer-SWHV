@@ -122,7 +122,6 @@ public class PluginAboutDialog extends JDialog implements HyperlinkListener {
 
     private void showDialog() {
         pack();
-        setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
         setVisible(true);

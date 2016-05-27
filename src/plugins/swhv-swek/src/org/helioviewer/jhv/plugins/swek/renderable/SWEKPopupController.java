@@ -97,8 +97,8 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
     public void mouseClicked(MouseEvent e) {
         if (mouseOverJHVEvent != null) {
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(currentTime));
-            hekPopUp.setLocation(calcWindowPosition(GLHelper.GL2AWTPoint(mouseOverPosition.x, mouseOverPosition.y), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.pack();
+            hekPopUp.setLocation(calcWindowPosition(GLHelper.GL2AWTPoint(mouseOverPosition.x, mouseOverPosition.y), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.setVisible(true);
 
             component.setCursor(helpCursor);

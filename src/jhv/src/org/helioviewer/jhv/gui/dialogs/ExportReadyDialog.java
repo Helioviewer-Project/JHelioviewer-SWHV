@@ -58,10 +58,9 @@ public class ExportReadyDialog extends JDialog implements ActionListener, Showab
 
     @Override
     public void showDialog() {
-        setSize(getPreferredSize());
+        pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
-        pack();
         getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }

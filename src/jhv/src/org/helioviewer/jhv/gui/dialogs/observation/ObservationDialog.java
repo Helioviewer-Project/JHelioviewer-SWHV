@@ -205,9 +205,9 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
             uiSelectionComboBox.setSelectedIndex(0);
         }
 
+        pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
-        pack();
         getRootPane().setDefaultButton(btnImages);
         setVisible(true);
     }

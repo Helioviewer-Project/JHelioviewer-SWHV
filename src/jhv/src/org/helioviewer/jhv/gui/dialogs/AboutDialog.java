@@ -143,7 +143,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
      */
     @Override
     public void showDialog() {
-        setSize(getPreferredSize());
+        pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -153,7 +153,6 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
             }
         });
 
-        pack();
         getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }

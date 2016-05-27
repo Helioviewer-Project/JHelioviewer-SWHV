@@ -106,10 +106,9 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     @Override
     public void showDialog() {
-        //setSize(getPreferredSize());
+        pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
-        pack();
         getRootPane().setDefaultButton(acceptBtn);
         setVisible(true);
     }
