@@ -6,13 +6,15 @@ public class ImageCacheStatusInitial implements ImageCacheStatus {
 
     @Override
     public CacheStatus getImageStatus(int compositionLayer) {
-        assert (compositionLayer == 0);
+        if (compositionLayer != 0)
+            throw new IllegalArgumentException();
         return imageStatus;
     }
 
     @Override
     public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
-        assert (compositionLayer == 0);
+        if (compositionLayer != 0)
+            throw new IllegalArgumentException();
         imageStatus = newStatus;
     }
 
