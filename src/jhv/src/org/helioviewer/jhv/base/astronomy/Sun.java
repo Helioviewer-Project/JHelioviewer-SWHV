@@ -8,10 +8,10 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class Sun {
 
-    public static final double MassEarth = 5.97237e24;
-    public static final double MassSun = 1.98855e30;
+    // http://asa.usno.navy.mil/static/files/2016/Astronomical_Constants_2016.pdf
+    public static final double SunEarthMassRatio = 332946.0487;
     // https://en.wikipedia.org/wiki/Lagrangian_point#L1
-    public static final double L1Factor = 1 - Math.cbrt(MassEarth / MassSun / 3);
+    public static final double L1Factor = 1 - Math.cbrt(1 / SunEarthMassRatio / 3);
 
     public static final double Radius = 1;
     public static final double Radius2 = Radius * Radius;
