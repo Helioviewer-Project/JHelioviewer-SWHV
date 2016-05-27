@@ -1,13 +1,18 @@
 package org.helioviewer.jhv.base.astronomy;
 
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.base.time.JulianDay;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class Carrington {
 
-    public static final int CR_MINIMAL = 1557;
+    public static final double CR_SIDEREAL = 25.38; // days
+    public static final double CR_SYNODIC_MEAN = 27.2753;
 
-    public static final long[] CRstart = new long[] {
+    public static final int CR_MINIMAL = 1557;
+    public static final int CR_MAXIMAL = 2627;
+
+    public static final long[] CR_start = new long[] {
         /* 1557 */ 1753091500L, /* 1970-01-21T06:58:11 */
         /* 1558 */ 4115390920L, /* 1970-02-17T15:09:50 */
         /* 1559 */ 6476373840L, /* 1970-03-16T22:59:33 */
@@ -1081,17 +1086,37 @@ public class Carrington {
         /* 2627 */ 2523286892400L, /* 2049-12-16T17:01:32 */
     };
 
-    public void computeTable() {
+    // derived from tim2carr
+    public static double time2CR(JHVDate time) {
+        double mjd = JulianDay.milli2mjd(time.milli);
+        double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / CR_SYNODIC_MEAN + 1.;
+
+        Position.L p = Sun.getEarth(time);
+        double flon = p.lon / (2 * Math.PI);
+
+        int icr = (int) cr;
+        double fcr = cr - icr;
+        if (Math.abs(fcr - flon) > 12 / 360.) {
+            if (fcr > flon)
+                icr++;
+            else if (fcr < flon)
+                icr--;
+        }
+
+        return flon + icr;
+    }
+
+    public static void computeTable() {
         JHVDate next = TimeUtils.MINIMAL_DATE;
 
         while (next.milli < TimeUtils.MAXIMAL_DATE.milli) {
-            double cr = Sun.time2Carrington(next);
+            double cr = time2CR(next);
             int icr = (int) cr;
 
-            double rcr = ((int) ((cr - icr)  * (4e6) + .5)) / (4e6);
+            double rcr = ((int) ((cr - icr) * (4e6) + .5)) / (4e6);
             if (rcr == (int) rcr) {
-                System.out.println("        /* " + (icr + (int) rcr) + " */ " + next.milli + ", /* " + next + " */");
-                next = new JHVDate(next.milli + (long) ((TimeUtils.CARRINGTON_SYNODIC - 0.25) * TimeUtils.DAY_IN_MILLIS));
+                System.out.println("        /* " + (icr + (int) rcr) + " */ " + next.milli + "L, /* " + next + " */");
+                next = new JHVDate(next.milli + (long) ((CR_SYNODIC_MEAN - 0.25) * TimeUtils.DAY_IN_MILLIS));
             } else
                 next = new JHVDate(next.milli + 500);
         }

@@ -40,18 +40,10 @@ public class Sun {
         EpochEarthQ = new Position.Q(EpochEarthL.time, EpochEarthL.rad, new Quat(EpochEarthL.lat, EpochEarthL.lon));
     }
 
-    private static double milli2mjd(long milli) {
-        return JulianDay.UNIX_EPOCH_MJD + milli / (double) TimeUtils.DAY_IN_MILLIS;
-    }
-
-    private static double mjd2jcy(double mjd, double epoch) {
-        return (JulianDay.DJM0 - epoch + mjd) / 36525.;
-    }
-
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
     public static Position.L getEarth(JHVDate time) {
-        double mjd = milli2mjd(time.milli);
-        double t = mjd2jcy(mjd, 2415020.);
+        double mjd = JulianDay.milli2mjd(time.milli);
+        double t = JulianDay.mjd2jcy(mjd, 2415020.);
 
         // Geometric Mean Longitude (deg)
         double mnl = 279.69668 + 36000.76892 * t + 0.0003025 * t * t;
@@ -92,34 +84,14 @@ public class Sun {
 
     private static double sunRot(double mjd) {
         // 1854-01-01.5 / Carrington sidereal period 25.38
-        return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / TimeUtils.CARRINGTON_SIDEREAL); // rad
+        return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / Carrington.CR_SIDEREAL); // rad
     }
 
-    // derived from tim2carr
-    public static double time2Carrington(JHVDate time) {
-        double mjd = milli2mjd(time.milli);
-        double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / TimeUtils.CARRINGTON_SYNODIC + 1.;
-
-        Position.L p = getEarth(time);
-        double flon = p.lon / (2 * Math.PI);
-
-        int icr = (int) cr;
-        double fcr = cr - icr;
-        if (Math.abs(fcr - flon) > 12 / 360.) {
-            if (fcr > flon)
-                icr++;
-            else if (fcr < flon)
-                icr--;
-        }
-
-        return flon + icr;
-    }
-
-    private static final double theta0 = sunRot(milli2mjd(TimeUtils.EPOCH.milli));
+    private static final double theta0 = sunRot(JulianDay.milli2mjd(TimeUtils.EPOCH.milli));
 
     public static Quat getHCI(JHVDate time) {
         // 1.7381339560109783
-        return new Quat(0, sunRot(milli2mjd(time.milli)) + (1.738033457804639 + EpochEarthL.lon - theta0));
+        return new Quat(0, sunRot(JulianDay.milli2mjd(time.milli)) + (1.738033457804639 + EpochEarthL.lon - theta0));
     }
 
     public static Position.Q getEarthQuat(JHVDate time) {
