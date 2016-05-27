@@ -68,7 +68,6 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
             }
         });
         closeButtonContainer.add(downloadButton);
-
         add(closeButtonContainer, BorderLayout.SOUTH);
 
         getRootPane().registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -84,10 +83,9 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
 
     @Override
     public void showDialog() {
-        setSize(getPreferredSize());
+        pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
-        pack();
         getRootPane().setDefaultButton(downloadButton);
         setVisible(true);
     }

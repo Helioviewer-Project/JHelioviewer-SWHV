@@ -426,9 +426,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (event != null) {
             Rectangle graphArea = drawController.getGraphArea();
             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(drawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x)));
-            dialog.setLocation(e.getLocationOnScreen());
-            dialog.validate();
             dialog.pack();
+            dialog.setLocation(e.getLocationOnScreen());
             dialog.setVisible(true);
         } else {
             drawController.setMovieFrame(p);

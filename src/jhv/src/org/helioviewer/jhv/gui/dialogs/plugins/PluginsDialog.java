@@ -277,10 +277,9 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         updatePluginList();
         pluginList.selectFirstItem();
 
-        setSize(getPreferredSize());
+        pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
-        pack();
         getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }
