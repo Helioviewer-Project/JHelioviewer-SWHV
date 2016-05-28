@@ -99,7 +99,7 @@ public class MonthViewController implements CalendarViewController {
             String[] months = new DateFormatSymbols().getShortMonths();
 
             for (int i = 0; i < 12; i++) {
-                if (months[i].equals((String) value)) {
+                if (months[i].equals(value)) {
                     calendar.set(Calendar.MONTH, i);
                 }
             }
