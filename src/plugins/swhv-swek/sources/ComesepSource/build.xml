@@ -125,10 +125,6 @@
         </jar>
     </target>
 
-    <target name="doc" />
-
-    <target name="bundle-src" />
-
     <target name="install-source" depends="jar-bundle">
         <copy file="${comesepsource.build}/${source.name}.jar" todir="${swhv-swek.homedir.sources}" />
     </target>
