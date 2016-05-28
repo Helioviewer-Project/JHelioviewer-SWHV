@@ -20,7 +20,7 @@ public interface MetaDataContainer {
      *            Search for this key
      * @return value corresponding to the key, null if the key does not exist
      */
-    public String get(String key);
+    String get(String key);
     /**
      * Gets the value for a given key as an integer value.
      * 
@@ -31,7 +31,7 @@ public interface MetaDataContainer {
      * @return value corresponding to the key, if it is an integer value, 0
      *         otherwise
      */
-    public int tryGetInt(String key);
+    int tryGetInt(String key);
     /**
      * Gets the value for a given key as a double value.
      * 
@@ -42,6 +42,6 @@ public interface MetaDataContainer {
      * @return value corresponding to the key, if it is a double value, 0
      *         otherwise
      */
-    public double tryGetDouble(String key);
+    double tryGetDouble(String key);
 
 }

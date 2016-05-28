@@ -13,7 +13,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventType;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  */
 public interface JHVEventContainerRequestHandler {
-
     /**
      * Handle request for an interval.
      *
@@ -24,8 +23,8 @@ public interface JHVEventContainerRequestHandler {
      * @param endDate
      *            the end date of the interval
      */
-    public abstract void handleRequestForInterval(JHVEventType eventType, Interval interval);
+    void handleRequestForInterval(JHVEventType eventType, Interval interval);
 
-    public abstract ArrayList<JHVEvent> getOtherRelations(JHVEvent event);
+    ArrayList<JHVEvent> getOtherRelations(JHVEvent event);
 
 }

@@ -15,8 +15,8 @@ import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
  */
 public interface JHVEventHandler {
 
-    public abstract void cacheUpdated();
+    void cacheUpdated();
 
-    public abstract void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events);
+    void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events);
 
 }

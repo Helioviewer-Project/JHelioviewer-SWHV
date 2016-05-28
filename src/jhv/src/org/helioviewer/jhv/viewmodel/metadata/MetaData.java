@@ -6,24 +6,24 @@ import org.helioviewer.jhv.base.math.Vec3;
 
 public interface MetaData {
 
-    public int getFrameNumber();
+    int getFrameNumber();
 
-    public Region getPhysicalRegion();
+    Region getPhysicalRegion();
 
-    public int getPixelWidth();
+    int getPixelWidth();
 
-    public int getPixelHeight();
+    int getPixelHeight();
 
-    public Position.Q getViewpoint();
+    Position.Q getViewpoint();
 
-    public double getInnerCutOffRadius();
+    double getInnerCutOffRadius();
 
-    public double getOuterCutOffRadius();
+    double getOuterCutOffRadius();
 
-    public double getCutOffValue();
+    double getCutOffValue();
 
-    public Vec3 getCutOffDirection();
+    Vec3 getCutOffDirection();
 
-    public Position.L getViewpointL();
+    Position.L getViewpointL();
 
 }

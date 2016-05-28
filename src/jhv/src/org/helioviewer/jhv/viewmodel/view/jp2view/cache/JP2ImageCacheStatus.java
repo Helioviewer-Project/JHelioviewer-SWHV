@@ -5,6 +5,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
 public interface JP2ImageCacheStatus extends ImageCacheStatus {
 
-    public ResolutionSet getResolutionSet(int compositionLayer);
+    ResolutionSet getResolutionSet(int compositionLayer);
 
 }

@@ -10,11 +10,11 @@ package org.helioviewer.jhv.gui.components.calendar;
  * @author Stephan Pagel
  */
 public interface JHVCalendarListener {
-
     /**
      * Invoked when an action occurs.
      * 
      * @param e
      */
-    public void actionPerformed(JHVCalendarEvent e);
+    void actionPerformed(JHVCalendarEvent e);
+
 }

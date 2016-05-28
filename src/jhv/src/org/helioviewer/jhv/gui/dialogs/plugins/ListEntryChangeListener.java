@@ -6,14 +6,14 @@ package org.helioviewer.jhv.gui.dialogs.plugins;
  * @author Stephan Pagel
  * */
 public interface ListEntryChangeListener {
-
     /**
      * Something changed within an instance of {@link List}.
      * */
-    public void listChanged();
+    void listChanged();
 
     /**
      * An item of an instance of {@link List} has been changed.
      * */
-    public void itemChanged();
+    void itemChanged();
+
 }

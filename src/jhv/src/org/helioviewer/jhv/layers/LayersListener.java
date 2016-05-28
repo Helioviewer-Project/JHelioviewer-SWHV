@@ -7,14 +7,13 @@ import org.helioviewer.jhv.viewmodel.view.View;
  * The callbacks are invoked on the Event Dispatch Thread
  */
 public interface LayersListener {
-
     /**
      * Gets fired if a new layer has been added.
      *
      * @param idx
      *            - view of the added layer
      */
-    public abstract void layerAdded(View view);
+    void layerAdded(View view);
 
     /**
      * Gets fired if the active layer has changed (meaning, a new layer has
@@ -23,6 +22,6 @@ public interface LayersListener {
      * @param view
      *            - view of the new active layer, null if none
      */
-    public abstract void activeLayerChanged(View view);
+    void activeLayerChanged(View view);
 
 }

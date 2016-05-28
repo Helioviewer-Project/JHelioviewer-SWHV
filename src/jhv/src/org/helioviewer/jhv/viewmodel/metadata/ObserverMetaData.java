@@ -6,19 +6,19 @@ public interface ObserverMetaData {
      *
      * @return Observatory used to take the picture.
      */
-    public String getObservatory();
+    String getObservatory();
     /**
      * Returns the instrument used to take the picture.
      *
      * @return Instrument used to take the picture.
      */
-    public String getInstrument();
+    String getInstrument();
     /**
      * Returns the detector used to take the picture.
      *
      * @return Detector used to take the picture.
      */
-    public String getDetector();
+    String getDetector();
     /**
      * Returns the measurement used to take the picture.
      *
@@ -26,12 +26,12 @@ public interface ObserverMetaData {
      *
      * @return Measurement used to take the picture.
      */
-    public String getMeasurement();
+    String getMeasurement();
     /**
      * Returns the full name of the instrument.
      *
      * @return Full name of the instrument
      */
-    public String getFullName();
+    String getFullName();
 
 }
