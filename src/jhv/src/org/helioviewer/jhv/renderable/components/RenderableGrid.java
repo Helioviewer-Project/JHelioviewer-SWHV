@@ -92,8 +92,8 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private static int FLAT_STEPS_THETA = 24;
-    private static int FLAT_STEPS_RADIAL = 10;
+    private static final int FLAT_STEPS_THETA = 24;
+    private static final int FLAT_STEPS_RADIAL = 10;
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
