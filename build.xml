@@ -4,7 +4,6 @@
     <property name="src.base" value="${basedir}/src/"/>
     <property name="src.path" value="${src.base}/jhv/src/"/>
     <property name="bin.eclipse" value="${src.base}/jhv/bin/"/>
-    <property name="doc" value="${basedir}/doc/"/>
     <property name="bin" value="${basedir}/bin/"/>
     <property name="bin.jhv" value="${bin}/jhv"/>
     <property name="resources" value="${basedir}/resources/"/>
@@ -12,7 +11,6 @@
     <property name="build" value="${basedir}/build/"/>
     <property name="build.resources" value="${basedir}/build-resources/"/>
     <property name="temp" value="${basedir}/temp/"/>
-    <property name="bzrpath" value="bzr"/>
     <property environment="env"/>
     <path id="lib.path.ref">
         <fileset dir="${env.RT_PATH}" includes="classes.jar"/>
@@ -33,7 +31,6 @@
         <mkdir dir="${bin.jhv}"/>
         <mkdir dir="${build}"/>
         <mkdir dir="${temp}"/>
-        <mkdir dir="${doc}"/>
     </target>
 
     <target name="clean" depends="mkdir">
@@ -48,9 +45,6 @@
             <fileset dir="${temp}" followsymlinks="false" defaultexcludes="no"/>
         </delete>
         <delete includeemptydirs="true" verbose="true">
-            <fileset dir="${doc}" followsymlinks="false" defaultexcludes="no"/>
-        </delete>
-        <delete includeemptydirs="true" verbose="true">
             <fileset dir="${src.base}" includes="${bin.eclipse}" followsymlinks="false" defaultexcludes="no"/>
         </delete>
         <antcall target="mkdir"/>
@@ -60,9 +54,6 @@
     <!-- JAR file generation -->
     <target name="init" depends="mkdir">
         <echo message="Trying to determine revision"/>
-        <!-- <exec executable="${bzrpath}" outputproperty="jhv.revision.tmp" resolveexecutable="true" searchpath="true" resultproperty="jhv.revision.retcode" failifexecutionfails="false">
-            <arg value="revno"/>
-        </exec> -->
         <exec executable="svnversion" outputproperty="jhv.revision.tmp" resolveexecutable="true" searchpath="true" resultproperty="jhv.revision.retcode" failifexecutionfails="false">
             <arg value="."/>
         </exec>
@@ -271,67 +262,19 @@
         </tar>
     </target>
 
-    <!-- Source bundle -->
-    <target name="bundle-src" depends="bundle-src-zip, bundle-src-tar"/>
-    <target name="bundle-src-prepare" depends="build-init">
-        <mkdir dir="bin/build"/>
-        <javac destdir="${bin}/build/" srcdir="${build.resources}/shared/" includes="**/ManifestGenerator.java"/>
-        <taskdef name="generateManifest" classname="ManifestGenerator">
-            <classpath location="${bin}/build/"/>
-        </taskdef>
-        <mkdir dir="${temp}/build/src"/>
-        <delete file="${temp}/build/src/bzrstatus"/>
-        <exec executable="${bzrpath}" output="${temp}/build/src/bzrstatus" resolveexecutable="true" searchpath="true">
-            <arg value="status"/>
-            <arg value="-S"/>
-            <arg value="-r"/>
-            <arg value="0"/>
-        </exec>
-        <delete file="${temp}/build/src/bzrfiles"/>
-        <generateManifest input="${temp}/build/src/bzrstatus" output="${temp}/build/src/bzrfiles"/>
-        <loadfile property="jhv.files" srcFile="${temp}/build/src/bzrfiles"/>
-    </target>
-
-    <target name="bundle-src-tar" depends="bundle-src-prepare">
-        <tar destfile="${build}/${jhv.pkg.name}.src.tar.gz" compression="gzip" defaultexcludes="no" longfile="gnu">
-            <zipfileset dir="." includes="${jhv.files}" prefix="${jhv.pkg.name}-src/" defaultexcludes="no"/>
-        </tar>
-    </target>
-
-    <target name="bundle-src-zip" depends="bundle-src-prepare">
-        <zip destfile="${build}/${jhv.pkg.name}.src.zip" defaultexcludes="no">
-            <zipfileset dir="." includes="${jhv.files}" defaultexcludes="no" prefix="${jhv.pkg.name}-src/"/>
-        </zip>
-    </target>
-
     <target name="version" depends="init">
         <echo message="${jhv.version}.${jhv.revision}" file="${build}/VERSION"/>
     </target>
 
     <!-- all -->
-    <target name="release-all" depends="release-no-src, bundle-src, version"/>
+    <target name="release-all" depends="release-no-src, version"/>
     <target name="release-no-src" depends="release-mac, release-windows, release-tar"/>
-    <target name="bundle-all" depends="bundle-no-src, bundle-src"/>
+    <target name="bundle-all" depends="bundle-no-src"/>
     <target name="bundle-no-src" depends="bundle-mac, bundle-windows, bundle-tar"/>
-
-    <!-- documentation -->
-    <target name="doc">
-        <javadoc access="private" destdir="${doc}" author="true" version="true" use="true" windowtitle="JHelioviewer API" sourcepath="${src.path}" linksource="true">
-            <classpath>
-                <fileset dir="${lib}">
-                    <include name="**/*.jar"/>
-                </fileset>
-            </classpath>
-        </javadoc>
-    </target>
 
     <!-- plugins -->
     <target name="release-plugins">
         <ant antfile="plugins/build.xml" inheritAll="false" target="all"/>
-    </target>
-
-    <target name="doc-plugins">
-        <ant antfile="plugins/build.xml" inheritAll="false" target="doc"/>
     </target>
 
     <target name="clean-plugins">

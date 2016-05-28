@@ -9,18 +9,6 @@
         </subant>
     </target>
 
-    <target name="bundle-src">
-        <subant target="bundle-src">
-            <fileset dir="." includes="*/build.xml"/>
-        </subant>
-    </target>
-
-    <target name="doc">
-        <subant target="doc">
-            <fileset dir="." includes="*/build.xml"/>
-        </subant>
-    </target>
-
     <target name="clean">
         <subant target="clean">
             <fileset dir="." includes="*/build.xml"/>
