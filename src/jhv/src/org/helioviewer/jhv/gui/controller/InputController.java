@@ -177,13 +177,13 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     public void removePlugin(InputControllerPlugin plugin) {
         if (plugin instanceof MouseListener)
-            mouseListeners.remove((MouseListener) plugin);
+            mouseListeners.remove(plugin);
         if (plugin instanceof MouseMotionListener)
-            mouseMotionListeners.remove((MouseMotionListener) plugin);
+            mouseMotionListeners.remove(plugin);
         if (plugin instanceof MouseWheelListener)
-            mouseWheelListeners.remove((MouseWheelListener) plugin);
+            mouseWheelListeners.remove(plugin);
         if (plugin instanceof KeyListener)
-            keyListeners.remove((KeyListener) plugin);
+            keyListeners.remove(plugin);
         plugin.setCamera(null);
         plugin.setComponent(null);
     }

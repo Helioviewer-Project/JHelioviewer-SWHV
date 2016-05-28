@@ -87,7 +87,6 @@ public class PfssData {
         this.lastQuality = PfssSettings.qualityReduction;
         this.lastFixedColor = PfssSettings.fixedColor;
 
-        double x = 0, y = 0, z = 0;
         int type = 0;
         ByteArrayInputStream is = new ByteArrayInputStream(this.gzipFitsFile);
         try {
@@ -118,9 +117,9 @@ public class PfssData {
                     int ry = fieldliney[i] + 32768;
                     int rz = fieldlinez[i] + 32768;
 
-                    x = 3. * (rx * 2. / 65535 - 1.);
-                    y = 3. * (ry * 2. / 65535 - 1.);
-                    z = 3. * (rz * 2. / 65535 - 1.);
+                    double x = 3. * (rx * 2. / 65535 - 1.);
+                    double y = 3. * (ry * 2. / 65535 - 1.);
+                    double z = 3. * (rz * 2. / 65535 - 1.);
 
                     double helpx = cphi * x + sphi * y;
                     double helpy = -sphi * x + cphi * y;

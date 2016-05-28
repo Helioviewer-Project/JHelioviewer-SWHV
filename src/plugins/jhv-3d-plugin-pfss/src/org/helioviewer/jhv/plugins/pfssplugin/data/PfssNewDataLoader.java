@@ -55,7 +55,6 @@ public class PfssNewDataLoader implements Runnable {
                 ArrayList<Pair<String, Long>> urls = null;
 
                 try {
-                    URL data;
                     Integer cacheKey = startYear * 10000 + startMonth;
                     synchronized (parsedCache) {
                         urls = parsedCache.get(cacheKey);
@@ -64,15 +63,14 @@ public class PfssNewDataLoader implements Runnable {
                         urls = new ArrayList<Pair<String, Long>>();
                         String m = (startMonth) < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
                         String url = PfssSettings.baseUrl + startYear + "/" + m + "/list.txt";
-                        data = new URL(url);
+                        URL data = new URL(url);
+
                         BufferedReader in = new BufferedReader(new InputStreamReader(data.openStream(), "UTF-8"));
                         String inputLine;
-                        String[] splitted = null;
                         while ((inputLine = in.readLine()) != null) {
-                            splitted = inputLine.split(" ");
-                            url = splitted[1];
+                            String[] splitted = inputLine.split(" ");
                             Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
-                            urls.add(new Pair<String, Long>(url, dd.getTime()));
+                            urls.add(new Pair<String, Long>(splitted[1], dd.getTime()));
                         }
                         in.close();
                         synchronized (parsedCache) {
