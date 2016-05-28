@@ -13,7 +13,7 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public interface View {
 
-    public enum AnimationMode {
+    enum AnimationMode {
         LOOP {
             @Override
             public String toString() {
@@ -34,16 +34,16 @@ public interface View {
         }, SWINGDOWN
     }
 
-    public void abolish();
+    void abolish();
 
-    public void render(Camera camera, Viewport vp, double factor);
+    void render(Camera camera, Viewport vp, double factor);
 
     /**
      * Returns the URI representing the location of the image.
      *
      * @return URI representing the location of the image.
      */
-    public URI getUri();
+    URI getUri();
     /**
      * Returns the name the image.
      *
@@ -52,7 +52,7 @@ public interface View {
      *
      * @return Name of the image
      */
-    public String getName();
+    String getName();
     /**
      * Returns the download uri the image.
      *
@@ -61,12 +61,12 @@ public interface View {
      *
      * @return download uri
      */
-    public URI getDownloadURI();
+    URI getDownloadURI();
 
 
-    public LUT getDefaultLUT();
+    LUT getDefaultLUT();
 
-    public CacheStatus getImageCacheStatus(int frame);
+    CacheStatus getImageCacheStatus(int frame);
 
     /**
      * Returns the frame rate on which the View is operating right now.
@@ -76,39 +76,39 @@ public interface View {
      *
      * @return average actual frame rate
      */
-    public float getCurrentFramerate();
+    float getCurrentFramerate();
 
-    public boolean isMultiFrame();
+    boolean isMultiFrame();
 
     /**
      * Returns the current frame number.
      *
      * @return current frame number
      */
-    public int getCurrentFrameNumber();
+    int getCurrentFrameNumber();
 
     /**
      * Returns the maximum frame number.
      *
      * @return maximum frame number
      */
-    public int getMaximumFrameNumber();
+    int getMaximumFrameNumber();
 
-    public void setImageLayer(RenderableImageLayer imageLayer);
+    void setImageLayer(RenderableImageLayer imageLayer);
 
-    public RenderableImageLayer getImageLayer();
+    RenderableImageLayer getImageLayer();
 
-    public void setDataHandler(ImageDataHandler dataHandler);
+    void setDataHandler(ImageDataHandler dataHandler);
 
-    public JHVDate getFrameTime(int frame);
-    public JHVDate getFirstTime();
-    public JHVDate getLastTime();
+    JHVDate getFrameTime(int frame);
+    JHVDate getFirstTime();
+    JHVDate getLastTime();
 
     // <!- only for Layers
-    public JHVDate getNextTime(AnimationMode mode, int deltaT);
-    public void setFrame(JHVDate time);
-    public JHVDate getFrameTime(JHVDate time);
-    public MetaData getMetaData(JHVDate time);
+    JHVDate getNextTime(AnimationMode mode, int deltaT);
+    void setFrame(JHVDate time);
+    JHVDate getFrameTime(JHVDate time);
+    MetaData getMetaData(JHVDate time);
     // -->
 
 }

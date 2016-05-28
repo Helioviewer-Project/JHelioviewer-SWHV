@@ -16,7 +16,7 @@ package org.helioviewer.jhv.viewmodel.imagecache;
  */
 public interface ImageCacheStatus {
 
-    public enum CacheStatus {
+    enum CacheStatus {
         HEADER, PARTIAL, COMPLETE
     }
 
@@ -31,7 +31,7 @@ public interface ImageCacheStatus {
      * @param newStatus
      *            New image data cache status
      */
-    public void setImageStatus(int compositionLayer, CacheStatus newStatus);
+    void setImageStatus(int compositionLayer, CacheStatus newStatus);
 
     /**
      * Downgrades the status from complete to partial, if necessary.
@@ -42,7 +42,7 @@ public interface ImageCacheStatus {
      * @param compositionLayer
      *            Layer to downgrade.
      */
-    public void downgradeImageStatus(int compositionLayer);
+    void downgradeImageStatus(int compositionLayer);
 
     /**
      * Returns the image cache status of the given layer.
@@ -51,13 +51,13 @@ public interface ImageCacheStatus {
      *            Layer to get the image cache status for
      * @return Image cache status
      */
-    public CacheStatus getImageStatus(int compositionLayer);
+    CacheStatus getImageStatus(int compositionLayer);
 
     /**
      * Returns the highest frame until which the status is at least PARTIAL.
      * 
      * @return highest frame until which the status is at least PARTIAL.
      */
-    public int getImageCachedPartiallyUntil();
+    int getImageCachedPartiallyUntil();
 
 }

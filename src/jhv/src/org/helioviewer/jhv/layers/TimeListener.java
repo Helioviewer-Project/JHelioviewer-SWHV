@@ -4,6 +4,6 @@ import org.helioviewer.jhv.base.time.JHVDate;
 
 public interface TimeListener {
 
-    public abstract void timeChanged(JHVDate time);
+    void timeChanged(JHVDate time);
 
 }

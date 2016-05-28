@@ -14,7 +14,7 @@ public interface EventTypePanelModelListener {
      * @param swekSupplier
      *            the supplier that became active
      */
-    public abstract void newEventTypeAndSourceActive(SWEKEventType eventType, SWEKSupplier swekSupplier);
+    void newEventTypeAndSourceActive(SWEKEventType eventType, SWEKSupplier swekSupplier);
 
     /**
      * Called if the event type supplied by the swek source became inactive.
@@ -26,6 +26,6 @@ public interface EventTypePanelModelListener {
      * @param supplier
      *            the supplier providing the event
      */
-    public abstract void newEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSupplier supplier);
+    void newEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSupplier supplier);
 
 }

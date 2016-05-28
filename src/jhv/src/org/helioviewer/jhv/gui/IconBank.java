@@ -25,7 +25,7 @@ public class IconBank {
      * @author dmueller
      *
      */
-    public static enum JHVIcon {
+    public enum JHVIcon {
         // The formatter will not merge together multiple lines, if at least one
         // empty line is inserted in between:
 

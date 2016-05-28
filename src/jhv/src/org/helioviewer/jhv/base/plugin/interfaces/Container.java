@@ -19,7 +19,7 @@ public interface Container {
      * @return User friendly name of the content this container contains. A null
      *         value as return value is possible but should be avoided!
      */
-    public String getName();
+    String getName();
 
     /**
      * Returns a short description what the content of the container does.
@@ -27,14 +27,14 @@ public interface Container {
      * @return Short description what the content of the container does. A null
      *         value as return value is possible.
      */
-    public String getDescription();
+    String getDescription();
 
     /**
      * This method returns if the content is currently activated or not.
      * 
      * @return True if the content is currently used; false otherwise.
      */
-    public boolean isActive();
+    boolean isActive();
 
     /**
      * Sets the content activated or not.
@@ -43,11 +43,11 @@ public interface Container {
      *            true if content has to be activated or false if it has to be
      *            deactivated.
      */
-    public void setActive(boolean active);
+    void setActive(boolean active);
 
     /**
      * If this method is called an update to the settings file will be executed.
      */
-    public void changeSettings();
+    void changeSettings();
 
 }
