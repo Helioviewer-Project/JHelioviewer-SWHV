@@ -6,8 +6,8 @@ import javax.swing.JComponent;
 
 public interface MainContentPanelPlugin {
 
-    public String getTabName();
+    String getTabName();
 
-    public LinkedList<JComponent> getVisualInterfaces();
+    LinkedList<JComponent> getVisualInterfaces();
 
 }

@@ -13,14 +13,13 @@ package org.helioviewer.jhv.base.plugin.interfaces;
  * @author Stephan Pagel
  */
 public interface Plugin {
-
     /**
      * This method returns a user friendly name of the plug-in which will be
      * displayed in the plug-in overview for instance.
      * 
      * @return A user friendly name of the plug-in.
      */
-    public String getName();
+    String getName();
 
     /**
      * This method returns a short description of the plug-in which gives a
@@ -28,21 +27,21 @@ public interface Plugin {
      * 
      * @return Short description of the plug-in.
      */
-    public String getDescription();
+    String getDescription();
 
     /**
      * This method will be called by the JHV application when the user want's to
      * activate the plug-in. The plug-in has to do all necessary things to
      * register and initialize itself in JHV here.
      */
-    public void installPlugin();
+    void installPlugin();
 
     /**
      * This method will be called by the JHV application when the user want's to
      * deactivate the plug-in. The plug-in has to do all necessary things to
      * deregister itself in JHV here.
      */
-    public void uninstallPlugin();
+    void uninstallPlugin();
 
     /**
      * Sets the plug-in state.
@@ -55,7 +54,7 @@ public interface Plugin {
      *            The new filter state
      * @see #getState()
      */
-    public void setState(String state);
+    void setState(String state);
 
     /**
      * Gets the plug-in state.
@@ -68,12 +67,12 @@ public interface Plugin {
      *            The new filter state
      * @see #setState()
      */
-    public String getState();
+    String getState();
 
     /**
      * This method is used to display licenses and other information about the
      * plugin in the about dialog of jhv.
      */
-    public String getAboutLicenseText();
+    String getAboutLicenseText();
 
 }

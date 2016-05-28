@@ -11,39 +11,40 @@ import com.jogamp.opengl.GL2;
 
 public interface Renderable {
 
-    public void render(Camera camera, Viewport vp, GL2 gl);
+    void render(Camera camera, Viewport vp, GL2 gl);
 
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale);
+    void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale);
 
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl);
+    void renderFloat(Camera camera, Viewport vp, GL2 gl);
 
-    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl);
+    void renderFullFloat(Camera camera, Viewport vp, GL2 gl);
 
-    public void renderMiniview(Camera camera, Viewport vp, GL2 gl);
+    void renderMiniview(Camera camera, Viewport vp, GL2 gl);
 
-    public void prerender(GL2 gl);
+    void prerender(GL2 gl);
 
-    public void remove(GL2 gl);
+    void remove(GL2 gl);
 
-    public Component getOptionsPanel();
+    Component getOptionsPanel();
 
-    public String getName();
+    String getName();
 
-    public boolean isVisible(int i);
+    boolean isVisible(int i);
 
-    public boolean isVisible();
+    boolean isVisible();
 
-    public int isVisibleIdx();
+    int isVisibleIdx();
 
-    public void setVisible(boolean b);
+    void setVisible(boolean b);
 
-    public String getTimeString();
+    String getTimeString();
 
-    public boolean isDeletable();
+    boolean isDeletable();
 
-    public void init(GL2 gl);
+    void init(GL2 gl);
 
-    public void dispose(GL2 gl);
+    void dispose(GL2 gl);
 
-    public void setVisible(int ctImages);
+    void setVisible(int ctImages);
+
 }

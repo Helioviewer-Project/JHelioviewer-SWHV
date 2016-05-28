@@ -6,8 +6,8 @@ import org.helioviewer.jhv.camera.Camera;
 
 public interface InputControllerPlugin {
 
-    public void setCamera(Camera camera);
+    void setCamera(Camera camera);
 
-    public void setComponent(Component component);
+    void setComponent(Component component);
 
 }

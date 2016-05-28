@@ -14,41 +14,41 @@ public interface ImageData {
      *
      * @return width of the image
      */
-    public int getWidth();
+    int getWidth();
     /**
      * Returns the height of the image
      *
      * @return height of the image
      */
-    public int getHeight();
+    int getHeight();
 
-    public int getBitsPerPixel();
+    int getBitsPerPixel();
 
-    public Buffer getBuffer();
+    Buffer getBuffer();
 
     /**
      * Returns an object to get informations about the image format
      *
      * @return object containing informations about the image format
      */
-    public ImageFormat getImageFormat();
+    ImageFormat getImageFormat();
 
-    public Region getRegion();
+    Region getRegion();
 
-    public void setRegion(Region r);
+    void setRegion(Region r);
 
-    public BufferedImage getBufferedImage();
+    BufferedImage getBufferedImage();
 
-    public void setMetaData(MetaData m);
+    void setMetaData(MetaData m);
 
-    public MetaData getMetaData();
+    MetaData getMetaData();
 
-    public void setViewpoint(Position.Q p);
+    void setViewpoint(Position.Q p);
 
-    public Position.Q getViewpoint();
+    Position.Q getViewpoint();
 
-    public boolean getUploaded();
+    boolean getUploaded();
 
-    public void setUploaded(boolean uploaded);
+    void setUploaded(boolean uploaded);
 
 }
