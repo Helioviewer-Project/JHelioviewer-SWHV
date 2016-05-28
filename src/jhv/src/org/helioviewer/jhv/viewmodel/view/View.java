@@ -31,7 +31,7 @@ public interface View {
             public String toString() {
                 return "Swing";
             }
-        }, SWINGDOWN;
+        }, SWINGDOWN
     }
 
     public void abolish();

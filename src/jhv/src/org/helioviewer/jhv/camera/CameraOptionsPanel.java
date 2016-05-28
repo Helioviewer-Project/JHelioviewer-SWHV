@@ -31,7 +31,7 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 @SuppressWarnings("serial")
 public class CameraOptionsPanel extends SmallPanel implements PositionLoadFire {
 
-    private static enum CameraMode {
+    private enum CameraMode {
         OBSERVER, EARTH, EXPERT
     }
 

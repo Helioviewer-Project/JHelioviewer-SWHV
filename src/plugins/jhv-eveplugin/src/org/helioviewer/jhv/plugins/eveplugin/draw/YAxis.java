@@ -11,7 +11,7 @@ import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 public class YAxis {
 
     public enum YAxisLocation {
-        LEFT, RIGHT;
+        LEFT, RIGHT
     }
 
     public double start;

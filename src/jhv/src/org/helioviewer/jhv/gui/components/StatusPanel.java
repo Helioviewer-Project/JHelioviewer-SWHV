@@ -41,7 +41,7 @@ public class StatusPanel extends JPanel {
 
     public enum Alignment {
         LEFT, RIGHT
-    };
+    }
 
     /**
      * Default constructor

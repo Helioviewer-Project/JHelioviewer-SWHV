@@ -214,4 +214,4 @@ public enum JHVDirectory {
     /** A File representation of the path of the directory. */
     abstract public File getFile();
 
-};
+}

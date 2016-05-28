@@ -25,7 +25,7 @@ import org.helioviewer.jhv.threads.CancelTask;
 
 public class PfssNewDataLoader implements Runnable {
 
-    private static int TIMEOUT_DOWNLOAD_SECONDS = 120;
+    private static final int TIMEOUT_DOWNLOAD_SECONDS = 120;
 
     private final JHVDate start;
     private final JHVDate end;

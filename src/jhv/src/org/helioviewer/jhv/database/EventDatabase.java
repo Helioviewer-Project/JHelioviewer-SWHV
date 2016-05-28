@@ -54,7 +54,7 @@ public class EventDatabase {
     private final static ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(10000);
     private final static ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
 
-    private static long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
+    private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     public static int config_hash;
 
     private static final String INSERT_EVENT = "INSERT INTO events(uid) VALUES(?)";
