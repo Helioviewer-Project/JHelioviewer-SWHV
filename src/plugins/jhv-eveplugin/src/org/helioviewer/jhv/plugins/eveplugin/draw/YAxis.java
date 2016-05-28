@@ -117,12 +117,14 @@ public class YAxis {
         return scale.invScale(maxValue);
     }
 
-    private static interface YAxisScale {
-        public abstract double scale(double val);
+    private interface YAxisScale {
 
-        public abstract double invScale(double val);
+        double scale(double val);
 
-        public abstract String getLabel();
+        double invScale(double val);
+
+        String getLabel();
+
     }
 
     private static class YAxisLogScale implements YAxisScale {

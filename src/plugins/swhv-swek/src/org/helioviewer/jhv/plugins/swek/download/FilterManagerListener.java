@@ -17,7 +17,7 @@ public interface FilterManagerListener {
      * @param swekEventType
      *            the event type for which the filters where added
      */
-    public abstract void filtersAdded(SWEKEventType swekEventType);
+    void filtersAdded(SWEKEventType swekEventType);
 
     /**
      * Called if the filters were removed from the filter manager.
@@ -27,6 +27,6 @@ public interface FilterManagerListener {
      * @param swekEventType
      *            the event type for which the parameter was removed
      */
-    public abstract void filtersRemoved(SWEKEventType swekEventType, SWEKParameter parameter);
+    void filtersRemoved(SWEKEventType swekEventType, SWEKParameter parameter);
 
 }

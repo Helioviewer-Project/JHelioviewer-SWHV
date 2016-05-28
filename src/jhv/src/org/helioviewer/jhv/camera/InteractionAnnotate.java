@@ -15,7 +15,7 @@ import com.jogamp.opengl.GL2;
 
 public class InteractionAnnotate extends Interaction {
 
-    public static enum AnnotationMode {
+    public enum AnnotationMode {
         RECTANGLE, CIRCLE, CROSS;
         private static AnnotationMode[] vals = values();
 

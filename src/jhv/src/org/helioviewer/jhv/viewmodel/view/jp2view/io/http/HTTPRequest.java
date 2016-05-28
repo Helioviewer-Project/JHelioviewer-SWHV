@@ -13,7 +13,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 public class HTTPRequest extends HTTPMessage {
 
     /** An enum identifying the 2 types of HTTPRequests supported. */
-    public static enum Method {
+    public enum Method {
         GET, POST
     }
 

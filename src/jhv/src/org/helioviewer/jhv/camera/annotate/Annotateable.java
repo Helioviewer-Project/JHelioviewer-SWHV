@@ -8,16 +8,16 @@ import com.jogamp.opengl.GL2;
 
 public interface Annotateable {
 
-    public void render(Viewport vp, GL2 gl, boolean active);
+    void render(Viewport vp, GL2 gl, boolean active);
 
-    public void mouseDragged(MouseEvent e);
+    void mouseDragged(MouseEvent e);
 
-    public void mouseReleased(MouseEvent e);
+    void mouseReleased(MouseEvent e);
 
-    public void mousePressed(MouseEvent e);
+    void mousePressed(MouseEvent e);
 
-    public boolean beingDragged();
+    boolean beingDragged();
 
-    public boolean isDraggable();
+    boolean isDraggable();
 
 }
