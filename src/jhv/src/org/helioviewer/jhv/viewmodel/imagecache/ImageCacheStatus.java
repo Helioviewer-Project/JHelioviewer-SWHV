@@ -18,7 +18,7 @@ public interface ImageCacheStatus {
 
     public enum CacheStatus {
         HEADER, PARTIAL, COMPLETE
-    };
+    }
 
     /**
      * Sets the image cache status of one composition layer.

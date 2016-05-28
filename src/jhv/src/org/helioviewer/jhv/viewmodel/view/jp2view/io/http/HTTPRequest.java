@@ -15,7 +15,7 @@ public class HTTPRequest extends HTTPMessage {
     /** An enum identifying the 2 types of HTTPRequests supported. */
     public static enum Method {
         GET, POST
-    };
+    }
 
     /** The request type */
     protected Method method;

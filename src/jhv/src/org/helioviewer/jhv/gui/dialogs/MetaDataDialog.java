@@ -79,10 +79,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
     private final DefaultTableModel fitsModel = new LocalTableModel(null, new Object[] { "FITS Key", "value" });
     private final DefaultListModel jhList = new DefaultListModel();
-    private final JList jhBox = new JList(jhList);
 
     private final DefaultListModel basicList = new DefaultListModel();
-    private final JList basicBox = new JList(basicList);
     private Document xmlDoc = null;
     private boolean metaDataOK;
     private String outFileName;
@@ -97,7 +95,9 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         bottomPanel.add(exportFitsButton);
         bottomPanel.add(closeButton);
 
+        JList basicBox = new JList(basicList);
         basicBox.setCellRenderer(new WrappedTextCellRenderer());
+        JList jhBox = new JList(jhList);
         jhBox.setCellRenderer(new WrappedTextCellRenderer());
 
         ComponentListener cl = new ComponentAdapter() {
@@ -316,7 +316,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      *            Node to read
      * @return value of the node
      */
-    private final String getElementValue(Node elem) {
+    private String getElementValue(Node elem) {
         if (elem != null && elem.hasChildNodes()) {
             for (Node child = elem.getFirstChild(); child != null; child = child.getNextSibling()) {
                 if (child.getNodeType() == Node.TEXT_NODE) {

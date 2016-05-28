@@ -77,7 +77,7 @@ public class JHVRgbToYuv420j8Bit {
         }
     }
 
-    private static final void rgb2yuv(int r, int g, int b, int[] out) {
+    private static void rgb2yuv(int r, int g, int b, int[] out) {
         int y = 66 * r + 129 * g + 25 * b;
         int u = -38 * r - 74 * g + 112 * b;
         int v = 112 * r - 94 * g - 18 * b;
@@ -90,7 +90,7 @@ public class JHVRgbToYuv420j8Bit {
         out[2] = clip(v + 128, 0, 255);
     }
 
-    private static final void rgb2yuv_new(int r, int g, int b, int[] out) { // for 0.2
+    private static void rgb2yuv_new(int r, int g, int b, int[] out) { // for 0.2
         int y = 77 * r + 150 * g + 15 * b;
         int u = -43 * r - 85 * g + 128 * b;
         int v = 128 * r - 107 * g - 21 * b;

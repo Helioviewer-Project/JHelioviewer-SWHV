@@ -70,7 +70,7 @@ public class JHVEventCache {
 
     private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
 
-    private final Map<Integer, JHVRelatedEvents> relEvents = new HashMap<Integer, JHVRelatedEvents>();;
+    private final Map<Integer, JHVRelatedEvents> relEvents = new HashMap<Integer, JHVRelatedEvents>();
 
     private final Set<JHVEventType> activeEventTypes;
 

@@ -111,7 +111,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     public enum RecordMode {
         LOOP, SHOT, FREE
-    };
+    }
 
     private enum RecordSize {
         H1080 {

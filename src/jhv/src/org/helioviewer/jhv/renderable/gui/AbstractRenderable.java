@@ -52,7 +52,7 @@ public abstract class AbstractRenderable implements Renderable {
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
-    };
+    }
 
     @Override
     public void prerender(GL2 gl) {

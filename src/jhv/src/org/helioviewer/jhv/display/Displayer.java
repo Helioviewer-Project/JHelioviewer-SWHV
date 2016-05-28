@@ -20,7 +20,7 @@ public class Displayer implements JHVEventHighlightListener {
     public static final double CAMERA_ZOOM_MULTIPLIER_WHEEL = 2.;
     public static final double CAMERA_ZOOM_MULTIPLIER_BUTTON = 2.;
 
-    public static enum DisplayMode {
+    public enum DisplayMode {
         ORTHO, LATITUDINAL, LOGPOLAR, POLAR;
 
         public String getLabel() {

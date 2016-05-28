@@ -327,9 +327,7 @@ public class ChunkedInputStreamAlt extends InputStream {
     private static void exhaustInputStream(InputStream inStream) throws IOException {
         // read and discard the remainder of the message
         byte buffer[] = new byte[1024];
-        while (inStream.read(buffer) >= 0) {
-            ;
-        }
+        while (inStream.read(buffer) >= 0) ;
     }
 
 }

@@ -25,7 +25,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
 
     private enum ZOOM {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
-    };
+    }
 
     public DrawControllerOptionsPanel() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));

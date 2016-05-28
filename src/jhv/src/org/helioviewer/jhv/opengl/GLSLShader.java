@@ -68,7 +68,7 @@ public class GLSLShader {
         gl.glUniform1i(id, texunit);
     }
 
-    private final void attachVertexShader(GL2 gl, String vertexText) {
+    private void attachVertexShader(GL2 gl, String vertexText) {
         int iID = gl.glCreateShader(GL2.GL_VERTEX_SHADER);
 
         String[] akProgramText = new String[1];
@@ -97,7 +97,7 @@ public class GLSLShader {
         vertexID = iID;
     }
 
-    private final void attachFragmentShader(GL2 gl, String fragmentText) {
+    private void attachFragmentShader(GL2 gl, String fragmentText) {
         int iID = gl.glCreateShader(GL2.GL_FRAGMENT_SHADER);
 
         String[] akProgramText = new String[1];
@@ -126,7 +126,7 @@ public class GLSLShader {
         fragmentID = iID;
     }
 
-    private final void initializeProgram(GL2 gl, boolean cleanUp) {
+    private void initializeProgram(GL2 gl, boolean cleanUp) {
         progID = gl.glCreateProgram();
         gl.glAttachShader(progID, vertexID);
         gl.glAttachShader(progID, fragmentID);
