@@ -20,7 +20,7 @@ import org.json.JSONObject;
 
 public abstract class SWEKDownloader {
 
-    protected boolean overmax = true;
+    private boolean overmax = true;
 
     public boolean extern2db(JHVEventType eventType, long start, long end, List<SWEKParam> params) {
         ArrayList<Interval> range = EventDatabase.db2daterange(eventType);

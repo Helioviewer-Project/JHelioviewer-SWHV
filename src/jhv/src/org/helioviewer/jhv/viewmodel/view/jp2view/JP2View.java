@@ -91,9 +91,8 @@ public class JP2View extends AbstractView {
     private static class AbolishThread extends Thread {
         private JP2View view;
 
-        public Runnable init(JP2View view) {
+        public void init(JP2View view) {
             this.view = view;
-            return this;
         }
 
         @Override

@@ -22,11 +22,11 @@ import javax.swing.JSpinner;
  */
 public class WheelSupport {
 
-    public static final String CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER = "mouseWheelListener";
-    protected static final String SPINNER_ACTION_NAME_INCREMENT = "increment";
-    protected static final String SPINNER_ACTION_NAME_DECREMENT = "decrement";
-    protected static final String SLIDER_ACTION_NAME_INCREMENT = "positiveUnitIncrement";
-    protected static final String SLIDER_ACTION_NAME_DECREMENT = "negativeUnitIncrement";
+    private static final String CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER = "mouseWheelListener";
+    private static final String SPINNER_ACTION_NAME_INCREMENT = "increment";
+    private static final String SPINNER_ACTION_NAME_DECREMENT = "decrement";
+    private static final String SLIDER_ACTION_NAME_INCREMENT = "positiveUnitIncrement";
+    private static final String SLIDER_ACTION_NAME_DECREMENT = "negativeUnitIncrement";
 
     public static void installMouseWheelSupport(final JSpinner spinner) {
         MouseWheelListener l = new MouseWheelListener() {

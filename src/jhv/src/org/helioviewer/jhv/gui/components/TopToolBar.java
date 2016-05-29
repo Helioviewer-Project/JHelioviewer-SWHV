@@ -135,7 +135,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
      *            Current interaction mode
      * @see #setDisplayMode(DisplayMode)
      */
-    protected void createNewToolBar() {
+    private void createNewToolBar() {
         removeAll();
 
         // Zoom
@@ -341,7 +341,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
      * @param mode
      *            Display mode can be either ICONANDTEXT, ICONONLY or TEXTONLY.
      */
-    public void setDisplayMode(DisplayMode mode) {
+    private void setDisplayMode(DisplayMode mode) {
         DisplayMode oldDisplayMode = displayMode;
         if (mode != null) {
             displayMode = mode;
@@ -368,7 +368,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
      * @param e
      *            MouseEvent that triggered the event
      */
-    protected void maybeShowPopup(MouseEvent e) {
+    private void maybeShowPopup(MouseEvent e) {
         if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu popUpMenu = new JPopupMenu();
             ButtonGroup group = new ButtonGroup();

@@ -18,10 +18,10 @@ public class YAxis {
     public double end;
 
     private final YAxisScale scale;
-    protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
 
-    private final static float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
-    private final static float UNSCALED_MAX_BOUND = Float.MAX_VALUE;
+    private static final double ZOOMSTEP_PERCENTAGE = 0.02;
+    private static final float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
+    private static final float UNSCALED_MAX_BOUND = Float.MAX_VALUE;
 
     private final double scaledMinBound;
     private final double scaledMaxBound;

@@ -34,10 +34,10 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
     }
 
     private static class TreeLabel extends JPanel {
-        ImageIcon imageIcon;
+
+        private final ImageIcon imageIcon;
 
         public TreeLabel(ImageIcon icon) {
-            super();
             imageIcon = icon;
             int size = new JLabel("J").getPreferredSize().height;
             setPreferredSize(new Dimension(size, size));
