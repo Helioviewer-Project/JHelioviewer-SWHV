@@ -31,16 +31,14 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 bp.z += 2 * Math.PI;
         }
 
-        Vec3 p1 = bp;
         Vec3 p2 = new Vec3(radius, ep.y, bp.z);
-        Vec3 p3 = ep;
         Vec3 p4 = new Vec3(radius, bp.y, ep.z);
 
         gl.glBegin(GL2.GL_LINE_STRIP);
-        interpolatedDraw(vp, gl, p1, p2);
-        interpolatedDraw(vp, gl, p2, p3);
-        interpolatedDraw(vp, gl, p3, p4);
-        interpolatedDraw(vp, gl, p4, p1);
+        interpolatedDraw(vp, gl, bp, p2);
+        interpolatedDraw(vp, gl, p2, ep);
+        interpolatedDraw(vp, gl, ep, p4);
+        interpolatedDraw(vp, gl, p4, bp);
         gl.glEnd();
     }
 

@@ -107,12 +107,8 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
     }
 
     private String getTitleText() {
-        final StringBuilder title = new StringBuilder();
-        title.append("<html>");
-        title.append("<font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">");
-        title.append("<b>" + plugin.getName() + "</b>");
-        title.append("</font></html>");
-        return title.toString();
+        return "<html><font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">" +
+                "<b>" + plugin.getName() + "</b></font></html>";
     }
 
     private String getDescriptionText() {

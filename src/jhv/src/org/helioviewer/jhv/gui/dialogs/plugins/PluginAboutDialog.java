@@ -89,13 +89,8 @@ public class PluginAboutDialog extends JDialog implements HyperlinkListener {
      * */
     private String getHeaderText() {
         String pluginName = plugin.getName() == null ? "Unknown plug-in name" : plugin.getName();
-        StringBuilder headerText = new StringBuilder();
-        headerText.append("<html><center>");
-        headerText.append("<font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + (getFont().getSize() + 2) + ";\">");
-        headerText.append("<b>" + pluginName + "</b>");
-        headerText.append("</font></center></html>");
-
-        return headerText.toString();
+        return "<html><center><font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + (getFont().getSize() + 2) + ";\">" +
+                "<b>" + pluginName + "</b></font></center></html>";
     }
 
     /**
@@ -105,14 +100,8 @@ public class PluginAboutDialog extends JDialog implements HyperlinkListener {
         String pluginDesc = plugin.getDescription() == null ? "No description available" : plugin.getDescription();
         String pluginLicense = plugin.getAboutLicenseText() == null ? " " : plugin.getAboutLicenseText();
 
-        StringBuilder contentText = new StringBuilder();
-        contentText.append("<html><center>");
-        contentText.append("<font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">");
-        contentText.append("<p><b>Plug-in description</b><br>" + pluginDesc + "</p>");
-        contentText.append("<p><b>Plug-in license information</b><br>" + pluginLicense + "</p>");
-        contentText.append("</font></center></html>");
-
-        return contentText.toString();
+        return "<html><center><font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">" +
+                "<p><b>Plug-in description</b><br>" + pluginDesc + "</p><p><b>Plug-in license information</b><br>" + pluginLicense + "</p></font></center></html>";
     }
 
     public static void showDialog(Plugin plugin) {

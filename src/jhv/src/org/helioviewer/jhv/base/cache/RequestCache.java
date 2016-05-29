@@ -86,8 +86,7 @@ public class RequestCache {
         for (int i = 1; i < intervals.size(); i++) {
             Interval curr = intervals.get(i);
             if (prev.end >= curr.start) {
-                Interval merged = new Interval(prev.start, Math.max(prev.end, curr.end));
-                prev = merged;
+                prev = new Interval(prev.start, Math.max(prev.end, curr.end));
             } else {
                 result.add(prev);
                 prev = curr;

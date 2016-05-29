@@ -12,13 +12,12 @@ public class GZIPUtils {
     }
 
     public static InputStream decompress(byte[] compressed) {
-        byte[] buf = compressed;
-        if (buf == null || buf.length == 0)
+        if (compressed == null || compressed.length == 0)
             return new ByteArrayInputStream(new byte[0]);
 
         try {
-            InputStream in = new ByteArrayInputStream(buf);
-            if (isCompressed(buf)) {
+            InputStream in = new ByteArrayInputStream(compressed);
+            if (isCompressed(compressed)) {
                 in = new GZIPInputStream(in);
             }
             return in;
