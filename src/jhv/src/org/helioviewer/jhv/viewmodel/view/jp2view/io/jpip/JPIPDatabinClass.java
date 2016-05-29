@@ -28,16 +28,16 @@ public enum JPIPDatabinClass {
     META_DATABIN(KakaduConstants.KDU_META_DATABIN, JPIPConstants.META_DATA_BIN_CLASS, "M");
 
     /** The classID as an integer as per the Kakadu library. */
-    private int kakaduClassID;
+    private final int kakaduClassID;
 
     /** The classID as an integer as per the JPEG2000 Part-9 standard. */
-    private int standardClassID;
+    private final int standardClassID;
 
     /**
      * The classID as a string as per the JPEG2000 Part-9 standard. Used for
      * cache model updates.
      */
-    private String jpipString;
+    private final String jpipString;
 
     /**
      * Constructor.

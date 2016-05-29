@@ -232,25 +232,16 @@ public class FITSImage implements MetaDataContainer {
         return builder.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String get(String key) {
         return header.getStringValue(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double tryGetDouble(String key) {
         return header.getDoubleValue(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int tryGetInt(String key) {
         return header.getIntValue(key);

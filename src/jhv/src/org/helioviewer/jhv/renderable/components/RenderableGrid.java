@@ -374,10 +374,10 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private static class GridLabel {
-        protected String txt;
-        protected float x;
-        protected float y;
-        protected float theta;
+        protected final String txt;
+        protected final float x;
+        protected final float y;
+        protected final float theta;
 
         protected GridLabel(String _txt, float _x, float _y, float _theta) {
             txt = _txt;

@@ -15,7 +15,6 @@ import org.helioviewer.jhv.viewmodel.view.AbstractView;
 public class SimpleImageView extends AbstractView {
 
     private final URI uri;
-    private BufferedImage image;
 
     /**
      * Constructor which loads the corresponding image from given URI.
@@ -29,8 +28,8 @@ public class SimpleImageView extends AbstractView {
      */
     public SimpleImageView(URI _uri) throws IOException {
         uri = _uri;
-        image = ImageIO.read(uri.toURL());
 
+        BufferedImage image = ImageIO.read(uri.toURL());
         if (image.getColorModel().getPixelSize() <= 8) {
             imageData = new SingleChannelByte8ImageData(image);
         } else if (image.getColorModel().getPixelSize() <= 16) {

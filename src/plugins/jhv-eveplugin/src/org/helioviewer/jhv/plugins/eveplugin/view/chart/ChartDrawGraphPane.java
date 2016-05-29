@@ -225,11 +225,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 ct++;
             }
         }
+
         if (ct == -1) {
             drawNoData(g, graphArea);
-            return;
         }
-
     }
 
     private void drawTimelineValues(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {

@@ -17,7 +17,7 @@ public class InteractionAnnotate extends Interaction {
 
     public enum AnnotationMode {
         RECTANGLE, CIRCLE, CROSS;
-        private static AnnotationMode[] vals = values();
+        private static final AnnotationMode[] vals = values();
 
         protected AnnotationMode next() {
             return vals[(this.ordinal() + 1) % vals.length];

@@ -15,12 +15,12 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 
 public class BandCache {
 
-    private static long DAYS_PER_CHUNK = 8;
+    private static final long DAYS_PER_CHUNK = 8;
     private static final long MILLIS_PER_TICK = 60000;
     private static final long CHUNKED_SIZE = TimeUtils.DAY_IN_MILLIS / MILLIS_PER_TICK * DAYS_PER_CHUNK;
     private static final long MILLIS_PER_CHUNK = TimeUtils.DAY_IN_MILLIS * DAYS_PER_CHUNK;
-    private static int MAX_LEVEL = 12;
-    private static int FACTOR_STEP = 2;
+    private static final int MAX_LEVEL = 12;
+    private static final int FACTOR_STEP = 2;
     private boolean hasData = false;
 
     private final HashMap<Long, DataChunk> cacheMap = new HashMap<Long, DataChunk>();

@@ -17,7 +17,7 @@ public class YAxis {
     public double start;
     public double end;
 
-    private YAxisScale scale;
+    private final YAxisScale scale;
     protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
 
     private final static float UNSCALED_MIN_BOUND = Float.MIN_VALUE;
