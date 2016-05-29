@@ -100,7 +100,7 @@ public class ChunkedInputStreamAlt extends InputStream {
      *
      * @throws IOException If an IO error occurs
      */
-    public ChunkedInputStreamAlt(InputStream in) throws IOException {
+    public ChunkedInputStreamAlt(InputStream in) {
         if (in == null) {
             throw new IllegalArgumentException("InputStream parameter may not be null");
         }

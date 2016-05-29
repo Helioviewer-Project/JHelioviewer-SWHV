@@ -61,10 +61,7 @@ public abstract class SWEKDownloader {
             else
                 overmax = false;
 
-            if (!parseEvents(eventJSON, type))
-                return false;
-
-            return parseAssociations(eventJSON);
+            return parseEvents(eventJSON, type) && parseAssociations(eventJSON);
         } catch (JSONException e) {
             overmax = false;
             Log.error("JSON parsing error " + e);

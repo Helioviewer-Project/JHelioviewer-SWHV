@@ -27,31 +27,31 @@ public class SystemProperties {
         if (os != null && arch != null) {
             os = os.toLowerCase();
             arch = arch.toLowerCase();
-            if (os.indexOf("windows") != -1) {
+            if (os.contains("windows")) {
                 System.setProperty("jhv.os", "windows");
-                if (arch.indexOf("64") != -1)
+                if (arch.contains("64"))
                     System.setProperty("jhv.arch", "x86-64");
-                else if (arch.indexOf("86") != -1)
+                else if (arch.contains("86"))
                     System.setProperty("jhv.arch", "x86-32");
                 else {
                     Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
                 }
-            } else if (os.indexOf("linux") != -1) {
+            } else if (os.contains("linux")) {
                 System.setProperty("jhv.os", "linux");
-                if (arch.indexOf("64") != -1)
+                if (arch.contains("64"))
                     System.setProperty("jhv.arch", "x86-64");
-                else if (arch.indexOf("86") != -1)
+                else if (arch.contains("86"))
                     System.setProperty("jhv.arch", "x86-32");
                 else {
                     Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);
                 }
-            } else if (os.indexOf("mac os x") != -1) {
+            } else if (os.contains("mac os x")) {
                 System.setProperty("jhv.os", "mac");
-                if (arch.indexOf("ppc") != -1)
+                if (arch.contains("ppc"))
                     System.setProperty("jhv.arch", "ppc");
-                else if (arch.indexOf("64") != -1)
+                else if (arch.contains("64"))
                     System.setProperty("jhv.arch", "x86-64");
-                else if (arch.indexOf("86") != -1)
+                else if (arch.contains("86"))
                     System.setProperty("jhv.arch", "x86-32");
                 else {
                     Log.error("Platform > Could not determine platform. OS: " + os + " - arch: " + arch);

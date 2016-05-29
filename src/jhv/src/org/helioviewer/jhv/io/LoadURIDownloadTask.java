@@ -17,7 +17,7 @@ public class LoadURIDownloadTask extends LoadURITask {
     @Override
     protected View backgroundWork() {
         FileDownloader filedownloader = new FileDownloader();
-        URI newUri = filedownloader.downloadFromHTTP(uri, true);
+        URI newUri = filedownloader.downloadFromHTTP(uri);
 
         View view = null;
         try {

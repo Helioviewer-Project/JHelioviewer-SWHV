@@ -201,13 +201,13 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
             return value * TimeUtils.DAY_IN_MILLIS;
         case Calendar.HOUR:
         case Calendar.HOUR_OF_DAY:
-            return value * 60 * 60 * 1000l;
+            return value * 60 * 60 * 1000L;
         case Calendar.MINUTE:
-            return value * 60 * 1000l;
+            return value * 60 * 1000L;
         case Calendar.SECOND:
-            return value * 1000l;
+            return value * 1000L;
         case Calendar.MILLISECOND:
-            return value * 1l;
+            return value;
         default:
             return 0;
         }

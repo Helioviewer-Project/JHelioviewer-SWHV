@@ -240,10 +240,7 @@ public class LogSettings {
      */
     public boolean getLoggingEnabled(String logger) {
         Level level = getLoggingLevel(logger);
-        if (level == null) {
-            return false;
-        }
-        return !level.equals(Level.OFF);
+        return level != null && !level.equals(Level.OFF);
     }
 
     /**
@@ -295,10 +292,7 @@ public class LogSettings {
      */
     public boolean getDefaultLoggingEnabled(String logger) {
         Level level = getDefaultLoggingLevel(logger);
-        if (level == null) {
-            return false;
-        }
-        return !level.equals(Level.OFF);
+        return level != null && !level.equals(Level.OFF);
     }
 
     /**

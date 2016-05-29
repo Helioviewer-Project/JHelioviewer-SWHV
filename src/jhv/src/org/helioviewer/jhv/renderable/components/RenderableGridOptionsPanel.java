@@ -92,7 +92,7 @@ public class RenderableGridOptionsPanel extends SmallPanel {
         add(new JLabel("Grid type", JLabel.RIGHT), c0);
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.WEST;
-        createGridChoiceBox(renderableGrid);
+        createGridChoiceBox();
         add(gridChoiceBox, c0);
 
         c0.gridy = 2;
@@ -122,7 +122,7 @@ public class RenderableGridOptionsPanel extends SmallPanel {
         setSmall();
     }
 
-    private void createGridChoiceBox(RenderableGrid renderableGrid) {
+    private void createGridChoiceBox() {
         gridChoiceBox = new JComboBox(RenderableGrid.GridChoiceType.values());
         gridChoiceBox.setToolTipText("Choose grid options");
         gridChoiceBox.setSelectedItem(RenderableGrid.GridChoiceType.VIEWPOINT);
