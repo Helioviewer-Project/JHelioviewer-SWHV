@@ -11,12 +11,12 @@ public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
 
-    public static UpdateViewpoint updateEarthFixedDistance = new UpdateViewpointEarthFixedDistance();
-    public static UpdateViewpoint updateEarth = new UpdateViewpointEarth();
-    public static UpdateViewpoint updateExpert = new UpdateViewpointExpert();
-    public static UpdateViewpoint updateObserver = new UpdateViewpointObserver();
+    UpdateViewpoint updateEarthFixedDistance = new UpdateViewpointEarthFixedDistance();
+    UpdateViewpoint updateEarth = new UpdateViewpointEarth();
+    UpdateViewpoint updateExpert = new UpdateViewpointExpert();
+    UpdateViewpoint updateObserver = new UpdateViewpointObserver();
 
-    static class UpdateViewpointEarthFixedDistance implements UpdateViewpoint {
+    class UpdateViewpointEarthFixedDistance implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             Position.L p = Sun.getEarth(time);
@@ -24,14 +24,14 @@ public interface UpdateViewpoint {
         }
     }
 
-    static class UpdateViewpointEarth implements UpdateViewpoint {
+    class UpdateViewpointEarth implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             return Sun.getEarthQuat(time);
         }
     }
 
-    static class UpdateViewpointObserver implements UpdateViewpoint {
+    class UpdateViewpointObserver implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             View view = Layers.getActiveView();
@@ -43,7 +43,7 @@ public interface UpdateViewpoint {
         }
     }
 
-    static class UpdateViewpointExpert implements UpdateViewpoint {
+    class UpdateViewpointExpert implements UpdateViewpoint {
 
         private PositionLoad positionLoad;
 
