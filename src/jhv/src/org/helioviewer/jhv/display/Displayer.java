@@ -113,13 +113,13 @@ public class Displayer implements JHVEventHighlightListener {
         fullViewport = new Viewport(-1, x, y, w, h);
     }
 
-    private static Camera camera = new Camera();
+    private static final Camera camera = new Camera();
 
     public static Camera getCamera() {
         return camera;
     }
 
-    private static Viewport[] viewports = { new Viewport(0, 0, 0, 100, 100), null, null, null };
+    private static final Viewport[] viewports = { new Viewport(0, 0, 0, 100, 100), null, null, null };
     private static int activeViewport = 0;
 
     public static Viewport fullViewport = new Viewport(-1, 0, 0, 100, 100);

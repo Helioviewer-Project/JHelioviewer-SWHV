@@ -28,7 +28,7 @@ public enum HEKEventEnum {
      * @param eventAbbreviation
      *            The hek abbreviation of the hek event
      */
-    private HEKEventEnum(String hekEventName, String swekEventName, String eventAbbreviation) {
+    HEKEventEnum(String hekEventName, String swekEventName, String eventAbbreviation) {
         this.eventAbbreviation = eventAbbreviation;
         this.swekEventName = swekEventName;
         this.hekEventName = hekEventName;

@@ -116,12 +116,7 @@ public class SWEKConfigurationManager {
             } else {
                 isConfigParsed = false;
             }
-            if (!isConfigParsed) {
-                // TODO set on the panel the config file could not be parsed.
-                configLoaded = false;
-            } else {
-                configLoaded = true;
-            }
+            configLoaded = isConfigParsed; // TODO set on the panel the config file could not be parsed
         }
     }
 

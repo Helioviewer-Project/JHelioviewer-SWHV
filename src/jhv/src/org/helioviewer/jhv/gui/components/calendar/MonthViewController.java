@@ -14,8 +14,8 @@ import java.util.GregorianCalendar;
  */
 public class MonthViewController implements CalendarViewController {
 
-    Calendar calendar = new GregorianCalendar();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy");
+    private final Calendar calendar = new GregorianCalendar();
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy");
 
     /**
      * {@inheritDoc}

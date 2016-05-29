@@ -14,8 +14,8 @@ import org.helioviewer.jhv.viewmodel.view.AbstractView;
 
 public class SimpleImageView extends AbstractView {
 
-    protected URI uri;
-    protected BufferedImage image;
+    private final URI uri;
+    private BufferedImage image;
 
     /**
      * Constructor which loads the corresponding image from given URI.
@@ -44,18 +44,12 @@ public class SimpleImageView extends AbstractView {
         imageData.setMetaData(_metaData);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getName() {
         String name = uri.getPath();
         return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public URI getUri() {
         return uri;

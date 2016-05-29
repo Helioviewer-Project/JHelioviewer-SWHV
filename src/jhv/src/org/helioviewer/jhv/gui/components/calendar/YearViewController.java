@@ -13,7 +13,7 @@ import java.util.GregorianCalendar;
  */
 public class YearViewController implements CalendarViewController {
 
-    Calendar calendar = new GregorianCalendar();
+    private final Calendar calendar = new GregorianCalendar();
 
     /**
      * {@inheritDoc}

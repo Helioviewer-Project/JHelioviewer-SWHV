@@ -38,7 +38,7 @@ public class PluginSettings {
 
     private static final String PLUGIN_FILENAME = "PluginProperties.xml";
 
-    private static PluginSettings singletonInstance = new PluginSettings();
+    private static final PluginSettings singletonInstance = new PluginSettings();
 
     private String settingsFileName;
 

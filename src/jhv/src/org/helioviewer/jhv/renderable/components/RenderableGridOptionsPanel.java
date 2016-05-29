@@ -29,8 +29,8 @@ public class RenderableGridOptionsPanel extends SmallPanel {
 
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
-    JComboBox gridChoiceBox;
-    RenderableGrid grid;
+    private JComboBox gridChoiceBox;
+    private final RenderableGrid grid;
 
     public RenderableGridOptionsPanel(RenderableGrid renderableGrid) {
         grid = renderableGrid;

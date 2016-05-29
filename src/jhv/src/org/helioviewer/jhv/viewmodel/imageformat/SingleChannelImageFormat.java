@@ -16,7 +16,7 @@ package org.helioviewer.jhv.viewmodel.imageformat;
  */
 public class SingleChannelImageFormat implements ImageFormat {
 
-    int bitDepth;
+    private final int bitDepth;
 
     /**
      * Default constructor.

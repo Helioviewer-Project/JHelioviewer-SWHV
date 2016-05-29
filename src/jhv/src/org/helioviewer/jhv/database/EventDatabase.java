@@ -72,7 +72,7 @@ public class EventDatabase {
     private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link " + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id " + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id " + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
     private static final String SELECT_EVENT_BY_ID = "SELECT e.id, e.start, e.end, e.data, event_type.name, event_type.supplier FROM events AS e LEFT JOIN event_type ON e.type_id = event_type.id WHERE e.id=?";
 
-    private static HashMap<Object, PreparedStatement> statements = new HashMap<Object, PreparedStatement>();
+    private static final HashMap<Object, PreparedStatement> statements = new HashMap<Object, PreparedStatement>();
 
     private static PreparedStatement getPreparedStatement(Connection connection, String statement) {
         statement = statement.intern();

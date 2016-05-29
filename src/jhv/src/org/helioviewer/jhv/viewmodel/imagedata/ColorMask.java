@@ -10,7 +10,9 @@ package org.helioviewer.jhv.viewmodel.imagedata;
  */
 public class ColorMask {
 
-    boolean red, green, blue;
+    private final boolean red;
+    private final boolean green;
+    private final boolean blue;
 
     /**
      * Default constructor.

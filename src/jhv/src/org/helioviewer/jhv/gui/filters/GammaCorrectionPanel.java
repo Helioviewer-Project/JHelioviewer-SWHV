@@ -24,7 +24,7 @@ import org.helioviewer.jhv.opengl.GLImage;
  */
 public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterDetails {
 
-    private static double factor = 0.01 * Math.log(10);
+    private static final double factor = 0.01 * Math.log(10);
 
     private final JSlider gammaSlider;
     private final JLabel title;

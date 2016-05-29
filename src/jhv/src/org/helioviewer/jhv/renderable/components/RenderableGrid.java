@@ -473,11 +473,10 @@ public class RenderableGrid extends AbstractRenderable {
         for (GridLabel lonLabel : lonLabels) {
             gl.glPushMatrix();
             {
-                GridLabel label = lonLabel;
-                gl.glTranslatef(label.x, 0, label.y);
-                gl.glRotatef(label.theta, 0, 1, 0);
+                gl.glTranslatef(lonLabel.x, 0, lonLabel.y);
+                gl.glRotatef(lonLabel.theta, 0, 1, 0);
 
-                renderer.draw3D(label.txt, 0, 0, 0, textScaleFactor);
+                renderer.draw3D(lonLabel.txt, 0, 0, 0, textScaleFactor);
                 renderer.flush();
             }
             gl.glPopMatrix();

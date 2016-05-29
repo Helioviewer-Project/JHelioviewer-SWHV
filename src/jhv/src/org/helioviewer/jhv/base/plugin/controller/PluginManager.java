@@ -27,7 +27,7 @@ import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
  */
 public class PluginManager {
 
-    private static PluginManager singletonInstance = new PluginManager();
+    private static final PluginManager singletonInstance = new PluginManager();
 
     private final PluginSettings pluginSettings = PluginSettings.getSingletonInstance();
     private final Map<Plugin, PluginContainer> plugins = new HashMap<Plugin, PluginContainer>();
