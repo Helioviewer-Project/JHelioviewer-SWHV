@@ -32,7 +32,7 @@ public class ComesepParser implements SWEKParser {
     private void parseParameter(JSONObject result, Object key, JHVEvent currentEvent) throws JSONException {
         if (key instanceof String) {
             String keyString = (String) key;
-            String value = null;
+            String value;
             if (!result.isNull(keyString)) {
                 value = result.optString(keyString);
             } else {

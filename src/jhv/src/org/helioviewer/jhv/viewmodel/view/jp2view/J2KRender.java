@@ -134,7 +134,7 @@ class J2KRender implements Runnable {
         compositorBuf.Native_destroy();
         compositor.Remove_ilayer(ilayer, status != CacheStatus.COMPLETE);
 
-        ImageData imdata = null;
+        ImageData imdata;
         if (numComponents < 3) {
             imdata = new SingleChannelByte8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
         } else {

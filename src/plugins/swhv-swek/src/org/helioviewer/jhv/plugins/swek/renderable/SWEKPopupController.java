@@ -59,14 +59,13 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
     }
 
     private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {
-        int yCoord = 0;
-        boolean yCoordInMiddle = false;
-
         int compWidth = component.getWidth();
         int compHeight = component.getHeight();
         int compLocX = component.getLocationOnScreen().x;
         int compLocY = component.getLocationOnScreen().y;
 
+        boolean yCoordInMiddle = false;
+        int yCoord;
         if (p.y + hekHeight + yOffset < compHeight) {
             yCoord = p.y + compLocY + yOffset;
         } else {
@@ -80,7 +79,7 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
             }
         }
 
-        int xCoord = 0;
+        int xCoord;
         if (p.x + hekWidth + xOffset < compWidth) {
             xCoord = p.x + compLocX + xOffset;
         } else {
