@@ -9,20 +9,20 @@ import java.awt.Color;
  *      code
  * @author Helge Dietert
  */
-public class GimpGradientSegment {
+class GimpGradientSegment {
     double leftStop;
-    double midStop;
+    private double midStop;
     double rightStop;
-    double rl;
-    double gl;
-    double bl;
-    double al;
-    double rr;
-    double gr;
-    double br;
-    double ar;
-    int blendingType;
-    int blendingColor;
+    private double rl;
+    private double gl;
+    private double bl;
+    private double al;
+    private double rr;
+    private double gr;
+    private double br;
+    private double ar;
+    private int blendingType;
+    private int blendingColor;
     // int blendingColorLeft;
     // int blendingColorRight;
 

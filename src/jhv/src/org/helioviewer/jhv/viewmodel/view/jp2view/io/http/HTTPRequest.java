@@ -18,16 +18,16 @@ public class HTTPRequest extends HTTPMessage {
     }
 
     /** The request type */
-    protected final Method method;
+    private final Method method;
 
     /** The URI of the object */
-    protected String uri;
+    private String uri;
 
     /**
      * The message body. Since it could potentially be created piecewise I use a
      * string builder to build it incrementally.
      */
-    protected StringBuilder messageBody = new StringBuilder();
+    private StringBuilder messageBody = new StringBuilder();
 
     /**
      * Constructs a new HTTP request indicating the request type.
@@ -35,7 +35,7 @@ public class HTTPRequest extends HTTPMessage {
      * @throws ProtocolException
      */
     public HTTPRequest(Method _method) {
-        this.method = _method;
+        method = _method;
     }
 
     /** Returns the URI of the object requested. */
@@ -45,22 +45,22 @@ public class HTTPRequest extends HTTPMessage {
 
     /** Sets the URI of the object. */
     public void setURI(String _uri) {
-        this.uri = _uri;
+        uri = _uri;
     }
 
     /** Sets a new message body. */
     public void setMessageBody(String _msg) {
-        this.messageBody = new StringBuilder(_msg);
+        messageBody = new StringBuilder(_msg);
     }
 
     /** Appends the specified String to the message body */
     public void appendToMessageBody(String _msg) {
-        this.messageBody.append(_msg);
+        messageBody.append(_msg);
     }
 
     /** Returns a String representation of the method body. */
     public String getMessageBody() {
-        return this.messageBody.toString();
+        return messageBody.toString();
     }
 
     /** Returns the method of the request. */

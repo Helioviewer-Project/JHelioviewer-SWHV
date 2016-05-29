@@ -3,7 +3,8 @@ package org.helioviewer.jhv.opengl;
 import com.jogamp.opengl.GL2;
 
 public class GLSLLineShader extends GLSLShader {
-    public final static GLSLLineShader line = new GLSLLineShader("/data/vertex.glsl", "/data/fragmentortho.glsl");
+
+    private static final GLSLLineShader line = new GLSLLineShader("/data/vertex.glsl", "/data/fragmentortho.glsl");
 
     public GLSLLineShader(String vertex, String fragment) {
         super(vertex, fragment);
@@ -20,4 +21,5 @@ public class GLSLLineShader extends GLSLShader {
     @Override
     protected void _after_init(GL2 gl) {
     }
+
 }

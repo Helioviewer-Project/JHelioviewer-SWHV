@@ -52,10 +52,10 @@ public class GLText {
     public static final int TEXT_SIZE_NORMAL = 12;
     public static final int TEXT_SIZE_LARGE = 16;
 
-    private final static int LEFT_MARGIN_TEXT = 10;
-    private final static int RIGHT_MARGIN_TEXT = 10;
-    private final static int TOP_MARGIN_TEXT = 5;
-    private final static int BOTTOM_MARGIN_TEXT = 5;
+    private static final int LEFT_MARGIN_TEXT = 10;
+    private static final int RIGHT_MARGIN_TEXT = 10;
+    private static final int TOP_MARGIN_TEXT = 5;
+    private static final int BOTTOM_MARGIN_TEXT = 5;
 
     public static void drawText(GL2 gl, Viewport vp, List<String> txts, int pt_x, int pt_y) {
         TextRenderer renderer = GLText.getRenderer(TEXT_SIZE_NORMAL);
