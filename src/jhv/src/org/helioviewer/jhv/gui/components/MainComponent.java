@@ -25,7 +25,7 @@ import com.jogamp.opengl.awt.GLCanvas;
 @SuppressWarnings("serial")
 public class MainComponent extends GLCanvas implements GLEventListener {
 
-    private static GLCapabilities capabilities = new GLCapabilities(GLProfile.getDefault());
+    private static final GLCapabilities capabilities = new GLCapabilities(GLProfile.getDefault());
 
     static {
         capabilities.setSampleBuffers(true);

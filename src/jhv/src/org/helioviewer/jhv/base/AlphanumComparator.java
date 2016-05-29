@@ -44,7 +44,8 @@ import java.util.Comparator;
  * The change to java 1.5 has been done.
  */
 public class AlphanumComparator implements Comparator<String> {
-    private final boolean isDigit(char ch) {
+
+    private boolean isDigit(char ch) {
         return ch >= 48 && ch <= 57;
     }
 
@@ -52,7 +53,7 @@ public class AlphanumComparator implements Comparator<String> {
      * Length of string is passed in for improved efficiency (only need to
      * calculate it once)
      **/
-    private final String getChunk(String s, int slength, int marker) {
+    private String getChunk(String s, int slength, int marker) {
         StringBuilder chunk = new StringBuilder();
         char c = s.charAt(marker);
         chunk.append(c);

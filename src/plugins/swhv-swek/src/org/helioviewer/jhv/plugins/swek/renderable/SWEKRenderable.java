@@ -46,9 +46,9 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final float LINEWIDTH_HIGHLIGHT = 2;
     private static final float LINEWIDTH_CACTUS = 2.02f;
 
-    private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
-    private final static double ICON_SIZE = 0.1;
-    private final static double ICON_SIZE_HIGHLIGHTED = 0.16;
+    private static final HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
+    private static final double ICON_SIZE = 0.1;
+    private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);

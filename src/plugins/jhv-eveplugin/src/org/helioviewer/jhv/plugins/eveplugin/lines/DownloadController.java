@@ -28,12 +28,11 @@ public class DownloadController {
     private static final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<Band, ArrayList<Interval>>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
 
-    public static final DownloadController getSingletonInstance() {
+    public static DownloadController getSingletonInstance() {
         return singletonInstance;
     }
 
     public void updateBand(Band band, long start, long end) {
-
         List<Interval> missingIntervalsNoExtend = band.getMissingDaysInInterval(start, end);
         if (!missingIntervalsNoExtend.isEmpty()) {
             Interval realQueryInterval = extendQueryInterval(start, end);

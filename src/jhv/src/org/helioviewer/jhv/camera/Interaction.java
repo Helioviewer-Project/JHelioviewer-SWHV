@@ -15,7 +15,7 @@ import com.jogamp.opengl.GL2;
 
 public class Interaction implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
 
-    protected Camera camera;
+    protected final Camera camera;
 
     public Interaction(Camera _camera) {
         camera = _camera;

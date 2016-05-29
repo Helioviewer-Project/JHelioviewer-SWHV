@@ -54,9 +54,6 @@ public class FITSView extends AbstractView {
         return fits.getHeaderAsXML();
     }
 
-    /**
-     * {@inheritDoc}
-     * */
     @Override
     public String getName() {
         if (_metaData instanceof ObserverMetaData) {
@@ -67,9 +64,6 @@ public class FITSView extends AbstractView {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * */
     @Override
     public URI getUri() {
         return uri;

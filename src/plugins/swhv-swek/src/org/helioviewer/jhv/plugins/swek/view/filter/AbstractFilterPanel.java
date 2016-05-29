@@ -32,9 +32,9 @@ import org.helioviewer.jhv.plugins.swek.download.FilterManager;
 public abstract class AbstractFilterPanel extends JPanel {
 
     /** the SWEK parameter for this filter */
-    protected SWEKParameter parameter;
+    protected final SWEKParameter parameter;
     /** the SWEK the event type */
-    protected SWEKEventType eventType;
+    protected final SWEKEventType eventType;
     /** The minimum value of the filter */
     protected double min;
     /** The maximum value of the filter */

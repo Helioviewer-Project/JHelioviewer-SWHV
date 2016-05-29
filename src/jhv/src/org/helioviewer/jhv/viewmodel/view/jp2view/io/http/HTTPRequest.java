@@ -18,7 +18,7 @@ public class HTTPRequest extends HTTPMessage {
     }
 
     /** The request type */
-    protected Method method;
+    protected final Method method;
 
     /** The URI of the object */
     protected String uri;

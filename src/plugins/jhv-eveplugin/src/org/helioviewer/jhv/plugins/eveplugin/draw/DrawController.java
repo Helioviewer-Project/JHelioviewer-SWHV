@@ -21,8 +21,8 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
 
-    public TimeAxis selectedAxis;
-    public TimeAxis availableAxis;
+    public final TimeAxis selectedAxis;
+    public final TimeAxis availableAxis;
 
     private static final HashSet<DrawControllerListener> listeners = new HashSet<DrawControllerListener>();
 
