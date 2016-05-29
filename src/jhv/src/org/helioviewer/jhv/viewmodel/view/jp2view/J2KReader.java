@@ -219,7 +219,6 @@ class J2KReader implements Runnable {
     @Override
     public void run() {
         boolean complete = false;
-        boolean viewChanged = false;
         boolean downgradeNecessary = false;
 
         JP2ImageParameter prevParams = null;
@@ -237,8 +236,7 @@ class J2KReader implements Runnable {
             ReaderMode readerMode = parentImageRef.getReaderMode();
 
             // check whether view parameters have changed
-            viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
-
+            boolean viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
             // if view has changed downgrade caching status
             if (viewChanged) {
                 complete = false;
@@ -275,9 +273,6 @@ class J2KReader implements Runnable {
                     int complete_steps = 0;
                     int current_step;
 
-                    // build queries
-                    JPIPQuery[] stepQuerys;
-
                     // Decide what cache strategy to use:
                     // - If this is not the main view, choose FIRSTFRAMEONLY
                     // - If this is not a movie, choose FIRSTFRAMEONLY
@@ -285,7 +280,6 @@ class J2KReader implements Runnable {
                     // - If the meta data is not complete yet, choose MISSINGFRAMESFIRST
                     // - In any other case, choose ALLFRAMESEQUALLY
                     CacheStrategy strategy;
-
                     if (num_layers <= 1) { // !isMultiFrame()
                         strategy = CacheStrategy.CURRENTFRAMEONLY;
                     } else if (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) {
@@ -297,6 +291,7 @@ class J2KReader implements Runnable {
                     }
 
                     // build query based on strategy
+                    JPIPQuery[] stepQuerys;
                     switch (strategy) {
                     case CURRENTFRAMEONLY:
                     case CURRENTFRAMEFIRST:
@@ -335,9 +330,6 @@ class J2KReader implements Runnable {
                     }
 
                     JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
-
-                    // long time = System.currentTimeMillis();
-
                     // send queries until everything is complete or caching is interrupted
                     while ((complete_steps < stepQuerys.length) && !stopReading) {
                         if (current_step >= stepQuerys.length)
@@ -386,8 +378,8 @@ class J2KReader implements Runnable {
                                         }
                                     }
                                 }
-                                MoviePanel.cacheStatusChanged();
 
+                                MoviePanel.cacheStatusChanged();
                                 downgradeNecessary = false;
                             }
 
@@ -403,7 +395,6 @@ class J2KReader implements Runnable {
                                 case CURRENTFRAMEFIRST:
                                     cacheStatusRef.setImageStatus(curLayer, CacheStatus.COMPLETE);
                                     break;
-
                                 default:
                                     for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--) {
                                         cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);

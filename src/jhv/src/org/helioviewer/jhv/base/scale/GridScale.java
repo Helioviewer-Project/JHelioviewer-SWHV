@@ -110,7 +110,7 @@ public abstract class GridScale {
 
         @Override
         public Vec3 transformInverse(Vec2 pt) {
-            return transform.transformInverse(pt, this);
+            return transform.transformInverse(pt);
         }
 
         @Override

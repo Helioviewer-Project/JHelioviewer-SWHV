@@ -24,7 +24,7 @@ public class TimeAxis {
         return (long) (start + (end - start) * (x - x0) / (double) w);
     }
 
-    void move(int x0, int w, double pixelDistance) {
+    void move(int w, double pixelDistance) {
         double diff = (double) (end - start) / w;
         move(pixelDistance * diff);
     }

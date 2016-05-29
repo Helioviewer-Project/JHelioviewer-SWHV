@@ -495,20 +495,20 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException e) {
-            System.out.println(e);
+            Log.error(e.getMessage());
             return new ArrayList<JsonEvent>();
         } catch (ExecutionException e) {
-            System.out.println(e);
+            Log.error(e.getMessage());
             return new ArrayList<JsonEvent>();
         }
     }
 
     public static class JsonEvent {
-        final public int id;
-        final public byte[] json;
-        final public JHVEventType type;
-        final public long start;
-        final public long end;
+        public final int id;
+        public final byte[] json;
+        public final JHVEventType type;
+        public final long start;
+        public final long end;
 
         public JsonEvent(byte[] _json, JHVEventType _type, int _id, long _start, long _end) {
             start = _start;
