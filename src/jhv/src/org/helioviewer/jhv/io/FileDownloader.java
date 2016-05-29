@@ -78,8 +78,6 @@ public class FileDownloader {
                 if (!dialog.wasInterrupted) {
                     Message.err("Download", "Unable to download from http", false);
                 }
-                // if the file was not loaded successfully
-            } else {
             }
         } catch (IOException e) {
             dialog.setVisible(false);

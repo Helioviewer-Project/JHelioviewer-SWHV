@@ -75,9 +75,8 @@ public class SWEKSourceManager {
         if (!sourcesLoaded) {
             // Check the sweksettings file for the downloaders
             if (checkAndDownloadJars()) {
-                if (prepareDownloadersClassLoader()) {
-                    sourcesLoaded = true;
-                }
+                prepareDownloadersClassLoader();
+                sourcesLoaded = true;
             } else {
                 sourcesLoaded = false;
             }
@@ -258,19 +257,14 @@ public class SWEKSourceManager {
 
     /**
      * Creates a class loader from the given jars
-     *
-     * @return True if the classloader was created, false if the classloader was
-     *         not created.
      */
-    private boolean prepareDownloadersClassLoader() {
+    private void prepareDownloadersClassLoader() {
         URL[] urls = jarURLList.toArray(new URL[0]);
         if (loadExternalJars) {
             urlClassLoader = URLClassLoader.newInstance(urls, PluginManager.getSingletonInstance().getPluginContainer(swekplugin).getClassLoader());
         } else {
             urlClassLoader = URLClassLoader.newInstance(urls, Thread.currentThread().getContextClassLoader());
         }
-
-        return true;
     }
 
 }

@@ -40,7 +40,7 @@ public class PfssPluginPanel extends SmallPanel {
         levelSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                PfssSettings.qualityReduction = 8 - ((Integer) levelSpinner.getValue()).intValue();
+                PfssSettings.qualityReduction = 8 - (Integer) levelSpinner.getValue();
                 Displayer.display();
             }
         });
