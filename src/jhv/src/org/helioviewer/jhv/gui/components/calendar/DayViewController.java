@@ -22,70 +22,48 @@ public class DayViewController implements CalendarViewController {
         calendar.setMinimalDaysInFirstWeek(1);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * A period of one month will be added to the current date.
-     */
+    // A period of one month will be added to the current date.
+    @Override
     public Date moveForward() {
         calendar.add(Calendar.MONTH, 1);
         return calendar.getTime();
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * A period of one month will be removed from the current date.
-     */
+    // A period of one month will be removed from the current date
+    @Override
     public Date moveBack() {
         calendar.add(Calendar.MONTH, -1);
         return calendar.getTime();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getSelectionButtonText() {
         return dateFormat.format(calendar.getTime());
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The column headers are the short names of the weekdays.
-     */
+    // The column headers are the short names of the weekdays
+    @Override
     public String[] getGridColumnHeader() {
-        String[] values = new DateFormatSymbols().getShortWeekdays();
         String[] result = new String[7];
-
-        for (int i = 1; i < 8; i++)
-            result[i - 1] = values[i];
+        System.arraycopy(new DateFormatSymbols().getShortWeekdays(), 1, result, 0, 7);
 
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Point getCorrespondingCellOfCurrentDate() {
         return new Point(calendar.get(Calendar.WEEK_OF_MONTH) - 1, calendar.get(Calendar.DAY_OF_WEEK) - 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setDateOfCellValue(Object value) {
         if (value instanceof Integer) {
             calendar.set(Calendar.DAY_OF_MONTH, (Integer) value);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Returns a 2 dimensional array where all days of a month are placed
-     * against the corresponding weekday.
-     */
+    // Returns a 2 dimensional array where all days of a month are placed against the corresponding weekday
+    @Override
     public Object[][] getGridData() {
         // compute number of days in selected month
         Calendar cal = (Calendar) calendar.clone();
@@ -111,16 +89,12 @@ public class DayViewController implements CalendarViewController {
         return data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Date getDate() {
         return calendar.getTime();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setDate(Date date) {
         calendar.setTime(date);
     }
