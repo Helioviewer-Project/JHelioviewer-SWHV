@@ -66,7 +66,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void moveX(double pixelDistance) {
-        selectedAxis.move(graphArea.x, graphArea.width, pixelDistance);
+        selectedAxis.move(graphArea.width, pixelDistance);
         setAvailableInterval();
     }
 

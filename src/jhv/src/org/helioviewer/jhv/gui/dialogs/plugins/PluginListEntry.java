@@ -36,36 +36,31 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
     private final PluginContainer plugin;
     private final List list;
 
-    private final JLabel descLabel = new JLabel();
     private final LinkLabel infoLabel = new LinkLabel("More");
 
     private final JLabel preferencesLabel = new JLabel();
     private final JLabel enableLabel = new JLabel();
     private final JLabel removeLabel = new JLabel();
 
-    private final JEditorPane titlePane = new JEditorPane("text/html", "");
-    private final JPanel descPane = new JPanel();
-    private final JPanel buttonPane = new JPanel();
-
     public PluginListEntry(PluginContainer plugin, List list) {
         this.plugin = plugin;
         this.list = list;
 
         // title
-        titlePane.setText(getTitleText());
+        JEditorPane titlePane = new JEditorPane("text/html", getTitleText());
         titlePane.setEditable(false);
         titlePane.setOpaque(false);
 
         // description
-        descLabel.setText(getDescriptionText());
+        JLabel descLabel = new JLabel(getDescriptionText());
 
-        descPane.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel descPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
         descPane.setOpaque(false);
         descPane.add(descLabel);
         descPane.add(infoLabel);
 
         // "buttons"
-        buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPane.setOpaque(false);
         // buttonPane.add(preferencesLabel);
         buttonPane.add(enableLabel);

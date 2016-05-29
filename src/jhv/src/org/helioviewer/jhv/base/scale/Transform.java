@@ -12,7 +12,7 @@ public interface Transform {
 
     public Vec2 transform(Vec3 pt, GridScale scale);
 
-    public Vec3 transformInverse(Vec2 pt, GridScale scale);
+    public Vec3 transformInverse(Vec2 pt);
 
     public static Transform transformpolar = new TransformPolar();
     public static Transform transformlatitudinal = new TransformLatitudinal();
@@ -33,7 +33,7 @@ public interface Transform {
         }
 
         @Override
-        public Vec3 transformInverse(Vec2 pt, GridScale scale) {
+        public Vec3 transformInverse(Vec2 pt) {
             double r = pt.y;
             double theta = -pt.x / MathUtils.radeg;
             double y = r * Math.cos(theta);
@@ -60,7 +60,7 @@ public interface Transform {
         }
 
         @Override
-        public Vec3 transformInverse(Vec2 pt, GridScale scale) {
+        public Vec3 transformInverse(Vec2 pt) {
             double phi = pt.x / MathUtils.radeg;
             double theta = pt.y / MathUtils.radeg;
             phi += Math.PI;
