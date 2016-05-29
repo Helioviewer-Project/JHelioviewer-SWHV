@@ -76,7 +76,7 @@ public class YearViewController implements CalendarViewController {
         int year = calendar.get(Calendar.YEAR) - 6;
 
         for (int i = 0; i < 12; i++) {
-            data[i / 4][i % 4] = Integer.valueOf(year + i);
+            data[i / 4][i % 4] = year + i;
         }
 
         return data;
@@ -94,7 +94,7 @@ public class YearViewController implements CalendarViewController {
      */
     public void setDateOfCellValue(Object value) {
         if (value instanceof Integer) {
-            calendar.set(Calendar.YEAR, ((Integer) value).intValue());
+            calendar.set(Calendar.YEAR, (Integer) value);
         }
     }
 

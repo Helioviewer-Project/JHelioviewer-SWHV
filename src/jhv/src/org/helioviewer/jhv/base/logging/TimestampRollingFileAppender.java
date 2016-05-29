@@ -91,11 +91,11 @@ public class TimestampRollingFileAppender extends FileAppender {
             String[] files = fdir.list();
             long maxMilliseconds = days * 24 * 60 * 60 * 1000;
             if (files != null) {
-                for (int i = 0; i < files.length; ++i) {
-                    File f = new File(fdir, files[i]);
+                for (String file : files) {
+                    File f = new File(fdir, file);
                     if (f.isFile()) {
                         try {
-                            Date timeStampCurrentFile = formatter.parse(files[i]);
+                            Date timeStampCurrentFile = formatter.parse(file);
                             if (timeStamp.getTime() - timeStampCurrentFile.getTime() > maxMilliseconds) {
                                 if (f.delete()) {
                                     Logger.getRootLogger().info("Log file " + f.getAbsolutePath() + " deleted");

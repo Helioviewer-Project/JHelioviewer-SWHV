@@ -84,10 +84,10 @@ public class JPIPSocket extends HTTPSocket {
         if (cnew != null) {
             map = new HashMap<String, String>();
             String[] parts = cnew.split(",");
-            for (int i = 0; i < parts.length; i++)
-                for (int j = 0; j < cnewParams.length; j++)
-                    if (parts[i].startsWith(cnewParams[j] + "="))
-                        map.put(cnewParams[j], parts[i].substring(cnewParams[j].length() + 1));
+            for (String part : parts)
+                for (String cnewParam : cnewParams)
+                    if (part.startsWith(cnewParam + "="))
+                        map.put(cnewParam, part.substring(cnewParam.length() + 1));
         }
         if (map == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server!");
