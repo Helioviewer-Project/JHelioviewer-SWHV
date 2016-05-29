@@ -223,7 +223,6 @@ public class LogSettings {
                 if (settingsOutputStream != null) {
                     try {
                         settingsOutputStream.close();
-                        settingsOutputStream = null;
                     } catch (IOException e) {
                         Log.error("Could not close FileOutputStream for " + logSettingsPath, e);
                     }

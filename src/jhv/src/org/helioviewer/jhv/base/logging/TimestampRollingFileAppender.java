@@ -74,8 +74,7 @@ public class TimestampRollingFileAppender extends FileAppender {
      * underlying org.apache.log4j.FileAppender.activateOptions()
      */
     public void activateOptions() {
-        Date timeStamp = null;
-
+        Date timeStamp;
         try {
             formatter.applyPattern(pattern);
             timeStamp = formatter.parse(timeStampString);

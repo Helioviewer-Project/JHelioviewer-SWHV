@@ -161,7 +161,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             try {
                 BufferedReader input = new BufferedReader(new FileReader(LogSettings.getSingletonInstance().getCurrentLogFile()));
                 try {
-                    String line = null;
+                    String line;
                     StringBuilder sb = new StringBuilder();
                     while ((line = input.readLine()) != null) {
                         sb.append(line).append('\n');
