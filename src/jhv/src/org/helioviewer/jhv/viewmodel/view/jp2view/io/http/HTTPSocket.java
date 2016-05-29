@@ -31,7 +31,7 @@ public class HTTPSocket extends Socket {
     private String lastUsedHost = null;
 
     /** The default port for the HTTP socket */
-    public static final int PORT = 80;
+    private static final int PORT = 80;
 
     /**
      * Connects to the specified host via the supplied URI.

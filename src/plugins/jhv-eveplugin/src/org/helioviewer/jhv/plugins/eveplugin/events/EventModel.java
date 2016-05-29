@@ -77,10 +77,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         return eventUnderMouse.event;
     }
 
-    public void setEventUnderMouse(EventPlotConfiguration event) {
-        eventUnderMouse = event;
-    }
-
     @Override
     public void draw(Graphics2D g, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
@@ -144,7 +140,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                 eventTypeNr++;
             }
 
-            setEventUnderMouse(shouldRedraw);
+            eventUnderMouse = shouldRedraw;
             if (mousePosition != null) {
                 JHVEventContainer.highlight(highlightedEvent);
             }
@@ -274,4 +270,5 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             return true;
         return !(eventUnderMouse.x0 <= p.x && p.x <= eventUnderMouse.x1 && eventUnderMouse.yPosition - 4 <= p.y && p.y <= eventUnderMouse.yPosition + 5);
     }
+
 }

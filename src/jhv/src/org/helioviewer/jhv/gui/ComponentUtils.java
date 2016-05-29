@@ -35,7 +35,7 @@ public class ComponentUtils {
         container.setVisible(visible);
     }
 
-    public static void setClientProperty(Component container, String property, String value) {
+    private static void setClientProperty(Component container, String property, String value) {
         if (container instanceof Container) {
             Component[] components = ((Container) container).getComponents();
             for (Component component : components) {
