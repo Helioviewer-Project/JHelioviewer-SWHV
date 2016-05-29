@@ -10,14 +10,13 @@ import org.helioviewer.jhv.layers.Layers;
 
 public interface Transform {
 
-    public Vec2 transform(Vec3 pt, GridScale scale);
+    Vec2 transform(Vec3 pt, GridScale scale);
+    Vec3 transformInverse(Vec2 pt);
 
-    public Vec3 transformInverse(Vec2 pt);
+    Transform transformpolar = new TransformPolar();
+    Transform transformlatitudinal = new TransformLatitudinal();
 
-    public static Transform transformpolar = new TransformPolar();
-    public static Transform transformlatitudinal = new TransformLatitudinal();
-
-    public static class TransformPolar implements Transform {
+    class TransformPolar implements Transform {
         @Override
         public Vec2 transform(Vec3 pt, GridScale scale) {
             Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
@@ -45,7 +44,7 @@ public interface Transform {
         }
     }
 
-    public static class TransformLatitudinal implements Transform {
+    class TransformLatitudinal implements Transform {
         @Override
         public Vec2 transform(Vec3 pt, GridScale scale) {
             double theta = Math.PI / 2 - Math.acos(-pt.y);

@@ -15,10 +15,10 @@ import org.helioviewer.jhv.renderable.components.RenderableGrid.GridChoiceType;
 
 public abstract class GridScale {
 
-    public static final GridScale polar = new GridScale.GridScaleIdentity(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
-    public static final GridScale latitudinal = new GridScale.GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
-    public static final GridScale logpolar = new GridScale.GridScaleLogY(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
-    public static final GridScale ortho = new GridScale.GridScaleOrtho(0, 0, 0, 0, Transform.transformlatitudinal);
+    public static final GridScale polar = new GridScaleIdentity(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
+    public static final GridScale latitudinal = new GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
+    public static final GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
+    public static final GridScale ortho = new GridScaleOrtho(0, 0, 0, 0, Transform.transformlatitudinal);
 
     public static GridScale current = ortho;
 
@@ -52,7 +52,7 @@ public abstract class GridScale {
 
     abstract public Vec2 mouseToGridInv(Point point, Viewport vp, Camera camera);
 
-    public static abstract class GridScaleAbstract extends GridScale {
+    private static abstract class GridScaleAbstract extends GridScale {
 
         protected double xStart;
         protected double xStop;
@@ -128,7 +128,7 @@ public abstract class GridScale {
         }
     }
 
-    public static class GridScaleLogY extends GridScaleAbstract {
+    private static class GridScaleLogY extends GridScaleAbstract {
 
         public GridScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
             super(_xStart, _xStop, _yStart, _yStop, _transform);
@@ -156,7 +156,7 @@ public abstract class GridScale {
 
     }
 
-    public static class GridScaleIdentity extends GridScaleAbstract {
+    private static class GridScaleIdentity extends GridScaleAbstract {
 
         public GridScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
             super(_xStart, _xStop, _yStart, _yStop, _transform);
@@ -183,7 +183,7 @@ public abstract class GridScale {
         }
     }
 
-    public static class GridScaleOrtho extends GridScaleIdentity {
+    private static class GridScaleOrtho extends GridScaleIdentity {
         public GridScaleOrtho(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
             super(_xStart, _xStop, _yStart, _yStop, _transform);
         }
