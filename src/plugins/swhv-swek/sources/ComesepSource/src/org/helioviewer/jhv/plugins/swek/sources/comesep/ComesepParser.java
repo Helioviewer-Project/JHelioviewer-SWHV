@@ -14,21 +14,19 @@ public class ComesepParser implements SWEKParser {
     @Override
     public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
         JHVEvent currentEvent = new JHVEvent(type, id, start, end);
+
         currentEvent.initParams();
-        if (!parseResult(json, currentEvent)) {
-            return null;
-        }
+        parseResult(json, currentEvent);
         currentEvent.finishParams();
 
         return currentEvent;
     }
 
-    private boolean parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
+    private void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
         Iterator<?> keys = result.keys();
         while (keys.hasNext()) {
             parseParameter(result, keys.next(), currentEvent);
         }
-        return true;
     }
 
     private void parseParameter(JSONObject result, Object key, JHVEvent currentEvent) throws JSONException {
