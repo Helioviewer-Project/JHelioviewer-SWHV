@@ -86,7 +86,6 @@ public class FileDownloader {
             e.printStackTrace();
         } finally {
             dialog.setVisible(false);
-            dialog = null;
         }
         // return destination of file
         return new File(outFileName).toURI();
@@ -193,12 +192,11 @@ public class FileDownloader {
 
         downloadThread = new Thread(new Runnable() {
             public void run() {
-                URLConnection conn = null;
                 FileOutputStream out = null;
                 InputStream in = null;
 
                 try {
-                    conn = finalSource.toURL().openConnection();
+                    URLConnection conn = finalSource.toURL().openConnection();
                     in = conn.getInputStream();
                     out = new FileOutputStream(finalDest);
 

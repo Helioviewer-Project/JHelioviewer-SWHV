@@ -56,12 +56,13 @@ public class HEKParser implements SWEKParser {
                 if (keyString.equals("refs")) {
                     parseRefs(currentEvent, result.getJSONArray(originalKeyString));
                 } else {
-                    String value = null;
+                    String value;
                     if (!result.isNull(keyString)) {
                         value = result.optString(keyString);
                     } else {
                         continue;
                     }
+
                     if (keyString.equals("hgs_bbox")) {
                         hgsBoundedBox = parsePolygon(value);
                     } else if (keyString.equals("hgs_boundcc")) {

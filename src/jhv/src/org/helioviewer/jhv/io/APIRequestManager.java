@@ -57,25 +57,24 @@ public class APIRequestManager {
     public static long getLatestImageDate(String observatory, String instrument, String detector, String measurement, boolean message) {
         long timestamp = System.currentTimeMillis();
         boolean readDate = false;
-        View view = null;
 
         try {
             String server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
-            view = loadImage(server, observatory, instrument, detector, measurement, timestamp, message);
+            View view = loadImage(server, observatory, instrument, detector, measurement, timestamp, message);
             if (view != null) {
                 timestamp = view.getFirstTime().milli;
                 readDate = true;
 
                 EventQueue.invokeLater(new Runnable() {
-                    private View view;
+                    private View theView;
 
                     @Override
                     public void run() {
-                        view.abolish();
+                        theView.abolish();
                     }
 
                     public Runnable init(View _view) {
-                        view = _view;
+                        theView = _view;
                         return this;
                     }
                 }.init(view));

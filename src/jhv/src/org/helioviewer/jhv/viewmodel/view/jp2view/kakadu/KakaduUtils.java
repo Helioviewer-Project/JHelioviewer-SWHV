@@ -110,10 +110,10 @@ public class KakaduUtils {
      * @throws JHV_KduException
      */
     public static void downloadInitialData(JPIPSocket socket, JHV_Kdu_cache cache, ImageCacheStatus status) throws IOException, JHV_KduException {
-        JPIPResponse res = null;
         JPIPRequest req = new JPIPRequest(JPIPRequest.Method.GET, new JPIPQuery("stream", "0", "metareq", "[*]!!", "len", Integer.toString(JPIPConstants.META_REQUEST_LEN)));
 
         try {
+            JPIPResponse res;
             do {
                 socket.send(req);
                 if ((res = socket.receive()) == null)
@@ -151,14 +151,13 @@ public class KakaduUtils {
      * @throws JHV_KduException
      */
     private static Jp2_input_box[] findBox(Jp2_family_src src, long boxType, int boxNumber) throws JHV_KduException {
-        Jp2_locator jp2Locator = null;
         Jp2_input_box box = null, box_final = null;
         Jp2_input_box result[] = { null, null };
 
         try {
             box = new Jp2_input_box();
             box_final = new Jp2_input_box();
-            jp2Locator = new Jp2_locator();
+            Jp2_locator jp2Locator = new Jp2_locator();
 
             if (!box.Open(src, jp2Locator)) {
                 throw new JHV_KduException("Box not open: " + boxNumber);
@@ -272,11 +271,10 @@ public class KakaduUtils {
      */
     public static String getXml(Jp2_family_src src, int boxNumber) throws JHV_KduException {
         String xml = null;
-        Jp2_input_box xmlBox = null, assocBox = null, assoc2Box = null;
-        Jp2_input_box findBoxResult[];
 
-        findBoxResult = KakaduUtils.findBox(src, Kdu_global.jp2_xml_4cc, boxNumber);
-        xmlBox = findBoxResult[0];
+        Jp2_input_box assocBox = null, assoc2Box = null;
+        Jp2_input_box findBoxResult[] = KakaduUtils.findBox(src, Kdu_global.jp2_xml_4cc, boxNumber);
+        Jp2_input_box xmlBox = findBoxResult[0];
 
         if (xmlBox == null) {
             findBoxResult = KakaduUtils.findBox(src, Kdu_global.jp2_association_4cc, boxNumber);
