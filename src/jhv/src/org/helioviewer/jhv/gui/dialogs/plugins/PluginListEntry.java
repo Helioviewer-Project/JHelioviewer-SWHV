@@ -47,16 +47,10 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
     private final JPanel descPane = new JPanel();
     private final JPanel buttonPane = new JPanel();
 
-    public PluginListEntry(final PluginContainer plugin, final List list) {
+    public PluginListEntry(PluginContainer plugin, List list) {
         this.plugin = plugin;
         this.list = list;
-        initVisualComponents();
-    }
 
-    /**
-     * Initialize the visual parts of the component.
-     */
-    private void initVisualComponents() {
         // title
         titlePane.setText(getTitleText());
         titlePane.setEditable(false);
@@ -91,7 +85,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
         add(descPane, BorderLayout.LINE_START);
         add(buttonPane, BorderLayout.LINE_END);
 
-        final int height = titlePane.getPreferredSize().height + buttonPane.getPreferredSize().height;
+        int height = titlePane.getPreferredSize().height + buttonPane.getPreferredSize().height;
         setMinimumSize(new Dimension(getMinimumSize().width, height));
         setMaximumSize(new Dimension(getMaximumSize().width, height));
 
@@ -152,7 +146,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
     /**
      * Enables or disables the corresponding plug-in.
      * */
-    public void setPluginActive(final boolean active) {
+    public void setPluginActive(boolean active) {
         if (plugin.isActive() == active) {
             return;
         }
@@ -179,10 +173,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
 
     // Mouse Listener
 
-    /**
-     * {@inheritDoc}
-     * */
-    public void mouseClicked(final MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
         list.selectItem(plugin.getName());
 
         if (e.getSource().equals(infoLabel)) {
@@ -196,47 +187,31 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * */
-    public void mouseEntered(final MouseEvent e) {
+    public void mouseEntered(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     * */
-    public void mouseExited(final MouseEvent e) {
+    public void mouseExited(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     * */
-    public void mousePressed(final MouseEvent e) {
+    public void mousePressed(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     * */
-    public void mouseReleased(final MouseEvent e) {
+    public void mouseReleased(MouseEvent e) {
     }
 
     // Link Label
     private static class LinkLabel extends JLabel {
 
-        public LinkLabel(final String text) {
-            initVisualComponents(text);
-        }
-
-        private void initVisualComponents(final String text) {
+        public LinkLabel(String text) {
             setText("<html><u>" + text + "</u></html>");
             setForeground(Color.BLUE);
 
             addMouseListener(new MouseAdapter() {
-                public void mouseEntered(final MouseEvent e) {
+                public void mouseEntered(MouseEvent e) {
                     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 }
 
-                public void mouseExited(final MouseEvent e) {
+                public void mouseExited(MouseEvent e) {
                     setCursor(Cursor.getDefaultCursor());
                 }
             });

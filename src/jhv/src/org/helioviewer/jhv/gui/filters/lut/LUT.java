@@ -3,8 +3,6 @@ package org.helioviewer.jhv.gui.filters.lut;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
@@ -148,7 +146,7 @@ public class LUT {
      * @throws FileNotFoundException
      *             From opening the file
      */
-    private static LUT readGimpGradientFile(File file) throws Exception, IOException {
+    private static LUT readGimpGradientFile(File file) throws Exception {
         FileInputStream fr = null;
         LUT l;
         try {
@@ -173,7 +171,7 @@ public class LUT {
      * @throws IOException
      *             From opening the file
      */
-    private static LUT readGimpGradientStream(InputStream is) throws Exception, IOException {
+    private static LUT readGimpGradientStream(InputStream is) throws Exception {
         BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         GimpGradient gg = new GimpGradient(in);
         int[] lut8 = new int[256];

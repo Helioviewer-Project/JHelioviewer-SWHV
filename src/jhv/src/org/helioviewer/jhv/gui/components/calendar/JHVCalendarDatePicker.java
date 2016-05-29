@@ -56,7 +56,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         return textField;
     }
 
-    private JButton popupButton;
+    private final JButton popupButton;
     private Popup popup = null;
 
     public JHVCalendarDatePicker() {
