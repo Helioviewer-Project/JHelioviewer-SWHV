@@ -169,12 +169,11 @@ public class JP2Image {
      */
     private void initRemote(JHV_Kdu_cache cache, ImageCacheStatus status) throws JHV_KduException {
         // Create the JPIP-socket necessary for communications
-        JPIPResponse res;
         socket = new JPIPSocket();
 
         try {
             // Connect to the JPIP server and add the first response to cache
-            res = (JPIPResponse) socket.connect(uri);
+            JPIPResponse res = (JPIPResponse) socket.connect(uri);
             cache.addJPIPResponseData(res, status);
 
             // Download the necessary initial data
@@ -395,7 +394,8 @@ public class JP2Image {
 
     // if instance was built before cancelling
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         if (!isAbolished) {
             EventQueue.invokeLater(new Runnable() {
                 @Override

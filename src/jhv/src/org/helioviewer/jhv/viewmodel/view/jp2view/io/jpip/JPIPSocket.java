@@ -148,7 +148,7 @@ public class JPIPSocket extends HTTPSocket {
         if (!_req.headerExists(HTTPHeaderKey.HOST.toString()))
             _req.setHeader(HTTPHeaderKey.HOST.toString(), (getHost() + ":" + getPort()));
         // Adds a necessary JPIP request field
-        if ((jpipChannelID != null && queryStr.indexOf("cid=") == -1) && (queryStr.indexOf("cclose") == -1))
+        if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
         if (_req.getMethod() == Method.GET) {

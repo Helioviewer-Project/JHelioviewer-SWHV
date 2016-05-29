@@ -247,10 +247,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         }
 
         private static boolean containsPoint(Point p, int clickx, int clicky, int clickw, int clickh) {
-            if (p != null) {
-                return p.x >= clickx && p.x <= clickx + clickw && p.y >= clicky && p.y <= clicky + clickh;
-            }
-            return false;
+            return p != null && p.x >= clickx && p.x <= clickx + clickw && p.y >= clicky && p.y <= clicky + clickh;
         }
     }
 

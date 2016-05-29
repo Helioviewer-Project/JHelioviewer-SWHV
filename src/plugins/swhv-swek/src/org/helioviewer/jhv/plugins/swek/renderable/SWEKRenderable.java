@@ -134,8 +134,7 @@ public class SWEKRenderable extends AbstractRenderable {
             gl.glBegin(GL2.GL_QUADS);
             {
                 Vec3 v = new Vec3();
-                for (int i = 0; i < texCoordHelpers.length; i++) {
-                    int[] el = texCoordHelpers[i];
+                for (int[] el : texCoordHelpers) {
                     double deltatheta = sz / distSun * (el[1] * 2 - 1);
                     double deltar = sz * (el[0] * 2 - 1);
                     double r = distSun + deltar;

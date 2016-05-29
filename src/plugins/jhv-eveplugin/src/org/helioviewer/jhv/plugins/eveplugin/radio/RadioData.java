@@ -253,19 +253,16 @@ public class RadioData extends AbstractLineDataSelectorElement {
         @Override
         protected ArrayList<JP2ViewCallisto> backgroundWork() {
             ArrayList<JP2ViewCallisto> jpList = new ArrayList<JP2ViewCallisto>();
-            for (int i = 0; i < datesToDownload.size(); i++) {
-                long date = datesToDownload.get(i);
-
+            for (long date : datesToDownload) {
                 JP2ViewCallisto v = null;
                 try {
                     v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM",
-                                                                                     date, date + 1 /* force JPX (TBD) */, -100, false);
+                            date, date + 1 /* force JPX (TBD) */, -100, false);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                 }
                 jpList.add(v);
             }
-
             return jpList;
         }
 
