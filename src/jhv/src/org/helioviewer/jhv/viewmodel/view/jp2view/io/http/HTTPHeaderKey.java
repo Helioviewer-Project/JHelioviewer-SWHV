@@ -19,7 +19,7 @@ public enum HTTPHeaderKey {
 
     private final String str;
 
-    private HTTPHeaderKey(final String _str) {
+    HTTPHeaderKey(final String _str) {
         str = _str;
     }
 

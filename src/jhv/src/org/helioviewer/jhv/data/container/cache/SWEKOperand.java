@@ -10,7 +10,7 @@ public enum SWEKOperand {
 
     private String representation;
 
-    private SWEKOperand(String representation) {
+    SWEKOperand(String representation) {
         this.representation = representation;
     }
 
