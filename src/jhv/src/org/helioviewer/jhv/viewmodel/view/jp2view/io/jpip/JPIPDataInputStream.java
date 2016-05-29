@@ -45,7 +45,7 @@ public class JPIPDataInputStream {
      * 
      * @throws java.io.IOException
      */
-    private final long readVBAS() throws IOException {
+    private long readVBAS() throws IOException {
         int c;
         long value = 0;
 
