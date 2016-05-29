@@ -34,8 +34,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
     private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();
     private static final String ROBserver = DataSources.ROBsettings.get("API.jp2images.path");
 
-    public static final int MAX_AMOUNT_OF_DAYS = 3;
-    public static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
+    private static final int MAX_AMOUNT_OF_DAYS = 3;
+    private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
     private final RadioOptionsPanel optionsPanel;
     private IndexColorModel colorModel;
@@ -134,7 +134,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         }
     }
 
-    void requestForData() {
+    private void requestForData() {
         for (DownloadedJPXData jpxData : cache.values()) {
             jpxData.requestData();
         }

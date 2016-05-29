@@ -46,10 +46,10 @@ public abstract class AbstractAnnotateable implements Annotateable {
         return pt;
     }
 
-    protected static Vec3 toCart(double x, double y, double z) {
-        return new Vec3(x * Math.sin(y) * Math.sin(z),
-                x * Math.cos(y),
-                x * Math.sin(y) * Math.cos(z));
+    protected static Vec3 toCart(double y, double z) {
+        return new Vec3(radius * Math.sin(y) * Math.sin(z),
+                        radius * Math.cos(y),
+                        radius * Math.sin(y) * Math.cos(z));
     }
 
     protected Vec3 computePoint(Point p) {
@@ -71,7 +71,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
                 double t = i / subdivisions;
                 double y0 = (1 - t) * p1s.y + t * p2s.y;
                 double z0 = (1 - t) * p1s.z + t * p2s.z;
-                Vec3 p0 = toCart(radius, y0, z0);
+                Vec3 p0 = toCart(y0, z0);
                 p0.y = -p0.y;
                 previous = GLHelper.drawVertex(camera, vp, gl, p0, previous);
             }
@@ -84,12 +84,12 @@ public abstract class AbstractAnnotateable implements Annotateable {
                 double t = i / subdivisions;
                 double y0 = (1 - t) * p1s.y + t * p2s.y;
                 double z0 = (1 - t) * p1s.z + t * p2s.z;
-                Vec3 p0 = toCart(radius, y0, z0);
+                Vec3 p0 = toCart(y0, z0);
 
                 t = (i + 1) / subdivisions;
                 double y1 = (1 - t) * p1s.y + t * p2s.y;
                 double z1 = (1 - t) * p1s.z + t * p2s.z;
-                Vec3 p1 = toCart(radius, y1, z1);
+                Vec3 p1 = toCart(y1, z1);
 
                 Vec3 p1minusp0 = Vec3.subtract(p1, p0);
                 Vec3 v = Vec3.cross(p0, p1minusp0);
