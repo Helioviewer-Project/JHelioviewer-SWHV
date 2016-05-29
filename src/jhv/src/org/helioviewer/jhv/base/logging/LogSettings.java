@@ -44,12 +44,12 @@ public class LogSettings {
     /**
      * Identifier for the file appender
      */
-    public static final String FILE_LOGGER = "file";
+    private static final String FILE_LOGGER = "file";
 
     /**
      * Identifier for the console appender
      */
-    public static final String CONSOLE_LOGGER = "console";
+    private static final String CONSOLE_LOGGER = "console";
 
     private Properties defaultSettings;
 

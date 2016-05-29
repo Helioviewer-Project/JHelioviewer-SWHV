@@ -115,16 +115,10 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void focusGained(FocusEvent arg0) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void focusLost(FocusEvent arg0) {
         // has popup button or a subcomponent of jhvCalendar lost the focus?
@@ -144,9 +138,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         // open or close the popup window when the event was fired by the
@@ -161,9 +152,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -172,16 +160,10 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void keyReleased(KeyEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void keyTyped(KeyEvent e) {
     }
@@ -260,9 +242,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(JHVCalendarEvent e) {
         // close popup
@@ -274,10 +253,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         informAllJHVCalendarListeners(new JHVCalendarEvent(this));
     }
 
-    /**
-     * 
-     * @param date
-     */
     public void setDate(Date date) {
         if (date != null) {
             long milli = date.getTime();

@@ -22,7 +22,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 
 /**
  * Implementation of View for JPG2000 images.
- * <p>
  * This class represents the gateway to the heart of the helioviewer project. It
  * is responsible for reading and decoding JPG2000 images.
  */
@@ -36,8 +35,7 @@ public class JP2View extends AbstractView {
         executor.execute(task);
     }
 
-    // Member related to JP2
-    protected JP2Image _jp2Image;
+    JP2Image _jp2Image;
 
     private int targetFrame = 0;
     private int trueFrame = -1;
@@ -305,7 +303,7 @@ public class JP2View extends AbstractView {
         signalRender(jp2Image, factor);
     }
 
-    protected void signalRender(JP2Image jp2Image, double factor) {
+    private void signalRender(JP2Image jp2Image, double factor) {
         // from reader on EDT, might come after abolish
         if (stopRender || jp2Image == null) {
             return;
