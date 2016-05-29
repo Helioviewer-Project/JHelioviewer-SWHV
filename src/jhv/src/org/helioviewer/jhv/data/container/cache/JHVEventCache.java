@@ -40,10 +40,7 @@ public class JHVEventCache {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof SortedDateInterval) {
-                return compareTo((SortedDateInterval) o) == 0;
-            }
-            return false;
+            return o instanceof SortedDateInterval && compareTo((SortedDateInterval) o) == 0;
         }
 
         @Override

@@ -342,12 +342,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         private static final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
 
-        private static final int TIMESTEP_SECONDS = 0;
-        private static final int TIMESTEP_MINUTES = 1;
-        private static final int TIMESTEP_HOURS = 2;
-        private static final int TIMESTEP_DAYS = 3;
-        private static final int TIMESTEP_ALL = 4;
-
         private final JSpinner spinnerCadence = new JSpinner();
         private final JComboBox comboUnit = new JComboBox(timeStepUnitStrings);
 
@@ -357,7 +351,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             spinnerCadence.setPreferredSize(new Dimension(50, 25));
             spinnerCadence.setModel(new SpinnerNumberModel(30, 1, 1000000, 1));
 
-            comboUnit.setSelectedIndex(TIMESTEP_MINUTES);
+            comboUnit.setSelectedItem("min");
             comboUnit.addActionListener(this);
 
             JPanel panel = new JPanel();

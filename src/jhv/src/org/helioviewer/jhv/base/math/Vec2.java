@@ -245,9 +245,7 @@ public class Vec2 {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Vec2)
-            return isApproxEqual((Vec2) o, 0.0);
-        return false;
+        return o instanceof Vec2 && isApproxEqual((Vec2) o, 0.0);
     }
 
     @Override

@@ -129,10 +129,8 @@ public class DataSources {
 
        @Override
         public boolean equals(Object o) {
-            if (o instanceof Item)
-                return key == ((Item) o).key;
-            return false;
-        }
+           return o instanceof Item && key == ((Item) o).key;
+       }
 
         public String getDescription() {
             return description;

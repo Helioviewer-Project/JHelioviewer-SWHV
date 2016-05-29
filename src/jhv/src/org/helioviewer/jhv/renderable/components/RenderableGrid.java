@@ -291,8 +291,7 @@ public class RenderableGrid extends AbstractRenderable {
             TextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             float textScaleFactor = textScale / renderer.getFont().getSize2D();
             renderer.begin3DRendering();
-            for (int i = 0; i < radialLabels.size(); ++i) {
-                GridLabel label = radialLabels.get(i);
+            for (GridLabel label : radialLabels) {
                 renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, 0, fuzz * rsize * textScaleFactor);
             }
             renderer.end3DRendering();
@@ -465,17 +464,16 @@ public class RenderableGrid extends AbstractRenderable {
         renderer.begin3DRendering();
 
         gl.glDisable(GL2.GL_CULL_FACE);
-        for (int i = 0; i < latLabels.size(); ++i) {
-            GridLabel label = latLabels.get(i);
+        for (GridLabel label : latLabels) {
             renderer.draw3D(label.txt, label.x, label.y, 0, textScaleFactor);
         }
         renderer.flush();
         gl.glEnable(GL2.GL_CULL_FACE);
 
-        for (int i = 0; i < lonLabels.size(); ++i) {
+        for (GridLabel lonLabel : lonLabels) {
             gl.glPushMatrix();
             {
-                GridLabel label = lonLabels.get(i);
+                GridLabel label = lonLabel;
                 gl.glTranslatef(label.x, 0, label.y);
                 gl.glRotatef(label.theta, 0, 1, 0);
 
