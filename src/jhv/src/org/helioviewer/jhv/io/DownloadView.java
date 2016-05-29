@@ -46,12 +46,9 @@ public class DownloadView {
 
         File downloadDestination = fileDownloader.getDefaultDownloadLocation(uri);
         try {
-            if (!fileDownloader.get(downloadUri, downloadDestination, "Downloading " + v.getName())) {
-                return;
-            }
+            fileDownloader.get(downloadUri, downloadDestination, "Downloading " + v.getName());
         } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
     }
 

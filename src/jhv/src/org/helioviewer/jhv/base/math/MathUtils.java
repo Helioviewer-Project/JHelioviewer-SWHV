@@ -91,15 +91,15 @@ public class MathUtils {
         return f;
     }
 
-    public static final int clip(int val, int from, int to) {
+    public static int clip(int val, int from, int to) {
         return val < from ? from : (val > to ? to : val);
     }
 
-    public static final int clip(int val, int max) {
+    public static int clip(int val, int max) {
         return val < max ? val : max;
     }
 
-    public static final int nextPowerOfTwo(int n) {
+    public static int nextPowerOfTwo(int n) {
         n = n - 1;
         n = n | (n >> 1);
         n = n | (n >> 2);
@@ -110,11 +110,11 @@ public class MathUtils {
         return n;
     }
 
-    public static final int roundDownTo(int a, int quanta) { // works with pot quanta
+    public static int roundDownTo(int a, int quanta) { // works with pot quanta
         return a & ~(quanta - 1);
     }
 
-    public static final int roundUpTo(int a, int quanta) { // works with pot quanta
+    public static int roundUpTo(int a, int quanta) { // works with pot quanta
         return (a + (quanta - 1)) & ~(quanta - 1);
     }
 

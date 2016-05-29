@@ -87,11 +87,11 @@ public class Vec3 {
         this.z += s;
     }
 
-    public final static Vec3 add(Vec3 vec1, Vec3 vec2) {
+    public static Vec3 add(Vec3 vec1, Vec3 vec2) {
         return new Vec3(vec1.x + vec2.x, vec1.y + vec2.y, vec1.z + vec2.z);
     }
 
-    public final static Vec3 add(Vec3 vec1, double s) {
+    public static Vec3 add(Vec3 vec1, double s) {
         return new Vec3(vec1.x + s, vec1.y + s, vec1.z + s);
     }
 
@@ -108,11 +108,11 @@ public class Vec3 {
         this.z -= s;
     }
 
-    public final static Vec3 subtract(Vec3 vec1, Vec3 vec2) {
+    public static Vec3 subtract(Vec3 vec1, Vec3 vec2) {
         return new Vec3(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
     }
 
-    public final static Vec3 subtract(Vec3 vec1, double s) {
+    public static Vec3 subtract(Vec3 vec1, double s) {
         return new Vec3(vec1.x - s, vec1.y - s, vec1.z - s);
     }
 
@@ -132,13 +132,13 @@ public class Vec3 {
         this.z /= s;
     }
 
-    public final static Vec3 divide(Vec3 vec1, Vec3 vec2) {
+    public static Vec3 divide(Vec3 vec1, Vec3 vec2) {
         if (vec2.x == 0.0 || vec2.y == 0.0 || vec2.z == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         return new Vec3(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z);
     }
 
-    public final static Vec3 divide(Vec3 vec1, double s) {
+    public static Vec3 divide(Vec3 vec1, double s) {
         if (s == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         return new Vec3(vec1.x / s, vec1.y / s, vec1.z / s);
@@ -156,11 +156,11 @@ public class Vec3 {
         this.z *= s;
     }
 
-    public final static Vec3 multiply(Vec3 vec1, Vec3 vec2) {
+    public static Vec3 multiply(Vec3 vec1, Vec3 vec2) {
         return new Vec3(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z);
     }
 
-    public final static Vec3 multiply(Vec3 vec1, double s) {
+    public static Vec3 multiply(Vec3 vec1, double s) {
         return new Vec3(vec1.x * s, vec1.y * s, vec1.z * s);
     }
 
@@ -168,7 +168,7 @@ public class Vec3 {
         return Vec3.dot(this, vec);
     }
 
-    public final static double dot(Vec3 u, Vec3 v) {
+    public static double dot(Vec3 u, Vec3 v) {
         return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
     }
 
@@ -176,7 +176,7 @@ public class Vec3 {
         return Vec3.cross(this, vec);
     }
 
-    public final static Vec3 cross(Vec3 u, Vec3 v) {
+    public static Vec3 cross(Vec3 u, Vec3 v) {
         return new Vec3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
     }
 
@@ -186,7 +186,7 @@ public class Vec3 {
         this.z = -this.z;
     }
 
-    public final static Vec3 negate(Vec3 vec) {
+    public static Vec3 negate(Vec3 vec) {
         Vec3 vecCopy = vec.copy();
         vecCopy.negate();
         return vecCopy;
@@ -252,7 +252,7 @@ public class Vec3 {
         return new Vec3(this);
     }
 
-    public final static double[] toArray(Vec3[] vecs) {
+    public static double[] toArray(Vec3[] vecs) {
         double[] arr = new double[vecs.length * 3];
         for (int i = 0; i < vecs.length; i++) {
             Vec3 v = vecs[i];
