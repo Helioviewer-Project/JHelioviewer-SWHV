@@ -224,10 +224,10 @@ public class FITSImage implements MetaDataContainer {
         for (Cursor iter = header.iterator(); iter.hasNext();) {
             headerCard = (HeaderCard) iter.next();
             if (headerCard.getValue() != null) {
-                builder.append("<" + headerCard.getKey() + ">" + headerCard.getValue() + "</" + headerCard.getKey() + ">" + sep);
+                builder.append("<").append(headerCard.getKey()).append(">").append(headerCard.getValue()).append("</").append(headerCard.getKey()).append(">").append(sep);
             }
         }
-        builder.append("</fits>" + sep + "</meta>");
+        builder.append("</fits>").append(sep).append("</meta>");
 
         return builder.toString();
     }

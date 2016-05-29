@@ -31,7 +31,7 @@ public class RenderableGrid extends AbstractRenderable {
 
         private final String display;
 
-        private GridChoiceType(String s) {
+        GridChoiceType(String s) {
             display = s;
         }
 

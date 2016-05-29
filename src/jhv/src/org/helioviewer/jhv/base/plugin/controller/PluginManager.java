@@ -76,9 +76,9 @@ public class PluginManager {
      *             not be loaded. The relevant plug-ins are named in the
      *             exception message.
      */
-    public void searchForPlugins(File file, boolean recursively, Set<String> deactivatedPlugins) throws IOException {
+    public void searchForPlugins(File file, Set<String> deactivatedPlugins) throws IOException {
         // search and load plug-ins
-        LinkedList<String> list = searchAndLoadPlugins(file, recursively, deactivatedPlugins);
+        LinkedList<String> list = searchAndLoadPlugins(file, deactivatedPlugins);
 
         // if there is at least one plug-in which could not be loaded throw an
         // exception and add plug-in names to the message of the exception.
@@ -105,13 +105,13 @@ public class PluginManager {
      *            Set with file names of plugins which should be deactivated
      * @return list with file names where the plug-in could not be loaded.
      */
-    private LinkedList<String> searchAndLoadPlugins(File file, boolean recursivly, Set<String> deactivedPlugins) {
+    private LinkedList<String> searchAndLoadPlugins(File file, Set<String> deactivedPlugins) {
         LinkedList<String> result = new LinkedList<String>();
         File[] files = file.listFiles();
 
         for (File f : files) {
             if (f.isDirectory()) {
-                result.addAll(searchAndLoadPlugins(f, recursivly, deactivedPlugins));
+                result.addAll(searchAndLoadPlugins(f, deactivedPlugins));
             } else if (f.isFile() && f.getName().toLowerCase().endsWith(".jar") && !deactivedPlugins.contains(f.getName())) {
                 Log.debug("Found Plugin Jar File: " + f.toURI());
                 try {
