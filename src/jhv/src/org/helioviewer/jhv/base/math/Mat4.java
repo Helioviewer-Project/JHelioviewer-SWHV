@@ -342,9 +342,8 @@ public class Mat4 {
         // Quaterniond quat = new Quaterniond(degAng, axisx, axisy, axisz);
         // return buildRotationMatrix(quat);
         Mat4 r = Mat4.identity();
-        double RadAng = angle;
-        double ca = Math.cos(RadAng);
-        double sa = Math.sin(RadAng);
+        double ca = Math.cos(angle);
+        double sa = Math.sin(angle);
 
         if (axisx == 1 && axisy == 0 && axisz == 0) // about x-axis
         {
@@ -450,25 +449,22 @@ public class Mat4 {
     @Override
     public final String toString() {
         String format = "%01.02f";
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format(format + ", ", m[0]));
-        sb.append(String.format(format + ", ", m[4]));
-        sb.append(String.format(format + ", ", m[8]));
-        sb.append(String.format(format + ", \n", m[12]));
-        sb.append(String.format(format + ", ", m[1]));
-        sb.append(String.format(format + ", ", m[5]));
-        sb.append(String.format(format + ", ", m[9]));
-        sb.append(String.format(format + ", \n", m[13]));
-        sb.append(String.format(format + ", ", m[2]));
-        sb.append(String.format(format + ", ", m[6]));
-        sb.append(String.format(format + ", ", m[10]));
-        sb.append(String.format(format + ", \n", m[14]));
-        sb.append(String.format(format + ", ", m[3]));
-        sb.append(String.format(format + ", ", m[7]));
-        sb.append(String.format(format + ", ", m[11]));
-        sb.append(String.format(format + ", \n", m[15]));
-
-        return sb.toString();
+        return String.format(format + ", ", m[0]) +
+               String.format(format + ", ", m[4]) +
+               String.format(format + ", ", m[8]) +
+               String.format(format + ", \n", m[12]) +
+               String.format(format + ", ", m[1]) +
+               String.format(format + ", ", m[5]) +
+               String.format(format + ", ", m[9]) +
+               String.format(format + ", \n", m[13]) +
+               String.format(format + ", ", m[2]) +
+               String.format(format + ", ", m[6]) +
+               String.format(format + ", ", m[10]) +
+               String.format(format + ", \n", m[14]) +
+               String.format(format + ", ", m[3]) +
+               String.format(format + ", ", m[7]) +
+               String.format(format + ", ", m[11]) +
+               String.format(format + ", \n", m[15]);
     }
 
 }
