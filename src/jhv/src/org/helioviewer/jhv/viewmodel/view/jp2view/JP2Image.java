@@ -230,7 +230,7 @@ public class JP2Image {
         }
     }
 
-    protected void startReader(JP2View view) {
+    void startReader(JP2View view) {
         if (cacheReader != null) // remote
             try {
                 reader = new J2KReader(view, this);
@@ -240,7 +240,7 @@ public class JP2Image {
             }
     }
 
-    protected void signalReader(JP2ImageParameter params) {
+    void signalReader(JP2ImageParameter params) {
         if (reader != null)
             reader.signalReader(params);
     }
@@ -249,7 +249,7 @@ public class JP2Image {
 
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
-    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
+    JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
         MetaData m = metaDataList[frame];
         Region mr = m.getPhysicalRegion();
         Region r = ViewROI.updateROI(camera, vp, p, m);
@@ -331,7 +331,7 @@ public class JP2Image {
      *
      * @return URI representing the location of the image.
      */
-    protected URI getURI() {
+    URI getURI() {
         return uri;
     }
 
@@ -347,7 +347,7 @@ public class JP2Image {
         return downloadURI;
     }
 
-    protected String getName() {
+    String getName() {
         MetaData m = metaDataList[0];
         if (m instanceof ObserverMetaData) {
             return ((ObserverMetaData) m).getFullName();
@@ -365,7 +365,7 @@ public class JP2Image {
      *
      * @return Socket connected to the server
      */
-    protected JPIPSocket getSocket() {
+    JPIPSocket getSocket() {
         if (socket == null)
             return null;
 
@@ -375,7 +375,7 @@ public class JP2Image {
     }
 
     // Returns the number of output components
-    protected int getNumComponents() {
+    int getNumComponents() {
         return numComponents;
     }
 
@@ -411,7 +411,7 @@ public class JP2Image {
      * operations. I use the 'abolish' name to distinguish it from what the
      * Kakadu library uses.
      */
-    protected void abolish() {
+    void abolish() {
         isAbolished = true;
 
         if (reader != null) {
@@ -445,11 +445,11 @@ public class JP2Image {
     }
 
     // Returns the cache reference
-    protected JHV_Kdu_cache getCacheRef() {
+    JHV_Kdu_cache getCacheRef() {
         return cacheReader;
     }
 
-    protected ImageCacheStatus getImageCacheStatus() {
+    ImageCacheStatus getImageCacheStatus() {
         return imageCacheStatus;
     }
 

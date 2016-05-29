@@ -14,40 +14,34 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
  */
 public class JPIPDataSegment implements Cloneable {
 
-    /** The data-bin in-class identifier. */
+    // The data-bin in-class identifier
     public long binID;
 
-    /** The data-bin auxiliary information. */
+    // The data-bin auxiliary information
     public long aux;
 
-    /** The data-bin class identifier. */
+    // The data-bin class identifier
     public JPIPDatabinClass classID;
 
-    /** The code-stream index. */
+    // The code-stream index
     public long codestreamID;
 
-    /** Offset of this segment within the data-bin data. */
+    // Offset of this segment within the data-bin data
     public int offset;
 
-    /** Length of this segment. */
+    // Length of this segment
     public int length;
 
-    /** The segment data. */
+    // The segment data
     public byte data[];
 
-    /**
-     * Indicates if this segment is the last one (when there is a data segment
-     * stream).
-     */
+    // Indicates if this segment is the last one (when there is a data segment stream)
     public boolean isFinal;
 
-    /** Indicates if this segment is a End Of Response message. */
+    // Indicates if this segment is a End Of Response message
     public boolean isEOR;
 
-    /** Indicates if this data segment is a complete data bin */
-    public boolean isComplete;
-
-    /** Returns a completely disjoint clone of the JPIPDataSegment */
+    // Returns a completely disjoint clone of the JPIPDataSegment
     @Override
     public JPIPDataSegment clone() throws CloneNotSupportedException {
         super.clone();
@@ -58,7 +52,6 @@ public class JPIPDataSegment implements Cloneable {
         ret.classID = this.classID;
         ret.codestreamID = this.codestreamID;
         ret.data = this.data == null ? null : this.data.clone();
-        ret.isComplete = this.isComplete;
         ret.isEOR = this.isEOR;
         ret.isFinal = this.isFinal;
         ret.length = this.length;
@@ -66,7 +59,7 @@ public class JPIPDataSegment implements Cloneable {
         return ret;
     }
 
-    /** Returns a string representation of the JPIP data segment. */
+    // Returns a string representation of the JPIP data segment
     @Override
     public String toString() {
         String res;

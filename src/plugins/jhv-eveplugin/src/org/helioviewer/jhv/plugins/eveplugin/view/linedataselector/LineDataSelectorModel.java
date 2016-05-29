@@ -19,7 +19,7 @@ public class LineDataSelectorModel implements TableModel {
 
     private static final ArrayList<LineDataSelectorElement> elements = new ArrayList<LineDataSelectorElement>();
 
-    public final static int NUMBEROFCOLUMNS = 5;
+    private static final int NUMBEROFCOLUMNS = 5;
 
     public void addLineDataSelectorModelListener(LineDataSelectorModelListener listener) {
         listeners.add(listener);
