@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
 
-import java.io.IOException;
 import java.util.LinkedList;
 
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPResponse;
@@ -27,7 +26,7 @@ public class JPIPResponse extends HTTPResponse {
      * @param res
      * @throws IOException
      */
-    public JPIPResponse(HTTPResponse res) throws IOException {
+    public JPIPResponse(HTTPResponse res) {
         super(res.getCode(), res.getReason());
 
         for (String key : res.getHeaders())

@@ -112,10 +112,7 @@ public class FilterManager {
     }
 
     public boolean isFiltered(SWEKEventType eventType, SWEKParameter parameter) {
-        if (filters.containsKey(eventType)) {
-            return filters.get(eventType).containsKey(parameter);
-        }
-        return false;
+        return filters.containsKey(eventType) && filters.get(eventType).containsKey(parameter);
     }
 
     /**

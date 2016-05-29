@@ -105,10 +105,7 @@ public class DownloadController {
 
     public boolean isDownloadActive(Band band) {
         ArrayList<Interval> list = downloadMap.get(band);
-        if (list == null) {
-            return false;
-        }
-        return !list.isEmpty();
+        return list != null && !list.isEmpty();
     }
 
     private void fireDownloadStarted(Band band) {
@@ -121,9 +118,9 @@ public class DownloadController {
 
     private List<Future<?>> addDownloads(DownloadThread[] jobs) {
         List<Future<?>> futureJobs = new ArrayList<Future<?>>();
-        for (int i = 0; i < jobs.length; ++i) {
-            Band band = jobs[i].getBand();
-            Interval interval = jobs[i].getInterval();
+        for (DownloadThread job : jobs) {
+            Band band = job.getBand();
+            Interval interval = job.getInterval();
 
             ArrayList<Interval> list = downloadMap.get(band);
             if (list == null) {
@@ -132,7 +129,7 @@ public class DownloadController {
             list.add(interval);
 
             downloadMap.put(band, list);
-            futureJobs.add(EVEPlugin.executorService.submit(jobs[i]));
+            futureJobs.add(EVEPlugin.executorService.submit(job));
         }
         return futureJobs;
     }

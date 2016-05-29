@@ -51,8 +51,6 @@ public class APIRequestManager {
      * @param message
      *            display error message
      * @return time stamp of the latest available image on the server
-     * @throws IOException
-     * @throws MalformedURLException
      */
     public static long getLatestImageDate(String observatory, String instrument, String detector, String measurement, boolean message) {
         long timestamp = System.currentTimeMillis();
