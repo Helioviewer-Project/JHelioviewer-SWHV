@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +57,7 @@ public class Band extends AbstractLineDataSelectorElement {
         }
     }
 
-    public final BandType getBandType() {
+    public BandType getBandType() {
         return bandType;
     }
 
@@ -127,12 +126,10 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     private void updateWarnLevels(Rectangle graphArea) {
-        final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
-        final LinkedList<String> warnLabels = new LinkedList<String>();
+        LinkedList<Integer> warnLevels = new LinkedList<Integer>();
+        LinkedList<String> warnLabels = new LinkedList<String>();
         HashMap<String, Double> unconvertedWarnLevels = bandType.getWarnLevels();
-        Iterator<Map.Entry<String, Double>> it = unconvertedWarnLevels.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Double> pairs = it.next();
+        for (Map.Entry<String, Double> pairs : unconvertedWarnLevels.entrySet()) {
             warnLevels.add(yAxis.value2pixel(graphArea.y, graphArea.height, pairs.getValue()));
             warnLabels.add(pairs.getKey());
         }
@@ -175,12 +172,12 @@ public class Band extends AbstractLineDataSelectorElement {
         warnLevels = new int[numberOfWarnLevels];
         warnLabels = new String[numberOfWarnLevels];
         int counter = 0;
-        for (final Integer warnLevel : _warnLevels) {
+        for (Integer warnLevel : _warnLevels) {
             warnLevels[counter] = warnLevel;
             counter++;
         }
         counter = 0;
-        for (final String warnLabel : _warnLabels) {
+        for (String warnLabel : _warnLabels) {
             warnLabels[counter] = warnLabel;
             counter++;
         }

@@ -40,14 +40,9 @@ public class FileDownloader {
      * 
      * @param sourceURI
      *            address of file which have to be downloaded.
-     * @param downloadIfAlreadyExists
-     *            set this flag to download a file when a file in the download
-     *            directory with the same name already exists. The file will not
-     *            be overridden but an increased number will be added to the
-     *            file name.
      * @return URI to the downloaded file or null if download fails.
      */
-    public URI downloadFromHTTP(URI sourceURI, boolean downloadIfAlreadyExists) {
+    public URI downloadFromHTTP(URI sourceURI) {
         // check if sourceURI is an http address
         if (sourceURI == null)
             return null;
@@ -72,7 +67,6 @@ public class FileDownloader {
         StandAloneDialog dialog = new StandAloneDialog("Downloading " + name);
         dialog.setVisible(true);
 
-        // if local file name doesn't exist, download file
         try {
             if (!downloadFile(sourceURI, new File(outFileName))) {
                 if (!dialog.wasInterrupted) {

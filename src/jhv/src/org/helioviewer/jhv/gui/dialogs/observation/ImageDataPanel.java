@@ -44,12 +44,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     private final TimeSelectionPanel timeSelectionPanel = new TimeSelectionPanel();
     private final CadencePanel cadencePanel = new CadencePanel();
-    private final InstrumentsPanel instrumentsPanel;
+    private final InstrumentsPanel instrumentsPanel = new InstrumentsPanel();
 
     protected ImageDataPanel() {
-        super();
-        instrumentsPanel = new InstrumentsPanel(this);
-
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         JPanel timePane = new JPanel();
@@ -57,8 +54,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         timePane.add(timeSelectionPanel);
         timePane.add(cadencePanel);
 
-        JPanel instrumentsPane = new JPanel();
-        instrumentsPane.setLayout(new BorderLayout());
+        JPanel instrumentsPane = new JPanel(new BorderLayout());
         instrumentsPane.add(instrumentsPanel, BorderLayout.CENTER);
 
         add(timePane);
@@ -422,7 +418,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          */
         private final JComboBox comboDetectorMeasurement = new JComboBox(new String[] { "Loading..." });
 
-        public InstrumentsPanel(final ImageDataPanel imageDataPanel) {
+        public InstrumentsPanel() {
             setLayout(new GridLayout(4, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
             JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
