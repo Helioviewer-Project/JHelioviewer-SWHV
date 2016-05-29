@@ -152,7 +152,7 @@ public class FileUtils {
      *            Path to the executable
      */
     public static void registerExecutable(String identifier, String path) {
-        boolean registered = false;
+        boolean registered;
 
         try {
             Log.debug("FileUtils.registerExecutable(" + identifier + ", " + path + ") > Trying to use execFile.setExecutable from JDK 1.6+");

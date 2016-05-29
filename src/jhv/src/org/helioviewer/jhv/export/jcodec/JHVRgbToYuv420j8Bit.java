@@ -25,9 +25,9 @@ public class JHVRgbToYuv420j8Bit {
         int[][] out = new int[4][3];
 
         int r, g, b, rgb;
-        int y = 0, x = 0, srcHeight = img.getHeight(), srcWidth = img.getWidth();
+        int x, y = 0, srcHeight = img.getHeight(), srcWidth = img.getWidth();
 
-        int offChr = 0, offLuma = 0, offSrc = 0, strideDst = dst.getWidth();
+        int offChr = 0, offLuma = 0, strideDst = dst.getWidth();
         for (int i = 0; i < srcHeight >> 1; i++) {
             x = 0;
             for (int j = 0; j < srcWidth >> 1; j++) {
@@ -90,6 +90,7 @@ public class JHVRgbToYuv420j8Bit {
         out[2] = clip(v + 128, 0, 255);
     }
 
+/*
     private static void rgb2yuv_new(int r, int g, int b, int[] out) { // for 0.2
         int y = 77 * r + 150 * g + 15 * b;
         int u = -43 * r - 85 * g + 128 * b;
@@ -102,5 +103,6 @@ public class JHVRgbToYuv420j8Bit {
         out[1] = clip(u, -128, 127);
         out[2] = clip(v, -128, 127);
     }
+*/
 
 }

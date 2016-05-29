@@ -218,8 +218,6 @@ class J2KReader implements Runnable {
 
     @Override
     public void run() {
-        JPIPRequest req = null;
-
         boolean complete = false;
         boolean viewChanged = false;
         boolean downgradeNecessary = false;
@@ -266,213 +264,196 @@ class J2KReader implements Runnable {
                 }
             }
 
-            // if socket is open, get image data
-            if (socket != null && !socket.isClosed()) {
+            // if socket is open and data is needed, get image data
+            if (socket != null && !socket.isClosed() && !complete) {
                 try {
-                    // if nothing to do, check whether there are some queries left
-                    // (actually, I do not know when this might happen...)
-                    if (complete) {
-                        // contrary to the above comment, last query was spuriously resent
-                        req = null;
-                        /*
-                         * if (req != null && req.getQuery() != null) {
-                         * socket.send(req); socket.receive(); }
-                         */
-                        // keep socket open as we may need more data
-                        //socket.close();
+                    boolean stopReading = false;
+                    int curLayer = currParams.compositionLayer;
 
-                        // requesting data
+                    lastResponseTime = -1;
+
+                    int complete_steps = 0;
+                    int current_step;
+
+                    // build queries
+                    JPIPQuery[] stepQuerys;
+
+                    // Decide what cache strategy to use:
+                    // - If this is not the main view, choose FIRSTFRAMEONLY
+                    // - If this is not a movie, choose FIRSTFRAMEONLY
+                    // - If the image has been zoomed, choose CURRENTFRAMEFIRST
+                    // - If the meta data is not complete yet, choose MISSINGFRAMESFIRST
+                    // - In any other case, choose ALLFRAMESEQUALLY
+                    CacheStrategy strategy;
+
+                    if (num_layers <= 1) { // !isMultiFrame()
+                        strategy = CacheStrategy.CURRENTFRAMEONLY;
+                    } else if (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) {
+                        strategy = CacheStrategy.CURRENTFRAMEFIRST;
+                    } else if (cacheStatusRef.getImageCachedPartiallyUntil() < num_layers - 1) {
+                        strategy = CacheStrategy.MISSINGFRAMESFIRST;
                     } else {
-                        JPIPResponse res = null;
-                        boolean stopReading = false;
-                        int curLayer = currParams.compositionLayer;
+                        strategy = CacheStrategy.ALLFRAMESEQUALLY;
+                    }
 
-                        lastResponseTime = -1;
+                    // build query based on strategy
+                    switch (strategy) {
+                    case CURRENTFRAMEONLY:
+                    case CURRENTFRAMEFIRST:
+                        stepQuerys = new JPIPQuery[1];
+                        stepQuerys[0] = createQuery(currParams, curLayer, curLayer);
+                        current_step = 0;
+                        break;
+                    default:
+                        int num_steps = num_layers / JPIPConstants.MAX_REQ_LAYERS;
+                        if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
+                            num_steps++;
 
-                        int complete_steps = 0;
-                        int current_step;
+                        int lpf = 0,
+                        lpi = 0,
+                        max_layers = num_layers - 1;
+                        stepQuerys = new JPIPQuery[num_steps];
 
-                        // build queries
-                        JPIPQuery[] stepQuerys;
+                        // create queries for packages containing several frames
+                        for (int i = 0; i < num_steps; i++) {
+                            lpf += JPIPConstants.MAX_REQ_LAYERS;
+                            if (lpf > max_layers)
+                                lpf = max_layers;
 
-                        // Decide what cache strategy to use:
-                        // - If this is not the main view, choose FIRSTFRAMEONLY
-                        // - If this is not a movie, choose FIRSTFRAMEONLY
-                        // - If the image has been zoomed, choose CURRENTFRAMEFIRST
-                        // - If the meta data is not complete yet, choose MISSINGFRAMESFIRST
-                        // - In any other case, choose ALLFRAMESEQUALLY
-                        CacheStrategy strategy;
+                            stepQuerys[i] = createQuery(currParams, lpi, lpf);
 
-                        if (num_layers <= 1) { // !isMultiFrame()
-                            strategy = CacheStrategy.CURRENTFRAMEONLY;
-                        } else if (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) {
-                            strategy = CacheStrategy.CURRENTFRAMEFIRST;
-                        } else if (cacheStatusRef.getImageCachedPartiallyUntil() < num_layers - 1) {
-                            strategy = CacheStrategy.MISSINGFRAMESFIRST;
+                            lpi = lpf + 1;
+                            if (lpi > max_layers)
+                                lpi = 0;
+                        }
+                        // select current step based on strategy
+                        if (strategy == CacheStrategy.MISSINGFRAMESFIRST) {
+                            current_step = cacheStatusRef.getImageCachedPartiallyUntil() / JPIPConstants.MAX_REQ_LAYERS;
                         } else {
-                            strategy = CacheStrategy.ALLFRAMESEQUALLY;
+                            current_step = curLayer / JPIPConstants.MAX_REQ_LAYERS;
                         }
+                    }
 
-                        // build query based on strategy
-                        switch (strategy) {
-                        case CURRENTFRAMEONLY:
-                        case CURRENTFRAMEFIRST:
-                            stepQuerys = new JPIPQuery[1];
-                            stepQuerys[0] = createQuery(currParams, curLayer, curLayer);
+                    JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
+
+                    // long time = System.currentTimeMillis();
+
+                    // send queries until everything is complete or caching is interrupted
+                    while ((complete_steps < stepQuerys.length) && !stopReading) {
+                        if (current_step >= stepQuerys.length)
                             current_step = 0;
-                            break;
-                        default:
-                            int num_steps = num_layers / JPIPConstants.MAX_REQ_LAYERS;
-                            if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
-                                num_steps++;
 
-                            int lpf = 0,
-                            lpi = 0,
-                            max_layers = num_layers - 1;
-                            stepQuerys = new JPIPQuery[num_steps];
-
-                            // create queries for packages containing several frames
-                            for (int i = 0; i < num_steps; i++) {
-                                lpf += JPIPConstants.MAX_REQ_LAYERS;
-                                if (lpf > max_layers)
-                                    lpf = max_layers;
-
-                                stepQuerys[i] = createQuery(currParams, lpi, lpf);
-
-                                lpi = lpf + 1;
-                                if (lpi > max_layers)
-                                    lpi = 0;
-                            }
-                            // select current step based on strategy
-                            if (strategy == CacheStrategy.MISSINGFRAMESFIRST) {
-                                current_step = cacheStatusRef.getImageCachedPartiallyUntil() / JPIPConstants.MAX_REQ_LAYERS;
-                            } else {
-                                current_step = curLayer / JPIPConstants.MAX_REQ_LAYERS;
-                            }
+                        // if query is already complete, go to next step
+                        if (stepQuerys[current_step] == null) {
+                            current_step++;
+                            continue;
                         }
 
-                        req = new JPIPRequest(HTTPRequest.Method.GET);
+                        // update requested package size
+                        stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), Integer.toString(jpipRequestLen));
 
-                        // long time = System.currentTimeMillis();
+                        req.setQuery(stepQuerys[current_step]);
+                        // Log.debug(stepQuerys[current_step].toString());
+                        socket.send(req);
 
-                        // send queries until everything is complete or caching is interrupted
-                        while ((complete_steps < stepQuerys.length) && !stopReading) {
-                            if (current_step >= stepQuerys.length)
-                                current_step = 0;
+                        // long start = System.currentTimeMillis();
+                        JPIPResponse res = socket.receive();
+                        // System.out.println(res.getResponseSize() /
+                        // (System.currentTimeMillis() - start));
 
-                            // if query is already complete, go to next step
-                            if (stepQuerys[current_step] == null) {
-                                current_step++;
-                                continue;
-                            }
+                        // receive data
+                        if (res != null) {
+                            // update optimal package size
+                            flowControl();
 
-                            // update requested package size
-                            stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), Integer.toString(jpipRequestLen));
-
-                            req.setQuery(stepQuerys[current_step]);
-                            // Log.debug(stepQuerys[current_step].toString());
-                            socket.send(req);
-
-                            // long start = System.currentTimeMillis();
-                            res = socket.receive();
-                            // System.out.println(res.getResponseSize() /
-                            // (System.currentTimeMillis() - start));
-
-                            // receive data
-                            if (res != null) {
-                                // update optimal package size
-                                flowControl();
-
-                                // downgrade if necessary
-                                if (downgradeNecessary && res.getResponseSize() > 0) {
-                                    switch (strategy) {
-                                    case CURRENTFRAMEONLY:
-                                    case CURRENTFRAMEFIRST:
-                                        for (int i = 0; i < num_layers; i++) {
-                                            cacheStatusRef.downgradeImageStatus(i);
-                                        }
-                                        break;
-
-                                    default:
-                                        for (int i = 0; i < stepQuerys.length; i++) {
-                                            if (stepQuerys[i] == null) {
-                                                continue;
-                                            }
-                                            for (int j = i * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((i + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
-                                                cacheStatusRef.downgradeImageStatus(j);
-                                            }
-                                        }
+                            // downgrade if necessary
+                            if (downgradeNecessary && res.getResponseSize() > 0) {
+                                switch (strategy) {
+                                case CURRENTFRAMEONLY:
+                                case CURRENTFRAMEFIRST:
+                                    for (int i = 0; i < num_layers; i++) {
+                                        cacheStatusRef.downgradeImageStatus(i);
                                     }
-                                    MoviePanel.cacheStatusChanged();
+                                    break;
 
-                                    downgradeNecessary = false;
-                                }
-
-                                // add response to cache - react if query complete
-                                if (cacheRef.addJPIPResponseData(res, cacheStatusRef)) {
-                                    // mark query as complete
-                                    complete_steps++;
-                                    stepQuerys[current_step] = null;
-
-                                    // tell the cache status
-                                    switch (strategy) {
-                                    case CURRENTFRAMEONLY:
-                                    case CURRENTFRAMEFIRST:
-                                        cacheStatusRef.setImageStatus(curLayer, CacheStatus.COMPLETE);
-                                        break;
-
-                                    default:
-                                        for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--) {
-                                            cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);
+                                default:
+                                    for (int i = 0; i < stepQuerys.length; i++) {
+                                        if (stepQuerys[i] == null) {
+                                            continue;
+                                        }
+                                        for (int j = i * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((i + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
+                                            cacheStatusRef.downgradeImageStatus(j);
                                         }
                                     }
                                 }
                                 MoviePanel.cacheStatusChanged();
 
-                                if ((readerMode == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || readerMode == ReaderMode.ALWAYSFIREONNEWDATA) {
-                                    // if package belongs to current frame tell the render-thread
-                                    switch (strategy) {
-                                    case CURRENTFRAMEONLY:
-                                    case CURRENTFRAMEFIRST:
-                                        signalRender(currParams.factor);
-                                        break;
-                                    default:
-                                        /*! not good
-                                        if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
-                                            signalRender(currParams.factor);
-                                        }*/
+                                downgradeNecessary = false;
+                            }
+
+                            // add response to cache - react if query complete
+                            if (cacheRef.addJPIPResponseData(res, cacheStatusRef)) {
+                                // mark query as complete
+                                complete_steps++;
+                                stepQuerys[current_step] = null;
+
+                                // tell the cache status
+                                switch (strategy) {
+                                case CURRENTFRAMEONLY:
+                                case CURRENTFRAMEFIRST:
+                                    cacheStatusRef.setImageStatus(curLayer, CacheStatus.COMPLETE);
+                                    break;
+
+                                default:
+                                    for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--) {
+                                        cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);
                                     }
                                 }
                             }
+                            MoviePanel.cacheStatusChanged();
 
-                            // select next query based on strategy
-                            switch (strategy) {
-                            case MISSINGFRAMESFIRST:
-                                current_step++;
-                                break;
-                            case ALLFRAMESEQUALLY:
-                                current_step++;
-                                break;
-                            default:
-                                break;
-                            }
-
-                            // check whether caching has to be interrupted
-                            if (readerSignal.isSignaled() || Thread.interrupted()) {
-                                stopReading = true;
+                            if ((readerMode == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || readerMode == ReaderMode.ALWAYSFIREONNEWDATA) {
+                                // if package belongs to current frame tell the render-thread
+                                switch (strategy) {
+                                case CURRENTFRAMEONLY:
+                                case CURRENTFRAMEFIRST:
+                                    signalRender(currParams.factor);
+                                    break;
+                                default:
+                                    /*! not good
+                                    if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
+                                        signalRender(currParams.factor);
+                                    }*/
+                                }
                             }
                         }
 
-                        // check whether all queries are complete
-                        complete = (complete_steps >= stepQuerys.length) && strategy != CacheStrategy.CURRENTFRAMEFIRST;
-                        // if current frame first -> signal again, to go on reading
-                        if (strategy == CacheStrategy.CURRENTFRAMEFIRST) {
-                            readerSignal.signal(currParams);
+                        // select next query based on strategy
+                        switch (strategy) {
+                        case MISSINGFRAMESFIRST:
+                            current_step++;
+                            break;
+                        case ALLFRAMESEQUALLY:
+                            current_step++;
+                            break;
+                        default:
+                            break;
+                        }
+
+                        // check whether caching has to be interrupted
+                        if (readerSignal.isSignaled() || Thread.interrupted()) {
+                            stopReading = true;
                         }
                     }
-                } catch (IOException e) {
+
+                    // check whether all queries are complete
+                    complete = (complete_steps >= stepQuerys.length) && strategy != CacheStrategy.CURRENTFRAMEFIRST;
+                    // if current frame first -> signal again, to go on reading
+                    if (strategy == CacheStrategy.CURRENTFRAMEFIRST) {
+                        readerSignal.signal(currParams);
+                    }
+                 } catch (IOException e) {
                     if (verbose) {
-                        Log.error(e.getMessage() + ": " + req.getMessageBody() + " " + req.getQuery());
                         e.printStackTrace();
                     }
                     if (socket != null) {
