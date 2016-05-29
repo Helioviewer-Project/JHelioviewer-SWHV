@@ -14,8 +14,8 @@ import java.util.GregorianCalendar;
  */
 public class DayViewController implements CalendarViewController {
 
-    Calendar calendar = new GregorianCalendar();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("MMM yyyy");
+    private final Calendar calendar = new GregorianCalendar();
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM yyyy");
 
     public DayViewController() {
         calendar.setFirstDayOfWeek(Calendar.SUNDAY);

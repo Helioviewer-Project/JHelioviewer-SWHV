@@ -19,7 +19,7 @@ public class SWEKSupplier {
 
     /** The display name of the supplier */
     private final String supplierDisplayName;
-    private static HashMap<String, SWEKSupplier> suppliers = new HashMap<String, SWEKSupplier>();
+    private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<String, SWEKSupplier>();
 
     /**
      * Creates a SWEK supplier with an supplier name and a source.

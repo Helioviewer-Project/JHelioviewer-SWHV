@@ -10,7 +10,7 @@ import org.helioviewer.jhv.io.DataSources;
 
 public class ServerListCombo extends JComboBox {
 
-    private static ActionListener change = new ActionListener() {
+    private static final ActionListener change = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DataSources.changeServer((String) ((JComboBox) e.getSource()).getModel().getSelectedItem());

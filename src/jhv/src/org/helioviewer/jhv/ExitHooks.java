@@ -9,7 +9,7 @@ import org.helioviewer.jhv.layers.Layers;
 
 public class ExitHooks {
 
-    private static Thread finishMovieThread = new Thread() {
+    private static final Thread finishMovieThread = new Thread() {
         @Override
         public void run() {
             try {

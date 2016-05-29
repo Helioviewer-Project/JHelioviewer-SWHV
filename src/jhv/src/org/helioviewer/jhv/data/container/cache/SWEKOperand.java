@@ -8,7 +8,7 @@ import org.helioviewer.jhv.base.logging.Log;
 public enum SWEKOperand {
     EQUALS("="), NOT_EQUAL("!="), BIGGER(">"), SMALLER("<"), BIGGER_OR_EQUAL(">="), SMALLER_OR_EQUAL("<="), LIKE("like");
 
-    private String representation;
+    private final String representation;
 
     SWEKOperand(String representation) {
         this.representation = representation;

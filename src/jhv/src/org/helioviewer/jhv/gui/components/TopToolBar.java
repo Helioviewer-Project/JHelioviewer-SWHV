@@ -58,7 +58,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private JToggleButton rotateButton;
     private JToggleButton annotateButton;
 
-    protected ArrayList<JToggleButton> pluginList = new ArrayList<JToggleButton>();
+    private final ArrayList<JToggleButton> pluginList = new ArrayList<JToggleButton>();
 
     public TopToolBar() {
         setRollover(true);

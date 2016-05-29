@@ -46,7 +46,7 @@ public class SWEKEventType {
 
     private final boolean containsParameterFilter;
     private HashMap<String, String> databaseFields;
-    private static HashMap<String, SWEKEventType> swekEventTypes = new HashMap<String, SWEKEventType>();
+    private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<String, SWEKEventType>();
 
     /**
      * Creates an event type for the given event name, suppliers list, parameter
