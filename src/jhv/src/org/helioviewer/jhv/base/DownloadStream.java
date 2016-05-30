@@ -165,6 +165,8 @@ public class DownloadStream {
             if (code == 400) {
                 response400 = true;
                 strm = httpC.getErrorStream();
+                if (strm == null)
+                    strm = httpC.getInputStream();
             } else {
                 strm = httpC.getInputStream();
             }
