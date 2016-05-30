@@ -155,8 +155,9 @@ public class Layers {
         }
 
         int activeFrame = activeView.getCurrentFrameNumber();
+        boolean last = activeFrame == activeView.getMaximumFrameNumber();
         for (FrameListener listener : frameListeners) {
-            listener.frameChanged(activeFrame);
+            listener.frameChanged(activeFrame, last);
         }
 
         MoviePanel.setFrameSlider(activeFrame);
