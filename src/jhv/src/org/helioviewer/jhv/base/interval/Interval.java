@@ -50,9 +50,8 @@ public class Interval implements Comparable<Interval> {
     }
 
     @Override
-    public int compareTo(Interval other) {
-        return (int) ((start - other.start) % 1);
-
+    public int compareTo(Interval o) {
+        return start < o.start ? -1 : (start > o.start ? 1 : 0);
     }
 
     public static ArrayList<Interval> splitInterval(Interval interval, int days) {
@@ -74,9 +73,9 @@ public class Interval implements Comparable<Interval> {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof Interval) {
-            Interval s = (Interval) other;
+    public boolean equals(Object o) {
+        if (o instanceof Interval) {
+            Interval s = (Interval) o;
             return start == s.start && end == s.end;
         }
         return false;
