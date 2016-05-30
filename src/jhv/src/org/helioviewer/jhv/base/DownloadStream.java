@@ -43,6 +43,9 @@ public class DownloadStream {
      * Suggested name to save (if wanted)
      */
     private String outputName = null;
+
+    private String disposition = null;
+
     /**
      * Read timeout in ms
      */
@@ -179,15 +182,7 @@ public class DownloadStream {
             // Okay just normal
             in = connection.getInputStream();
         }
-        // Setting the default output name
-        outputName = url.getFile().replace('/', '-');
-        String disposition = connection.getHeaderField("Content-Disposition");
-        if (disposition != null) {
-            Matcher m = Regex.ContentDispositionFilename.matcher(disposition);
-            if (m.find()) {
-                outputName = m.group(1);
-            }
-        }
+        disposition = connection.getHeaderField("Content-Disposition");
     }
 
     /**
@@ -211,6 +206,17 @@ public class DownloadStream {
      * @return suggested download name
      */
     public String getOutputName() {
+        if (outputName == null) {
+            if (disposition != null) {
+                Matcher m = Regex.ContentDispositionFilename.matcher(disposition);
+                if (m.find()) {
+                    outputName = m.group(1);
+                }
+            }
+            if (outputName == null) {
+                outputName = url.getFile().replace('/', '-');
+            }
+        }
         return outputName;
     }
 
