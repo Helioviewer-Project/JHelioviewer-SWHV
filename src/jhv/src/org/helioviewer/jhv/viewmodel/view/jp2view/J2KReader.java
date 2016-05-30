@@ -367,7 +367,6 @@ class J2KReader implements Runnable {
                                         cacheStatusRef.downgradeImageStatus(i);
                                     }
                                     break;
-
                                 default:
                                     for (int i = 0; i < stepQuerys.length; i++) {
                                         if (stepQuerys[i] == null) {

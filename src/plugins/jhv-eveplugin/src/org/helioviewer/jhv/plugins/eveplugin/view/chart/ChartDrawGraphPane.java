@@ -111,7 +111,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private boolean axisHightlightToggled(Rectangle graphArea) {
+    private boolean toggleAxisHightlight(Rectangle graphArea) {
         boolean inLeftYAxis = false;
         boolean inRightYAxes = false;
         int rightYAxisNumber = -2;
@@ -121,11 +121,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             inLeftYAxis = yAxisVerticalCondition && mousePosition.x < graphArea.x;
             rightYAxisNumber = (mousePosition.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         }
+
         boolean toggled = false;
         int ct = -1;
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
-                if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                if ((inRightYAxes && rightYAxisNumber == ct) || (inLeftYAxis && ct == -1)) {
                     toggled = toggled || !el.getYAxis().isHighlighted();
                     el.getYAxis().setHighlighted(true);
                 } else {
@@ -142,7 +143,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     protected void paintComponent(Graphics g1) {
         Rectangle graphArea = drawController.getGraphArea();
 
-        boolean axisHighlightChanged = axisHightlightToggled(graphArea);
+        boolean axisHighlightChanged = toggleAxisHightlight(graphArea);
         if (forceRedrawGraph || axisHighlightChanged) {
             redrawGraph(graphArea);
             forceRedrawGraph = false;
