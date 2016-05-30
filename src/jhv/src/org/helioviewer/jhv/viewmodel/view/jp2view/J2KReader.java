@@ -263,7 +263,7 @@ class J2KReader implements Runnable {
             }
 
             // if socket is open and data is needed, get image data
-            if (socket != null && !socket.isClosed() && !complete) {
+            if (!complete && socket != null && !socket.isClosed()) {
                 try {
                     boolean stopReading = false;
                     int curLayer = currParams.compositionLayer;
