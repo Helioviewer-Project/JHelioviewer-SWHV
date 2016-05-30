@@ -42,7 +42,6 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
-import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.IconBank;
@@ -250,19 +249,27 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // Control buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));
 
-        previousFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.BACK), "Step to previous frame", getPreviousFrameAction());
+        previousFrameButton = new JButton(IconBank.getIcon(JHVIcon.BACK));
+        previousFrameButton.setToolTipText("Step to previous frame");
+        previousFrameButton.addActionListener(getPreviousFrameAction());
         buttonPanel.add(previousFrameButton);
 
-        playButton = ButtonCreator.createButton(playIcon, "Play movie", getPlayPauseAction());
+        playButton = new JButton(playIcon);
+        playButton.setToolTipText("Play movie");
+        playButton.addActionListener(getPlayPauseAction());
         buttonPanel.add(playButton);
 
-        nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", getNextFrameAction());
+        nextFrameButton = new JButton(IconBank.getIcon(JHVIcon.FORWARD));
+        nextFrameButton.setToolTipText("Step to next frame");
+        nextFrameButton.addActionListener(getNextFrameAction());
         buttonPanel.add(nextFrameButton);
 
         recordButton = new RecordButton();
         buttonPanel.add(recordButton);
 
-        advancedButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "Options", "Options to control playback and recording", this);
+        advancedButton = new JButton("Options", IconBank.getIcon(JHVIcon.SHOW_MORE));
+        advancedButton.setToolTipText("Options to control playback and recording");
+        advancedButton.addActionListener(this);
         advancedButton.setHorizontalTextPosition(SwingConstants.LEADING);
         advancedButton.setBorderPainted(false);
         advancedButton.setFocusPainted(false);
@@ -467,7 +474,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Updates the speed of the animation. This function is called when changing
-     * the speed of the animation or the its unit.
+     * the speed of the animation or its unit.
      */
     private static void updateMovieSpeed() {
         if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
@@ -704,9 +711,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             setUI(new TimeSliderUI(this));
         }
 
-        /**
-         * Overrides updateUI, to keep own SliderUI.
-         */
+        // Overrides updateUI, to keep own SliderUI
         @Override
         public void updateUI() {
         }
@@ -715,7 +720,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     /**
      * Extension of BasicSliderUI overriding some drawing functions.
-     *
      * All functions for size calculations stay the same.
      */
     private static class TimeSliderUI extends BasicSliderUI {
@@ -728,7 +732,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         private static final BasicStroke thinStroke = new BasicStroke(1);
 
         /**
-         * Default constructor.
+         * Default constructor
          *
          * @param component
          *            the component where this UI delegate is being
@@ -738,26 +742,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             super(component);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected TrackListener createTrackListener(JSlider slider) {
             return new TimeTrackListener();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected void scrollDueToClickInTrack(int dir) {
             if (trackListener instanceof TimeTrackListener)
                 slider.setValue(this.valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void paintThumb(Graphics g) {
             g.setColor(Color.BLACK);
@@ -808,9 +803,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             g2d.setStroke(thinStroke);
         }
 
-        /**
-         * Overrides the track listener to access currentX
-         */
+        // Overrides the track listener to access currentX
         protected class TimeTrackListener extends TrackListener {
             public int getCurrentX() {
                 return currentMouseX;
