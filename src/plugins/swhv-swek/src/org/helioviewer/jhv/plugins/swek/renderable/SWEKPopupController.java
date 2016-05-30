@@ -135,8 +135,6 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
 
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
-        Vec3 pt = null;
-        Vec3 hitpoint = null;
 
         Viewport vp = Displayer.getActiveViewport();
         for (JHVRelatedEvents evtr : eventsToDraw) {
@@ -146,6 +144,7 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
                 continue;
 
             if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+                Vec3 hitpoint, pt;
                 if (evt.getName() == "Coronal Mass Ejection") { // interned
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
                     double speed = SWEKData.readCMESpeed(evt);
@@ -184,11 +183,12 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
                         mousepos = scale.mouseToGridInv(e.getPoint(), vp, camera);
                     }
                 } else {
-                    hitpoint = getHitPoint(e, vp);
-                    pt = pi.centralPoint();
-                    pt = camera.getViewpoint().orientation.rotateVector(pt);
                     GridScale scale = GridScale.current;
-                    tf = scale.transform(pt);
+                    Vec3 pt = pi.centralPoint();
+                    if (pt != null) {
+                        pt = camera.getViewpoint().orientation.rotateVector(pt);
+                        tf = scale.transform(pt);
+                    }
                     mousepos = scale.mouseToGridInv(e.getPoint(), vp, camera);
                 }
 
