@@ -221,8 +221,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         if (image != null) {
             boolean differenceMode = image.getDifferenceMode();
             if (differenceMode) {
-                boolean baseDifferenceMode = image.getBaseDifferenceMode();
-                setDifferenceModetoChangeCombobox(differenceMode, baseDifferenceMode);
+                setDifferenceModetoChangeCombobox(true, image.getBaseDifferenceMode());
             } else {
                 setDifferenceModetoChangeCombobox(false, false);
             }
