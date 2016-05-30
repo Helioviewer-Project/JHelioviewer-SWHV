@@ -113,7 +113,6 @@ public class ExportMovie implements FrameListener {
         canvasHeight = exportHeight - sh;
 
         stopped = false;
-        currentFrame = 0;
 
         MoviePanel.recordPanelSetEnabled(false);
 
@@ -158,15 +157,11 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    private static int currentFrame = 0;
-
     // loop mode only
     @Override
-    public void frameChanged(int frame) {
-        if (frame < currentFrame)
+    public void frameChanged(int frame, boolean last) {
+        if (last)
             stop();
-        else
-            currentFrame = frame;
     }
 
     private static class FrameConsumer implements Runnable {
