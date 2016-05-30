@@ -116,17 +116,17 @@ class J2KRender implements Runnable {
             compositorBuf.Get_region(newRegion, localIntBuffer);
 
             int srcIdx = 0;
-            int destIdx = newOffset.Get_x() + newOffset.Get_y() * aWidth;
+            int dstIdx = newOffset.Get_x() + newOffset.Get_y() * aWidth;
 
             if (numComponents < 3) {
-                for (int row = 0; row < newHeight; row++, destIdx += aWidth, srcIdx += newWidth) {
+                for (int row = 0; row < newHeight; row++, dstIdx += aWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
+                        byteBuffer[dstIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
                     }
                 }
             } else {
-                for (int row = 0; row < newHeight; row++, destIdx += aWidth, srcIdx += newWidth) {
-                    System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
+                for (int row = 0; row < newHeight; row++, dstIdx += aWidth, srcIdx += newWidth) {
+                    System.arraycopy(localIntBuffer, srcIdx, intBuffer, dstIdx, newWidth);
                 }
             }
         }
