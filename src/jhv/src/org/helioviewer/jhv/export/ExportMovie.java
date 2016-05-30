@@ -160,7 +160,7 @@ public class ExportMovie implements FrameListener {
     // loop mode only
     @Override
     public void frameChanged(int frame, boolean last) {
-        if (last)
+        if (last) // last frame missed, to be fixed with layers refactor
             stop();
     }
 
@@ -214,7 +214,6 @@ public class ExportMovie implements FrameListener {
             try {
                 if (keep) {
                     movieExporter.close();
-
                     EventQueue.invokeLater(new Runnable() {
                         @Override
                         public void run() {
