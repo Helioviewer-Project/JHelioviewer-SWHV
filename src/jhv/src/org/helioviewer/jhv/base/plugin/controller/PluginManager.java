@@ -108,6 +108,9 @@ public class PluginManager {
     private LinkedList<String> searchAndLoadPlugins(File file, Set<String> deactivedPlugins) {
         LinkedList<String> result = new LinkedList<String>();
         File[] files = file.listFiles();
+        if (files == null) {
+            return result;
+        }
 
         for (File f : files) {
             if (f.isDirectory()) {

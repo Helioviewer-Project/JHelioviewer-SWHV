@@ -56,10 +56,7 @@ public abstract class SWEKDownloader {
 
         try {
             JSONObject eventJSON = JSONUtils.getJSONStream(stream);
-            if (eventJSON.has("overmax"))
-                overmax = eventJSON.getBoolean("overmax");
-            else
-                overmax = false;
+            overmax = eventJSON.has("overmax") && eventJSON.getBoolean("overmax");
 
             return parseEvents(eventJSON, type) && parseAssociations(eventJSON);
         } catch (JSONException e) {

@@ -39,7 +39,6 @@ public class ExitHooks {
             @Override
             public void run() {
                 File[] tempFiles = JHVDirectory.TEMP.getFile().listFiles();
-
                 for (File tempFile : tempFiles) {
                     tempFile.delete();
                 }
