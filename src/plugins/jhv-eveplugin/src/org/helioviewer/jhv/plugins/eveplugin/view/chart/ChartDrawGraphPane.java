@@ -116,9 +116,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         boolean inRightYAxes = false;
         int rightYAxisNumber = -2;
         if (mousePosition != null) {
-            boolean yAxisVerticalCondition = (mousePosition.y > graphArea.y && mousePosition.y <= graphArea.y + graphArea.height);
-            inRightYAxes = mousePosition.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
-            inLeftYAxis = mousePosition.x < graphArea.x && yAxisVerticalCondition;
+            boolean yAxisVerticalCondition = mousePosition.y > graphArea.y && mousePosition.y <= graphArea.y + graphArea.height;
+            inRightYAxes = yAxisVerticalCondition && mousePosition.x > graphArea.x + graphArea.width;
+            inLeftYAxis = yAxisVerticalCondition && mousePosition.x < graphArea.x;
             rightYAxisNumber = (mousePosition.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         }
         boolean toggled = false;
@@ -141,7 +141,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     protected void paintComponent(Graphics g1) {
         Rectangle graphArea = drawController.getGraphArea();
-        if (forceRedrawGraph || axisHightlightToggled(graphArea)) {
+
+        boolean axisHighlightChanged = axisHightlightToggled(graphArea);
+        if (forceRedrawGraph || axisHighlightChanged) {
             redrawGraph(graphArea);
             forceRedrawGraph = false;
         }
