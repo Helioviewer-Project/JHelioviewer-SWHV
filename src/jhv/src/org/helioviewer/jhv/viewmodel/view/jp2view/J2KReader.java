@@ -77,14 +77,7 @@ class J2KReader implements Runnable {
 
     private final int num_layers;
 
-    /**
-     * The constructor. Creates and connects the socket if image is remote.
-     *
-     * @param _imageViewRef
-     * @throws IOException
-     * @throws JHV_KduException
-     */
-    J2KReader(JP2View _imageViewRef, JP2Image _jp2ImageRef) throws IOException, JHV_KduException {
+    J2KReader(JP2View _imageViewRef, JP2Image _jp2ImageRef) throws IOException {
         parentViewRef = _imageViewRef;
         parentImageRef = _jp2ImageRef;
 
@@ -92,20 +85,23 @@ class J2KReader implements Runnable {
         cacheRef = parentImageRef.getCacheRef();
         cacheStatusRef = parentImageRef.getImageCacheStatus();
 
-        socket = parentImageRef.getSocket();
-        if (socket == null) {
+        if ((socket = parentImageRef.getSocket()) == null)
             reconnect();
-        }
 
         myThread = null;
         stop = false;
     }
 
-    private void reconnect() throws IOException, JHV_KduException {
-        socket = new JPIPSocket();
-        JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
-        cacheRef.addJPIPResponseData(res, cacheStatusRef);
-        MoviePanel.cacheStatusChanged();
+    private void reconnect() throws IOException {
+        try {
+            // System.out.println(">>> reconnect");
+            socket = new JPIPSocket();
+            JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
+            cacheRef.addJPIPResponseData(res, cacheStatusRef);
+            MoviePanel.cacheStatusChanged();
+        } catch (JHV_KduException e) {
+            e.printStackTrace();
+        }
     }
 
     private void ioExcept(IOException e, JP2ImageParameter params) {
@@ -121,7 +117,6 @@ class J2KReader implements Runnable {
         readerSignal.signal(params);
     }
 
-    /** Starts the J2KReader thread. */
     void start() {
         if (myThread != null)
             stop();
@@ -130,7 +125,6 @@ class J2KReader implements Runnable {
         myThread.start();
     }
 
-    /** Stops the J2KReader thread. */
     private void stop() {
         if (myThread != null && myThread.isAlive()) {
             try {
@@ -149,7 +143,7 @@ class J2KReader implements Runnable {
         }
     }
 
-    /** Releases the resources associated with this object. */
+    // Release the resources associated with this object
     void abolish() {
         stop = true;
         stop();
@@ -229,7 +223,7 @@ class J2KReader implements Runnable {
         });
     }
 
-    protected void signalReader(JP2ImageParameter params) {
+    void signalReader(JP2ImageParameter params) {
         readerSignal.signal(params);
     }
 
@@ -250,7 +244,10 @@ class J2KReader implements Runnable {
                 continue;
             }
 
-            ReaderMode readerMode = parentImageRef.getReaderMode();
+            if (socket == null) { // should not happen
+                // Thread.dumpStack();
+                break;
+            }
 
             // check whether view parameters have changed
             boolean viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
@@ -260,22 +257,14 @@ class J2KReader implements Runnable {
                 downgradeNecessary = true;
             }
 
-            // if socket is closed, but communication is necessary, open it
-            if (socket != null && socket.isClosed()) {
+            if (!complete) {
                 try {
-                    reconnect();
-                } catch (IOException e) {
-                    ioExcept(e, currParams);
-                } catch (JHV_KduException e) {
-                    e.printStackTrace();
-                }
-            }
+                    if (socket.isClosed())
+                        reconnect();
 
-            // if socket is open and data is needed, get image data
-            if (!complete && socket != null && !socket.isClosed()) {
-                try {
                     boolean stopReading = false;
                     int curLayer = currParams.compositionLayer;
+                    ReaderMode readerMode = parentImageRef.getReaderMode();
 
                     lastResponseTime = -1;
 
@@ -359,8 +348,7 @@ class J2KReader implements Runnable {
 
                         // long start = System.currentTimeMillis();
                         JPIPResponse res = socket.receive();
-                        // System.out.println(res.getResponseSize() /
-                        // (System.currentTimeMillis() - start));
+                        // System.out.println(res.getResponseSize() / (System.currentTimeMillis() - start));
 
                         // receive data
                         if (res != null) {
