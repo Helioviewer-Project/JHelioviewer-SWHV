@@ -94,14 +94,31 @@ class J2KReader implements Runnable {
 
         socket = parentImageRef.getSocket();
         if (socket == null) {
-            socket = new JPIPSocket();
-            JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
-            cacheRef.addJPIPResponseData(res, cacheStatusRef);
-            MoviePanel.cacheStatusChanged();
+            reconnect();
         }
 
         myThread = null;
         stop = false;
+    }
+
+    private void reconnect() throws IOException, JHV_KduException {
+        socket = new JPIPSocket();
+        JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
+        cacheRef.addJPIPResponseData(res, cacheStatusRef);
+        MoviePanel.cacheStatusChanged();
+    }
+
+    private void ioExcept(IOException e, JP2ImageParameter params) {
+        if (verbose) {
+            e.printStackTrace();
+        }
+        try {
+            socket.close();
+        } catch (IOException ioe) {
+            Log.error("J2KReader.run() > Error closing socket", ioe);
+        }
+        // Send signal to try again
+        readerSignal.signal(params);
     }
 
     /** Starts the J2KReader thread. */
@@ -159,7 +176,7 @@ class J2KReader implements Runnable {
 
         long tdat = replyDataTime - replyTextTime;
 
-        if (((receivedBytes - jpipRequestLen) < (jpipRequestLen >> 1)) && (receivedBytes > (jpipRequestLen >> 1))) {
+        if ((receivedBytes - jpipRequestLen) < (jpipRequestLen >> 1) && receivedBytes > (jpipRequestLen >> 1)) {
             if (tdat > 10000)
                 adjust = -1;
             else if (lastResponseTime > 0) {
@@ -246,19 +263,11 @@ class J2KReader implements Runnable {
             // if socket is closed, but communication is necessary, open it
             if (socket != null && socket.isClosed()) {
                 try {
-                    socket = new JPIPSocket();
-                    socket.connect(parentImageRef.getURI());
+                    reconnect();
                 } catch (IOException e) {
-                    if (verbose) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        socket.close();
-                    } catch (IOException ioe) {
-                        Log.error("J2KReader.run() > Error closing socket", ioe);
-                    }
-                    // Send signal to try again
-                    readerSignal.signal(currParams);
+                    ioExcept(e, currParams);
+                } catch (JHV_KduException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -443,18 +452,7 @@ class J2KReader implements Runnable {
                         readerSignal.signal(currParams);
                     }
                  } catch (IOException e) {
-                    if (verbose) {
-                        e.printStackTrace();
-                    }
-                    if (socket != null) {
-                        try {
-                            socket.close();
-                        } catch (IOException ioe) {
-                            Log.error("J2KReader.run() > Error closing socket", ioe);
-                        }
-                    }
-                    // send signal to try again
-                    readerSignal.signal(currParams);
+                    ioExcept(e, currParams);
                 } catch (JHV_KduException e) {
                     e.printStackTrace();
                 }
