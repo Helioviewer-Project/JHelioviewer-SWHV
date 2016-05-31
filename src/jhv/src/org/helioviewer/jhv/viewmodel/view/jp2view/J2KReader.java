@@ -104,19 +104,6 @@ class J2KReader implements Runnable {
         }
     }
 
-    private void ioExcept(IOException e, JP2ImageParameter params) {
-        if (verbose) {
-            e.printStackTrace();
-        }
-        try {
-            socket.close();
-        } catch (IOException ioe) {
-            Log.error("J2KReader.run() > Error closing socket", ioe);
-        }
-        // Send signal to try again
-        readerSignal.signal(params);
-    }
-
     void start() {
         if (myThread != null)
             stop();
@@ -242,11 +229,6 @@ class J2KReader implements Runnable {
                 currParams = readerSignal.waitForSignal();
             } catch (InterruptedException e) {
                 continue;
-            }
-
-            if (socket == null) { // should not happen
-                // Thread.dumpStack();
-                break;
             }
 
             // check whether view parameters have changed
@@ -440,7 +422,16 @@ class J2KReader implements Runnable {
                         readerSignal.signal(currParams);
                     }
                  } catch (IOException e) {
-                    ioExcept(e, currParams);
+                    if (verbose) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        socket.close();
+                    } catch (IOException ioe) {
+                        Log.error("J2KReader.run() > Error closing socket", ioe);
+                    }
+                    // Send signal to try again
+                    readerSignal.signal(currParams);
                 } catch (JHV_KduException e) {
                     e.printStackTrace();
                 }
