@@ -33,6 +33,7 @@ public class FileUtils {
 
     private static final Map<String, String> registeredExecutables = new HashMap<String, String>();
 
+    private static final int BUFSIZ = 65536;
     private static final byte[] HEX_CHAR_TABLE = { (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f' };
 
     /**
@@ -219,7 +220,7 @@ public class FileUtils {
         OutputStream out = new FileOutputStream(dst);
 
         // Transfer bytes from in to out
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[BUFSIZ];
         int len;
         while ((len = in.read(buf)) > 0) {
             out.write(buf, 0, len);
@@ -229,9 +230,8 @@ public class FileUtils {
     }
 
     public static void copy(InputStream in, OutputStream out) throws IOException {
-
         // Transfer bytes from in to out
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[BUFSIZ];
         int len;
         while ((len = in.read(buf)) > 0) {
             out.write(buf, 0, len);
@@ -255,7 +255,7 @@ public class FileUtils {
         OutputStream out = new FileOutputStream(dst);
 
         // Transfer bytes from in to out
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[BUFSIZ];
         int len;
         while ((len = in.read(buf)) > 0) {
             out.write(buf, 0, len);
@@ -389,12 +389,12 @@ public class FileUtils {
     public static String byteArrayToHexString(byte b[]) {
         byte[] hex = new byte[2 * b.length];
         int index = 0;
-
         for (byte a : b) {
             int v = a & 0xFF;
             hex[index++] = HEX_CHAR_TABLE[v >>> 4];
             hex[index++] = HEX_CHAR_TABLE[v & 0xF];
         }
+
         try {
             return new String(hex, "ASCII");
         } catch (UnsupportedEncodingException e) {
