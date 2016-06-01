@@ -50,7 +50,6 @@ public class JPIPDataInputStream {
         long value = 0;
 
         vbasLength = 0;
-
         do {
             if (vbasLength >= 9)
                 throw new ProtocolException("VBAS length not supported");
@@ -100,15 +99,13 @@ public class JPIPDataInputStream {
                 throw new EOFException("EOF reached before completing EOR message");
 
             seg.length = (int) readVBAS();
-
         } else {
             seg.isEOR = false;
             seg.binID &= (long) ~(0x70 << ((vbasLength - 1) * 7));
 
-            seg.isFinal = ((vbasFstByte & 0x10) != 0);
+            seg.isFinal = (vbasFstByte & 0x10) != 0;
 
             m = (vbasFstByte & 0x7F) >> 5;
-
             if (m == 0)
                 throw new ProtocolException("Invalid Bin-ID value format");
             else if (m >= 2) {
@@ -127,7 +124,7 @@ public class JPIPDataInputStream {
             seg.offset = (int) readVBAS();
             seg.length = (int) readVBAS();
 
-            if ((classId == JPIPConstants.EXTENDED_PRECINCT_DATA_BIN_CLASS) || (classId == JPIPConstants.EXTENDED_TILE_DATA_BIN_CLASS))
+            if (classId == JPIPConstants.EXTENDED_PRECINCT_DATA_BIN_CLASS || classId == JPIPConstants.EXTENDED_TILE_DATA_BIN_CLASS)
                 seg.aux = readVBAS();
         }
 
@@ -140,7 +137,6 @@ public class JPIPDataInputStream {
 
             int offset = 0;
             int len = seg.length;
-
             while (len != 0) {
                 int read = in.read(seg.data, offset, len);
                 if (read == -1)
