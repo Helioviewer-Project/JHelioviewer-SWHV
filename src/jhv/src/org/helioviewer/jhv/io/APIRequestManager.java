@@ -80,7 +80,7 @@ public class APIRequestManager {
                 Log.error("APIRequestManager.getLatestImageDate() > Could not load latest image. Use current date as initial end date.", new Exception());
             }
         } catch (MalformedURLException e) {
-            Log.error("APIRequestManager.getLatestImageDate() > Malformed jpip request url. Use current date as initial end date.", e);
+            Log.error("APIRequestManager.getLatestImageDate() > Malformed JPIP request URL. Use current date as initial end date.", e);
         } catch (IOException e) {
             Log.error("APIRequestManager.getLatestImageDate() > Error while opening stream. Use current date as initial end date.", e);
         }
@@ -158,24 +158,6 @@ public class APIRequestManager {
         return requestData(jpipRequest, fileRequest, message);
     }
 
-    private static View requestData(String jpipRequest, String fileRequest, boolean message) throws IOException {
-        // get URL from server where file with image series is located
-        try {
-            return requestData(new URL(jpipRequest), new URI(fileRequest), message);
-        } catch (IOException e) {
-            if (e instanceof UnknownHostException) {
-                Log.debug("APIRequestManager.requestData > Error will be thrown", e);
-                throw new IOException("Unknown Host: " + e.getMessage());
-            } else {
-                Log.debug("APIRequestManager.loadImage() > Error will be thrown", e);
-                throw new IOException("Error in the server communication: " + e.getMessage());
-            }
-        } catch (URISyntaxException e) {
-            Log.error("Error creating jpip request", e);
-        }
-        return null;
-    }
-
     /**
      * Sends an request to the server to compute where the image series is
      * located on the server together with meta information like timestamps for
@@ -188,7 +170,7 @@ public class APIRequestManager {
      * <p>
      * Returns the corresponding View for the file.
      *
-     * @param jpipRequest
+     * @param _jpipRequest
      *            The http request url which is sent to the server
      * @param downloadUri
      *            the http uri from which the whole file can be downloaded
@@ -197,8 +179,10 @@ public class APIRequestManager {
      * @return The View corresponding to the file whose location was returned by
      *         the server
      */
-    private static View requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
+    private static View requestData(String _jpipRequest, String fileRequest, boolean errorMessage) throws IOException {
         try {
+            URL jpipRequest = new URL(_jpipRequest);
+            URI downloadUri = new URI(fileRequest);
             APIResponse response = new APIResponse(new DownloadStream(jpipRequest).getInput());
 
             // Could we handle the answer from the server
@@ -245,9 +229,20 @@ public class APIRequestManager {
                 }
             }
         } catch (SocketTimeoutException e) {
-            Log.error("Socket timeout while requesting jpip url", e);
-            Message.err("Socket timeout", "Socket timeout while requesting jpip url", false);
+            Log.error("Socket timeout while requesting JPIP URL", e);
+            Message.err("Socket timeout", "Socket timeout while requesting JPIP URL", false);
+        } catch (IOException e) {
+            if (e instanceof UnknownHostException) {
+                Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
+                throw new IOException("Unknown Host: " + e.getMessage());
+            } else {
+                Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
+                throw new IOException("Error in the server communication: " + e.getMessage());
+            }
+        } catch (URISyntaxException e) {
+            Log.error("Error creating JPIP request", e);
         }
+
         return null;
     }
 
