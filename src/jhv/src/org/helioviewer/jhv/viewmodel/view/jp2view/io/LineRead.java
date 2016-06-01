@@ -9,10 +9,10 @@ public class LineRead {
     private static final int CR = 13;
     private static final int LF = 10;
 
-    private static byte[] readRawLine(InputStream inputStream) throws IOException {
+    private static byte[] readRawLine(InputStream in) throws IOException {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         int ch;
-        while ((ch = inputStream.read()) >= 0) {
+        while ((ch = in.read()) >= 0) {
             buf.write(ch);
             if (ch == LF) {
                 break;
@@ -21,8 +21,8 @@ public class LineRead {
         return buf.toByteArray();
     }
 
-    public static String readAsciiLine(InputStream inputStream) throws IOException {
-        byte[] rawdata = readRawLine(inputStream);
+    public static String readAsciiLine(InputStream in) throws IOException {
+        byte[] rawdata = readRawLine(in);
         int len = rawdata.length;
         int offset = 0;
         if (len > 0 && rawdata[len - 1] == LF) {
@@ -32,6 +32,14 @@ public class LineRead {
             }
         }
         return new String(rawdata, 0, len - offset, "US-ASCII");
+    }
+
+    public static void readCRLF(InputStream in) throws IOException {
+        int cr = in.read();
+        int lf = in.read();
+        if (cr != CR || lf != LF) {
+            throw new IOException("CRLF expected: " + cr + "/" + lf);
+        }
     }
 
 }
