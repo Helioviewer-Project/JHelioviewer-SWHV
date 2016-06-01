@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 
+import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +37,8 @@ public class HTTPSocket extends Socket {
 
     private static final int TO_CONNECT = 30000;
     private static final int TO_READ = 30000;
+
+    protected InputStream inputStream;
 
     /**
      * Connects to the specified host via the supplied URI.
@@ -115,9 +118,9 @@ public class HTTPSocket extends Socket {
      * @throws java.io.IOException
      */
     public HTTPMessage receive() throws IOException {
-        InputStream lineInput = getInputStream();
+        inputStream = new BufferedInputStream(getInputStream(), 65536);
 
-        String line = LineRead.readAsciiLine(lineInput);
+        String line = LineRead.readAsciiLine(inputStream);
         String parts[] = line.split(" ", 3);
         if (parts.length != 3) {
             throw new ProtocolException("Invalid HTTP message: " + line);
@@ -146,7 +149,7 @@ public class HTTPSocket extends Socket {
             HTTPResponse res = new HTTPResponse(code, parts[2]);
             // Parses HTTP headers
             for (;;) {
-                line = LineRead.readAsciiLine(lineInput);
+                line = LineRead.readAsciiLine(inputStream);
                 if (line.length() == 0)
                     break;
 
