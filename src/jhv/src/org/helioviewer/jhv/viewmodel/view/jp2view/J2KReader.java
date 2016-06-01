@@ -98,7 +98,6 @@ class J2KReader implements Runnable {
             socket = new JPIPSocket();
             JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
             cacheRef.addJPIPResponseData(res, cacheStatusRef);
-            MoviePanel.cacheStatusChanged();
         } catch (JHV_KduException e) {
             e.printStackTrace();
         }
@@ -190,7 +189,6 @@ class J2KReader implements Runnable {
     private JPIPQuery createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
         JPIPQuery query = new JPIPQuery();
         query.setField(JPIPRequestField.CONTEXT.toString(), "jpxl<" + iniLayer + "-" + endLayer + ">");
-
         query.setField(JPIPRequestField.FSIZ.toString(), Integer.toString(currParams.resolution.width) + "," + Integer.toString(currParams.resolution.height) + "," + "closest");
         query.setField(JPIPRequestField.ROFF.toString(), Integer.toString(currParams.subImage.x) + "," + Integer.toString(currParams.subImage.y));
         query.setField(JPIPRequestField.RSIZ.toString(), Integer.toString(currParams.subImage.width) + "," + Integer.toString(currParams.subImage.height));
@@ -356,8 +354,6 @@ class J2KReader implements Runnable {
                                         }
                                     }
                                 }
-
-                                MoviePanel.cacheStatusChanged();
                                 downgradeNecessary = false;
                             }
 

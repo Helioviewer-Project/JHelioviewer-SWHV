@@ -113,8 +113,7 @@ public class SWEKEventType {
 
                 for (SWEKRelatedOn swon : relon) {
                     SWEKParameter p = swon.parameterFrom;
-                    String dbtype = swon.dbType;
-                    fields.put(p.getParameterName().intern(), dbtype);
+                    fields.put(p.getParameterName().intern(), swon.dbType);
                 }
             }
             if (re.getRelatedWith() == this) {
@@ -122,8 +121,7 @@ public class SWEKEventType {
 
                 for (SWEKRelatedOn swon : relon) {
                     SWEKParameter p = swon.parameterWith;
-                    String dbtype = swon.dbType;
-                    fields.put(p.getParameterName().intern(), dbtype);
+                    fields.put(p.getParameterName().intern(), swon.dbType);
                 }
             }
         }
