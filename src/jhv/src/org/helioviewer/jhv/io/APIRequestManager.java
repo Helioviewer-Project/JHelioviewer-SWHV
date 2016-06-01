@@ -109,7 +109,6 @@ public class APIRequestManager {
      * @param message
      *            display error message.
      * @return view of the nearest image file on the server.
-     * @throws MalformedURLException
      * @throws IOException
      */
     private static View loadImage(String server, String observatory, String instrument, String detector, String measurement, long startTime, boolean message) throws IOException {
@@ -119,22 +118,7 @@ public class APIRequestManager {
                                       "&measurement=" + measurement +
                                       "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
-
-        // get URL from server where file with image series is located
-        try {
-            return requestData(new URL(jpipRequest), new URI(fileRequest), message);
-        } catch (IOException e) {
-            if (e instanceof UnknownHostException) {
-                Log.debug("APIRequestManager.loadImage() > Error will be thrown", e);
-                throw new IOException("Unknown Host: " + e.getMessage());
-            } else {
-                Log.debug("APIRequestManager.loadImage() > Error will be thrown", e);
-                throw new IOException("Error in the server communication:" + e.getMessage());
-            }
-        } catch (URISyntaxException e) {
-            Log.error("Error creating jpip request", e);
-        }
-        return null;
+        return requestData(jpipRequest, fileRequest, message);
     }
 
     /**
@@ -158,7 +142,6 @@ public class APIRequestManager {
      * @param message
      *            display error message.
      * @return view of the file which represents the image series on the server.
-     * @throws MalformedURLException
      * @throws IOException
      */
     private static View loadImageSeries(String server, String observatory, String instrument, String detector, String measurement, long startTime, long endTime, int cadence, boolean message) throws IOException {
@@ -172,23 +155,24 @@ public class APIRequestManager {
             fileRequest += "&cadence=" + Integer.toString(cadence);
         }
         String jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
-        // Log.debug("APIRequestManager.loadImageSeries() > request url: " + jpipRequest);
+        return requestData(jpipRequest, fileRequest, message);
+    }
 
+    private static View requestData(String jpipRequest, String fileRequest, boolean message) throws IOException {
         // get URL from server where file with image series is located
         try {
             return requestData(new URL(jpipRequest), new URI(fileRequest), message);
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
-                Log.debug("APIRequestManager.loadImageSeries() > Error will be thrown", e);
+                Log.debug("APIRequestManager.requestData > Error will be thrown", e);
                 throw new IOException("Unknown Host: " + e.getMessage());
             } else {
-                Log.debug("APIRequestManager.loadImageSeries() > Error will be thrown", e);
-                throw new IOException("Error in the server communication:" + e.getMessage());
+                Log.debug("APIRequestManager.loadImage() > Error will be thrown", e);
+                throw new IOException("Error in the server communication: " + e.getMessage());
             }
         } catch (URISyntaxException e) {
             Log.error("Error creating jpip request", e);
         }
-
         return null;
     }
 
