@@ -79,8 +79,6 @@ public class APIRequestManager {
             } else {
                 Log.error("APIRequestManager.getLatestImageDate() > Could not load latest image. Use current date as initial end date.", new Exception());
             }
-        } catch (MalformedURLException e) {
-            Log.error("APIRequestManager.getLatestImageDate() > Malformed JPIP request URL. Use current date as initial end date.", e);
         } catch (IOException e) {
             Log.error("APIRequestManager.getLatestImageDate() > Error while opening stream. Use current date as initial end date.", e);
         }
@@ -228,19 +226,19 @@ public class APIRequestManager {
                     }
                 }
             }
+        } catch (MalformedURLException e) {
+            Log.error("APIRequestManager.requestData() > Malformed JPIP request URL: " + _jpipRequest);
+        } catch (URISyntaxException e) {
+            Log.error("APIRequestManager.requestData() > URI syntax exception: " + fileRequest);
+        } catch (UnknownHostException e) {
+            Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
+            throw new IOException("Unknown Host: " + e.getMessage());
         } catch (SocketTimeoutException e) {
             Log.error("Socket timeout while requesting JPIP URL", e);
             Message.err("Socket timeout", "Socket timeout while requesting JPIP URL", false);
         } catch (IOException e) {
-            if (e instanceof UnknownHostException) {
-                Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
-                throw new IOException("Unknown Host: " + e.getMessage());
-            } else {
-                Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
-                throw new IOException("Error in the server communication: " + e.getMessage());
-            }
-        } catch (URISyntaxException e) {
-            Log.error("Error creating JPIP request", e);
+            Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
+            throw new IOException("Error in the server communication: " + e.getMessage());
         }
 
         return null;
