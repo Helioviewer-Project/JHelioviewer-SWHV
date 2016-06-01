@@ -7,7 +7,8 @@ import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStreamAlt;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStream;
+//import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStreamAlt;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
@@ -207,7 +208,7 @@ public class JPIPSocket extends HTTPSocket {
 
         replyTextTm = System.currentTimeMillis();
 
-        ChunkedInputStreamAlt input = new ChunkedInputStreamAlt(new BufferedInputStream(getInputStream(), 65536));
+        ChunkedInputStream input = new ChunkedInputStream(new BufferedInputStream(getInputStream(), 65536));
 
         JPIPDataInputStream jpip;
         if ("gzip".equals(res.getHeader("Content-Encoding")))

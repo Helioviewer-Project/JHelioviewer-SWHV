@@ -8,7 +8,7 @@ import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.URI;
 
-import org.helioviewer.jhv.viewmodel.view.jp2view.io;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.LineRead;
 
 /**
  *

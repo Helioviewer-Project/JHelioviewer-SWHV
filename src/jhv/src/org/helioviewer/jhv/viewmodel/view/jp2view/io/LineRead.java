@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.viewmodel.view.jp2view.io
+package org.helioviewer.jhv.viewmodel.view.jp2view.io;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -10,7 +10,7 @@ public class LineRead {
     private static final int LF = 10;
 
     private static byte[] readRawLine(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream(256);
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
         int ch;
         while ((ch = inputStream.read()) >= 0) {
             buf.write(ch);
