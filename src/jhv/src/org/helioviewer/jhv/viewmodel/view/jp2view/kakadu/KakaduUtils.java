@@ -394,7 +394,6 @@ public class KakaduUtils {
 
     public static void cacheMetaData(Jp2_family_src src, MetaData[] metaDataList) throws Exception {
         XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
-        int num = metaDataList.length;
 
         Jp2_input_box findBoxResult[], assocBox;
         Jp2_input_box xmlBox = new Jp2_input_box();
@@ -402,7 +401,7 @@ public class KakaduUtils {
         findBoxResult = findBox(src, Kdu_global.jp2_association_4cc, 1);
         assocBox = findBoxResult[0];
         if (assocBox != null) {
-            for (int i = 0; i < num; i++) {
+            for (int i = 0; i < metaDataList.length; i++) {
                 try {
                     if (myFindBox2(xmlBox, assocBox, Kdu_global.jp2_xml_4cc, 1)) {
                         hvMetaData.parseXML(xmlBox2xml(xmlBox));
