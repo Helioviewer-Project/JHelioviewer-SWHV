@@ -33,6 +33,9 @@ public class HTTPSocket extends Socket {
     /** The default port for the HTTP socket */
     private static final int PORT = 80;
 
+    private static final int TO_CONNECT = 30000;
+    private static final int TO_READ = 30000;
+
     /**
      * Connects to the specified host via the supplied URI.
      *
@@ -44,10 +47,10 @@ public class HTTPSocket extends Socket {
         lastUsedHost = _uri.getHost();
         super.setReceiveBufferSize(Math.max(262144, 2 * getReceiveBufferSize()));
         super.setTrafficClass(0x08 | 0x10);
-        super.setSoTimeout(20000);
+        super.setSoTimeout(TO_READ);
         super.setKeepAlive(true);
         super.setTcpNoDelay(true);
-        super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), 10000);
+        reconnect();
 
         return null;
     }
@@ -58,7 +61,7 @@ public class HTTPSocket extends Socket {
      * @throws java.io.IOException
      */
     public void reconnect() throws IOException {
-        super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), 10000);
+        super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TO_CONNECT);
     }
 
     /**
