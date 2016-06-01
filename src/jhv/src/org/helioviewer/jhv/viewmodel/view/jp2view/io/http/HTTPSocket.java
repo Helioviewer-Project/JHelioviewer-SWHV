@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 
-import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +7,8 @@ import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.URI;
+
+import org.helioviewer.jhv.viewmodel.view.jp2view.io;
 
 /**
  *
@@ -116,10 +117,7 @@ public class HTTPSocket extends Socket {
     public HTTPMessage receive() throws IOException {
         InputStream lineInput = getInputStream();
 
-        String line = readLine(lineInput);
-        if (line == null)
-            return null;
-
+        String line = LineRead.readAsciiLine(lineInput);
         String parts[] = line.split(" ", 3);
         if (parts.length != 3) {
             throw new ProtocolException("Invalid HTTP message: " + line);
@@ -146,13 +144,10 @@ public class HTTPSocket extends Socket {
 
             // Instantiates new HTTPResponse
             HTTPResponse res = new HTTPResponse(code, parts[2]);
-
             // Parses HTTP headers
             for (;;) {
-                line = readLine(lineInput);
-                if (line == null)
-                    throw new EOFException("End of stream reached before end of HTTP message");
-                else if (line.length() <= 0)
+                line = LineRead.readAsciiLine(lineInput);
+                if (line.length() == 0)
                     break;
 
                 parts = line.split(": ", 2);
@@ -163,39 +158,8 @@ public class HTTPSocket extends Socket {
             }
             return res;
         } else {
-            throw new ProtocolException("Requests receiving not yet supported!");
+            throw new ProtocolException("Requests receiving not yet supported");
         }
-    }
-
-    private static byte[] readRawLine(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        int ch;
-        while ((ch = inputStream.read()) >= 0) {
-            buf.write(ch);
-            if (ch == '\n') {
-                break;
-            }
-        }
-        if (buf.size() == 0) {
-            return null;
-        }
-        return buf.toByteArray();
-    }
-
-    private static String readLine(InputStream inputStream) throws IOException {
-        byte[] rawdata = readRawLine(inputStream);
-        if (rawdata == null) {
-            return null;
-        }
-        int len = rawdata.length;
-        int offset = 0;
-        if (len > 0 && rawdata[len - 1] == '\n') {
-            offset++;
-            if (len > 1 && rawdata[len - 2] == '\r') {
-                offset++;
-            }
-        }
-        return new String(rawdata, 0, len - offset, "US-ASCII");
     }
 
     /** Returns the lastUsedPort */
