@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
