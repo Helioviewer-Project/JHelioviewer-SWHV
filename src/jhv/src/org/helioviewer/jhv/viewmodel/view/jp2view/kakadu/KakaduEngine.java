@@ -47,11 +47,13 @@ public class KakaduEngine {
     public void destroy() throws KduException {
         destroyCompositor(compositor);
         if (jpxSrc != null) {
-            jpxSrc.Close();
+            if (jpxSrc.Exists())
+                jpxSrc.Close();
             jpxSrc.Native_destroy();
         }
         if (familySrc != null) {
-            familySrc.Close();
+            if (familySrc.Exists())
+                familySrc.Close();
             familySrc.Native_destroy();
         }
     }
