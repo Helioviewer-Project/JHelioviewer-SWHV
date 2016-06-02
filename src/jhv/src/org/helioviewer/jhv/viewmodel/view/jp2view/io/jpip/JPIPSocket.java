@@ -208,16 +208,20 @@ public class JPIPSocket extends HTTPSocket {
         replyTextTm = System.currentTimeMillis();
 
         ChunkedInputStream input = new ChunkedInputStream(inputStream);
-
         JPIPDataInputStream jpip;
         if ("gzip".equals(res.getHeader("Content-Encoding")))
             jpip = new JPIPDataInputStream(new GZIPInputStream(input));
         else
             jpip = new JPIPDataInputStream(input);
 
-        JPIPDataSegment seg;
-        while ((seg = jpip.readSegment()) != null)
-            res.addJpipDataSegment(seg);
+        try {
+            JPIPDataSegment seg;
+            while ((seg = jpip.readSegment()) != null)
+                res.addJpipDataSegment(seg);
+        } finally {
+            // make sure the stream is exhausted
+            input.close();
+        }
 
         if ("close".equals(res.getHeader("Connection"))) {
             super.close();

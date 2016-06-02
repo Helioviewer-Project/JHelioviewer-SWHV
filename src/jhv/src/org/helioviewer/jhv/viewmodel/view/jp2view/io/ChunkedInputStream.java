@@ -5,6 +5,17 @@ import java.io.InputStream;
 import java.net.ProtocolException;
 
 /**
+ * Transparently coalesces chunks of a HTTP stream that uses
+ * Transfer-Encoding chunked.
+ *
+ * Note that this class NEVER closes the underlying stream, even when close
+ * gets called.  Instead, it will read until the "end" of its chunking on close,
+ * which allows for the seamless invocation of subsequent HTTP 1.1 calls, while
+ * not requiring the client to remember to read the entire contents of the
+ * response.
+ */
+
+/**
  * The class <code>ChunkedInputStream</code> allows to decode HTTP chunked
  * responses with a simple format. Does not support internal chunk headers.
  */
@@ -15,7 +26,11 @@ public class ChunkedInputStream extends InputStream {
     /** The last chunk length */
     private int chunkLength = 0;
 
+    /** True if we've reached the end of stream */
     private boolean eof = false;
+
+    /** True if this stream is closed */
+    private boolean closed = false;
 
     /** The base input stream */
     private final InputStream in;
@@ -30,6 +45,11 @@ public class ChunkedInputStream extends InputStream {
      */
     public ChunkedInputStream(InputStream _in) {
         in = _in;
+    }
+
+    // Returns the length of the payload read
+    public int getTotalLength() {
+        return totalLength;
     }
 
     /**
@@ -63,6 +83,10 @@ public class ChunkedInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
+        if (closed) {
+            throw new IOException("Attempt to read from closed stream");
+        }
+
         for (;;) {
             if (eof)
                 return -1;
@@ -71,6 +95,7 @@ public class ChunkedInputStream extends InputStream {
                 int read = in.read(b, off, Math.min(chunkLength, len));
                 if (read != -1) {
                     chunkLength -= read;
+                    totalLength += read;
                     if (chunkLength == 0)
                         LineRead.readCRLF(in);
                 }
@@ -87,8 +112,6 @@ public class ChunkedInputStream extends InputStream {
                     chunkLength = Integer.parseInt(line, 16);
                     if (chunkLength <= 0)
                         eof = true;
-                    else
-                        totalLength += chunkLength;
                 } catch (NumberFormatException ex) {
                     throw new ProtocolException("Invalid chunk length format");
                 }
@@ -96,11 +119,25 @@ public class ChunkedInputStream extends InputStream {
         }
     }
 
-    /**
-     * Returns the total length of the read data.
-     */
-    public int getTotalLength() {
-        return totalLength;
+    @Override
+    public int read (byte[] b) throws IOException {
+        return read(b, 0, b.length);
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (!closed) {
+            try {
+                if (!eof) {
+                    // read and discard the remainder of the message
+                    byte buf[] = new byte[1024];
+                    while (read(buf) >= 0) ;
+                }
+            } finally {
+                eof = true;
+                closed = true;
+            }
+        }
     }
 
 }
