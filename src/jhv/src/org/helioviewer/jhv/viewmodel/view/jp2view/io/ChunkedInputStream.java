@@ -110,8 +110,10 @@ public class ChunkedInputStream extends InputStream {
                 // line = (separator > 0) ? line.substring(0, separator).trim() : line.trim();
                 try {
                     chunkLength = Integer.parseInt(line, 16);
-                    if (chunkLength <= 0)
+                    if (chunkLength <= 0) {
+                        LineRead.readCRLF(in);
                         eof = true;
+                    }
                 } catch (NumberFormatException ex) {
                     throw new ProtocolException("Invalid chunk length format");
                 }
