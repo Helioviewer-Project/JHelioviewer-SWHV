@@ -49,8 +49,8 @@ public class HTTPSocket extends Socket {
     public Object connect(URI _uri) throws IOException {
         lastUsedPort = _uri.getPort() <= 0 ? PORT : _uri.getPort();
         lastUsedHost = _uri.getHost();
-        super.setReceiveBufferSize(Math.max(262144, 2 * getReceiveBufferSize()));
-        super.setTrafficClass(0x08 | 0x10);
+        super.setReceiveBufferSize(Math.max(262144 * 8, 2 * getReceiveBufferSize()));
+        super.setTrafficClass(0x10);
         super.setSoTimeout(TO_READ);
         super.setKeepAlive(true);
         super.setTcpNoDelay(true);
@@ -66,6 +66,7 @@ public class HTTPSocket extends Socket {
      */
     private void reconnect() throws IOException {
         super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TO_CONNECT);
+        inputStream = new BufferedInputStream(getInputStream(), 65536);
     }
 
     /**
@@ -118,8 +119,6 @@ public class HTTPSocket extends Socket {
      * @throws java.io.IOException
      */
     public HTTPMessage receive() throws IOException {
-        inputStream = new BufferedInputStream(getInputStream(), 65536);
-
         String line = LineRead.readAsciiLine(inputStream);
         String parts[] = line.split(" ", 3);
         if (parts.length != 3) {
