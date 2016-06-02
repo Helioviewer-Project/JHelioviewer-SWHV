@@ -180,9 +180,9 @@ public class JPIPSocket extends HTTPSocket {
         if (_req.getMethod() == HTTPRequest.Method.POST)
             str.append(queryStr);
 
-        if (!isConnected()) {
-            reconnect();
-        }
+        // if (!isConnected())
+        //    reconnect();
+
         // Writes the result to the output stream
         getOutputStream().write(str.toString().getBytes("UTF-8"));
     }

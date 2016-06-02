@@ -64,7 +64,7 @@ public class HTTPSocket extends Socket {
      *
      * @throws java.io.IOException
      */
-    public void reconnect() throws IOException {
+    private void reconnect() throws IOException {
         super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TO_CONNECT);
     }
 
@@ -76,8 +76,8 @@ public class HTTPSocket extends Socket {
      * @throws java.io.IOException
      */
     public void send(HTTPMessage _msg) throws IOException {
-        if (!isConnected())
-            reconnect();
+        // if (!isConnected())
+        //    reconnect();
 
         StringBuilder str = new StringBuilder();
 
