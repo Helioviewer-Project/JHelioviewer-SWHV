@@ -411,11 +411,12 @@ class J2KReader implements Runnable {
                         }
                     }
 
-                    // check whether all queries are complete
-                    complete = (complete_steps >= stepQuerys.length) && strategy != CacheStrategy.CURRENTFRAMEFIRST;
                     // if current frame first -> signal again, to go on reading
                     if (strategy == CacheStrategy.CURRENTFRAMEFIRST) {
                         readerSignal.signal(currParams);
+                    } else {
+                        // check whether all queries are complete
+                        complete = complete_steps >= stepQuerys.length;
                     }
                  } catch (IOException e) {
                     if (verbose) {
