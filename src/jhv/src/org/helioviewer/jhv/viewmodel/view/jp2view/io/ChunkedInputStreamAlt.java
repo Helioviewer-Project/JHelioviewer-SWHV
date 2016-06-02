@@ -280,8 +280,9 @@ public class ChunkedInputStreamAlt extends InputStream {
         final byte[] bytes = baos.toByteArray();
         String dataString = new String(bytes, 0, bytes.length, "US-ASCII");
 
-        int separator = dataString.indexOf(';');
-        dataString = (separator > 0) ? dataString.substring(0, separator).trim() : dataString.trim();
+        // esajpip doesn't use chunk extension
+        // int separator = dataString.indexOf(';');
+        // dataString = (separator > 0) ? dataString.substring(0, separator).trim() : dataString.trim();
 
         int result;
         try {
