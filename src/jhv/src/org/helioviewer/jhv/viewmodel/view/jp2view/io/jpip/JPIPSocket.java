@@ -193,9 +193,6 @@ public class JPIPSocket extends HTTPSocket {
         // long tini = System.currentTimeMillis();
 
         HTTPResponse httpRes = (HTTPResponse) super.receive();
-        if (httpRes == null)
-            return null;
-
         JPIPResponse res = new JPIPResponse(httpRes);
 
         if (res.getCode() != 200)
