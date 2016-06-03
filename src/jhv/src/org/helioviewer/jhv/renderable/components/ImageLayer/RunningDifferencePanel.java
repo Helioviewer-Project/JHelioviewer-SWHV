@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.filters;
+package org.helioviewer.jhv.renderable.components.ImageLayer;
 
 import java.awt.Component;
 import java.awt.FlowLayout;

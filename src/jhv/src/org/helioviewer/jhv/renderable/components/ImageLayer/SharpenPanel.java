@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.filters;
+package org.helioviewer.jhv.renderable.components.ImageLayer;
 
 import java.awt.Component;
 
@@ -11,11 +11,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.opengl.GLImage;
 
-/**
- * Panel containing a slider for changing the weighting of the sharpening.
- *
- * @author Markus Langenberg
- */
 public class SharpenPanel extends AbstractFilterPanel implements ChangeListener, FilterDetails {
 
     private final JSlider sharpeningSlider;
@@ -35,9 +30,6 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
         sharpeningLabel = new JLabel("0%");
     }
 
-    /**
-     * Sets the weighting of the sharpening.
-     */
     @Override
     public void stateChanged(ChangeEvent e) {
         image.setSharpen(sharpeningSlider.getValue() / 10.f);
@@ -46,11 +38,6 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     }
 
     /**
-     * Sets the sharpen value.
-     *
-     * This may be useful if the sharpen value is changed from another source
-     * than the slider itself.
-     *
      * @param sharpen
      *            New sharpen value. Must be within [0, 10]
      */

@@ -10,8 +10,8 @@ import javax.swing.JComboBox;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
-import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 
 @SuppressWarnings("serial")

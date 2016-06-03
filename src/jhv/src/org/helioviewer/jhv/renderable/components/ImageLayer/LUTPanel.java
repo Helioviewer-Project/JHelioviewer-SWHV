@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.filters;
+package org.helioviewer.jhv.renderable.components.ImageLayer;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -14,10 +14,10 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
 
+import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.opengl.GLImage;
 
 public class LUTPanel extends AbstractFilterPanel implements ActionListener, FilterDetails {

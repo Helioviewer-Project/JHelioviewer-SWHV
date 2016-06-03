@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.filters;
+package org.helioviewer.jhv.renderable.components.ImageLayer;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
@@ -13,11 +13,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.opengl.GLImage;
 
-/**
- * Panel containing a slider for changing the contrast of the image.
- *
- * @author Markus Langenberg
- */
 public class ContrastPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterDetails {
 
     private static final float sliderToContrastScale = 25.0f;
@@ -90,12 +85,12 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
 
     @Override
     public Component getSlider() {
-        return this.contrastSlider;
+        return contrastSlider;
     }
 
     @Override
     public Component getValue() {
-        return this.contrastLabel;
+        return contrastLabel;
     }
 
 }
