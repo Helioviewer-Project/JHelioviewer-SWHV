@@ -3,8 +3,8 @@ package org.helioviewer.jhv.opengl;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.filters;
+package org.helioviewer.jhv.renderable.components.ImageLayer;
 
 import java.awt.Component;
 
@@ -11,12 +11,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
-/**
- * Panel containing a spinner for changing the opacity of the image.
- *
- * @author Markus Langenberg
- * @author Malte Nuhn
- */
 public class OpacityPanel extends AbstractFilterPanel implements ChangeListener, FilterDetails {
 
     private final JSlider opacitySlider;
@@ -36,9 +30,6 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
         opacityLabel = new JLabel("0%");
     }
 
-    /**
-     * Sets the weighting of the sharpening.
-     */
     @Override
     public void stateChanged(ChangeEvent e) {
         image.setOpacity(opacitySlider.getValue() / 100.f);
@@ -47,12 +38,7 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     }
 
     /**
-     * Sets the sharpen value.
-     *
-     * This may be useful, if the opacity is changed from another source than
-     * the slider itself.
-     *
-     * @param sharpen
+     * @param opacity
      *            New opacity value. Must be within [0, 1]
      */
     private void setValue(float opacity) {

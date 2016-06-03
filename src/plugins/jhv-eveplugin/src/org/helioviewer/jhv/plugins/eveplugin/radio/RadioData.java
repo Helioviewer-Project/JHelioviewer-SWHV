@@ -16,8 +16,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;

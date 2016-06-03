@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.filters;
+package org.helioviewer.jhv.renderable.components.ImageLayer;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
@@ -13,15 +13,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.opengl.GLImage;
 
-/**
- * Panel containing a slider for changing the gamma value of the image.
- *
- * <p>
- * To be able to reset the gamma value to 1.0, the slider snaps to 1.0 if it
- * close to it.
- *
- * @author Markus Langenberg
- */
 public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterDetails {
 
     private static final double factor = 0.01 * Math.log(10);
@@ -44,9 +35,6 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         gammaLabel = new JLabel("1.0");
     }
 
-    /**
-     * Sets the gamma value of the image.
-     */
     @Override
     public void stateChanged(ChangeEvent e) {
         int sliderValue = gammaSlider.getValue();
@@ -74,9 +62,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     public void mousePressed(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc} In this case, snaps the slider to 1.0 if it is close to it.
-     */
+    // snaps the slider to 1.0 if it is close to it.
     @Override
     public void mouseReleased(MouseEvent e) {
         int sliderValue = gammaSlider.getValue();
@@ -87,11 +73,6 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     }
 
     /**
-     * Sets the panel values.
-     *
-     * This may be useful, if the values are changed from another source than
-     * the panel itself.
-     *
      * @param gamma
      *            New gamma value, must be within [0.1, 10]
      */

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.filters;
+package org.helioviewer.jhv.renderable.components.ImageLayer;
 
 import org.helioviewer.jhv.opengl.GLImage;
 
