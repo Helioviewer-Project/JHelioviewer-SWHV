@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,6 +14,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import javax.swing.DefaultComboBoxModel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
@@ -43,54 +47,48 @@ import org.json.JSONObject;
  */
 public class DataSources {
 
-    public static final Map<String, String> ROBsettings;
-    private static final Map<String, String> IASsettings;
-    private static final Map<String, String> GSFCsettings;
-
-    static {
-        ROBsettings = new HashMap<String, String>();
-        IASsettings = new HashMap<String, String>();
-        GSFCsettings = new HashMap<String, String>();
-
-        String[][] ROBpairs = {
-            { "API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]" },
-            { "API.jp2images.path", "http://swhv.oma.be/hv/api/index.php" },
-            { "API.jp2series.path", "http://swhv.oma.be/hv/api/index.php" },
-            { "default.remote.path", "jpip://swhv.oma.be:8090" },
-            { "API.event.path", "http://swhv.oma.be/hv/api/" },
-            { "default.httpRemote.path", "http://swhv.oma.be/hv/jp2/" }
-        };
-
-        String[][] IASpairs = {
-                { "API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]" },
-                { "API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php" },
-                { "API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php" },
-                { "default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080" },
-                { "API.event.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/" },
-                { "default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/" }
-        };
-
-        String[][] GSFCpairs = {
-                { "API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]" },
-                { "API.jp2images.path", "http://helioviewer.org/api/index.php" },
-                { "API.jp2series.path", "http://helioviewer.org/api/index.php" },
-                { "default.remote.path", "jpip://helioviewer.org:8090" },
-                { "API.event.path", "http://helioviewer.org/api/" },
-                { "default.httpRemote.path", "http://helioviewer.org/jp2/" }
-        };
-
-        for (String[] pair : ROBpairs) {
-            ROBsettings.put(pair[0], pair[1]);
+    private static final HashMap<String, HashMap<String, String>> serverSettings = new HashMap<String, HashMap<String, String>>() {
+        {
+            put("ROB",
+                new HashMap<String, String>() {
+                {
+                    put("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
+                    put("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php");
+                    put("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php");
+                    put("default.remote.path", "jpip://swhv.oma.be:8090");
+                    put("default.httpRemote.path", "http://swhv.oma.be/hv/jp2/");
+                }
+            });
+            put("IAS",
+                new HashMap<String, String>() {
+                {
+                    put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");
+                    put("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");
+                    put("default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080");
+                    put("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
+                }
+            });
+            put("GSFC",
+                new HashMap<String, String>() {
+                {
+                    put("API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.jp2images.path", "http://helioviewer.org/api/index.php");
+                    put("API.jp2series.path", "http://helioviewer.org/api/index.php");
+                    put("default.remote.path", "jpip://helioviewer.org:8090");
+                    put("default.httpRemote.path", "http://helioviewer.org/jp2/");
+                }
+            });
         }
-        for (String[] pair : IASpairs) {
-            IASsettings.put(pair[0], pair[1]);
-        }
-        for (String[] pair : GSFCpairs) {
-            GSFCsettings.put(pair[0], pair[1]);
-        }
+    };
+
+    public static String getServerSetting(String server, String setting) {
+        Map<String, String> settings = serverSettings.get(server);
+        if (settings != null)
+            return settings.get(setting);
+        else
+            return null;
     }
-
-    private static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
     public static class Item implements Comparable<Item> {
 
@@ -165,6 +163,8 @@ public class DataSources {
     }
 
     private static DataSources instance;
+    private static DefaultComboBoxModel comboModel;
+    private static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
     private DataSources() {}
 
@@ -182,6 +182,7 @@ public class DataSources {
                 }
             }
 
+            String selectedServer;
             String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
             if (datasourcesPath.contains("ias.u-psud.fr")) {
                 selectedServer = "IAS";
@@ -191,6 +192,9 @@ public class DataSources {
                 selectedServer = "ROB";
             }
             changeServer(selectedServer);
+
+            String[] serverList = new String[] { "ROB", "IAS", "GSFC" };
+            comboModel = new DefaultComboBoxModel(serverList);
         }
         return instance;
     }
@@ -312,21 +316,8 @@ public class DataSources {
         return null;
     }
 
-    private static String selectedServer = "";
-    private static final String[] serverList = new String[] { "ROB", "IAS", "GSFC" };
-
-    public static void changeServer(String server) {
-        selectedServer = server;
-
-        Map<String, String> map;
-        if (server.contains("ROB")) {
-            map = ROBsettings;
-        } else if (server.contains("IAS")) {
-            map = IASsettings;
-        } else /* if (server.contains("GSFC")) */ {
-            map = GSFCsettings;
-        }
-
+    private static void changeServer(String server) {
+        Map<String, String> map = serverSettings.get(server);
         for (Map.Entry<String, String> entry : map.entrySet()) {
             Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
         }
@@ -412,12 +403,21 @@ public class DataSources {
 
     private static boolean first = true;
 
-    public static String[] getServerList() {
-        return serverList;
+    public static final ActionListener serverChange = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String server = (String) comboModel.getSelectedItem();
+                changeServer(server);
+                ObservationDialog.getInstance().setAvailabilityStatus(server);
+            }
+        };
+
+    public static final DefaultComboBoxModel getComboModel() {
+        return comboModel;
     }
 
     public static String getSelectedServer() {
-        return selectedServer;
+        return (String) comboModel.getSelectedItem();
     }
 
 }
