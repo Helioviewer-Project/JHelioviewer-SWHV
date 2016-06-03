@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,6 +19,7 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -297,16 +300,16 @@ public class DataSources {
         return result.toArray(new Item[result.size()]);
     }
 
-    public static int getSourceID(String observatory, String instrument, String detector, String measurement) {
+    public static Object getObject(String observatory, String instrument, String detector, String measurement, String key) {
         try {
             return jsonResult.getJSONObject(observatory).getJSONObject("children").
                               getJSONObject(instrument).getJSONObject("children").
                               getJSONObject(detector).getJSONObject("children").
-                              getJSONObject(measurement).getInt("sourceId");
+                              getJSONObject(measurement).get(key);
         } catch (JSONException e) {
-            Log.error("Cannot find sourceID " + e);
+            Log.error("Cannot find key: " + key + " "  + e);
         }
-        return -1;
+        return null;
     }
 
     private static String selectedServer = "";
@@ -372,8 +375,31 @@ public class DataSources {
                 if (idp.validSelection()) {
                     if (first) {
                         first = false;
-                        SetupTimeTask setupTimeTask = new SetupTimeTask(idp.getObservatory(), idp.getInstrument(), idp.getDetector(), idp.getMeasurement());
-                        JHVGlobals.getExecutorService().execute(setupTimeTask);
+
+                        //SetupTimeTask setupTimeTask = new SetupTimeTask(idp.getObservatory(), idp.getInstrument(), idp.getDetector(), idp.getMeasurement());
+                        //JHVGlobals.getExecutorService().execute(setupTimeTask);
+
+                        Date endDate = new Date();
+                        Object timeStamp = getObject(idp.getObservatory(), idp.getInstrument(), idp.getDetector(), idp.getMeasurement(), "end");
+                        if (timeStamp instanceof String) {
+                            try {
+                                endDate = TimeUtils.sqlDateFormat.parse((String) timeStamp);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+
+                        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+                        gregorianCalendar.setTime(endDate);
+
+                        gregorianCalendar.add(GregorianCalendar.SECOND, idp.getCadence());
+                        idp.setEndDate(gregorianCalendar.getTime(), false);
+
+                        gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
+                        idp.setStartDate(gregorianCalendar.getTime(), false);
+
+                        if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")))
+                            idp.loadRemote();
                     }
                 } else {
                     Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." +
