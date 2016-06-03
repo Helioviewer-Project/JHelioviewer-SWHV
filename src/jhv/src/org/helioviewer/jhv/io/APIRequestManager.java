@@ -47,8 +47,7 @@ public class APIRequestManager {
      * @throws IOException
      */
     private static View loadImage(String server, String sourceId, long startTime, boolean message) throws IOException {
-        String fileRequest = server + "?action=getJP2Image&sourceId=" + sourceId +
-                                      "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
+        String fileRequest = server + "sourceId=" + sourceId + "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
         return requestData(jpipRequest, fileRequest, message);
     }
@@ -72,9 +71,7 @@ public class APIRequestManager {
      * @throws IOException
      */
     private static View loadImageSeries(String server, String sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
-        String fileRequest = server + "?action=getJPX&sourceId=" + sourceId +
-                                      "&startTime=" + TimeUtils.apiDateFormat.format(startTime) +
-                                      "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
+        String fileRequest = server + "sourceId=" + sourceId + "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
         if (cadence != -100) {
             fileRequest += "&cadence=" + Integer.toString(cadence);
         }
@@ -167,12 +164,13 @@ public class APIRequestManager {
      * @throws IOException
      */
     public static View requestAndOpenRemoteFile(String server, String sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
-        if (server == null) // use default
-            server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
-
         if (startTime == endTime) {
+            if (server == null) // use default
+                server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
             return loadImage(server, sourceId, startTime, message);
         } else {
+            if (server == null) // use default
+                server = Settings.getSingletonInstance().getProperty("API.jp2series.path");
             return loadImageSeries(server, sourceId, startTime, endTime, cadence, message);
         }
     }
