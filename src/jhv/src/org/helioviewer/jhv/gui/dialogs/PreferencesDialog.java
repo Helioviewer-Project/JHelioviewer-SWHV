@@ -13,7 +13,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -139,10 +138,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         row_1.add(new JLabel("Default server", JLabel.RIGHT));
-
-        JComboBox comboServer = new JComboBox(DataSources.getComboModel());
-        comboServer.addActionListener(DataSources.serverChange);
-        row_1.add(comboServer);
+        row_1.add(DataSources.getServerComboBox());
         paramsPanel.add(row_1);
 
         JPanel row0 = new JPanel(new FlowLayout(FlowLayout.LEADING));
