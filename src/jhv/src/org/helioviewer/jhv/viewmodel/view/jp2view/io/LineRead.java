@@ -10,7 +10,7 @@ public class LineRead {
     private static final int LF = 10;
 
     private static byte[] readRawLine(InputStream in) throws IOException {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        ByteArrayOutputStream buf = new ByteArrayOutputStream(64);
         int ch;
         while ((ch = in.read()) >= 0) {
             buf.write(ch);
