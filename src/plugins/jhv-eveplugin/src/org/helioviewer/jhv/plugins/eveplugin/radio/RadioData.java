@@ -256,10 +256,10 @@ public class RadioData extends AbstractLineDataSelectorElement {
             for (long date : datesToDownload) {
                 JP2ViewCallisto v = null;
                 try {
-                    v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM",
-                            date, date + 1 /* force JPX (TBD) */, -100, false);
+                    v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, "49", // hardcode
+                                                            date, date + 1 /* force JPX (TBD) */, -100, false);
                 } catch (IOException e) {
-                    Log.error("An error occured while opening the remote file!", e);
+                    Log.error("An error occured while opening the remote file: " + e.getMessage());
                 }
                 jpList.add(v);
             }
@@ -272,9 +272,9 @@ public class RadioData extends AbstractLineDataSelectorElement {
                 ArrayList<JP2ViewCallisto> jpList = get();
                 initJPX(jpList, datesToDownload);
             } catch (InterruptedException e) {
-                Log.error("ImageDownloadWorker execution interrupted: " + e.getMessage());
+                Log.error("RadioJPXDownload execution interrupted: " + e.getMessage());
             } catch (ExecutionException e) {
-                Log.error("ImageDownloadWorker execution error: " + e.getMessage());
+                Log.error("RadioJPXDownload execution error: " + e.getMessage());
             }
         }
 
