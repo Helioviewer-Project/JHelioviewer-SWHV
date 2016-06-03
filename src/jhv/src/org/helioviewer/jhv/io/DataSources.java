@@ -16,6 +16,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
@@ -195,6 +196,7 @@ public class DataSources {
 
             String[] serverList = new String[] { "ROB", "IAS", "GSFC" };
             comboModel = new DefaultComboBoxModel(serverList);
+            comboModel.setSelectedItem(selectedServer);
         }
         return instance;
     }
@@ -403,7 +405,7 @@ public class DataSources {
 
     private static boolean first = true;
 
-    public static final ActionListener serverChange = new ActionListener() {
+    private static final ActionListener serverChange = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String server = (String) comboModel.getSelectedItem();
@@ -412,8 +414,15 @@ public class DataSources {
             }
         };
 
-    public static final DefaultComboBoxModel getComboModel() {
-        return comboModel;
+    private static boolean firstCombo = true;
+
+    public static JComboBox getServerComboBox() {
+        JComboBox combo = new JComboBox(comboModel);
+        if (firstCombo) {
+            firstCombo = false;
+            combo.addActionListener(serverChange);
+        }
+        return combo;
     }
 
     public static String getSelectedServer() {
