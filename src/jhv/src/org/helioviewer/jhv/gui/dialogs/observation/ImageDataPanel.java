@@ -423,7 +423,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
             add(labelServer);
-            add(ServerListCombo.getInstance());
+
+            JComboBox comboServer = new JComboBox(DataSources.getComboModel());
+            comboServer.addActionListener(DataSources.serverChange);
+            add(comboServer);
 
             JLabel labelObservatory = new JLabel("Observatory", JLabel.RIGHT);
             add(labelObservatory);
