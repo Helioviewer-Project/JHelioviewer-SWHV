@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,9 +21,6 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.message.Message;
-import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONException;
@@ -324,17 +319,14 @@ public class DataSources {
             Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
         }
 
-        JHVWorker<Void, Void> reloadTask = new JHVWorker<Void, Void>() {
-
-            private JSONObject newJsonResult = null;
+        JHVWorker<JSONObject, Void> reloadTask = new JHVWorker<JSONObject, Void>() {
 
             @Override
-            protected Void backgroundWork() {
+            protected JSONObject backgroundWork() {
                 while (true) {
                     try {
                         URL url = new URL(Settings.getSingletonInstance().getProperty("API.dataSources.path"));
-                        newJsonResult = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
-                        break;
+                        return JSONUtils.getJSONStream(new DownloadStream(url).getInput());
                     } catch (MalformedURLException e) {
                         Log.error("Invalid url to retrieve data source", e);
                         break;
@@ -342,8 +334,6 @@ public class DataSources {
                         Log.error("While retrieving the available data sources got invalid response", e);
                         break;
                     } catch (IOException e) {
-                        // Log.error("Error while reading the available data sources", e);
-                        // Message.err("Cannot Download Source Information", "When trying to read the available data sources from the internet got:" + System.getProperty("line.separator") + e.getMessage(), false);
                         try {
                             Thread.sleep(5000);
                         } catch (InterruptedException e1) {
@@ -357,44 +347,14 @@ public class DataSources {
 
             @Override
             protected void done() {
-                if (newJsonResult == null)
-                    return;
-
-                jsonResult = newJsonResult;
-
-                ImageDataPanel idp = ObservationDialog.getInstance().getObservationImagePane();
-
-                idp.setupSources(DataSources.getSingletonInstance());
-                if (idp.validSelection()) {
-                    if (first) {
-                        first = false;
-
-                        Date endDate = new Date();
-                        Object timeStamp = getObject(idp.getObservatory(), idp.getInstrument(), idp.getDetector(), idp.getMeasurement(), "end");
-                        if (timeStamp instanceof String) {
-                            try {
-                                endDate = TimeUtils.sqlDateFormat.parse((String) timeStamp);
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-
-                        GregorianCalendar gregorianCalendar = new GregorianCalendar();
-                        gregorianCalendar.setTime(endDate);
-
-                        gregorianCalendar.add(GregorianCalendar.SECOND, idp.getCadence());
-                        idp.setEndDate(gregorianCalendar.getTime(), false);
-
-                        gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-                        idp.setStartDate(gregorianCalendar.getTime(), false);
-
-                        if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")))
-                            idp.loadRemote();
+                try {
+                    JSONObject newJsonResult = get();
+                    if (newJsonResult != null) {
+                        jsonResult = newJsonResult;
+                        ObservationDialog.getInstance().getObservationImagePane().setupSources();
                     }
-                } else {
-                    Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." +
-                                System.getProperty("line.separator") +
-                                "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -402,8 +362,6 @@ public class DataSources {
         reloadTask.setThreadName("MAIN--ReloadServer");
         JHVGlobals.getExecutorService().execute(reloadTask);
     }
-
-    private static boolean first = true;
 
     private static final ActionListener serverChange = new ActionListener() {
             @Override
