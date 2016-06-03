@@ -71,7 +71,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 first = false;
 
                 Date endDate = new Date();
-                Object timeStamp = DataSources.getObject(getObservatory(), getInstrument(), getDetector(), getMeasurement(), "end");
+                Object timeStamp = DataSources.getObject(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(),
+                                                         instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), "end");
                 if (timeStamp instanceof String) {
                     try {
                         endDate = TimeUtils.sqlDateFormat.parse((String) timeStamp);
@@ -97,6 +98,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
                         System.getProperty("line.separator") +
                         "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
         }
+    }
+
+    public Object getSourceId() {
+        return DataSources.getObject(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(),
+                                     instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), "sourceId");
     }
 
     /**
@@ -147,47 +153,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
     }
 
     /**
-     * Returns the selected observatory.
-     *
-     * @return selected observatory.
-     */
-    public String getObservatory() {
-        return instrumentsPanel.getObservatory();
-    }
-
-    /**
-     * Returns the selected instrument.
-     *
-     * @return selected instrument.
-     * */
-    public String getInstrument() {
-        return instrumentsPanel.getInstrument();
-    }
-
-    /**
-     * Returns the selected detector.
-     *
-     * @return selected detector.
-     * */
-    public String getDetector() {
-        return instrumentsPanel.getDetector();
-    }
-
-    /**
-     * Returns the selected measurement.
-     *
-     * @return selected measurement.
-     * */
-    public String getMeasurement() {
-        return instrumentsPanel.getMeasurement();
-    }
-
-    /**
      * Loads an image series from the Helioviewer server and adds a new layer to
      * the GUI which represents the image series.
      * */
     public void loadRemote() {
-        LoadRemoteTask remoteTask = new LoadRemoteTask(getObservatory(), getInstrument(), getDetector(), getMeasurement(), getStartTime(), getEndTime(), getCadence());
+        LoadRemoteTask remoteTask = new LoadRemoteTask(getSourceId().toString(), getStartTime(), getEndTime(), getCadence());
         JHVGlobals.getExecutorService().execute(remoteTask);
     }
 

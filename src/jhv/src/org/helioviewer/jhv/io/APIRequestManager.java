@@ -34,28 +34,20 @@ import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
 public class APIRequestManager {
     /**
      * Sends an request to the server to compute where the nearest image is
-     * located on the server. The address of the file will be returned.
+     * located on the server.
      *
-     * @param observatory
-     *            observatory of the requested image.
-     * @param instrument
-     *            instrument of the requested image.
-     * @param detector
-     *            detector of the requested image.
-     * @param measurement
-     *            measurement of the requested image.
+     * @param server
+     * @param sourceId
+     *            sourceId of the requested image
      * @param startTime
-     *            time if the requested image.
+     *            time if the requested image
      * @param message
-     *            display error message.
-     * @return view of the nearest image file on the server.
+     *            display error message
+     * @return view of the nearest image file on the server
      * @throws IOException
      */
-    private static View loadImage(String server, String observatory, String instrument, String detector, String measurement, long startTime, boolean message) throws IOException {
-        String fileRequest = server + "?action=getJP2Image&observatory=" + observatory +
-                                      "&instrument=" + instrument +
-                                      "&detector=" + detector +
-                                      "&measurement=" + measurement +
+    private static View loadImage(String server, String sourceId, long startTime, boolean message) throws IOException {
+        String fileRequest = server + "?action=getJP2Image&sourceId=" + sourceId +
                                       "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
         return requestData(jpipRequest, fileRequest, message);
@@ -63,32 +55,24 @@ public class APIRequestManager {
 
     /**
      * Sends an request to the server to compute where the image series is
-     * located on the server. The address of the file will be returned.
+     * located on the server.
      *
-     * @param observatory
-     *            observatory of the requested image series.
-     * @param instrument
-     *            instrument of the requested image series.
-     * @param detector
-     *            detector of the requested image series.
-     * @param measurement
-     *            measurement of the requested image series.
+     * @param server
+     * @param sourceId
+     *            sourceId of the requested image series
      * @param startTime
-     *            start time of the requested image series.
+     *            start time of the requested image series
      * @param endTime
-     *            end time of the requested image series.
+     *            end time of the requested image series
      * @param cadence
-     *            cadence between to images of the image series.
+     *            cadence between to images of the image series
      * @param message
-     *            display error message.
-     * @return view of the file which represents the image series on the server.
+     *            display error message
+     * @return view of the file which represents the image series on the server
      * @throws IOException
      */
-    private static View loadImageSeries(String server, String observatory, String instrument, String detector, String measurement, long startTime, long endTime, int cadence, boolean message) throws IOException {
-        String fileRequest = server + "?action=getJPX&observatory=" + observatory +
-                                      "&instrument=" + instrument +
-                                      "&detector=" + detector +
-                                      "&measurement=" + measurement +
+    private static View loadImageSeries(String server, String sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
+        String fileRequest = server + "?action=getJPX&sourceId=" + sourceId +
                                       "&startTime=" + TimeUtils.apiDateFormat.format(startTime) +
                                       "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
         if (cadence != -100) {
@@ -98,27 +82,6 @@ public class APIRequestManager {
         return requestData(jpipRequest, fileRequest, message);
     }
 
-    /**
-     * Sends an request to the server to compute where the image series is
-     * located on the server together with meta information like timestamps for
-     * the frames.
-     * <p>
-     * After processing the request it will if the server gives a sufficient
-     * reply, i.e. "uri" is set it will try to load the result with
-     * {@link #newLoad(URI, URI, boolean)}. It will display and log any further
-     * message from the server.
-     * <p>
-     * Returns the corresponding View for the file.
-     *
-     * @param _jpipRequest
-     *            The http request url which is sent to the server
-     * @param downloadUri
-     *            the http uri from which the whole file can be downloaded
-     * @param errorMessage
-     *            display error message
-     * @return The View corresponding to the file whose location was returned by
-     *         the server
-     */
     private static View requestData(String _jpipRequest, String fileRequest, boolean errorMessage) throws IOException {
         try {
             URL jpipRequest = new URL(_jpipRequest);
@@ -187,43 +150,36 @@ public class APIRequestManager {
     }
 
     /**
-     * Method does remote opening. If image series, file is downloaded. If
-     * single frame, file is opened via JPIP on delphi.nascom.nasa.gov:8090.
+     * Method does remote opening. If image series, file is downloaded.
      *
-     * @param cadence
-     *            cadence between two frames (null for single images).
+     * @param server
+     * @param sourceId
+     *            sourceId of the requested image
      * @param startTime
      *            start time of the requested image
      * @param endTime
-     *            end time of the requested image (empty for single images).
-     * @param observatory
-     *            observatory of the requested image
-     * @param instrument
-     *            instrument of the requested image
-     * @param detector
-     *            detector of the requested image.
-     * @param measurement
-     *            measurement of the requested image.
+     *            end time of the requested image
+     * @param cadence
+     *            cadence between two frames
      * @param message
      *            display error message
      * @return new view
      * @throws IOException
      */
-    public static View requestAndOpenRemoteFile(String server, String observatory, String instrument, String detector, String measurement, long startTime, long endTime, int cadence, boolean message) throws IOException {
+    public static View requestAndOpenRemoteFile(String server, String sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
         if (server == null) // use default
             server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
 
         if (startTime == endTime) {
-            return loadImage(server, observatory, instrument, detector, measurement, startTime, message);
+            return loadImage(server, sourceId, startTime, message);
         } else {
-            return loadImageSeries(server, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
+            return loadImageSeries(server, sourceId, startTime, endTime, cadence, message);
         }
     }
 
     /**
      * Loads a new image located at the given URI.
      *
-     * <p>
      * Depending on the file type, a different implementation of the View is
      * chosen. If there is no implementation available for the given type, an
      * exception is thrown.
@@ -234,8 +190,6 @@ public class APIRequestManager {
      *            URI from which the whole file can be downloaded
      * @return View containing the image
      * @throws IOException
-     *             if anything went wrong (e.g. type not supported, image not
-     *             found, etc.)
      */
     public static View loadView(URI uri, URI downloadURI) throws IOException {
         if (uri == null || uri.getScheme() == null) {
@@ -243,14 +197,14 @@ public class APIRequestManager {
         }
 
         try {
-            String down = downloadURI.toString().toLowerCase(Locale.ENGLISH);
-            if (down.endsWith(".fits") || down.endsWith(".fts")) {
+            String loc = uri.toString().toLowerCase(Locale.ENGLISH);
+            if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
                 return new FITSView(uri);
-            } else if (down.endsWith(".png") || down.endsWith(".jpg") || down.endsWith(".jpeg")) {
+            } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                  return new SimpleImageView(uri);
             } else {
                 JP2Image jp2Image;
-                if (down.contains("callisto"))
+                if (loc.contains("callisto"))
                     jp2Image = new JP2ImageCallisto(uri, downloadURI);
                 else
                     jp2Image = new JP2Image(uri, downloadURI);
