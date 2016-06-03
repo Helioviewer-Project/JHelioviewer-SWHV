@@ -376,9 +376,6 @@ public class DataSources {
                     if (first) {
                         first = false;
 
-                        //SetupTimeTask setupTimeTask = new SetupTimeTask(idp.getObservatory(), idp.getInstrument(), idp.getDetector(), idp.getMeasurement());
-                        //JHVGlobals.getExecutorService().execute(setupTimeTask);
-
                         Date endDate = new Date();
                         Object timeStamp = getObject(idp.getObservatory(), idp.getInstrument(), idp.getDetector(), idp.getMeasurement(), "end");
                         if (timeStamp instanceof String) {
