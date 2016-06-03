@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -22,6 +23,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
@@ -45,6 +47,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     private final TimeSelectionPanel timeSelectionPanel = new TimeSelectionPanel();
     private final CadencePanel cadencePanel = new CadencePanel();
     private final InstrumentsPanel instrumentsPanel = new InstrumentsPanel();
+    private static boolean first = true;
 
     protected ImageDataPanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -61,12 +64,39 @@ public class ImageDataPanel extends ObservationDialogPanel {
         add(instrumentsPane);
     }
 
-    public void setupSources(DataSources source) {
-        instrumentsPanel.setupSources(source);
-    }
+    public void setupSources() {
+        instrumentsPanel.setupSources(DataSources.getSingletonInstance());
+        if (instrumentsPanel.validSelection()) {
+            if (first) {
+                first = false;
 
-    public boolean validSelection() {
-        return instrumentsPanel.validSelection();
+                Date endDate = new Date();
+                Object timeStamp = DataSources.getObject(getObservatory(), getInstrument(), getDetector(), getMeasurement(), "end");
+                if (timeStamp instanceof String) {
+                    try {
+                        endDate = TimeUtils.sqlDateFormat.parse((String) timeStamp);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                GregorianCalendar gregorianCalendar = new GregorianCalendar();
+                gregorianCalendar.setTime(endDate);
+
+                gregorianCalendar.add(GregorianCalendar.SECOND, getCadence());
+                setEndDate(gregorianCalendar.getTime(), false);
+
+                gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
+                setStartDate(gregorianCalendar.getTime(), false);
+
+                if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")))
+                    loadRemote();
+            }
+        } else {
+            Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." +
+                        System.getProperty("line.separator") +
+                        "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
+        }
     }
 
     /**
