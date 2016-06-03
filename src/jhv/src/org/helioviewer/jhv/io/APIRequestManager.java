@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -31,65 +30,8 @@ import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
  *
  * Most of the methods only will work with the current Helioviewer server
  * because they modify links and requests that they will fit with the API.
- *
- * @author Stephan Pagel
- * @author Andre Dau
- * @author Helge Dietert
  */
 public class APIRequestManager {
-    /**
-     * Returns the date of the latest image available from the server
-     *
-     * @param observatory
-     *            observatory of the requested image.
-     * @param instrument
-     *            instrument of the requested image.
-     * @param detector
-     *            detector of the requested image.
-     * @param measurement
-     *            measurement of the requested image.
-     * @param message
-     *            display error message
-     * @return time stamp of the latest available image on the server
-     */
-    public static long getLatestImageDate(String observatory, String instrument, String detector, String measurement, boolean message) {
-        long timestamp = System.currentTimeMillis();
-        boolean readDate = false;
-
-        try {
-            String server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
-            View view = loadImage(server, observatory, instrument, detector, measurement, timestamp, message);
-            if (view != null) {
-                timestamp = view.getFirstTime().milli;
-                readDate = true;
-
-                EventQueue.invokeLater(new Runnable() {
-                    private View theView;
-
-                    @Override
-                    public void run() {
-                        theView.abolish();
-                    }
-
-                    public Runnable init(View _view) {
-                        theView = _view;
-                        return this;
-                    }
-                }.init(view));
-            } else {
-                Log.error("APIRequestManager.getLatestImageDate() > Could not load latest image. Use current date as initial end date.", new Exception());
-            }
-        } catch (IOException e) {
-            Log.error("APIRequestManager.getLatestImageDate() > Error while opening stream. Use current date as initial end date.", e);
-        }
-
-        if (readDate) {
-            return timestamp;
-        } else {
-            return System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS;
-        }
-    }
-
     /**
      * Sends an request to the server to compute where the nearest image is
      * located on the server. The address of the file will be returned.
