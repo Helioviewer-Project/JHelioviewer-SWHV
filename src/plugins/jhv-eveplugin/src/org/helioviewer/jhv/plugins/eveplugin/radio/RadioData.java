@@ -32,7 +32,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     private final YAxis yAxis;
 
     private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();
-    private static final String ROBserver = DataSources.getServerSetting("ROB", "API.jp2images.path");
+    private static final String ROBserver = DataSources.getServerSetting("ROB", "API.jp2series.path");
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
