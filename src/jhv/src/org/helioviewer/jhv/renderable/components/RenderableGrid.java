@@ -45,8 +45,8 @@ public class RenderableGrid extends AbstractRenderable {
     private static final float textScale = (float) (0.08 * Sun.Radius);
     private static final int SUBDIVISIONS = 360;
 
-    private static final float[] firstColor = new float[] { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f };
-    private static final float[] secondColor = new float[] { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f };
+    private static final float[] color1 = new float[] { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f };
+    private static final float[] color2 = new float[] { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f };
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
@@ -112,30 +112,30 @@ public class RenderableGrid extends AbstractRenderable {
         float w = (float) vp.aspect;
         float h = 1;
 
-        gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
+        gl.glColor3f(color1[0], color1[1], color1[2]);
         gl.glLineWidth(1);
         {
             gl.glBegin(GL2.GL_LINES);
             for (int i = 0; i < (FLAT_STEPS_THETA + 1); i++) {
                 float start = -w / 2 + i * w / FLAT_STEPS_THETA;
                 if (i == FLAT_STEPS_THETA / 2) {
-                    gl.glColor3f(secondColor[0], secondColor[1], secondColor[2]);
+                    gl.glColor3f(color2[0], color2[1], color2[2]);
                 }
                 gl.glVertex2f(start, -h / 2);
                 gl.glVertex2f(start, h / 2);
                 if (i == FLAT_STEPS_THETA / 2) {
-                    gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
+                    gl.glColor3f(color1[0], color1[1], color1[2]);
                 }
             }
             for (int i = 0; i < (FLAT_STEPS_RADIAL + 1); i++) {
                 float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
                 if (i == FLAT_STEPS_RADIAL / 2) {
-                    gl.glColor3f(secondColor[0], secondColor[1], secondColor[2]);
+                    gl.glColor3f(color2[0], color2[1], color2[2]);
                 }
                 gl.glVertex2f(-w / 2, start);
                 gl.glVertex2f(w / 2, start);
                 if (i == FLAT_STEPS_RADIAL / 2) {
-                    gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
+                    gl.glColor3f(color1[0], color1[1], color1[2]);
                 }
             }
             gl.glEnd();
@@ -493,9 +493,9 @@ public class RenderableGrid extends AbstractRenderable {
             positionBuffer.put((float) (Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS)));
             positionBuffer.put((float) (Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS)));
             if (i % 2 == 0) {
-                colorBuffer.put(firstColor);
+                colorBuffer.put(color1);
             } else {
-                colorBuffer.put(secondColor);
+                colorBuffer.put(color2);
             }
         }
 

@@ -20,15 +20,8 @@ public class RenderableViewpoint extends AbstractRenderable {
 
     private static final float lineWidth = 2;
 
-    private static final Color firstcolor = Color.BLUE;
-    private static final float oneRed = firstcolor.getRed() / 255f;
-    private static final float oneGreen = firstcolor.getGreen() / 255f;
-    private static final float oneBlue = firstcolor.getBlue() / 255f;
-
-    private static final Color secondcolor = Color.WHITE;
-    private static final float twoRed = secondcolor.getRed() / 255f;
-    private static final float twoGreen = secondcolor.getGreen() / 255f;
-    private static final float twoBlue = secondcolor.getBlue() / 255f;
+    private static final float[] color1 = new float[] { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f };
+    private static final float[] color2 = new float[] { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f };
 
     private String timeString = null;
 
@@ -58,9 +51,9 @@ public class RenderableViewpoint extends AbstractRenderable {
             int subdivisions = 10;
             for (int i = 0; i <= subdivisions; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3f(oneRed, oneGreen, oneBlue);
+                    gl.glColor3f(color1[0], color1[1], color1[2]);
                 } else {
-                    gl.glColor3f(twoRed, twoGreen, twoBlue);
+                    gl.glColor3f(color2[0], color2[1], color2[2]);
                 }
                 x = -bw + 2 * bw / subdivisions * i;
                 y = bh;
@@ -73,9 +66,9 @@ public class RenderableViewpoint extends AbstractRenderable {
             }
             for (int i = 0; i <= subdivisions; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3f(oneRed, oneGreen, oneBlue);
+                    gl.glColor3f(color1[0], color1[1], color1[2]);
                 } else {
-                    gl.glColor3f(twoRed, twoGreen, twoBlue);
+                    gl.glColor3f(color2[0], color2[1], color2[2]);
                 }
                 x = bw;
                 y = bh - 2 * bh / subdivisions * i;
@@ -88,9 +81,9 @@ public class RenderableViewpoint extends AbstractRenderable {
             }
             for (int i = 0; i <= subdivisions; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3f(oneRed, oneGreen, oneBlue);
+                    gl.glColor3f(color1[0], color1[1], color1[2]);
                 } else {
-                    gl.glColor3f(twoRed, twoGreen, twoBlue);
+                    gl.glColor3f(color2[0], color2[1], color2[2]);
                 }
                 x = bw - 2 * bw / subdivisions * i;
                 y = -bh;
@@ -103,9 +96,9 @@ public class RenderableViewpoint extends AbstractRenderable {
             }
             for (int i = 0; i <= subdivisions; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3f(oneRed, oneGreen, oneBlue);
+                    gl.glColor3f(color1[0], color1[1], color1[2]);
                 } else {
-                    gl.glColor3f(twoRed, twoGreen, twoBlue);
+                    gl.glColor3f(color2[0], color2[1], color2[2]);
                 }
                 x = -bw;
                 y = -bh + 2 * bh / subdivisions * i;

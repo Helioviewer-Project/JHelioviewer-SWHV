@@ -23,9 +23,9 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
 
     public RenderableMiniview() {
-        Layers.addLayersListener(this);
-        optionsPanel = new RenderableMiniviewOptionsPanel();
+        optionsPanel = new RenderableMiniviewOptionsPanel(this);
         setVisible(true);
+        Layers.addLayersListener(this);
     }
 
     public void reshapeViewport() {

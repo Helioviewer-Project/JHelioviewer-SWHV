@@ -12,18 +12,21 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
 public class RenderableMiniviewOptionsPanel extends SmallPanel {
 
-    private JSpinner xSpinner;
     private static final int DEFAULT = 10;
-    protected int scale = DEFAULT;
+    int scale = DEFAULT;
 
-    public RenderableMiniviewOptionsPanel() {
+    private final RenderableMiniview miniview;
+    private JSpinner xSpinner;
+
+    public RenderableMiniviewOptionsPanel(RenderableMiniview miniview) {
+        this.miniview = miniview;
+
         createXSpinner();
 
         GridBagLayout gridBagLayout = new GridBagLayout();
@@ -56,7 +59,7 @@ public class RenderableMiniviewOptionsPanel extends SmallPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 scale = ((Double) xSpinner.getValue()).intValue();
-                ImageViewerGui.getRenderableMiniview().reshapeViewport();
+                miniview.reshapeViewport();
                 Displayer.display();
             }
         });
