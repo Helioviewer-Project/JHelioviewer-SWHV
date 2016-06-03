@@ -157,8 +157,12 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * the GUI which represents the image series.
      * */
     public void loadRemote() {
-        LoadRemoteTask remoteTask = new LoadRemoteTask(getSourceId().toString(), getStartTime(), getEndTime(), getCadence());
-        JHVGlobals.getExecutorService().execute(remoteTask);
+        Object sourceId = getSourceId();
+        if (sourceId != null) {
+            LoadRemoteTask remoteTask = new LoadRemoteTask(sourceId.toString(), getStartTime(), getEndTime(), getCadence());
+            JHVGlobals.getExecutorService().execute(remoteTask);
+        } else
+            throw new IllegalArgumentException();
     }
 
     // Methods derived from Observation Dialog Panel
