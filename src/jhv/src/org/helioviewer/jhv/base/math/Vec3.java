@@ -256,7 +256,7 @@ public class Vec3 {
         double[] arr = new double[vecs.length * 3];
         for (int i = 0; i < vecs.length; i++) {
             Vec3 v = vecs[i];
-            arr[i * 3 + 0] = v.x;
+            arr[i * 3] = v.x;
             arr[i * 3 + 1] = v.y;
             arr[i * 3 + 2] = v.z;
         }

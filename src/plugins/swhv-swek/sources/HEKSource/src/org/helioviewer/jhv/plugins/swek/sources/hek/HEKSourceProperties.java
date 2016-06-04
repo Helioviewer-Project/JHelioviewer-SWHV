@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.helioviewer.jhv.base.logging.Log;
+
 /**
  * Gives access to the HEK source properties
  * 
@@ -54,7 +56,7 @@ public class HEKSourceProperties {
             hekSourceProperties.load(defaultPropStream);
             defaultPropStream.close();
         } catch (IOException ex) {
-            System.out.println("Could not load the hek settings." + ex);
+            Log.error("Could not load the hek settings " + ex);
         }
     }
 
