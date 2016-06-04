@@ -57,7 +57,7 @@ public class DataSources {
             put("IAS",
                 new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
                     put("default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080");
@@ -67,7 +67,7 @@ public class DataSources {
             put("GSFC",
                 new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.dataSources.path", "http://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://api.helioviewer.org/v2/getJP2Image/?");
                     put("API.jp2series.path", "http://api.helioviewer.org/v2/getJPX/?");
                     put("default.remote.path", "jpip://helioviewer.org:8090");
@@ -323,7 +323,7 @@ public class DataSources {
             else
                 return meas.get(key);
         } catch (JSONException e) {
-            Log.error("Cannot find key: " + key + " "  + e);
+            Log.error("Cannot find key " + key + " for " + observatory + " " + instrument + " " + detector + " " + measurement);
         }
         return null;
     }
