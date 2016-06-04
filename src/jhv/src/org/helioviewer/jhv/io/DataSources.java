@@ -67,8 +67,7 @@ public class DataSources {
             put("GSFC",
                 new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
-                    // put("API.dataSources.path", "http://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.dataSources.path", "http://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://api.helioviewer.org/v2/getJP2Image/?");
                     put("API.jp2series.path", "http://api.helioviewer.org/v2/getJPX/?");
                     put("default.remote.path", "jpip://helioviewer.org:8090");
@@ -209,7 +208,10 @@ public class DataSources {
             Iterator<String> iter = root.keys();
             while (iter.hasNext()) {
                 String key = iter.next();
-                JSONObject child = root.getJSONObject(key);
+                JSONObject child = root.optJSONObject(key);
+                if (child == null)
+                    break;
+
                 Item newItem = new Item(key, child.optBoolean("default", false),
                                         child.getString("name").replace((char) 8287, ' '), // e.g. 304\u205f\u212b
                                         child.getString("description"));
@@ -229,8 +231,8 @@ public class DataSources {
         if (child == null) {
             Iterator<String> iter = obj.keys();
             if (iter.hasNext())
-                child = obj.getJSONObject(iter.next());
-            else
+                child = obj.optJSONObject(iter.next());
+            if (child == null)
                 child = obj;
         }
         return child;
