@@ -68,6 +68,7 @@ public class DataSources {
                 new HashMap<String, String>() {
                 {
                     put("API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    // put("API.dataSources.path", "http://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://api.helioviewer.org/v2/getJP2Image/?");
                     put("API.jp2series.path", "http://api.helioviewer.org/v2/getJPX/?");
                     put("default.remote.path", "jpip://helioviewer.org:8090");
@@ -200,7 +201,7 @@ public class DataSources {
      *
      * @param root
      *            Element for which the children will be created
-     * @return List of items to select or null if some error occurs
+     * @return List of items to select
      */
     private Item[] getChildrenList(JSONObject root) {
         try {
@@ -243,21 +244,18 @@ public class DataSources {
     }
 
     /**
-     * Resolves the detectors for a observatory and instrument
+     * Resolve the available observatories
      *
-     * @param observatory
-     *            Name of observatory to query
-     * @param instrument
-     *            Name of instrument to query
-     * @return List of available measurements, null if not valid
+     * @return List of available observatories
      */
-    public Item[] getDetectors(String observatory, String instrument) {
-        try {
-            return getChildrenList(getJSONChildren(observatory, instrument));
-        } catch (JSONException e) {
-            Log.error("Cannot find detectors for " + observatory, e);
+    public Item[] getObservatories() {
+        ArrayList<Item> result = new ArrayList<Item>();
+        for (Item item : getChildrenList(jsonResult)) {
+            if (SupportedObservatories.contains(item.getName())) {
+                result.add(item);
+            }
         }
-        return new Item[0];
+        return result.toArray(new Item[result.size()]);
     }
 
     /**
@@ -265,8 +263,7 @@ public class DataSources {
      *
      * @param observatory
      *            Name of observatory for which the instruments are returned
-     * @return List of available instruments, null if this observatory is not
-     *         supported
+     * @return List of available instruments
      */
     public Item[] getInstruments(String observatory) {
         try {
@@ -284,9 +281,27 @@ public class DataSources {
      *            Name of observatory to query
      * @param instrument
      *            Name of instrument to query
+     * @return List of available detectors
+     */
+    public Item[] getDetectors(String observatory, String instrument) {
+        try {
+            return getChildrenList(getJSONChildren(observatory, instrument));
+        } catch (JSONException e) {
+            Log.error("Cannot find detectors for " + observatory, e);
+        }
+        return new Item[0];
+    }
+
+    /**
+     * Resolves the measurements for a observatory, instrument and detector
+     *
+     * @param observatory
+     *            Name of observatory to query
+     * @param instrument
+     *            Name of instrument to query
      * @param detector
      *            Name of detector to query
-     * @return List of available measurements, null if not valid
+     * @return List of available measurements
      */
     public Item[] getMeasurements(String observatory, String instrument, String detector) {
         try {
@@ -297,24 +312,14 @@ public class DataSources {
         return new Item[0];
     }
 
-    /**
-     * Resolve the available observatories
-     *
-     * @return List of available observatories
-     */
-    public Item[] getObservatories() {
-        ArrayList<Item> result = new ArrayList<Item>();
-        for (Item item : getChildrenList(jsonResult)) {
-            if (SupportedObservatories.contains(item.getName())) {
-                result.add(item);
-            }
-        }
-        return result.toArray(new Item[result.size()]);
-    }
-
     public static Object getObject(String observatory, String instrument, String detector, String measurement, String key) {
         try {
-            return getJSONChildren(observatory, instrument, detector).getJSONObject(measurement).get(key);
+            JSONObject det = getJSONChildren(observatory, instrument, detector);
+            JSONObject meas = det.optJSONObject(measurement);
+            if (meas == null)
+                return det.get(key);
+            else
+                return meas.get(key);
         } catch (JSONException e) {
             Log.error("Cannot find key: " + key + " "  + e);
         }
