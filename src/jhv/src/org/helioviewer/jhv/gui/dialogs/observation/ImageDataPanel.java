@@ -491,13 +491,18 @@ public class ImageDataPanel extends ObservationDialogPanel {
                             printMode = ItemPair.PrintMode.FIRSTITEM_ONLY;
                         }
 
-                        for (Item measurement : measurements) {
-                            values.add(new ItemPair(detector, measurement, printMode));
+                        if (measurements.length == 0) { // not found
+                            for (Item d : detectors)
+                                values.add(new ItemPair(d, d, ItemPair.PrintMode.FIRSTITEM_ONLY));
+                            break;
+                        } else {
+                            for (Item measurement : measurements)
+                                values.add(new ItemPair(detector, measurement, printMode));
                         }
                     }
 
                     setComboBox(comboDetectorMeasurement, values);
-                    comboDetectorMeasurement.setEnabled(true);
+                    comboDetectorMeasurement.setEnabled(values.size() != 0);
                 }
             });
         }
@@ -518,7 +523,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          */
         private void setComboBox(JComboBox container, Item[] items) {
             container.setModel(new DefaultComboBoxModel(items));
-            container.setEnabled(true);
+            container.setEnabled(items.length != 0);
             for (int i = 0; i < items.length; i++) {
                 if (items[i].isDefaultItem()) {
                     container.setSelectedIndex(i);
