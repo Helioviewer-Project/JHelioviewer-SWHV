@@ -314,12 +314,12 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         vertices.add(-r);
         vertices.add(0f);
 
-        faceIndices.add(beginPositionNumberCorona + 0);
+        faceIndices.add(beginPositionNumberCorona);
         faceIndices.add(beginPositionNumberCorona + 2);
         faceIndices.add(beginPositionNumberCorona + 1);
 
         faceIndices.add(beginPositionNumberCorona + 2);
-        faceIndices.add(beginPositionNumberCorona + 0);
+        faceIndices.add(beginPositionNumberCorona);
         faceIndices.add(beginPositionNumberCorona + 3);
 
         FloatBuffer positionBuffer = FloatBuffer.allocate(vertices.size());
@@ -341,9 +341,9 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     private static void subdivide(int vx, int vy, int vz, ArrayList<Float> vertexList, ArrayList<Integer> faceList, int level) {
         if (level != 0) {
-            float x1 = (vertexList.get(3 * vx) + vertexList.get(3 * vy));
-            float y1 = (vertexList.get(3 * vx + 1) + vertexList.get(3 * vy + 1));
-            float z1 = (vertexList.get(3 * vx + 2) + vertexList.get(3 * vy + 2));
+            float x1 = vertexList.get(3 * vx) + vertexList.get(3 * vy);
+            float y1 = vertexList.get(3 * vx + 1) + vertexList.get(3 * vy + 1);
+            float z1 = vertexList.get(3 * vx + 2) + vertexList.get(3 * vy + 2);
             float length = (float) Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
             x1 /= length;
             y1 /= length;
@@ -353,9 +353,9 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             vertexList.add(y1);
             vertexList.add(z1);
 
-            float x2 = (vertexList.get(3 * vz) + vertexList.get(3 * vy));
-            float y2 = (vertexList.get(3 * vz + 1) + vertexList.get(3 * vy + 1));
-            float z2 = (vertexList.get(3 * vz + 2) + vertexList.get(3 * vy + 2));
+            float x2 = vertexList.get(3 * vz) + vertexList.get(3 * vy);
+            float y2 = vertexList.get(3 * vz + 1) + vertexList.get(3 * vy + 1);
+            float z2 = vertexList.get(3 * vz + 2) + vertexList.get(3 * vy + 2);
             length = (float) Math.sqrt(x2 * x2 + y2 * y2 + z2 * z2);
             x2 /= length;
             y2 /= length;
@@ -365,9 +365,9 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             vertexList.add(y2);
             vertexList.add(z2);
 
-            float x3 = (vertexList.get(3 * vx) + vertexList.get(3 * vz));
-            float y3 = (vertexList.get(3 * vx + 1) + vertexList.get(3 * vz + 1));
-            float z3 = (vertexList.get(3 * vx + 2) + vertexList.get(3 * vz + 2));
+            float x3 = vertexList.get(3 * vx) + vertexList.get(3 * vz);
+            float y3 = vertexList.get(3 * vx + 1) + vertexList.get(3 * vz + 1);
+            float z3 = vertexList.get(3 * vx + 2) + vertexList.get(3 * vz + 2);
             length = (float) Math.sqrt(x3 * x3 + y3 * y3 + z3 * z3);
             x3 /= length;
             y3 /= length;

@@ -188,9 +188,7 @@ public class Vec2 {
             return;
 
         // can't happen / something is really messed up
-        System.out.println(len);
-        System.out.println(this);
-        Log.error("The length of the vector is bigger than 1");
+        Log.error("The length of the vector is bigger than 1: " + len + " " + this);
         System.exit(1);
 
         this.x = Double.NaN;
@@ -205,7 +203,7 @@ public class Vec2 {
         double[] arr = new double[vecs.length * 3];
         for (int i = 0; i < vecs.length; i++) {
             Vec2 v = vecs[i];
-            arr[i * 2 + 0] = v.x;
+            arr[i * 2] = v.x;
             arr[i * 2 + 1] = v.y;
         }
         return arr;
