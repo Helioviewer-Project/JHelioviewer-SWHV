@@ -161,8 +161,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         if (sourceId != null) {
             LoadRemoteTask remoteTask = new LoadRemoteTask(sourceId.toString(), getStartTime(), getEndTime(), getCadence());
             JHVGlobals.getExecutorService().execute(remoteTask);
-        } else
-            throw new IllegalArgumentException();
+        }
     }
 
     // Methods derived from Observation Dialog Panel
