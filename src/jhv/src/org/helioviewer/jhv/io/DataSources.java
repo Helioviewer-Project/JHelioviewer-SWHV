@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.DefaultComboBoxModel;
@@ -205,10 +204,10 @@ public class DataSources {
      */
     private Item[] getChildrenList(JSONObject root) {
         try {
-            SortedSet<Item> children = new TreeSet<Item>();
-            Iterator<?> iter = root.keys();
+            TreeSet<Item> children = new TreeSet<Item>();
+            Iterator<String> iter = root.keys();
             while (iter.hasNext()) {
-                String key = (String) iter.next();
+                String key = iter.next();
                 JSONObject child = root.getJSONObject(key);
                 Item newItem = new Item(key, child.optBoolean("default", false),
                                         child.getString("name").replace((char) 8287, ' '), // e.g. 304\u205f\u212b
@@ -224,10 +223,22 @@ public class DataSources {
 
     private static JSONObject jsonResult;
 
-    private JSONObject getJSONItemChildren(String... spec) throws JSONException {
-        JSONObject o = jsonResult.getJSONObject(spec[0]).getJSONObject("children");
+    private static JSONObject optJSONChildren(JSONObject obj) {
+        JSONObject child = obj.optJSONObject("children");
+        if (child == null) {
+            Iterator<String> iter = obj.keys();
+            if (iter.hasNext())
+                child = obj.getJSONObject(iter.next());
+            else
+                child = obj;
+        }
+        return child;
+    }
+
+    private static JSONObject getJSONChildren(String... spec) throws JSONException {
+        JSONObject o = optJSONChildren(jsonResult.getJSONObject(spec[0]));
         for (int i = 1; i < spec.length; i++)
-            o = o.getJSONObject(spec[i]).getJSONObject("children");
+            o = optJSONChildren(o.getJSONObject(spec[i]));
         return o;
     }
 
@@ -242,7 +253,7 @@ public class DataSources {
      */
     public Item[] getDetectors(String observatory, String instrument) {
         try {
-            return getChildrenList(getJSONItemChildren(observatory, instrument));
+            return getChildrenList(getJSONChildren(observatory, instrument));
         } catch (JSONException e) {
             Log.error("Cannot find detectors for " + observatory, e);
         }
@@ -259,7 +270,7 @@ public class DataSources {
      */
     public Item[] getInstruments(String observatory) {
         try {
-            return getChildrenList(getJSONItemChildren(observatory));
+            return getChildrenList(getJSONChildren(observatory));
         } catch (JSONException e) {
             Log.error("Cannot find instruments for " + observatory, e);
         }
@@ -279,7 +290,7 @@ public class DataSources {
      */
     public Item[] getMeasurements(String observatory, String instrument, String detector) {
         try {
-            return getChildrenList(getJSONItemChildren(observatory, instrument, detector));
+            return getChildrenList(getJSONChildren(observatory, instrument, detector));
         } catch (JSONException e) {
             Log.error("Cannot find measurements for " + observatory, e);
         }
@@ -303,10 +314,7 @@ public class DataSources {
 
     public static Object getObject(String observatory, String instrument, String detector, String measurement, String key) {
         try {
-            return jsonResult.getJSONObject(observatory).getJSONObject("children").
-                              getJSONObject(instrument).getJSONObject("children").
-                              getJSONObject(detector).getJSONObject("children").
-                              getJSONObject(measurement).get(key);
+            return getJSONChildren(observatory, instrument, detector).getJSONObject(measurement).get(key);
         } catch (JSONException e) {
             Log.error("Cannot find key: " + key + " "  + e);
         }
