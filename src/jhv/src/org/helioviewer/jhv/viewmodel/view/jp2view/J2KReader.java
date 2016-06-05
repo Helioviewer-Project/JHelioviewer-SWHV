@@ -332,13 +332,13 @@ class J2KReader implements Runnable {
                         // System.out.println(res.getResponseSize() / (System.currentTimeMillis() - start));
 
                         // receive data
-                        if (res != null) {
+                        if (res != null && res.getResponseSize() > 0) {
                             //System.out.println(">>> request " + (idx++) + " " + jpipRequestLen + " " + res.getResponseSize());
                             // update optimal package size
                             flowControl();
 
                             // downgrade if necessary
-                            if (downgradeNecessary && res.getResponseSize() > 0) {
+                            if (downgradeNecessary /*&& res.getResponseSize() > 0*/) {
                                 switch (strategy) {
                                 case CURRENTFRAMEONLY:
                                 case CURRENTFRAMEFIRST:
@@ -412,7 +412,6 @@ class J2KReader implements Runnable {
                             stopReading = true;
                         }
                     }
-
 
                     int completed = 0;
                     for (; completed < num_layers; completed++) {
