@@ -330,7 +330,7 @@ class J2KReader implements Runnable {
                         // System.out.println(res.getResponseSize() / (System.currentTimeMillis() - start));
 
                         // receive data
-                        if (res != null && res.getResponseSize() > 0) {
+                        if (res.getResponseSize() > 0) {
                             //System.out.println(">>> request " + (idx++) + " " + jpipRequestLen + " " + res.getResponseSize());
                             // update optimal package size
                             flowControl();
