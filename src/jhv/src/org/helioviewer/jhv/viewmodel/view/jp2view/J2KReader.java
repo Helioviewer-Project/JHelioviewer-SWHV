@@ -216,12 +216,10 @@ class J2KReader implements Runnable {
     public void run() {
         boolean complete = false;
         boolean downgradeNecessary = false;
-
-        JP2ImageParameter prevParams = null;
         JP2ImageParameter currParams = null;
 
         while (!stop) {
-            prevParams = currParams;
+            JP2ImageParameter prevParams = currParams;
             // wait for signal
             try {
                 currParams = readerSignal.waitForSignal();
