@@ -77,6 +77,8 @@ public class DataSources {
         }
     };
 
+    private static final String[] serverList = new String[] { "ROB", "IAS", "GSFC" };
+
     public static String getServerSetting(String server, String setting) {
         Map<String, String> settings = serverSettings.get(server);
         if (settings != null)
@@ -188,7 +190,6 @@ public class DataSources {
             }
             changeServer(selectedServer);
 
-            String[] serverList = new String[] { "ROB", "IAS", "GSFC" };
             comboModel = new DefaultComboBoxModel(serverList);
             comboModel.setSelectedItem(selectedServer);
         }
