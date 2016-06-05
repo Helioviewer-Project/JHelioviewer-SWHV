@@ -411,12 +411,19 @@ class J2KReader implements Runnable {
                         }
                     }
 
+
+                    int completed = 0;
+                    for (; completed < num_layers; completed++) {
+                        if (cacheStatusRef.getImageStatus(completed) != CacheStatus.COMPLETE)
+                            break;
+                    }
+                    complete = completed == num_layers;
+                    //if (complete)
+                    //   System.out.println(">> COMPLETE");
+
                     // if current frame first -> signal again, to go on reading
                     if (strategy == CacheStrategy.CURRENTFRAMEFIRST) {
                         readerSignal.signal(currParams);
-                    } else {
-                        // check whether all queries are complete
-                        complete = complete_steps >= stepQuerys.length;
                     }
                  } catch (IOException e) {
                     if (verbose) {
