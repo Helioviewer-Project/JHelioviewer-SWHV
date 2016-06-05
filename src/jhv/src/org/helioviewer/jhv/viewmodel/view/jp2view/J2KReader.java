@@ -165,8 +165,8 @@ class J2KReader implements Runnable {
                 if ((tgap + tdat) < 1000)
                     adjust = +1;
                 else {
-                    double gapRatio = ((double) tgap) / ((double) (tgap + tdat));
-                    double targetRatio = (tdat + tgap) / 10000.0;
+                    double gapRatio = tgap / (double) (tgap + tdat);
+                    double targetRatio = (tdat + tgap) / 40000.; // 10000.0;
 
                     if (gapRatio > targetRatio)
                         adjust = +1;
@@ -307,6 +307,7 @@ class J2KReader implements Runnable {
                         }
                     }
 
+                    //int idx = 0;
                     JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
                     // send queries until everything is complete or caching is interrupted
                     while ((complete_steps < stepQuerys.length) && !stopReading) {
@@ -332,6 +333,7 @@ class J2KReader implements Runnable {
 
                         // receive data
                         if (res != null) {
+                            //System.out.println(">>> request " + (idx++) + " " + jpipRequestLen + " " + res.getResponseSize());
                             // update optimal package size
                             flowControl();
 
