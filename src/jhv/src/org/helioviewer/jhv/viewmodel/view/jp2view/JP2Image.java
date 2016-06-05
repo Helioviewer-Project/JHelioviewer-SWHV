@@ -244,8 +244,6 @@ public class JP2Image {
             reader.signalReader(params);
     }
 
-    private JP2ImageParameter oldImageViewParams;
-
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
     JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
@@ -288,15 +286,8 @@ public class JP2Image {
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, factor);
 
-        boolean viewChanged = oldImageViewParams == null ||
-                              !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
-                                imageViewParams.resolution.equals(oldImageViewParams.resolution));
         // ping reader
-        if (viewChanged) {
-            signalReader(imageViewParams);
-        }
-
-        oldImageViewParams = imageViewParams;
+        signalReader(imageViewParams);
 
         return imageViewParams;
     }
