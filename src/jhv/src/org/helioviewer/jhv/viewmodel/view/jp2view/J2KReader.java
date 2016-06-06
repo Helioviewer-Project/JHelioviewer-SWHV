@@ -217,10 +217,9 @@ class J2KReader implements Runnable {
         if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
             num_steps++;
 
-        int lpf = 0, lpi = 0, max_layers = num_layers - 1;
         JPIPQuery[] stepQuerys = new JPIPQuery[num_steps];
 
-        // create queries for packages containing several frames
+        int lpf = 0, lpi = 0, max_layers = num_layers - 1;
         for (int i = 0; i < num_steps; i++) {
             lpf += JPIPConstants.MAX_REQ_LAYERS;
             if (lpf > max_layers)
@@ -352,7 +351,7 @@ class J2KReader implements Runnable {
                                 if (singleFrame) {
                                     cacheStatusRef.setImageStatus(currParams.compositionLayer, CacheStatus.COMPLETE);
                                 } else {
-                                    for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--)
+                                    for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++)
                                         cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);
                                 }
                             }
