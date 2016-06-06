@@ -8,7 +8,6 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
@@ -262,11 +261,6 @@ class J2KReader implements Runnable {
                     if (socket.isClosed())
                         reconnect();
 
-                    boolean stopReading = false;
-                    ReaderMode readerMode = parentImageRef.getReaderMode();
-
-                    lastResponseTime = -1;
-
                     // choose cache strategy
                     boolean singleFrame = false;
                     if (num_layers <= 1 /* one frame */ ||
@@ -292,6 +286,9 @@ class J2KReader implements Runnable {
                             current_step = currParams.compositionLayer / JPIPConstants.MAX_REQ_LAYERS;
                     }
 
+                    boolean stopReading = false;
+                    lastResponseTime = -1;
+
                     //int idx = 0;
                     JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
                     // send queries until everything is complete or caching is interrupted
@@ -312,11 +309,8 @@ class J2KReader implements Runnable {
                         // Log.debug(stepQuerys[current_step].toString());
                         socket.send(req);
 
-                        // long start = System.currentTimeMillis();
-                        JPIPResponse res = socket.receive();
-                        // System.out.println(res.getResponseSize() / (System.currentTimeMillis() - start));
-
                         // receive data
+                        JPIPResponse res = socket.receive();
                         if (res.getResponseSize() > 0) {
                             //System.out.println(">>> request " + (idx++) + " " + jpipRequestLen + " " + res.getResponseSize());
                             // update optimal package size
@@ -350,18 +344,13 @@ class J2KReader implements Runnable {
                                 // tell the cache status
                                 if (singleFrame) {
                                     cacheStatusRef.setImageStatus(currParams.compositionLayer, CacheStatus.COMPLETE);
+                                    signalRender(currParams.factor);
                                 } else {
                                     for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++)
                                         cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);
                                 }
                             }
                             MoviePanel.cacheStatusChanged();
-
-                            if ((readerMode == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || readerMode == ReaderMode.ALWAYSFIREONNEWDATA) {
-                                // if package belongs to current frame tell the render-thread
-                                if (singleFrame)
-                                    signalRender(currParams.factor);
-                            }
                         }
 
                         // select next query based on strategy

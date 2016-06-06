@@ -82,13 +82,7 @@ public class JP2Image {
 
     private final JP2ImageCacheStatus imageCacheStatus;
 
-    // Reader
-    public enum ReaderMode {
-        ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA
-    }
-
     private J2KReader reader;
-    private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
     final MetaData[] metaDataList;
 
@@ -290,30 +284,6 @@ public class JP2Image {
         signalReader(imageViewParams);
 
         return imageViewParams;
-    }
-
-    /**
-     * Sets the reader mode.
-     *
-     * The options are:
-     * ONLYFIREONCOMPLETE: The reader only fires when the current frame is loaded completely
-     * ALWAYSFIREONNEWDATA: Whenever new data is received the reader fires. This is the default value.
-     *
-     * @param readerMode
-     * @see #getReaderMode()
-     */
-    public void setReaderMode(ReaderMode _readerMode) {
-        readerMode = _readerMode;
-    }
-
-    /**
-     * Returns the reader mode.
-     *
-     * @return Current reader mode.
-     * @see #setReaderMode(ReaderMode)
-     */
-    ReaderMode getReaderMode() {
-        return readerMode;
     }
 
     /**
