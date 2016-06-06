@@ -567,9 +567,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     private static final Timer sliderTimer = new Timer(1000 / 10, new SliderListener());
 
-    private static boolean cacheChanged = false;
+    private static volatile boolean cacheChanged = false;
 
-    // accessed from J2KReader threads, safe
+    // accessed from J2KReader threads
     public static void cacheStatusChanged() {
         cacheChanged = true;
     }
