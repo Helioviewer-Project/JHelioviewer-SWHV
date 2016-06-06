@@ -321,16 +321,14 @@ class J2KReader implements Runnable {
                                 downgradeNecessary = false;
 
                                 if (singleFrame) {
-                                    for (int i = 0; i < num_layers; i++)
-                                        cacheStatusRef.downgradeImageStatus(i);
+                                    cacheStatusRef.downgradeImageStatus(0, num_layers - 1);
                                 } else {
                                     for (int i = 0; i < stepQuerys.length; i++) {
                                         if (stepQuerys[i] == null) {
                                             continue;
                                         }
-                                        for (int j = i * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((i + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
-                                            cacheStatusRef.downgradeImageStatus(j);
-                                        }
+                                        cacheStatusRef.downgradeImageStatus(i * JPIPConstants.MAX_REQ_LAYERS,
+                                                                            Math.min((i + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1);
                                     }
                                 }
                             }

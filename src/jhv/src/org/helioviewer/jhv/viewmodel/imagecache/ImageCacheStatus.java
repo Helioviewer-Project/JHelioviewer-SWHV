@@ -38,11 +38,8 @@ public interface ImageCacheStatus {
      * 
      * This function may be called during zooming or panning, when entering
      * areas that have not been loaded so far.
-     * 
-     * @param compositionLayer
-     *            Layer to downgrade.
      */
-    void downgradeImageStatus(int compositionLayer);
+    void downgradeImageStatus(int startFrame, int endFrame);
 
     /**
      * Returns the image cache status of the given layer.

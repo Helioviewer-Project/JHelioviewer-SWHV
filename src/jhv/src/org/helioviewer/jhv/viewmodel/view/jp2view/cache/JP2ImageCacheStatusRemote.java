@@ -40,11 +40,14 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     // not threadsafe
     @Override
-    public void downgradeImageStatus(int compositionLayer) {
-        if (imageStatus[compositionLayer] != CacheStatus.COMPLETE) { //!
-            return;
+    public void downgradeImageStatus(int startFrame, int endFrame) {
+        startFrame = startFrame < 0 ? 0 : startFrame;
+        endFrame = endFrame > maxFrameNumber ? maxFrameNumber : endFrame;
+
+        for (int i = startFrame; i <= endFrame; i++) {
+            if (imageStatus[i] == CacheStatus.COMPLETE) //!
+                imageStatus[i] = CacheStatus.PARTIAL;
         }
-        imageStatus[compositionLayer] = CacheStatus.PARTIAL;
     }
 
     // not threadsafe
