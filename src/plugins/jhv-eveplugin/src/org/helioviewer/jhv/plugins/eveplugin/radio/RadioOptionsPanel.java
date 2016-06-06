@@ -40,7 +40,9 @@ class RadioOptionsPanel extends SmallPanel {
         availabilityButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String url = Settings.getSingletonInstance().getProperty("availability.radio.url");
+                String url = Settings.getSingletonInstance().getProperty("availability.images.url");
+                url += "#IID" + RadioData.CallistoID;
+
                 JHVGlobals.openURL(url);
             }
         });

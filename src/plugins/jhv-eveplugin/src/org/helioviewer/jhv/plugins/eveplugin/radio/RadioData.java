@@ -31,8 +31,9 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
     private final YAxis yAxis;
 
-    private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();
+    public static final String CallistoID = "49";
     private static final String ROBserver = DataSources.getServerSetting("ROB", "API.jp2series.path");
+    private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
@@ -256,7 +257,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
             for (long date : datesToDownload) {
                 JP2ViewCallisto v = null;
                 try {
-                    v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, "49", // hardcode
+                    v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, CallistoID,
                                                             date, date + 1 /* force JPX (TBD) */, -100, false);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file: " + e.getMessage());
