@@ -37,7 +37,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 class J2KReader implements Runnable {
 
     private enum CacheStrategy {
-        CURRENTFRAMEONLY, CURRENTFRAMEFIRST, MISSINGFRAMESFIRST, ALLFRAMESEQUALLY
+        CURRENTFRAMEFIRST, MISSINGFRAMESFIRST, ALLFRAMESEQUALLY
     }
 
     /** Whether IOExceptions should be shown on System.err or not */
@@ -256,9 +256,7 @@ class J2KReader implements Runnable {
                     // - If the meta data is not complete yet, choose MISSINGFRAMESFIRST
                     // - In any other case, choose ALLFRAMESEQUALLY
                     CacheStrategy strategy;
-                    if (num_layers <= 1) { // !isMultiFrame()
-                        strategy = CacheStrategy.CURRENTFRAMEONLY;
-                    } else if (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) {
+                    if (num_layers <= 1 /* one frame */ || (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE)) {
                         strategy = CacheStrategy.CURRENTFRAMEFIRST;
                     } else if (cacheStatusRef.getImageCachedPartiallyUntil() < num_layers - 1) {
                         strategy = CacheStrategy.MISSINGFRAMESFIRST;
@@ -269,7 +267,6 @@ class J2KReader implements Runnable {
                     // build query based on strategy
                     JPIPQuery[] stepQuerys;
                     switch (strategy) {
-                    case CURRENTFRAMEONLY:
                     case CURRENTFRAMEFIRST:
                         stepQuerys = new JPIPQuery[1];
                         stepQuerys[0] = createQuery(currParams, curLayer, curLayer);
@@ -338,7 +335,6 @@ class J2KReader implements Runnable {
                             // downgrade if necessary
                             if (downgradeNecessary /*&& res.getResponseSize() > 0*/) {
                                 switch (strategy) {
-                                case CURRENTFRAMEONLY:
                                 case CURRENTFRAMEFIRST:
                                     for (int i = 0; i < num_layers; i++) {
                                         cacheStatusRef.downgradeImageStatus(i);
@@ -365,7 +361,6 @@ class J2KReader implements Runnable {
 
                                 // tell the cache status
                                 switch (strategy) {
-                                case CURRENTFRAMEONLY:
                                 case CURRENTFRAMEFIRST:
                                     cacheStatusRef.setImageStatus(curLayer, CacheStatus.COMPLETE);
                                     break;
@@ -379,17 +374,8 @@ class J2KReader implements Runnable {
 
                             if ((readerMode == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || readerMode == ReaderMode.ALWAYSFIREONNEWDATA) {
                                 // if package belongs to current frame tell the render-thread
-                                switch (strategy) {
-                                case CURRENTFRAMEONLY:
-                                case CURRENTFRAMEFIRST:
+                                if (strategy == CacheStrategy.CURRENTFRAMEFIRST)
                                     signalRender(currParams.factor);
-                                    break;
-                                default:
-                                    /*! not good
-                                    if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
-                                        signalRender(currParams.factor);
-                                    }*/
-                                }
                             }
                         }
 
@@ -420,8 +406,8 @@ class J2KReader implements Runnable {
                     //if (complete)
                     //   System.out.println(">> COMPLETE");
 
-                    // if current frame first -> signal again, to go on reading
-                    if (strategy == CacheStrategy.CURRENTFRAMEFIRST) {
+                    // if incomplete && interrupted && current frame first -> signal again to go on reading
+                    if (!complete && !stopReading && strategy == CacheStrategy.CURRENTFRAMEFIRST) {
                         readerSignal.signal(currParams);
                     }
                  } catch (IOException e) {
