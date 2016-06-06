@@ -143,6 +143,22 @@ class J2KReader implements Runnable {
         }
     }
 
+    private void signalRender(final double factor) {
+        if (stop)
+            return;
+
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                parentViewRef.signalRenderFromReader(parentImageRef, factor);
+            }
+        });
+    }
+
+    void signalReader(JP2ImageParameter params) {
+        readerSignal.signal(params);
+    }
+
     /**
      * This method perfoms the flow control, that is, adjusts dynamically the
      * value of the variable <code>JPIP_REQUEST_LEN</code>. The used algorithm
@@ -196,20 +212,31 @@ class J2KReader implements Runnable {
         return query;
     }
 
-    private void signalRender(final double factor) {
-        if (stop)
-            return;
-
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                parentViewRef.signalRenderFromReader(parentImageRef, factor);
-            }
-        });
+    private JPIPQuery[] createSingleQuery(JP2ImageParameter currParams) {
+        return new JPIPQuery[] { createQuery(currParams, currParams.compositionLayer, currParams.compositionLayer) };
     }
 
-    void signalReader(JP2ImageParameter params) {
-        readerSignal.signal(params);
+    private JPIPQuery[] createMultiQuery(JP2ImageParameter currParams) {
+        int num_steps = num_layers / JPIPConstants.MAX_REQ_LAYERS;
+        if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
+            num_steps++;
+
+        int lpf = 0, lpi = 0, max_layers = num_layers - 1;
+        JPIPQuery[] stepQuerys = new JPIPQuery[num_steps];
+
+        // create queries for packages containing several frames
+        for (int i = 0; i < num_steps; i++) {
+            lpf += JPIPConstants.MAX_REQ_LAYERS;
+            if (lpf > max_layers)
+                lpf = max_layers;
+
+            stepQuerys[i] = createQuery(currParams, lpi, lpf);
+
+            lpi = lpf + 1;
+            if (lpi > max_layers)
+                lpi = 0;
+        }
+        return stepQuerys;
     }
 
     @Override
@@ -241,7 +268,6 @@ class J2KReader implements Runnable {
                         reconnect();
 
                     boolean stopReading = false;
-                    int curLayer = currParams.compositionLayer;
                     ReaderMode readerMode = parentImageRef.getReaderMode();
 
                     lastResponseTime = -1;
@@ -256,7 +282,8 @@ class J2KReader implements Runnable {
                     // - If the meta data is not complete yet, choose MISSINGFRAMESFIRST
                     // - In any other case, choose ALLFRAMESEQUALLY
                     CacheStrategy strategy;
-                    if (num_layers <= 1 /* one frame */ || (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE)) {
+                    if (num_layers <= 1 /* one frame */ ||
+                       (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(currParams.compositionLayer) != CacheStatus.COMPLETE)) {
                         strategy = CacheStrategy.CURRENTFRAMEFIRST;
                     } else if (cacheStatusRef.getImageCachedPartiallyUntil() < num_layers - 1) {
                         strategy = CacheStrategy.MISSINGFRAMESFIRST;
@@ -268,44 +295,23 @@ class J2KReader implements Runnable {
                     JPIPQuery[] stepQuerys;
                     switch (strategy) {
                     case CURRENTFRAMEFIRST:
-                        stepQuerys = new JPIPQuery[1];
-                        stepQuerys[0] = createQuery(currParams, curLayer, curLayer);
+                        stepQuerys = createSingleQuery(currParams);
                         current_step = 0;
                         break;
                     default:
-                        int num_steps = num_layers / JPIPConstants.MAX_REQ_LAYERS;
-                        if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
-                            num_steps++;
-
-                        int lpf = 0,
-                        lpi = 0,
-                        max_layers = num_layers - 1;
-                        stepQuerys = new JPIPQuery[num_steps];
-
-                        // create queries for packages containing several frames
-                        for (int i = 0; i < num_steps; i++) {
-                            lpf += JPIPConstants.MAX_REQ_LAYERS;
-                            if (lpf > max_layers)
-                                lpf = max_layers;
-
-                            stepQuerys[i] = createQuery(currParams, lpi, lpf);
-
-                            lpi = lpf + 1;
-                            if (lpi > max_layers)
-                                lpi = 0;
-                        }
+                        stepQuerys = createMultiQuery(currParams);
                         // select current step based on strategy
                         if (strategy == CacheStrategy.MISSINGFRAMESFIRST) {
                             current_step = cacheStatusRef.getImageCachedPartiallyUntil() / JPIPConstants.MAX_REQ_LAYERS;
                         } else {
-                            current_step = curLayer / JPIPConstants.MAX_REQ_LAYERS;
+                            current_step = currParams.compositionLayer / JPIPConstants.MAX_REQ_LAYERS;
                         }
                     }
 
                     //int idx = 0;
                     JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
                     // send queries until everything is complete or caching is interrupted
-                    while ((complete_steps < stepQuerys.length) && !stopReading) {
+                    while (!stopReading && complete_steps < stepQuerys.length) {
                         if (current_step >= stepQuerys.length)
                             current_step = 0;
 
@@ -362,7 +368,7 @@ class J2KReader implements Runnable {
                                 // tell the cache status
                                 switch (strategy) {
                                 case CURRENTFRAMEFIRST:
-                                    cacheStatusRef.setImageStatus(curLayer, CacheStatus.COMPLETE);
+                                    cacheStatusRef.setImageStatus(currParams.compositionLayer, CacheStatus.COMPLETE);
                                     break;
                                 default:
                                     for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--) {
@@ -380,16 +386,8 @@ class J2KReader implements Runnable {
                         }
 
                         // select next query based on strategy
-                        switch (strategy) {
-                        case MISSINGFRAMESFIRST:
+                        if (strategy != CacheStrategy.CURRENTFRAMEFIRST)
                             current_step++;
-                            break;
-                        case ALLFRAMESEQUALLY:
-                            current_step++;
-                            break;
-                        default:
-                            break;
-                        }
 
                         // check whether caching has to be interrupted
                         if (readerSignal.isSignaled() || Thread.interrupted()) {
@@ -406,7 +404,7 @@ class J2KReader implements Runnable {
                     //if (complete)
                     //   System.out.println(">> COMPLETE");
 
-                    // if incomplete && interrupted && current frame first -> signal again to go on reading
+                    // if incomplete && not interrupted && current frame first -> signal again to go on reading
                     if (!complete && !stopReading && strategy == CacheStrategy.CURRENTFRAMEFIRST) {
                         readerSignal.signal(currParams);
                     }
