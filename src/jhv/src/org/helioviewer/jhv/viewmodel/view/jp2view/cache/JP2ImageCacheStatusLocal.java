@@ -9,15 +9,13 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 
 public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements JP2ImageCacheStatus {
 
-    private final int maxFrameNumber;
     private final ResolutionSet[] resolutionSet;
 
     public JP2ImageCacheStatusLocal(Kdu_region_compositor compositor, int _maxFrameNumber) throws KduException {
         super(_maxFrameNumber);
-        maxFrameNumber = _maxFrameNumber;
 
-        resolutionSet = new ResolutionSet[maxFrameNumber + 1];
-        for (int i = 0; i <= maxFrameNumber; ++i) {
+        resolutionSet = new ResolutionSet[_maxFrameNumber + 1];
+        for (int i = 0; i <= _maxFrameNumber; ++i) {
             resolutionSet[i] = KakaduHelper.getResolutionSet(compositor, i);
         }
     }
