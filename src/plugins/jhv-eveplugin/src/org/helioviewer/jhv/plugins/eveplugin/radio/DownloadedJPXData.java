@@ -20,7 +20,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ImageCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
@@ -51,10 +50,11 @@ class DownloadedJPXData implements ImageDataHandler {
         view.setDataHandler(this);
 
         JP2ImageCallisto image = view.getJP2Image();
-        image.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
+
         ResolutionSet resolutionSet = image.getResolutionSet(0);
         jp2Width = resolutionSet.getResolutionLevel(0).width;
         jp2Height = resolutionSet.getResolutionLevel(0).height;
+
         XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
         try {
             hvMetaData.parseXML(image.getXML(0));
