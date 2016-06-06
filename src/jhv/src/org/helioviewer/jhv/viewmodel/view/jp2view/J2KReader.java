@@ -236,11 +236,9 @@ class J2KReader implements Runnable {
     @Override
     public void run() {
         boolean complete = false;
-        boolean downgradeNecessary = false;
-        JP2ImageParameter currParams = null;
 
         while (!stop) {
-            JP2ImageParameter prevParams = currParams;
+            JP2ImageParameter currParams;
             // wait for signal
             try {
                 currParams = readerSignal.waitForSignal();
@@ -248,15 +246,7 @@ class J2KReader implements Runnable {
                 continue;
             }
 
-            // check whether view parameters have changed
-            boolean viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
-            // if view has changed downgrade caching status
-            if (viewChanged) {
-                complete = false;
-                downgradeNecessary = true;
-            }
-
-            if (!complete) {
+            if (!complete || currParams.downgrade) {
                 try {
                     if (socket.isClosed())
                         reconnect();
@@ -311,45 +301,26 @@ class J2KReader implements Runnable {
 
                         // receive data
                         JPIPResponse res = socket.receive();
-                        if (res.getResponseSize() > 0) {
-                            //System.out.println(">>> request " + (idx++) + " " + jpipRequestLen + " " + res.getResponseSize());
-                            // update optimal package size
-                            flowControl();
+                        //System.out.println(">>> request " + (idx++) + " " + jpipRequestLen + " " + res.getResponseSize());
+                        // update optimal package size
+                        flowControl();
 
-                            // downgrade if necessary
-                            if (downgradeNecessary) {
-                                downgradeNecessary = false;
+                        // add response to cache - react if query complete
+                        if (cacheRef.addJPIPResponseData(res, cacheStatusRef)) {
+                            // mark query as complete
+                            complete_steps++;
+                            stepQuerys[current_step] = null;
 
-                                if (singleFrame) {
-                                    cacheStatusRef.downgradeImageStatus(0, num_layers - 1);
-                                } else {
-                                    for (int i = 0; i < stepQuerys.length; i++) {
-                                        if (stepQuerys[i] == null) {
-                                            continue;
-                                        }
-                                        cacheStatusRef.downgradeImageStatus(i * JPIPConstants.MAX_REQ_LAYERS,
-                                                                            Math.min((i + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1);
-                                    }
-                                }
+                            // tell the cache status
+                            if (singleFrame) {
+                                cacheStatusRef.setImageStatus(currParams.compositionLayer, CacheStatus.COMPLETE);
+                                signalRender(currParams.factor);
+                            } else {
+                                for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++)
+                                    cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);
                             }
-
-                            // add response to cache - react if query complete
-                            if (cacheRef.addJPIPResponseData(res, cacheStatusRef)) {
-                                // mark query as complete
-                                complete_steps++;
-                                stepQuerys[current_step] = null;
-
-                                // tell the cache status
-                                if (singleFrame) {
-                                    cacheStatusRef.setImageStatus(currParams.compositionLayer, CacheStatus.COMPLETE);
-                                    signalRender(currParams.factor);
-                                } else {
-                                    for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++)
-                                        cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);
-                                }
-                            }
-                            MoviePanel.cacheStatusChanged();
                         }
+                        MoviePanel.cacheStatusChanged();
 
                         // select next query based on strategy
                         if (!singleFrame)

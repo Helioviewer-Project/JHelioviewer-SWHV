@@ -30,6 +30,8 @@ public class JP2ImageParameter {
 
     public final double factor;
 
+    public boolean downgrade = false;
+
     /** This constructor assigns all variables... throw NPE if any args are null */
     public JP2ImageParameter(JP2Image _jp2Image, Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer, double _factor) {
         if (_roi == null || _resolution == null)
@@ -61,7 +63,7 @@ public class JP2ImageParameter {
 
     @Override
     public String toString() {
-        return "ImageViewParams[ " + jp2Image + " " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + compositionLayer + "] " + factor + "]";
+        return "ImageViewParams[ " + jp2Image + " " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + compositionLayer + "] " + factor + " " + downgrade + "]";
     }
 
 }
