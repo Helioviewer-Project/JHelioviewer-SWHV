@@ -18,7 +18,7 @@ public class ImageCacheStatusLocal implements ImageCacheStatus {
     }
 
     @Override
-    public void downgradeImageStatus(int compositionLayer) {
+    public void downgradeImageStatus(int startFrame, int endFrame) {
     }
 
     @Override
