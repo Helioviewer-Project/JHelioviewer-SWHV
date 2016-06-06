@@ -36,10 +36,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
  */
 class J2KReader implements Runnable {
 
-    private enum CacheStrategy {
-        CURRENTFRAMEFIRST, MISSINGFRAMESFIRST, ALLFRAMESEQUALLY
-    }
-
     /** Whether IOExceptions should be shown on System.err or not */
     private static final boolean verbose = false;
 
@@ -272,40 +268,29 @@ class J2KReader implements Runnable {
 
                     lastResponseTime = -1;
 
-                    int complete_steps = 0;
-                    int current_step;
-
-                    // Decide what cache strategy to use:
-                    // - If this is not the main view, choose FIRSTFRAMEONLY
-                    // - If this is not a movie, choose FIRSTFRAMEONLY
-                    // - If the image has been zoomed, choose CURRENTFRAMEFIRST
-                    // - If the meta data is not complete yet, choose MISSINGFRAMESFIRST
-                    // - In any other case, choose ALLFRAMESEQUALLY
-                    CacheStrategy strategy;
+                    // choose cache strategy
+                    boolean singleFrame = false;
                     if (num_layers <= 1 /* one frame */ ||
                        (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(currParams.compositionLayer) != CacheStatus.COMPLETE)) {
-                        strategy = CacheStrategy.CURRENTFRAMEFIRST;
-                    } else if (cacheStatusRef.getImageCachedPartiallyUntil() < num_layers - 1) {
-                        strategy = CacheStrategy.MISSINGFRAMESFIRST;
-                    } else {
-                        strategy = CacheStrategy.ALLFRAMESEQUALLY;
+                        singleFrame = true;
                     }
 
                     // build query based on strategy
+                    int complete_steps = 0;
+                    int current_step;
                     JPIPQuery[] stepQuerys;
-                    switch (strategy) {
-                    case CURRENTFRAMEFIRST:
+
+                    if (singleFrame) {
                         stepQuerys = createSingleQuery(currParams);
                         current_step = 0;
-                        break;
-                    default:
+                    } else {
                         stepQuerys = createMultiQuery(currParams);
-                        // select current step based on strategy
-                        if (strategy == CacheStrategy.MISSINGFRAMESFIRST) {
-                            current_step = cacheStatusRef.getImageCachedPartiallyUntil() / JPIPConstants.MAX_REQ_LAYERS;
-                        } else {
+
+                        int partial = cacheStatusRef.getImageCachedPartiallyUntil();
+                        if (partial < num_layers - 1)
+                            current_step = partial / JPIPConstants.MAX_REQ_LAYERS;
+                        else
                             current_step = currParams.compositionLayer / JPIPConstants.MAX_REQ_LAYERS;
-                        }
                     }
 
                     //int idx = 0;
@@ -339,14 +324,13 @@ class J2KReader implements Runnable {
                             flowControl();
 
                             // downgrade if necessary
-                            if (downgradeNecessary /*&& res.getResponseSize() > 0*/) {
-                                switch (strategy) {
-                                case CURRENTFRAMEFIRST:
-                                    for (int i = 0; i < num_layers; i++) {
+                            if (downgradeNecessary) {
+                                downgradeNecessary = false;
+
+                                if (singleFrame) {
+                                    for (int i = 0; i < num_layers; i++)
                                         cacheStatusRef.downgradeImageStatus(i);
-                                    }
-                                    break;
-                                default:
+                                } else {
                                     for (int i = 0; i < stepQuerys.length; i++) {
                                         if (stepQuerys[i] == null) {
                                             continue;
@@ -356,7 +340,6 @@ class J2KReader implements Runnable {
                                         }
                                     }
                                 }
-                                downgradeNecessary = false;
                             }
 
                             // add response to cache - react if query complete
@@ -366,27 +349,24 @@ class J2KReader implements Runnable {
                                 stepQuerys[current_step] = null;
 
                                 // tell the cache status
-                                switch (strategy) {
-                                case CURRENTFRAMEFIRST:
+                                if (singleFrame) {
                                     cacheStatusRef.setImageStatus(currParams.compositionLayer, CacheStatus.COMPLETE);
-                                    break;
-                                default:
-                                    for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--) {
+                                } else {
+                                    for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--)
                                         cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);
-                                    }
                                 }
                             }
                             MoviePanel.cacheStatusChanged();
 
                             if ((readerMode == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || readerMode == ReaderMode.ALWAYSFIREONNEWDATA) {
                                 // if package belongs to current frame tell the render-thread
-                                if (strategy == CacheStrategy.CURRENTFRAMEFIRST)
+                                if (singleFrame)
                                     signalRender(currParams.factor);
                             }
                         }
 
                         // select next query based on strategy
-                        if (strategy != CacheStrategy.CURRENTFRAMEFIRST)
+                        if (!singleFrame)
                             current_step++;
 
                         // check whether caching has to be interrupted
@@ -404,8 +384,8 @@ class J2KReader implements Runnable {
                     //if (complete)
                     //   System.out.println(">> COMPLETE");
 
-                    // if incomplete && not interrupted && current frame first -> signal again to go on reading
-                    if (!complete && !stopReading && strategy == CacheStrategy.CURRENTFRAMEFIRST) {
+                    // if incomplete && not interrupted && single frame -> signal again to go on reading
+                    if (!complete && !stopReading && singleFrame) {
                         readerSignal.signal(currParams);
                     }
                  } catch (IOException e) {
