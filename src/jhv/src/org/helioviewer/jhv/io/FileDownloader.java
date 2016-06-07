@@ -34,13 +34,6 @@ public class FileDownloader {
     private Thread downloadThread;
     private JProgressBar progressBar;
 
-    File getDefaultDownloadLocation(URI source) {
-        if (source == null) {
-            return null;
-        }
-        return new File(JHVDirectory.REMOTEFILES.getPath() + source.getPath().substring(Math.max(0, source.getPath().lastIndexOf('/'))));
-    }
-
     /**
      * Gets the file from the source and writes it to the destination file. The
      * methods provides an own dialog, which displays the current download
@@ -48,15 +41,13 @@ public class FileDownloader {
      * 
      * @param source
      *            specifies the location of the file which has to be downloaded.
-     * @param dest
-     *            location where data of the file has to be stored.
      * @param title
      *            title which should be displayed in the header of the progress
      *            dialog.
      * @return True, if download was successful, false otherwise.
      * @throws IOException
      */
-    boolean get(URI source, File dest, String title) throws IOException {
+    boolean get(URI source, String title) throws IOException {
         // create own dialog where to display the progress
         progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
         // progressBar.setPreferredSize(new Dimension(200, 20));
@@ -65,6 +56,7 @@ public class FileDownloader {
         dialog.setVisible(true);
 
         // download the file
+        File dest = new File(JHVDirectory.REMOTEFILES.getPath() + source.getPath().substring(Math.max(0, source.getPath().lastIndexOf('/'))));
         boolean result = downloadFile(source, dest);
         dialog.dispose();
 
@@ -121,12 +113,10 @@ public class FileDownloader {
                     out = new FileOutputStream(finalDest);
 
                     int contentLength = ds.getContentLength();
-                    if (progressBar != null) {
-                        if (contentLength < 0)
-                            progressBar.setIndeterminate(true);
-                        else
-                            progressBar.setMaximum(contentLength);
-                    }
+                    if (contentLength < 0)
+                        progressBar.setIndeterminate(true);
+                    else
+                        progressBar.setMaximum(contentLength);
 
                     byte[] buffer = new byte[1024];
                     int numCurrentRead;
@@ -135,10 +125,8 @@ public class FileDownloader {
                     while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
                         out.write(buffer, 0, numCurrentRead);
 
-                        if (progressBar != null) {
-                            numTotalRead += numCurrentRead;
-                            progressBar.setValue(numTotalRead);
-                        }
+                        numTotalRead += numCurrentRead;
+                        progressBar.setValue(numTotalRead);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -160,11 +148,7 @@ public class FileDownloader {
             }
         }
 
-        boolean result = true;
-        if (progressBar != null) {
-            result = contentLength == -1 /* cannot determine */ || progressBar.getValue() >= progressBar.getMaximum();
-        }
-        return result;
+        return contentLength == -1 /* cannot determine */ || progressBar.getValue() >= progressBar.getMaximum();
     }
 
     /**
