@@ -13,20 +13,16 @@ public class RenderableCellRenderer extends DefaultTableCellRenderer {
         if (value instanceof Renderable) {
             Renderable renderable = (Renderable) value;
             String layerName = renderable.getName();
-            String tooltip = layerName;
-
+            setText(layerName);
             if (renderable instanceof RenderableImageLayer && ((RenderableImageLayer) renderable).isActiveImageLayer()) {
-                tooltip += " (master)";
-                setToolTipText(tooltip);
+                setToolTipText(layerName + " (master)");
                 setFont(UIGlobals.UIFontBold);
             } else {
                 setToolTipText(null);
                 setFont(UIGlobals.UIFont);
             }
-
-            setText(layerName);
-            setBorder(RenderableContainerPanel.commonBorder);
         }
+        setBorder(RenderableContainerPanel.commonBorder);
     }
 
 }

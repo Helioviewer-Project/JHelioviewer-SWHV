@@ -1,9 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer;
 
-import java.awt.Component;
-
-import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -16,27 +12,20 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 public class RemoveCellRenderer extends DefaultTableCellRenderer {
 
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-        // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
+    public void setValue(Object value) {
         if (value instanceof LineDataSelectorElement) {
             LineDataSelectorElement lineDataElement = (LineDataSelectorElement) value;
-
-            label.setText(null);
-            label.setHorizontalAlignment(SwingConstants.CENTER);
-            label.setBorder(LineDataSelectorTablePanel.commonBorder);
-
             if (lineDataElement.isDeletable()) {
-                label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-                label.setToolTipText("Click to remove");
+                setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
+                setToolTipText("Click to remove");
             } else {
-                label.setIcon(null);
-                label.setToolTipText(null);
+                setIcon(null);
+                setToolTipText(null);
             }
         }
-
-        return label;
+        setText(null);
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setBorder(LineDataSelectorTablePanel.commonBorder);
     }
 
 }

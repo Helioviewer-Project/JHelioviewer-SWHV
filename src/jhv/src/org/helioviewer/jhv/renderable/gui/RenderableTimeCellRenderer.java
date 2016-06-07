@@ -9,16 +9,14 @@ public class RenderableTimeCellRenderer extends DefaultTableCellRenderer {
     public void setValue(Object value) {
         if (value instanceof Renderable) {
             Renderable renderable = (Renderable) value;
-            setBorder(RenderableContainerPanel.commonBorder);
-
             String timeString = renderable.getTimeString();
             setText(timeString);
-
             if (timeString == null)
                 setToolTipText(null);
             else
                 setToolTipText("UTC time");
         }
+        setBorder(RenderableContainerPanel.commonBorder);
     }
 
 }

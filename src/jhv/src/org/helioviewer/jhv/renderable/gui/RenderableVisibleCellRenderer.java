@@ -13,11 +13,6 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
     public void setValue(Object value) {
         if (value instanceof Renderable) {
             Renderable renderable = (Renderable) value;
-
-            setText(null);
-            setHorizontalAlignment(SwingConstants.CENTER);
-            setBorder(RenderableContainerPanel.commonBorder);
-
             if (renderable.isVisible()) {
                 setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
                 setToolTipText("Click to hide");
@@ -26,6 +21,9 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
                 setToolTipText("Click to show");
             }
         }
+        setText(null);
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setBorder(RenderableContainerPanel.commonBorder);
     }
 
 }
