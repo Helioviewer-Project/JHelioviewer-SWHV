@@ -2,7 +2,6 @@ package org.helioviewer.jhv.base.cache;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -80,7 +79,8 @@ public class RequestCache {
         if (intervals == null || intervals.size() <= 1)
             return intervals;
 
-        Collections.sort(intervals, new IntervalComparator());
+        Collections.sort(intervals);
+
         ArrayList<Interval> result = new ArrayList<Interval>();
         Interval prev = intervals.get(0);
         for (int i = 1; i < intervals.size(); i++) {
@@ -101,18 +101,6 @@ public class RequestCache {
         icache.add(ri);
         icache = merge(icache);
         return getInvertedCache(icache);
-    }
-
-    private static class IntervalComparator implements Comparator<Interval> {
-        @Override
-        public int compare(Interval i1, Interval i2) {
-            if (i1.start > i2.start)
-                return 1;
-            else if (i1.start == i2.start)
-                return 0;
-            else
-                return -1;
-        }
     }
 
 }
