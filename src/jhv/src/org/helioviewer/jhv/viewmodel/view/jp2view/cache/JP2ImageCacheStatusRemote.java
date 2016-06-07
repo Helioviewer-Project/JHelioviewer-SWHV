@@ -3,6 +3,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_region_compositor;
 
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 
@@ -12,7 +13,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     private final ResolutionSet[] resolutionSet;
     private final Kdu_region_compositor compositor;
 
-    // accessed from J2KReader, read also from EDT by MoviePanel, for the latter not very important if values are consistent
+    // r/w image load, r/w J2KReader, r J2KRender, r MoviePanel/EDT
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
 
@@ -71,8 +72,10 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     @Override
     public ResolutionSet getResolutionSet(int compositionLayer) {
-        if (resolutionSet[compositionLayer] == null) // temporary
+        if (resolutionSet[compositionLayer] == null) {
+            Log.error("resolutionSet[" + compositionLayer + "] null"); // never happened?
             return resolutionSet[0];
+        }
         return resolutionSet[compositionLayer];
     }
 
