@@ -20,19 +20,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
-/**
- * This class has two different purposes. The first is to connect to and
- * retrieve image data from a JPIP server (if the image is remote). The second
- * is that all view-changed signals are routed through this thread... so it must
- * forward them to the J2KRender thread through that threads signal.
- *
- * TODO The server may change the parameters of the request, and we should take
- * it into account...
- *
- * @author caplins
- * @author Juan Pablo
- * @author Markus Langenberg
- */
 class J2KReader implements Runnable {
 
     /** Whether IOExceptions should be shown on System.err or not */
