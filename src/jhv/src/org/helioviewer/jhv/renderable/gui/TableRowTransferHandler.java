@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.renderable.gui;
 
 import java.awt.AlphaComposite;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -73,25 +74,25 @@ public class TableRowTransferHandler extends TransferHandler {
 
     @Override
     public boolean importData(TransferHandler.TransferSupport info) {
-        JTable target = (JTable) info.getComponent();
-        JTable.DropLocation dl = (JTable.DropLocation) info.getDropLocation();
-        int index = dl.getRow();
+        TransferHandler.DropLocation idl = info.getDropLocation();
+        if (idl instanceof JTable.DropLocation) {
+            int index = ((JTable.DropLocation) idl).getRow();
+            int max = grid.getModel().getRowCount();
+            if (index < 0 || index > max)
+                index = max;
 
-        int max = grid.getModel().getRowCount();
-        if (index < 0 || index > max)
-            index = max;
-        target.setCursor(Cursor.getDefaultCursor());
-        try {
-            Object obj = info.getTransferable().getTransferData(DataFlavor.stringFlavor);
-            int rowFrom = Integer.parseInt((String) obj);
-            if (rowFrom != -1 && rowFrom != index) {
-                ((Reorderable) grid.getModel()).reorder(rowFrom, index);
-                // if (index > rowFrom)
-                //    index--;
-                return true;
+            try {
+                Object obj = info.getTransferable().getTransferData(DataFlavor.stringFlavor);
+                int rowFrom = Integer.parseInt((String) obj);
+                if (rowFrom != -1 && rowFrom != index) {
+                    ((Reorderable) grid.getModel()).reorder(rowFrom, index);
+                    // if (index > rowFrom)
+                    //    index--;
+                    return true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return false;
     }
