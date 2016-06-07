@@ -9,14 +9,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLConnection;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JWindow;
 
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
@@ -83,26 +84,11 @@ public class FileDownloader {
         return new File(outFileName).toURI();
     }
 
-    public File getDefaultDownloadLocation(URI source) {
+    File getDefaultDownloadLocation(URI source) {
         if (source == null) {
             return null;
         }
         return new File(JHVDirectory.REMOTEFILES.getPath() + source.getPath().substring(Math.max(0, source.getPath().lastIndexOf('/'))));
-    }
-
-    /**
-     * Gets the file from the source and writes it to the destination file.
-     * 
-     * @param source
-     *            specifies the location of the file which has to be downloaded.
-     * @param dest
-     *            location where data of the file has to be stored.
-     * @return True, if download was successful, false otherwise.
-     * @throws IOException
-     */
-    public boolean get(URI source, File dest) throws IOException {
-        progressBar = null;
-        return downloadFile(source, dest);
     }
 
     /**
@@ -120,7 +106,7 @@ public class FileDownloader {
      * @return True, if download was successful, false otherwise.
      * @throws IOException
      */
-    public boolean get(URI source, File dest, String title) throws IOException {
+    boolean get(URI source, File dest, String title) throws IOException {
         // create own dialog where to display the progress
         progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
         // progressBar.setPreferredSize(new Dimension(200, 20));
@@ -133,14 +119,6 @@ public class FileDownloader {
         dialog.dispose();
 
         return result;
-    }
-
-    public boolean get(URI source, File dest, JProgressBar progressBar) throws IOException {
-        // set up progress bar and progress label
-        this.progressBar = progressBar;
-        progressBar.setName("Downloading '" + source.getPath().substring(source.getPath().lastIndexOf('/') + 1) + "'...");
-        // download the file
-        return downloadFile(source, dest);
     }
 
     /**
@@ -182,18 +160,22 @@ public class FileDownloader {
         }
         finalDest.createNewFile();
 
+        int contentLength = -100;
+
         downloadThread = new Thread(new Runnable() {
             public void run() {
                 FileOutputStream out = null;
-                InputStream in = null;
-
                 try {
-                    URLConnection conn = finalSource.toURL().openConnection();
-                    in = conn.getInputStream();
+                    DownloadStream ds = new DownloadStream(finalSource.toURL());
+                    InputStream in = ds.getInput();
                     out = new FileOutputStream(finalDest);
 
+                    int contentLength = ds.getContentLength();
                     if (progressBar != null) {
-                        progressBar.setMaximum(conn.getContentLength());
+                        if (contentLength < 0)
+                            progressBar.setIndeterminate(true);
+                        else
+                            progressBar.setMaximum(contentLength);
                     }
 
                     byte[] buffer = new byte[1024];
@@ -211,10 +193,6 @@ public class FileDownloader {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    try {
-                        in.close();
-                    } catch (Exception e) {
-                    }
                     try {
                         out.close();
                     } catch (Exception e) {
@@ -234,7 +212,7 @@ public class FileDownloader {
 
         boolean result = true;
         if (progressBar != null) {
-            result = (progressBar.getValue() >= progressBar.getMaximum());
+            result = contentLength == -1 /* cannot determine */ || progressBar.getValue() >= progressBar.getMaximum();
         }
         return result;
     }
@@ -251,7 +229,7 @@ public class FileDownloader {
 
         /**
          * @param title
-         *            Text to show on top of the progress bar
+         *            Text to show next to the progress bar
          */
         public StandAloneDialog(String title) {
             super(ImageViewerGui.getMainFrame());
@@ -259,8 +237,7 @@ public class FileDownloader {
 
             setLayout(new FlowLayout());
 
-            progressBar.setString(title);
-            progressBar.setStringPainted(true);
+            add(new JLabel(title));
             add(progressBar);
 
             JButton cmdCancel = new JButton("Cancel");
@@ -271,9 +248,6 @@ public class FileDownloader {
             setSize(getPreferredSize());
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public void actionPerformed(ActionEvent e) {
             if (downloadThread != null && downloadThread.isAlive()) {
                 downloadThread.interrupt();
