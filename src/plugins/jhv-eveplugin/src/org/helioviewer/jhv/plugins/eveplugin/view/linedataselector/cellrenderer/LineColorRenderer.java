@@ -21,11 +21,9 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof LineDataSelectorElement) {
             LineDataSelectorElement ldse = (LineDataSelectorElement) value;
-
             Color c = ldse.getDataColor();
             if (c != null && ldse instanceof Band) {
                 lineColorPanel.setLineColor(c);
@@ -33,11 +31,10 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
                 lineColorPanel.setBorder(LineDataSelectorTablePanel.commonBorder);
                 return lineColorPanel;
             }
-
-            label.setText(null);
-            label.setBorder(LineDataSelectorTablePanel.commonBorder);
         }
 
+        label.setText(null);
+        label.setBorder(LineDataSelectorTablePanel.commonBorder);
         return label;
     }
 

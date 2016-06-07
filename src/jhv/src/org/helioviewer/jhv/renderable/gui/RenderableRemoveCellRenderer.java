@@ -13,11 +13,6 @@ public class RenderableRemoveCellRenderer extends DefaultTableCellRenderer {
     public void setValue(Object value) {
         if (value instanceof Renderable) {
             Renderable renderable = (Renderable) value;
-
-            setText(null);
-            setHorizontalAlignment(SwingConstants.CENTER);
-            setBorder(RenderableContainerPanel.commonBorder);
-
             if (renderable.isDeletable()) {
                 setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
                 setToolTipText("Click to remove");
@@ -26,6 +21,9 @@ public class RenderableRemoveCellRenderer extends DefaultTableCellRenderer {
                 setToolTipText(null); // "Cannot be removed"
             }
         }
+        setText(null);
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setBorder(RenderableContainerPanel.commonBorder);
     }
 
 }
