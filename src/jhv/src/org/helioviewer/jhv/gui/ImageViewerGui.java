@@ -9,7 +9,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.AbstractList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -39,7 +39,6 @@ import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.InputController;
 import org.helioviewer.jhv.io.CommandLineProcessor;
-import org.helioviewer.jhv.io.LoadURIDownloadTask;
 import org.helioviewer.jhv.io.LoadURITask;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
@@ -203,12 +202,11 @@ public class ImageViewerGui {
      * */
     public static void loadImagesAtStartup() {
         // get values for different command line options
-        AbstractList<URI> jpipUris = CommandLineProcessor.getJPIPOptionValues();
-        AbstractList<URI> downloadAddresses = CommandLineProcessor.getDownloadOptionValues();
-        AbstractList<URI> jpxUrls = CommandLineProcessor.getJPXOptionValues();
+        List<URI> jpipUris = CommandLineProcessor.getJPIPOptionValues();
+        List<URI> jpxUrls = CommandLineProcessor.getJPXOptionValues();
 
         // Do nothing if no resource is specified
-        if (jpipUris.isEmpty() && downloadAddresses.isEmpty() && jpxUrls.isEmpty()) {
+        if (jpipUris.isEmpty() && jpxUrls.isEmpty()) {
             return;
         }
 
@@ -223,13 +221,6 @@ public class ImageViewerGui {
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
                 LoadURITask uriTask = new LoadURITask(jpipUri, jpipUri);
-                JHVGlobals.getExecutorService().execute(uriTask);
-            }
-        }
-        // -download
-        for (URI downloadAddress : downloadAddresses) {
-            if (downloadAddress != null) {
-                LoadURIDownloadTask uriTask = new LoadURIDownloadTask(downloadAddress, downloadAddress);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
         }

@@ -18,7 +18,6 @@ import javax.swing.JWindow;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.DownloadStream;
-import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
@@ -34,55 +33,6 @@ public class FileDownloader {
 
     private Thread downloadThread;
     private JProgressBar progressBar;
-
-    /**
-     * Downloads a file from a given HTTP address to the download directory of
-     * JHV.
-     * 
-     * @param sourceURI
-     *            address of file which have to be downloaded.
-     * @return URI to the downloaded file or null if download fails.
-     */
-    public URI downloadFromHTTP(URI sourceURI) {
-        // check if sourceURI is an http address
-        if (sourceURI == null)
-            return null;
-
-        String scheme = sourceURI.getScheme();
-        if (scheme == null)
-            return null;
-        if (!scheme.equalsIgnoreCase("http")) {
-            return null;
-        }
-
-        try {
-            sourceURI = new URI(sourceURI.toString());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        String name = sourceURI.getPath().substring(sourceURI.getPath().lastIndexOf('/') + 1);
-        String outFileName = JHVDirectory.REMOTEFILES.getPath() + sourceURI.getPath().substring(sourceURI.getPath().lastIndexOf('/') + 1);
-
-        progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
-        StandAloneDialog dialog = new StandAloneDialog("Downloading " + name);
-        dialog.setVisible(true);
-
-        try {
-            if (!downloadFile(sourceURI, new File(outFileName))) {
-                if (!dialog.wasInterrupted) {
-                    Message.err("Download", "Unable to download from http", false);
-                }
-            }
-        } catch (IOException e) {
-            dialog.setVisible(false);
-            e.printStackTrace();
-        } finally {
-            dialog.setVisible(false);
-        }
-        // return destination of file
-        return new File(outFileName).toURI();
-    }
 
     File getDefaultDownloadLocation(URI source) {
         if (source == null) {
