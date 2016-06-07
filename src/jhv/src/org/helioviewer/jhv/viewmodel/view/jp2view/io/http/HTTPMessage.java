@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,7 +18,7 @@ import java.util.Set;
 public abstract class HTTPMessage {
 
     /** A hash table with the headers of the message */
-    private final Hashtable<String, String> headers = new Hashtable<String, String>();
+    private final HashMap<String, String> headers = new HashMap<String, String>();
 
     /** Returns <code>true</code> if the message is a request. */
     public abstract boolean isRequest();
@@ -56,10 +56,10 @@ public abstract class HTTPMessage {
     /**
      * Same as setHeader except for a map of headers.
      * 
-     * @param _map
+     * @param map
      */
-    public final void setHeaders(Map<String, String> _map) {
-        headers.putAll(_map);
+    public final void setHeaders(Map<String, String> map) {
+        headers.putAll(map);
     }
 
     /**
@@ -76,17 +76,17 @@ public abstract class HTTPMessage {
      * @param _key
      * @return True, if the header exists, false otherwise
      */
-    public final boolean headerExists(String _key) {
-        return headers.containsKey(_key);
+    public final boolean headerExists(String key) {
+        return headers.containsKey(key);
     }
 
     /**
      * Removes the specified message header.
      * 
-     * @param _key
+     * @param key
      */
-    public final void removeHeader(String _key) {
-        headers.remove(_key);
+    public final void removeHeader(String key) {
+        headers.remove(key);
     }
 
     /** Removes all the message headers. */
