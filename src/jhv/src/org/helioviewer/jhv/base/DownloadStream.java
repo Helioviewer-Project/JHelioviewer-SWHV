@@ -180,6 +180,10 @@ public class DownloadStream {
         return outputName;
     }
 
+    public int getContentLength() {
+        return contentLength;
+    }
+
     /**
      * @return the read timeout
      */
