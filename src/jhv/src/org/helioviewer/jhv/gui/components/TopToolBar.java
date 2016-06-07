@@ -256,13 +256,13 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         addSeparator();
 
-        for (JToggleButton button : this.pluginList) {
+        for (JToggleButton button : pluginList) {
             if (displayMode == DisplayMode.ICONANDTEXT)
-                this.add(button);
+                add(button);
             else if (displayMode == DisplayMode.TEXTONLY)
-                this.add(new JToggleButton(button.getText()));
+                add(new JToggleButton(button.getText()));
             else
-                this.add(new JToggleButton(button.getIcon()));
+                add(new JToggleButton(button.getIcon()));
         }
 
         JButton projectionButton = new JButton("Projection");
@@ -358,7 +358,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         pluginList.add(button);
     }
 
-    public void removeToolbarPlugin(AbstractButton button) {
+    public void removeToolbarPlugin(JToggleButton button) {
         pluginList.remove(button);
     }
 
