@@ -76,7 +76,7 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
             }
         }
 
-        LUT newMap = lutMap.get(combobox.getSelectedItem());
+        LUT newMap = lutMap.get((String) combobox.getSelectedItem());
         image.setLUT(newMap, invertButton.isSelected());
         Displayer.display();
     }
