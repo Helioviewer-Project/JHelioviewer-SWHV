@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.ParseException;
@@ -77,7 +76,7 @@ public class PositionLoad {
 
                 URL url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + beginDate + "&utc_end=" + endDate + "&deltat=" + deltat +
                                             "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
-                DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
+                DownloadStream ds = new DownloadStream(url, true);
 
                 result = JSONUtils.getJSONStream(ds.getInput());
                 if (ds.isResponse400()) {
@@ -89,7 +88,7 @@ public class PositionLoad {
                     ret = parseData(result);
                 }
             } catch (MalformedURLException e) {
-                Log.error("Wrong URL", e);
+                Log.error("Malformed URL", e);
             } catch (UnknownHostException e) {
                 Log.debug("Unknown host, network down?", e);
             } catch (IOException e) {
@@ -100,8 +99,6 @@ public class PositionLoad {
                 report = FAILEDSTATE + ": JSON parse error";
             } catch (NumberFormatException e) {
                 report = FAILEDSTATE + ": JSON parse error";
-            } catch (URISyntaxException e) {
-                report = FAILEDSTATE + ": wrong URI";
             } finally {
                 result = null;
             }

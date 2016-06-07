@@ -3,8 +3,8 @@ package org.helioviewer.jhv.plugins.eveplugin.lines;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
@@ -49,34 +48,33 @@ public class BandTypeAPI {
         try {
             defaultProperties.load(defaultPropStream);
             defaultPropStream.close();
-        } catch (IOException ex) {
-            Log.error("BandTypeAPI.loadSettings() > Could not load settings", ex);
+        } catch (IOException e) {
+            Log.error("BandTypeAPI.loadSettings() > Could not load settings", e);
         }
     }
 
     private String readJSON() {
         String string = null;
-        URI url = null;
+        URL url = null;
         try {
-            url = new URI(baseUrl + "/datasets/index.php");
-        } catch (URISyntaxException e) {
-            Log.error("Malformed url", e);
+            url = new URL(baseUrl + "/datasets/index.php");
+        } catch (MalformedURLException e) {
+            Log.error("Malformed URL", e);
         }
-        final File dstFile = new File(JHVDirectory.PLUGINS.getPath() + "/EVEPlugin/datasets.json");
+
+        File dstFile = new File(JHVDirectory.PLUGINS.getPath() + "/EVEPlugin/datasets.json");
         try {
-            DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-            FileUtils.save(ds.getInput(), dstFile);
+            FileUtils.save(new DownloadStream(url).getInput(), dstFile);
         } catch (UnknownHostException e) {
             Log.debug("Unknown host, network down?", e);
-        } catch (final IOException e1) {
-            Log.debug("Error downloading the bandtypes.", e1);
-        } catch (URISyntaxException e2) {
-            Log.debug("Malformed url", e2);
+        } catch (IOException e) {
+            Log.debug("Error downloading the bandtypes", e);
         }
+
         try {
             string = FileUtils.read(dstFile);
-        } catch (final IOException e1) {
-            Log.debug("Error reading the bandtypes.", e1);
+        } catch (IOException e) {
+            Log.debug("Error reading the bandtypes", e);
         }
         return string;
     }
@@ -154,8 +152,8 @@ public class BandTypeAPI {
             updateBandGroups(jsonGroupArray);
             JSONArray jsonObjectArray = (JSONArray) jsonmain.get("objects");
             updateBandTypes(jsonObjectArray);
-        } catch (JSONException e1) {
-            Log.error("JSON parsing error", e1);
+        } catch (JSONException e) {
+            Log.error("JSON parsing error", e);
         }
     }
 

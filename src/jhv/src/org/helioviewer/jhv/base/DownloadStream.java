@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.regex.Matcher;
@@ -16,20 +13,6 @@ import java.util.zip.InflaterInputStream;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.logging.Log;
 
-/**
- * General connection class which gives to a given URL a proper InputStream with
- * the response back, trying to use compressed transmission if the server
- * supports it and hopefully as many protocols as needed.
- *
- * To use it: - Create a new DownloadStream object - Add post data with
- * .setOutput() - Connect with the current parameters .connect(), automatically
- * done if used getInput() - Get input stream .getInput() - Get output filename
- * .getOutputName()
- *
- * To save data @see UploadStream
- *
- * @author Helge Dietert
- */
 public class DownloadStream {
     /**
      * Input stream to read the data from
@@ -44,63 +27,37 @@ public class DownloadStream {
      */
     private String outputName = null;
 
-    private String disposition = null;
+    private String contentDisposition = null;
+    private int contentLength = -1;
+    private boolean response400 = false;
 
     /**
      * Read timeout in ms
      */
-    private int readTimeout;
+    private final int readTimeout;
     /**
      * Connect timeout in ms
      */
-    private int connectTimeout;
+    private final int connectTimeout;
     /**
      * Used url to connect
      */
-    final private URL url;
-    private boolean ignore400;
-    private boolean response400;
+    private final URL url;
+    private final boolean ignore400;
 
-    /**
-     * Creates a download object for a given uri, assuming a file if not given a
-     * scheme
-     *
-     * @param uri
-     *            The used uri to connect
-     * @throws URISyntaxException
-     *             if the uri is malformed
-     * @throws MalformedURLException
-     *             if the url is malformed
-     */
-    public DownloadStream(URI uri, int connectTimeout, int readTimeout) throws URISyntaxException, MalformedURLException {
-        if (!uri.isAbsolute()) {
-            uri = new URI("file:" + uri);
-        }
-        url = uri.toURL();
-        this.readTimeout = readTimeout;
-        this.connectTimeout = connectTimeout;
-        this.ignore400 = false;
-    }
-
-    public DownloadStream(URI uri, int connectTimeout, int readTimeout, boolean ignore400) throws URISyntaxException, MalformedURLException {
-        this(uri, connectTimeout, readTimeout);
-        this.ignore400 = ignore400;
-    }
-
-    /**
-     * Creates a downloadstream with the given url
-     *
-     * @param url
-     *            The url to connect to
-     */
-    public DownloadStream(URL url, int connectTimeout, int readTimeout) {
+    private DownloadStream(URL url, int connectTimeout, int readTimeout, boolean ignore400) {
         this.url = url;
         this.readTimeout = readTimeout;
         this.connectTimeout = connectTimeout;
+        this.ignore400 = ignore400;
+    }
+
+    public DownloadStream(URL url, boolean ignore400) {
+        this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), ignore400);
     }
 
     public DownloadStream(URL url) {
-        this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
+        this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), false);
     }
 
     public boolean isResponse400() {
@@ -184,7 +141,8 @@ public class DownloadStream {
             // Okay just normal
             in = connection.getInputStream();
         }
-        disposition = connection.getHeaderField("Content-Disposition");
+        contentDisposition = connection.getHeaderField("Content-Disposition");
+        contentLength = connection.getContentLength();
     }
 
     /**
@@ -209,8 +167,8 @@ public class DownloadStream {
      */
     public String getOutputName() {
         if (outputName == null) {
-            if (disposition != null) {
-                Matcher m = Regex.ContentDispositionFilename.matcher(disposition);
+            if (contentDisposition != null) {
+                Matcher m = Regex.ContentDispositionFilename.matcher(contentDisposition);
                 if (m.find()) {
                     outputName = m.group(1);
                 }
@@ -244,22 +202,6 @@ public class DownloadStream {
      */
     public void setOutput(String output) {
         this.output = output;
-    }
-
-    /**
-     * @param timeout
-     *            the timeout to set
-     */
-    public void setReadTimeout(int timeout) {
-        this.readTimeout = timeout;
-    }
-
-    /**
-     * @param timeout
-     *            the timeout to set
-     */
-    public void setConnectTimeout(int timeout) {
-        this.connectTimeout = timeout;
     }
 
 }
