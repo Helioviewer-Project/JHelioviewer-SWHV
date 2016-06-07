@@ -75,38 +75,31 @@ public class HTTPSocket extends Socket {
      *            A <code>HTTPMessage</code> object with the message.
      * @throws java.io.IOException
      */
-    public void send(HTTPMessage _msg) throws IOException {
+    public void send(HTTPRequest req) throws IOException {
         // if (!isConnected())
         //    reconnect();
 
         StringBuilder str = new StringBuilder();
+        // Adds the URI line
+        str.append(req.getMethod()).append(' ').append(req.getURI()).append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
 
-        if (_msg.isRequest()) {
-            HTTPRequest req = (HTTPRequest) _msg;
-            String msgBody = req.getMessageBody();
+        String msgBody = req.getMessageBody();
+        // Sets the content length header if it's a POST
+        if (req.getMethod() == HTTPRequest.Method.POST)
+            req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(msgBody.getBytes("UTF-8").length));
 
-            // Adds the URI line
-            str.append(req.getMethod()).append(' ').append(req.getURI()).append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
-
-            // Sets the content length header if it's a POST
-            if (req.getMethod() == HTTPRequest.Method.POST)
-                req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(msgBody.getBytes("UTF-8").length));
-
-            // Adds the headers
-            for (String key : req.getHeaders()) {
-                str.append(key).append(": ").append(req.getHeader(key)).append(HTTPConstants.CRLF);
-            }
-            str.append(HTTPConstants.CRLF);
-
-            // Adds the message body if it's a POST
-            if (req.getMethod() == HTTPRequest.Method.POST)
-                str.append(msgBody);
-
-            // Writes the result to the output stream
-            getOutputStream().write(str.toString().getBytes("UTF-8"));
-        } else {
-            throw new ProtocolException("Responses sending not yet supported!");
+        // Adds the headers
+        for (String key : req.getHeaders()) {
+            str.append(key).append(": ").append(req.getHeader(key)).append(HTTPConstants.CRLF);
         }
+        str.append(HTTPConstants.CRLF);
+
+        // Adds the message body if it's a POST
+        if (req.getMethod() == HTTPRequest.Method.POST)
+            str.append(msgBody);
+
+        // Writes the result to the output stream
+        getOutputStream().write(str.toString().getBytes("UTF-8"));
     }
 
     /**
