@@ -219,19 +219,24 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
-        drawHorizontalLabels(g, graphArea, timeAxis);
+        Stroke stroke = g.getStroke();
+        g.setStroke(new BasicStroke(0.5f));
+        {
+            drawHorizontalLabels(g, graphArea, timeAxis);
 
-        int ct = -1;
-        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
-            if (el.showYAxis()) {
-                drawVerticalLabels(g, graphArea, el, ct, el.getYAxis().isHighlighted());
-                ct++;
+            int ct = -1;
+            for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+                if (el.showYAxis()) {
+                    drawVerticalLabels(g, graphArea, el, ct, el.getYAxis().isHighlighted());
+                    ct++;
+                }
+            }
+
+            if (ct == -1) {
+                drawNoData(g, graphArea);
             }
         }
-
-        if (ct == -1) {
-            drawNoData(g, graphArea);
-        }
+        g.setStroke(stroke);
     }
 
     private void drawTimelineValues(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
