@@ -287,8 +287,13 @@ class J2KReader implements Runnable {
                         socket.send(req);
 
                         // receive data
+                        //long start = System.currentTimeMillis();
                         JPIPResponse res = socket.receive();
+                        //double delta = System.currentTimeMillis() - start;
+                        //delta = delta > 0 ? delta : 1;
+                        //System.out.println(">> " + String.format("%.3fM", res.getResponseSize() / delta * 1000. / (1024.*1024.)) + " " + jpipRequestLen);
                         //System.out.println(">>> request " + (idx++) + " " + jpipRequestLen + " " + res.getResponseSize());
+
                         // update optimal package size
                         flowControl();
 
