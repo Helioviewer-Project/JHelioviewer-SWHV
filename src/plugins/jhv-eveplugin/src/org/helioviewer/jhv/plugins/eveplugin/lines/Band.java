@@ -51,6 +51,11 @@ public class Band extends AbstractLineDataSelectorElement {
     @Override
     public void zoomToFitAxis() {
         float[] bounds = bandCache.getBounds(EVEPlugin.dc.selectedAxis);
+        if (bounds[0] == bounds[1]) {
+            resetAxis();
+            return;
+        }
+
         if (bounds[0] != Float.MIN_VALUE && bounds[1] != Float.MIN_VALUE) {
             yAxis.reset(bounds[0], bounds[1]);
             updateGraphsData();
