@@ -22,15 +22,15 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
-import org.helioviewer.jhv.io.DownloadView;
+import org.helioviewer.jhv.io.DownloadViewTask;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2View;
 
 @SuppressWarnings("serial")
 public class RunningDifferencePanel extends AbstractFilterPanel implements ChangeListener {
@@ -58,7 +58,8 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                DownloadView.downloadLayer((JP2View) view);
+                DownloadViewTask downloadTask = new DownloadViewTask(view);
+                JHVGlobals.getExecutorService().execute(downloadTask);
             }
         });
         downloadLayerButton.setBorder(null);
@@ -231,11 +232,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
     public void setView(View _view) {
         view = _view;
-        if (view instanceof JP2View) {
-            downloadLayerButton.setVisible(true); // enabled no good
-        } else {
-            downloadLayerButton.setVisible(false);
-        }
     }
 
     public Component getPanel() {
