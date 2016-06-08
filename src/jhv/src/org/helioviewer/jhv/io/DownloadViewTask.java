@@ -17,7 +17,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JWindow;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -68,9 +67,10 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
         URI srcURI;
         if (downloadURI.getScheme().equalsIgnoreCase("jpip")) {
-            String httpPath = Settings.getSingletonInstance().getProperty("default.httpRemote.path");
+            // String httpPath = Settings.getSingletonInstance().getProperty("default.httpRemote.path"); - not good if server changed
             try {
-                srcURI = new URI(httpPath + downloadURI.getPath().substring(Math.max(0, downloadURI.getPath().lastIndexOf('/'))));
+                srcURI = new URI(downloadURI.toString().replaceFirst("jpip://", "http://").replaceFirst(":" + downloadURI.getPort(), "/jp2"));
+                // srcURI = new URI(httpPath + downloadURI.getPath().substring(Math.max(0, downloadURI.getPath().lastIndexOf('/'))));
             } catch (URISyntaxException e) {
                 e.printStackTrace();
                 return null;
@@ -81,6 +81,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         if (srcURI.equals(dstFile.toURI())) // avoid self-destruction
             return null;
 
+        boolean failed = false;
         FileOutputStream out = null;
         try {
             DownloadStream ds = new DownloadStream(srcURI.toURL());
@@ -116,12 +117,13 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
                 }
             }
         } catch (Exception e) {
+            failed = true;
             e.printStackTrace();
         } finally {
             try {
                 if (out != null)
                     out.close();
-                if (isCancelled())
+                if (failed || isCancelled())
                     dstFile.delete();
             } catch (Exception e) {
                 e.printStackTrace();
