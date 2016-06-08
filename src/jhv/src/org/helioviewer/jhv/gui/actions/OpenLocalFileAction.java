@@ -43,8 +43,7 @@ public class OpenLocalFileAction extends AbstractAction {
         String fileName = fileDialog.getFile();
 
         if (fileName != null && directory != null) {
-            File selectedFile = new File(directory + File.separator + fileName);
-
+            File selectedFile = new File(directory + File.separator + fileName).getAbsoluteFile();
             if (selectedFile.exists() && selectedFile.isFile()) {
                 // remember the current directory for future
                 Settings.getSingletonInstance().setProperty("default.local.path", directory);
