@@ -22,6 +22,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.APIResponseDump;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatusInitial;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
@@ -290,7 +291,8 @@ public class JP2Image {
         }
 
         // ping reader
-        signalReader(imageViewParams);
+        if (imageCacheStatus.getImageStatus(frame) != CacheStatus.COMPLETE) // do not disturb caching
+            signalReader(imageViewParams);
 
         oldImageViewParams = imageViewParams;
 
