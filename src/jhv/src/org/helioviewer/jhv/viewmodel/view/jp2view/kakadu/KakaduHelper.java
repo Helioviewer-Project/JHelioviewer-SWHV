@@ -88,7 +88,7 @@ public class KakaduHelper {
     public static int[] getLUT(Jpx_source jpxSrc) throws KduException {
         Jpx_codestream_source stream = jpxSrc.Access_codestream(0);
         if (!stream.Exists()) {
-            throw new KduException(">> stream doesn't exist");
+            throw new KduException(">> stream does not exist");
         }
 
         Jp2_palette palette = stream.Access_palette();

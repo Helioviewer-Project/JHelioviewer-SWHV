@@ -31,7 +31,7 @@ public class DownloadView {
     private static void downloadFromJPIP(JP2View v) {
         FileDownloader fileDownloader = new FileDownloader();
         URI downloadUri = v.getDownloadURI();
-        URI uri = v.getUri();
+        URI uri = v.getURI();
 
         // the http server to download the file from is unknown
         if (downloadUri.equals(uri) && !downloadUri.toString().contains("delphi.nascom.nasa.gov")) {

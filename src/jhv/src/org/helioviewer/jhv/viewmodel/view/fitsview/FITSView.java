@@ -65,7 +65,7 @@ public class FITSView extends AbstractView {
     }
 
     @Override
-    public URI getUri() {
+    public URI getURI() {
         return uri;
     }
 

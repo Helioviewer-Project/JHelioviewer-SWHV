@@ -16,7 +16,7 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class SDOCutOutAction extends AbstractAction {
 
-    private static final String URL = "http://www.lmsal.com/get_aia_data/?";
+    private static final String baseURL = "http://www.lmsal.com/get_aia_data/?";
 
     private static final double AIA_CDELT = 0.6;
 
@@ -28,7 +28,7 @@ public class SDOCutOutAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e)
     {
-        StringBuilder url = new StringBuilder(URL);
+        StringBuilder url = new StringBuilder(baseURL);
         JHVDate startdate = Layers.getStartDate();
         if (startdate != null) {
             String start = startdate.toString();

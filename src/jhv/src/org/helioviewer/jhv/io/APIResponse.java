@@ -24,7 +24,7 @@ class APIResponse {
         } catch (JSONException e) {
             Log.error("Invalid JSON response " + data, e);
         } catch (URISyntaxException e) {
-            Log.error("Invalid uri in response " + data, e);
+            Log.error("Invalid URI in response " + data, e);
         }
     }
 

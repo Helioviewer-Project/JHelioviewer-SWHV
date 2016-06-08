@@ -122,7 +122,7 @@ public class APIRequestManager {
                         Message.err("Server could not return data", Message.formatMessageString(message), false);
                     }
                 } else {
-                    Log.error("Did not find uri in reponse to " + jpipRequest);
+                    Log.error("Did not find URI in response to " + jpipRequest);
                     if (errorMessage) {
                         Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
                     }

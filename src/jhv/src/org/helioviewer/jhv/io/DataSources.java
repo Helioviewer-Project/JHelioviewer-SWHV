@@ -344,10 +344,10 @@ public class DataSources {
                         URL url = new URL(Settings.getSingletonInstance().getProperty("API.dataSources.path"));
                         return JSONUtils.getJSONStream(new DownloadStream(url).getInput());
                     } catch (MalformedURLException e) {
-                        Log.error("Invalid url to retrieve data source", e);
+                        Log.error("Invalid data sources URL", e);
                         break;
                     } catch (JSONException e) {
-                        Log.error("While retrieving the available data sources got invalid response", e);
+                        Log.error("Invalid response while retrieving the available data sources", e);
                         break;
                     } catch (IOException e) {
                         try {

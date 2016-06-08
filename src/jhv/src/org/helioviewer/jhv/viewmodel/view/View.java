@@ -43,7 +43,7 @@ public interface View {
      *
      * @return URI representing the location of the image.
      */
-    URI getUri();
+    URI getURI();
     /**
      * Returns the name the image.
      *

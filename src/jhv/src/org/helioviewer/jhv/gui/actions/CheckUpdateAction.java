@@ -24,7 +24,7 @@ public class CheckUpdateAction extends AbstractAction {
             update.check();
         } catch (Exception e) {
             // Should not happen
-            Log.error("Error while parsing update url " + e.getLocalizedMessage(), e);
+            Log.error("Error while parsing update URL " + e.getLocalizedMessage(), e);
         }
     }
 
