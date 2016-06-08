@@ -27,7 +27,7 @@ public class PositionLoad {
     private static final String LOADEDSTATE = "Loaded";
     private static final String FAILEDSTATE = "Failed";
 
-    private static final String baseUrl = "http://swhv.oma.be/position?";
+    private static final String baseURL = "http://swhv.oma.be/position?";
     private static final String target = "SUN";
     private String observer = "Earth";
 
@@ -74,7 +74,7 @@ public class PositionLoad {
                 if (span / deltat > max)
                     deltat = span / max;
 
-                URL url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + beginDate + "&utc_end=" + endDate + "&deltat=" + deltat +
+                URL url = new URL(baseURL + "abcorr=LT%2BS&utc=" + beginDate + "&utc_end=" + endDate + "&deltat=" + deltat +
                                             "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
                 DownloadStream ds = new DownloadStream(url, true);
 
