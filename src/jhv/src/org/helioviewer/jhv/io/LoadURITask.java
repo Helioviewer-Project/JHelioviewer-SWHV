@@ -33,8 +33,8 @@ public class LoadURITask extends JHVWorker<View, Void> {
         try {
             view = APIRequestManager.loadView(uri, downloadURI);
         } catch (IOException e) {
-            Log.error("An error occurred while opening the remote file!", e);
-            Message.err("An error occurred while opening the remote file!", e.getMessage(), false);
+            Log.error("An error occurred while opening the remote file: ", e);
+            Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);
         }
         return view;
     }

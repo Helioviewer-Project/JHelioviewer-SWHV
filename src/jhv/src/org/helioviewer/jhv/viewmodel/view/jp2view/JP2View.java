@@ -77,7 +77,7 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public URI getUri() {
+    public URI getURI() {
         return _jp2Image.getURI();
     }
 

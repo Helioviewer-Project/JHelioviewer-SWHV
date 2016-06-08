@@ -50,7 +50,7 @@ public class SimpleImageView extends AbstractView {
     }
 
     @Override
-    public URI getUri() {
+    public URI getURI() {
         return uri;
     }
 

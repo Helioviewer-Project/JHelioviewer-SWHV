@@ -86,7 +86,7 @@ public class DownloadStream {
         // Set timeouts
         connection.setConnectTimeout(connectTimeout);
         connection.setReadTimeout(readTimeout);
-        // Try to get a better input stream supporting compression if using http
+
         if (connection instanceof HttpURLConnection) {
             HttpURLConnection httpC = (HttpURLConnection) connection;
             // get compression if supported
@@ -109,13 +109,11 @@ public class DownloadStream {
             // Check the connection code
             int code = httpC.getResponseCode();
             if (code > 400) {
-                Log.error("DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + code);
-                throw new IOException("Error opening http connection to " + url + " Response code: " + code);
+                throw new IOException("Error opening HTTP connection to " + url + " Response code: " + code);
             }
 
             if (!ignore400 && code == 400) {
-                Log.error("DownloadStream.connect() > Error opening http connection to " + url + " Response code: " + code);
-                throw new IOException("Error opening http connection to " + url + " Response code: " + code);
+                throw new IOException("Error opening HTTP connection to " + url + " Response code: " + code);
             }
 
             InputStream strm;

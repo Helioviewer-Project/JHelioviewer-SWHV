@@ -77,7 +77,7 @@ public class JPIPSocket extends HTTPSocket {
             res = receive();
         }
         if (res == null)
-            throw new IOException("The server did not send a response after connection.");
+            throw new IOException("The server did not send a response after connection");
 
         HashMap<String, String> map = null;
         String cnew = res.getHeader("JPIP-cnew");
@@ -90,7 +90,7 @@ public class JPIPSocket extends HTTPSocket {
                         map.put(cnewParam, part.substring(cnewParam.length() + 1));
         }
         if (map == null)
-            throw new IOException("The header 'JPIP-cnew' was not sent by the server!");
+            throw new IOException("The header 'JPIP-cnew' was not sent by the server");
 
         jpipPath = "/" + map.get("path");
 
@@ -99,7 +99,7 @@ public class JPIPSocket extends HTTPSocket {
             throw new IOException("The channel id was not sent by the server");
 
         if (!"http".equals(map.get("transport")))
-            throw new IOException("The client currently only supports http transport.");
+            throw new IOException("The client only supports HTTP transport");
 
         return res;
     }
@@ -200,7 +200,7 @@ public class JPIPSocket extends HTTPSocket {
         if (!"chunked".equals(res.getHeader("Transfer-Encoding")))
             throw new IOException("Only chunked responses are supported");
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
-            throw new IOException("Expected image/jpp-stream content!");
+            throw new IOException("Expected image/jpp-stream content");
 
         replyTextTm = System.currentTimeMillis();
 
@@ -230,18 +230,6 @@ public class JPIPSocket extends HTTPSocket {
         // * 1.0) / (double)(replyDataTm - tini));
 
         return res;
-    }
-
-    /** Returns the JPIP channel ID */
-    public String getJpipChannelID() {
-        return jpipChannelID;
-    }
-
-    /**
-     * Returns the JPIP path.
-     */
-    public String getJpipPath() {
-        return jpipPath;
     }
 
     /**
