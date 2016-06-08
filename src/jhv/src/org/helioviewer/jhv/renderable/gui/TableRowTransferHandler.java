@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.renderable.gui;
 
 import java.awt.AlphaComposite;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;

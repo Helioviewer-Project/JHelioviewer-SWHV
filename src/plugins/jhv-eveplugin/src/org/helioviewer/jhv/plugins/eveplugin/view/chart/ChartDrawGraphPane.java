@@ -61,6 +61,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private final EventModel eventModel;
 
     private final Stroke boldStroke = new BasicStroke(2);
+    private final Stroke thinStroke = new BasicStroke(0.5f);
     private Point mousePosition;
     private int lastWidth = -1;
     private int lastHeight = -1;
@@ -220,7 +221,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
         Stroke stroke = g.getStroke();
-        g.setStroke(new BasicStroke(0.5f));
+        g.setStroke(thinStroke);
         {
             drawHorizontalLabels(g, graphArea, timeAxis);
 
