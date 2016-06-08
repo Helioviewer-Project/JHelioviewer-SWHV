@@ -28,7 +28,7 @@ public class BandTypeAPI {
     private static final ArrayList<BandGroup> orderedGroups = new ArrayList<BandGroup>();
 
     private final Properties defaultProperties = new Properties();
-    private final String baseUrl;
+    private final String baseURL;
 
     public static BandTypeAPI getSingletonInstance() {
         if (singletonInstance == null) {
@@ -39,7 +39,7 @@ public class BandTypeAPI {
 
     private BandTypeAPI() {
         loadSettings();
-        baseUrl = defaultProperties.getProperty("plugin.eve.dataseturl");
+        baseURL = defaultProperties.getProperty("plugin.eve.dataseturl");
         updateDatasets();
     }
 
@@ -57,7 +57,7 @@ public class BandTypeAPI {
         String string = null;
         URL url = null;
         try {
-            url = new URL(baseUrl + "/datasets/index.php");
+            url = new URL(baseURL + "/datasets/index.php");
         } catch (MalformedURLException e) {
             Log.error("Malformed URL", e);
         }
@@ -103,7 +103,7 @@ public class BandTypeAPI {
                     bandtypes[i].setUnitLabel((String) job.get("unitLabel"));
                 }
                 if (job.has("baseUrl")) {
-                    bandtypes[i].setBaseUrl((String) job.get("baseUrl"));
+                    bandtypes[i].setBaseURL((String) job.get("baseUrl"));
                 }
                 if (job.has("scale")) {
                     bandtypes[i].setScale(job.getString("scale"));

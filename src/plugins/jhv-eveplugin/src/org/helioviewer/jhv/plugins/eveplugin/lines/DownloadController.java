@@ -219,7 +219,7 @@ public class DownloadController {
         }
 
         private URL buildRequestURL(Interval interval, BandType type) throws MalformedURLException {
-            String urlf = type.getBaseUrl() + "start_date=%s&end_date=%s&timeline=%s&data_format=json";
+            String urlf = type.getBaseURL() + "start_date=%s&end_date=%s&timeline=%s&data_format=json";
             String url = String.format(urlf, TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
             return new URL(url);
         }

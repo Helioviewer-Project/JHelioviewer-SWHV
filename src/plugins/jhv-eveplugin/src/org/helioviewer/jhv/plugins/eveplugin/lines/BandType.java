@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class BandType {
 
-    private String baseUrl;
+    private String baseURL;
     private BandGroup group;
     private String label;
     private String name;
@@ -19,12 +19,12 @@ public class BandType {
         return label;
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
+    public String getBaseURL() {
+        return baseURL;
     }
 
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public void setBaseURL(String baseURL) {
+        this.baseURL = baseURL;
     }
 
     public BandGroup getGroup() {

@@ -38,7 +38,7 @@ public class PfssDataLoader implements Runnable {
                 in = new BufferedInputStream(new FileInputStream(f), 65536);
                 loadFromFile = true;
             } else {
-                URL u = new URL(PfssSettings.baseUrl + url);
+                URL u = new URL(PfssSettings.baseURL + url);
                 URLConnection uc = u.openConnection();
                 in = new BufferedInputStream(uc.getInputStream(), 65536);
                 String encoding = uc.getHeaderField("Content-Encoding");

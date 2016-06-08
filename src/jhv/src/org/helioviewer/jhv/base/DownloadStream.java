@@ -126,6 +126,7 @@ public class DownloadStream {
                 strm = httpC.getInputStream();
             }
 
+            contentDisposition = httpC.getHeaderField("Content-Disposition");
             in = getEncodedStream(httpC.getContentEncoding(), strm);
         } else {
             // Not an http connection
@@ -139,7 +140,6 @@ public class DownloadStream {
             // Okay just normal
             in = connection.getInputStream();
         }
-        contentDisposition = connection.getHeaderField("Content-Disposition");
         contentLength = connection.getContentLength();
     }
 
