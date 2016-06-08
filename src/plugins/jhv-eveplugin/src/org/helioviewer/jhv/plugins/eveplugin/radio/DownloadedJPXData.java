@@ -64,7 +64,7 @@ class DownloadedJPXData implements ImageDataHandler {
             long start = JHVDate.parseDateTime(hvMetaData.get("DATE-OBS")).milli;
             long end = JHVDate.parseDateTime(hvMetaData.get("DATE-END")).milli;
             if (startDate != start || endDate != end)
-                Log.warn("something is wrong with the jpx dates " + start + " " + end + " " + startDate + " " + endDate);
+                Log.warn("Something is wrong with the JPX dates " + start + " " + end + " " + startDate + " " + endDate);
 
             hvMetaData.destroyXML();
         } catch (Exception e) {
