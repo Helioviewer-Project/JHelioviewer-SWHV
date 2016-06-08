@@ -94,10 +94,10 @@ public class PfssData {
             BasicHDU hdus[] = fits.read();
             BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
 
-            short[] fieldlinex = ((short[]) bhdu.getColumn("FIELDLINEx"));
-            short[] fieldliney = ((short[]) bhdu.getColumn("FIELDLINEy"));
-            short[] fieldlinez = ((short[]) bhdu.getColumn("FIELDLINEz"));
-            short[] fieldlines = ((short[]) bhdu.getColumn("FIELDLINEs"));
+            short[] fieldlinex = (short[]) bhdu.getColumn("FIELDLINEx");
+            short[] fieldliney = (short[]) bhdu.getColumn("FIELDLINEy");
+            short[] fieldlinez = (short[]) bhdu.getColumn("FIELDLINEz");
+            short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
 
             Header header = bhdu.getHeader();
 

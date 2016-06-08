@@ -42,7 +42,7 @@ public class PfssDataLoader implements Runnable {
                 URLConnection uc = u.openConnection();
                 in = new BufferedInputStream(uc.getInputStream(), 65536);
                 String encoding = uc.getHeaderField("Content-Encoding");
-                if (encoding != null && encoding.equals("gzip")) {
+                if ("gzip".equals(encoding)) {
                     in = new GZIPInputStream(in);
                 }
             }

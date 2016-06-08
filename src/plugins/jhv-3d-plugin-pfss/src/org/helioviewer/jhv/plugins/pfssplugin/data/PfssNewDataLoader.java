@@ -78,11 +78,11 @@ public class PfssNewDataLoader implements Runnable {
                         }
                     }
                 } catch (MalformedURLException e) {
-                    Log.warn("Could not read pfss entries : URL unavailable");
+                    Log.warn("Could not read PFSS entries : URL unavailable");
                 } catch (IOException e) {
-                    Log.warn("Could not read pfss entries");
+                    Log.warn("Could not read PFSS entries");
                 } catch (ParseException e) {
-                    Log.warn("Could not parse date time during pfss loading");
+                    Log.warn("Could not parse date time during PFSS loading");
                 }
 
                 for (Pair<String, Long> pair : urls) {
