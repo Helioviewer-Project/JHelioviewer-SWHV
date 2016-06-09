@@ -477,7 +477,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         Displayer.display();
     }
 
-    public GLImage getImage() {
+    public GLImage getGLImage() {
         return glImage;
     }
 

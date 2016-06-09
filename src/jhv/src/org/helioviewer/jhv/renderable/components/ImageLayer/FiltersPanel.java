@@ -89,11 +89,7 @@ public class FiltersPanel extends SmallPanel {
     public void setActiveImage(GLImage image) {
         runningDifferencePanel.setGLImage(image);
         opacityPanel.setGLImage(image);
-        channelMixerPanel.setGLImage(image);
         lutPanel.setGLImage(image);
-        gammaCorrectionPanel.setGLImage(image);
-        contrastPanel.setGLImage(image);
-        sharpenPanel.setGLImage(image);
     }
 
     public void refresh() {

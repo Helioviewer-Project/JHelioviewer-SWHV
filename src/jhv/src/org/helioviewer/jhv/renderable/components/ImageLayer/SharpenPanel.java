@@ -9,9 +9,8 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.opengl.GLImage;
 
-public class SharpenPanel extends AbstractFilterPanel implements ChangeListener, FilterDetails {
+public class SharpenPanel implements ChangeListener, FilterDetails {
 
     private final JSlider sharpeningSlider;
     private final JLabel sharpeningLabel;
@@ -19,31 +18,15 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     public SharpenPanel() {
         sharpeningLabel = new JLabel("0%");
         sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-        sharpeningSlider.setMinorTickSpacing(25);
-        // sharpeningSlider.setPaintTicks(true);
-
         sharpeningSlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(sharpeningSlider);
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        image.setSharpen(sharpeningSlider.getValue() / 10.f);
+        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setSharpen(sharpeningSlider.getValue() / 10.f);
         sharpeningLabel.setText(sharpeningSlider.getValue() + "%");
         Displayer.display();
-    }
-
-    // sharpen must be within [0, 10]
-    private void setValue(float sharpen) {
-        sharpeningSlider.setValue((int) (sharpen * 10.f));
-    }
-
-    @Override
-    public void setGLImage(GLImage image) {
-        super.setGLImage(image);
-        if (image != null) {
-            setValue(image.getSharpen());
-        }
     }
 
     @Override
