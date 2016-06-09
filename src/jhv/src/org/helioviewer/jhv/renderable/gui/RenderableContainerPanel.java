@@ -37,7 +37,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
-import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
+import org.helioviewer.jhv.layers.RenderableImageLayer;
 
 @SuppressWarnings("serial")
 public class RenderableContainerPanel extends JPanel {

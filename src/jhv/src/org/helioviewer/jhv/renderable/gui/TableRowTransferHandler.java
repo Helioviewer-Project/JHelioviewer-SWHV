@@ -16,7 +16,7 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
+import org.helioviewer.jhv.layers.RenderableImageLayer;
 
 // Handles DnD row reordering
 @SuppressWarnings("serial")

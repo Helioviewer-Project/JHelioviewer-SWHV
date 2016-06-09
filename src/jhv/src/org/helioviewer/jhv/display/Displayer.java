@@ -256,6 +256,16 @@ public class Displayer implements JHVEventHighlightListener {
         display();
     }
 
+    private static boolean showCorona = true;
+
+    public static void toggleShowCorona() {
+        showCorona = !showCorona;
+    }
+
+    public static boolean getShowCorona() {
+        return showCorona;
+    }
+
     private static final Displayer instance = new Displayer();
 
     public static Displayer getSingletonInstance() {

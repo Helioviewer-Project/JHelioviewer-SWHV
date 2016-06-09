@@ -3,7 +3,7 @@ package org.helioviewer.jhv.renderable.gui;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
+import org.helioviewer.jhv.layers.RenderableImageLayer;
 
 @SuppressWarnings("serial")
 public class RenderableCellRenderer extends DefaultTableCellRenderer {

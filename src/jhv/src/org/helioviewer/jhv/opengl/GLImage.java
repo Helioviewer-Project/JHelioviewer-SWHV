@@ -5,6 +5,7 @@ import java.nio.IntBuffer;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -95,6 +96,9 @@ public class GLImage {
 
         MetaData metadata = imageData.getMetaData();
         shader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
+        if (!Displayer.getShowCorona())
+            shader.setOuterCutOffRadius(1.);
+
         if (metadata.getCutOffValue() > 0) {
             Vec3 cdir = metadata.getCutOffDirection();
             shader.setCutOffDirection((float) cdir.x, (float) cdir.y, 0);

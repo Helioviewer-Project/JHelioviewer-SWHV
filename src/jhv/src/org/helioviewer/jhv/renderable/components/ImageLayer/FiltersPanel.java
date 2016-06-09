@@ -5,8 +5,7 @@ import java.awt.GridBagLayout;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
-import org.helioviewer.jhv.opengl.GLImage;
-import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
+import org.helioviewer.jhv.layers.RenderableImageLayer;
 
 @SuppressWarnings("serial")
 public class FiltersPanel extends SmallPanel {
