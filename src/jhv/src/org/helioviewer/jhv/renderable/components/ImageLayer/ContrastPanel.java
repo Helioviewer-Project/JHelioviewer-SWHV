@@ -12,7 +12,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 public class ContrastPanel implements ChangeListener, FilterDetails {
 
-    private static final float sliderToContrastScale = 25.0f;
+    private static final float sliderToContrastScale = 25.f;
 
     private final JSlider contrastSlider;
     private final JLabel contrastLabel;

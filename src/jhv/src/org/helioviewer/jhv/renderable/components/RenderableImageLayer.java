@@ -105,7 +105,8 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         }
 
         /*glImage.*/setOpacity(opacity);
-        glImage.setLUT(view.getDefaultLUT(), false);
+        //glImage.setLUT(view.getDefaultLUT(), false);
+        filtersPanel.setLUT(view.getDefaultLUT());
 
         view.setImageLayer(this);
         view.setDataHandler(this);

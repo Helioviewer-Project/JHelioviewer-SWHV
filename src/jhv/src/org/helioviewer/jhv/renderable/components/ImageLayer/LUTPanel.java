@@ -18,9 +18,8 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.opengl.GLImage;
 
-public class LUTPanel extends AbstractFilterPanel implements ActionListener, FilterDetails {
+public class LUTPanel implements ActionListener, FilterDetails {
 
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
     private static final Icon enhanceIcon = IconBank.getIcon(JHVIcon.LAYER_IMAGE);
@@ -58,54 +57,23 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == invertButton) {
-            if (invertButton.isSelected()) {
-                invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-            } else {
-                invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-            }
+            invertButton.setBorder(BorderFactory.createBevelBorder(invertButton.isSelected() ? BevelBorder.LOWERED : BevelBorder.RAISED));
         } else if (e.getSource() == enhanceButton) {
             boolean isSelected = enhanceButton.isSelected();
-            image.setEnhanced(isSelected);
-            if (isSelected) {
-                enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-            } else {
-                enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-            }
+            ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setEnhanced(isSelected);
+            enhanceButton.setBorder(BorderFactory.createBevelBorder(isSelected ? BevelBorder.LOWERED : BevelBorder.RAISED));
         }
 
         LUT newMap = lutMap.get((String) combobox.getSelectedItem());
-        image.setLUT(newMap, invertButton.isSelected());
+        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setLUT(newMap, invertButton.isSelected());
         Displayer.display();
     }
 
-    private void setValue(LUT lut, boolean invertLUT, boolean enhanced) {
-        invertButton.setSelected(invertLUT);
-        enhanceButton.setSelected(enhanced);
-
+    public void setLUT(LUT lut) {
         String name = lut.getName();
         if (lutMap.put(name, lut) == null)
             combobox.addItem(name);
-        combobox.setSelectedItem(name);
-
-        if (invertLUT) {
-            invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        } else {
-            invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        }
-
-        if (enhanced) {
-            enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        } else {
-            enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        }
-    }
-
-    @Override
-    public void setGLImage(GLImage image) {
-        super.setGLImage(image);
-        if (image != null) {
-            setValue(image.getLUT(), image.getInvertLUT(), image.getEnhanced());
-        }
+        combobox.setSelectedItem(name); // triggers display
     }
 
     @Override

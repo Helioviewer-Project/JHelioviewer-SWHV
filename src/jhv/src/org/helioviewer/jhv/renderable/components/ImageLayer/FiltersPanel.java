@@ -3,6 +3,7 @@ package org.helioviewer.jhv.renderable.components.ImageLayer;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
@@ -13,11 +14,7 @@ public class FiltersPanel extends SmallPanel {
 
     private final RunningDifferencePanel runningDifferencePanel;
     private final OpacityPanel opacityPanel;
-    private final ChannelMixerPanel channelMixerPanel;
     private final LUTPanel lutPanel;
-    private final GammaCorrectionPanel gammaCorrectionPanel;
-    private final ContrastPanel contrastPanel;
-    private final SharpenPanel sharpenPanel;
 
     final RenderableImageLayer imageLayer;
 
@@ -26,11 +23,11 @@ public class FiltersPanel extends SmallPanel {
 
         runningDifferencePanel = new RunningDifferencePanel();
         opacityPanel = new OpacityPanel();
-        channelMixerPanel = new ChannelMixerPanel();
+        ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel();
         lutPanel = new LUTPanel();
-        gammaCorrectionPanel = new GammaCorrectionPanel();
-        contrastPanel = new ContrastPanel();
-        sharpenPanel = new SharpenPanel();
+        GammaCorrectionPanel gammaCorrectionPanel = new GammaCorrectionPanel();
+        ContrastPanel contrastPanel = new ContrastPanel();
+        SharpenPanel sharpenPanel = new SharpenPanel();
 
         setLayout(new GridBagLayout());
 
@@ -88,11 +85,14 @@ public class FiltersPanel extends SmallPanel {
 
     public void setActiveImage(GLImage image) {
         runningDifferencePanel.setGLImage(image);
-        lutPanel.setGLImage(image);
     }
 
     public void setOpacity(float opacity) {
         opacityPanel.setValue(opacity);
+    }
+
+    public void setLUT(LUT lut) {
+        lutPanel.setLUT(lut);
     }
 
     public void setView(View view) {

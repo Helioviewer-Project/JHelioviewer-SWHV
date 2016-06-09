@@ -26,10 +26,9 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        int sliderValue = gammaSlider.getValue();
-        double gamma = Math.exp(sliderValue * factor);
+        float gamma = (float) Math.exp(gammaSlider.getValue() * factor);
 
-        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setGamma((float) gamma);
+        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setGamma(gamma);
         gammaLabel.setText(String.format("%.1f", gamma));
         Displayer.display();
     }
