@@ -29,30 +29,29 @@ public class ImageLayerOptions extends SmallPanel {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 1;
-        c.weighty = 1;
-
-        c.gridx = 0;
-
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridy = 0;
+
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridx = 0;
+
         c.gridwidth = 3;
-        this.add(runningDifferencePanel.getComponent(), c);
+        c.gridy = 0;
+        add(runningDifferencePanel.getComponent(), c);
         c.gridwidth = 1;
         c.gridy++;
-        this.addToGridBag(c, opacityPanel);
+        addToGridBag(c, opacityPanel);
         c.gridy++;
-        this.addToGridBag(c, sharpenPanel);
+        addToGridBag(c, sharpenPanel);
         c.gridy++;
-        this.addToGridBag(c, gammaCorrectionPanel);
+        addToGridBag(c, gammaCorrectionPanel);
         c.gridy++;
-        this.addToGridBag(c, contrastPanel);
+        addToGridBag(c, contrastPanel);
         c.gridy++;
-        this.addToGridBag(c, lutPanel);
+        addToGridBag(c, lutPanel);
         c.gridy++;
-        this.addToGridBag(c, channelMixerPanel);
-        c.gridy++;
+        addToGridBag(c, channelMixerPanel);
 
         setSmall();
     }
@@ -61,20 +60,20 @@ public class ImageLayerOptions extends SmallPanel {
         c.gridwidth = 1;
 
         c.gridx = 0;
-        c.weightx = 0.;
-        c.weighty = 1.0;
+        c.weightx = 0;
+        c.weighty = 1;
         c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;
         add(details.getTitle(), c);
 
         c.gridx = 1;
-        c.weightx = 1.;
+        c.weightx = 1;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
         add(details.getComponent(), c);
 
         c.gridx = 2;
-        c.weightx = 0.;
+        c.weightx = 0;
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.NONE;
         add(details.getLabel(), c);

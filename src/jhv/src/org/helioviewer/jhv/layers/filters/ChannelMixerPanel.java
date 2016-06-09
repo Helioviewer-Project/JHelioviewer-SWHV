@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
-import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 
 public class ChannelMixerPanel implements ItemListener, FilterDetails {
 

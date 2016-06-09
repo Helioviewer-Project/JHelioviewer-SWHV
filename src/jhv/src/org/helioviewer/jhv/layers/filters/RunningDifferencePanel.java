@@ -30,7 +30,6 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.io.DownloadViewTask;
-import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
 public class RunningDifferencePanel implements ChangeListener {
