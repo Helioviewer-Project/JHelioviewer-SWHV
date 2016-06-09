@@ -17,14 +17,13 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     private final JLabel opacityLabel;
 
     public OpacityPanel() {
+        opacityLabel = new JLabel("0%");
         opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         opacitySlider.setMinorTickSpacing(25);
         // opacitySlider.setPaintTicks(true);
 
         opacitySlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(opacitySlider);
-
-        opacityLabel = new JLabel("0%");
     }
 
     @Override
@@ -61,7 +60,7 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     }
 
     @Override
-    public Component getValue() {
+    public Component getLabel() {
         return opacityLabel;
     }
 

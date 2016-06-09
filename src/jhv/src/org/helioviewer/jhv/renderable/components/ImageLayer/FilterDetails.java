@@ -8,6 +8,6 @@ public interface FilterDetails {
 
     Component getComponent();
 
-    Component getValue();
+    Component getLabel();
 
 }

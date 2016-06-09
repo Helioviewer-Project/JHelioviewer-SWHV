@@ -119,7 +119,7 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
     }
 
     @Override
-    public Component getValue() {
+    public Component getLabel() {
         return buttonPanel;
     }
 
