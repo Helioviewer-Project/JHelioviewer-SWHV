@@ -164,7 +164,7 @@ class J2KReader implements Runnable {
                     adjust = +1;
                 else {
                     double gapRatio = tgap / (double) (tgap + tdat);
-                    double targetRatio = (tdat + tgap) / 40000.; // 10000.0;
+                    double targetRatio = (tdat + tgap) / 10000.;
 
                     if (gapRatio > targetRatio)
                         adjust = +1;
@@ -174,7 +174,7 @@ class J2KReader implements Runnable {
             }
         }
 
-        jpipRequestLen += (jpipRequestLen >> 2) * adjust;
+        jpipRequestLen += (jpipRequestLen >> 1) * adjust;
 
         if (jpipRequestLen > JPIPConstants.MAX_REQUEST_LEN)
             jpipRequestLen = JPIPConstants.MAX_REQUEST_LEN;
