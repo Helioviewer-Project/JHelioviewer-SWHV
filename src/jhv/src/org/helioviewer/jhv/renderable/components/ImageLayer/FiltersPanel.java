@@ -12,17 +12,16 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 public class FiltersPanel extends SmallPanel {
 
     private final OpacityPanel opacityPanel;
-    private final LUTPanel lutPanel;
 
     final RenderableImageLayer imageLayer;
 
-    public FiltersPanel(RenderableImageLayer imageLayer) {
+    public FiltersPanel(RenderableImageLayer imageLayer, float opacity, LUT lut) {
         this.imageLayer = imageLayer;
 
         RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
-        opacityPanel = new OpacityPanel();
+        opacityPanel = new OpacityPanel(opacity);
         ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel();
-        lutPanel = new LUTPanel();
+        LUTPanel lutPanel = new LUTPanel(lut);
         GammaCorrectionPanel gammaCorrectionPanel = new GammaCorrectionPanel();
         ContrastPanel contrastPanel = new ContrastPanel();
         SharpenPanel sharpenPanel = new SharpenPanel();
@@ -83,10 +82,6 @@ public class FiltersPanel extends SmallPanel {
 
     public void setOpacity(float opacity) {
         opacityPanel.setValue(opacity);
-    }
-
-    public void setLUT(LUT lut) {
-        lutPanel.setLUT(lut);
     }
 
 }

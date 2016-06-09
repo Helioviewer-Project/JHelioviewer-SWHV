@@ -41,7 +41,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     private int indexBufferID;
     private int indexBufferSize;
     private final GLImage glImage = new GLImage();
-    private final FiltersPanel filtersPanel = new FiltersPanel(this);
+    private FiltersPanel filtersPanel;
 
     private JHVWorker<?, ?> worker;
     private View view;
@@ -104,9 +104,9 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             }
         }
 
-        /*glImage.*/setOpacity(opacity);
-        //glImage.setLUT(view.getDefaultLUT(), false);
-        filtersPanel.setLUT(view.getDefaultLUT());
+        glImage.setOpacity(opacity);
+        glImage.setLUT(view.getDefaultLUT(), false);
+        filtersPanel = new FiltersPanel(this, opacity, view.getDefaultLUT());
 
         view.setImageLayer(this);
         view.setDataHandler(this);
@@ -120,6 +120,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     @Override
     public void remove(GL2 gl) {
+        filtersPanel = null;
         if (view != null) {
             Layers.removeLayer(view);
             view.setDataHandler(null);
@@ -393,8 +394,6 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     @Override
     public Component getOptionsPanel() {
-        if (view == null)
-            return null;
         return filtersPanel;
     }
 
