@@ -33,7 +33,6 @@ import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
-import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 
 /**
  * Toolbar containing the most common actions.
@@ -244,7 +243,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         JToggleButton coronaVisibilityButton = new JToggleButton(new AbstractAction("Off-disk Corona") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                RenderableImageLayer.toggleCorona();
+                Displayer.toggleShowCorona();
                 Displayer.display();
             }
         });

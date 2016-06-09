@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components;
+package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 import java.awt.geom.Rectangle2D;
@@ -34,8 +34,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableImageLayer extends AbstractRenderable implements ImageDataHandler {
-
-    private static boolean showCorona = true;
 
     private int positionBufferID;
     private int indexBufferID;
@@ -178,9 +176,6 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
             shader.setViewport(vp.x, vp.yGL, vp.width, vp.height);
-            if (!RenderableImageLayer.showCorona) {
-                shader.setOuterCutOffRadius(1.);
-            }
             shader.filter(gl);
 
             camera.push(imageData.getViewpoint());
@@ -382,10 +377,6 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             faceList.add(vy);
             faceList.add(vz);
         }
-    }
-
-    public static void toggleCorona() {
-        showCorona = !showCorona;
     }
 
     public void setOpacity(float opacity) {
