@@ -25,7 +25,7 @@ public class Interaction implements MouseWheelListener, MouseMotionListener, Mou
     public Interaction(Camera _camera) {
         camera = _camera;
 
-        wheelTimer = new Timer(1000/10, new ActionListener() {
+        wheelTimer = new Timer(1000/2, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Displayer.render(1);
