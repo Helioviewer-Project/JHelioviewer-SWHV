@@ -7,13 +7,13 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.RenderableImageLayer;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 public class LoadURITask extends JHVWorker<View, Void> {
 
-    private final RenderableImageLayer imageLayer;
+    private final ImageLayer imageLayer;
     private final URI downloadURI;
     protected final URI uri;
 
@@ -21,7 +21,7 @@ public class LoadURITask extends JHVWorker<View, Void> {
         uri = _uri;
         downloadURI = _downloadURI;
 
-        imageLayer = new RenderableImageLayer(this);
+        imageLayer = new ImageLayer(this);
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
         Displayer.display(); // ensures the dummy text is displayed
         setThreadName("MAIN--LoadURI");

@@ -4,7 +4,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.RenderableImageLayer;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
@@ -13,7 +13,7 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public abstract class AbstractView implements View {
 
-    private RenderableImageLayer imageLayer;
+    private ImageLayer imageLayer;
     private ImageCacheStatusLocal cacheStatus;
     protected ImageData imageData = null;
     protected MetaData _metaData;
@@ -98,12 +98,12 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public void setImageLayer(RenderableImageLayer _imageLayer) {
+    public void setImageLayer(ImageLayer _imageLayer) {
         imageLayer = _imageLayer;
     }
 
     @Override
-    public RenderableImageLayer getImageLayer() {
+    public ImageLayer getImageLayer() {
         return imageLayer;
     }
 

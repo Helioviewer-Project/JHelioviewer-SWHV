@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components.ImageLayer;
+package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
 
@@ -9,6 +9,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.layers.ImageLayerOptions;
 
 public class ContrastPanel implements ChangeListener, FilterDetails {
 
@@ -26,7 +27,7 @@ public class ContrastPanel implements ChangeListener, FilterDetails {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setContrast(contrastSlider.getValue() / sliderToContrastScale);
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setContrast(contrastSlider.getValue() / sliderToContrastScale);
         contrastLabel.setText(Integer.toString(contrastSlider.getValue()));
         Displayer.display();
     }

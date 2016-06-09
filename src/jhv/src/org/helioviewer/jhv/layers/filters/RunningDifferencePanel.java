@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components.ImageLayer;
+package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -28,6 +28,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
+import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.io.DownloadViewTask;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -55,7 +56,7 @@ public class RunningDifferencePanel implements ChangeListener {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                DownloadViewTask downloadTask = new DownloadViewTask(((FiltersPanel) getComponent().getParent()).imageLayer.getView());
+                DownloadViewTask downloadTask = new DownloadViewTask(((ImageLayerOptions) getComponent().getParent()).getView());
                 JHVGlobals.getExecutorService().execute(downloadTask);
             }
         });
@@ -73,7 +74,7 @@ public class RunningDifferencePanel implements ChangeListener {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                MetaDataDialog dialog = new MetaDataDialog(((FiltersPanel) getComponent().getParent()).imageLayer.getView());
+                MetaDataDialog dialog = new MetaDataDialog(((ImageLayerOptions) getComponent().getParent()).getView());
                 dialog.showDialog();
             }
         });
@@ -108,13 +109,13 @@ public class RunningDifferencePanel implements ChangeListener {
     private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
         if (showExtraPanel) {
             radPanel.setVisible(true);
-            ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setRunDiffNoRot(!diffRot.isSelected());
+            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setRunDiffNoRot(!diffRot.isSelected());
         } else {
             radPanel.setVisible(false);
         }
 
-        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setDifferenceMode(differenceMode);
-        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setBaseDifferenceMode(baseDifferenceMode);
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(differenceMode);
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceMode(baseDifferenceMode);
     }
 
     private void addRadioButtons() {
@@ -161,9 +162,9 @@ public class RunningDifferencePanel implements ChangeListener {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (comboBox.getSelectedItem().equals(combolist[2])) {
-                    ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setBaseDifferenceNoRot(!diffRot.isSelected());
+                    ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceNoRot(!diffRot.isSelected());
                 } else {
-                    ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setRunDiffNoRot(!diffRot.isSelected());
+                    ((ImageLayerOptions) getComponent().getParent()).getGLImage().setRunDiffNoRot(!diffRot.isSelected());
                 }
                 Displayer.display();
             }
@@ -198,7 +199,7 @@ public class RunningDifferencePanel implements ChangeListener {
     @Override
     public void stateChanged(ChangeEvent e) {
         float value = ((SpinnerNumberModel) truncateSpinner.getModel()).getNumber().floatValue();
-        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setTruncation(1 - value);
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setTruncation(1 - value);
         Displayer.display();
     }
 

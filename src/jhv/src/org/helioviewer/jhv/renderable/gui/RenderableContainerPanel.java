@@ -37,7 +37,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
-import org.helioviewer.jhv.layers.RenderableImageLayer;
+import org.helioviewer.jhv.layers.ImageLayer;
 
 @SuppressWarnings("serial")
 public class RenderableContainerPanel extends JPanel {
@@ -86,7 +86,7 @@ public class RenderableContainerPanel extends JPanel {
             public void tableChanged(TableModelEvent e) {
                 if (e.getType() == TableModelEvent.INSERT) {
                     int idx = e.getFirstRow();
-                    if (grid.getValueAt(idx, 0) instanceof RenderableImageLayer)
+                    if (grid.getValueAt(idx, 0) instanceof ImageLayer)
                         grid.getSelectionModel().setSelectionInterval(idx, idx);
                 }
             }
@@ -202,8 +202,8 @@ public class RenderableContainerPanel extends JPanel {
                     renderableContainer.fireListeners();
                     Displayer.display();
                 }
-                if (col == TITLE_COL && renderable instanceof RenderableImageLayer) {
-                    ((RenderableImageLayer) renderable).setActiveImageLayer();
+                if (col == TITLE_COL && renderable instanceof ImageLayer) {
+                    ((ImageLayer) renderable).setActiveImageLayer();
                     renderableContainer.fireListeners();
                 }
                 if (col == REMOVE_COL && renderable.isDeletable()) {
@@ -219,7 +219,7 @@ public class RenderableContainerPanel extends JPanel {
             @Override
             public void mouseMoved(MouseEvent arg0) {
                 int row = grid.rowAtPoint(arg0.getPoint());
-                if (grid.getValueAt(row, 0) instanceof RenderableImageLayer) {
+                if (grid.getValueAt(row, 0) instanceof ImageLayer) {
                     grid.setCursor(UIGlobals.openHandCursor);
                 } else {
                     grid.setCursor(Cursor.getDefaultCursor());

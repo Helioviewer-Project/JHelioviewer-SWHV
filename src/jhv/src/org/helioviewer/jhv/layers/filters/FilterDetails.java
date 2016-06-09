@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components.ImageLayer;
+package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
 

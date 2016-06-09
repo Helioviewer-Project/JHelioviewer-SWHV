@@ -3,7 +3,7 @@ package org.helioviewer.jhv.renderable.gui;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.layers.RenderableImageLayer;
+import org.helioviewer.jhv.layers.ImageLayer;
 
 @SuppressWarnings("serial")
 public class RenderableCellRenderer extends DefaultTableCellRenderer {
@@ -14,7 +14,7 @@ public class RenderableCellRenderer extends DefaultTableCellRenderer {
             Renderable renderable = (Renderable) value;
             String layerName = renderable.getName();
             setText(layerName);
-            if (renderable instanceof RenderableImageLayer && ((RenderableImageLayer) renderable).isActiveImageLayer()) {
+            if (renderable instanceof ImageLayer && ((ImageLayer) renderable).isActiveImageLayer()) {
                 setToolTipText(layerName + " (master)");
                 setFont(UIGlobals.UIFontBold);
             } else {

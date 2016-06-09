@@ -16,7 +16,7 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.layers.RenderableImageLayer;
+import org.helioviewer.jhv.layers.ImageLayer;
 
 // Handles DnD row reordering
 @SuppressWarnings("serial")
@@ -51,7 +51,7 @@ public class TableRowTransferHandler extends TransferHandler {
 
         int row = grid.getSelectedRow();
         Object el = grid.getModel().getValueAt(row, 0);
-        if (!(el instanceof RenderableImageLayer)) {
+        if (!(el instanceof ImageLayer)) {
             return null;
         }
         createImageOfRow(row);
