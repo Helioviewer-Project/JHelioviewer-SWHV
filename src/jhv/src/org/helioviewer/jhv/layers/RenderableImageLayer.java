@@ -47,6 +47,8 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     private static final double vpScale = 0.035;
     private static final String loading = "Loading...";
 
+    private static final Pair<FloatBuffer, IntBuffer> bufferPair = makeIcosphere(2);
+
     public RenderableImageLayer(JHVWorker<?, ?> _worker) {
         worker = _worker;
         setVisible(true);
@@ -55,13 +57,12 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     @Override
     public void init(GL2 gl) {
         glImage.init(gl);
-        Pair<FloatBuffer, IntBuffer> bufferPair = makeIcosphere(2);
+
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
 
-        int positionBufferSize = positionBuffer.capacity();
         positionBufferID = generate(gl);
-
+        int positionBufferSize = positionBuffer.capacity();
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
         gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
@@ -123,6 +124,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             Layers.removeLayer(view);
             view.setDataHandler(null);
             view.setImageLayer(null);
+            view.abolish();
             view = null;
 
             if (Displayer.multiview) {
