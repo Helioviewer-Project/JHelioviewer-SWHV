@@ -31,7 +31,7 @@ public class OpacityPanel implements ChangeListener, FilterDetails {
 
     // opacity must be within [0, 1]
     public void setValue(float opacity) {
-        opacitySlider.setValue((int) (opacity * 100.f));
+        opacitySlider.setValue((int) (opacity * 100.f)); // triggers display
     }
 
     @Override
