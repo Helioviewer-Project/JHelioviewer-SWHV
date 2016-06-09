@@ -15,11 +15,8 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
 
     private final JSlider sharpeningSlider;
     private final JLabel sharpeningLabel;
-    private final JLabel title;
 
     public SharpenPanel() {
-        title = new JLabel("Sharpen", JLabel.RIGHT);
-
         sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         sharpeningSlider.setMinorTickSpacing(25);
         // sharpeningSlider.setPaintTicks(true);
@@ -55,11 +52,11 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
 
     @Override
     public Component getTitle() {
-        return title;
+        return new JLabel("Sharpen", JLabel.RIGHT);
     }
 
     @Override
-    public Component getSlider() {
+    public Component getComponent() {
         return sharpeningSlider;
     }
 

@@ -32,12 +32,9 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
     private final JToggleButton invertButton;
     private final JToggleButton enhanceButton;
 
-    private final JLabel title;
-
     public LUTPanel() {
         lutMap = new TreeMap<String, LUT>(LUT.getStandardList());
 
-        title = new JLabel("Color", JLabel.RIGHT);
         combobox = new JComboBox(lutMap.keySet().toArray());
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
@@ -113,11 +110,11 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
 
     @Override
     public Component getTitle() {
-        return title;
+        return new JLabel("Color", JLabel.RIGHT);
     }
 
     @Override
-    public Component getSlider() {
+    public Component getComponent() {
         return combobox;
     }
 

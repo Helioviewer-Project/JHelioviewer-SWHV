@@ -6,7 +6,7 @@ public interface FilterDetails {
 
     Component getTitle();
 
-    Component getSlider();
+    Component getComponent();
 
     Component getValue();
 

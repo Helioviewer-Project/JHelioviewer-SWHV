@@ -18,12 +18,9 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     private static final float sliderToContrastScale = 25.0f;
 
     private final JSlider contrastSlider;
-    private final JLabel title;
     private final JLabel contrastLabel;
 
     public ContrastPanel() {
-        title = new JLabel("Contrast", JLabel.RIGHT);
-
         contrastSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         contrastSlider.setMinorTickSpacing(25 * 2); // twice wider
         // contrastSlider.setPaintTicks(true);
@@ -80,11 +77,11 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
 
     @Override
     public Component getTitle() {
-        return title;
+        return new JLabel("Contrast", JLabel.RIGHT);
     }
 
     @Override
-    public Component getSlider() {
+    public Component getComponent() {
         return contrastSlider;
     }
 

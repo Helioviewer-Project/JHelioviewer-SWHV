@@ -41,7 +41,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     private int indexBufferID;
     private int indexBufferSize;
     private final GLImage glImage = new GLImage();
-    private final FiltersPanel filtersPanel = new FiltersPanel();
+    private final FiltersPanel filtersPanel = new FiltersPanel(this);
 
     private JHVWorker<?, ?> worker;
     private View view;
@@ -475,6 +475,10 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         setImageData(imageData);
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
         Displayer.display();
+    }
+
+    public GLImage getImage() {
+        return glImage;
     }
 
 }
