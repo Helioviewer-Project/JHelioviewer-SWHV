@@ -19,7 +19,6 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.io.APIResponseDump;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
@@ -392,8 +391,6 @@ public class JP2Image {
             reader.abolish();
             reader = null;
         }
-
-        APIResponseDump.getSingletonInstance().removeResponse(uri);
 
         try {
             destroyEngine();
