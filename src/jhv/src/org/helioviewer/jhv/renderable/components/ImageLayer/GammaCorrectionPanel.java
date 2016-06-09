@@ -67,7 +67,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     public void mouseReleased(MouseEvent e) {
         int sliderValue = gammaSlider.getValue();
 
-        if (sliderValue <= 5 && sliderValue >= -5 && sliderValue != 0) {
+        if (sliderValue < 3 && sliderValue > -3 && sliderValue != 0) {
             gammaSlider.setValue(0);
         }
     }
