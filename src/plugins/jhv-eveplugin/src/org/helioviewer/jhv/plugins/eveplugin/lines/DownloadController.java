@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,10 +10,12 @@ import java.util.concurrent.Future;
 
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +50,6 @@ public class DownloadController {
             }
 
             DownloadThread[] jobs = new DownloadThread[n];
-
             int i = 0;
             for (Interval interval : intervals) {
                 jobs[i] = new DownloadThread(band, interval);
@@ -134,23 +134,18 @@ public class DownloadController {
         return futureJobs;
     }
 
-    private void downloadFinished(final Band band, final Interval interval) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<Interval> list = downloadMap.get(band);
-                if (list != null) {
-                    list.remove(interval);
-                    if (list.isEmpty()) {
-                        downloadMap.remove(band);
-                    }
-                }
-                fireDownloadFinished(band);
+    private void downloadFinished(Band band, Interval interval) {
+        ArrayList<Interval> list = downloadMap.get(band);
+        if (list != null) {
+            list.remove(interval);
+            if (list.isEmpty()) {
+                downloadMap.remove(band);
             }
-        });
+        }
+        fireDownloadFinished(band);
     }
 
-    private class DownloadThread implements Runnable {
+    private class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
 
         private final Interval interval;
         private final Band band;
@@ -169,22 +164,13 @@ public class DownloadController {
         }
 
         @Override
-        public void run() {
-            try {
-                requestData();
-            } finally {
-                downloadFinished(band, interval);
-            }
-        }
-
-        private void requestData() {
+        protected Pair<float[], long[]> backgroundWork() {
             URL url;
-
             try {
                 url = buildRequestURL(interval, band.getBandType());
             } catch (MalformedURLException e) {
                 Log.error("Error creating EVE URL: ", e);
-                return;
+                return null;
             }
 
             try {
@@ -198,24 +184,38 @@ public class DownloadController {
                 JSONArray data = json.getJSONArray("data");
                 int length = data.length();
                 if (length == 0) {
-                    return;
+                    return null;
                 }
 
                 float[] values = new float[length];
                 long[] dates = new long[length];
-
                 for (int i = 0; i < length; i++) {
                     JSONArray entry = data.getJSONArray(i);
                     dates[i] = entry.getLong(0) * 1000;
                     values[i] = (float) (entry.getDouble(1) * multiplier);
                 }
 
-                addDataToCache(band, values, dates);
+                return new Pair<float[], long[]>(values, dates);
             } catch (JSONException e) {
                 Log.error("Error Parsing the EVE Response ", e);
             } catch (IOException e) {
                 Log.error("Error Parsing the EVE Response ", e);
             }
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            if (!isCancelled()) {
+                try {
+                    Pair<float[], long[]> p = get();
+                    if (p != null)
+                        band.addToCache(p.a, p.b);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            downloadFinished(band, interval);
         }
 
         private URL buildRequestURL(Interval interval, BandType type) throws MalformedURLException {
@@ -224,14 +224,6 @@ public class DownloadController {
             return new URL(url);
         }
 
-        private void addDataToCache(final Band band, final float[] values, final long[] dates) {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    band.addToCache(values, dates);
-                }
-            });
-        }
     }
 
 }
