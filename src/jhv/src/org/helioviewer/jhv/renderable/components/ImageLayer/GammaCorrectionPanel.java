@@ -10,7 +10,7 @@ import javax.swing.event.ChangeListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
-public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeListener, FilterDetails {
+public class GammaCorrectionPanel implements ChangeListener, FilterDetails {
 
     private static final double factor = 0.01 * Math.log(10);
 

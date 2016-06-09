@@ -29,11 +29,10 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.DownloadViewTask;
-import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class RunningDifferencePanel extends AbstractFilterPanel implements ChangeListener {
+public class RunningDifferencePanel implements ChangeListener {
 
     private final JSpinner truncateSpinner;
     private final JLabel truncateLabel;
@@ -47,8 +46,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     private final JPanel radPanel;
     private final JComboBox comboBox;
 
-    private View view;
-
     public RunningDifferencePanel() {
         downloadLayerButton = new JButton(new AbstractAction() {
             {
@@ -58,7 +55,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                DownloadViewTask downloadTask = new DownloadViewTask(view);
+                DownloadViewTask downloadTask = new DownloadViewTask(((FiltersPanel) getComponent().getParent()).imageLayer.getView());
                 JHVGlobals.getExecutorService().execute(downloadTask);
             }
         });
@@ -76,7 +73,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                MetaDataDialog dialog = new MetaDataDialog(view);
+                MetaDataDialog dialog = new MetaDataDialog(((FiltersPanel) getComponent().getParent()).imageLayer.getView());
                 dialog.showDialog();
             }
         });
@@ -102,32 +99,22 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         comboBox = new JComboBox(combolist);
         topPanel = new JPanel(new GridBagLayout());
         radPanel = new JPanel(new FlowLayout());
+        radPanel.setVisible(false);
+
         addRadioButtons();
     }
 
-    private void setDifferenceMode(boolean showExtraPanel) {
+
+    private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
         if (showExtraPanel) {
             radPanel.setVisible(true);
-            image.setRunDiffNoRot(!diffRot.isSelected());
+            ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setRunDiffNoRot(!diffRot.isSelected());
         } else {
             radPanel.setVisible(false);
         }
-    }
 
-    private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
-        setDifferenceMode(showExtraPanel);
-        image.setDifferenceMode(differenceMode);
-        image.setBaseDifferenceMode(baseDifferenceMode);
-    }
-
-    private void setDifferenceModetoChangeCombobox(boolean differenceMode, boolean baseDifferenceMode) {
-        if (!differenceMode) {
-            comboBox.setSelectedItem(combolist[0]);
-        } else if (!baseDifferenceMode) {
-            comboBox.setSelectedItem(combolist[1]);
-        } else {
-            comboBox.setSelectedItem(combolist[2]);
-        }
+        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setDifferenceMode(differenceMode);
+        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setBaseDifferenceMode(baseDifferenceMode);
     }
 
     private void addRadioButtons() {
@@ -174,9 +161,9 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (comboBox.getSelectedItem().equals(combolist[2])) {
-                    image.setBaseDifferenceNoRot(!diffRot.isSelected());
+                    ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setBaseDifferenceNoRot(!diffRot.isSelected());
                 } else {
-                    image.setRunDiffNoRot(!diffRot.isSelected());
+                    ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setRunDiffNoRot(!diffRot.isSelected());
                 }
                 Displayer.display();
             }
@@ -211,30 +198,11 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     @Override
     public void stateChanged(ChangeEvent e) {
         float value = ((SpinnerNumberModel) truncateSpinner.getModel()).getNumber().floatValue();
-        image.setTruncation(1 - value);
+        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setTruncation(1 - value);
         Displayer.display();
     }
 
-    @Override
-    public void setGLImage(GLImage image) {
-        super.setGLImage(image);
-
-        if (image != null) {
-            boolean differenceMode = image.getDifferenceMode();
-            if (differenceMode) {
-                setDifferenceModetoChangeCombobox(true, image.getBaseDifferenceMode());
-            } else {
-                setDifferenceModetoChangeCombobox(false, false);
-            }
-            truncateSpinner.setValue(1.f - image.getTruncation());
-        }
-    }
-
-    public void setView(View _view) {
-        view = _view;
-    }
-
-    public Component getPanel() {
+    public Component getComponent() {
         return diffPanel;
     }
 
