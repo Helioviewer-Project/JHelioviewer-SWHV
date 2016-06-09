@@ -113,9 +113,6 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         Layers.addLayer(view);
         ImageViewerGui.getRenderableContainer().fireListeners();
 
-        filtersPanel.setActiveImage(glImage);
-        filtersPanel.setView(view);
-
         if (Displayer.multiview) {
             ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
         }
@@ -123,9 +120,6 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     @Override
     public void remove(GL2 gl) {
-        filtersPanel.setActiveImage(null);
-        filtersPanel.setView(null);
-
         if (view != null) {
             Layers.removeLayer(view);
             view.setDataHandler(null);
@@ -479,6 +473,10 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     public GLImage getGLImage() {
         return glImage;
+    }
+
+    public View getView() {
+        return view;
     }
 
 }
