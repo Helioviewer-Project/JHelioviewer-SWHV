@@ -75,7 +75,7 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     }
 
     @Override
-    public Component getValue() {
+    public Component getLabel() {
         return new JLabel("           ");
     }
 

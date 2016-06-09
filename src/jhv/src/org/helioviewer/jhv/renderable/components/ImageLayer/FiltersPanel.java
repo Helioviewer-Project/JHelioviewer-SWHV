@@ -83,7 +83,7 @@ public class FiltersPanel extends SmallPanel {
         c.weightx = 0.;
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.NONE;
-        add(details.getValue(), c);
+        add(details.getLabel(), c);
     }
 
     public void setActiveImage(GLImage image) {

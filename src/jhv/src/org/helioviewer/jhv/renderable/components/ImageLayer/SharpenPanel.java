@@ -17,14 +17,13 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     private final JLabel sharpeningLabel;
 
     public SharpenPanel() {
+        sharpeningLabel = new JLabel("0%");
         sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         sharpeningSlider.setMinorTickSpacing(25);
         // sharpeningSlider.setPaintTicks(true);
 
         sharpeningSlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(sharpeningSlider);
-
-        sharpeningLabel = new JLabel("0%");
     }
 
     @Override
@@ -34,10 +33,7 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
         Displayer.display();
     }
 
-    /**
-     * @param sharpen
-     *            New sharpen value. Must be within [0, 10]
-     */
+    // sharpen must be within [0, 10]
     private void setValue(float sharpen) {
         sharpeningSlider.setValue((int) (sharpen * 10.f));
     }
@@ -61,7 +57,7 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     }
 
     @Override
-    public Component getValue() {
+    public Component getLabel() {
         return sharpeningLabel;
     }
 

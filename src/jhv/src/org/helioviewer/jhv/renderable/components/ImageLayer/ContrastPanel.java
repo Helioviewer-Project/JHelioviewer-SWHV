@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.renderable.components.ImageLayer;
 
 import java.awt.Component;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
 import javax.swing.JSlider;
@@ -13,7 +11,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.opengl.GLImage;
 
-public class ContrastPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterDetails {
+public class ContrastPanel extends AbstractFilterPanel implements ChangeListener, FilterDetails {
 
     private static final float sliderToContrastScale = 25.0f;
 
@@ -21,15 +19,13 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     private final JLabel contrastLabel;
 
     public ContrastPanel() {
+        contrastLabel = new JLabel("0");
         contrastSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         contrastSlider.setMinorTickSpacing(25 * 2); // twice wider
         // contrastSlider.setPaintTicks(true);
 
-        contrastSlider.addMouseListener(this);
         contrastSlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(contrastSlider);
-
-        contrastLabel = new JLabel("0");
     }
 
     @Override
@@ -37,30 +33,6 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         image.setContrast(contrastSlider.getValue() / sliderToContrastScale);
         contrastLabel.setText(Integer.toString(contrastSlider.getValue()));
         Displayer.display();
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        int sliderValue = contrastSlider.getValue();
-        if (sliderValue <= 2 && sliderValue >= -2 && sliderValue != 0) {
-            contrastSlider.setValue(0);
-        }
     }
 
     private void setValue(float contrast) {
@@ -86,7 +58,7 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     }
 
     @Override
-    public Component getValue() {
+    public Component getLabel() {
         return contrastLabel;
     }
 

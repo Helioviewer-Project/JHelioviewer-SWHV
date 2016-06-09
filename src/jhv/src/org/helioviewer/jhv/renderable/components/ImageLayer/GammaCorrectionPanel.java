@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.renderable.components.ImageLayer;
 
 import java.awt.Component;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
 import javax.swing.JSlider;
@@ -13,7 +11,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.opengl.GLImage;
 
-public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterDetails {
+public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeListener, FilterDetails {
 
     private static final double factor = 0.01 * Math.log(10);
 
@@ -21,15 +19,13 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     private final JLabel gammaLabel;
 
     public GammaCorrectionPanel() {
+        gammaLabel = new JLabel("1.0");
         gammaSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         gammaSlider.setMinorTickSpacing(25 * 2); // twice wider
         // gammaSlider.setPaintTicks(true);
 
         gammaSlider.addChangeListener(this);
-        gammaSlider.addMouseListener(this);
         WheelSupport.installMouseWheelSupport(gammaSlider);
-
-        gammaLabel = new JLabel("1.0");
     }
 
     @Override
@@ -43,36 +39,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         Displayer.display();
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    // snaps the slider to 1.0 if it is close to it.
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        int sliderValue = gammaSlider.getValue();
-
-        if (sliderValue < 3 && sliderValue > -3 && sliderValue != 0) {
-            gammaSlider.setValue(0);
-        }
-    }
-
-    /**
-     * @param gamma
-     *            New gamma value, must be within [0.1, 10]
-     */
+    // gamma must be within [0.1, 10]
     private void setValue(float gamma) {
         gammaSlider.setValue((int) (Math.log(gamma) / factor));
     }
@@ -96,7 +63,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     }
 
     @Override
-    public Component getValue() {
+    public Component getLabel() {
         return gammaLabel;
     }
 
