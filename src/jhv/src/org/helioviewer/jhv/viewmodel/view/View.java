@@ -6,7 +6,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.RenderableImageLayer;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -93,9 +93,9 @@ public interface View {
      */
     int getMaximumFrameNumber();
 
-    void setImageLayer(RenderableImageLayer imageLayer);
+    void setImageLayer(ImageLayer imageLayer);
 
-    RenderableImageLayer getImageLayer();
+    ImageLayer getImageLayer();
 
     void setDataHandler(ImageDataHandler dataHandler);
 

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components.ImageLayer;
+package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -18,6 +18,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.layers.ImageLayerOptions;
 
 public class LUTPanel implements ActionListener, FilterDetails {
 
@@ -66,12 +67,12 @@ public class LUTPanel implements ActionListener, FilterDetails {
             invertButton.setBorder(BorderFactory.createBevelBorder(invertButton.isSelected() ? BevelBorder.LOWERED : BevelBorder.RAISED));
         } else if (e.getSource() == enhanceButton) {
             boolean isSelected = enhanceButton.isSelected();
-            ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setEnhanced(isSelected);
+            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setEnhanced(isSelected);
             enhanceButton.setBorder(BorderFactory.createBevelBorder(isSelected ? BevelBorder.LOWERED : BevelBorder.RAISED));
         }
 
         LUT newMap = lutMap.get((String) combobox.getSelectedItem());
-        ((FiltersPanel) getComponent().getParent()).imageLayer.getGLImage().setLUT(newMap, invertButton.isSelected());
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLUT(newMap, invertButton.isSelected());
         Displayer.display();
     }
 

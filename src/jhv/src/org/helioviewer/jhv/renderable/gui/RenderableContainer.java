@@ -11,7 +11,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.RenderableImageLayer;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 
@@ -28,7 +28,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         int lastImagelayerIndex = -1;
         int size = renderables.size();
         for (int i = 0; i < size; i++) {
-            if (renderables.get(i) instanceof RenderableImageLayer) {
+            if (renderables.get(i) instanceof ImageLayer) {
                 lastImagelayerIndex = i;
             }
         }
@@ -124,7 +124,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         Renderable toMove = renderables.get(fromIndex);
         Renderable moveTo = renderables.get(Math.max(0, toIndex - 1));
 
-        if (!(toMove instanceof RenderableImageLayer) || !(moveTo instanceof RenderableImageLayer)) {
+        if (!(toMove instanceof ImageLayer) || !(moveTo instanceof ImageLayer)) {
             return;
         }
         renderables.remove(fromIndex);
@@ -233,10 +233,10 @@ public class RenderableContainer implements TableModel, Reorderable {
         GLText.dispose(gl);
     }
 
-    public RenderableImageLayer getViewportRenderableImageLayer(int idx) {
+    public ImageLayer getViewportImageLayer(int idx) {
         for (Renderable r : renderables) {
-            if (r instanceof RenderableImageLayer && r.isVisible(idx)) {
-                return (RenderableImageLayer) r;
+            if (r instanceof ImageLayer && r.isVisible(idx)) {
+                return (ImageLayer) r;
             }
         }
         return null;
@@ -245,8 +245,8 @@ public class RenderableContainer implements TableModel, Reorderable {
     public void setRender(Camera camera, double factor) {
         for (Renderable r : renderables) {
             int i;
-            if (r instanceof RenderableImageLayer && (i = r.isVisibleIdx()) != -1) {
-                RenderableImageLayer im = (RenderableImageLayer) r;
+            if (r instanceof ImageLayer && (i = r.isVisibleIdx()) != -1) {
+                ImageLayer im = (ImageLayer) r;
                 im.setRender(camera, Displayer.getViewports()[i], factor);
             }
         }
@@ -257,8 +257,8 @@ public class RenderableContainer implements TableModel, Reorderable {
 
         if (multiview) {
             for (Renderable r : renderables) {
-                if (r instanceof RenderableImageLayer && r.isVisible()) {
-                    RenderableImageLayer im = (RenderableImageLayer) r;
+                if (r instanceof ImageLayer && r.isVisible()) {
+                    ImageLayer im = (ImageLayer) r;
                     r.setVisible(ctImages);
                     im.setOpacity(1);
                     ctImages++;
@@ -266,8 +266,8 @@ public class RenderableContainer implements TableModel, Reorderable {
             }
         } else {
             for (Renderable r : renderables) {
-                if (r instanceof RenderableImageLayer && r.isVisible()) {
-                    RenderableImageLayer im = (RenderableImageLayer) r;
+                if (r instanceof ImageLayer && r.isVisible()) {
+                    ImageLayer im = (ImageLayer) r;
                     r.setVisible(0);
                     float opacity;
                     if (im.getName().contains("LASCO") || im.getName().contains("COR"))

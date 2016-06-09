@@ -21,7 +21,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.renderable.components.ImageLayer.FiltersPanel;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
@@ -33,13 +32,13 @@ import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class RenderableImageLayer extends AbstractRenderable implements ImageDataHandler {
+public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private int positionBufferID;
     private int indexBufferID;
     private int indexBufferSize;
     private final GLImage glImage = new GLImage();
-    private FiltersPanel filtersPanel;
+    private ImageLayerOptions optionsPanel;
 
     private JHVWorker<?, ?> worker;
     private View view;
@@ -49,7 +48,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     private static final Pair<FloatBuffer, IntBuffer> bufferPair = makeIcosphere(2);
 
-    public RenderableImageLayer(JHVWorker<?, ?> _worker) {
+    public ImageLayer(JHVWorker<?, ?> _worker) {
         worker = _worker;
         setVisible(true);
     }
@@ -105,7 +104,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
         glImage.setOpacity(opacity);
         glImage.setLUT(view.getDefaultLUT(), false);
-        filtersPanel = new FiltersPanel(this, opacity, view.getDefaultLUT());
+        optionsPanel = new ImageLayerOptions(this, opacity, view.getDefaultLUT());
 
         view.setImageLayer(this);
         view.setDataHandler(this);
@@ -119,7 +118,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     @Override
     public void remove(GL2 gl) {
-        filtersPanel = null;
+        optionsPanel = null;
         if (view != null) {
             Layers.removeLayer(view);
             view.setDataHandler(null);
@@ -382,12 +381,12 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     }
 
     public void setOpacity(float opacity) {
-        filtersPanel.setOpacity(opacity);
+        optionsPanel.setOpacity(opacity);
     }
 
     @Override
     public Component getOptionsPanel() {
-        return filtersPanel;
+        return optionsPanel;
     }
 
     @Override
@@ -463,11 +462,11 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         Displayer.display();
     }
 
-    public GLImage getGLImage() {
+    GLImage getGLImage() {
         return glImage;
     }
 
-    public View getView() {
+    View getView() {
         return view;
     }
 

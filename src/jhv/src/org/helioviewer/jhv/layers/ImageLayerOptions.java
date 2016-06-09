@@ -1,20 +1,21 @@
-package org.helioviewer.jhv.renderable.components.ImageLayer;
+package org.helioviewer.jhv.layers;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
-import org.helioviewer.jhv.layers.RenderableImageLayer;
+import org.helioviewer.jhv.layers.filters.*;
+import org.helioviewer.jhv.opengl.GLImage;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class FiltersPanel extends SmallPanel {
+public class ImageLayerOptions extends SmallPanel {
 
+    private final ImageLayer imageLayer;
     private final OpacityPanel opacityPanel;
 
-    final RenderableImageLayer imageLayer;
-
-    public FiltersPanel(RenderableImageLayer imageLayer, float opacity, LUT lut) {
+    public ImageLayerOptions(ImageLayer imageLayer, float opacity, LUT lut) {
         this.imageLayer = imageLayer;
 
         RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
@@ -79,8 +80,16 @@ public class FiltersPanel extends SmallPanel {
         add(details.getLabel(), c);
     }
 
-    public void setOpacity(float opacity) {
+    void setOpacity(float opacity) {
         opacityPanel.setValue(opacity);
+    }
+
+    public GLImage getGLImage() {
+        return imageLayer.getGLImage();
+    }
+
+    public View getView() {
+        return imageLayer.getView();
     }
 
 }
