@@ -23,12 +23,28 @@ public class Layers {
     private static View activeView;
     private static final ArrayList<View> layers = new ArrayList<View>();
 
-    public static View getLayer(int index) {
-        try {
-            return layers.get(index);
-        } catch (Exception e) {
-            return null;
+    public static JHVDate getStartDate() {
+        JHVDate earliest = null;
+
+        for (View view : layers) {
+            JHVDate start = view.getFirstTime();
+            if (earliest == null || start.compareTo(earliest) < 0) {
+                earliest = start;
+            }
         }
+        return earliest;
+    }
+
+    public static JHVDate getEndDate() {
+        JHVDate latest = null;
+
+        for (View view : layers) {
+            JHVDate end = view.getLastTime();
+            if (latest == null || end.compareTo(latest) > 0) {
+                latest = end;
+            }
+        }
+        return latest;
     }
 
     public static int getNumLayers() {
@@ -47,11 +63,45 @@ public class Layers {
         return activeView;
     }
 
-    public static void setActiveView(View view) {
+    static void setActiveView(View view) {
         if (view != activeView) {
             activeView = view;
             setMasterMovie(view);
             fireActiveLayerChanged(view);
+        }
+    }
+
+    static View getLayer(int index) {
+        try {
+            return layers.get(index);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    static void removeLayer(View view) {
+        layers.remove(view);
+        if (view == activeView) {
+            setActiveView(getLayer(layers.size() - 1));
+        }
+    }
+
+    static void addLayer(View view) {
+        layers.add(view);
+        fireLayerAdded(view);
+        setActiveView(view);
+        setFrame(0);
+    }
+
+    private static void fireLayerAdded(View view) {
+        for (LayersListener ll : layerListeners) {
+            ll.layerAdded(view);
+        }
+    }
+
+    private static void fireActiveLayerChanged(View view) {
+        for (LayersListener ll : layerListeners) {
+            ll.activeLayerChanged(view);
         }
     }
 
@@ -161,57 +211,6 @@ public class Layers {
         }
 
         MoviePanel.setFrameSlider(activeFrame);
-    }
-
-    public static JHVDate getStartDate() {
-        JHVDate earliest = null;
-
-        for (View view : layers) {
-            JHVDate start = view.getFirstTime();
-            if (earliest == null || start.compareTo(earliest) < 0) {
-                earliest = start;
-            }
-        }
-        return earliest;
-    }
-
-    public static JHVDate getEndDate() {
-        JHVDate latest = null;
-
-        for (View view : layers) {
-            JHVDate end = view.getLastTime();
-            if (latest == null || end.compareTo(latest) > 0) {
-                latest = end;
-            }
-        }
-        return latest;
-    }
-
-    public static void removeLayer(View view) {
-        layers.remove(view);
-        if (view == activeView) {
-            setActiveView(getLayer(layers.size() - 1));
-        }
-        view.abolish();
-    }
-
-    public static void addLayer(View view) {
-        layers.add(view);
-        fireLayerAdded(view);
-        setActiveView(view);
-        setFrame(0);
-    }
-
-    private static void fireLayerAdded(View view) {
-        for (LayersListener ll : layerListeners) {
-            ll.layerAdded(view);
-        }
-    }
-
-    private static void fireActiveLayerChanged(View view) {
-        for (LayersListener ll : layerListeners) {
-            ll.activeLayerChanged(view);
-        }
     }
 
     private static final HashSet<FrameListener> frameListeners = new HashSet<FrameListener>();
