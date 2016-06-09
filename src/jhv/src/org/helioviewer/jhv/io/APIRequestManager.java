@@ -110,7 +110,6 @@ public class APIRequestManager {
                 if (message != null && errorMessage) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
-                APIResponseDump.getSingletonInstance().putResponse(response);
                 return loadView(response.getURI(), downloadUri);
             } else {
                 // We did not get a reply to load data or no reply at all
