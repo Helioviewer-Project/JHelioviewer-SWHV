@@ -104,7 +104,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             }
         }
 
-        glImage.setOpacity(opacity);
+        /*glImage.*/setOpacity(opacity);
         glImage.setLUT(view.getDefaultLUT(), false);
 
         view.setImageLayer(this);
@@ -393,8 +393,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     }
 
     public void setOpacity(float opacity) {
-        glImage.setOpacity(opacity);
-        filtersPanel.refresh();
+        filtersPanel.setOpacity(opacity);
     }
 
     @Override

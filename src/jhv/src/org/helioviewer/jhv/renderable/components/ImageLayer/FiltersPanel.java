@@ -88,12 +88,11 @@ public class FiltersPanel extends SmallPanel {
 
     public void setActiveImage(GLImage image) {
         runningDifferencePanel.setGLImage(image);
-        opacityPanel.setGLImage(image);
         lutPanel.setGLImage(image);
     }
 
-    public void refresh() {
-        opacityPanel.refresh();
+    public void setOpacity(float opacity) {
+        opacityPanel.setValue(opacity);
     }
 
     public void setView(View view) {
