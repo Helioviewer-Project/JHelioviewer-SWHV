@@ -18,12 +18,9 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     private static final double factor = 0.01 * Math.log(10);
 
     private final JSlider gammaSlider;
-    private final JLabel title;
     private final JLabel gammaLabel;
 
     public GammaCorrectionPanel() {
-        title = new JLabel("Gamma", JLabel.RIGHT);
-
         gammaSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         gammaSlider.setMinorTickSpacing(25 * 2); // twice wider
         // gammaSlider.setPaintTicks(true);
@@ -90,11 +87,11 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
 
     @Override
     public Component getTitle() {
-        return title;
+        return new JLabel("Gamma", JLabel.RIGHT);
     }
 
     @Override
-    public Component getSlider() {
+    public Component getComponent() {
         return gammaSlider;
     }
 

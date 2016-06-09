@@ -15,11 +15,8 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
 
     private final JSlider opacitySlider;
     private final JLabel opacityLabel;
-    private final JLabel title;
 
     public OpacityPanel() {
-        title = new JLabel("Opacity", JLabel.RIGHT);
-
         opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         opacitySlider.setMinorTickSpacing(25);
         // opacitySlider.setPaintTicks(true);
@@ -55,11 +52,11 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
 
     @Override
     public Component getTitle() {
-        return title;
+        return new JLabel("Opacity", JLabel.RIGHT);
     }
 
     @Override
-    public Component getSlider() {
+    public Component getComponent() {
         return opacitySlider;
     }
 

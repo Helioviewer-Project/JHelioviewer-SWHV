@@ -19,12 +19,9 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     private final JCheckBox redCheckBox;
     private final JCheckBox greenCheckBox;
     private final JCheckBox blueCheckBox;
-    private final JLabel title;
     private final JPanel boxPanel;
 
     public ChannelMixerPanel() {
-        title = new JLabel("Channels", JLabel.RIGHT);
-
         boxPanel = new JPanel(new GridLayout(1, 3));
 
         redCheckBox = new JCheckBox("Red", true);
@@ -69,11 +66,11 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
 
     @Override
     public Component getTitle() {
-        return title;
+        return new JLabel("Channels", JLabel.RIGHT);
     }
 
     @Override
-    public Component getSlider() {
+    public Component getComponent() {
         return boxPanel;
     }
 

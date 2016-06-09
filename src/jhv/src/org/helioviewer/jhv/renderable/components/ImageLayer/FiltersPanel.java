@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.opengl.GLImage;
+import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
@@ -18,7 +19,11 @@ public class FiltersPanel extends SmallPanel {
     private final ContrastPanel contrastPanel;
     private final SharpenPanel sharpenPanel;
 
-    public FiltersPanel() {
+    final RenderableImageLayer imageLayer;
+
+    public FiltersPanel(RenderableImageLayer imageLayer) {
+        this.imageLayer = imageLayer;
+
         runningDifferencePanel = new RunningDifferencePanel();
         opacityPanel = new OpacityPanel();
         channelMixerPanel = new ChannelMixerPanel();
@@ -72,7 +77,7 @@ public class FiltersPanel extends SmallPanel {
         c.weightx = 1.;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
-        add(details.getSlider(), c);
+        add(details.getComponent(), c);
 
         c.gridx = 2;
         c.weightx = 0.;
