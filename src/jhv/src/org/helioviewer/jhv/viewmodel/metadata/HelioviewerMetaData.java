@@ -24,7 +24,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private String observatory = " ";
     private String fullName = "";
 
-    private double unitPerPixel = 1;
+    private double unitPerPixelX = 1;
+    private double unitPerPixelY = 1;
     private double sunPositionX = 0;
     private double sunPositionY = 0;
 
@@ -221,16 +222,17 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             }
 
             double radiusSunInArcsec = Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance) * MathUtils.radeg * 3600;
-            double solarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
-            unitPerPixel = Sun.Radius / solarPixelRadius;
+            double radiusSunFactor = Sun.Radius / radiusSunInArcsec;
+            unitPerPixelX = arcsecPerPixelX * radiusSunFactor;
+            unitPerPixelY = arcsecPerPixelY * radiusSunFactor;
 
             double sunX = m.tryGetDouble("CRPIX1") - 0.5;
             double sunY = m.tryGetDouble("CRPIX2") - 0.5;
 
-            sunPositionX = unitPerPixel * sunX;
-            sunPositionY = unitPerPixel * (pixelHeight - 1 - sunY);
+            sunPositionX = unitPerPixelX * sunX;
+            sunPositionY = unitPerPixelY * (pixelHeight - 1 - sunY);
 
-            region = new Region(-unitPerPixel * sunX, -unitPerPixel * sunY, pixelWidth * unitPerPixel, pixelHeight * unitPerPixel);
+            region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelWidth * unitPerPixelX, pixelHeight * unitPerPixelY);
         } else { // pixel based
             region = new Region(0, 0, pixelWidth, pixelHeight);
         }
@@ -271,8 +273,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     @Override
     public Region roiToRegion(SubImage roi, double factorX, double factorY) {
-        return new Region(roi.x * factorX * unitPerPixel - sunPositionX, roi.y * factorY * unitPerPixel - sunPositionY,
-                          roi.width * factorX * unitPerPixel, roi.height * factorY * unitPerPixel);
+        return new Region(roi.x * factorX * unitPerPixelX - sunPositionX, roi.y * factorY * unitPerPixelY - sunPositionY,
+                          roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
     }
 
     @Override
