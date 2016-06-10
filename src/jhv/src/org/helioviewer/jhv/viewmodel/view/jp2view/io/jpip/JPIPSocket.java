@@ -54,19 +54,17 @@ public class JPIPSocket extends HTTPSocket {
      * @throws IOException
      */
     @Override
-    public Object connect(URI _uri) throws IOException {
-        super.connect(_uri);
+    public Object connect(URI uri) throws IOException {
+        super.connect(uri);
 
-        jpipPath = _uri.getPath();
+        jpipPath = uri.getPath();
+
+        JPIPQuery query = new JPIPQuery(JPIPRequestField.CNEW.toString(), "http",
+                                        JPIPRequestField.TYPE.toString(), "jpp-stream",
+                                        JPIPRequestField.TID.toString(), "0",
+                                        JPIPRequestField.LEN.toString(), "512"); // deliberately small
 
         JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
-
-        JPIPQuery query = new JPIPQuery();
-        query.setField(JPIPRequestField.CNEW.toString(), "http");
-        query.setField(JPIPRequestField.TYPE.toString(), "jpp-stream");
-        query.setField(JPIPRequestField.TID.toString(), "0");
-        /* deliberately small */
-        query.setField(JPIPRequestField.LEN.toString(), "512");
         req.setQuery(query.toString());
 
         JPIPResponse res = null;
@@ -110,16 +108,13 @@ public class JPIPSocket extends HTTPSocket {
 
         try {
             if (jpipChannelID != null) {
+                JPIPQuery query = new JPIPQuery(JPIPRequestField.CCLOSE.toString(), jpipChannelID,
+                                                JPIPRequestField.LEN.toString(), "0");
+
                 JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
-
-                JPIPQuery query = new JPIPQuery();
-                query.setField(JPIPRequestField.CCLOSE.toString(), jpipChannelID);
-                query.setField(JPIPRequestField.LEN.toString(), "0");
                 req.setQuery(query.toString());
-
                 send(req);
             }
-
         } catch (IOException e) {
             // e.printStackTrace();
         } finally {
@@ -133,49 +128,49 @@ public class JPIPSocket extends HTTPSocket {
      * @param _req
      * @throws IOException
      */
-    public void send(JPIPRequest _req) throws IOException {
-        String queryStr = _req.getQuery();
+    public void send(JPIPRequest req) throws IOException {
+        String queryStr = req.getQuery();
 
         // Adds some default headers if they were not already added.
-        if (!_req.headerExists(HTTPHeaderKey.USER_AGENT.toString()))
-            _req.setHeader(HTTPHeaderKey.USER_AGENT.toString(), JHVGlobals.getUserAgent());
-        if (!_req.headerExists(HTTPHeaderKey.ACCEPT_ENCODING.toString()))
-            _req.setHeader(HTTPHeaderKey.ACCEPT_ENCODING.toString(), "gzip");
-        if (!_req.headerExists(HTTPHeaderKey.CACHE_CONTROL.toString()))
-            _req.setHeader(HTTPHeaderKey.CACHE_CONTROL.toString(), "no-cache");
-        if (!_req.headerExists(HTTPHeaderKey.HOST.toString()))
-            _req.setHeader(HTTPHeaderKey.HOST.toString(), (getHost() + ":" + getPort()));
+        if (!req.headerExists(HTTPHeaderKey.USER_AGENT.toString()))
+            req.setHeader(HTTPHeaderKey.USER_AGENT.toString(), JHVGlobals.getUserAgent());
+        if (!req.headerExists(HTTPHeaderKey.ACCEPT_ENCODING.toString()))
+            req.setHeader(HTTPHeaderKey.ACCEPT_ENCODING.toString(), "gzip");
+        if (!req.headerExists(HTTPHeaderKey.CACHE_CONTROL.toString()))
+            req.setHeader(HTTPHeaderKey.CACHE_CONTROL.toString(), "no-cache");
+        if (!req.headerExists(HTTPHeaderKey.HOST.toString()))
+            req.setHeader(HTTPHeaderKey.HOST.toString(), (getHost() + ":" + getPort()));
         // Adds a necessary JPIP request field
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
-        if (_req.getMethod() == Method.GET) {
-            if (!_req.headerExists(HTTPHeaderKey.CONNECTION.toString()))
-                _req.setHeader(HTTPHeaderKey.CONNECTION.toString(), "Keep-Alive");
-        } else if (_req.getMethod() == Method.POST) {
-            if (!_req.headerExists(HTTPHeaderKey.CONTENT_TYPE.toString()))
-                _req.setHeader(HTTPHeaderKey.CONTENT_TYPE.toString(), "application/x-www-form-urlencoded");
-            if (!_req.headerExists(HTTPHeaderKey.CONTENT_LENGTH.toString()))
-                _req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(queryStr.getBytes("UTF-8").length));
+        if (req.getMethod() == Method.GET) {
+            if (!req.headerExists(HTTPHeaderKey.CONNECTION.toString()))
+                req.setHeader(HTTPHeaderKey.CONNECTION.toString(), "Keep-Alive");
+        } else if (req.getMethod() == Method.POST) {
+            if (!req.headerExists(HTTPHeaderKey.CONTENT_TYPE.toString()))
+                req.setHeader(HTTPHeaderKey.CONTENT_TYPE.toString(), "application/x-www-form-urlencoded");
+            if (!req.headerExists(HTTPHeaderKey.CONTENT_LENGTH.toString()))
+                req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(queryStr.getBytes("UTF-8").length));
         }
 
         StringBuilder str = new StringBuilder();
 
         // Adds the URI line
-        str.append(_req.getMethod()).append(' ').append(jpipPath);
-        if (_req.getMethod() == Method.GET) {
+        str.append(req.getMethod()).append(' ').append(jpipPath);
+        if (req.getMethod() == Method.GET) {
             str.append('?').append(queryStr);
         }
         str.append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
 
         // Adds the headers
-        for (String key : _req.getHeaders()) {
-            str.append(key).append(": ").append(_req.getHeader(key)).append(HTTPConstants.CRLF);
+        for (String key : req.getHeaders()) {
+            str.append(key).append(": ").append(req.getHeader(key)).append(HTTPConstants.CRLF);
         }
         str.append(HTTPConstants.CRLF);
 
         // Adds the message body if necessary
-        if (_req.getMethod() == HTTPRequest.Method.POST)
+        if (req.getMethod() == HTTPRequest.Method.POST)
             str.append(queryStr);
 
         // if (!isConnected())
