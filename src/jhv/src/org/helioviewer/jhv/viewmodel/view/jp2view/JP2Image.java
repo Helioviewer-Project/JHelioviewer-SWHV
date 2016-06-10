@@ -27,6 +27,7 @@ import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
+import org.helioviewer.jhv.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.viewmodel.view.ViewROI;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusLocal;
@@ -141,6 +142,10 @@ public class JP2Image {
 
             metaDataList = new MetaData[frameCount];
             KakaduUtils.cacheMetaData(kduReader.getFamilySrc(), metaDataList);
+            for (int i = 0; i < frameCount; i++) {
+                if (metaDataList[i] == null)
+                    metaDataList[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
+            }
 
             if (cacheReader != null) { // remote
                 imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader.getCompositor(), getMaximumFrameNumber());
