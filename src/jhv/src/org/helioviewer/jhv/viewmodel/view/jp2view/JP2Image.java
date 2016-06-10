@@ -373,8 +373,13 @@ public class JP2Image {
                 @Override
                 public void run() {
                     abolish();
+                    try {
+                        super.finalize();
+                    } catch (Throwable t) {}
                 }
             });
+        } else {
+            super.finalize();
         }
     }
 
