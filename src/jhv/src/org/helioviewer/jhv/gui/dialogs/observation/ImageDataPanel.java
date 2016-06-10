@@ -129,7 +129,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * @param newEnd
      *            new start date and time
      */
-    public void setEndDate(Date newEnd, boolean byUser) {
+    private void setEndDate(Date newEnd, boolean byUser) {
         timeSelectionPanel.setEndDate(newEnd, byUser);
     }
 
@@ -139,7 +139,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * @param newStart
      *            new start date and time
      */
-    public void setStartDate(Date newStart, boolean byUser) {
+    private void setStartDate(Date newStart, boolean byUser) {
         timeSelectionPanel.setStartDate(newStart, byUser);
     }
 
@@ -156,7 +156,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * Loads an image series from the Helioviewer server and adds a new layer to
      * the GUI which represents the image series.
      * */
-    public void loadRemote() {
+    private void loadRemote() {
         Object sourceId = getSourceId();
         if (sourceId != null) {
             LoadRemoteTask remoteTask = new LoadRemoteTask(sourceId.toString(), getStartTime(), getEndTime(), getCadence());

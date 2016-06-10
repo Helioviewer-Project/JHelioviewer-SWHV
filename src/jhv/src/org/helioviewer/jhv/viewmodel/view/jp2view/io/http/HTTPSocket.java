@@ -45,27 +45,21 @@ public class HTTPSocket extends Socket {
      * @param _uri
      * @throws IOException
      */
-    public Object connect(URI _uri) throws IOException {
-        lastUsedPort = _uri.getPort() <= 0 ? PORT : _uri.getPort();
-        lastUsedHost = _uri.getHost();
+    protected Object connect(URI uri) throws IOException {
+        int port = uri.getPort();
+        lastUsedPort = port <= 0 ? PORT : port;
+        lastUsedHost = uri.getHost();
+
         super.setReceiveBufferSize(Math.max(262144 * 8, 2 * getReceiveBufferSize()));
         super.setTrafficClass(0x10);
         super.setSoTimeout(TO_READ);
         super.setKeepAlive(true);
         super.setTcpNoDelay(true);
-        reconnect();
+        super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TO_CONNECT);
+
+        inputStream = new BufferedInputStream(getInputStream(), 65536);
 
         return null;
-    }
-
-    /**
-     * Reconnects to the last used host, and using the last used port.
-     *
-     * @throws java.io.IOException
-     */
-    private void reconnect() throws IOException {
-        super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TO_CONNECT);
-        inputStream = new BufferedInputStream(getInputStream(), 65536);
     }
 
     /**
@@ -75,10 +69,7 @@ public class HTTPSocket extends Socket {
      *            A <code>HTTPMessage</code> object with the message.
      * @throws java.io.IOException
      */
-    public void send(HTTPRequest req) throws IOException {
-        // if (!isConnected())
-        //    reconnect();
-
+    protected void send(HTTPRequest req) throws IOException {
         StringBuilder str = new StringBuilder();
         // Adds the URI line
         str.append(req.getMethod()).append(' ').append(req.getURI()).append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
@@ -110,7 +101,7 @@ public class HTTPSocket extends Socket {
      *         <code>null</code> if the end of stream was reached.
      * @throws java.io.IOException
      */
-    public HTTPMessage receive() throws IOException {
+    protected HTTPMessage receive() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);
         String parts[] = line.split(" ", 3);
         if (parts.length != 3) {
@@ -163,7 +154,7 @@ public class HTTPSocket extends Socket {
     }
 
     /** Returns the lastUsedHost */
-    public String getHost() {
+    protected String getHost() {
         return lastUsedHost;
     }
 

@@ -7,7 +7,6 @@ import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStream;
-//import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStreamAlt;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
@@ -22,7 +21,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest.Method;
  *
  */
 public class JPIPSocket extends HTTPSocket {
-
     /**
      * The jpip channel ID for the connection (persistent)
      */
