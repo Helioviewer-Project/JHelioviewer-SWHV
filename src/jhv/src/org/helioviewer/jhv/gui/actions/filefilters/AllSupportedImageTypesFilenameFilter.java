@@ -5,10 +5,10 @@ import java.io.FilenameFilter;
 
 public class AllSupportedImageTypesFilenameFilter implements FilenameFilter {
 
-    private static AllSupportedImageTypesFilter fileFilter;
+    private static ExtensionFileFilter.AllSupportedImageTypesFilter fileFilter;
 
     public AllSupportedImageTypesFilenameFilter() {
-        fileFilter = new AllSupportedImageTypesFilter();
+        fileFilter = new ExtensionFileFilter.AllSupportedImageTypesFilter();
     }
 
     @Override

@@ -430,7 +430,7 @@ public class JP2Image {
 
     LUT getDefaultLUT() {
         if (builtinLUT != null) {
-            return new LUT("built-in", builtinLUT/* , builtinLUT */);
+            return new LUT(getName() + " built-in", builtinLUT/* , builtinLUT */);
         }
         return getAssociatedLUT();
     }
