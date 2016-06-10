@@ -12,13 +12,67 @@ import javax.swing.filechooser.FileFilter;
  */
 public abstract class ExtensionFileFilter extends FileFilter {
 
+    public static class AllSupportedImageTypesFilter extends ExtensionFileFilter {
+
+        public AllSupportedImageTypesFilter() {
+            extensions = new String[] { "jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx" };
+        }
+
+        public String getDescription() {
+            return "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".jp2\", \".jpx\")";
+        }
+
+    }
+
+    public static class FitsFilter extends ExtensionFileFilter {
+
+        public FitsFilter() {
+            extensions = new String[] { "fits", "fts" };
+        }
+
+        public String getDescription() {
+            return "FITS files (\".fts\", \".fits\")";
+        }
+
+    }
+
+    public static class JP2Filter extends ExtensionFileFilter {
+
+        public JP2Filter() {
+            extensions = new String[] { "jp2", "jpx" };
+        }
+
+        public String getDescription() {
+            return "JPG2000 files (\".jp2\", \".jpx\")";
+        }
+    }
+
+    public class JPGFilter extends ExtensionFileFilter {
+
+        public JPGFilter() {
+            extensions = new String[] { "jpg", "jpeg" };
+        }
+
+        public String getDescription() {
+           return "JPG files (\".jpg\", \".jpeg\")";
+        }
+
+    }
+
+    public static class PNGFilter extends ExtensionFileFilter {
+
+        public PNGFilter() {
+            extensions = new String[] { "png" };
+        }
+        public String getDescription() {
+            return "PNG files (\".png\")";
+        }
+
+    }
+
     protected String[] extensions = {};
 
-    /**
-     * {@inheritDoc}
-     */
     public boolean accept(File f) {
-
         if (f.isDirectory())
             return true;
 
@@ -27,7 +81,6 @@ public abstract class ExtensionFileFilter extends FileFilter {
             if (testName.endsWith(ext))
                 return true;
         }
-
         return false;
     }
 
@@ -43,7 +96,6 @@ public abstract class ExtensionFileFilter extends FileFilter {
         if (extensions.length > 0) {
             return extensions[0];
         }
-
         return null;
     }
 

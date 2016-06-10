@@ -39,10 +39,14 @@ public class LUTPanel implements ActionListener, FilterDetails {
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
 
-        String name = lut.getName();
-        if (lutMap.put(name, lut) == null)
-            combobox.addItem(name);
-        combobox.setSelectedItem(name);
+        if (lut != null) {
+            String name = lut.getName();
+            if (lutMap.get(name) == null) {
+                lutMap.put(name, lut);
+                combobox.addItem(name);
+            }
+            combobox.setSelectedItem(name);
+        }
 
         combobox.addActionListener(this);
 
