@@ -12,7 +12,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
  * @version 0.1
  * 
  */
-public class JPIPDataSegment implements Cloneable {
+public class JPIPDataSegment {
 
     // The data-bin in-class identifier
     public long binID;
@@ -41,24 +41,6 @@ public class JPIPDataSegment implements Cloneable {
     // Indicates if this segment is a End Of Response message
     public boolean isEOR;
 
-    // Returns a completely disjoint clone of the JPIPDataSegment
-    @Override
-    public JPIPDataSegment clone() throws CloneNotSupportedException {
-        super.clone();
-
-        JPIPDataSegment ret = new JPIPDataSegment();
-        ret.aux = this.aux;
-        ret.binID = this.binID;
-        ret.classID = this.classID;
-        ret.codestreamID = this.codestreamID;
-        ret.data = this.data == null ? null : this.data.clone();
-        ret.isEOR = this.isEOR;
-        ret.isFinal = this.isFinal;
-        ret.length = this.length;
-        ret.offset = this.offset;
-        return ret;
-    }
-
     // Returns a string representation of the JPIP data segment
     @Override
     public String toString() {
@@ -67,13 +49,12 @@ public class JPIPDataSegment implements Cloneable {
         if (isEOR)
             res += "EOR id=" + binID + " len=" + length;
         else {
-            res += "class=" + classID.getJpipString() + " stream=" + codestreamID;
+            res += "class=" + classID.jpipString + " stream=" + codestreamID;
             res += " id=" + binID + " off=" + offset + " len=" + length;
             if (isFinal)
                 res += " final";
         }
-        res += "]";
-        return res;
+        return res + "]";
     }
 
 }

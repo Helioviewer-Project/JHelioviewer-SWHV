@@ -368,7 +368,6 @@ public class JP2Image {
     // if instance was built before cancelling
     @Override
     protected void finalize() throws Throwable {
-        super.finalize();
         if (!isAbolished) {
             EventQueue.invokeLater(new Runnable() {
                 @Override

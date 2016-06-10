@@ -116,7 +116,7 @@ public class JPIPDataInputStream {
             seg.codestreamID = codestream;
 
             for (JPIPDatabinClass idEnum : JPIPDatabinClass.values())
-                if (classId == idEnum.getStandardClassID())
+                if (classId == idEnum.standardClassID)
                     seg.classID = idEnum;
             if (seg.classID == null)
                 throw new ProtocolException("Invalid databin classID");
