@@ -209,8 +209,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         pixelWidth = m.tryGetInt("NAXIS1");
         pixelHeight = m.tryGetInt("NAXIS2");
 
-        boolean isCallisto = instrument.equals("CALLISTO");
-        if (!isCallisto) {
+        if (instrument.equals("CALLISTO")) { // pixel based
+            region = new Region(0, 0, pixelWidth, pixelHeight);
+        } else {
             double arcsecPerPixelX = m.tryGetDouble("CDELT1");
             double arcsecPerPixelY = m.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX) || Double.isNaN(arcsecPerPixelY)) {
@@ -222,9 +223,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             }
 
             double radiusSunInArcsec = Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance) * MathUtils.radeg * 3600;
-            double radiusSunFactor = Sun.Radius / radiusSunInArcsec;
-            unitPerPixelX = arcsecPerPixelX * radiusSunFactor;
-            unitPerPixelY = arcsecPerPixelY * radiusSunFactor;
+            double unitPerArcsec = Sun.Radius / radiusSunInArcsec;
+            unitPerPixelX = arcsecPerPixelX * unitPerArcsec;
+            unitPerPixelY = arcsecPerPixelY * unitPerArcsec;
 
             double sunX = m.tryGetDouble("CRPIX1") - 0.5;
             double sunY = m.tryGetDouble("CRPIX2") - 0.5;
@@ -233,8 +234,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             sunPositionY = unitPerPixelY * (pixelHeight - 1 - sunY);
 
             region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelWidth * unitPerPixelX, pixelHeight * unitPerPixelY);
-        } else { // pixel based
-            region = new Region(0, 0, pixelWidth, pixelHeight);
         }
     }
 

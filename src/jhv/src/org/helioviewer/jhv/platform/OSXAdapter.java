@@ -114,7 +114,7 @@ public class OSXAdapter implements InvocationHandler {
         if (result == null) {
             return true;
         }
-        return Boolean.valueOf(result.toString());
+        return Boolean.parseBoolean(result.toString());
     }
 
     // InvocationHandler implementation
@@ -132,7 +132,7 @@ public class OSXAdapter implements InvocationHandler {
     // Compare the method that was called to the intended method when the OSXAdapter instance was created
     // (e.g. handleAbout, handleQuit, handleOpenFile, etc.)
     protected boolean isCorrectMethod(Method method, Object[] args) {
-        return (targetMethod != null && proxySignature.equals(method.getName()) && args.length == 1);
+        return (targetMethod != null && args.length == 1 && proxySignature.equals(method.getName()));
     }
 
     // It is important to mark the ApplicationEvent as handled and cancel the default behavior

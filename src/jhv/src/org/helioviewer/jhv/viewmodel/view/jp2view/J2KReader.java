@@ -161,20 +161,20 @@ class J2KReader implements Runnable {
                 long tgap = replyTextTime - lastResponseTime;
 
                 if ((tgap + tdat) < 1000)
-                    adjust = +1;
+                    adjust = +2;
                 else {
                     double gapRatio = tgap / (double) (tgap + tdat);
                     double targetRatio = (tdat + tgap) / 10000.;
 
                     if (gapRatio > targetRatio)
-                        adjust = +1;
+                        adjust = +2;
                     else
                         adjust = -1;
                 }
             }
         }
 
-        jpipRequestLen += (jpipRequestLen >> 1) * adjust;
+        jpipRequestLen += (jpipRequestLen >> 2) * adjust;
 
         if (jpipRequestLen > JPIPConstants.MAX_REQUEST_LEN)
             jpipRequestLen = JPIPConstants.MAX_REQUEST_LEN;
