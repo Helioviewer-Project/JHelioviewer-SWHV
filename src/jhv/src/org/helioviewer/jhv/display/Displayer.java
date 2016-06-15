@@ -241,7 +241,7 @@ public class Displayer implements JHVEventHighlightListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (toDisplay) {
-                ImageViewerGui.getMainComponent().repaint();
+                ImageViewerGui.getGLComponent().repaint();
                 toDisplay = false;
             }
             if (renderFactor != -1) {

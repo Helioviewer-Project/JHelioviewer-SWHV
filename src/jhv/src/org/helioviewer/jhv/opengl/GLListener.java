@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.components;
+package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
@@ -10,27 +10,18 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
+import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.awt.GLCanvas;
 
-@SuppressWarnings("serial")
-public class MainComponent extends GLCanvas implements GLEventListener {
+public class GLListener implements GLEventListener {
 
-    public MainComponent() {
-        super(GLHelper.getGLCapabilities());
-        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(getGLProfile()).createDummyAutoDrawable(null, true, getRequestedGLCapabilities(), null);
-        sharedDrawable.display();
-        // GUI events can lead to context destruction and invalidation of GL objects and state
-        setSharedAutoDrawable(sharedDrawable);
+    private final ScalableSurface surface;
 
-        addGLEventListener(this);
+    public GLListener(ScalableSurface surface) {
+        this.surface = surface;
     }
 
     @Override
@@ -38,7 +29,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         GL2 gl = drawable.getGL().getGL2(); // try to force an exception
 
         GLInfo.update(gl);
-        GLInfo.updatePixelScale(this);
+        GLInfo.updatePixelScale(surface);
 
         gl.glDisable(GL2.GL_TEXTURE_1D);
         gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -171,7 +162,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
-        GLInfo.updatePixelScale(this);
+        GLInfo.updatePixelScale(surface);
 
         ImageViewerGui.getRenderableContainer().prerender(gl);
 
