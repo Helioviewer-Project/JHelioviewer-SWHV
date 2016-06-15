@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
@@ -27,7 +29,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
     private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();
 
-    private final JSplitPane splitpane;
+    private final JHVSplitPane splitPane;
     private final JPanel pluginContainer;
     private final CollapsiblePane collapsiblePane;
 
@@ -37,20 +39,31 @@ public class MainContentPanel extends JPanel implements ActionListener {
         collapsiblePane.toggleButton.addActionListener(this);
 
         // nest in a container to avoid crash of GLCanvas inside JSplitPane
-        JPanel container = new JPanel(new BorderLayout());
+        final JPanel container = new JPanel(new BorderLayout());
         container.setMinimumSize(new Dimension());
         container.add(mainComponent, BorderLayout.CENTER);
 
-        splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
-        splitpane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
-        splitpane.setTopComponent(container);
-        splitpane.setResizeWeight(0.66);
-        splitpane.setOneTouchExpandable(false);
-        splitpane.setDividerSize(0);
+        splitPane = new JHVSplitPane(JSplitPane.VERTICAL_SPLIT, false);
+        splitPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
+        splitPane.setOneTouchExpandable(false);
+        splitPane.setDividerSize(0);
+        splitPane.setResizeWeight(0.66);
+
+        splitPane.setTopComponent(container);
+
+        if (System.getProperty("jhv.os").equals("mac")) {
+            splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent pce) {
+                    splitPane.setTopComponent(null);
+                    splitPane.setTopComponent(container);
+                }
+            });
+        }
 
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension());
-        add(splitpane, BorderLayout.CENTER);
+        add(splitPane, BorderLayout.CENTER);
     }
 
     /**
@@ -89,9 +102,9 @@ public class MainContentPanel extends JPanel implements ActionListener {
      * height of the components.
      * */
     private void updateLayout() {
-        splitpane.remove(collapsiblePane);
+        splitPane.remove(collapsiblePane);
         remove(collapsiblePane);
-        splitpane.setDividerSize(0);
+        splitPane.setDividerSize(0);
 
         if (pluginList.isEmpty()) {
             revalidate();
@@ -106,8 +119,8 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 pluginContainer.add(pluginList.get(0).getVisualInterfaces().get(0), BorderLayout.CENTER);
                 collapsiblePane.setTitle(pluginList.get(0).getTabName());
 
-                splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
+                splitPane.setBottomComponent(collapsiblePane);
+                splitPane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
             } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {
                 JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -120,8 +133,8 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 pluginContainer.add(tabbedPane, BorderLayout.CENTER);
                 collapsiblePane.setTitle("Plugins");
 
-                splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
+                splitPane.setBottomComponent(collapsiblePane);
+                splitPane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
             }
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);

@@ -91,6 +91,7 @@ public class ImageViewerGui {
 
         midSplitPane = new JHVSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
         midSplitPane.setBorder(null);
+        midSplitPane.setOneTouchExpandable(false);
         contentPanel.add(midSplitPane, BorderLayout.CENTER);
 
         Camera camera = Displayer.getCamera();
@@ -162,7 +163,7 @@ public class ImageViewerGui {
         mainFrame.setVisible(true);
 
         // force GLCanvas initialisation for pixel scale
-        // mainComponent.display();
+        mainComponent.display();
     }
 
     private static JFrame createMainFrame() {
