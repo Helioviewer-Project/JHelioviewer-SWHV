@@ -22,14 +22,12 @@ public class GLInfo {
         if (first) {
             first = false;
 
-            String version = gl.glGetString(GL2.GL_VERSION);
-            Log.debug("GLInfo > Version string: " + version);
-            String extensionStr = gl.glGetString(GL2.GL_EXTENSIONS);
-            Log.debug("GLInfo.update() > Extensions: " + extensionStr);
+            Log.debug("GLInfo > Version string: " + gl.glGetString(GL2.GL_VERSION));
+            Log.debug("GLInfo > Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
 
             if (!gl.isExtensionAvailable("GL_VERSION_2_1")) {
                 String err = "OpenGL 2.1 not supported. JHelioviewer is not able to run.";
-                Log.error("GLInfo.update() > " + err);
+                Log.error("GLInfo > " + err);
                 throw new GLException(err);
             }
 
