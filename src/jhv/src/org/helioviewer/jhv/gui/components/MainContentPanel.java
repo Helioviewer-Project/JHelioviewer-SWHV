@@ -55,7 +55,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
             splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent pce) {
-                    splitPane.setTopComponent(null);
                     splitPane.setTopComponent(container);
                 }
             });

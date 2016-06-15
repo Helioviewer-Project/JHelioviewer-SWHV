@@ -16,24 +16,15 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 
 @SuppressWarnings("serial")
 public class MainComponent extends GLCanvas implements GLEventListener {
 
-    private static final GLCapabilities capabilities = new GLCapabilities(GLProfile.getDefault());
-
-    static {
-        capabilities.setSampleBuffers(true);
-        capabilities.setNumSamples(GLInfo.GLSAMPLES);
-    }
-
     public MainComponent() {
-        super(capabilities);
+        super(GLHelper.getGLCapabilities());
         GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(getGLProfile()).createDummyAutoDrawable(null, true, getRequestedGLCapabilities(), null);
         sharedDrawable.display();
         // GUI events can lead to context destruction and invalidation of GL objects and state
