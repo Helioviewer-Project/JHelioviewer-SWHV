@@ -7,6 +7,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.List;
@@ -26,6 +28,7 @@ import org.helioviewer.jhv.camera.InteractionPan;
 import org.helioviewer.jhv.camera.InteractionRotate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
+import org.helioviewer.jhv.gui.components.JHVSplitPane;
 import org.helioviewer.jhv.gui.components.MainComponent;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
@@ -51,7 +54,7 @@ public class ImageViewerGui {
 
     public static final int SIDE_PANEL_WIDTH = 320;
     public static final int SIDE_PANEL_WIDTH_EXTRA = 20;
-    public static final int SPLIT_DIVIDER_SIZE = 3;
+    public static final int SPLIT_DIVIDER_SIZE = 1;
 
     private static JFrame mainFrame;
     private static JSplitPane midSplitPane;
@@ -86,10 +89,8 @@ public class ImageViewerGui {
         JPanel contentPanel = new JPanel(new BorderLayout());
         mainFrame.setContentPane(contentPanel);
 
-        midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
+        midSplitPane = new JHVSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
         midSplitPane.setBorder(null);
-        midSplitPane.setOneTouchExpandable(false);
-        midSplitPane.setDividerSize(6);
         contentPanel.add(midSplitPane, BorderLayout.CENTER);
 
         Camera camera = Displayer.getCamera();
@@ -134,7 +135,16 @@ public class ImageViewerGui {
 
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
-        midSplitPane.setDividerSize(SPLIT_DIVIDER_SIZE);
+
+        if (System.getProperty("jhv.os").equals("mac")) {
+            midSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent pce) {
+                    midSplitPane.setRightComponent(null);
+                    midSplitPane.setRightComponent(mainContentPanel);
+                }
+            });
+        }
 
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);
@@ -152,7 +162,7 @@ public class ImageViewerGui {
         mainFrame.setVisible(true);
 
         // force GLCanvas initialisation for pixel scale
-        mainComponent.display();
+        // mainComponent.display();
     }
 
     private static JFrame createMainFrame() {
