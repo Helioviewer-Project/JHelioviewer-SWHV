@@ -111,10 +111,7 @@ public class OSXAdapter implements InvocationHandler {
     // See setFileHandler above for an example
     public boolean callTarget(Object appleEvent) throws InvocationTargetException, IllegalAccessException {
         Object result = targetMethod.invoke(targetObject, (Object[]) null);
-        if (result == null) {
-            return true;
-        }
-        return Boolean.parseBoolean(result.toString());
+        return result == null || Boolean.parseBoolean(result.toString());
     }
 
     // InvocationHandler implementation
