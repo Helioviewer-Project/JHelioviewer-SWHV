@@ -9,9 +9,13 @@ import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 
+import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLHelper {
 
@@ -92,11 +96,31 @@ public class GLHelper {
         return tf;
     }
 
-    public static GLCapabilities getGLCapabilities() {
+    public static GLCanvas createGLCanvas() {
+        GLCanvas canvas = new GLCanvas(getGLCapabilities());
+        setSharedContext(canvas);
+        return canvas;
+    }
+
+    private static GLCapabilities getGLCapabilities() {
         GLCapabilities capabilities = new GLCapabilities(GLProfile.getDefault());
         capabilities.setSampleBuffers(true);
         capabilities.setNumSamples(GLInfo.GLSAMPLES);
         return capabilities;
+    }
+
+    private static void setSharedContext(GLCanvas canvas) {
+        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(canvas.getGLProfile()).createDummyAutoDrawable(null, true, canvas.getRequestedGLCapabilities(), null);
+        sharedDrawable.display();
+        // GUI events can lead to context destruction and invalidation of GL objects and state
+        canvas.setSharedAutoDrawable(sharedDrawable);
+    }
+
+    private static void setSharedContext(GLWindow window) {
+        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(window.getGLProfile()).createDummyAutoDrawable(null, true, window.getRequestedGLCapabilities(), null);
+        sharedDrawable.display();
+        // GUI events can lead to context destruction and invalidation of GL objects and state
+        window.setSharedAutoDrawable(sharedDrawable);
     }
 
 }

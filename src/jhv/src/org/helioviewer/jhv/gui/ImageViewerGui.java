@@ -29,7 +29,6 @@ import org.helioviewer.jhv.camera.InteractionRotate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.JHVSplitPane;
-import org.helioviewer.jhv.gui.components.MainComponent;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -43,12 +42,16 @@ import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.InputController;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.LoadURITask;
+import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
 import org.helioviewer.jhv.renderable.components.RenderableViewpoint;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
+
+import com.jogamp.opengl.awt.GLCanvas;
 
 public class ImageViewerGui {
 
@@ -62,8 +65,10 @@ public class ImageViewerGui {
 
     private static SideContentPane leftPane;
 
+    private static GLCanvas glComponent;
+    private static GLListener glListener;
+
     private static InputController inputController;
-    private static MainComponent mainComponent;
     private static MainContentPanel mainContentPanel;
 
     private static ZoomStatusPanel zoomStatus;
@@ -130,9 +135,12 @@ public class ImageViewerGui {
         leftScrollPane.setBorder(null);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(renderableContainerPanel.getGridRowHeight());
 
-        mainComponent = new MainComponent();
-        inputController = new InputController(camera, mainComponent);
-        mainContentPanel = new MainContentPanel(mainComponent);
+        glComponent = GLHelper.createGLCanvas();
+        glListener = new GLListener(glComponent);
+        glComponent.addGLEventListener(glListener);
+
+        inputController = new InputController(camera, glComponent);
+        mainContentPanel = new MainContentPanel(glComponent);
 
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
@@ -162,7 +170,7 @@ public class ImageViewerGui {
         mainFrame.setVisible(true);
 
         // force GLCanvas initialisation for pixel scale
-        mainComponent.display();
+        glComponent.display();
     }
 
     private static JFrame createMainFrame() {
@@ -262,8 +270,12 @@ public class ImageViewerGui {
         return leftScrollPane;
     }
 
-    public static MainComponent getMainComponent() {
-        return mainComponent;
+    public static GLCanvas getGLComponent() {
+        return glComponent;
+    }
+
+    public static GLListener getGLListener() {
+        return glListener;
     }
 
     public static MainContentPanel getMainContentPanel() {

@@ -269,7 +269,7 @@ public class JP2Image {
 
         int maxDim = Math.max(subImage.width, subImage.height);
         double adj = 1;
-        if (maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying() && !ImageViewerGui.getMainComponent().isRecording()) {
+        if (maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying() && !ImageViewerGui.getGLListener().isRecording()) {
             adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
             if (adj > 0.5)
                 adj = 1;

@@ -52,7 +52,7 @@ public class ExportMovie implements FrameListener {
     }
 
     private void exportMovieFinish(GL2 gl) {
-        ImageViewerGui.getMainComponent().detachExport();
+        ImageViewerGui.getGLListener().detachExport();
         MoviePanel.recordPanelSetEnabled(true);
 
         try {
@@ -117,7 +117,7 @@ public class ExportMovie implements FrameListener {
         MoviePanel.recordPanelSetEnabled(false);
 
         grabber = new GLGrab(canvasWidth, canvasHeight);
-        ImageViewerGui.getMainComponent().attachExport(instance);
+        ImageViewerGui.getGLListener().attachExport(instance);
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(new Date());
         if (mode == RecordMode.SHOT) {

@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.components.MainComponent;
 
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment.Type;
@@ -58,11 +57,11 @@ public class GLGrab {
             fbo.bind(gl);
             Camera camera = Displayer.getCamera();
             if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
-                MainComponent.renderScene(camera, gl);
+                GLListener.renderScene(camera, gl);
             } else {
-                MainComponent.renderSceneScale(camera, gl);
+                GLListener.renderSceneScale(camera, gl);
             }
-            MainComponent.renderFloatScene(camera, gl);
+            GLListener.renderFloatScene(camera, gl);
             fbo.unbind(gl);
 
             fbo.use(gl, fboTex);
