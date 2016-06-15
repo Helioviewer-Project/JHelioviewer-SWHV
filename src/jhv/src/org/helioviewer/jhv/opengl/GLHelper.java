@@ -10,6 +10,8 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
 
 public class GLHelper {
 
@@ -89,4 +91,12 @@ public class GLHelper {
         }
         return tf;
     }
+
+    public static GLCapabilities getGLCapabilities() {
+        GLCapabilities capabilities = new GLCapabilities(GLProfile.getDefault());
+        capabilities.setSampleBuffers(true);
+        capabilities.setNumSamples(GLInfo.GLSAMPLES);
+        return capabilities;
+    }
+
 }

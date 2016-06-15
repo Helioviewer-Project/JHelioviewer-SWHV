@@ -141,7 +141,6 @@ public class ImageViewerGui {
             midSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent pce) {
-                    midSplitPane.setRightComponent(null);
                     midSplitPane.setRightComponent(mainContentPanel);
                 }
             });
