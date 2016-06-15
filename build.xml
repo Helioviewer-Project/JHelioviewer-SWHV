@@ -167,7 +167,7 @@
                     <arg value="bundle.sh"/>
                 </exec>
                 <mkdir dir="${temp}/build/mac/"/>
-                <bundleapp outputdirectory="${temp}/build/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JavaHelioViewer" icon="${build.resources}/mac/JHV_icon.icns" shortversion="${jhv.version}" copyright="©2015, European Space Agency">
+                <bundleapp outputdirectory="${temp}/build/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JavaHelioViewer" icon="${build.resources}/mac/JHV_icon.icns" shortversion="${jhv.version}" version="${jhv.version}.${jhv.revision}" copyright="©2016, European Space Agency">
                     <classpath file="JHelioviewer.jar"/>
                     <option value="-Xdock:name=JHelioviewer"/>
                 </bundleapp>
