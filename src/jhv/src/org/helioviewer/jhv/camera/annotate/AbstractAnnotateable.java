@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.Color;
-import java.awt.Point;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Vec2;
@@ -52,12 +51,12 @@ public abstract class AbstractAnnotateable implements Annotateable {
                         radius * Math.sin(y) * Math.cos(z));
     }
 
-    protected Vec3 computePoint(Point p) {
+    protected Vec3 computePoint(int x, int y) {
         Vec3 pt;
         if (Displayer.mode == DisplayMode.ORTHO) {
-            pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), p.x, p.y, camera.getViewpoint().orientation, true);
+            pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
         } else {
-            pt = GridScale.current.transformInverse(GridScale.current.mouseToGrid(p, Displayer.getActiveViewport(), camera, GridChoiceType.VIEWPOINT));
+            pt = GridScale.current.transformInverse(GridScale.current.mouseToGrid(x, y, Displayer.getActiveViewport(), camera, GridChoiceType.VIEWPOINT));
         }
         return pt;
     }
@@ -109,9 +108,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
                     Vec3 p1minusv = Vec3.subtract(p1, v);
                     p1minusv.normalize();
                     gl.glVertex3f((float) p1minusv.x, (float) p1minusv.y, (float) p1minusv.z);
-
                 }
-
             }
 
             gl.glEnd();

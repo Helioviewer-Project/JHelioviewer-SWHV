@@ -2,7 +2,6 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Point;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -74,8 +73,8 @@ public class RenderableGrid extends AbstractRenderable {
     private int colorBufferID;
     private GridChoiceType gridChoice = GridChoiceType.VIEWPOINT;
 
-    public Vec2 gridPoint(Camera camera, Viewport vp, Point point) {
-        return GridScale.current.mouseToGrid(point, vp, camera, gridChoice);
+    public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
+        return GridScale.current.mouseToGrid(x, y, vp, camera, gridChoice);
     }
 
     public static Quat getGridQuat(Camera camera, GridChoiceType gridChoice) {
