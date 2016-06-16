@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 import org.helioviewer.jhv.base.math.Vec2;
@@ -8,7 +7,8 @@ import org.helioviewer.jhv.display.Displayer;
 
 public class InteractionPan extends Interaction {
 
-    private Point lastMousePoint;
+    private int lastX;
+    private int lastY;
 
     public InteractionPan(Camera _camera) {
         super(_camera);
@@ -16,21 +16,19 @@ public class InteractionPan extends Interaction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        lastMousePoint = e.getPoint();
+        lastX = e.getX();
+        lastY = e.getY();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (lastMousePoint == null) // freak crash
-            return;
-
-        Point p = e.getPoint();
-        int x = p.x - lastMousePoint.x;
-        int y = p.y - lastMousePoint.y;
-        double m = 2. * camera.getWidth() / Displayer.getActiveViewport().height;
-        lastMousePoint = p;
+        int x = e.getX() - lastX;
+        int y = e.getY() - lastY;
+        lastX = e.getX();
+        lastY = e.getY();
 
         Vec2 pan = camera.getCurrentTranslation();
+        double m = 2. * camera.getWidth() / Displayer.getActiveViewport().height;
         camera.setCurrentTranslation(pan.x + x * m, pan.y - y * m);
         Displayer.render(0.5);
     }

@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.Point;
-
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
@@ -77,9 +75,9 @@ public class CameraHelper {
         return computeNormalizedY(vp, screenY) * width - translation.y;
     }
 
-    public static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, Point screenPos) {
-        double up1x = computeUpX(camera, vp, screenPos.x);
-        double up1y = computeUpY(camera, vp, screenPos.y);
+    public static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, double screenX, double screenY) {
+        double up1x = computeUpX(camera, vp, screenX);
+        double up1y = computeUpY(camera, vp, screenY);
 
         Vec3 hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
