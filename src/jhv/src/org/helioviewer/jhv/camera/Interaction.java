@@ -2,22 +2,19 @@ package org.helioviewer.jhv.camera;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 
+import com.jogamp.newt.event.KeyEvent;
+import com.jogamp.newt.event.KeyListener;
+import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.newt.event.MouseListener;
 import com.jogamp.opengl.GL2;
 
-public class Interaction implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
+public class Interaction implements MouseListener, KeyListener {
 
     protected final Camera camera;
     private final Timer wheelTimer;
@@ -38,8 +35,8 @@ public class Interaction implements MouseWheelListener, MouseMotionListener, Mou
     }
 
     @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        camera.zoom(Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL * e.getWheelRotation());
+    public void mouseWheelMoved(MouseEvent e) {
+        camera.zoom(Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL /* tbd * e.getWheelRotation()*/);
 
         Displayer.render(0.5);
         wheelTimer.restart();
@@ -74,10 +71,6 @@ public class Interaction implements MouseWheelListener, MouseMotionListener, Mou
 
     @Override
     public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
     }
 
     @Override
