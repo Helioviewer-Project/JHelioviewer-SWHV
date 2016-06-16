@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.event.MouseEvent;
-
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.display.Displayer;
+
+import com.jogamp.newt.event.MouseEvent;
 
 public class InteractionPan extends Interaction {
 

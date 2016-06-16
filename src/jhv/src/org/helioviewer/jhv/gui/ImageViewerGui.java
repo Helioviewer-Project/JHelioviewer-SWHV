@@ -50,7 +50,8 @@ import org.helioviewer.jhv.renderable.components.RenderableViewpoint;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
 
-import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.newt.awt.NewtCanvasAWT;
+import com.jogamp.newt.opengl.GLWindow;
 
 public class ImageViewerGui {
 
@@ -63,7 +64,7 @@ public class ImageViewerGui {
 
     private static SideContentPane leftPane;
 
-    private static GLCanvas glComponent;
+    private static NewtCanvasAWT glComponent;
     private static GLListener glListener;
 
     private static InputController inputController;
@@ -134,11 +135,13 @@ public class ImageViewerGui {
         leftScrollPane.setBorder(null);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(renderableContainerPanel.getGridRowHeight());
 
-        glComponent = GLHelper.createGLCanvas();
-        glListener = new GLListener(glComponent);
-        glComponent.addGLEventListener(glListener);
+        GLWindow glWindow = GLHelper.createGLWindow();
+        glListener = new GLListener(glWindow);
+        glWindow.addGLEventListener(glListener);
 
-        inputController = new InputController(glComponent, glComponent);
+        glComponent = new NewtCanvasAWT(glWindow);
+
+        inputController = new InputController(glWindow, glComponent);
         mainContentPanel = new MainContentPanel(glComponent);
 
         midSplitPane.setLeftComponent(leftScrollPane);
@@ -169,7 +172,7 @@ public class ImageViewerGui {
         mainFrame.setVisible(true);
 
         // force GLCanvas initialisation for pixel scale
-        glComponent.display();
+        // glComponent.display();
     }
 
     private static JFrame createMainFrame() {
@@ -243,9 +246,8 @@ public class ImageViewerGui {
         }
     }
 
-    /**
-     * Toggles the visibility of the control panel on the left side.
-     */
+
+    // Toggles the visibility of the control panel on the left side
     public static void toggleSidePanel() {
         leftScrollPane.setVisible(!leftScrollPane.isVisible());
 
@@ -269,7 +271,7 @@ public class ImageViewerGui {
         return leftScrollPane;
     }
 
-    public static GLCanvas getGLComponent() {
+    public static NewtCanvasAWT getGLComponent() {
         return glComponent;
     }
 
