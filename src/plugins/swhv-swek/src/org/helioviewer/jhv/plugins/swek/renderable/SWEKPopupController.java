@@ -24,18 +24,17 @@ import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 
-public class SWEKPopupController implements MouseListener, MouseMotionListener, InputControllerPlugin, TimeListener {
+public class SWEKPopupController implements MouseListener, MouseMotionListener, TimeListener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
     private static final int yOffset = 12;
 
     private final Component component;
-    private static Camera camera;
+    private final Camera camera;
 
     private static Cursor lastCursor;
 
@@ -45,11 +44,7 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
 
     public SWEKPopupController(Component component) {
         this.component = component;
-    }
-
-    @Override
-    public void setCamera(Camera _camera) {
-        camera = _camera;
+        camera = Displayer.getCamera();
     }
 
     @Override

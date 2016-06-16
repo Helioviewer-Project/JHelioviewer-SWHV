@@ -40,7 +40,7 @@ public class GLGrab {
         fboTex.free(gl);
     }
 
-    public BufferedImage renderFrame(GL2 gl) {
+    public BufferedImage renderFrame(Camera camera, GL2 gl) {
         if (fbo == null)
             init(gl);
 
@@ -55,7 +55,6 @@ public class GLGrab {
         Displayer.reshapeAll();
         {
             fbo.bind(gl);
-            Camera camera = Displayer.getCamera();
             if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
                 GLListener.renderScene(camera, gl);
             } else {

@@ -6,7 +6,6 @@ import java.awt.Component;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -134,8 +133,7 @@ public class RenderableViewpoint extends AbstractRenderable {
         return timeString;
     }
 
-    public void fireTimeUpdated() {
-        JHVDate time = Displayer.getCamera().getViewpoint().time;
+    public void fireTimeUpdated(JHVDate time) {
         timeString = time.toString();
         ImageViewerGui.getCarringtonStatusPanel().update(time);
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);

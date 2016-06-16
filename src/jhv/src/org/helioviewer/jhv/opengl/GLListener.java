@@ -166,11 +166,12 @@ public class GLListener implements GLEventListener {
 
         ImageViewerGui.getRenderableContainer().prerender(gl);
 
+        Camera camera = Displayer.getCamera();
+
         if (exporter != null) {
-            exporter.handleMovieExport(gl);
+            exporter.handleMovieExport(camera, gl);
         }
 
-        Camera camera = Displayer.getCamera();
         if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
             renderScene(camera, gl);
             renderMiniview(gl);

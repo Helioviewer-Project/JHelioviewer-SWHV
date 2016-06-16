@@ -12,6 +12,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.ImageUtils;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -63,13 +64,13 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    public void handleMovieExport(GL2 gl) {
+    public void handleMovieExport(Camera camera, GL2 gl) {
         if (stopped) {
             exportMovieFinish(gl);
             return;
         }
 
-        BufferedImage screenshot = grabber.renderFrame(gl);
+        BufferedImage screenshot = grabber.renderFrame(camera, gl);
         try {
             if (mode == RecordMode.SHOT || frameQueue.size() <= NUM_FRAMES)
                 executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));

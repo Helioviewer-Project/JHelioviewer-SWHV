@@ -12,17 +12,17 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.StatusPanel;
-import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 
 @SuppressWarnings("serial")
-public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener, InputControllerPlugin {
+public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener {
 
     private static final String nullCoordStr = "---\u00B0,---\u00B0";
 
-    private static Camera camera;
+    private final Camera camera;
 
     public PositionStatusPanel() {
         setText(formatOrtho(null, 0, 0, 0));
+        camera = Displayer.getCamera();
     }
 
     private void update(Point position) {
@@ -53,11 +53,6 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
 
         return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : (%+5d\u2033,%+5d\u2033)", coordStr, r, px, py);
-    }
-
-    @Override
-    public void setCamera(Camera _camera) {
-        camera = _camera;
     }
 
     @Override
