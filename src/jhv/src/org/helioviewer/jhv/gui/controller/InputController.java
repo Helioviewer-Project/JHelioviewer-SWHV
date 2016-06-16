@@ -11,7 +11,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.HashSet;
 
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -19,13 +18,11 @@ import org.helioviewer.jhv.opengl.GLInfo;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
-    private final Camera camera;
     private final Component component;
 
     private boolean buttonDown = false;
 
-    public InputController(Camera _camera, Component _component) {
-        camera = _camera;
+    public InputController(Component _component) {
         component = _component;
         component.addMouseListener(this);
         component.addMouseMotionListener(this);
@@ -162,7 +159,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     private final HashSet<MouseWheelListener> mouseWheelListeners = new HashSet<MouseWheelListener>();
     private final HashSet<KeyListener> keyListeners = new HashSet<KeyListener>();
 
-    public void addPlugin(InputControllerPlugin plugin) {
+    public void addPlugin(Object plugin) {
         if (plugin instanceof MouseListener)
             mouseListeners.add((MouseListener) plugin);
         if (plugin instanceof MouseMotionListener)
@@ -171,10 +168,9 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             mouseWheelListeners.add((MouseWheelListener) plugin);
         if (plugin instanceof KeyListener)
             keyListeners.add((KeyListener) plugin);
-        plugin.setCamera(camera);
     }
 
-    public void removePlugin(InputControllerPlugin plugin) {
+    public void removePlugin(Object plugin) {
         if (plugin instanceof MouseListener)
             mouseListeners.remove(plugin);
         if (plugin instanceof MouseMotionListener)
@@ -183,7 +179,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             mouseWheelListeners.remove(plugin);
         if (plugin instanceof KeyListener)
             keyListeners.remove(plugin);
-        plugin.setCamera(null);
     }
 
 }
