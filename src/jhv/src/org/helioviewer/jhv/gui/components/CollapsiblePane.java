@@ -46,15 +46,12 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         }
         toggleButton.setPreferredSize(new Dimension(0, UIGlobals.UIFontSmallBold.getSize() + 4));
         toggleButton.addActionListener(this);
+        add(toggleButton, BorderLayout.PAGE_START);
 
         component = new JPanel(new BorderLayout());
         component.add(managed);
         ComponentUtils.setVisible(component, startExpanded);
         add(component, BorderLayout.CENTER);
-
-        JPanel topButtonsPanel = new JPanel(new BorderLayout());
-        topButtonsPanel.add(toggleButton, BorderLayout.NORTH);
-        add(topButtonsPanel, BorderLayout.PAGE_START);
     }
 
     public void setTitle(final String title) {
