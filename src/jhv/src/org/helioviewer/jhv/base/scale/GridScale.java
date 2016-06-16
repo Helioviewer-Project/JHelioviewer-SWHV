@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.base.scale;
 
-import java.awt.Point;
-
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
@@ -48,9 +46,9 @@ public abstract class GridScale {
 
     abstract public Vec3 transformInverse(Vec2 pt);
 
-    abstract public Vec2 mouseToGrid(int x, int y, Viewport vp, Camera camera, GridChoiceType gridChoice);
+    abstract public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridChoiceType gridChoice);
 
-    abstract public Vec2 mouseToGridInv(Point point, Viewport vp, Camera camera);
+    abstract public Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
     private static abstract class GridScaleAbstract extends GridScale {
 
@@ -121,9 +119,9 @@ public abstract class GridScale {
         }
 
         @Override
-        public Vec2 mouseToGridInv(Point point, Viewport vp, Camera camera) {
-            double x = CameraHelper.computeUpX(camera, vp, point.x) / vp.aspect;
-            double y = CameraHelper.computeUpY(camera, vp, point.y);
+        public Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera) {
+            double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect;
+            double y = CameraHelper.computeUpY(camera, vp, py);
             return new Vec2(x, y);
         }
     }
