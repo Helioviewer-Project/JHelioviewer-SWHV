@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import java.awt.event.MouseEvent;
-
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
@@ -44,18 +42,18 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        Vec3 pt = computePoint(e.getX(), e.getY());
+    public void mousePressed(int x, int y) {
+        Vec3 pt = computePoint(x, y);
         if (pt != null)
             crossPoint = pt;
+    }
+
+    @Override
+    public void mouseDragged(int x, int y) {
+    }
+
+    @Override
+    public void mouseReleased() {
     }
 
     @Override

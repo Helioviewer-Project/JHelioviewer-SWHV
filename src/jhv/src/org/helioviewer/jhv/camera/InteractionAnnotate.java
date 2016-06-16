@@ -60,9 +60,9 @@ public class InteractionAnnotate extends Interaction {
     @Override
     public void mousePressed(MouseEvent e) {
         newAnnotateable = mode.generateAnnotateable(camera);
-        newAnnotateable.mousePressed(e);
+        newAnnotateable.mousePressed(e.getX(), e.getY());
         if (!newAnnotateable.isDraggable()) {
-            finishAnnotateable(e);
+            finishAnnotateable();
         }
         Displayer.display();
     }
@@ -70,14 +70,14 @@ public class InteractionAnnotate extends Interaction {
     @Override
     public void mouseDragged(MouseEvent e) {
         if (newAnnotateable != null && newAnnotateable.isDraggable()) {
-            newAnnotateable.mouseDragged(e);
+            newAnnotateable.mouseDragged(e.getX(), e.getY());
             Displayer.display();
         }
     }
 
-    private void finishAnnotateable(MouseEvent e) {
+    private void finishAnnotateable() {
         if (newAnnotateable != null && newAnnotateable.beingDragged()) {
-            newAnnotateable.mouseReleased(e);
+            newAnnotateable.mouseReleased();
             annotateables.add(newAnnotateable);
             activeIndex = annotateables.size() - 1;
         }
@@ -87,7 +87,7 @@ public class InteractionAnnotate extends Interaction {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        finishAnnotateable(e);
+        finishAnnotateable();
     }
 
     @Override
