@@ -36,7 +36,11 @@ public class Interaction implements MouseListener, KeyListener {
 
     @Override
     public void mouseWheelMoved(MouseEvent e) {
-        camera.zoom(Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL /* tbd * e.getWheelRotation()*/);
+        float r = e.getRotation()[1];
+        if (r == 0)
+            return;
+
+        camera.zoom(Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL * r);
 
         Displayer.render(0.5);
         wheelTimer.restart();
