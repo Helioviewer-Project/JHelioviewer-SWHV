@@ -86,6 +86,8 @@ public class JavaHelioViewer {
         SystemProperties.setPlatform();
         Log.info("OS: " + System.getProperty("jhv.os") + " - arch: " + System.getProperty("jhv.arch") + " - java arch: " + System.getProperty("jhv.java.arch"));
 
+        System.setProperty("newt.window.icons", "null,null");
+
         Log.debug("Instantiate Kakadu engine");
         try {
             JHVLoader.copyKDULibs();
