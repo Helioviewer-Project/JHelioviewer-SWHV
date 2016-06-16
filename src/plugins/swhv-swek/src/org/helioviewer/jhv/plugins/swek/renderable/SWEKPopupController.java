@@ -34,7 +34,7 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
     private static final int xOffset = 12;
     private static final int yOffset = 12;
 
-    private static Component component;
+    private final Component component;
     private static Camera camera;
 
     private static Cursor lastCursor;
@@ -43,9 +43,8 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
     static Point mouseOverPosition = null;
     long currentTime;
 
-    @Override
-    public void setComponent(Component _component) {
-        component = _component;
+    public SWEKPopupController(Component component) {
+        this.component = component;
     }
 
     @Override
@@ -128,13 +127,15 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(MouseEvent me) {
         ArrayList<JHVRelatedEvents> eventsToDraw = SWEKData.getSingletonInstance().getActiveEvents(currentTime);
         if (eventsToDraw.isEmpty())
             return;
 
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
+
+        Point mp = me.getPoint();
 
         Viewport vp = Displayer.getActiveViewport();
         for (JHVRelatedEvents evtr : eventsToDraw) {
@@ -152,10 +153,10 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
                     distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
 
                     Position.Q p = pi.getEarthPosition();
-                    hitpoint = p.orientation.rotateInverseVector(getHitPointPlane(e, vp));
+                    hitpoint = p.orientation.rotateInverseVector(getHitPointPlane(vp, mp.x, mp.y));
                     pt = p.orientation.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
                 } else {
-                    hitpoint = getHitPoint(e, vp);
+                    hitpoint = getHitPoint(vp, mp.x, mp.y);
                     pt = pi.centralPoint();
                 }
 
@@ -165,7 +166,7 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
                     double deltaZ = Math.abs(hitpoint.z - pt.z);
                     if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
                         mouseOverJHVEvent = evtr;
-                        mouseOverPosition = e.getPoint();
+                        mouseOverPosition = mp;
                         break;
                     }
                 }
@@ -180,7 +181,7 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
                         distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
                         GridScale scale = GridScale.current;
                         tf = new Vec2(scale.getXValueInv(principalAngle), scale.getYValueInv(distSun));
-                        mousepos = scale.mouseToGridInv(e.getPoint(), vp, camera);
+                        mousepos = scale.mouseToGridInv(mp, vp, camera);
                     }
                 } else {
                     GridScale scale = GridScale.current;
@@ -189,7 +190,7 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
                         pt = camera.getViewpoint().orientation.rotateVector(pt);
                         tf = scale.transform(pt);
                     }
-                    mousepos = scale.mouseToGridInv(e.getPoint(), vp, camera);
+                    mousepos = scale.mouseToGridInv(mp, vp, camera);
                 }
 
                 if (tf != null && mousepos != null) {
@@ -197,7 +198,7 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
                         mouseOverJHVEvent = evtr;
-                        mouseOverPosition = e.getPoint();
+                        mouseOverPosition = mp;
                         break;
                     }
                 }
@@ -215,14 +216,12 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
         }
     }
 
-    private Vec3 getHitPointPlane(MouseEvent e, Viewport vp) {
-        Point p = e.getPoint();
-        return CameraHelper.getVectorFromPlane(camera, vp, p.x, p.y, Quat.ZERO, true);
+    private Vec3 getHitPointPlane(Viewport vp, double x, double y) {
+        return CameraHelper.getVectorFromPlane(camera, vp, x, y, Quat.ZERO, true);
     }
 
-    private Vec3 getHitPoint(MouseEvent e, Viewport vp) {
-        Point p = e.getPoint();
-        Vec3 hp = CameraHelper.getVectorFromSphere(camera, vp, p.x, p.y, camera.getViewpoint().orientation, true);
+    private Vec3 getHitPoint(Viewport vp, double x, double y) {
+        Vec3 hp = CameraHelper.getVectorFromSphere(camera, vp, x, y, camera.getViewpoint().orientation, true);
         if (hp != null)
             hp.y = -hp.y;
         return hp;
