@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import java.awt.event.MouseEvent;
-
 import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
@@ -10,11 +8,11 @@ public interface Annotateable {
 
     void render(Viewport vp, GL2 gl, boolean active);
 
-    void mouseDragged(MouseEvent e);
+    void mousePressed(int x, int y);
 
-    void mouseReleased(MouseEvent e);
+    void mouseDragged(int x, int y);
 
-    void mousePressed(MouseEvent e);
+    void mouseReleased();
 
     boolean beingDragged();
 
