@@ -57,7 +57,6 @@ public class ImageViewerGui {
 
     public static final int SIDE_PANEL_WIDTH = 320;
     public static final int SIDE_PANEL_WIDTH_EXTRA = 20;
-    public static final int SPLIT_DIVIDER_SIZE = 1;
 
     private static JFrame mainFrame;
     private static JSplitPane midSplitPane;
@@ -95,7 +94,7 @@ public class ImageViewerGui {
         mainFrame.setContentPane(contentPanel);
 
         midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
-        midSplitPane.setDividerSize(SPLIT_DIVIDER_SIZE);
+        midSplitPane.setDividerSize(2);
         midSplitPane.setBorder(null);
         midSplitPane.setOneTouchExpandable(false);
         contentPanel.add(midSplitPane, BorderLayout.CENTER);

@@ -16,7 +16,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 
 /**
@@ -26,6 +25,8 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
  * */
 @SuppressWarnings("serial")
 public class MainContentPanel extends JPanel implements ActionListener {
+
+    private static final int DIVIDER_SIZE = 3;
 
     private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();
 
@@ -119,7 +120,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle(pluginList.get(0).getTabName());
 
                 splitPane.setBottomComponent(collapsiblePane);
-                splitPane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
+                splitPane.setDividerSize(DIVIDER_SIZE);
             } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {
                 JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -133,7 +134,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle("Plugins");
 
                 splitPane.setBottomComponent(collapsiblePane);
-                splitPane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
+                splitPane.setDividerSize(DIVIDER_SIZE);
             }
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);
