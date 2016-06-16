@@ -28,7 +28,7 @@ import org.helioviewer.jhv.camera.InteractionPan;
 import org.helioviewer.jhv.camera.InteractionRotate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
-import org.helioviewer.jhv.gui.components.JHVSplitPane;
+//import org.helioviewer.jhv.gui.components.JHVSplitPane;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -94,7 +94,8 @@ public class ImageViewerGui {
         JPanel contentPanel = new JPanel(new BorderLayout());
         mainFrame.setContentPane(contentPanel);
 
-        midSplitPane = new JHVSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
+        midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
+        midSplitPane.setDividerSize(SPLIT_DIVIDER_SIZE);
         midSplitPane.setBorder(null);
         midSplitPane.setOneTouchExpandable(false);
         contentPanel.add(midSplitPane, BorderLayout.CENTER);
