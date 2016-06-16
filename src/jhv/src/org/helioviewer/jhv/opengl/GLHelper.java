@@ -97,30 +97,38 @@ public class GLHelper {
     }
 
     public static GLCanvas createGLCanvas() {
-        GLCanvas canvas = new GLCanvas(getGLCapabilities());
-        setSharedContext(canvas);
+        GLProfile profile = GLProfile.getDefault();
+        GLCapabilities capabilities = getGLCapabilities(profile);
+        GLCanvas canvas = new GLCanvas(capabilities);
+
+        // GUI events can lead to context destruction and invalidation of GL objects and state
+        canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
+
         return canvas;
     }
 
-    private static GLCapabilities getGLCapabilities() {
-        GLCapabilities capabilities = new GLCapabilities(GLProfile.getDefault());
+    public static GLWindow createGLWindow() {
+        GLProfile profile = GLProfile.getDefault();
+        GLCapabilities capabilities = getGLCapabilities(profile);
+        GLWindow window = GLWindow.create(capabilities);
+
+        // GUI events can lead to context destruction and invalidation of GL objects and state
+        window.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
+
+        return window;
+    }
+
+    private static GLCapabilities getGLCapabilities(GLProfile profile) {
+        GLCapabilities capabilities = new GLCapabilities(profile);
         capabilities.setSampleBuffers(true);
         capabilities.setNumSamples(GLInfo.GLSAMPLES);
         return capabilities;
     }
 
-    private static void setSharedContext(GLCanvas canvas) {
-        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(canvas.getGLProfile()).createDummyAutoDrawable(null, true, canvas.getRequestedGLCapabilities(), null);
+    private static GLAutoDrawable getSharedDrawable(GLProfile profile, GLCapabilities capabilities) {
+        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(profile).createDummyAutoDrawable(null, true, capabilities, null);
         sharedDrawable.display();
-        // GUI events can lead to context destruction and invalidation of GL objects and state
-        canvas.setSharedAutoDrawable(sharedDrawable);
-    }
-
-    private static void setSharedContext(GLWindow window) {
-        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(window.getGLProfile()).createDummyAutoDrawable(null, true, window.getRequestedGLCapabilities(), null);
-        sharedDrawable.display();
-        // GUI events can lead to context destruction and invalidation of GL objects and state
-        window.setSharedAutoDrawable(sharedDrawable);
+        return sharedDrawable;
     }
 
 }
