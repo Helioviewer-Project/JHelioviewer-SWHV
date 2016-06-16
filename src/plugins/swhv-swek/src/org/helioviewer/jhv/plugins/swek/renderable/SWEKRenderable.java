@@ -39,7 +39,7 @@ import com.jogamp.opengl.GL2;
 public class SWEKRenderable extends AbstractRenderable {
 
     private static final SWEKRenderableOptionsPanel optionsPanel = new SWEKRenderableOptionsPanel();
-    private static final SWEKPopupController controller = new SWEKPopupController();
+    private static final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
 
     private static final int DIVPOINTS = 10;
     private static final float LINEWIDTH = 1;

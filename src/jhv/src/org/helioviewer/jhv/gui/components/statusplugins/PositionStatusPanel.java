@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -59,10 +58,6 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     @Override
     public void setCamera(Camera _camera) {
         camera = _camera;
-    }
-
-    @Override
-    public void setComponent(Component _component) {
     }
 
     @Override
