@@ -3,9 +3,6 @@ package org.helioviewer.jhv.plugins.swek.renderable;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.astronomy.Position;
@@ -27,7 +24,10 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 
-public class SWEKPopupController implements MouseListener, MouseMotionListener, TimeListener {
+import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.newt.event.MouseListener;
+
+public class SWEKPopupController implements MouseListener, TimeListener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
@@ -218,6 +218,10 @@ public class SWEKPopupController implements MouseListener, MouseMotionListener, 
         if (hp != null)
             hp.y = -hp.y;
         return hp;
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseEvent e) {
     }
 
 }

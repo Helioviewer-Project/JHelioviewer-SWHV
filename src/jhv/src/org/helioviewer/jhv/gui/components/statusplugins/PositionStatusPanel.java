@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
@@ -12,8 +9,11 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 
+import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.newt.event.MouseListener;
+
 @SuppressWarnings("serial")
-public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener {
+public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener {
 
     private static final String nullCoordStr = "---\u00B0,---\u00B0";
 
@@ -62,6 +62,30 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     @Override
     public void mouseMoved(MouseEvent e) {
         update(e.getX(), e.getY());
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
     }
 
 }
