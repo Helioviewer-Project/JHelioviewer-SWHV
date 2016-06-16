@@ -48,7 +48,7 @@ public abstract class GridScale {
 
     abstract public Vec3 transformInverse(Vec2 pt);
 
-    abstract public Vec2 mouseToGrid(Point point, Viewport vp, Camera camera, GridChoiceType gridChoice);
+    abstract public Vec2 mouseToGrid(int x, int y, Viewport vp, Camera camera, GridChoiceType gridChoice);
 
     abstract public Vec2 mouseToGridInv(Point point, Viewport vp, Camera camera);
 
@@ -114,9 +114,9 @@ public abstract class GridScale {
         }
 
         @Override
-        public Vec2 mouseToGrid(Point point, Viewport vp, Camera camera, GridChoiceType gridChoice) {
-            double x = CameraHelper.computeUpX(camera, vp, point.x) / vp.aspect + 0.5;
-            double y = CameraHelper.computeUpY(camera, vp, point.y) + 0.5;
+        public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridChoiceType gridChoice) {
+            double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect + 0.5;
+            double y = CameraHelper.computeUpY(camera, vp, py) + 0.5;
             return new Vec2(getInterpolatedXValue(x), getInterpolatedYValue(y));
         }
 
@@ -189,8 +189,8 @@ public abstract class GridScale {
         }
 
         @Override
-        public Vec2 mouseToGrid(Point point, Viewport vp, Camera camera, GridChoiceType gridChoice) {
-            Vec3 p = CameraHelper.getVectorFromSphere(camera, vp, point.x, point.y, Quat.ZERO, true);
+        public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridChoiceType gridChoice) {
+            Vec3 p = CameraHelper.getVectorFromSphere(camera, vp, px, py, Quat.ZERO, true);
             if (p == null)
                 return null;
 

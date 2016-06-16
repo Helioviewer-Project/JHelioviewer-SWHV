@@ -53,7 +53,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Vec3 pt = computePoint(e.getPoint());
+        Vec3 pt = computePoint(e.getX(), e.getY());
         if (pt != null)
             crossPoint = pt;
     }

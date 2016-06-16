@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
@@ -25,16 +24,16 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         camera = Displayer.getCamera();
     }
 
-    private void update(Point position) {
+    private void update(int x, int y) {
         Viewport vp = Displayer.getActiveViewport();
-        Vec2 coord = ImageViewerGui.getRenderableGrid().gridPoint(camera, vp, position);
+        Vec2 coord = ImageViewerGui.getRenderableGrid().gridPoint(camera, vp, x, y);
 
         if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
             setText(String.format("(\u03C6,\u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y));
         } else if (Displayer.mode == Displayer.DisplayMode.POLAR || Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
             setText(String.format("(\u03B8,\u03c1) : (%.2f\u00B0,%.2fR\u2299)", coord.x, coord.y));
         } else {
-            Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, position.x, position.y, camera.getCurrentDragRotation());
+            Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getCurrentDragRotation());
             double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
             double d = camera.getViewpoint().distance;
@@ -57,12 +56,12 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        update(e.getPoint());
+        update(e.getX(), e.getY());
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        update(e.getPoint());
+        update(e.getX(), e.getY());
     }
 
 }
