@@ -139,7 +139,7 @@ public class ImageViewerGui {
         glListener = new GLListener(glComponent);
         glComponent.addGLEventListener(glListener);
 
-        inputController = new InputController(glComponent);
+        inputController = new InputController(glComponent, glComponent);
         mainContentPanel = new MainContentPanel(glComponent);
 
         midSplitPane.setLeftComponent(leftScrollPane);

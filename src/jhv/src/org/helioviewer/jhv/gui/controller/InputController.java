@@ -18,16 +18,16 @@ import org.helioviewer.jhv.opengl.GLInfo;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
-    private final Component component;
+    private final Component awtComponent;
 
     private boolean buttonDown = false;
 
-    public InputController(Component _component) {
-        component = _component;
+    public InputController(Component component, Component awtComponent) {
         component.addMouseListener(this);
         component.addMouseMotionListener(this);
         component.addMouseWheelListener(this);
         component.addKeyListener(this);
+        this.awtComponent = awtComponent;
     }
 
     private MouseEvent synthesizeMouse(MouseEvent e) {
@@ -56,7 +56,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         e = synthesizeMouse(e);
 
         if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
-            component.setCursor(buttonDown ? UIGlobals.closedHandCursor : UIGlobals.openHandCursor);
+            awtComponent.setCursor(buttonDown ? UIGlobals.closedHandCursor : UIGlobals.openHandCursor);
         }
 
         for (MouseListener listener : mouseListeners)
@@ -67,7 +67,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     public void mouseExited(MouseEvent e) {
         e = synthesizeMouse(e);
 
-        component.setCursor(Cursor.getDefaultCursor());
+        awtComponent.setCursor(Cursor.getDefaultCursor());
 
         for (MouseListener listener : mouseListeners)
             listener.mouseExited(e);
@@ -79,7 +79,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
-                component.setCursor(UIGlobals.closedHandCursor);
+                awtComponent.setCursor(UIGlobals.closedHandCursor);
             }
             buttonDown = true;
         }
@@ -95,7 +95,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
-                component.setCursor(UIGlobals.openHandCursor);
+                awtComponent.setCursor(UIGlobals.openHandCursor);
             }
             buttonDown = false;
         }
