@@ -29,7 +29,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
     private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();
 
-    private final JHVSplitPane splitPane;
+    private final JSplitPane splitPane;
     private final JPanel pluginContainer;
     private final CollapsiblePane collapsiblePane;
 
@@ -43,10 +43,10 @@ public class MainContentPanel extends JPanel implements ActionListener {
         container.setMinimumSize(new Dimension());
         container.add(mainComponent, BorderLayout.CENTER);
 
-        splitPane = new JHVSplitPane(JSplitPane.VERTICAL_SPLIT, false);
+        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
+        splitPane.setDividerSize(0);
         splitPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
         splitPane.setOneTouchExpandable(false);
-        splitPane.setDividerSize(0);
         splitPane.setResizeWeight(0.66);
 
         splitPane.setTopComponent(container);
