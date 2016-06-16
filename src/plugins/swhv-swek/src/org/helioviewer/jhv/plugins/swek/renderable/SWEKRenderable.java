@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.swek.renderable;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -354,7 +353,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private final static int MOUSE_OFFSET_X = 25;
     private final static int MOUSE_OFFSET_Y = 25;
 
-    private void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, Point pt) {
+    private void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<String>();
         JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
         JHVEventParameter[] params = evt.getSimpleVisibleEventParameters();
@@ -365,7 +364,7 @@ public class SWEKRenderable extends AbstractRenderable {
             }
         }
         if (!txts.isEmpty())
-            GLText.drawText(gl, vp, txts, pt.x + MOUSE_OFFSET_X, pt.y + MOUSE_OFFSET_Y);
+            GLText.drawText(gl, vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
     @Override
@@ -413,7 +412,7 @@ public class SWEKRenderable extends AbstractRenderable {
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
         if (SWEKPopupController.mouseOverJHVEvent != null) {
-            drawText(gl, vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverPosition);
+            drawText(gl, vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
         }
     }
 
