@@ -34,8 +34,11 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
     private Popup crPopup = null;
     private JHVCarrington carringtonPanel = null;
     private final Calendar calendar = new GregorianCalendar();
+    private final boolean isEndDate;
 
-    public JHVCarringtonPicker() {
+    public JHVCarringtonPicker(boolean isEnd) {
+        isEndDate = isEnd;
+
         crPopupButton = new JButton("CR");
         // crPopupButton.setPreferredSize();
         crPopupButton.addFocusListener(this);
@@ -104,6 +107,10 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         }
     }
 
+    public Date getDate() {
+        return calendar.getTime();
+    }
+
     private void informAllJHVCalendarListeners(JHVCalendarEvent e) {
         for (JHVCalendarListener l : listeners) {
             l.actionPerformed(e);
@@ -136,7 +143,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     private void showCRPopup() {
         // set up the popup content
-        carringtonPanel = new JHVCarrington(calendar.getTime());
+        carringtonPanel = new JHVCarrington(calendar.getTime(), isEndDate);
         carringtonPanel.setPreferredSize(carringtonPanel.getMinimumSize());
         carringtonPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         carringtonPanel.addJHVCalendarListener(this);
@@ -191,8 +198,10 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
         private Date currentDate = new Date();
         private final JComboBox carringtonRotations;
+        private final boolean isEndDate;
 
-        public JHVCarrington(Date date) {
+        public JHVCarrington(Date date, boolean isEnd) {
+            isEndDate = isEnd;
             setLayout(new BorderLayout());
 
             setMinimumSize(new Dimension(250, 200));
@@ -266,7 +275,17 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            currentDate = new Date(Carrington.CR_start[((Integer) carringtonRotations.getSelectedItem()) - Carrington.CR_MINIMAL]);
+            int location = ((Integer) carringtonRotations.getSelectedItem()) - Carrington.CR_MINIMAL;
+            if (!isEndDate) {
+                currentDate = new Date(Carrington.CR_start[location]);
+            } else {
+
+                if ((location + 1) < Carrington.CR_start.length) {
+                    currentDate = new Date(Carrington.CR_start[location + 1] - 1000);
+                } else {
+                    currentDate = new Date(Carrington.CR_start[location]);
+                }
+            }
             informAllJHVCalendarListeners(new JHVCalendarEvent(this));
         }
 

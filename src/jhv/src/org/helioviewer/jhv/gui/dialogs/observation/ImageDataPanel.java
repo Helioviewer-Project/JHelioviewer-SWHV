@@ -211,7 +211,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             calendarEndDate.setToolTipText("UTC date for observation end");
 
             // create end date Carrington picker
-            carringtonEnd = new JHVCarringtonPicker();
+            carringtonEnd = new JHVCarringtonPicker(true);
             carringtonEnd.addJHVCalendarListener(this);
             carringtonEnd.setToolTipText("Carrington rotation for observation end");
 
@@ -225,7 +225,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             calendarStartDate.setToolTipText("UTC date for observation start");
 
             // create start date Carrington picker
-            carringtonStart = new JHVCarringtonPicker();
+            carringtonStart = new JHVCarringtonPicker(false);
             carringtonStart.addJHVCalendarListener(this);
             carringtonStart.setToolTipText("Carrington rotation for observation start");
 
@@ -300,6 +300,12 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 setStartDate(new Date(getStartTime()), true);
             } else if (e.getSource() == calendarEndDate) {
                 setEndDate(new Date(getEndTime()), true);
+            } else if (e.getSource() == carringtonStart) {
+                textStartTime.setText(TimeUtils.timeDateFormat.format(carringtonStart.getDate()));
+                setStartDate(carringtonStart.getDate(), true);
+            } else if (e.getSource() == carringtonEnd) {
+                textEndTime.setText(TimeUtils.timeDateFormat.format(carringtonEnd.getDate()));
+                setStartDate(carringtonEnd.getDate(), true);
             }
         }
 
