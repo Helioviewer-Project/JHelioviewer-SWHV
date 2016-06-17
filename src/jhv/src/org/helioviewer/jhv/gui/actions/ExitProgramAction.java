@@ -8,6 +8,7 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.ExitHooks;
+import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
 public class ExitProgramAction extends AbstractAction {
@@ -15,7 +16,10 @@ public class ExitProgramAction extends AbstractAction {
     public ExitProgramAction() {
         super("Quit");
         putValue(SHORT_DESCRIPTION, "Quit program");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        putValue(ACCELERATOR_KEY, key);
+        KeyShortcuts.registerKey(key, this);
     }
 
     @Override
