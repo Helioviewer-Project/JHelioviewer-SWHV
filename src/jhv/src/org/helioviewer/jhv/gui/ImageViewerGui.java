@@ -59,11 +59,11 @@ public class ImageViewerGui {
     public static final int SIDE_PANEL_WIDTH_EXTRA = 20;
 
     private static JFrame mainFrame;
-    private static JSplitPane midSplitPane;
     private static JScrollPane leftScrollPane;
 
     private static SideContentPane leftPane;
 
+    private static GLWindow glWindow;
     private static NewtCanvasAWT glComponent;
     private static GLListener glListener;
 
@@ -93,10 +93,9 @@ public class ImageViewerGui {
         JPanel contentPanel = new JPanel(new BorderLayout());
         mainFrame.setContentPane(contentPanel);
 
-        midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
+        final JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
         midSplitPane.setDividerSize(2);
         midSplitPane.setBorder(null);
-        midSplitPane.setOneTouchExpandable(false);
         contentPanel.add(midSplitPane, BorderLayout.CENTER);
 
         Camera camera = Displayer.getCamera();
@@ -135,7 +134,7 @@ public class ImageViewerGui {
         leftScrollPane.setBorder(null);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(renderableContainerPanel.getGridRowHeight());
 
-        GLWindow glWindow = GLHelper.createGLWindow();
+        glWindow = GLHelper.createGLWindow();
         glListener = new GLListener(glWindow);
         glWindow.addGLEventListener(glListener);
 
@@ -213,6 +212,10 @@ public class ImageViewerGui {
         }
     }
 
+    public static void toggleFullScreen() {
+        glWindow.setFullscreen(!glWindow.isFullscreen());
+    }
+
     /**
      * Loads the images which have to be displayed when the program starts.
      *
@@ -243,19 +246,6 @@ public class ImageViewerGui {
                 LoadURITask uriTask = new LoadURITask(jpipUri, jpipUri);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
-        }
-    }
-
-
-    // Toggles the visibility of the control panel on the left side
-    public static void toggleSidePanel() {
-        leftScrollPane.setVisible(!leftScrollPane.isVisible());
-
-        int lastLocation = midSplitPane.getLastDividerLocation();
-        if (lastLocation > 10) {
-            midSplitPane.setDividerLocation(lastLocation);
-        } else {
-            midSplitPane.setDividerLocation(leftScrollPane.getPreferredSize().width + SIDE_PANEL_WIDTH_EXTRA);
         }
     }
 

@@ -47,7 +47,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
         splitPane.setDividerSize(0);
         splitPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
-        splitPane.setOneTouchExpandable(false);
         splitPane.setResizeWeight(0.66);
 
         splitPane.setTopComponent(container);
