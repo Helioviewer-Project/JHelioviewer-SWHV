@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.components.calendar;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,7 +40,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         isEndDate = isEnd;
 
         crPopupButton = new JButton("CR");
-        // crPopupButton.setPreferredSize();
+        crPopupButton.setPreferredSize(new Dimension(crPopupButton.getFontMetrics(crPopupButton.getFont()).stringWidth("CR") + 14, crPopupButton.getFontMetrics(crPopupButton.getFont()).getHeight()));
         crPopupButton.addFocusListener(this);
         crPopupButton.addActionListener(this);
         add(crPopupButton);
