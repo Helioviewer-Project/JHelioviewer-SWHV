@@ -21,7 +21,7 @@ public class JHVCarringtonPicker extends JPanel implements ActionListener {
     private Date currentDate = new Date();
     private final JComboBox carringtonRotations;
 
-    public JHVCarringtonPicker() {
+    public JHVCarringtonPicker(Date date) {
         setLayout(new BorderLayout());
 
         setMinimumSize(new Dimension(250, 200));
@@ -29,6 +29,7 @@ public class JHVCarringtonPicker extends JPanel implements ActionListener {
         // add sub components
         JPanel p = new JPanel();
         carringtonRotations = new JComboBox(createCarringtonRotations());
+        setDate(date);
         carringtonRotations.addActionListener(this);
         p.add(carringtonRotations);
         add(p, BorderLayout.CENTER);
