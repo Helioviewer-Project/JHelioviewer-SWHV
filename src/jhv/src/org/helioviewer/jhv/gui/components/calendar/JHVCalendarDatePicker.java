@@ -47,6 +47,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     private final Calendar calendar = new GregorianCalendar();
 
     private JHVCalendar jhvCalendar = null;
+    private JHVCarringtonPicker carringtonPicker = null;
     private final JTextField textField = new JTextField();
 
     private static final Icon icon = IconBank.getIcon(JHVIcon.DATE);
@@ -59,7 +60,8 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     private final JButton calPopupButton;
     private final JButton crPopupButton;
 
-    private Popup popup = null;
+    private Popup calPopup = null;
+    private Popup crPopup = null;
 
     public JHVCalendarDatePicker() {
         setLayout(new BorderLayout(0, 0));
@@ -137,7 +139,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
             // if the receiver of the focus is not a subcomponent of the
             // jhvCalendar than hide the popup
             if (jhvCalendar != null && !jhvCalendar.isAncestorOf(arg0.getOppositeComponent())) {
-                hidePopup();
+                hideCalPopup();
             }
         }
 
@@ -155,10 +157,17 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         // corresponding popup button
         if (e.getSource() == calPopupButton) {
             setDate(parseDate(textField.getText()));
-            if (popup == null) {
-                showPopup();
+            if (calPopup == null) {
+                showCalPopup();
             } else {
-                hidePopup();
+                hideCalPopup();
+            }
+        } else if (e.getSource() == crPopupButton) {
+            setDate(parseDate(textField.getText()));
+            if (crPopup == null) {
+                showCRPopup();
+            } else {
+                hideCRPopup();
             }
         }
     }
@@ -191,7 +200,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * Opens an new popup window where the user can select a date.
      */
-    private void showPopup() {
+    private void showCalPopup() {
         // set up the popup content
         jhvCalendar = new JHVCalendar();
         jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());
@@ -206,8 +215,8 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
         // create popup
         PopupFactory factory = PopupFactory.getSharedInstance();
-        popup = factory.getPopup(calPopupButton, jhvCalendar, x, y);
-        popup.show();
+        calPopup = factory.getPopup(calPopupButton, jhvCalendar, x, y);
+        calPopup.show();
 
         jhvCalendar.componentResized(null);
 
@@ -218,11 +227,11 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         y = y + jhvCalendar.getSize().height > Toolkit.getDefaultToolkit().getScreenSize().height ? textField.getLocationOnScreen().y - jhvCalendar.getSize().height : y;
         y = y < 0 ? 0 : y;
 
-        popup.hide();
+        calPopup.hide();
 
         // show popup
-        popup = factory.getPopup(calPopupButton, jhvCalendar, x, y);
-        popup.show();
+        calPopup = factory.getPopup(calPopupButton, jhvCalendar, x, y);
+        calPopup.show();
     }
 
     /**
@@ -246,20 +255,73 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * Closes the popup window if it is still displayed.
      */
-    private void hidePopup() {
-        if (popup != null) {
-            popup.hide();
-            popup = null;
+    private void hideCalPopup() {
+        if (calPopup != null) {
+            calPopup.hide();
+            calPopup = null;
         }
     }
 
+    private void hideCRPopup() {
+        if (crPopup != null) {
+            crPopup.hide();
+            crPopup = null;
+        }
+
+    }
+
+    private void showCRPopup() {
+        // set up the popup content
+        carringtonPicker = new JHVCarringtonPicker();
+        carringtonPicker.setPreferredSize(carringtonPicker.getMinimumSize());
+        carringtonPicker.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        carringtonPicker.addJHVCalendarListener(this);
+        carringtonPicker.setDate(calendar.getTime());
+        addFocusListenerToAllChildren(carringtonPicker);
+
+        // get position for popup
+        int x = textField.getLocationOnScreen().x;
+        int y = textField.getLocationOnScreen().y + textField.getSize().height;
+
+        // create popup
+        PopupFactory factory = PopupFactory.getSharedInstance();
+        crPopup = factory.getPopup(crPopupButton, carringtonPicker, x, y);
+        crPopup.show();
+
+        // carringtonPicker.componentResized(null);
+
+        // correct position of popup when it does not fit into screen area
+        x = x + carringtonPicker.getSize().width > Toolkit.getDefaultToolkit().getScreenSize().width ? Toolkit.getDefaultToolkit().getScreenSize().width - carringtonPicker.getSize().width : x;
+        x = x < 0 ? 0 : x;
+
+        y = y + carringtonPicker.getSize().height > Toolkit.getDefaultToolkit().getScreenSize().height ? textField.getLocationOnScreen().y - carringtonPicker.getSize().height : y;
+        y = y < 0 ? 0 : y;
+
+        crPopup.hide();
+
+        // show popup
+        crPopup = factory.getPopup(crPopupButton, carringtonPicker, x, y);
+        crPopup.show();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(JHVCalendarEvent e) {
-        // close popup
-        hidePopup();
-        // set selected date
-        setDate(jhvCalendar.getDate());
-        jhvCalendar = null;
+        if (e.getSource().equals(jhvCalendar)) {
+            // close popup
+            hideCalPopup();
+            // set selected date
+            setDate(jhvCalendar.getDate());
+            jhvCalendar = null;
+        } else if (e.getSource().equals(carringtonPicker)) {
+            // close popup
+            hideCRPopup();
+            // set selected date
+            setDate(carringtonPicker.getDate());
+            jhvCalendar = null;
+        }
         // inform all listeners of this class that a new date was choosen by the
         // user
         informAllJHVCalendarListeners(new JHVCalendarEvent(this));
