@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.util.HashSet;
 
+import javax.swing.KeyStroke;
+
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -22,10 +24,10 @@ public class InputController implements MouseListener, KeyListener {
     private boolean buttonDown = false;
 
     public InputController(Window window, Component awtComponent) {
+        this.awtComponent = awtComponent;
         window.addMouseListener(this);
         window.addKeyListener(this);
-        this.awtComponent = awtComponent;
-    }
+  }
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -112,6 +114,25 @@ public class InputController implements MouseListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        int code = e.getKeyCode();
+        switch (code) {
+            case 0xd:
+                code = java.awt.event.KeyEvent.VK_ENTER;
+                break;
+            case 0x95:
+                code = java.awt.event.KeyEvent.VK_LEFT;
+                break;
+            case 0x97:
+                code = java.awt.event.KeyEvent.VK_RIGHT;
+                break;
+            default:
+                break;
+        }
+
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(code, e.getModifiers());
+        if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource(), 0))
+            return;
+
         ImageViewerGui.getCurrentInteraction().keyReleased(e);
         for (KeyListener listener : keyListeners)
             listener.keyReleased(e);
