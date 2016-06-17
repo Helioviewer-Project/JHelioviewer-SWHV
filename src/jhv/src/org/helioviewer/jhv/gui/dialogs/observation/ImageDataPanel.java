@@ -210,28 +210,30 @@ public class ImageDataPanel extends ObservationDialogPanel {
             calendarEndDate.addJHVCalendarListener(this);
             calendarEndDate.setToolTipText("UTC date for observation end");
 
+            // create end time field
+            textEndTime = new TimeTextField();
+            textEndTime.setToolTipText("UTC time for observation end.\nIf equal to start time, a single image closest to the time will be added.");
+
             // create end date Carrington picker
             carringtonEnd = new JHVCarringtonPicker(true);
             carringtonEnd.addJHVCalendarListener(this);
             carringtonEnd.setToolTipText("Carrington rotation for observation end");
-
-            // create end time field
-            textEndTime = new TimeTextField();
-            textEndTime.setToolTipText("UTC time for observation end.\nIf equal to start time, a single image closest to the time will be added.");
+            carringtonEnd.setDate(new Date(getEndTime()));
 
             // create start date picker
             calendarStartDate = new JHVCalendarDatePicker();
             calendarStartDate.addJHVCalendarListener(this);
             calendarStartDate.setToolTipText("UTC date for observation start");
 
+            // create start time field
+            textStartTime = new TimeTextField();
+            textStartTime.setToolTipText("UTC time for observation start");
+
             // create start date Carrington picker
             carringtonStart = new JHVCarringtonPicker(false);
             carringtonStart.addJHVCalendarListener(this);
             carringtonStart.setToolTipText("Carrington rotation for observation start");
-
-            // create start time field
-            textStartTime = new TimeTextField();
-            textStartTime.setToolTipText("UTC time for observation start");
+            carringtonStart.setDate(new Date(getStartTime()));
 
             // add components to panel
             JPanel startDatePane = new JPanel(new BorderLayout());
