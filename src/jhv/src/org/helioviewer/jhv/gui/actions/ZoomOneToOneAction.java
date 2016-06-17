@@ -11,13 +11,11 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-/**
- * Action to zoom such that the active layer fits completely in the viewport
- */
 @SuppressWarnings("serial")
 public class ZoomOneToOneAction extends AbstractAction {
 
@@ -29,7 +27,10 @@ public class ZoomOneToOneAction extends AbstractAction {
     public ZoomOneToOneAction(boolean small, boolean useIcon) {
         super("Actual Size", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_1TO1_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_1TO1)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom to native resolution");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        putValue(ACCELERATOR_KEY, key);
+        KeyShortcuts.registerKey(key, this);
     }
 
     @Override

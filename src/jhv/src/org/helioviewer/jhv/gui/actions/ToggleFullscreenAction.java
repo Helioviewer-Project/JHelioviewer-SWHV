@@ -8,6 +8,7 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
 public class ToggleFullscreenAction extends AbstractAction {
@@ -15,7 +16,10 @@ public class ToggleFullscreenAction extends AbstractAction {
     public ToggleFullscreenAction() {
         super("Toggle Full Screen");
         putValue(SHORT_DESCRIPTION, "Toggle full screen");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        putValue(ACCELERATOR_KEY, key);
+        KeyShortcuts.registerKey(key, this);
     }
 
     @Override

@@ -11,10 +11,8 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.input.KeyShortcuts;
 
-/**
- * Action to zoom such that the active layer fits completely in the viewport
- */
 @SuppressWarnings("serial")
 public class ZoomFitAction extends AbstractAction {
 
@@ -26,7 +24,10 @@ public class ZoomFitAction extends AbstractAction {
     public ZoomFitAction(boolean small, boolean useIcon) {
         super("Zoom to Fit", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_FIT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_FIT)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom to fit");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_9, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_9, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        putValue(ACCELERATOR_KEY, key);
+        KeyShortcuts.registerKey(key, this);
     }
 
     @Override

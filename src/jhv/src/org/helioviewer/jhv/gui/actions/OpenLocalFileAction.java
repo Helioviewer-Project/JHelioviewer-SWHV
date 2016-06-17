@@ -14,6 +14,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.AllSupportedImageTypesFilenameFilter;
+import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.io.LoadURITask;
 
 /**
@@ -28,7 +29,10 @@ public class OpenLocalFileAction extends AbstractAction {
     public OpenLocalFileAction() {
         super("Open...");
         putValue(SHORT_DESCRIPTION, "Open new image");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        putValue(ACCELERATOR_KEY, key);
+        KeyShortcuts.registerKey(key, this);
     }
 
     @Override
