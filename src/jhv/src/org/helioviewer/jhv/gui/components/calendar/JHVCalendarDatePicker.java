@@ -36,7 +36,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * This component allows to select a date or enter a date by hand. It works
  * similar to a combobox apart from that the popup is not a list but represents
  * a {@link JHVCalendar} component.
- * 
+ *
  * @see JHVCalendar
  * @author Stephan Pagel
  */
@@ -56,7 +56,9 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         return textField;
     }
 
-    private final JButton popupButton;
+    private final JButton calPopupButton;
+    private final JButton crPopupButton;
+
     private Popup popup = null;
 
     public JHVCalendarDatePicker() {
@@ -68,19 +70,28 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         textField.addKeyListener(this);
 
         // set up popup button
-        popupButton = new JButton(icon);
-        popupButton.setPreferredSize(new Dimension(icon.getIconWidth() + 14, popupButton.getPreferredSize().height));
-        popupButton.addFocusListener(this);
-        popupButton.addActionListener(this);
+        calPopupButton = new JButton(icon);
+        calPopupButton.setPreferredSize(new Dimension(icon.getIconWidth() + 14, calPopupButton.getPreferredSize().height));
+        calPopupButton.addFocusListener(this);
+        calPopupButton.addActionListener(this);
 
         // place sub components
-        add(popupButton, BorderLayout.EAST);
+
+        crPopupButton = new JButton("CR");
+        crPopupButton.setPreferredSize(new Dimension(icon.getIconWidth() + 14, calPopupButton.getPreferredSize().height));
+        crPopupButton.addFocusListener(this);
+        crPopupButton.addActionListener(this);
+
+        JPanel buttonGroup = new JPanel();
+        buttonGroup.add(calPopupButton);
+        buttonGroup.add(crPopupButton);
+        add(buttonGroup, BorderLayout.EAST);
         add(textField, BorderLayout.CENTER);
     }
 
     /**
      * Adds a listener which will be informed when a date has been selected.
-     * 
+     *
      * @param l
      *            listener which has to be informed.
      */
@@ -93,7 +104,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * Removes a listener which should not be informed anymore when a date has
      * been selected.
-     * 
+     *
      * @param l
      *            listener which should not be informed anymore.
      */
@@ -105,7 +116,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     /**
      * Informs all listener of this class by passing the corresponding event.
-     * 
+     *
      * @param e
      *            event
      */
@@ -122,7 +133,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     @Override
     public void focusLost(FocusEvent arg0) {
         // has popup button or a subcomponent of jhvCalendar lost the focus?
-        if (arg0.getComponent() == popupButton || (jhvCalendar != null && jhvCalendar.isAncestorOf(arg0.getComponent()))) {
+        if (arg0.getComponent() == calPopupButton || (jhvCalendar != null && jhvCalendar.isAncestorOf(arg0.getComponent()))) {
             // if the receiver of the focus is not a subcomponent of the
             // jhvCalendar than hide the popup
             if (jhvCalendar != null && !jhvCalendar.isAncestorOf(arg0.getOppositeComponent())) {
@@ -142,7 +153,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     public void actionPerformed(ActionEvent e) {
         // open or close the popup window when the event was fired by the
         // corresponding popup button
-        if (e.getSource() == popupButton) {
+        if (e.getSource() == calPopupButton) {
             setDate(parseDate(textField.getText()));
             if (popup == null) {
                 showPopup();
@@ -195,7 +206,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
         // create popup
         PopupFactory factory = PopupFactory.getSharedInstance();
-        popup = factory.getPopup(popupButton, jhvCalendar, x, y);
+        popup = factory.getPopup(calPopupButton, jhvCalendar, x, y);
         popup.show();
 
         jhvCalendar.componentResized(null);
@@ -210,14 +221,14 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         popup.hide();
 
         // show popup
-        popup = factory.getPopup(popupButton, jhvCalendar, x, y);
+        popup = factory.getPopup(calPopupButton, jhvCalendar, x, y);
         popup.show();
     }
 
     /**
      * Adds to all subcomponents of a component the focus listener off this
      * class.
-     * 
+     *
      * @param parent
      *            add focus listener to subcomponents of this parent
      */
@@ -249,7 +260,8 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         // set selected date
         setDate(jhvCalendar.getDate());
         jhvCalendar = null;
-        // inform all listeners of this class that a new date was choosen by the user
+        // inform all listeners of this class that a new date was choosen by the
+        // user
         informAllJHVCalendarListeners(new JHVCalendarEvent(this));
     }
 
@@ -265,7 +277,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     /**
      * Returns the selected date.
-     * 
+     *
      * @return the selected date.
      */
     public Date getDate() {
@@ -275,7 +287,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     /**
      * Tries to parse a given date string to a date object. If the string could
      * not be parsed the method returns a null value.
-     * 
+     *
      * @param source
      *            the given date string.
      * @return the corresponding date object.
@@ -296,7 +308,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     @Override
     public void setEnabled(boolean enabled) {
         textField.setEnabled(enabled);
-        popupButton.setEnabled(enabled);
+        calPopupButton.setEnabled(enabled);
     }
 
 }
