@@ -30,6 +30,7 @@ import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
+import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.io.DataSources;
@@ -71,8 +72,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 first = false;
 
                 Date endDate = new Date();
-                Object timeStamp = DataSources.getObject(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(),
-                                                         instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), "end");
+                Object timeStamp = DataSources.getObject(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(), instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), "end");
                 if (timeStamp instanceof String) {
                     try {
                         endDate = TimeUtils.sqlDateFormat.parse((String) timeStamp);
@@ -90,19 +90,17 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
                 setStartDate(gregorianCalendar.getTime(), false);
 
-                if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")))
+                if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
                     loadRemote();
+                }
             }
         } else {
-            Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." +
-                        System.getProperty("line.separator") +
-                        "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
+            Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." + System.getProperty("line.separator") + "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
         }
     }
 
     public Object getSourceId() {
-        return DataSources.getObject(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(),
-                                     instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), "sourceId");
+        return DataSources.getObject(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(), instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), "sourceId");
     }
 
     /**
@@ -197,6 +195,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
         private final TimeTextField textEndTime;
         private final JHVCalendarDatePicker calendarStartDate;
         private final JHVCalendarDatePicker calendarEndDate;
+        private final JHVCarringtonPicker carringtonStart;
+        private final JHVCarringtonPicker carringtonEnd;
 
         private boolean setFromOutside = false;
 
@@ -210,6 +210,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
             calendarEndDate.addJHVCalendarListener(this);
             calendarEndDate.setToolTipText("UTC date for observation end");
 
+            // create end date Carrington picker
+            carringtonEnd = new JHVCarringtonPicker();
+            carringtonEnd.addJHVCalendarListener(this);
+            carringtonEnd.setToolTipText("Carrington rotation for observation end");
+
             // create end time field
             textEndTime = new TimeTextField();
             textEndTime.setToolTipText("UTC time for observation end.\nIf equal to start time, a single image closest to the time will be added.");
@@ -219,6 +224,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
             calendarStartDate.addJHVCalendarListener(this);
             calendarStartDate.setToolTipText("UTC date for observation start");
 
+            // create start date Carrington picker
+            carringtonStart = new JHVCarringtonPicker();
+            carringtonStart.addJHVCalendarListener(this);
+            carringtonStart.setToolTipText("Carrington rotation for observation start");
+
             // create start time field
             textStartTime = new TimeTextField();
             textStartTime.setToolTipText("UTC time for observation start");
@@ -227,6 +237,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             JPanel startDatePane = new JPanel(new BorderLayout());
             startDatePane.add(new JLabel("Start date"), BorderLayout.PAGE_START);
             startDatePane.add(calendarStartDate, BorderLayout.CENTER);
+            startDatePane.add(carringtonStart, BorderLayout.LINE_END);
 
             JPanel startTimePane = new JPanel(new BorderLayout());
             startTimePane.add(new JLabel("Start time"), BorderLayout.PAGE_START);
@@ -235,6 +246,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             JPanel endDatePane = new JPanel(new BorderLayout());
             endDatePane.add(new JLabel("End date"), BorderLayout.PAGE_START);
             endDatePane.add(calendarEndDate, BorderLayout.CENTER);
+            endDatePane.add(carringtonEnd, BorderLayout.LINE_END);
 
             JPanel endTimePane = new JPanel(new BorderLayout());
             endTimePane.add(new JLabel("End time"), BorderLayout.PAGE_START);
@@ -292,10 +304,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
 
         /**
-         * Checks if the selected start date is before or equal to selected end date.
+         * Checks if the selected start date is before or equal to selected end
+         * date.
          *
-         * @return boolean value if selected start date is before or equal to selected end
-         *         date.
+         * @return boolean value if selected start date is before or equal to
+         *         selected end date.
          */
         public boolean isStartDateBeforeEndDate() {
             return calendarStartDate.getDate().getTime() <= calendarEndDate.getDate().getTime();
@@ -404,8 +417,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
     // Instruments Panel
 
     /**
-     * The panel bundles the components to select the instrument etc.
-     * Reads the available data from org.helioviewer.jhv.io.DataSources
+     * The panel bundles the components to select the instrument etc. Reads the
+     * available data from org.helioviewer.jhv.io.DataSources
      * */
     private static class InstrumentsPanel extends JPanel {
         /**
@@ -491,12 +504,14 @@ public class ImageDataPanel extends ObservationDialogPanel {
                         }
 
                         if (measurements.length == 0) { // not found
-                            for (Item d : detectors)
+                            for (Item d : detectors) {
                                 values.add(new ItemPair(d, d, ItemPair.PrintMode.FIRSTITEM_ONLY));
+                            }
                             break;
                         } else {
-                            for (Item measurement : measurements)
+                            for (Item measurement : measurements) {
                                 values.add(new ItemPair(detector, measurement, printMode));
+                            }
                         }
                     }
 
@@ -529,8 +544,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     return;
                 }
             }
-            if (items.length > 0)
+            if (items.length > 0) {
                 container.setSelectedIndex(0);
+            }
         }
 
         /**
@@ -551,8 +567,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     return;
                 }
             }
-            if (!items.isEmpty())
+            if (!items.isEmpty()) {
                 container.setSelectedIndex(0);
+            }
         }
 
         /**
