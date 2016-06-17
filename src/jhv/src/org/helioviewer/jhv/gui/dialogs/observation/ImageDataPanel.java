@@ -307,7 +307,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 setStartDate(carringtonStart.getDate(), true);
             } else if (e.getSource() == carringtonEnd) {
                 textEndTime.setText(TimeUtils.timeDateFormat.format(carringtonEnd.getDate()));
-                setStartDate(carringtonEnd.getDate(), true);
+                setEndDate(carringtonEnd.getDate(), true);
             }
         }
 
