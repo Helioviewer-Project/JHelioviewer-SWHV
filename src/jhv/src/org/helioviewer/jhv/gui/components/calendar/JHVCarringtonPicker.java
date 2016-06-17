@@ -97,12 +97,9 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         }
     }
 
-    public void setDate(Date date) {
-        if (date != null) {
-            long milli = date.getTime();
-            if (milli > TimeUtils.MINIMAL_DATE.milli && milli < TimeUtils.MAXIMAL_DATE.milli) {
-                calendar.setTime(date);
-            }
+    public void setDate(long date) {
+        if (date > TimeUtils.MINIMAL_DATE.milli && date < TimeUtils.MAXIMAL_DATE.milli) {
+            calendar.setTimeInMillis(date);
         }
     }
 
@@ -142,7 +139,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     private void showCRPopup() {
         // set up the popup content
-        carringtonPanel = new JHVCarrington(calendar.getTime(), isEndDate);
+        carringtonPanel = new JHVCarrington(calendar.getTime().getTime(), isEndDate);
         carringtonPanel.setPreferredSize(carringtonPanel.getMinimumSize());
         carringtonPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         carringtonPanel.addJHVCalendarListener(this);
@@ -195,11 +192,11 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
     private static class JHVCarrington extends JPanel implements ActionListener {
 
         private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
-        private Date currentDate = new Date();
+        private long currentDate = System.currentTimeMillis();
         private final JComboBox carringtonRotations;
         private final boolean isEndDate;
 
-        public JHVCarrington(Date date, boolean isEnd) {
+        public JHVCarrington(long date, boolean isEnd) {
             isEndDate = isEnd;
             setLayout(new BorderLayout());
 
@@ -218,9 +215,9 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
          * @param date
          *            Selected date of the calendar component.
          */
-        public void setDate(Date date) {
+        public void setDate(long date) {
             currentDate = date;
-            carringtonRotations.setSelectedIndex((int) Math.floor(Carrington.time2CR(new JHVDate(currentDate.getTime()))) - Carrington.CR_MINIMAL);
+            carringtonRotations.setSelectedIndex((int) Math.floor(Carrington.time2CR(new JHVDate(currentDate))) - Carrington.CR_MINIMAL);
         }
 
         /**
@@ -228,7 +225,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
          *
          * @return selected date.
          */
-        public Date getDate() {
+        public long getDate() {
             return currentDate;
         }
 
@@ -274,13 +271,13 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         public void actionPerformed(ActionEvent e) {
             int location = ((Integer) carringtonRotations.getSelectedItem()) - Carrington.CR_MINIMAL;
             if (!isEndDate) {
-                currentDate = new Date(Carrington.CR_start[location]);
+                currentDate = Carrington.CR_start[location];
             } else {
 
                 if ((location + 1) < Carrington.CR_start.length) {
-                    currentDate = new Date(Carrington.CR_start[location + 1] - 1000);
+                    currentDate = Carrington.CR_start[location + 1] - 1000;
                 } else {
-                    currentDate = new Date(Carrington.CR_start[location]);
+                    currentDate = Carrington.CR_start[location];
                 }
             }
             informAllJHVCalendarListeners(new JHVCalendarEvent(this));
