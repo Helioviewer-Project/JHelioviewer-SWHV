@@ -218,7 +218,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             carringtonEnd = new JHVCarringtonPicker(true);
             carringtonEnd.addJHVCalendarListener(this);
             carringtonEnd.setToolTipText("Carrington rotation for observation end");
-            carringtonEnd.setDate(new Date(getEndTime()));
+            carringtonEnd.setDate(getEndTime());
 
             // create start date picker
             calendarStartDate = new JHVCalendarDatePicker();
@@ -233,7 +233,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             carringtonStart = new JHVCarringtonPicker(false);
             carringtonStart.addJHVCalendarListener(this);
             carringtonStart.setToolTipText("Carrington rotation for observation start");
-            carringtonStart.setDate(new Date(getStartTime()));
+            carringtonStart.setDate(getStartTime());
 
             // add components to panel
             JPanel startDatePane = new JPanel(new BorderLayout());
@@ -300,10 +300,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
         public void actionPerformed(JHVCalendarEvent e) {
             if (e.getSource() == calendarStartDate) {
                 setStartDate(new Date(getStartTime()), true);
-                carringtonStart.setDate(new Date(getStartTime()));
+                carringtonStart.setDate(getStartTime());
             } else if (e.getSource() == calendarEndDate) {
                 setEndDate(new Date(getEndTime()), true);
-                carringtonEnd.setDate(new Date(getEndTime()));
+                carringtonEnd.setDate(getEndTime());
             } else if (e.getSource() == carringtonStart) {
                 textStartTime.setText(TimeUtils.timeDateFormat.format(carringtonStart.getDate()));
                 setStartDate(carringtonStart.getDate(), true);
