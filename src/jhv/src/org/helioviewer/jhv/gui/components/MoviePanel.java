@@ -49,6 +49,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
@@ -630,7 +631,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         public PlayPauseAction() {
             super("Play/Pause Movie");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            putValue(ACCELERATOR_KEY, key);
+            KeyShortcuts.registerKey(key, this);
         }
 
         @Override
@@ -652,7 +655,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         public PreviousFrameAction() {
             super("Step to Previous Frame");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            putValue(ACCELERATOR_KEY, key);
+            KeyShortcuts.registerKey(key, this);
         }
 
         @Override
@@ -675,7 +680,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         public NextFrameAction() {
             super("Step to Next Frame");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            putValue(ACCELERATOR_KEY, key);
+            KeyShortcuts.registerKey(key, this);
         }
 
         @Override

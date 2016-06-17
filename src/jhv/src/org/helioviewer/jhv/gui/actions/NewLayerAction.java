@@ -12,6 +12,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -21,7 +22,10 @@ public class NewLayerAction extends AbstractAction {
     public NewLayerAction(boolean small, boolean useIcon) {
         super("New Layer...", useIcon ? IconBank.getIcon(JHVIcon.ADD) : null);
         putValue(SHORT_DESCRIPTION, "Add new layer");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        putValue(ACCELERATOR_KEY, key);
+        KeyShortcuts.registerKey(key, this);
     }
 
     @Override
@@ -45,7 +49,6 @@ public class NewLayerAction extends AbstractAction {
                 }
             }
         }
-        // Show dialog
         ObservationDialog.getInstance().showDialog();
     }
 
