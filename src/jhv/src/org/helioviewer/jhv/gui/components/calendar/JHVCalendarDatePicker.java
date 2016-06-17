@@ -272,11 +272,10 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     private void showCRPopup() {
         // set up the popup content
-        carringtonPicker = new JHVCarringtonPicker();
+        carringtonPicker = new JHVCarringtonPicker(calendar.getTime());
         carringtonPicker.setPreferredSize(carringtonPicker.getMinimumSize());
         carringtonPicker.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         carringtonPicker.addJHVCalendarListener(this);
-        carringtonPicker.setDate(calendar.getTime());
         addFocusListenerToAllChildren(carringtonPicker);
 
         // get position for popup
