@@ -300,8 +300,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
         public void actionPerformed(JHVCalendarEvent e) {
             if (e.getSource() == calendarStartDate) {
                 setStartDate(new Date(getStartTime()), true);
+                carringtonStart.setDate(new Date(getStartTime()));
             } else if (e.getSource() == calendarEndDate) {
                 setEndDate(new Date(getEndTime()), true);
+                carringtonEnd.setDate(new Date(getEndTime()));
             } else if (e.getSource() == carringtonStart) {
                 textStartTime.setText(TimeUtils.timeDateFormat.format(carringtonStart.getDate()));
                 setStartDate(carringtonStart.getDate(), true);
