@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.components.calendar;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -203,8 +202,6 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         public JHVCarrington(Date date, boolean isEnd) {
             isEndDate = isEnd;
             setLayout(new BorderLayout());
-
-            setMinimumSize(new Dimension(250, 200));
 
             // add sub components
             JPanel p = new JPanel();
