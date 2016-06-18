@@ -16,11 +16,9 @@ public class OpacityPanel implements ChangeListener, FilterDetails {
     private final JSlider opacitySlider;
     private final JLabel opacityLabel;
 
-    public OpacityPanel(float opacity) {
+    public OpacityPanel() {
         opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
-        setValue(opacity);
         opacityLabel = new JLabel(opacitySlider.getValue() + "%");
-
         opacitySlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(opacitySlider);
     }

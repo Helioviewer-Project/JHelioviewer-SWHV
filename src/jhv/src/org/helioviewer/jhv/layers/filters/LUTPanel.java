@@ -32,22 +32,12 @@ public class LUTPanel implements ActionListener, FilterDetails {
     private final JToggleButton invertButton;
     private final JToggleButton enhanceButton;
 
-    public LUTPanel(LUT lut) {
+    public LUTPanel() {
         lutMap = new TreeMap<String, LUT>(LUT.getStandardList());
 
         combobox = new JComboBox(lutMap.keySet().toArray());
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
-
-        if (lut != null) {
-            String name = lut.getName();
-            if (lutMap.get(name) == null) {
-                lutMap.put(name, lut);
-                combobox.addItem(name);
-            }
-            combobox.setSelectedItem(name);
-        }
-
         combobox.addActionListener(this);
 
         invertButton = new JToggleButton(invertIcon);
@@ -78,6 +68,20 @@ public class LUTPanel implements ActionListener, FilterDetails {
         LUT newMap = lutMap.get(combobox.getSelectedItem());
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLUT(newMap, invertButton.isSelected());
         Displayer.display();
+    }
+
+    public void setLUT(LUT lut) {
+        String name;
+        if (lut != null) {
+            name = lut.getName();
+            if (lutMap.get(name) == null) {
+                lutMap.put(name, lut);
+                combobox.addItem(name);
+            }
+        } else // e.g. RGB
+            name = "Gray";
+
+        combobox.setSelectedItem(name);
     }
 
     @Override
