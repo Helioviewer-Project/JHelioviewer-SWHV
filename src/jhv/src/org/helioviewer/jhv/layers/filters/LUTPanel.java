@@ -75,7 +75,7 @@ public class LUTPanel implements ActionListener, FilterDetails {
             enhanceButton.setBorder(BorderFactory.createBevelBorder(isSelected ? BevelBorder.LOWERED : BevelBorder.RAISED));
         }
 
-        LUT newMap = lutMap.get((String) combobox.getSelectedItem());
+        LUT newMap = lutMap.get(combobox.getSelectedItem());
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLUT(newMap, invertButton.isSelected());
         Displayer.display();
     }

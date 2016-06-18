@@ -9,7 +9,6 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.opengl.GLInfo;
 
 import com.jogamp.newt.Window;
 import com.jogamp.newt.event.KeyEvent;

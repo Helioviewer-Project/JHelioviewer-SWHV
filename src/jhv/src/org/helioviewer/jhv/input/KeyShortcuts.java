@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.input;
 
-import java.awt.EventQueue;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -43,15 +42,9 @@ public class KeyShortcuts {
     }
 
     static boolean handleKeyStroke(KeyStroke keyStroke, Object source, int id) {
-        if (actionMap.containsKey(keyStroke)) {
-            final Action a = actionMap.get(keyStroke);
-            final ActionEvent ae = new ActionEvent(source, id, null);
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    a.actionPerformed(ae);
-                }
-            });
+        Action action = actionMap.get(keyStroke);
+        if (action != null) {
+            action.actionPerformed(new ActionEvent(source, id, null));
             return true;
         }
         return false;
