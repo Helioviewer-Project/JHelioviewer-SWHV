@@ -18,6 +18,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
             extensions = new String[] { "jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx" };
         }
 
+        @Override
         public String getDescription() {
             return "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".jp2\", \".jpx\")";
         }
@@ -30,6 +31,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
             extensions = new String[] { "fits", "fts" };
         }
 
+        @Override
         public String getDescription() {
             return "FITS files (\".fts\", \".fits\")";
         }
@@ -42,17 +44,19 @@ public abstract class ExtensionFileFilter extends FileFilter {
             extensions = new String[] { "jp2", "jpx" };
         }
 
+        @Override
         public String getDescription() {
             return "JPG2000 files (\".jp2\", \".jpx\")";
         }
     }
 
-    public class JPGFilter extends ExtensionFileFilter {
+    public static class JPGFilter extends ExtensionFileFilter {
 
         public JPGFilter() {
             extensions = new String[] { "jpg", "jpeg" };
         }
 
+        @Override
         public String getDescription() {
            return "JPG files (\".jpg\", \".jpeg\")";
         }
@@ -64,6 +68,8 @@ public abstract class ExtensionFileFilter extends FileFilter {
         public PNGFilter() {
             extensions = new String[] { "png" };
         }
+
+        @Override
         public String getDescription() {
             return "PNG files (\".png\")";
         }
@@ -72,6 +78,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
 
     protected String[] extensions = {};
 
+    @Override
     public boolean accept(File f) {
         if (f.isDirectory())
             return true;

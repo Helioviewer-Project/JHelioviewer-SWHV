@@ -15,6 +15,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
@@ -36,7 +37,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private int indexBufferID;
     private int indexBufferSize;
     private final GLImage glImage = new GLImage();
-    private ImageLayerOptions optionsPanel;
+    private final ImageLayerOptions optionsPanel;
 
     private JHVWorker<?, ?> worker;
     private View view;
@@ -46,6 +47,9 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     public ImageLayer(JHVWorker<?, ?> _worker) {
         worker = _worker;
+
+        optionsPanel = new ImageLayerOptions(this);
+        ComponentUtils.setEnabled(optionsPanel, false);
         setVisible(true);
     }
 
@@ -98,9 +102,9 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             }
         }
 
-        glImage.setOpacity(opacity);
-        glImage.setLUT(view.getDefaultLUT(), false);
-        optionsPanel = new ImageLayerOptions(this, opacity, view.getDefaultLUT());
+        optionsPanel.setOpacity(opacity);
+        optionsPanel.setLUT(view.getDefaultLUT());
+        ComponentUtils.setEnabled(optionsPanel, true);
 
         view.setImageLayer(this);
         view.setDataHandler(this);
@@ -114,7 +118,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public void remove(GL2 gl) {
-        optionsPanel = null;
+        ComponentUtils.setEnabled(optionsPanel, false);
         if (view != null) {
             Layers.removeLayer(view);
             view.setDataHandler(null);

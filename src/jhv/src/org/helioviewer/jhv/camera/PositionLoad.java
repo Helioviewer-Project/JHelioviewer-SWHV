@@ -99,8 +99,6 @@ public class PositionLoad {
                 report = FAILEDSTATE + ": JSON parse error";
             } catch (NumberFormatException e) {
                 report = FAILEDSTATE + ": JSON parse error";
-            } finally {
-                result = null;
             }
 
             return ret;

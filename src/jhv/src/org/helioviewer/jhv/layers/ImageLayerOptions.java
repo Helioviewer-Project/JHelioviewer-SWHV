@@ -14,14 +14,15 @@ public class ImageLayerOptions extends SmallPanel {
 
     private final ImageLayer imageLayer;
     private final OpacityPanel opacityPanel;
+    private final LUTPanel lutPanel;
 
-    public ImageLayerOptions(ImageLayer imageLayer, float opacity, LUT lut) {
+    public ImageLayerOptions(ImageLayer imageLayer) {
         this.imageLayer = imageLayer;
 
         RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
-        opacityPanel = new OpacityPanel(opacity);
+        opacityPanel = new OpacityPanel();
         ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel();
-        LUTPanel lutPanel = new LUTPanel(lut);
+        lutPanel = new LUTPanel();
         GammaCorrectionPanel gammaCorrectionPanel = new GammaCorrectionPanel();
         ContrastPanel contrastPanel = new ContrastPanel();
         SharpenPanel sharpenPanel = new SharpenPanel();
@@ -81,6 +82,10 @@ public class ImageLayerOptions extends SmallPanel {
 
     void setOpacity(float opacity) {
         opacityPanel.setValue(opacity);
+    }
+
+    void setLUT(LUT lut) {
+        lutPanel.setLUT(lut);
     }
 
     public GLImage getGLImage() {
