@@ -21,6 +21,10 @@ public class KeyShortcuts {
         actionMap.put(key, act);
     }
 
+    public static void unregisterKey(KeyStroke key) {
+        actionMap.remove(key);
+    }
+
     // this is delicate
     private KeyShortcuts() {
         final JPanel dummy = new JPanel();
