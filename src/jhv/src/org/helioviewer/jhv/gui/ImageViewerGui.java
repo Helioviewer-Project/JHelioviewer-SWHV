@@ -135,6 +135,8 @@ public class ImageViewerGui {
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(renderableContainerPanel.getGridRowHeight());
 
         glWindow = GLHelper.createGLWindow();
+        glWindow.setUndecorated(true);
+        glWindow.setTitle(mainFrame.getTitle());
         glListener = new GLListener(glWindow);
         glWindow.addGLEventListener(glListener);
 

@@ -32,7 +32,7 @@ class RadioOptionsPanel extends SmallPanel {
         lutBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                EVEPlugin.rdm.setLUT(LUT.getStandardList().get((String) lutBox.getSelectedItem()));
+                EVEPlugin.rdm.setLUT(LUT.getStandardList().get(lutBox.getSelectedItem()));
             }
         });
 
