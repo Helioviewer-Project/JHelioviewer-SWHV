@@ -47,7 +47,7 @@ public class IconBank {
         LEFT("arrow_left.gif"), RIGHT("arrow_right.gif"), UP("1uparrow1.png"), DOWN("1downarrow1.png"), RIGHT2("arrow.plain.right.gif"), DOWN2("arrow.plain.down.gif"),
 
         // MOUSE POINTERS
-        OPEN_HAND("OpenedHand.gif"), OPEN_HAND_SMALL("OpenedHand2.gif"), CLOSED_HAND("ClosedHand.gif"),
+        OPEN_HAND("OpenedHand.gif"), OPEN_HAND_SMALL("OpenedHand2.gif"), CLOSED_HAND("ClosedHand.gif"), OPEN_HAND_MAC("pointer.png"), CLOSED_HAND_MAC("drag.png"),
 
         PAN("pan24x24.png"), PAN_SELECTED("pan_selected24x24.png"),
 
