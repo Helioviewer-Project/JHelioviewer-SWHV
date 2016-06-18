@@ -212,10 +212,6 @@ public class ImageViewerGui {
         }
     }
 
-    public static void toggleFullScreen() {
-        glWindow.setFullscreen(!glWindow.isFullscreen());
-    }
-
     /**
      * Loads the images which have to be displayed when the program starts.
      *
@@ -259,6 +255,10 @@ public class ImageViewerGui {
 
     public static JScrollPane getLeftScrollPane() {
         return leftScrollPane;
+    }
+
+    public static GLWindow getGLWindow() {
+        return glWindow;
     }
 
     public static NewtCanvasAWT getGLComponent() {
