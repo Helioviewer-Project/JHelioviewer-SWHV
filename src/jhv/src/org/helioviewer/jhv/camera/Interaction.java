@@ -40,7 +40,7 @@ public class Interaction implements MouseListener, KeyListener {
         if (r == 0)
             return;
 
-        camera.zoom(Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL * r);
+        camera.zoom(-Displayer.CAMERA_ZOOM_MULTIPLIER_WHEEL * r);
 
         Displayer.render(0.5);
         wheelTimer.restart();
