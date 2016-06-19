@@ -84,31 +84,13 @@ public class ImageViewerGui {
 
     public static void prepareGui() {
         mainFrame = createMainFrame();
-
-        JMenuBar menuBar = new MenuBar();
-        mainFrame.setJMenuBar(menuBar);
-
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        mainFrame.setContentPane(contentPanel);
-
-        final JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
-        midSplitPane.setDividerSize(2);
-        midSplitPane.setBorder(null);
-        contentPanel.add(midSplitPane, BorderLayout.CENTER);
+        mainFrame.setJMenuBar(new MenuBar());
 
         Camera camera = Displayer.getCamera();
         rotationInteraction = new InteractionRotate(camera);
         panInteraction = new InteractionPan(camera);
         annotateInteraction = new InteractionAnnotate(camera);
         currentInteraction = rotationInteraction;
-
-        // STATUS PANEL
-        zoomStatus = new ZoomStatusPanel(); // zoomStatus has to be initialised before topToolBar
-        carringtonStatus = new CarringtonStatusPanel();
-        framerateStatus = new FramerateStatusPanel();
-
-        TopToolBar topToolBar = new TopToolBar();
-        contentPanel.add(topToolBar, BorderLayout.PAGE_START);
 
         leftPane = new SideContentPane();
         // Movie control
@@ -143,9 +125,17 @@ public class ImageViewerGui {
         inputController = new InputController(glWindow, glComponent);
         mainContentPanel = new MainContentPanel(glComponent);
 
+        JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
+        midSplitPane.setDividerSize(2);
+        midSplitPane.setBorder(null);
+
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
 
+        // STATUS PANEL
+        zoomStatus = new ZoomStatusPanel();
+        carringtonStatus = new CarringtonStatusPanel();
+        framerateStatus = new FramerateStatusPanel();
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);
 
@@ -155,7 +145,9 @@ public class ImageViewerGui {
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
 
-        contentPanel.add(statusPanel, BorderLayout.PAGE_END);
+        mainFrame.add(new TopToolBar(), BorderLayout.PAGE_START);
+        mainFrame.add(midSplitPane, BorderLayout.CENTER);
+        mainFrame.add(statusPanel, BorderLayout.PAGE_END);
 
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
