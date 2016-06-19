@@ -1,0 +1,45 @@
+diff -ur jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java jogl-v2.3.2/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java
+--- jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2016-06-19 02:19:26.000000000 +0200
+@@ -1122,7 +1122,7 @@
+                                   //
+                                   // FIXME: IMHO this synchronization should be implicitly performed via 'CGL.flushBuffer(contextHandle)' above,
+                                   // in case this will be determined a driver bug - use a QUIRK entry in GLRendererQuirks!
+-                                  gl.glFinish();
++                                  // gl.glFinish();
+ 
+                                   // If v-sync is disabled, frames will be drawn as quickly as possible w/o delay,
+                                   // while still synchronizing w/ CALayer.
+diff -ur jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m jogl-v2.3.2/src/nativewindow/native/macosx/OSXmisc.m
+--- jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2/src/nativewindow/native/macosx/OSXmisc.m	2016-06-19 02:21:17.000000000 +0200
+@@ -336,6 +336,7 @@
+   (JNIEnv *env, jclass unused, jint x, jint y, jint width, jint height)
+ {
+     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
++    [CATransaction begin];
+     NSRect rect = NSMakeRect(x, y, width, height);
+ 
+     // Allocate the window
+@@ -365,6 +366,7 @@
+     // [myView lockFocus];
+     // [myView unlockFocus];
+ 
++    [CATransaction commit];
+     [pool release];
+ 
+     return (jlong) ((intptr_t) myWindow);
+@@ -379,9 +381,12 @@
+   (JNIEnv *env, jclass unused, jlong nsWindow)
+ {
+     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+-    NSWindow* mWin = (NSWindow*) ((intptr_t) nsWindow);
++    [CATransaction begin];
+ 
++    NSWindow* mWin = (NSWindow*) ((intptr_t) nsWindow);
+     [mWin close]; // performs release!
++
++    [CATransaction commit];
+     [pool release];
+ }
+ 

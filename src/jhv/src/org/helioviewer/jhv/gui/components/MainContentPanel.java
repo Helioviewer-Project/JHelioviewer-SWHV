@@ -5,8 +5,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
@@ -50,15 +48,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
         splitPane.setResizeWeight(0.66);
 
         splitPane.setTopComponent(container);
-
-        if (System.getProperty("jhv.os").equals("mac")) {
-            splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent pce) {
-                    splitPane.setTopComponent(container);
-                }
-            });
-        }
 
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension());
