@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -12,8 +11,6 @@ import java.net.URI;
 import java.util.List;
 
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
@@ -93,7 +90,6 @@ public class ImageViewerGui {
         currentInteraction = rotationInteraction;
 
         leftPane = new SideContentPane();
-        // Movie control
         leftPane.add("Movie Controls", MoviePanel.getInstance(), true);
         MoviePanel.setAdvanced(false);
 
@@ -122,7 +118,7 @@ public class ImageViewerGui {
 
         glComponent = new NewtCanvasAWT(glWindow);
 
-        inputController = new InputController(glWindow, glComponent);
+        inputController = new InputController(glWindow);
         mainContentPanel = new MainContentPanel(glComponent);
 
         JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
@@ -152,9 +148,6 @@ public class ImageViewerGui {
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
-
-        // force GLCanvas initialisation for pixel scale
-        // glComponent.display();
     }
 
     private static JFrame createMainFrame() {
@@ -181,12 +174,12 @@ public class ImageViewerGui {
         return frame;
     }
 
-    private static void enableFullScreen(Window window) {
+    private static void enableFullScreen(java.awt.Window window) {
         if (System.getProperty("jhv.os").equals("mac")) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             try {
                 Class<?> fullScreenUtilities = Class.forName("com.apple.eawt.FullScreenUtilities");
-                Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", Window.class, boolean.class);
+                Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", java.awt.Window.class, boolean.class);
                 setWindowCanFullScreen.invoke(fullScreenUtilities, window, true);
             } catch (Exception e) {
                 Log.error("Fullscreen utilities not available");

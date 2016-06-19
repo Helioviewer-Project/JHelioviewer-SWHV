@@ -1,14 +1,11 @@
 package org.helioviewer.jhv.input;
 
-import java.awt.Component;
-import java.awt.Cursor;
 import java.util.HashSet;
 
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIGlobals;
 
 import com.jogamp.newt.Window;
 import com.jogamp.newt.event.KeyEvent;
@@ -18,12 +15,7 @@ import com.jogamp.newt.event.MouseListener;
 
 public class InputController implements MouseListener, KeyListener {
 
-    private final Component awtComponent;
-
-    private boolean buttonDown = false;
-
-    public InputController(Window window, Component awtComponent) {
-        this.awtComponent = awtComponent;
+    public InputController(Window window) {
         window.addMouseListener(this);
         window.addKeyListener(this);
   }
@@ -37,31 +29,20 @@ public class InputController implements MouseListener, KeyListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
-            awtComponent.setCursor(buttonDown ? UIGlobals.closedHandCursor : UIGlobals.openHandCursor);
-        }
-
+        ImageViewerGui.getCurrentInteraction().mouseEntered(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseEntered(e);
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        awtComponent.setCursor(Cursor.getDefaultCursor());
-
+        ImageViewerGui.getCurrentInteraction().mouseExited(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseExited(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
-                awtComponent.setCursor(UIGlobals.closedHandCursor);
-            }
-            buttonDown = true;
-        }
-
         ImageViewerGui.getCurrentInteraction().mousePressed(e);
         for (MouseListener listener : mouseListeners)
             listener.mousePressed(e);
@@ -69,13 +50,6 @@ public class InputController implements MouseListener, KeyListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
-                awtComponent.setCursor(UIGlobals.openHandCursor);
-            }
-            buttonDown = false;
-        }
-
         ImageViewerGui.getCurrentInteraction().mouseReleased(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseReleased(e);
