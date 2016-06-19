@@ -36,12 +36,11 @@ public class UIGlobals {
                 defaultFont = "HelveticaNeue";
                 defaultSize -= 1;
 
-                openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND_MAC).getImage(), new Point(5, 1), IconBank.getIcon(JHVIcon.OPEN_HAND_MAC).toString());
                 closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC).getImage(), new Point(5, 1), IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC).toString());
             } else {
-                openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 8), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
                 closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 8), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
             }
+            openHandCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 
             HashMap<TextAttribute, Object> map = new HashMap<TextAttribute, Object>();
             map.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
@@ -99,7 +98,7 @@ public class UIGlobals {
 
     public static Font UIFontRoboto;
 
-    public static Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 8), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
-    public static Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 8), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
+    public static Cursor openHandCursor;
+    public static Cursor closedHandCursor;
 
 }
