@@ -45,8 +45,21 @@ diff -ur jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m jogl-v2.3.2/s
  
 diff -ur jogl-v2.3.2-orig/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java jogl-v2.3.2/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java
 --- jogl-v2.3.2-orig/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java	2015-10-10 03:08:14.000000000 +0200
-+++ jogl-v2.3.2/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java	2016-06-20 08:50:16.000000000 +0200
-@@ -763,20 +763,20 @@
++++ jogl-v2.3.2/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java	2016-06-20 09:21:16.000000000 +0200
+@@ -744,7 +744,11 @@
+                 if( 0 != surfaceHandle ) {
+                     throw new NativeWindowException("Internal Error - create w/o window, but has Newt NSView");
+                 }
+-                surfaceHandle = createView0(pS.getX(), pS.getY(), width, height);
++                OSXUtil.RunOnMainThread(true, false /* kickNSApp */, new Runnable() {
++                    @Override
++                    public void run() {
++                        surfaceHandle = createView0(pS.getX(), pS.getY(), width, height);
++                    } });
+                 if( 0 == surfaceHandle ) {
+                     throw new NativeWindowException("Could not create native view "+Thread.currentThread().getName()+" "+this);
+                 }
+@@ -763,20 +767,20 @@
                  }
                  windowStyle = ws;
              }
