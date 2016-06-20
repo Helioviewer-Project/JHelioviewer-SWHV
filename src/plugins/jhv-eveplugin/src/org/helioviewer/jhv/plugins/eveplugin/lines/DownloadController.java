@@ -36,9 +36,11 @@ public class DownloadController {
     public void updateBand(Band band, long start, long end) {
         List<Interval> missingIntervalsNoExtend = band.getMissingDaysInInterval(start, end);
         if (!missingIntervalsNoExtend.isEmpty()) {
-            Interval realQueryInterval = extendQueryInterval(start, end);
-            ArrayList<Interval> intervals = getIntervals(band, realQueryInterval);
+            // extend
+            start -= 7 * TimeUtils.DAY_IN_MILLIS;
+            end += 7 * TimeUtils.DAY_IN_MILLIS;
 
+            ArrayList<Interval> intervals = getIntervals(band, start, end);
             if (intervals == null) {
                 return;
             }
@@ -69,12 +71,8 @@ public class DownloadController {
         futureJobs.put(band, fj);
     }
 
-    private Interval extendQueryInterval(long start, long end) {
-        return new Interval(start - 7 * TimeUtils.DAY_IN_MILLIS, end + 7 * TimeUtils.DAY_IN_MILLIS);
-    }
-
-    private ArrayList<Interval> getIntervals(Band band, Interval queryInterval) {
-        List<Interval> missingIntervals = band.addRequest(band, queryInterval);
+    private ArrayList<Interval> getIntervals(Band band, long start, long end) {
+        List<Interval> missingIntervals = band.addRequest(start, end);
         if (missingIntervals.isEmpty()) {
             return null;
         }
