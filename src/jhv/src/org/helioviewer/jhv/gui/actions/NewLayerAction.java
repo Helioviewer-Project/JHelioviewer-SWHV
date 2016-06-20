@@ -23,7 +23,7 @@ public class NewLayerAction extends AbstractAction {
         super("New Layer...", useIcon ? IconBank.getIcon(JHVIcon.ADD) : null);
         putValue(SHORT_DESCRIPTION, "Add new layer");
 
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true);
         putValue(ACCELERATOR_KEY, key);
         KeyShortcuts.registerKey(key, this);
     }

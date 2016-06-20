@@ -102,7 +102,7 @@ public class InputController implements MouseListener, KeyListener {
                 break;
         }
 
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(code, e.getModifiers());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(code, e.getModifiers(), true);
         if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource(), 0))
             return;
 

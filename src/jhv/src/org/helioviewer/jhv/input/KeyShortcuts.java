@@ -8,9 +8,6 @@ import java.util.HashMap;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
-import javax.swing.JPanel;
-
-import com.jogamp.newt.Window;
 
 public class KeyShortcuts {
 
@@ -24,17 +21,14 @@ public class KeyShortcuts {
         actionMap.remove(key);
     }
 
-    // this is delicate
     private KeyShortcuts() {
-        final JPanel dummy = new JPanel();
         final KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         kfm.addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
-                KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(e);
-                if (e.getSource() instanceof Window && handleKeyStroke(keyStroke, e.getSource(), e.getID())) {
-                    kfm.redispatchEvent(dummy, e);
-                    return true;
+                int id = e.getID();
+                if (id == KeyEvent.KEY_RELEASED) {
+                    return handleKeyStroke(KeyStroke.getKeyStrokeForEvent(e), e.getSource(), id);
                 }
                 return false;
             }
