@@ -75,7 +75,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         calPopupButton.addActionListener(this);
 
         // place sub components
-
         add(calPopupButton, BorderLayout.EAST);
         add(textField, BorderLayout.CENTER);
     }

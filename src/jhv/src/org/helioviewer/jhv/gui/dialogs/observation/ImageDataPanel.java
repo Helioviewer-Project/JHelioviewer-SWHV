@@ -171,8 +171,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        ObservationDialogDateModel.getInstance().setStartDate(new Date(timeSelectionPanel.getStartTime()), true);
-        ObservationDialogDateModel.getInstance().setEndDate(new Date(timeSelectionPanel.getEndTime()), true);
+        ObservationDialogDateModel.getInstance().setStartDate(new Date(getStartTime()), true);
+        ObservationDialogDateModel.getInstance().setEndDate(new Date(getEndTime()), true);
 
         // check if start date is before end date -> if not show message
         if (!timeSelectionPanel.isStartDateBeforeEndDate()) {
@@ -218,7 +218,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             carringtonEnd = new JHVCarringtonPicker(true);
             carringtonEnd.addJHVCalendarListener(this);
             carringtonEnd.setToolTipText("Carrington rotation for observation end");
-            carringtonEnd.setDate(getEndTime());
+            carringtonEnd.setTime(getEndTime());
 
             // create start date picker
             calendarStartDate = new JHVCalendarDatePicker();
@@ -233,7 +233,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             carringtonStart = new JHVCarringtonPicker(false);
             carringtonStart.addJHVCalendarListener(this);
             carringtonStart.setToolTipText("Carrington rotation for observation start");
-            carringtonStart.setDate(getStartTime());
+            carringtonStart.setTime(getStartTime());
 
             // add components to panel
             JPanel startDatePane = new JPanel(new BorderLayout());
@@ -299,16 +299,16 @@ public class ImageDataPanel extends ObservationDialogPanel {
         @Override
         public void actionPerformed(JHVCalendarEvent e) {
             if (e.getSource() == calendarStartDate) {
-                setStartDate(new Date(getStartTime()), true);
-                carringtonStart.setDate(getStartTime());
+                long time = getStartTime();
+                setStartDate(new Date(time), true);
+                carringtonStart.setTime(time);
             } else if (e.getSource() == calendarEndDate) {
-                setEndDate(new Date(getEndTime()), true);
-                carringtonEnd.setDate(getEndTime());
+                long time = getEndTime();
+                setEndDate(new Date(time), true);
+                carringtonEnd.setTime(time);
             } else if (e.getSource() == carringtonStart) {
-                textStartTime.setText(TimeUtils.timeDateFormat.format(carringtonStart.getDate()));
                 setStartDate(carringtonStart.getDate(), true);
             } else if (e.getSource() == carringtonEnd) {
-                textEndTime.setText(TimeUtils.timeDateFormat.format(carringtonEnd.getDate()));
                 setEndDate(carringtonEnd.getDate(), true);
             }
         }
@@ -329,7 +329,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *
          * @return selected start time.
          * */
-        public long getStartTime() {
+        private long getStartTime() {
             return (calendarStartDate.getDate().getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textStartTime.getValue().getTime();
         }
 
@@ -338,7 +338,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *
          * @return selected end time.
          */
-        public long getEndTime() {
+        private long getEndTime() {
             return (calendarEndDate.getDate().getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textEndTime.getValue().getTime();
         }
 
