@@ -193,8 +193,8 @@ public class Band extends AbstractLineDataSelectorElement {
         return yAxis;
     }
 
-    public List<Interval> addRequest(Band band, Interval interval) {
-        return requestCache.adaptRequestCache(interval.start, interval.end);
+    public List<Interval> addRequest(long start, long end) {
+        return requestCache.adaptRequestCache(start, end);
     }
 
     public List<Interval> getMissingDaysInInterval(long start, long end) {
