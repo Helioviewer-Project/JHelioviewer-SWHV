@@ -1,6 +1,6 @@
 diff -ur jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java jogl-v2.3.2/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java
 --- jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2015-10-10 03:08:14.000000000 +0200
-+++ jogl-v2.3.2/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2016-06-19 02:19:26.000000000 +0200
++++ jogl-v2.3.2/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2016-06-20 08:47:10.000000000 +0200
 @@ -1122,7 +1122,7 @@
                                    //
                                    // FIXME: IMHO this synchronization should be implicitly performed via 'CGL.flushBuffer(contextHandle)' above,
@@ -12,7 +12,7 @@ diff -ur jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLCon
                                    // while still synchronizing w/ CALayer.
 diff -ur jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m jogl-v2.3.2/src/nativewindow/native/macosx/OSXmisc.m
 --- jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m	2015-10-10 03:08:14.000000000 +0200
-+++ jogl-v2.3.2/src/nativewindow/native/macosx/OSXmisc.m	2016-06-19 02:21:17.000000000 +0200
++++ jogl-v2.3.2/src/nativewindow/native/macosx/OSXmisc.m	2016-06-20 08:47:10.000000000 +0200
 @@ -336,6 +336,7 @@
    (JNIEnv *env, jclass unused, jint x, jint y, jint width, jint height)
  {
@@ -43,3 +43,37 @@ diff -ur jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m jogl-v2.3.2/s
      [pool release];
  }
  
+diff -ur jogl-v2.3.2-orig/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java jogl-v2.3.2/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java
+--- jogl-v2.3.2-orig/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java	2016-06-20 08:50:16.000000000 +0200
+@@ -763,20 +763,20 @@
+                 }
+                 windowStyle = ws;
+             }
+-            final long newWin = createWindow0( pS.getX(), pS.getY(), width, height,
+-                                               0 != ( STATE_MASK_FULLSCREEN & flags),
+-                                               windowStyle,
+-                                               NSBackingStoreBuffered, surfaceHandle);
+-            if ( newWin == 0 ) {
+-                throw new NativeWindowException("Could not create native window "+Thread.currentThread().getName()+" "+this);
+-            }
+-            setWindowHandle( newWin );
+-
+-            final boolean isOpaque = getGraphicsConfiguration().getChosenCapabilities().isBackgroundOpaque() && !offscreenInstance;
+             // Blocking initialization on main-thread!
+             OSXUtil.RunOnMainThread(true, false /* kickNSApp */, new Runnable() {
+                     @Override
+                     public void run() {
++                        long newWin = createWindow0( pS.getX(), pS.getY(), width, height,
++                                                     0 != ( STATE_MASK_FULLSCREEN & flags),
++                                                     windowStyle,
++                                                     NSBackingStoreBuffered, surfaceHandle);
++                        if ( newWin == 0 ) {
++                            throw new NativeWindowException("Could not create native window "+Thread.currentThread().getName()+" "+this);
++                        }
++                        setWindowHandle( newWin );
++
++                        boolean isOpaque = getGraphicsConfiguration().getChosenCapabilities().isBackgroundOpaque() && !offscreenInstance;
+                         initWindow0( parentWinHandle, newWin, pS.getX(), pS.getY(), width, height, reqPixelScale[0] /* HiDPI uniformPixelScale */,
+                                      isOpaque,
+                                      !offscreenInstance && 0 != ( STATE_MASK_ALWAYSONTOP & flags),
