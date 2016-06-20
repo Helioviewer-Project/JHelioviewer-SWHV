@@ -171,7 +171,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             availableAxis.start = availableInterval.start;
             availableAxis.end = availableInterval.end;
         }
-        optionsPanel.updateSelectedInterval(selectedAxis);
+        optionsPanel.updateSelectedInterval();
 
         for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
             el.fetchData(selectedAxis);

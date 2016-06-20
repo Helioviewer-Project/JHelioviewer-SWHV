@@ -115,7 +115,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         }
     }
 
-    void updateSelectedInterval(TimeAxis selectedAxis) {
+    void updateSelectedInterval() {
         zoomCombo.setSelectedItem(zoomCombo.getItemAt(0));
     }
 

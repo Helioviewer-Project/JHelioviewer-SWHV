@@ -28,10 +28,7 @@ public class KeyShortcuts {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 int id = e.getID();
-                if (id == KeyEvent.KEY_RELEASED) {
-                    return handleKeyStroke(KeyStroke.getKeyStrokeForEvent(e), e.getSource(), id);
-                }
-                return false;
+                return id == KeyEvent.KEY_RELEASED && handleKeyStroke(KeyStroke.getKeyStrokeForEvent(e), e.getSource(), id);
             }
         });
     }
