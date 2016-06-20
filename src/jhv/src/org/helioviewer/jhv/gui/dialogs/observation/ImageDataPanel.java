@@ -320,7 +320,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * @return boolean value if selected start date is before or equal to
          *         selected end date.
          */
-        public boolean isStartDateBeforeEndDate() {
+        boolean isStartDateBeforeEndDate() {
             return calendarStartDate.getDate().getTime() <= calendarEndDate.getDate().getTime();
         }
 

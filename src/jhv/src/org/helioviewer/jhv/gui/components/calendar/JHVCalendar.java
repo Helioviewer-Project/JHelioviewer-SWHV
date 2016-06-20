@@ -15,10 +15,8 @@ import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
 import java.util.AbstractList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -667,18 +665,10 @@ public class JHVCalendar extends JPanel implements ComponentListener {
         private final JButton dateButton = new JButton();
 
         public BottomPanel() {
-            initVisualComponents();
-        }
-
-        /**
-         * Initialize the visual parts of the component.
-         */
-        private void initVisualComponents() {
             // set basic layout
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
             // set up button
-            dateButton.setText("Today is " + dateFormat.format(new GregorianCalendar().getTime()));
-            dateButton.setBorder(BorderFactory.createEtchedBorder());
+            dateButton.setText("Today is " + dateFormat.format(new Date()));
             dateButton.addActionListener(this);
             // add label to component
             add(dateButton);
@@ -692,7 +682,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             changeDisplayMode(DisplayMode.DAYS);
-            setDate(new GregorianCalendar().getTime());
+            setDate(new Date());
         }
 
     }
