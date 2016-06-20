@@ -103,7 +103,7 @@ public class InputController implements MouseListener, KeyListener {
         }
 
         KeyStroke keyStroke = KeyStroke.getKeyStroke(code, e.getModifiers(), true);
-        if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource(), 0))
+        if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource(), java.awt.event.KeyEvent.KEY_RELEASED))
             return;
 
         ImageViewerGui.getCurrentInteraction().keyReleased(e);

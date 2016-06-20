@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,6 +30,7 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class JHVCarringtonPicker extends JPanel implements FocusListener, ActionListener, JHVCalendarListener {
+
     private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
 
     private final JButton crPopupButton;
@@ -38,9 +41,12 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     public JHVCarringtonPicker(boolean isEnd) {
         isEndDate = isEnd;
+        setLayout(new BorderLayout());
 
         crPopupButton = new JButton("CR");
-        crPopupButton.setPreferredSize(new Dimension(crPopupButton.getFontMetrics(crPopupButton.getFont()).stringWidth("CR") + 14, crPopupButton.getFontMetrics(crPopupButton.getFont()).getHeight()));
+        crPopupButton.setMargin(new Insets(0, 0, 0, 0));
+        FontMetrics fm = crPopupButton.getFontMetrics(crPopupButton.getFont());
+        crPopupButton.setPreferredSize(new Dimension(fm.stringWidth("CR") + 14, fm.getHeight()));
         crPopupButton.addFocusListener(this);
         crPopupButton.addActionListener(this);
         add(crPopupButton);
@@ -68,8 +74,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
             setDate(carringtonPanel.getDate());
             carringtonPanel = null;
         }
-        // inform all listeners of this class that a new date was choosen by the
-        // user
+        // inform all listeners of this class that a new date was choosen by the user
         informAllJHVCalendarListeners(new JHVCalendarEvent(this));
     }
 
@@ -135,7 +140,6 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
             crPopup.hide();
             crPopup = null;
         }
-
     }
 
     private void showCRPopup() {
@@ -274,7 +278,6 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
             if (!isEndDate) {
                 currentDate = Carrington.CR_start[location];
             } else {
-
                 if ((location + 1) < Carrington.CR_start.length) {
                     currentDate = Carrington.CR_start[location + 1] - 1000;
                 } else {
@@ -291,6 +294,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
             }
             return cr;
         }
+
     }
 
 }
