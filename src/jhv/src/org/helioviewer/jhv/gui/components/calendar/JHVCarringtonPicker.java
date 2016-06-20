@@ -12,9 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.AbstractList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
@@ -36,11 +33,9 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
     private final JButton crPopupButton;
     private Popup crPopup = null;
     private JHVCarrington carringtonPanel = null;
-    private final Calendar calendar = new GregorianCalendar();
-    private final boolean isEndDate;
+    private long time;
 
-    public JHVCarringtonPicker(boolean isEnd) {
-        isEndDate = isEnd;
+    public JHVCarringtonPicker() {
         setLayout(new BorderLayout());
 
         crPopupButton = new JButton("CR");
@@ -70,8 +65,6 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         if (e.getSource().equals(carringtonPanel)) {
             // close popup
             hideCRPopup();
-            // set selected date
-            setTime(carringtonPanel.getTime());
             carringtonPanel = null;
         }
         // inform all listeners of this class that a new date was choosen by the user
@@ -105,12 +98,12 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     public void setTime(long time) {
         if (time > TimeUtils.MINIMAL_DATE.milli && time < TimeUtils.MAXIMAL_DATE.milli) {
-            calendar.setTimeInMillis(time);
+            this.time = time;
         }
     }
 
-    public Date getDate() {
-        return calendar.getTime();
+    public long getTime() {
+        return time;
     }
 
     private void informAllJHVCalendarListeners(JHVCalendarEvent e) {
@@ -144,7 +137,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     private void showCRPopup() {
         // set up the popup content
-        carringtonPanel = new JHVCarrington(calendar.getTime().getTime(), isEndDate);
+        carringtonPanel = new JHVCarrington();
         carringtonPanel.setPreferredSize(carringtonPanel.getMinimumSize());
         carringtonPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         carringtonPanel.addJHVCalendarListener(this);
@@ -194,43 +187,20 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
     }
 
     @SuppressWarnings("serial")
-    private static class JHVCarrington extends JPanel implements ActionListener {
+    private class JHVCarrington extends JPanel implements ActionListener {
 
         private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
-        private long currentTime = System.currentTimeMillis();
         private final JComboBox crCombo;
-        private final boolean isEndDate;
 
-        public JHVCarrington(long time, boolean isEnd) {
-            isEndDate = isEnd;
+        public JHVCarrington() {
             setLayout(new BorderLayout());
 
             crCombo = new JComboBox(createCRList());
-            setTime(time);
-            crCombo.addActionListener(this);
-            add(crCombo);
-        }
-
-        /**
-         * Sets the current time to the calendar component.
-         *
-         * @param time
-         *            Selected time of the calendar component.
-         */
-        public void setTime(long time) {
-            currentTime = time;
-
             double cr = Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL;
             crCombo.setSelectedIndex((int) Math.round(cr));
-        }
 
-        /**
-         * Returns the selected time of the calendar component.
-         *
-         * @return selected date.
-         */
-        public long getTime() {
-            return currentTime;
+            crCombo.addActionListener(this);
+            add(crCombo);
         }
 
         /**
@@ -273,16 +243,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int cr = crCombo.getSelectedIndex();
-            if (!isEndDate) {
-                currentTime = Carrington.CR_start[cr];
-            } else {
-                if (cr + 1 < Carrington.CR_start.length) {
-                    currentTime = Carrington.CR_start[cr + 1] - 1000;
-                } else {
-                    currentTime = Carrington.CR_start[cr];
-                }
-            }
+            time = Carrington.CR_start[crCombo.getSelectedIndex()];
             informAllJHVCalendarListeners(new JHVCalendarEvent(this));
         }
 
