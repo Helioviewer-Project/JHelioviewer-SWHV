@@ -11,6 +11,8 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
+import com.jogamp.newt.opengl.GLWindow;
+
 @SuppressWarnings("serial")
 public class ToggleFullscreenAction extends AbstractAction {
 
@@ -28,7 +30,8 @@ public class ToggleFullscreenAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean full = ImageViewerGui.getGLWindow().isFullscreen();
+        final GLWindow window = ImageViewerGui.getGLWindow();
+        final boolean full = window.isFullscreen();
         if (full) {
             KeyShortcuts.unregisterKey(exitKey);
             KeyShortcuts.unregisterKey(playKey);
@@ -36,7 +39,15 @@ public class ToggleFullscreenAction extends AbstractAction {
             KeyShortcuts.registerKey(exitKey, this);
             KeyShortcuts.registerKey(playKey, MoviePanel.getPlayPauseAction());
         }
-        ImageViewerGui.getGLWindow().setFullscreen(!full);
+
+        new Thread() {
+            @Override
+            public void run() {
+                Thread t = window.setExclusiveContextThread(null);
+                window.setFullscreen(!full);
+                window.setExclusiveContextThread(t);
+            }
+        }.start();
     }
 
 }
