@@ -11,7 +11,6 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.EventDispatchQueue;
 import org.helioviewer.jhv.base.logging.Log;
@@ -164,13 +163,9 @@ public class APIRequestManager {
      */
     public static View requestAndOpenRemoteFile(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
         if (startTime == endTime) {
-            if (server == null) // use default
-                server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
-            return loadImage(server, sourceId, startTime, message);
+            return loadImage(DataSources.getServerSetting(server, "API.jp2images.path"), sourceId, startTime, message);
         } else {
-            if (server == null) // use default
-                server = Settings.getSingletonInstance().getProperty("API.jp2series.path");
-            return loadImageSeries(server, sourceId, startTime, endTime, cadence, message);
+            return loadImageSeries(DataSources.getServerSetting(server, "API.jp2series.path"), sourceId, startTime, endTime, cadence, message);
         }
     }
 

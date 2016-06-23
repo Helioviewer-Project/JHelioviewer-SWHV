@@ -8,14 +8,16 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 public class LoadRemoteTask extends LoadURITask {
 
+    private final String server;
     private final int sourceId;
     private final long startTime;
     private final long endTime;
     private final int cadence;
 
-    public LoadRemoteTask(int _sourceId, long _startTime, long _endTime, int _cadence) {
+    public LoadRemoteTask(String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
         super(null, null);
 
+        server = _server;
         sourceId = _sourceId;
         startTime = _startTime;
         endTime = _endTime;
@@ -27,7 +29,7 @@ public class LoadRemoteTask extends LoadURITask {
     protected View backgroundWork() {
         View view = null;
         try {
-            view = APIRequestManager.requestAndOpenRemoteFile(null, sourceId, startTime, endTime, cadence, true);
+            view = APIRequestManager.requestAndOpenRemoteFile(server, sourceId, startTime, endTime, cadence, true);
         } catch (IOException e) {
             Log.error("An error occured while opening the remote file: ", e);
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);
