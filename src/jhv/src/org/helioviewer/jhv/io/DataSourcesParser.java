@@ -85,24 +85,26 @@ public class DataSourcesParser {
 
         for (String key : sorted) {
             JSONObject json = root.getJSONObject(key);
+            String name = json.getString("name").replace((char) 8287, ' '); // for Windows
+            if (str == null && !DataSources.SupportedObservatories.contains(name)) // filter top level
+                continue;
 
             if (json.has("sourceId")) { // leaf
-                SourceItem item = new SourceItem(key, mergeNames(str, json.getString("name").replace((char) 8287, ' ')), // for Windows
-                                                      json.getString("description"),
-                                                      json.optBoolean("default", false),
-                                                      json.getInt("sourceId"),
-                                                      TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime(),
-                                                      TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime());
+                SourceItem item = new SourceItem(key, mergeNames(str, name),
+                                                 json.getString("description"),
+                                                 json.optBoolean("default", false),
+                                                 json.getInt("sourceId"),
+                                                 TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime(),
+                                                 TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime());
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);
                 if (item.defaultItem)
                     defaultPath = treeNode.getPath();
             } else {
-                String name = json.getString("name").replace((char) 8287, ' '); // for Windows
-                if (str == null) { // show only first level, else flatten hierarchy
+                if (str == null) { // show only top level, else flatten hierarchy
                     Item item = new Item(key, name,
-                                              json.getString("description"),
-                                              json.optBoolean("default", false));
+                                         json.getString("description"),
+                                         json.optBoolean("default", false));
                     DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item);
                     parentNode.add(treeNode);
                     parse(treeNode, json.getJSONObject("children"), "");

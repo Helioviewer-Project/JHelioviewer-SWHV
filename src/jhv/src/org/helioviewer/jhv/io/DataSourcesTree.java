@@ -72,7 +72,7 @@ public class DataSourcesTree extends JTree {
         @Override
         public void resetRowSelection() {
             super.resetRowSelection();
-            if (selectedPath != null)
+            if (selectedPath != null && selection == null)
                 selection = new TreePath[] { selectedPath };
         }
 
