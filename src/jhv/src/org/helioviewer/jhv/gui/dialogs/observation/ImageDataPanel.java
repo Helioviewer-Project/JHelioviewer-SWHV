@@ -64,7 +64,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         sourcesTree.setParsedData(parser);
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        if (item != null) {
+        if (item != null) { // valid
             if (first) {
                 first = false;
 
@@ -90,7 +90,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     int getSourceId() {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        if (item != null)
+        if (item != null) // valid
             return item.sourceId;
         else
             return -1;
@@ -148,9 +148,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * the GUI which represents the image series.
      * */
     private void loadRemote() {
-        int sourceId = getSourceId();
-        if (sourceId != -1) {
-            LoadRemoteTask remoteTask = new LoadRemoteTask(sourceId, getStartTime(), getEndTime(), getCadence());
+        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
+        if (item != null) { // valid
+            LoadRemoteTask remoteTask = new LoadRemoteTask(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
             JHVGlobals.getExecutorService().execute(remoteTask);
         }
     }
@@ -160,7 +160,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     @Override
     public boolean loadButtonPressed() {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        if (item == null) {
+        if (item == null) { // not valid
             Message.err("Data is not selected", "There is no information on what to add", false);
             return false;
         }

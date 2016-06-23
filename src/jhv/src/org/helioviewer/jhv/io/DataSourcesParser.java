@@ -15,7 +15,10 @@ public class DataSourcesParser {
     DefaultMutableTreeNode defaultNode;
     DefaultMutableTreeNode rootNode;
 
+    private final String server;
+
     DataSourcesParser(String server) {
+        this.server = server;
         rootNode = new DefaultMutableTreeNode(server);
     }
 
@@ -42,12 +45,12 @@ public class DataSourcesParser {
                 continue;
 
             if (json.has("sourceId")) { // leaf
-                DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(key, mergeNames(str, name),
-                                                                               json.getString("description"),
-                                                                               json.getInt("sourceId"),
-                                                                               TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime(),
-                                                                               TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime(),
-                                                                               json.optBoolean("default", false));
+                DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, key, mergeNames(str, name),
+                                                                                 json.getString("description"),
+                                                                                 json.getInt("sourceId"),
+                                                                                 TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime(),
+                                                                                 TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime(),
+                                                                                 json.optBoolean("default", false));
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);
                 if (item.defaultItem)

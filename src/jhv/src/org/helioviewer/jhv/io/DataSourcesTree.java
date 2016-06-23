@@ -34,13 +34,15 @@ public class DataSourcesTree extends JTree {
 
     public static class SourceItem extends Item {
 
+        public final String server;
         public final int sourceId;
         public final long start;
         public final long end;
         public final boolean defaultItem;
 
-        public SourceItem(String key, String name, String description, int sourceId, long start, long end, boolean defaultItem) {
+        public SourceItem(String server, String key, String name, String description, int sourceId, long start, long end, boolean defaultItem) {
             super(key, name, description);
+            this.server = server;
             this.sourceId = sourceId;
             this.start = start;
             this.end = end;
