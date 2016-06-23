@@ -63,7 +63,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     public void setupSources(DataSourcesParser parser) {
         sourcesTree.setParsedData(parser);
 
-        DataSourcesParser.SourceItem item = sourcesTree.getSelectedItem();
+        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item != null) {
             if (first) {
                 first = false;
@@ -89,7 +89,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     }
 
     int getSourceId() {
-        DataSourcesParser.SourceItem item = sourcesTree.getSelectedItem();
+        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item != null)
             return item.sourceId;
         else
@@ -159,7 +159,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     @Override
     public boolean loadButtonPressed() {
-        DataSourcesParser.SourceItem item = sourcesTree.getSelectedItem();
+        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) {
             Message.err("Data is not selected", "There is no information on what to add", false);
             return false;
