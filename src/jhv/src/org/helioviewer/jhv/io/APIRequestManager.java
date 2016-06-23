@@ -46,7 +46,7 @@ public class APIRequestManager {
      * @throws IOException
      */
     private static View loadImage(String server, int sourceId, long startTime, boolean message) throws IOException {
-        String fileRequest = server + "sourceId=" + Integer.toString(sourceId) + "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
+        String fileRequest = DataSources.getServerSetting(server, "API.jp2images.path") + "sourceId=" + Integer.toString(sourceId) + "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
         return requestData(jpipRequest, fileRequest, message);
     }
@@ -70,7 +70,7 @@ public class APIRequestManager {
      * @throws IOException
      */
     private static View loadImageSeries(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
-        String fileRequest = server + "sourceId=" + Integer.toString(sourceId) + "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
+        String fileRequest = DataSources.getServerSetting(server, "API.jp2series.path") + "sourceId=" + Integer.toString(sourceId) + "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
         if (cadence != -100) {
             fileRequest += "&cadence=" + Integer.toString(cadence);
         }
@@ -163,9 +163,9 @@ public class APIRequestManager {
      */
     public static View requestAndOpenRemoteFile(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
         if (startTime == endTime) {
-            return loadImage(DataSources.getServerSetting(server, "API.jp2images.path"), sourceId, startTime, message);
+            return loadImage(server, sourceId, startTime, message);
         } else {
-            return loadImageSeries(DataSources.getServerSetting(server, "API.jp2series.path"), sourceId, startTime, endTime, cadence, message);
+            return loadImageSeries(server, sourceId, startTime, endTime, cadence, message);
         }
     }
 

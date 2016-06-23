@@ -50,7 +50,7 @@ public class DataSources {
         }
     };
 
-    private static final String[] serverList = new String[] { "ROB", "IAS", "GSFC" };
+    private static final String[] serverList = new String[] { "ROB", "GSFC", "IAS" };
 
     public static String getServerSetting(String server, String setting) {
         Map<String, String> settings = serverSettings.get(server);
@@ -94,6 +94,14 @@ public class DataSources {
 
             comboModel = new DefaultComboBoxModel(serverList);
             comboModel.setSelectedItem(selectedServer);
+
+            DataSourcesTask loadTask;
+            loadTask = new DataSourcesTask("GSFC");
+            JHVGlobals.getExecutorService().execute(loadTask);
+            loadTask = new DataSourcesTask("ROB");
+            JHVGlobals.getExecutorService().execute(loadTask);
+            loadTask = new DataSourcesTask("IAS");
+            JHVGlobals.getExecutorService().execute(loadTask);
         }
         return instance;
     }
@@ -103,9 +111,6 @@ public class DataSources {
         for (Map.Entry<String, String> entry : map.entrySet()) {
             Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
         }
-
-        DataSourcesTask loadTask = new DataSourcesTask(server);
-        JHVGlobals.getExecutorService().execute(loadTask);
     }
 
     private static final ActionListener serverChange = new ActionListener() {
