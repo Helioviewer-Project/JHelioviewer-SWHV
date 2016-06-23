@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -28,6 +29,7 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
 
@@ -137,8 +139,19 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         paramsPanel.setLayout(new GridLayout(0, 1));
 
         JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row_1.add(new JLabel("Default server", JLabel.RIGHT));
-        row_1.add(DataSources.getServerComboBox());
+        row_1.add(new JLabel("Preferred server", JLabel.RIGHT));
+
+        final JComboBox combo = new JComboBox(new String[] { "ROB", "GSFC", "IAS" });
+        combo.setSelectedItem(DataSources.getPreferredServer());
+        combo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String server = (String) combo.getSelectedItem();
+                DataSources.saveServerSettings(server);
+                ObservationDialog.getInstance().setAvailabilityStatus(server);
+            }
+        });
+        row_1.add(combo);
         paramsPanel.add(row_1);
 
         JPanel row0 = new JPanel(new FlowLayout(FlowLayout.LEADING));

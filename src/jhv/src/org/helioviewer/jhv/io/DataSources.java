@@ -1,17 +1,11 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 
 public class DataSources {
 
@@ -50,7 +44,11 @@ public class DataSources {
         }
     };
 
-    private static final String[] serverList = new String[] { "ROB", "GSFC", "IAS" };
+    private static String preferredServer;
+
+    public static String getPreferredServer() {
+        return preferredServer;
+    }
 
     public static String getServerSetting(String server, String setting) {
         Map<String, String> settings = serverSettings.get(server);
@@ -60,8 +58,14 @@ public class DataSources {
             return null;
     }
 
+    public static void saveServerSettings(String server) {
+        Map<String, String> map = serverSettings.get(server);
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
+        }
+    }
+
     private static DataSources instance;
-    private static DefaultComboBoxModel comboModel;
 
     public static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
@@ -81,19 +85,15 @@ public class DataSources {
                 }
             }
 
-            String selectedServer;
             String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
             if (datasourcesPath.contains("ias.u-psud.fr")) {
-                selectedServer = "IAS";
+                preferredServer = "IAS";
             } else if (datasourcesPath.contains("helioviewer.org")) {
-                selectedServer = "GSFC";
+                preferredServer = "GSFC";
             } else {
-                selectedServer = "ROB";
+                preferredServer = "ROB";
             }
-            changeServer(selectedServer);
-
-            comboModel = new DefaultComboBoxModel(serverList);
-            comboModel.setSelectedItem(selectedServer);
+            saveServerSettings(preferredServer);
 
             DataSourcesTask loadTask;
             loadTask = new DataSourcesTask("GSFC");
@@ -104,37 +104,6 @@ public class DataSources {
             JHVGlobals.getExecutorService().execute(loadTask);
         }
         return instance;
-    }
-
-    private static void changeServer(String server) {
-        Map<String, String> map = serverSettings.get(server);
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
-        }
-    }
-
-    private static final ActionListener serverChange = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String server = (String) comboModel.getSelectedItem();
-                changeServer(server);
-                ObservationDialog.getInstance().setAvailabilityStatus(server);
-            }
-        };
-
-    private static boolean firstCombo = true;
-
-    public static JComboBox getServerComboBox() {
-        JComboBox combo = new JComboBox(comboModel);
-        if (firstCombo) {
-            firstCombo = false;
-            combo.addActionListener(serverChange);
-        }
-        return combo;
-    }
-
-    public static String getSelectedServer() {
-        return (String) comboModel.getSelectedItem();
     }
 
 }
