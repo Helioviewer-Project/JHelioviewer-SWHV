@@ -2,10 +2,6 @@ package org.helioviewer.jhv.io;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,13 +11,7 @@ import javax.swing.JComboBox;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.base.DownloadStream;
-import org.helioviewer.jhv.base.JSONUtils;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
-import org.helioviewer.jhv.threads.JHVWorker;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class DataSources {
 
@@ -108,54 +98,14 @@ public class DataSources {
         return instance;
     }
 
-    private static void changeServer(final String server) {
+    private static void changeServer(String server) {
         Map<String, String> map = serverSettings.get(server);
         for (Map.Entry<String, String> entry : map.entrySet()) {
             Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
         }
 
-        JHVWorker<Void, Void> reloadTask = new JHVWorker<Void, Void>() {
-
-            private final DataSourcesParser parser = new DataSourcesParser(server);
-
-            @Override
-            protected Void backgroundWork() {
-                while (true) {
-                    try {
-                        URL url = new URL(Settings.getSingletonInstance().getProperty("API.dataSources.path"));
-                        JSONObject json = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
-
-                        parser.parse(json);
-                        return null;
-                    } catch (MalformedURLException e) {
-                        Log.error("Invalid data sources URL", e);
-                        break;
-                    } catch (JSONException e) {
-                        Log.error("Invalid response while retrieving the available data sources", e);
-                        break;
-                    } catch (ParseException e) {
-                        Log.error("Invalid response while retrieving the available data sources", e);
-                        break;
-                    } catch (IOException e) {
-                        try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException e1) {
-                            Log.error(e1);
-                            break;
-                        }
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                ObservationDialog.getInstance().getObservationImagePane().setupSources(parser);
-            }
-
-        };
-        reloadTask.setThreadName("MAIN--ReloadServer");
-        JHVGlobals.getExecutorService().execute(reloadTask);
+        DataSourcesTask loadTask = new DataSourcesTask(server);
+        JHVGlobals.getExecutorService().execute(loadTask);
     }
 
     private static final ActionListener serverChange = new ActionListener() {
