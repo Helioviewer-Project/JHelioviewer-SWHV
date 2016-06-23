@@ -5,12 +5,9 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeSet;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -20,27 +17,11 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Data objects storing the information of available data as a central singleton
- * object.
- * <p>
- * On the first startup it will query
- * <code>http://helioviewer.org/api/?action=getDataSources</code> (or whatever
- * is set in the setting to "API.dataSources.path") and offer then convenient
- * methods to obtain the choices in drop down list as
- * <ul>
- * <li>Observatory (SDO, SOHO)
- * <li>Instrument (EIT,..)
- * <li>Detector
- * <li>Measurement (171..)
- * </ul>
- */
 public class DataSources {
 
     private static final HashMap<String, HashMap<String, String>> serverSettings = new HashMap<String, HashMap<String, String>>() {
@@ -88,80 +69,9 @@ public class DataSources {
             return null;
     }
 
-    public static class Item implements Comparable<Item> {
-
-        // Flag if this should take as default item
-        private final boolean defaultItem;
-
-        // Tooltip description
-        private final String description;
-
-        // Key as needed to send to the API for this item
-        private final String key;
-
-        // Display name for a dropdown list
-        private final String name;
-
-        /**
-         * Creates a new item
-         *
-         * @param key
-         *            Key to reference the API
-         * @param defaultItem
-         *            Flag to indicate usage as default
-         * @param name
-         *            Nice name to show, will be shown as toString()
-         * @param description
-         *            Longer description
-         */
-        public Item(String key, boolean defaultItem, String name, String description) {
-            this.key = key;
-            this.defaultItem = defaultItem;
-            this.name = name;
-            this.description = description;
-        }
-
-        @Override
-        public int compareTo(Item other) {
-            return JHVGlobals.alphanumComparator.compare(key, other.key);
-        }
-
-       @Override
-        public boolean equals(Object o) {
-           return o instanceof Item && key == ((Item) o).key;
-       }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public boolean isDefaultItem() {
-            return defaultItem;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-        @Override
-        public int hashCode() {
-            assert false : "hashCode not designed";
-            return 42;
-        }
-
-    }
-
     private static DataSources instance;
     private static DefaultComboBoxModel comboModel;
+
     public static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
     private DataSources() {}
@@ -197,153 +107,24 @@ public class DataSources {
         return instance;
     }
 
-    /**
-     * For the given root this will create a sorted list or items
-     *
-     * @param root
-     *            Element for which the children will be created
-     * @return List of items to select
-     */
-    private Item[] getChildrenList(JSONObject root) {
-        try {
-            TreeSet<Item> children = new TreeSet<Item>();
-            Iterator<String> iter = root.keys();
-            while (iter.hasNext()) {
-                String key = iter.next();
-                JSONObject child = root.optJSONObject(key);
-                if (child == null)
-                    break;
-
-                Item newItem = new Item(key, child.optBoolean("default", false),
-                                        child.getString("name").replace((char) 8287, ' '), // e.g. 304\u205f\u212b
-                                        child.getString("description"));
-                children.add(newItem);
-            }
-            return children.toArray(new Item[children.size()]);
-        } catch (JSONException e) {
-            Log.error("Error finding children of " + root, e);
-        }
-        return new Item[0];
-    }
-
-    private static JSONObject jsonResult;
-
-    private static JSONObject optJSONChildren(JSONObject obj) {
-        JSONObject child = obj.optJSONObject("children");
-        if (child == null) {
-            Iterator<String> iter = obj.keys();
-            if (iter.hasNext())
-                child = obj.optJSONObject(iter.next());
-            if (child == null)
-                child = obj;
-        }
-        return child;
-    }
-
-    private static JSONObject getJSONChildren(String... spec) throws JSONException {
-        JSONObject o = optJSONChildren(jsonResult.getJSONObject(spec[0]));
-        for (int i = 1; i < spec.length; i++)
-            o = optJSONChildren(o.getJSONObject(spec[i]));
-        return o;
-    }
-
-    /**
-     * Resolve the available observatories
-     *
-     * @return List of available observatories
-     */
-    public Item[] getObservatories() {
-        ArrayList<Item> result = new ArrayList<Item>();
-        for (Item item : getChildrenList(jsonResult)) {
-            if (SupportedObservatories.contains(item.getName())) {
-                result.add(item);
-            }
-        }
-        return result.toArray(new Item[result.size()]);
-    }
-
-    /**
-     * Resolves the instruments for a observatory
-     *
-     * @param observatory
-     *            Name of observatory for which the instruments are returned
-     * @return List of available instruments
-     */
-    public Item[] getInstruments(String observatory) {
-        try {
-            return getChildrenList(getJSONChildren(observatory));
-        } catch (JSONException e) {
-            Log.error("Cannot find instruments for " + observatory, e);
-        }
-        return new Item[0];
-    }
-
-    /**
-     * Resolves the detectors for a observatory and instrument
-     *
-     * @param observatory
-     *            Name of observatory to query
-     * @param instrument
-     *            Name of instrument to query
-     * @return List of available detectors
-     */
-    public Item[] getDetectors(String observatory, String instrument) {
-        try {
-            return getChildrenList(getJSONChildren(observatory, instrument));
-        } catch (JSONException e) {
-            Log.error("Cannot find detectors for " + observatory, e);
-        }
-        return new Item[0];
-    }
-
-    /**
-     * Resolves the measurements for a observatory, instrument and detector
-     *
-     * @param observatory
-     *            Name of observatory to query
-     * @param instrument
-     *            Name of instrument to query
-     * @param detector
-     *            Name of detector to query
-     * @return List of available measurements
-     */
-    public Item[] getMeasurements(String observatory, String instrument, String detector) {
-        try {
-            return getChildrenList(getJSONChildren(observatory, instrument, detector));
-        } catch (JSONException e) {
-            Log.error("Cannot find measurements for " + observatory, e);
-        }
-        return new Item[0];
-    }
-
-    public static Object getObject(String observatory, String instrument, String detector, String measurement, String key) {
-        try {
-            JSONObject det = getJSONChildren(observatory, instrument, detector);
-            JSONObject meas = det.optJSONObject(measurement);
-            if (meas == null)
-                return det.get(key);
-            else
-                return meas.get(key);
-        } catch (JSONException e) {
-            Log.error("Cannot find key " + key + " for " + observatory + " " + instrument + " " + detector + " " + measurement);
-        }
-        return null;
-    }
-
-    private static void changeServer(String server) {
+    private static void changeServer(final String server) {
         Map<String, String> map = serverSettings.get(server);
         for (Map.Entry<String, String> entry : map.entrySet()) {
             Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
         }
 
-        JHVWorker<JSONObject, Void> reloadTask = new JHVWorker<JSONObject, Void>() {
+        JHVWorker<DataSourcesParser, Void> reloadTask = new JHVWorker<DataSourcesParser, Void>() {
 
             @Override
-            protected JSONObject backgroundWork() {
+            protected DataSourcesParser backgroundWork() {
                 while (true) {
                     try {
                         URL url = new URL(Settings.getSingletonInstance().getProperty("API.dataSources.path"));
-                        return JSONUtils.getJSONStream(new DownloadStream(url).getInput());
+                        JSONObject json = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
+                        DataSourcesParser parser = new DataSourcesParser();
+                        parser.parse(server, json);
+
+                        return parser;
                     } catch (MalformedURLException e) {
                         Log.error("Invalid data sources URL", e);
                         break;
@@ -365,15 +146,9 @@ public class DataSources {
             @Override
             protected void done() {
                 try {
-                    JSONObject newJsonResult = get();
-                    if (newJsonResult != null) {
-                        //DataSourcesParse dialog = new DataSourcesParse(ImageViewerGui.getMainFrame(), "JSON", newJsonResult);
-                        //dialog.pack();
-                        //dialog.setLocationRelativeTo(ImageViewerGui.getMainFrame());
-                        //dialog.setVisible(true);
-
-                        jsonResult = newJsonResult;
-                        ObservationDialog.getInstance().getObservationImagePane().setupSources();
+                    DataSourcesParser newParser = get();
+                    if (newParser != null) {
+                        ObservationDialog.getInstance().getObservationImagePane().setupSources(newParser);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
