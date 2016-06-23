@@ -51,7 +51,6 @@ public class DataSourcesTree extends JTree {
 
     }
 
-    private final DefaultTreeModel treeModel;
     private final DefaultMutableTreeNode nodeROB;
     private final DefaultMutableTreeNode nodeGSFC;
     private final DefaultMutableTreeNode nodeIAS;
@@ -65,8 +64,7 @@ public class DataSourcesTree extends JTree {
         root.add(nodeGSFC);
         root.add(nodeIAS);
 
-        treeModel = new DefaultTreeModel(root);
-        setModel(treeModel);
+        setModel(new DefaultTreeModel(root));
         setRootVisible(false);
 
         DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
