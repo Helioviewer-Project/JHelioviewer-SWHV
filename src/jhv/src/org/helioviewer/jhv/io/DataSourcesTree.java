@@ -29,10 +29,13 @@ public class DataSourcesTree extends JTree {
     }
 
     public DataSourcesParser.SourceItem getSelectedItem() {
-        Object obj = ((DefaultMutableTreeNode) getSelectionPath().getLastPathComponent()).getUserObject();
-        if (obj instanceof DataSourcesParser.SourceItem)
-            return (DataSourcesParser.SourceItem) obj;
-        return null; // should not happen
+        TreePath path = getSelectionPath();
+        if (path != null) {
+            Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+            if (obj instanceof DataSourcesParser.SourceItem)
+                return (DataSourcesParser.SourceItem) obj;
+        }
+        return null; // only on source load error
     }
 
     @Override

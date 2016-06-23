@@ -1,25 +1,20 @@
 package org.helioviewer.jhv.gui.dialogs.observation;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -33,8 +28,8 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
-import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.io.DataSources.Item;
+import org.helioviewer.jhv.io.DataSourcesParser;
+import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.io.LoadRemoteTask;
 
 /**
@@ -47,7 +42,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     private final TimeSelectionPanel timeSelectionPanel = new TimeSelectionPanel();
     private final CadencePanel cadencePanel = new CadencePanel();
-    private final InstrumentsPanel instrumentsPanel = new InstrumentsPanel();
+    private final DataSourcesTree sourcesTree = new DataSourcesTree();
     private static boolean first = true;
 
     protected ImageDataPanel() {
@@ -59,27 +54,21 @@ public class ImageDataPanel extends ObservationDialogPanel {
         timePane.add(cadencePanel);
 
         JPanel instrumentsPane = new JPanel(new BorderLayout());
-        instrumentsPane.add(instrumentsPanel, BorderLayout.CENTER);
+        instrumentsPane.add(new JScrollPane(sourcesTree));
 
         add(timePane);
         add(instrumentsPane);
     }
 
-    public void setupSources() {
-        instrumentsPanel.setupSources(DataSources.getSingletonInstance());
-        if (instrumentsPanel.validSelection()) {
+    public void setupSources(DataSourcesParser parser) {
+        sourcesTree.setParsedData(parser);
+
+        DataSourcesParser.SourceItem item = sourcesTree.getSelectedItem();
+        if (item != null) {
             if (first) {
                 first = false;
 
-                Date endDate = new Date();
-                Object timeStamp = DataSources.getObject(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(), instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), "end");
-                if (timeStamp instanceof String) {
-                    try {
-                        endDate = TimeUtils.sqlDateFormat.parse((String) timeStamp);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
+                Date endDate = new Date(item.end);
 
                 GregorianCalendar gregorianCalendar = new GregorianCalendar();
                 gregorianCalendar.setTime(endDate);
@@ -99,8 +88,12 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
     }
 
-    public Object getSourceId() {
-        return DataSources.getObject(instrumentsPanel.getObservatory(), instrumentsPanel.getInstrument(), instrumentsPanel.getDetector(), instrumentsPanel.getMeasurement(), "sourceId");
+    int getSourceId() {
+        DataSourcesParser.SourceItem item = sourcesTree.getSelectedItem();
+        if (item != null)
+            return item.sourceId;
+        else
+            return -1;
     }
 
     /**
@@ -155,9 +148,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * the GUI which represents the image series.
      * */
     private void loadRemote() {
-        Object sourceId = getSourceId();
-        if (sourceId != null) {
-            LoadRemoteTask remoteTask = new LoadRemoteTask(sourceId.toString(), getStartTime(), getEndTime(), getCadence());
+        int sourceId = getSourceId();
+        if (sourceId != -1) {
+            LoadRemoteTask remoteTask = new LoadRemoteTask(Integer.toString(sourceId), getStartTime(), getEndTime(), getCadence());
             JHVGlobals.getExecutorService().execute(remoteTask);
         }
     }
@@ -166,7 +159,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     @Override
     public boolean loadButtonPressed() {
-        if (!instrumentsPanel.validSelection()) {
+        DataSourcesParser.SourceItem item = sourcesTree.getSelectedItem();
+        if (item == null) {
             Message.err("Data is not selected", "There is no information on what to add", false);
             return false;
         }
@@ -422,282 +416,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             return value;
         }
-    }
 
-    // Instruments Panel
-
-    /**
-     * The panel bundles the components to select the instrument etc. Reads the
-     * available data from org.helioviewer.jhv.io.DataSources
-     * */
-    private static class InstrumentsPanel extends JPanel {
-        /**
-         * Combobox to select observatory
-         */
-        private final JComboBox comboObservatory = new JComboBox(new String[] { "Loading..." });
-        /**
-         * Combobox to select instruments
-         */
-        private final JComboBox comboInstrument = new JComboBox(new String[] { "Loading..." });
-        /**
-         * Combobox to select detector and/or measurement
-         */
-        private final JComboBox comboDetectorMeasurement = new JComboBox(new String[] { "Loading..." });
-
-        public InstrumentsPanel() {
-            setLayout(new GridLayout(4, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
-
-            JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
-            add(labelServer);
-            add(DataSources.getServerComboBox());
-
-            JLabel labelObservatory = new JLabel("Observatory", JLabel.RIGHT);
-            add(labelObservatory);
-            add(comboObservatory);
-
-            JLabel labelInstrument = new JLabel("Instrument", JLabel.RIGHT);
-            add(labelInstrument);
-            add(comboInstrument);
-
-            JLabel labelDetectorMeasurement = new JLabel("Detector/Measurement", JLabel.RIGHT);
-            add(labelDetectorMeasurement);
-            add(comboDetectorMeasurement);
-
-            comboObservatory.setEnabled(false);
-            comboInstrument.setEnabled(false);
-            comboDetectorMeasurement.setEnabled(false);
-
-            ListCellRenderer itemRenderer = new DefaultListCellRenderer() {
-                // Override to show tooltip
-                @Override
-                public Component getListCellRendererComponent(JList list, Object value, int arg2, boolean arg3, boolean arg4) {
-                    JLabel result = (JLabel) super.getListCellRendererComponent(list, value, arg2, arg3, arg4);
-                    if (value instanceof DataSources.Item) {
-                        DataSources.Item item = (DataSources.Item) value;
-                        result.setToolTipText(item.getDescription());
-                    } else if (value instanceof ItemPair) {
-                        ItemPair item = (ItemPair) value;
-                        result.setToolTipText(item.getDescription());
-                    }
-                    return result;
-                }
-            };
-
-            comboObservatory.setRenderer(itemRenderer);
-            comboInstrument.setRenderer(itemRenderer);
-            comboDetectorMeasurement.setRenderer(itemRenderer);
-
-            comboObservatory.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    setComboBox(comboInstrument, DataSources.getSingletonInstance().getInstruments(getObservatory()));
-                }
-            });
-
-            comboInstrument.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    String obs = getObservatory();
-                    String ins = getInstrument();
-
-                    ArrayList<ItemPair> values = new ArrayList<ItemPair>();
-                    Item[] detectors = DataSources.getSingletonInstance().getDetectors(obs, ins);
-
-                    for (Item detector : detectors) {
-                        Item[] measurements = DataSources.getSingletonInstance().getMeasurements(obs, ins, detector.getKey());
-
-                        ItemPair.PrintMode printMode = ItemPair.PrintMode.BOTH;
-                        if (detectors.length == 1) {
-                            printMode = ItemPair.PrintMode.SECONDITEM_ONLY;
-                        } else if (measurements.length == 1) {
-                            printMode = ItemPair.PrintMode.FIRSTITEM_ONLY;
-                        }
-
-                        if (measurements.length == 0) { // not found
-                            for (Item d : detectors) {
-                                values.add(new ItemPair(d, d, ItemPair.PrintMode.FIRSTITEM_ONLY));
-                            }
-                            break;
-                        } else {
-                            for (Item measurement : measurements) {
-                                values.add(new ItemPair(detector, measurement, printMode));
-                            }
-                        }
-                    }
-
-                    setComboBox(comboDetectorMeasurement, values);
-                    comboDetectorMeasurement.setEnabled(values.size() != 0);
-                }
-            });
-        }
-
-        public void setupSources(DataSources source) {
-            setComboBox(comboObservatory, source.getObservatories());
-        }
-
-        /**
-         * Set the items combobox to the to the given parameter and selects the
-         * first default item or otherwise the first item
-         *
-         * @param items
-         *            string array which contains the names for the items of the
-         *            combobox.
-         * @param container
-         *            combobox where to add the items.
-         */
-        private void setComboBox(JComboBox container, Item[] items) {
-            container.setModel(new DefaultComboBoxModel(items));
-            container.setEnabled(items.length != 0);
-            for (int i = 0; i < items.length; i++) {
-                if (items[i].isDefaultItem()) {
-                    container.setSelectedIndex(i);
-                    return;
-                }
-            }
-            if (items.length > 0) {
-                container.setSelectedIndex(0);
-            }
-        }
-
-        /**
-         * Set the items combobox to the to the given parameter and selects the
-         * first default item or otherwise the first item
-         *
-         * @param items
-         *            string array which contains the names for the items of the
-         *            combobox.
-         * @param container
-         *            combobox where to add the items.
-         */
-        private void setComboBox(JComboBox container, ArrayList<ItemPair> items) {
-            container.setModel(new DefaultComboBoxModel(items.toArray()));
-            for (int i = 0; i < items.size(); i++) {
-                if (items.get(i).isDefaultItem()) {
-                    container.setSelectedIndex(i);
-                    return;
-                }
-            }
-            if (!items.isEmpty()) {
-                container.setSelectedIndex(0);
-            }
-        }
-
-        /**
-         * Checks whether the user did some valid selection
-         *
-         * @return true if the user did some valid selecion
-         */
-        public boolean validSelection() {
-            return getObservatory() != null && getInstrument() != null && getDetector() != null && getMeasurement() != null;
-        }
-
-        /**
-         * Returns the selected observation.
-         *
-         * @return selected observation (key value), null if no is selected
-         * */
-        public String getObservatory() {
-            Object selectedItem = comboObservatory.getSelectedItem();
-            if (selectedItem instanceof DataSources.Item) {
-                return ((DataSources.Item) selectedItem).getKey();
-            } else {
-                return null;
-            }
-        }
-
-        /**
-         * Returns the selected instrument.
-         *
-         * @return selected instrument (key value), null if no is selected
-         * */
-        public String getInstrument() {
-            Object selectedItem = comboInstrument.getSelectedItem();
-            if (selectedItem instanceof DataSources.Item) {
-                return ((DataSources.Item) selectedItem).getKey();
-            } else {
-                return null;
-            }
-        }
-
-        /**
-         * Returns the selected detector.
-         *
-         * @return selected detector (key value), null if no is selected
-         * */
-        public String getDetector() {
-            Object selectedItem = comboDetectorMeasurement.getSelectedItem();
-            if (selectedItem instanceof ItemPair) {
-                return ((ItemPair) selectedItem).getFirstItem().getKey();
-            } else {
-                return null;
-            }
-        }
-
-        /**
-         * Returns the selected measurement.
-         *
-         * @return selected measurement (key value), null if no is selected
-         * */
-        public String getMeasurement() {
-            Object selectedItem = comboDetectorMeasurement.getSelectedItem();
-            if (selectedItem instanceof ItemPair) {
-                return ((ItemPair) selectedItem).getSecondItem().getKey();
-            } else {
-                return null;
-            }
-        }
-
-        private static class ItemPair {
-
-            enum PrintMode {
-                FIRSTITEM_ONLY, SECONDITEM_ONLY, BOTH
-            }
-
-            private final Item firstItem;
-            private final Item secondItem;
-            private final PrintMode printMode;
-
-            public ItemPair(Item first, Item second, PrintMode newPrintMode) {
-                firstItem = first;
-                secondItem = second;
-                printMode = newPrintMode;
-            }
-
-            public Item getFirstItem() {
-                return firstItem;
-            }
-
-            public Item getSecondItem() {
-                return secondItem;
-            }
-
-            public boolean isDefaultItem() {
-                return firstItem.isDefaultItem() && secondItem.isDefaultItem();
-            }
-
-            @Override
-            public String toString() {
-                switch (printMode) {
-                case FIRSTITEM_ONLY:
-                    return firstItem.toString();
-                case SECONDITEM_ONLY:
-                    return secondItem.toString();
-                default:
-                    return firstItem.toString() + " " + secondItem.toString();
-                }
-            }
-
-            public String getDescription() {
-                switch (printMode) {
-                case FIRSTITEM_ONLY:
-                    return firstItem.getDescription();
-                case SECONDITEM_ONLY:
-                    return secondItem.getDescription();
-                default:
-                    return firstItem.getDescription() + " " + secondItem.getDescription();
-                }
-            }
-        }
     }
 
 }
