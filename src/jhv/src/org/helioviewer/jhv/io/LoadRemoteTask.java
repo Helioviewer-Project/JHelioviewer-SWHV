@@ -8,12 +8,12 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 public class LoadRemoteTask extends LoadURITask {
 
-    private final String sourceId;
+    private final int sourceId;
     private final long startTime;
     private final long endTime;
     private final int cadence;
 
-    public LoadRemoteTask(String _sourceId, long _startTime, long _endTime, int _cadence) {
+    public LoadRemoteTask(int _sourceId, long _startTime, long _endTime, int _cadence) {
         super(null, null);
 
         sourceId = _sourceId;

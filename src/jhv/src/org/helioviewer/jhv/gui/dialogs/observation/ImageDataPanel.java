@@ -150,7 +150,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     private void loadRemote() {
         int sourceId = getSourceId();
         if (sourceId != -1) {
-            LoadRemoteTask remoteTask = new LoadRemoteTask(Integer.toString(sourceId), getStartTime(), getEndTime(), getCadence());
+            LoadRemoteTask remoteTask = new LoadRemoteTask(sourceId, getStartTime(), getEndTime(), getCadence());
             JHVGlobals.getExecutorService().execute(remoteTask);
         }
     }

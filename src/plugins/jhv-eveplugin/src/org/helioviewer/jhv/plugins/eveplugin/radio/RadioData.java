@@ -31,7 +31,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
     private final YAxis yAxis;
 
-    public static final String CallistoID = "5000";
+    public static final int CallistoID = 5000;
     private static final String ROBserver = DataSources.getServerSetting("ROB", "API.jp2series.path");
     private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();
 

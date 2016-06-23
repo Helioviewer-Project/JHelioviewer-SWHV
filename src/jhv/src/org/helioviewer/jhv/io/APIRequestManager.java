@@ -46,8 +46,8 @@ public class APIRequestManager {
      * @return view of the nearest image file on the server
      * @throws IOException
      */
-    private static View loadImage(String server, String sourceId, long startTime, boolean message) throws IOException {
-        String fileRequest = server + "sourceId=" + sourceId + "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
+    private static View loadImage(String server, int sourceId, long startTime, boolean message) throws IOException {
+        String fileRequest = server + "sourceId=" + Integer.toString(sourceId) + "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
         return requestData(jpipRequest, fileRequest, message);
     }
@@ -70,8 +70,8 @@ public class APIRequestManager {
      * @return view of the file which represents the image series on the server
      * @throws IOException
      */
-    private static View loadImageSeries(String server, String sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
-        String fileRequest = server + "sourceId=" + sourceId + "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
+    private static View loadImageSeries(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
+        String fileRequest = server + "sourceId=" + Integer.toString(sourceId) + "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
         if (cadence != -100) {
             fileRequest += "&cadence=" + Integer.toString(cadence);
         }
@@ -162,7 +162,7 @@ public class APIRequestManager {
      * @return new view
      * @throws IOException
      */
-    public static View requestAndOpenRemoteFile(String server, String sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
+    public static View requestAndOpenRemoteFile(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
         if (startTime == endTime) {
             if (server == null) // use default
                 server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
