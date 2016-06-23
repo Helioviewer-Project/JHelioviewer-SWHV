@@ -250,10 +250,16 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
             String str = (String) uiSelectionComboBox.getSelectedItem();
             setUIContainerPane(str);
 
+/*
             if (str.equals("Image data"))
                 setAvailabilityStatus(DataSources.getSelectedServer());
             else
                 availabilityButton.setEnabled(true);
+*/
+
+            if (!str.equals("Image data"))
+                availabilityButton.setEnabled(true);
+
         } else if (e.getSource().equals(btnImages)) {
             addPressed();
         } else if (e.getSource().equals(btnClose)) {
