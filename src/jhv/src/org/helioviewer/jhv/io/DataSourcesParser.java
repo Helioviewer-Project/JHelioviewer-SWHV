@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -13,16 +12,11 @@ import org.json.JSONObject;
 
 public class DataSourcesParser {
 
-    TreeNode[] defaultPath;
+    DefaultMutableTreeNode defaultNode;
     DefaultMutableTreeNode rootNode;
 
     DataSourcesParser(String server) {
-        if (server.equals("ROB"))
-            rootNode = new DefaultMutableTreeNode(new DataSourcesTree.Item("ROB", "ROB", "Royal Observatory of Belgium"));
-        else if (server.equals("GSFC"))
-            rootNode = new DefaultMutableTreeNode(new DataSourcesTree.Item("GSFC", "GSFC", "Goddard Space Flight Center"));
-        else
-            rootNode = new DefaultMutableTreeNode(new DataSourcesTree.Item("IAS", "IAS", "Institut d'Astrophysique Spatiale"));
+        rootNode = new DefaultMutableTreeNode(server);
     }
 
     void parse(JSONObject json) throws ParseException, JSONException {
@@ -57,7 +51,7 @@ public class DataSourcesParser {
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);
                 if (item.defaultItem)
-                    defaultPath = treeNode.getPath();
+                    defaultNode = treeNode;
             } else {
                 if (str == null) { // show only top level, else flatten hierarchy
                     DataSourcesTree.Item item = new DataSourcesTree.Item(key, name.replace('_', ' '), json.getString("description"));
