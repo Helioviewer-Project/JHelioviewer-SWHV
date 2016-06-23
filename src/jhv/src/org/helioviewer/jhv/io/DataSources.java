@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -113,22 +114,26 @@ public class DataSources {
             Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
         }
 
-        JHVWorker<DataSourcesParser, Void> reloadTask = new JHVWorker<DataSourcesParser, Void>() {
+        JHVWorker<Void, Void> reloadTask = new JHVWorker<Void, Void>() {
+
+            private final DataSourcesParser parser = new DataSourcesParser(server);
 
             @Override
-            protected DataSourcesParser backgroundWork() {
+            protected Void backgroundWork() {
                 while (true) {
                     try {
                         URL url = new URL(Settings.getSingletonInstance().getProperty("API.dataSources.path"));
                         JSONObject json = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
-                        DataSourcesParser parser = new DataSourcesParser();
-                        parser.parse(server, json);
 
-                        return parser;
+                        parser.parse(json);
+                        return null;
                     } catch (MalformedURLException e) {
                         Log.error("Invalid data sources URL", e);
                         break;
                     } catch (JSONException e) {
+                        Log.error("Invalid response while retrieving the available data sources", e);
+                        break;
+                    } catch (ParseException e) {
                         Log.error("Invalid response while retrieving the available data sources", e);
                         break;
                     } catch (IOException e) {
@@ -145,14 +150,7 @@ public class DataSources {
 
             @Override
             protected void done() {
-                try {
-                    DataSourcesParser newParser = get();
-                    if (newParser != null) {
-                        ObservationDialog.getInstance().getObservationImagePane().setupSources(newParser);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                ObservationDialog.getInstance().getObservationImagePane().setupSources(parser);
             }
 
         };

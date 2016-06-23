@@ -6,6 +6,7 @@ import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -59,7 +60,7 @@ public class DataSourcesTree extends JTree {
     }
 
     public void setParsedData(DataSourcesParser parser) {
-        setModel(parser.model);
+        setModel(new DefaultTreeModel(parser.rootNode));
         if (parser.defaultPath != null)
             setSelectionPath(new TreePath(parser.defaultPath));
     }
