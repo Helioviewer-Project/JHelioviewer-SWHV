@@ -20,6 +20,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONException;
@@ -161,7 +162,7 @@ public class DataSources {
 
     private static DataSources instance;
     private static DefaultComboBoxModel comboModel;
-    private static final HashSet<String> SupportedObservatories = new HashSet<String>();
+    public static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
     private DataSources() {}
 
@@ -366,6 +367,11 @@ public class DataSources {
                 try {
                     JSONObject newJsonResult = get();
                     if (newJsonResult != null) {
+                        //DataSourcesParse dialog = new DataSourcesParse(ImageViewerGui.getMainFrame(), "JSON", newJsonResult);
+                        //dialog.pack();
+                        //dialog.setLocationRelativeTo(ImageViewerGui.getMainFrame());
+                        //dialog.setVisible(true);
+
                         jsonResult = newJsonResult;
                         ObservationDialog.getInstance().getObservationImagePane().setupSources();
                     }
