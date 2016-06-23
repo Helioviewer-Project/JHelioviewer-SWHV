@@ -13,49 +13,6 @@ import org.json.JSONObject;
 
 public class DataSourcesParser {
 
-    public static class Item {
-
-        // Key as needed to send to the API for this item
-        public final String key;
-
-        // Display name for a dropdown list
-        public final String name;
-
-        // Tooltip description
-        public final String description;
-
-        // Flag if this should take as default item
-        public final boolean defaultItem;
-
-        public Item(String key, String name, String description, boolean defaultItem) {
-            this.key = key;
-            this.name = name;
-            this.description = description;
-            this.defaultItem = defaultItem;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-    }
-
-    public static class SourceItem extends Item {
-
-        public final int sourceId;
-        public final long start;
-        public final long end;
-
-        public SourceItem(String key, String name, String description, boolean defaultItem, int sourceId, long start, long end) {
-            super(key, name, description, defaultItem);
-            this.sourceId = sourceId;
-            this.start = start;
-            this.end = end;
-        }
-
-    }
-
     TreeNode[] defaultPath;
     TreeModel model;
 
@@ -90,21 +47,19 @@ public class DataSourcesParser {
                 continue;
 
             if (json.has("sourceId")) { // leaf
-                SourceItem item = new SourceItem(key, mergeNames(str, name),
-                                                 json.getString("description"),
-                                                 json.optBoolean("default", false),
-                                                 json.getInt("sourceId"),
-                                                 TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime(),
-                                                 TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime());
+                DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(key, mergeNames(str, name),
+                                                                               json.getString("description"),
+                                                                               json.getInt("sourceId"),
+                                                                               TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime(),
+                                                                               TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime(),
+                                                                               json.optBoolean("default", false));
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);
                 if (item.defaultItem)
                     defaultPath = treeNode.getPath();
             } else {
                 if (str == null) { // show only top level, else flatten hierarchy
-                    Item item = new Item(key, name,
-                                         json.getString("description"),
-                                         json.optBoolean("default", false));
+                    DataSourcesTree.Item item = new DataSourcesTree.Item(key, name.replace('_', ' '), json.getString("description"));
                     DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item);
                     parentNode.add(treeNode);
                     parse(treeNode, json.getJSONObject("children"), "");

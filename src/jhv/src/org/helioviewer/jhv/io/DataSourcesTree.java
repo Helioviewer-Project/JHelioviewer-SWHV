@@ -12,6 +12,42 @@ import javax.swing.tree.TreeSelectionModel;
 
 public class DataSourcesTree extends JTree {
 
+    public static class Item {
+
+        public final String key;
+        public final String name;
+        public final String description;
+
+        public Item(String key, String name, String description) {
+            this.key = key;
+            this.name = name;
+            this.description = description;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+    }
+
+    public static class SourceItem extends Item {
+
+        public final int sourceId;
+        public final long start;
+        public final long end;
+        public final boolean defaultItem;
+
+        public SourceItem(String key, String name, String description, int sourceId, long start, long end, boolean defaultItem) {
+            super(key, name, description);
+            this.sourceId = sourceId;
+            this.start = start;
+            this.end = end;
+            this.defaultItem = defaultItem;
+        }
+
+    }
+
     public DataSourcesTree() {
         DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
         renderer.setOpenIcon(null);
@@ -28,12 +64,12 @@ public class DataSourcesTree extends JTree {
             setSelectionPath(new TreePath(parser.defaultPath));
     }
 
-    public DataSourcesParser.SourceItem getSelectedItem() {
+    public SourceItem getSelectedItem() {
         TreePath path = getSelectionPath();
         if (path != null) {
             Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-            if (obj instanceof DataSourcesParser.SourceItem)
-                return (DataSourcesParser.SourceItem) obj;
+            if (obj instanceof SourceItem)
+                return (SourceItem) obj;
         }
         return null; // only on source load error
     }
@@ -43,8 +79,8 @@ public class DataSourcesTree extends JTree {
         if (getRowForLocation(e.getX(), e.getY()) == -1)
             return null;
         Object obj = ((DefaultMutableTreeNode) getPathForLocation(e.getX(), e.getY()).getLastPathComponent()).getUserObject();
-        if (obj instanceof DataSourcesParser.Item)
-            return ((DataSourcesParser.Item) obj).description;
+        if (obj instanceof Item)
+            return ((Item) obj).description;
         return null;
     }
 
