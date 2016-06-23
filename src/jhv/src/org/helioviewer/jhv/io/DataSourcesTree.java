@@ -22,6 +22,19 @@ public class DataSourcesTree extends JTree {
         ToolTipManager.sharedInstance().registerComponent(this);
     }
 
+    public void setParsedData(DataSourcesParser parser) {
+        setModel(parser.model);
+        if (parser.defaultPath != null)
+            setSelectionPath(new TreePath(parser.defaultPath));
+    }
+
+    public DataSourcesParser.SourceItem getSelectedItem() {
+        Object obj = ((DefaultMutableTreeNode) getSelectionPath().getLastPathComponent()).getUserObject();
+        if (obj instanceof DataSourcesParser.SourceItem)
+            return (DataSourcesParser.SourceItem) obj;
+        return null; // should not happen
+    }
+
     @Override
     public String getToolTipText(MouseEvent e) {
         if (getRowForLocation(e.getX(), e.getY()) == -1)
@@ -34,20 +47,37 @@ public class DataSourcesTree extends JTree {
 
     private static class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
 
+        TreePath selectedPath;
+
         public OneLeafTreeSelectionModel() {
             setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         }
 
         @Override
         public void setSelectionPath(TreePath path) {
-            if (((DefaultMutableTreeNode) path.getLastPathComponent()).isLeaf())
+            if (((DefaultMutableTreeNode) path.getLastPathComponent()).isLeaf()) {
                 super.setSelectionPath(path);
+                selectedPath = path;
+            }
         }
 
         @Override
         public void addSelectionPath(TreePath path) {
-            if (((DefaultMutableTreeNode) path.getLastPathComponent()).isLeaf())
+            if (((DefaultMutableTreeNode) path.getLastPathComponent()).isLeaf()) {
                 super.addSelectionPath(path);
+                selectedPath = path;
+            }
+        }
+
+        @Override
+        public void resetRowSelection() {
+            super.resetRowSelection();
+            if (selectedPath != null)
+                selection = new TreePath[] { selectedPath };
+        }
+
+        @Override
+        public void clearSelection() {
         }
 
     }
