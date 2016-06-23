@@ -23,7 +23,6 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.io.DataSources;
 
 /**
  * The Observation Dialog provides the main interface to get data from the
