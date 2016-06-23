@@ -49,7 +49,24 @@ public class DataSourcesTree extends JTree {
 
     }
 
+    private final DefaultTreeModel treeModel;
+    private final DefaultMutableTreeNode nodeROB;
+    private final DefaultMutableTreeNode nodeGSFC;
+    private final DefaultMutableTreeNode nodeIAS;
+
     public DataSourcesTree() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("DataSources");
+        nodeROB = new DefaultMutableTreeNode(new Item("ROB", "ROB", "Royal Observatory of Belgium"));
+        nodeGSFC = new DefaultMutableTreeNode(new Item("GSFC", "GSFC", "Goddard Space Flight Center"));
+        nodeIAS = new DefaultMutableTreeNode(new Item("IAS", "IAS", "Institut d'Astrophysique Spatiale"));
+        root.add(nodeROB);
+        root.add(nodeGSFC);
+        root.add(nodeIAS);
+
+        treeModel = new DefaultTreeModel(root);
+        setModel(treeModel);
+        setRootVisible(false);
+
         DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
         renderer.setOpenIcon(null);
         renderer.setClosedIcon(null);
@@ -59,10 +76,23 @@ public class DataSourcesTree extends JTree {
         ToolTipManager.sharedInstance().registerComponent(this);
     }
 
+    private void reattach(DefaultMutableTreeNode tgt, DefaultMutableTreeNode src) {
+        tgt.removeAllChildren();
+        while (src.getChildCount() > 0)
+            tgt.add((DefaultMutableTreeNode) src.getFirstChild());
+    }
+
     public void setParsedData(DataSourcesParser parser) {
-        setModel(new DefaultTreeModel(parser.rootNode));
-        if (parser.defaultPath != null)
-            setSelectionPath(new TreePath(parser.defaultPath));
+        String server = parser.rootNode.toString();
+        if ("ROB".equals(server))
+            reattach(nodeROB, parser.rootNode);
+        else if ("GSFC".equals(server))
+            reattach(nodeGSFC, parser.rootNode);
+        else
+            reattach(nodeIAS, parser.rootNode);
+
+        if (parser.defaultNode != null)
+            setSelectionPath(new TreePath(parser.defaultNode.getPath()));
     }
 
     public SourceItem getSelectedItem() {
@@ -95,7 +125,8 @@ public class DataSourcesTree extends JTree {
 
         @Override
         public void setSelectionPath(TreePath path) {
-            if (((DefaultMutableTreeNode) path.getLastPathComponent()).isLeaf()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+            if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
                 super.setSelectionPath(path);
                 selectedPath = path;
             }
@@ -103,7 +134,8 @@ public class DataSourcesTree extends JTree {
 
         @Override
         public void addSelectionPath(TreePath path) {
-            if (((DefaultMutableTreeNode) path.getLastPathComponent()).isLeaf()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+            if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
                 super.addSelectionPath(path);
                 selectedPath = path;
             }
