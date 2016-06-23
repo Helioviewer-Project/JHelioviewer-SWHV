@@ -1,31 +1,32 @@
 package org.helioviewer.jhv.io;
 
+import java.text.ParseException;
 import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DataSourcesParser {
 
     TreeNode[] defaultPath;
-    TreeModel model;
+    DefaultMutableTreeNode rootNode;
 
-    void parse(String root, JSONObject json) {
-        DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(root);
+    DataSourcesParser(String server) {
+        if (server.equals("ROB"))
+            rootNode = new DefaultMutableTreeNode(new DataSourcesTree.Item("ROB", "ROB", "Royal Observatory of Belgium"));
+        else if (server.equals("GSFC"))
+            rootNode = new DefaultMutableTreeNode(new DataSourcesTree.Item("GSFC", "GSFC", "Goddard Space Flight Center"));
+        else
+            rootNode = new DefaultMutableTreeNode(new DataSourcesTree.Item("IAS", "IAS", "Institut d'Astrophysique Spatiale"));
+    }
 
-        try {
-            parse(treeNode, json, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        model = new DefaultTreeModel(treeNode);
+    void parse(JSONObject json) throws ParseException, JSONException {
+        parse(rootNode, json, null);
     }
 
     private String mergeNames(String str1, String str2) {
@@ -36,7 +37,7 @@ public class DataSourcesParser {
         return str1 + " " + str2;
     }
 
-    private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) throws Exception {
+    private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) throws ParseException, JSONException {
         TreeSet<String> sorted = new TreeSet<String>(JHVGlobals.alphanumComparator);
         sorted.addAll(root.keySet());
 
