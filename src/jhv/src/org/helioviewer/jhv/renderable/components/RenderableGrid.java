@@ -145,7 +145,7 @@ public class RenderableGrid extends AbstractRenderable {
         float w = (float) vp.aspect;
         float h = 1;
         TextRenderer renderer = GLText.getRenderer(size);
-        float textScaleFactor = textScale / renderer.getFont().getSize2D() / 3;
+        float textScaleFactor = textScale / renderer.getFont().getSize2D() / 3 * vp.width / 2048;
 
         renderer.begin3DRendering();
         {
