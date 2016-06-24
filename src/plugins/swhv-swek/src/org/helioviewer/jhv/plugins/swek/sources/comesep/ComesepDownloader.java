@@ -20,7 +20,7 @@ import org.json.JSONObject;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ComesepDownloader extends SWEKDownloader {
-    private static String _baseurl = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
+    private static final String _baseurl = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
     protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {

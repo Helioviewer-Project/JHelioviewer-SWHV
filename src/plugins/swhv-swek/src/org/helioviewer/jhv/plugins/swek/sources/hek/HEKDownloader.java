@@ -26,7 +26,7 @@ import org.json.JSONObject;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class HEKDownloader extends SWEKDownloader {
-    private static String _baseURL = "http://www.lmsal.com/hek/her?";
+    private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
     @Override
     protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
