@@ -210,10 +210,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             this.yPosition = yPosition;
         }
 
-        public JHVRelatedEvents draw(Rectangle graphArea, Graphics2D g, int nrPreviousLines, Point mousePosition) {
-            return draw(graphArea, event, x0, x1, yPosition, g, nrPreviousLines, mousePosition, true);
-        }
-
         public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, int nrPreviousLines, Point mousePosition, boolean highlight) {
             JHVRelatedEvents highlightedEvent = null;
             int spacePerLine = 3;
