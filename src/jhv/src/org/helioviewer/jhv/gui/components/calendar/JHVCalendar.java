@@ -662,13 +662,11 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      */
     private class BottomPanel extends JPanel implements ActionListener {
 
-        private final JButton dateButton = new JButton();
-
         public BottomPanel() {
             // set basic layout
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
             // set up button
-            dateButton.setText("Today is " + dateFormat.format(new Date()));
+            JButton dateButton = new JButton("Today is " + dateFormat.format(new Date()));
             dateButton.addActionListener(this);
             // add label to component
             add(dateButton);

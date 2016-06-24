@@ -8,42 +8,22 @@ import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser;
 
-/**
- * Manages all the downloaders and downloads of the SWEK plugin.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
 public class SWEKSourceManager {
 
-    private static SWEKSourceManager instance;
-    private static String ComesepSource = "COMESEP";
-    private static String HekSource = "HEK";
-
-    private SWEKSourceManager() {
-    }
-
-    public static SWEKSourceManager getSingletonInstance() {
-        if (instance == null) {
-            instance = new SWEKSourceManager();
-        }
-        return instance;
-    }
-
-    public SWEKDownloader getDownloader(SWEKSource swekSource) {
-        if (swekSource.getSourceName().equals(ComesepSource))
+    public static SWEKDownloader getDownloader(SWEKSource swekSource) {
+        if (swekSource.getSourceName().equals("COMESEP"))
             return new ComesepDownloader();
-        else if (swekSource.getSourceName().equals(HekSource))
+        else if (swekSource.getSourceName().equals("HEK"))
             return new HEKDownloader();
         else
             return null;
 
     }
 
-    public SWEKParser getParser(SWEKSource swekSource) {
-        if (swekSource.getSourceName().equals(ComesepSource))
+    public static SWEKParser getParser(SWEKSource swekSource) {
+        if (swekSource.getSourceName().equals("COMESEP"))
             return new ComesepParser();
-        else if (swekSource.getSourceName().equals(HekSource))
+        else if (swekSource.getSourceName().equals("HEK"))
             return new HEKParser();
         else
             return null;

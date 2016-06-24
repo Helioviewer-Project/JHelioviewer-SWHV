@@ -29,7 +29,6 @@ import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
  */
 public class DownloadWorker implements Runnable {
 
-    private static final SWEKSourceManager sourceManager = SWEKSourceManager.getSingletonInstance();
     private final JHVEventType jhvType;
     private final JHVEventCache eventCache;
     private final List<SWEKParam> params;
@@ -49,8 +48,8 @@ public class DownloadWorker implements Runnable {
     @Override
     public void run() {
         SWEKSource swekSource = jhvType.getSupplier().getSource();
-        SWEKDownloader downloader = sourceManager.getDownloader(swekSource);
-        SWEKParser parser = sourceManager.getParser(swekSource);
+        SWEKDownloader downloader = SWEKSourceManager.getDownloader(swekSource);
+        SWEKParser parser = SWEKSourceManager.getParser(swekSource);
 
         boolean success = true;
         if (parser == null || downloader == null) {

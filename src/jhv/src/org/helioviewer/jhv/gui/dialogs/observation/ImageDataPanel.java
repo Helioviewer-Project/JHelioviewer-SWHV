@@ -64,27 +64,24 @@ public class ImageDataPanel extends ObservationDialogPanel {
         sourcesTree.setParsedData(parser);
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        if (item != null) { // valid
-            if (first) {
-                first = false;
-
-                Date endDate = new Date(item.end);
-
-                GregorianCalendar gregorianCalendar = new GregorianCalendar();
-                gregorianCalendar.setTime(endDate);
-
-                gregorianCalendar.add(GregorianCalendar.SECOND, getCadence());
-                timeSelectionPanel.setEndDate(gregorianCalendar.getTime(), false);
-
-                gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-                timeSelectionPanel.setStartDate(gregorianCalendar.getTime(), false);
-
-                if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                    loadRemote(item);
-                }
-            }
-        } else {
+        if (item == null) { // not valid
             Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." + System.getProperty("line.separator") + "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
+        } else if (first) {
+            first = false;
+
+            Date endDate = new Date(item.end);
+
+            GregorianCalendar gregorianCalendar = new GregorianCalendar();
+            gregorianCalendar.setTime(endDate);
+
+            gregorianCalendar.add(GregorianCalendar.SECOND, getCadence());
+            timeSelectionPanel.setEndDate(gregorianCalendar.getTime(), false);
+            gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
+            timeSelectionPanel.setStartDate(gregorianCalendar.getTime(), false);
+
+            if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
+                loadRemote(item);
+            }
         }
     }
 
