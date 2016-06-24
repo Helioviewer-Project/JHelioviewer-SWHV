@@ -78,7 +78,7 @@ public class IncomingRequestManager implements JHVEventCacheRequestHandler {
     }
 
     private JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) {
-        SWEKParser parser = SWEKSourceManager.getSingletonInstance().getParser(jsonEvent.type.getSupplier().getSource());
+        SWEKParser parser = SWEKSourceManager.getParser(jsonEvent.type.getSupplier().getSource());
         return parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
     }
 

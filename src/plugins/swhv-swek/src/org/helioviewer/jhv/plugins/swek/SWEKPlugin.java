@@ -12,7 +12,6 @@ import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
-import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 import org.helioviewer.jhv.plugins.swek.view.SWEKPluginPanel;
 import org.helioviewer.jhv.threads.JHVWorker;
 
@@ -29,9 +28,6 @@ public class SWEKPlugin implements Plugin {
     /** Instance of the SWEKConfiguration */
     private final SWEKConfigurationManager SWEKConfig;
 
-    /** Instance of the SWEKDownloadManager */
-    private final SWEKSourceManager SWEKSources;
-
     /** the incoming request manager */
     private final IncomingRequestManager incomingRequestManager;
 
@@ -40,30 +36,8 @@ public class SWEKPlugin implements Plugin {
 
     private final SWEKRenderable renderable;
 
-    private final boolean loadExternalJars;
-
     public SWEKPlugin() {
         SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
-        SWEKSources = SWEKSourceManager.getSingletonInstance();
-        loadExternalJars = true;
-
-        incomingRequestManager = IncomingRequestManager.getSingletonInstance();
-        eventCache = JHVEventCache.getSingletonInstance();
-        renderable = new SWEKRenderable();
-    }
-
-    /**
-     * Creates a SWEKPlugin that loads or doesn't load the external jars
-     *
-     * @param loadExternalJars
-     *            true is the source jar should be loaded, false if the source
-     *            jars should not be loaded.
-     */
-    public SWEKPlugin(boolean loadExternalJars) {
-        SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
-        SWEKSources = SWEKSourceManager.getSingletonInstance();
-        this.loadExternalJars = loadExternalJars;
-
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
         renderable = new SWEKRenderable();
