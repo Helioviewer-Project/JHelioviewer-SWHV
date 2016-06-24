@@ -119,7 +119,7 @@ public class JHVEventCache {
     }
 
     public void removeEvents(final JHVEventType eventType, boolean keepActive) {
-        this.removeEventType(eventType, keepActive);
+        removeEventType(eventType, keepActive);
         fireEventCacheChanged();
     }
 
@@ -247,7 +247,7 @@ public class JHVEventCache {
         return new JHVEventCacheResult(eventsResult, missingIntervals);
     }
 
-    public void removeEventType(JHVEventType eventType, boolean keepActive) {
+    private void removeEventType(JHVEventType eventType, boolean keepActive) {
         if (!keepActive) {
             activeEventTypes.remove(eventType);
         } else {
