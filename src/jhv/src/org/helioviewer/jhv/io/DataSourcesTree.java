@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Enumeration;
 
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
@@ -14,6 +15,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 
+@SuppressWarnings("serial")
 public class DataSourcesTree extends JTree {
 
     public static class Item {
@@ -54,20 +56,21 @@ public class DataSourcesTree extends JTree {
 
     }
 
+    private final DefaultMutableTreeNode nodeRoot;
     private final DefaultMutableTreeNode nodeROB;
     private final DefaultMutableTreeNode nodeGSFC;
     private final DefaultMutableTreeNode nodeIAS;
 
     public DataSourcesTree() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("DataSources");
+        nodeRoot = new DefaultMutableTreeNode("DataSources");
         nodeROB = new DefaultMutableTreeNode(new Item("ROB", "ROB", "Royal Observatory of Belgium"));
         nodeGSFC = new DefaultMutableTreeNode(new Item("GSFC", "GSFC", "Goddard Space Flight Center"));
         nodeIAS = new DefaultMutableTreeNode(new Item("IAS", "IAS", "Institut d'Astrophysique Spatiale"));
-        root.add(nodeROB);
-        root.add(nodeGSFC);
-        root.add(nodeIAS);
+        nodeRoot.add(nodeROB);
+        nodeRoot.add(nodeGSFC);
+        nodeRoot.add(nodeIAS);
 
-        setModel(new DefaultTreeModel(root));
+        setModel(new DefaultTreeModel(nodeRoot));
         setRootVisible(false);
 
         DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
@@ -109,6 +112,20 @@ public class DataSourcesTree extends JTree {
         if (preferred && parser.defaultNode != null)
             setSelectionPath(new TreePath(parser.defaultNode.getPath()));
         return preferred;
+    }
+
+    public void setSelectedItem(String server, int sourceId) {
+        Enumeration<DefaultMutableTreeNode> e = nodeRoot.depthFirstEnumeration();
+        while (e.hasMoreElements()) {
+            DefaultMutableTreeNode node = e.nextElement();
+            if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
+                SourceItem item = (SourceItem) node.getUserObject();
+                if (item.sourceId == sourceId && item.server.equals(server)) {
+                    setSelectionPath(new TreePath(node.getPath()));
+                    break;
+                }
+            }
+        }
     }
 
     public SourceItem getSelectedItem() {
