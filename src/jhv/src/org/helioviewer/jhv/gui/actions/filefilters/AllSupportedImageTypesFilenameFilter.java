@@ -5,11 +5,7 @@ import java.io.FilenameFilter;
 
 public class AllSupportedImageTypesFilenameFilter implements FilenameFilter {
 
-    private static ExtensionFileFilter.AllSupportedImageTypesFilter fileFilter;
-
-    public AllSupportedImageTypesFilenameFilter() {
-        fileFilter = new ExtensionFileFilter.AllSupportedImageTypesFilter();
-    }
+    private final ExtensionFileFilter.AllSupportedImageTypesFilter fileFilter = new ExtensionFileFilter.AllSupportedImageTypesFilter();
 
     @Override
     public boolean accept(File dir, String name) {

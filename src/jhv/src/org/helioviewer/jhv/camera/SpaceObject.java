@@ -12,7 +12,7 @@ public class SpaceObject {
     private final double sizeInMeters;
 
     private static ArrayList<Object> objectList;
-    public static Object earth;
+    static Object earth;
 
     public static List<Object> getObjectList() {
         if (objectList == null) {
