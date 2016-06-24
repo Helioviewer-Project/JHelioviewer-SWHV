@@ -7,7 +7,6 @@ import java.util.List;
 import org.helioviewer.jhv.base.GZIPUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -31,14 +30,14 @@ public class DownloadWorker implements Runnable {
 
     private static final SWEKSourceManager sourceManager = SWEKSourceManager.getSingletonInstance();
     private final JHVEventType jhvType;
-    private final JHVEventContainer eventContainer;
+    private final JHVEventCache eventCache;
     private final List<SWEKParam> params;
     private final Interval requestInterval;
 
     public DownloadWorker(JHVEventType jhvType, Interval interval, List<SWEKParam> params) {
         requestInterval = interval;
         this.jhvType = jhvType;
-        eventContainer = JHVEventContainer.getSingletonInstance();
+        eventCache = JHVEventCache.getSingletonInstance();
         this.params = params;
     }
 
@@ -85,7 +84,7 @@ public class DownloadWorker implements Runnable {
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    eventContainer.finishedDownload(false);
+                    eventCache.finishedDownload(false);
                     SWEKDownloadManager.getSingletonInstance().workerFinished(DownloadWorker.this);
                 }
             });

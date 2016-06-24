@@ -12,7 +12,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventType;
  *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  */
-public interface JHVEventContainerRequestHandler {
+public interface JHVEventCacheRequestHandler {
     /**
      * Handle request for an interval.
      *

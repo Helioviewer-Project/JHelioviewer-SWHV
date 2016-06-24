@@ -15,7 +15,6 @@ import java.util.SortedMap;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
@@ -30,7 +29,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineD
 public class EventModel extends AbstractLineDataSelectorElement implements JHVEventHandler {
 
     private static EventModel instance;
-    private final JHVEventContainer eventContainer;
+    private final JHVEventCache eventCache;
     private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
     private static final float dash1[] = { 10f };
     private static final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
@@ -38,7 +37,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     private EventPlotConfiguration eventUnderMouse;
 
     private EventModel() {
-        eventContainer = JHVEventContainer.getSingletonInstance();
+        eventCache = JHVEventCache.getSingletonInstance();
         events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         EVEPlugin.ldsm.addLineData(this);
     }
@@ -52,7 +51,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        eventContainer.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, EventModel.this);
+        eventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, EventModel.this);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     @Override
     public void cacheUpdated() {
         TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
-        eventContainer.requestForInterval(xAxis.start, xAxis.end, this);
+        eventCache.requestForInterval(xAxis.start, xAxis.end, this);
         EVEPlugin.dc.fireRedrawRequest();
     }
 
@@ -142,7 +141,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
             eventUnderMouse = shouldRedraw;
             if (mousePosition != null) {
-                JHVEventContainer.highlight(highlightedEvent);
+                JHVEventCache.highlight(highlightedEvent);
             }
         }
     }

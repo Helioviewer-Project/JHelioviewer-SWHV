@@ -6,7 +6,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.GZIPUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.data.container.JHVEventContainerRequestHandler;
+import org.helioviewer.jhv.data.container.JHVEventCacheRequestHandler;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -19,7 +19,7 @@ import org.helioviewer.jhv.database.EventDatabase.JsonEvent;
 import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 
-public class IncomingRequestManager implements JHVEventContainerRequestHandler {
+public class IncomingRequestManager implements JHVEventCacheRequestHandler {
 
     private static IncomingRequestManager instance;
 
