@@ -104,22 +104,17 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 dispose();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().setDefaultButton(acceptBtn);
+        getRootPane().setFocusable(true);
     }
 
     @Override
     public void showDialog() {
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-
-        getRootPane().setDefaultButton(acceptBtn);
         setVisible(true);
     }
 
-    /**
-     * Saves the settings.
-     *
-     * Writes the informations to {@link org.helioviewer.jhv.Settings}.
-     */
     private void saveSettings() {
         settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovie.isSelected()));
         settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected()));
