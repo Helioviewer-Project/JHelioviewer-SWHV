@@ -360,7 +360,7 @@ public class SWEKConfigurationManager {
      *             if the source could not be parsed
      */
     private SWEKSource parseSource(JSONObject jsonObject) throws JSONException {
-        return new SWEKSource(parseSourceName(jsonObject), parseProviderName(jsonObject), parseDownloader(jsonObject), parseJarLocation(jsonObject), parseEventParser(jsonObject), parseBaseURL(jsonObject), parseGeneralParameters(jsonObject));
+        return new SWEKSource(parseSourceName(jsonObject), parseProviderName(jsonObject), parseGeneralParameters(jsonObject));
     }
 
     /**
@@ -387,60 +387,6 @@ public class SWEKConfigurationManager {
      */
     private String parseProviderName(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("provider_name");
-    }
-
-    /**
-     * Parses the downloader description from a json.
-     *
-     * @param jsonObject
-     *            the json from which to parse the downloader description
-     * @return the parsed downloader description
-     * @throws JSONException
-     *             if the downloader description could not be parsed
-     */
-    private String parseDownloader(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("downloader");
-
-    }
-
-    /**
-     * Parses the event parser from a json.
-     *
-     * @param jsonObject
-     *            the json from which to parse the event parser
-     * @return the parsed event parser
-     * @throws JSONException
-     *             if the event parser could not be parsed
-     */
-    private String parseEventParser(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("event_parser");
-    }
-
-    /**
-     * Parses the jar location from a json.
-     *
-     * @param jsonObject
-     *            the json from which to parse the jar location
-     * @return the parsed jar location
-     * @throws JSONException
-     *             if the event parser could not be parsed
-     */
-
-    private String parseJarLocation(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("jar_location");
-    }
-
-    /**
-     * Parses the base url from a json.
-     *
-     * @param jsonObject
-     *            the json from which to parse the base url
-     * @return the parsed base url
-     * @throws JSONException
-     *             if the base url could not be parsed
-     */
-    private String parseBaseURL(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("base_url");
     }
 
     /**

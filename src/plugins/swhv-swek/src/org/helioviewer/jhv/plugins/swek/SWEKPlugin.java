@@ -46,8 +46,6 @@ public class SWEKPlugin implements Plugin {
         SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
         SWEKSources = SWEKSourceManager.getSingletonInstance();
         loadExternalJars = true;
-        SWEKSources.setPlugin(this);
-        SWEKSources.loadExternalJars(loadExternalJars);
 
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
@@ -65,7 +63,6 @@ public class SWEKPlugin implements Plugin {
         SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
         SWEKSources = SWEKSourceManager.getSingletonInstance();
         this.loadExternalJars = loadExternalJars;
-        SWEKSources.loadExternalJars(loadExternalJars);
 
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
@@ -80,7 +77,6 @@ public class SWEKPlugin implements Plugin {
             @Override
             protected Void backgroundWork() {
                 SWEKConfig.loadConfiguration();
-                SWEKSources.loadSources();
                 return null;
             }
 

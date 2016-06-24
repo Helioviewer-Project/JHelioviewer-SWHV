@@ -140,13 +140,6 @@
             <fileset file="COPYING"/>
             <zipgroupfileset dir="${lib}" includes="**/*.jar" />
         </jar>
-        <subant target="jar-bundle">
-            <fileset dir="./sources/" includes="*/build.xml"/>
-        </subant>
-        <jar destfile="${build}/${plugin.name}.jar" update="true" >
-            <zipfileset dir="${sweksources}/HEKSource/build/" includes="*.jar" prefix="sources" />
-            <zipfileset dir="${sweksources}/ComesepSource/build/" includes="*.jar" prefix="sources" />
-        </jar>
     </target>
 
     <!-- install/release plugin -->
@@ -162,9 +155,6 @@
     <target name="install-plugin" depends="jar-bundle">
         <copy file="${build}/${plugin.name}.jar" todir="${plugins.dir}"/>
         <copy file="${build}/${plugin.name}.jar" todir="${jhv.root}/plugins"/>
-        <subant target="install-source">
-            <fileset dir="./sources/" includes="*/build.xml"/>
-        </subant>
     </target>
 
 </project>
