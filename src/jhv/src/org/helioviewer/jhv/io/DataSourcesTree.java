@@ -82,7 +82,7 @@ public class DataSourcesTree extends JTree {
             tgt.add((DefaultMutableTreeNode) src.getFirstChild());
     }
 
-    public void setParsedData(DataSourcesParser parser) {
+    public boolean setParsedData(DataSourcesParser parser) {
         String server = parser.rootNode.toString();
         if ("ROB".equals(server))
             reattach(nodeROB, parser.rootNode);
@@ -91,8 +91,10 @@ public class DataSourcesTree extends JTree {
         else
             reattach(nodeIAS, parser.rootNode);
 
-        if (parser.defaultNode != null)
+        boolean preferred = server.equals(DataSources.getPreferredServer());
+        if (preferred && parser.defaultNode != null)
             setSelectionPath(new TreePath(parser.defaultNode.getPath()));
+        return preferred;
     }
 
     public SourceItem getSelectedItem() {
