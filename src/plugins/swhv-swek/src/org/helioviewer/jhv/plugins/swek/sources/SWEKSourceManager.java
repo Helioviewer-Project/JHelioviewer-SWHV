@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources;
 
+import org.helioviewer.jhv.data.datatype.event.SWEKDownloader;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.helioviewer.jhv.data.datatype.event.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.sources;
+package org.helioviewer.jhv.data.datatype.event;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,9 +11,6 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.json.JSONException;
 import org.json.JSONObject;
