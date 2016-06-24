@@ -64,7 +64,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     }
 
     private ObservationDialog(JFrame mainFrame) {
-        super(mainFrame, true);
+        super(mainFrame, false);
 
         // set dialog settings
         setTitle("New Layer");
@@ -220,11 +220,8 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         }
     }
 
-    public void setAvailabilityStatus(String server) {
-        if (server.equals("ROB"))
-            availabilityButton.setEnabled(true);
-        else
-            availabilityButton.setEnabled(false);
+    public void setAvailabilityStatus(boolean status) {
+        availabilityButton.setEnabled(status);
     }
 
     /**
@@ -236,15 +233,9 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
             String str = (String) uiSelectionComboBox.getSelectedItem();
             setUIContainerPane(str);
 
-/*
-            if (str.equals("Image data"))
-                setAvailabilityStatus(DataSources.getSelectedServer());
-            else
-                availabilityButton.setEnabled(true);
-*/
-
+            // that will do for now
             if (!str.equals("Image data"))
-                availabilityButton.setEnabled(true);
+                setAvailabilityStatus(true);
 
         } else if (e.getSource().equals(btnImages)) {
             addPressed();
