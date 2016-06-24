@@ -63,9 +63,6 @@
             <fileset dir="${bin.eclipse}" followsymlinks="false" defaultexcludes="no"/>
         </delete>
         <antcall target="mkdir"/>
-        <subant target="clean">
-            <fileset dir="./sources/" includes="*/build.xml"/>
-        </subant>
     </target>
 
     <!-- Determine revision and version -->
