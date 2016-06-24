@@ -74,13 +74,13 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 gregorianCalendar.setTime(endDate);
 
                 gregorianCalendar.add(GregorianCalendar.SECOND, getCadence());
-                setEndDate(gregorianCalendar.getTime(), false);
+                timeSelectionPanel.setEndDate(gregorianCalendar.getTime(), false);
 
                 gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-                setStartDate(gregorianCalendar.getTime(), false);
+                timeSelectionPanel.setStartDate(gregorianCalendar.getTime(), false);
 
                 if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                    loadRemote();
+                    loadRemote(item);
                 }
             }
         } else {
@@ -115,26 +115,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
     }
 
     /**
-     * Set a new end date and time
-     *
-     * @param newEnd
-     *            new start date and time
-     */
-    private void setEndDate(Date newEnd, boolean byUser) {
-        timeSelectionPanel.setEndDate(newEnd, byUser);
-    }
-
-    /**
-     * Set a new start date and time
-     *
-     * @param newStart
-     *            new start date and time
-     */
-    private void setStartDate(Date newStart, boolean byUser) {
-        timeSelectionPanel.setStartDate(newStart, byUser);
-    }
-
-    /**
      * Returns the selected cadence.
      *
      * @return selected cadence.
@@ -147,12 +127,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * Loads an image series from the Helioviewer server and adds a new layer to
      * the GUI which represents the image series.
      * */
-    private void loadRemote() {
-        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        if (item != null) { // valid
-            LoadRemoteTask remoteTask = new LoadRemoteTask(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
-            JHVGlobals.getExecutorService().execute(remoteTask);
-        }
+    private void loadRemote(DataSourcesTree.SourceItem item) { // valid item
+        LoadRemoteTask remoteTask = new LoadRemoteTask(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
+        JHVGlobals.getExecutorService().execute(remoteTask);
     }
 
     // Methods derived from Observation Dialog Panel
@@ -174,7 +151,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        loadRemote();
+        loadRemote(item);
         return true;
     }
 
