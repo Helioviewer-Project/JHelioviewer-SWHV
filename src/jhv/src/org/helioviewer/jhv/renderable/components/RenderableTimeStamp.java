@@ -17,7 +17,6 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableTimeStamp extends AbstractRenderable {
 
-    private static final double vpScale = 0.035;
     private static final String name = "Timestamp";
 
     @Override
