@@ -252,14 +252,14 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             return;
 
         JHVDate startTime = view.getFirstTime();
-        beginDatePicker.setDate(new Date(startTime.milli - startTime.milli % (60 * 60 * 24 * 1000)));
+        beginDatePicker.setDate(new Date(startTime.milli - startTime.milli % TimeUtils.DAY_IN_MILLIS));
         beginTimePicker.setText(TimeUtils.timeDateFormat.format(startTime.getDate()));
         setBeginTime(applyChanges);
     }
 
     private void syncBothLayerNow() {
         Date nowDate = new Date(System.currentTimeMillis());
-        Date syncDate = new Date(nowDate.getTime() - nowDate.getTime() % (60 * 60 * 24 * 1000));
+        Date syncDate = new Date(nowDate.getTime() - nowDate.getTime() % TimeUtils.DAY_IN_MILLIS);
 
         beginDatePicker.setDate(syncDate);
         beginTimePicker.setText(TimeUtils.timeDateFormat.format(nowDate));
@@ -273,7 +273,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private void syncWithLayerCurrentTime() {
         Date currentDate = Layers.getLastUpdatedTimestamp().getDate();
-        Date syncDate = new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000));
+        Date syncDate = new Date(currentDate.getTime() - currentDate.getTime() % TimeUtils.DAY_IN_MILLIS);
 
         endDatePicker.setDate(syncDate);
         endTimePicker.setText(TimeUtils.timeDateFormat.format(currentDate));
@@ -291,7 +291,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             return;
 
         JHVDate endTime = view.getLastTime();
-        endDatePicker.setDate(new Date(endTime.milli - endTime.milli % (60 * 60 * 24 * 1000)));
+        endDatePicker.setDate(new Date(endTime.milli - endTime.milli % TimeUtils.DAY_IN_MILLIS));
         endTimePicker.setText(TimeUtils.timeDateFormat.format(endTime.getDate()));
         setEndTime(applyChanges);
     }
