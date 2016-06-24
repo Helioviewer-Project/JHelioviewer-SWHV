@@ -178,7 +178,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     @Override
     public boolean hasData() {
-        return JHVEventCache.getSingletonInstance().hasData();
+        return eventCache.hasData();
     }
 
     @Override

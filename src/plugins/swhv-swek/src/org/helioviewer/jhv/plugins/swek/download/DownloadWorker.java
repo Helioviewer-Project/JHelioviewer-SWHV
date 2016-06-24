@@ -34,10 +34,10 @@ public class DownloadWorker implements Runnable {
     private final List<SWEKParam> params;
     private final Interval requestInterval;
 
-    public DownloadWorker(JHVEventType jhvType, Interval interval, List<SWEKParam> params) {
+    public DownloadWorker(JHVEventType _jhvType, Interval interval, List<SWEKParam> params, JHVEventCache _eventCache) {
         requestInterval = interval;
-        this.jhvType = jhvType;
-        eventCache = JHVEventCache.getSingletonInstance();
+        jhvType = _jhvType;
+        eventCache = _eventCache;
         this.params = params;
     }
 
@@ -56,7 +56,7 @@ public class DownloadWorker implements Runnable {
                 @Override
                 public void run() {
                     for (JHVAssociation assoc : associationList) {
-                        JHVEventCache.getSingletonInstance().add(assoc);
+                        eventCache.add(assoc);
                     }
                 }
             });
@@ -67,7 +67,7 @@ public class DownloadWorker implements Runnable {
                 EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        JHVEventCache.getSingletonInstance().add(ev);
+                        eventCache.add(ev);
                     }
                 });
             }
