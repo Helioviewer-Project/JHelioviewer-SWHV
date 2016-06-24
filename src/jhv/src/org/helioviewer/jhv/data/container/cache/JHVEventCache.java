@@ -134,8 +134,8 @@ public class JHVEventCache {
     }
 
     public void intervalsNotDownloaded(JHVEventType eventType, Interval interval) {
-        JHVEventCache.getSingletonInstance().removeRequestedIntervals(eventType, interval);
-        JHVEventCache.getSingletonInstance().get(interval.start, interval.end, interval.start, interval.end);
+        removeRequestedIntervals(eventType, interval);
+        get(interval.start, interval.end, interval.start, interval.end);
     }
 
     public void eventTypeActivated(JHVEventType eventType) {
@@ -273,7 +273,7 @@ public class JHVEventCache {
         return downloadedCache.get(eventType).getAllRequestIntervals();
     }
 
-    public void removeRequestedIntervals(JHVEventType eventType, Interval interval) {
+    private void removeRequestedIntervals(JHVEventType eventType, Interval interval) {
         downloadedCache.get(eventType).removeRequestedInterval(interval);
     }
 
