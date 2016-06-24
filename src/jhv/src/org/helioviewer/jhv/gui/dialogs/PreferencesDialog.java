@@ -29,7 +29,6 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
 
@@ -141,9 +140,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         combo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String server = (String) combo.getSelectedItem();
-                DataSources.saveServerSettings(server);
-                ObservationDialog.getInstance().setAvailabilityStatus(server);
+                DataSources.saveServerSettings((String) combo.getSelectedItem());
             }
         });
         row_1.add(combo);

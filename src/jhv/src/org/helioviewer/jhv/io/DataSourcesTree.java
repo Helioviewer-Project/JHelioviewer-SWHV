@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JTree;
@@ -10,6 +11,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 
 public class DataSourcesTree extends JTree {
 
@@ -74,6 +77,17 @@ public class DataSourcesTree extends JTree {
 
         setSelectionModel(new OneLeafTreeSelectionModel());
         ToolTipManager.sharedInstance().registerComponent(this);
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getClickCount() == 2 && getRowForLocation(e.getX(), e.getY()) != -1) {
+                    Object obj = ((DefaultMutableTreeNode) getPathForLocation(e.getX(), e.getY()).getLastPathComponent()).getUserObject();
+                    if (obj instanceof SourceItem)
+                        ObservationDialog.getInstance().getObservationImagePane().loadButtonPressed();
+                }
+            }
+        });
     }
 
     private void reattach(DefaultMutableTreeNode tgt, DefaultMutableTreeNode src) {
@@ -125,22 +139,25 @@ public class DataSourcesTree extends JTree {
             setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         }
 
-        @Override
-        public void setSelectionPath(TreePath path) {
+        private void setSelectionPathInternal(TreePath path) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
             if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
                 super.setSelectionPath(path);
                 selectedPath = path;
+
+                boolean isROB = "ROB".equals(((SourceItem) node.getUserObject()).server);
+                ObservationDialog.getInstance().setAvailabilityStatus(isROB);
             }
         }
 
         @Override
+        public void setSelectionPath(TreePath path) {
+            setSelectionPathInternal(path);
+        }
+
+        @Override
         public void addSelectionPath(TreePath path) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-            if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
-                super.addSelectionPath(path);
-                selectedPath = path;
-            }
+            setSelectionPathInternal(path);
         }
 
         @Override
