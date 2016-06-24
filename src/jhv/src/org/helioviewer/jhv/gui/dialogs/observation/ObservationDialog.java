@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.dialogs.observation;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -60,22 +59,13 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         return instance;
     }
 
-    private ObservationDialog(JFrame mainFrame) {
-        super(mainFrame, true);
-        initVisualComponents();
-
-        imageObservationPanel = new ImageDataPanel();
-        addUserInterface("Image data", imageObservationPanel);
-    }
-
     public ImageDataPanel getObservationImagePane() {
         return imageObservationPanel;
     }
 
-    /**
-     * Sets up the visual sub components and the component itself.
-     * */
-    private void initVisualComponents() {
+    private ObservationDialog(JFrame mainFrame) {
+        super(mainFrame, true);
+
         // set dialog settings
         setTitle("New Layer");
         setContentPane(contentPane);
@@ -117,12 +107,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         buttonPane.add(btnClose);
         buttonPane.add(btnImages);
 
-        int btnWidth = Math.max(btnClose.getPreferredSize().getSize().width, btnImages.getPreferredSize().getSize().width);
-
-        btnImages.setPreferredSize(new Dimension(btnWidth, 25));
         btnImages.addActionListener(this);
-
-        btnClose.setPreferredSize(new Dimension(btnWidth, 25));
         btnClose.addActionListener(this);
 
         getRootPane().registerKeyboardAction(new ActionListener() {
@@ -131,6 +116,9 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
                 closeDialog();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        imageObservationPanel = new ImageDataPanel();
+        addUserInterface("Image data", imageObservationPanel);
     }
 
     /**
@@ -206,7 +194,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
 
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-
         getRootPane().setDefaultButton(btnImages);
         setVisible(true);
     }

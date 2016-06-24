@@ -46,6 +46,8 @@ public class ExportReadyDialog extends JDialog implements ActionListener, Showab
         add(closeButtonContainer, BorderLayout.SOUTH);
 
         getRootPane().registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().setDefaultButton(closeButton);
+        getRootPane().setFocusable(true);
     }
 
     public void init(String message) {
@@ -60,8 +62,6 @@ public class ExportReadyDialog extends JDialog implements ActionListener, Showab
     public void showDialog() {
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-
-        getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }
 

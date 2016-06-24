@@ -136,6 +136,8 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
                 dispose();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().setDefaultButton(closeButton);
+        getRootPane().setFocusable(true);
     }
 
     /**
@@ -153,7 +155,6 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
             }
         });
 
-        getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }
 
