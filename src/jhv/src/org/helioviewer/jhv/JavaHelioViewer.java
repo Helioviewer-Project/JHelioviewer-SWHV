@@ -116,7 +116,7 @@ public class JavaHelioViewer {
                 ImageViewerGui.prepareGui();
                 ImageViewerGui.loadImagesAtStartup();
 
-                DataSources.getSingletonInstance(); // query server for data
+                DataSources.loadSources();
 
                 Log.info("Load plugin settings");
                 PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());

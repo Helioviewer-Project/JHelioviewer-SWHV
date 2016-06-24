@@ -65,45 +65,36 @@ public class DataSources {
         }
     }
 
-    private static DataSources instance;
+    static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
-    public static final HashSet<String> SupportedObservatories = new HashSet<String>();
-
-    private DataSources() {}
-
-    public static DataSources getSingletonInstance() {
-        if (instance == null) {
-            instance = new DataSources();
-
-            String prop = Settings.getSingletonInstance().getProperty("supported.data.sources");
-            if (prop != null && SupportedObservatories.isEmpty()) {
-                String supportedObservatories[] = prop.split(" ");
-                for (String s : supportedObservatories) {
-                    if (!s.isEmpty()) {
-                        SupportedObservatories.add(s);
-                    }
+    public static void loadSources() {
+        String prop = Settings.getSingletonInstance().getProperty("supported.data.sources");
+        if (prop != null && SupportedObservatories.isEmpty()) {
+            String supportedObservatories[] = prop.split(" ");
+            for (String s : supportedObservatories) {
+                if (!s.isEmpty()) {
+                    SupportedObservatories.add(s);
                 }
             }
-
-            String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
-            if (datasourcesPath.contains("ias.u-psud.fr")) {
-                preferredServer = "IAS";
-            } else if (datasourcesPath.contains("helioviewer.org")) {
-                preferredServer = "GSFC";
-            } else {
-                preferredServer = "ROB";
-            }
-            saveServerSettings(preferredServer);
-
-            DataSourcesTask loadTask;
-            loadTask = new DataSourcesTask("GSFC");
-            JHVGlobals.getExecutorService().execute(loadTask);
-            loadTask = new DataSourcesTask("ROB");
-            JHVGlobals.getExecutorService().execute(loadTask);
-            loadTask = new DataSourcesTask("IAS");
-            JHVGlobals.getExecutorService().execute(loadTask);
         }
-        return instance;
+
+        String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
+        if (datasourcesPath.contains("ias.u-psud.fr")) {
+            preferredServer = "IAS";
+        } else if (datasourcesPath.contains("helioviewer.org")) {
+            preferredServer = "GSFC";
+        } else {
+            preferredServer = "ROB";
+        }
+        saveServerSettings(preferredServer);
+
+        DataSourcesTask loadTask;
+        loadTask = new DataSourcesTask("GSFC");
+        JHVGlobals.getExecutorService().execute(loadTask);
+        loadTask = new DataSourcesTask("ROB");
+        JHVGlobals.getExecutorService().execute(loadTask);
+        loadTask = new DataSourcesTask("IAS");
+        JHVGlobals.getExecutorService().execute(loadTask);
     }
 
 }
