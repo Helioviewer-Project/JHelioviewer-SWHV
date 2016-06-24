@@ -61,7 +61,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
     }
 
     public void setupSources(DataSourcesParser parser) {
-        sourcesTree.setParsedData(parser);
+        if (!sourcesTree.setParsedData(parser)) // not preferred
+            return;
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
