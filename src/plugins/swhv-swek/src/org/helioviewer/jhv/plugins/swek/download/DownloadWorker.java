@@ -7,6 +7,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.GZIPUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -49,7 +50,17 @@ public class DownloadWorker implements Runnable {
     public void run() {
         SWEKSource swekSource = jhvType.getSupplier().getSource();
         SWEKDownloader downloader = sourceManager.getDownloader(swekSource);
-        boolean success = downloader.extern2db(jhvType, requestInterval.start, requestInterval.end, params);
+        SWEKParser parser = sourceManager.getParser(swekSource);
+
+        boolean success = true;
+        if (parser == null || downloader == null) {
+            Log.warn("The swek downloader or swek parser with sourcename " + swekSource.getSourceName() + " could not be loaded");
+            success = false;
+        }
+
+        if (success)
+            success = downloader.extern2db(jhvType, requestInterval.start, requestInterval.end, params);
+
         if (success) {
             final ArrayList<JHVAssociation> associationList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, jhvType);
             EventQueue.invokeLater(new Runnable() {
@@ -60,7 +71,6 @@ public class DownloadWorker implements Runnable {
                     }
                 }
             });
-            SWEKParser parser = sourceManager.getParser(swekSource);
             ArrayList<JsonEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
             for (JsonEvent event : eventList) {
                 final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end, false);
