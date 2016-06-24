@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -227,7 +226,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         JHVWorker<ArrayList<JHVEvent>, Void> worker = new JHVWorker<ArrayList<JHVEvent>, Void>() {
             @Override
             public ArrayList<JHVEvent> backgroundWork() {
-                return JHVEventContainer.getSingletonInstance().getOtherRelations(event);
+                return JHVEventCache.getSingletonInstance().getOtherRelations(event);
             }
 
             @Override

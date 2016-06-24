@@ -13,6 +13,8 @@ import java.util.SortedMap;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.data.container.JHVEventCacheRequestHandler;
+import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -21,6 +23,13 @@ import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 
 public class JHVEventCache {
+    private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<JHVEventHandler>();
+
+    private JHVEventCacheRequestHandler incomingRequestManager;
+
+    private static final double factor = 0.2;
+
+    private static JHVRelatedEvents lastHighlighted = null;
 
     private static JHVEventCache instance;
 
@@ -86,6 +95,74 @@ public class JHVEventCache {
             instance = new JHVEventCache();
         }
         return instance;
+    }
+
+    public void requestForInterval(final long startDate, final long endDate, final JHVEventHandler handler) {
+        long deltaT = Math.max((long) ((endDate - startDate) * factor), TimeUtils.DAY_IN_MILLIS);
+        long newStartDate = startDate - deltaT;
+        long newEndDate = endDate + deltaT;
+        cacheEventHandlers.add(handler);
+
+        JHVEventCacheResult result = get(startDate, endDate, newStartDate, newEndDate);
+        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = result.getAvailableEvents();
+        handler.newEventsReceived(events);
+        for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
+            List<Interval> missingList = result.getMissingIntervals().get(eventType);
+            for (Interval missing : missingList) {
+                requestEvents(eventType, missing);
+            }
+        }
+    }
+
+    public void finishedDownload(boolean partially) {
+        fireEventCacheChanged();
+    }
+
+    public void removeEvents(final JHVEventType eventType, boolean keepActive) {
+        this.removeEventType(eventType, keepActive);
+        fireEventCacheChanged();
+    }
+
+    private void requestEvents(JHVEventType eventType, Interval interval) {
+        incomingRequestManager.handleRequestForInterval(eventType, interval);
+    }
+
+    private void fireEventCacheChanged() {
+        for (JHVEventHandler handler : cacheEventHandlers) {
+            handler.cacheUpdated();
+        }
+    }
+
+    public void intervalsNotDownloaded(JHVEventType eventType, Interval interval) {
+        JHVEventCache.getSingletonInstance().removeRequestedIntervals(eventType, interval);
+        JHVEventCache.getSingletonInstance().get(interval.start, interval.end, interval.start, interval.end);
+    }
+
+    public void eventTypeActivated(JHVEventType eventType) {
+        _eventTypeActivated(eventType);
+        fireEventCacheChanged();
+    }
+
+    public static void highlight(JHVRelatedEvents event) {
+        if (event == lastHighlighted) {
+            return;
+        }
+        if (event != null) {
+            event.highlight(true);
+
+        }
+        if (lastHighlighted != null) {
+            lastHighlighted.highlight(false);
+        }
+        lastHighlighted = event;
+    }
+
+    public void registerHandler(JHVEventCacheRequestHandler incomingRequestManager) {
+        this.incomingRequestManager = incomingRequestManager;
+    }
+
+    public ArrayList<JHVEvent> getOtherRelations(JHVEvent event) {
+        return incomingRequestManager.getOtherRelations(event);
     }
 
     public void add(JHVEvent event) {
@@ -200,7 +277,7 @@ public class JHVEventCache {
         downloadedCache.get(eventType).removeRequestedInterval(interval);
     }
 
-    public void eventTypeActivated(JHVEventType eventType) {
+    private void _eventTypeActivated(JHVEventType eventType) {
         activeEventTypes.add(eventType);
         if (!downloadedCache.containsKey(eventType)) {
             RequestCache cache = new RequestCache();

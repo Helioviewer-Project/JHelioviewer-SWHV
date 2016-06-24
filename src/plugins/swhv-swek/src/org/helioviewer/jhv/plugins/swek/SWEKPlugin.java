@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
-import org.helioviewer.jhv.data.container.JHVEventContainer;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
@@ -36,7 +36,7 @@ public class SWEKPlugin implements Plugin {
     private final IncomingRequestManager incomingRequestManager;
 
     /** instance of the event container */
-    private final JHVEventContainer eventContainer;
+    private final JHVEventCache eventCache;
 
     private final SWEKRenderable renderable;
 
@@ -50,7 +50,7 @@ public class SWEKPlugin implements Plugin {
         SWEKSources.loadExternalJars(loadExternalJars);
 
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
-        eventContainer = JHVEventContainer.getSingletonInstance();
+        eventCache = JHVEventCache.getSingletonInstance();
         renderable = new SWEKRenderable();
     }
 
@@ -68,7 +68,7 @@ public class SWEKPlugin implements Plugin {
         SWEKSources.loadExternalJars(loadExternalJars);
 
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
-        eventContainer = JHVEventContainer.getSingletonInstance();
+        eventCache = JHVEventCache.getSingletonInstance();
         renderable = new SWEKRenderable();
     }
 
@@ -86,7 +86,7 @@ public class SWEKPlugin implements Plugin {
 
             @Override
             protected void done() {
-                eventContainer.registerHandler(incomingRequestManager);
+                eventCache.registerHandler(incomingRequestManager);
                 ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), true);
                 ImageViewerGui.getLeftContentPane().revalidate();
 

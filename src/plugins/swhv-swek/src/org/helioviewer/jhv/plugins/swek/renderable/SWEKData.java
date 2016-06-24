@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
@@ -66,7 +65,7 @@ public class SWEKData implements LayersListener, JHVEventHandler {
         }
 
         if (request && endDate != null && beginDate != null) {
-            JHVEventContainer.getSingletonInstance().requestForInterval(beginDate.milli, endDate.milli, SWEKData.this);
+            JHVEventCache.getSingletonInstance().requestForInterval(beginDate.milli, endDate.milli, SWEKData.this);
         }
     }
 

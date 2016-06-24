@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.data.container.JHVEventContainer;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 
@@ -149,12 +149,12 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        JHVEventContainer.highlight(revent);
+        JHVEventCache.highlight(revent);
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        JHVEventContainer.highlight(null);
+        JHVEventCache.highlight(null);
     }
 
 }

@@ -14,7 +14,7 @@ import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.data.container.JHVEventContainer;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -106,7 +106,7 @@ public class SWEKPopupController implements MouseListener, TimeListener {
     @Override
     public void mouseExited(MouseEvent e) {
         mouseOverJHVEvent = null;
-        JHVEventContainer.highlight(null);
+        JHVEventCache.highlight(null);
     }
 
     @Override
@@ -198,7 +198,7 @@ public class SWEKPopupController implements MouseListener, TimeListener {
             }
         }
 
-        JHVEventContainer.highlight(mouseOverJHVEvent);
+        JHVEventCache.highlight(mouseOverJHVEvent);
         if (helpCursor != component.getCursor())
             lastCursor = component.getCursor();
 
