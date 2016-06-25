@@ -31,6 +31,27 @@ import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
  * because they modify links and requests that they will fit with the API.
  */
 public class APIRequestManager {
+
+    public static final int CADENCE_ANY = -100;
+
+    public static class APIRequest {
+
+        public final String server;
+        public final int sourceId;
+        public final long startTime;
+        public final long endTime;
+        public final int cadence;
+
+        public APIRequest(String server, int sourceId, long startTime, long endTime, int cadence) {
+            this.server = server;
+            this.sourceId = sourceId;
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.cadence = cadence;
+        }
+
+    }
+
     /**
      * Sends an request to the server to compute where the nearest image is
      * located on the server.
@@ -48,7 +69,7 @@ public class APIRequestManager {
     private static View loadImage(String server, int sourceId, long startTime, boolean message) throws IOException {
         String fileRequest = DataSources.getServerSetting(server, "API.jp2images.path") + "sourceId=" + Integer.toString(sourceId) + "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
-        return requestData(jpipRequest, fileRequest, message);
+        return requestData(jpipRequest, fileRequest, new APIRequest(server, sourceId, startTime, startTime, CADENCE_ANY), message);
     }
 
     /**
@@ -71,14 +92,14 @@ public class APIRequestManager {
      */
     private static View loadImageSeries(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
         String fileRequest = DataSources.getServerSetting(server, "API.jp2series.path") + "sourceId=" + Integer.toString(sourceId) + "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
-        if (cadence != -100) {
+        if (cadence != CADENCE_ANY) {
             fileRequest += "&cadence=" + Integer.toString(cadence);
         }
         String jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
-        return requestData(jpipRequest, fileRequest, message);
+        return requestData(jpipRequest, fileRequest, new APIRequest(server, sourceId, startTime, endTime, cadence), message);
     }
 
-    private static View requestData(String _jpipRequest, String fileRequest, boolean errorMessage) throws IOException {
+    private static View requestData(String _jpipRequest, String fileRequest, APIRequest apiRequest, boolean errorMessage) throws IOException {
         try {
             URL jpipRequest = new URL(_jpipRequest);
             URI downloadUri = new URI(fileRequest);
@@ -109,7 +130,7 @@ public class APIRequestManager {
                 if (message != null && errorMessage) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
-                return loadView(response.getURI(), downloadUri);
+                return loadView(response.getURI(), downloadUri, apiRequest);
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");
@@ -183,7 +204,7 @@ public class APIRequestManager {
      * @return View containing the image
      * @throws IOException
      */
-    public static View loadView(URI uri, URI downloadURI) throws IOException {
+    public static View loadView(URI uri, URI downloadURI, APIRequest apiRequest) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI");
         }
@@ -200,7 +221,10 @@ public class APIRequestManager {
                     jp2Image = new JP2ImageCallisto(uri, downloadURI);
                 else
                     jp2Image = new JP2Image(uri, downloadURI);
-                return EventDispatchQueue.invokeAndWait(new AllocateJP2View(jp2Image));
+
+                JP2View view = EventDispatchQueue.invokeAndWait(new AllocateJP2View(jp2Image));
+                view.setAPIRequest(apiRequest);
+                return view;
             }
         } catch (InterruptedException e) {
             // nothing
