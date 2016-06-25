@@ -35,8 +35,8 @@ public interface View {
         }, SWINGDOWN
     }
 
-    public APIRequest getAPIRequest();
-    public void setAPIRequest(APIRequest apiRequest);
+    APIRequest getAPIRequest();
+    void setAPIRequest(APIRequest apiRequest);
 
     void abolish();
 

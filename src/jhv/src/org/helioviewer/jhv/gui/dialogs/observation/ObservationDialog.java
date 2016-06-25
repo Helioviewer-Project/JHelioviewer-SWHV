@@ -43,10 +43,9 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     private final JPanel buttonPane = new JPanel();
     private final JButton btnImages = new JButton("Add");
     private final JButton btnClose = new JButton("Cancel");
+    private final JButton availabilityButton = new JButton("Available data");
 
     private ObservationDialogPanel selectedPane = null;
-
-    private JButton availabilityButton;
 
     private final ImageDataPanel imageObservationPanel;
 
@@ -80,7 +79,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         uiSelectionPane.setBorder(BorderFactory.createEtchedBorder());
         uiSelectionPane.add(new JLabel("Data type"));
         uiSelectionPane.add(uiSelectionComboBox);
-        availabilityButton = new JButton("Available data");
         uiSelectionPane.add(availabilityButton);
 
         availabilityButton.addActionListener(new ActionListener() {
