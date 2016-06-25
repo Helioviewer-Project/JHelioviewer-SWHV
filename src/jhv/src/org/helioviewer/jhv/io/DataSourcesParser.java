@@ -12,8 +12,8 @@ import org.json.JSONObject;
 
 public class DataSourcesParser {
 
+    final DefaultMutableTreeNode rootNode;
     DefaultMutableTreeNode defaultNode;
-    DefaultMutableTreeNode rootNode;
 
     private final String server;
 
