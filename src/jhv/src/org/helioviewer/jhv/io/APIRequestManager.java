@@ -53,49 +53,38 @@ public class APIRequestManager {
     }
 
     /**
-     * Sends an request to the server to compute where the nearest image is
-     * located on the server.
+     * Method does remote opening. If image series, file is downloaded.
      *
      * @param server
      * @param sourceId
      *            sourceId of the requested image
      * @param startTime
-     *            time if the requested image
-     * @param message
-     *            display error message
-     * @return view of the nearest image file on the server
-     * @throws IOException
-     */
-    private static View loadImage(String server, int sourceId, long startTime, boolean message) throws IOException {
-        String fileRequest = DataSources.getServerSetting(server, "API.jp2images.path") + "sourceId=" + Integer.toString(sourceId) + "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
-        String jpipRequest = fileRequest + "&jpip=true";
-        return requestData(jpipRequest, fileRequest, new APIRequest(server, sourceId, startTime, startTime, CADENCE_ANY), message);
-    }
-
-    /**
-     * Sends an request to the server to compute where the image series is
-     * located on the server.
-     *
-     * @param server
-     * @param sourceId
-     *            sourceId of the requested image series
-     * @param startTime
-     *            start time of the requested image series
+     *            start time of the requested image
      * @param endTime
-     *            end time of the requested image series
+     *            end time of the requested image
      * @param cadence
-     *            cadence between to images of the image series
+     *            cadence between two frames
      * @param message
      *            display error message
-     * @return view of the file which represents the image series on the server
+     * @return new view
      * @throws IOException
      */
-    private static View loadImageSeries(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
-        String fileRequest = DataSources.getServerSetting(server, "API.jp2series.path") + "sourceId=" + Integer.toString(sourceId) + "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
-        if (cadence != CADENCE_ANY) {
-            fileRequest += "&cadence=" + Integer.toString(cadence);
+    public static View requestAndOpenRemoteFile(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
+        String fileRequest, jpipRequest;
+
+        if (startTime == endTime) {
+            fileRequest = DataSources.getServerSetting(server, "API.jp2images.path") + "sourceId=" + Integer.toString(sourceId) +
+                          "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
+            jpipRequest = fileRequest + "&jpip=true";
+            cadence = CADENCE_ANY;
+        } else {
+            fileRequest = DataSources.getServerSetting(server, "API.jp2series.path") + "sourceId=" + Integer.toString(sourceId) +
+                         "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
+            if (cadence != CADENCE_ANY) {
+                fileRequest += "&cadence=" + Integer.toString(cadence);
+            }
+            jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
         }
-        String jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
         return requestData(jpipRequest, fileRequest, new APIRequest(server, sourceId, startTime, endTime, cadence), message);
     }
 
@@ -163,31 +152,6 @@ public class APIRequestManager {
         }
 
         return null;
-    }
-
-    /**
-     * Method does remote opening. If image series, file is downloaded.
-     *
-     * @param server
-     * @param sourceId
-     *            sourceId of the requested image
-     * @param startTime
-     *            start time of the requested image
-     * @param endTime
-     *            end time of the requested image
-     * @param cadence
-     *            cadence between two frames
-     * @param message
-     *            display error message
-     * @return new view
-     * @throws IOException
-     */
-    public static View requestAndOpenRemoteFile(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
-        if (startTime == endTime) {
-            return loadImage(server, sourceId, startTime, message);
-        } else {
-            return loadImageSeries(server, sourceId, startTime, endTime, cadence, message);
-        }
     }
 
     /**
