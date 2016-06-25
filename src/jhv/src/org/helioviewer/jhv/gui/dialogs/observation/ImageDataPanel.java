@@ -76,9 +76,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
             gregorianCalendar.setTime(endDate);
 
             gregorianCalendar.add(GregorianCalendar.SECOND, getCadence());
-            timeSelectionPanel.setEndDate(gregorianCalendar.getTime(), false);
+            setEndDate(gregorianCalendar.getTime(), false);
             gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-            timeSelectionPanel.setStartDate(gregorianCalendar.getTime(), false);
+            setStartDate(gregorianCalendar.getTime(), false);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
                 loadRemote(item);
@@ -113,12 +113,40 @@ public class ImageDataPanel extends ObservationDialogPanel {
     }
 
     /**
+     * Set a new end date and time
+     *
+     * @param newEnd
+     *            new start date and time
+     */
+    public void setEndDate(Date newEnd, boolean byUser) {
+        timeSelectionPanel.setEndDate(newEnd, byUser);
+    }
+
+    /**
+     * Set a new start date and time
+     *
+     * @param newStart
+     *            new start date and time
+     */
+    public void setStartDate(Date newStart, boolean byUser) {
+        timeSelectionPanel.setStartDate(newStart, byUser);
+    }
+
+    /**
      * Returns the selected cadence.
      *
      * @return selected cadence.
      */
     public int getCadence() {
         return cadencePanel.getCadence();
+    }
+
+    public void setCadence(int value) {
+        cadencePanel.setCadence(value);
+    }
+
+    public void setSourceSelection(String server, int sourceId) {
+        sourcesTree.setSelectedItem(server, sourceId);
     }
 
     /**
@@ -390,6 +418,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
             }
 
             return value;
+        }
+
+        public void setCadence(int value) {
+            // spinnerCadence.setValue(value); // tbd
         }
 
     }
