@@ -17,6 +17,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.io.APIRequestManager.APIRequest;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
@@ -356,6 +357,12 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     View getView() {
         return view;
+    }
+
+    public APIRequest getAPIRequest() {
+        if (view != null)
+            return view.getAPIRequest();
+        return null;
     }
 
 }

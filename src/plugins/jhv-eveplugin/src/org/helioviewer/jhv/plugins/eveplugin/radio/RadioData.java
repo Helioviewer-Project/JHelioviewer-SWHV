@@ -256,7 +256,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
                 JP2ViewCallisto v = null;
                 try {
                     v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile("ROB", CallistoID,
-                                                            date, date + 1 /* force JPX (TBD) */, -100, false);
+                                                            date, date + 1 /* force JPX (TBD) */, CADENCE_ANY, false);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file: " + e.getMessage());
                 }
