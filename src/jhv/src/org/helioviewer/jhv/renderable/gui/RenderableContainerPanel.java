@@ -204,7 +204,7 @@ public class RenderableContainerPanel extends JPanel {
                     APIRequestManager.APIRequest apiRequest = imageLayer.getAPIRequest();
                     if (apiRequest != null) { // loaded and remote
                         ObservationDialog.getInstance().getObservationImagePane().setAPIRequest(imageLayer, apiRequest);
-                        ObservationDialog.getInstance().showDialog();
+                        ObservationDialog.getInstance().showDialog("Change Layer", "Image data");
                         return;
                     }
                 }

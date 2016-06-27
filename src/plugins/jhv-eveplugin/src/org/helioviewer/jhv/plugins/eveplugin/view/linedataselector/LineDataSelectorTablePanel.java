@@ -109,7 +109,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         addLayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ObservationDialog.getInstance().showDialog(EVEPlugin.OBSERVATION_UI_NAME);
+                ObservationDialog.getInstance().showDialog("New Layer", EVEPlugin.OBSERVATION_UI_NAME);
             }
         });
         // addLayerButton.setBorder(null);
