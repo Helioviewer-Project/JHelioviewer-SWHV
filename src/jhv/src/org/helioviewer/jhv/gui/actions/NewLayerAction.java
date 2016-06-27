@@ -41,11 +41,11 @@ public class NewLayerAction extends AbstractAction {
             // only updates if it's really necessary with a tolerance of an hour
             int tolerance = 60 * 60 * 1000;
             if (Math.abs(start.milli - obsStartDate) > tolerance || Math.abs(end.milli - obsEndDate) > tolerance) {
-                if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
-                    ObservationDialogDateModel.getInstance().setStartDate(start.getDate(), false);
+                if (!ObservationDialogDateModel.getInstance().isStartTimeSetByUser()) {
+                    ObservationDialogDateModel.getInstance().setStartTime(start.milli, false);
                 }
-                if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
-                    ObservationDialogDateModel.getInstance().setEndDate(end.getDate(), false);
+                if (!ObservationDialogDateModel.getInstance().isEndTimeSetByUser()) {
+                    ObservationDialogDateModel.getInstance().setEndTime(end.milli, false);
                 }
             }
         }

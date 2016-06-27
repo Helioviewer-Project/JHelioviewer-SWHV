@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.util.Date;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -64,7 +63,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     @Override
     public void actionPerformed(JHVCalendarEvent e) {
         if (e.getSource() == calendarStartDate) {
-            ObservationDialogDateModel.getInstance().setStartDate(new Date(calendarStartDate.getTime()), true);
+            ObservationDialogDateModel.getInstance().setStartTime(calendarStartDate.getTime(), true);
         }
     }
 
@@ -72,7 +71,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     public void layerAdded(View view) {
         long start = view.getFirstTime().milli;
         calendarStartDate.setTime(start);
-        ObservationDialogDateModel.getInstance().setStartDate(new Date(start), false);
+        ObservationDialogDateModel.getInstance().setStartTime(start, false);
     }
 
     @Override
