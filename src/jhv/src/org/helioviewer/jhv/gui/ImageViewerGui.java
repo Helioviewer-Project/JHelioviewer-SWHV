@@ -208,14 +208,14 @@ public class ImageViewerGui {
         // -jpx
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
-                LoadURITask uriTask = new LoadURITask(jpxUrl, jpxUrl);
+                LoadURITask uriTask = new LoadURITask(null, jpxUrl, jpxUrl);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
         // -jpip
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
-                LoadURITask uriTask = new LoadURITask(jpipUri, jpipUri);
+                LoadURITask uriTask = new LoadURITask(null, jpipUri, jpipUri);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
         }

@@ -83,8 +83,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     public void setView(View _view) {
-        if (view != null)
-            return;
+        unsetView();
 
         view = _view;
         worker = null; // drop reference
@@ -117,24 +116,26 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
     }
 
-    @Override
-    public void remove(GL2 gl) {
-        ComponentUtils.setEnabled(optionsPanel, false);
+    private void unsetView() {
         if (view != null) {
             Layers.removeLayer(view);
             view.setDataHandler(null);
             view.setImageLayer(null);
             view.abolish();
             view = null;
-
-            if (Displayer.multiview) {
-                ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
-            }
         }
+        imageData = prevImageData = baseImageData = null;
+    }
+
+    @Override
+    public void remove(GL2 gl) {
+        ComponentUtils.setEnabled(optionsPanel, false);
         if (worker != null)
             worker.cancel(true);
-
-        imageData = prevImageData = baseImageData = null;
+        unsetView();
+        if (Displayer.multiview) {
+            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+        }
         dispose(gl);
     }
 
