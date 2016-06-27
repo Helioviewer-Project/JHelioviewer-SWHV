@@ -133,8 +133,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
         // has textfield lost the focus
         if (arg0.getComponent() == textField) {
-            // check the entered date when text field lost the focus
-            checkDateStringInTextField();
+            setDateFromTextField();
             informAllJHVCalendarListeners(new JHVCalendarEvent(this));
         }
     }
@@ -144,7 +143,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         // open or close the popup window when the event was fired by the
         // corresponding popup button
         if (e.getSource() == calPopupButton) {
-            checkDateStringInTextField();
+            setDateFromTextField();
             if (calPopup == null) {
                 showCalPopup();
             } else {
@@ -156,7 +155,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            checkDateStringInTextField();
+            setDateFromTextField();
             informAllJHVCalendarListeners(new JHVCalendarEvent(this));
         }
     }
@@ -169,12 +168,12 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     public void keyTyped(KeyEvent e) {
     }
 
-    private void checkDateStringInTextField() {
-        Date date = parseDate(textField.getText());
-        if (date == null) {
-            textField.setText(dateFormat.format(calendar.getTime()));
-        } else {
+    private void setDateFromTextField() {
+        try {
+            Date date = dateFormat.parse(textField.getText());
             setTime(date.getTime());
+        } catch (ParseException e) {
+            textField.setText(dateFormat.format(calendar.getTime()));
         }
     }
 
@@ -272,23 +271,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      */
     public long getTime() {
         return calendar.getTimeInMillis();
-    }
-
-    /**
-     * Tries to parse a given date string to a date object. If the string could
-     * not be parsed the method returns a null value.
-     *
-     * @param source
-     *            the given date string.
-     * @return the corresponding date object.
-     */
-    private Date parseDate(String source) {
-        Date date = null;
-        try {
-            date = dateFormat.parse(source);
-        } catch (ParseException e) {
-        }
-        return date;
     }
 
     /**

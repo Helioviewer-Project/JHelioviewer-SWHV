@@ -23,12 +23,10 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
 
     // setting for check.update.next
     private int nextCheck = 0;
-
     // suspended startups when clicked remindMeLater
     private static final int suspendedStarts = 5;
 
     private final JTextPane messagePane = new JTextPane();
-    private final JButton downloadButton = new JButton("Download");
 
     public NewVersionDialog(boolean verbose) {
         super(ImageViewerGui.getMainFrame(), false);
@@ -61,6 +59,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
             });
         }
 
+        JButton downloadButton = new JButton("Download");
         downloadButton.addActionListener(this);
         downloadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
