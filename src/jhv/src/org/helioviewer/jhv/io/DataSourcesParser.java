@@ -45,11 +45,11 @@ public class DataSourcesParser {
                 continue;
 
             if (json.has("sourceId")) { // leaf
+                long start = TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime();
+                long end = TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime();
+                String description = json.getString("description") + " [" + TimeUtils.dateFormat.format(start) + " : " + TimeUtils.dateFormat.format(end) + "]";
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, key, mergeNames(str, name),
-                                                                                 json.getString("description"),
-                                                                                 json.getInt("sourceId"),
-                                                                                 TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime(),
-                                                                                 TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime(),
+                                                                                 description, json.getInt("sourceId"), start, end,
                                                                                  json.optBoolean("default", false));
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);

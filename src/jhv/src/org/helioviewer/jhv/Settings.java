@@ -175,8 +175,11 @@ public class Settings {
                 ex.printStackTrace();
             }
         }
-        ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-        JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+
+        if (!System.getProperty("jhv.os").equals("mac")) {
+            ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+            JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+        }
     }
 
 }
