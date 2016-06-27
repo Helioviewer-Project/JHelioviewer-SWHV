@@ -21,7 +21,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
  * The Observation Dialog provides the main interface to get data from the
@@ -33,7 +32,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  * @author Stephan Pagel
  * */
 @SuppressWarnings("serial")
-public class ObservationDialog extends JDialog implements ActionListener, ShowableDialog {
+public class ObservationDialog extends JDialog implements ActionListener {
 
     private final HashMap<String, ObservationDialogPanel> uiMap = new HashMap<String, ObservationDialogPanel>();
 
@@ -66,10 +65,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         super(mainFrame, false);
 
         // set dialog settings
-        setTitle("New Layer");
         setContentPane(contentPane);
-
-        // set basic layout
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
         contentPane.setBorder(BorderFactory.createEmptyBorder(3, 9, 1, 9));
         contentPane.setFocusable(true);
@@ -177,17 +173,15 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
      * Shows up the dialog and initializes the UI with the panel of the given
      * name.
      * */
-    public void showDialog(String dataSourceName) {
+    public void showDialog(String title, String dataSourceName) {
+        setTitle(title);
+
         if (uiMap.isEmpty()) {
             Message.err("Error", "There are no data sources available!", false);
             return;
         }
 
-        if (dataSourceName != null) {
-            uiSelectionComboBox.setSelectedItem(dataSourceName);
-        } else {
-            uiSelectionComboBox.setSelectedIndex(0);
-        }
+        uiSelectionComboBox.setSelectedItem(dataSourceName);
 
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
@@ -198,12 +192,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     private void closeDialog() {
         setVisible(false);
         // dispose();
-    }
-
-    // Showable Dialog
-    @Override
-    public void showDialog() {
-        showDialog(null);
     }
 
     // Action Listener
@@ -239,10 +227,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         } else if (e.getSource().equals(btnClose)) {
             closeDialog();
         }
-    }
-
-    @Override
-    public void init() {
     }
 
 }

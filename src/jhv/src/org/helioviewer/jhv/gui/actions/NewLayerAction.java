@@ -49,7 +49,7 @@ public class NewLayerAction extends AbstractAction {
                 }
             }
         }
-        ObservationDialog.getInstance().showDialog();
+        ObservationDialog.getInstance().showDialog("New Layer", "Image data");
     }
 
 }
