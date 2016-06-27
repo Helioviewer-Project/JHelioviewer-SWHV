@@ -137,7 +137,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         ObservationDialogDateModel.getInstance().setEndDate(new Date(getEndTime()), true);
 
         // check if start date is before end date -> if not show message
-        if (!timeSelectionPanel.isStartDateBeforeEndDate()) {
+        if (!timeSelectionPanel.isStartTimeBeforeEndTime()) {
             JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -229,11 +229,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *            new start date and time
          */
         public void setEndTime(long endTime, boolean byUser) {
-            Date newEnd = new Date(endTime);
-            calendarEndDate.setDate(newEnd);
-            textEndTime.setText(TimeUtils.timeDateFormat.format(newEnd));
+            calendarEndDate.setTime(endTime);
+            textEndTime.setText(TimeUtils.timeDateFormat.format(endTime));
             if (!setFromOutside) {
-                ObservationDialogDateModel.getInstance().setEndDate(newEnd, byUser);
+                ObservationDialogDateModel.getInstance().setEndDate(new Date(endTime), byUser);
             } else {
                 setFromOutside = false;
             }
@@ -246,11 +245,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
          *            new start date and time
          */
         public void setStartTime(long startTime, boolean byUser) {
-            Date newStart = new Date(startTime);
-            calendarStartDate.setDate(newStart);
-            textStartTime.setText(TimeUtils.timeDateFormat.format(newStart));
+            calendarStartDate.setTime(startTime);
+            textStartTime.setText(TimeUtils.timeDateFormat.format(startTime));
             if (!setFromOutside) {
-                ObservationDialogDateModel.getInstance().setStartDate(newStart, byUser);
+                ObservationDialogDateModel.getInstance().setStartDate(new Date(startTime), byUser);
             } else {
                 setFromOutside = false;
             }
@@ -284,8 +282,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * @return boolean value if selected start date is before or equal to
          *         selected end date.
          */
-        boolean isStartDateBeforeEndDate() {
-            return calendarStartDate.getDate().getTime() <= calendarEndDate.getDate().getTime();
+        boolean isStartTimeBeforeEndTime() {
+            return calendarStartDate.getTime() <= calendarEndDate.getTime();
         }
 
         /**
@@ -294,7 +292,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * @return selected start time.
          * */
         private long getStartTime() {
-            return (calendarStartDate.getDate().getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textStartTime.getValue().getTime();
+            return (calendarStartDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textStartTime.getValue().getTime();
         }
 
         /**
@@ -303,7 +301,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * @return selected end time.
          */
         private long getEndTime() {
-            return (calendarEndDate.getDate().getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textEndTime.getValue().getTime();
+            return (calendarEndDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textEndTime.getValue().getTime();
         }
 
         @Override

@@ -144,7 +144,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         // open or close the popup window when the event was fired by the
         // corresponding popup button
         if (e.getSource() == calPopupButton) {
-            setDate(parseDate(textField.getText()));
+            checkDateStringInTextField();
             if (calPopup == null) {
                 showCalPopup();
             } else {
@@ -169,12 +169,12 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     public void keyTyped(KeyEvent e) {
     }
 
-    public void checkDateStringInTextField() {
+    private void checkDateStringInTextField() {
         Date date = parseDate(textField.getText());
         if (date == null) {
             textField.setText(dateFormat.format(calendar.getTime()));
         } else {
-            setDate(date);
+            setTime(date.getTime());
         }
     }
 
@@ -252,21 +252,16 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
             // close popup
             hideCalPopup();
             // set selected date
-            setDate(jhvCalendar.getDate());
+            setTime(jhvCalendar.getDate().getTime());
             jhvCalendar = null;
         }
-        // inform all listeners of this class that a new date was choosen by the
-        // user
+        // inform all listeners of this class that a new date was choosen by the user
         informAllJHVCalendarListeners(new JHVCalendarEvent(this));
     }
 
-    public void setDate(Date date) {
-        if (date != null) {
-            long milli = date.getTime();
-            if (milli > TimeUtils.MINIMAL_DATE.milli && milli < TimeUtils.MAXIMAL_DATE.milli) {
-                calendar.setTime(date);
-            }
-        }
+    public void setTime(long time) {
+        if (time > TimeUtils.MINIMAL_DATE.milli && time < TimeUtils.MAXIMAL_DATE.milli)
+            calendar.setTimeInMillis(time);
         textField.setText(dateFormat.format(calendar.getTime()));
     }
 
@@ -275,8 +270,8 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      *
      * @return the selected date.
      */
-    public Date getDate() {
-        return calendar.getTime();
+    public long getTime() {
+        return calendar.getTimeInMillis();
     }
 
     /**
