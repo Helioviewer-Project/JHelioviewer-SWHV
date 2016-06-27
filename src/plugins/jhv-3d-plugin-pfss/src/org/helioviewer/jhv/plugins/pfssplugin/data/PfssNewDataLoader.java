@@ -39,17 +39,15 @@ public class PfssNewDataLoader implements Runnable {
     @Override
     public void run() {
         if (start != null && end != null && start.milli <= end.milli) {
-            final Calendar startCal = GregorianCalendar.getInstance();
-            startCal.setTime(start.getDate());
+            Calendar cal = GregorianCalendar.getInstance();
 
-            final Calendar endCal = GregorianCalendar.getInstance();
-            endCal.setTime(new Date(end.milli + 31 * TimeUtils.DAY_IN_MILLIS));
+            cal.setTimeInMillis(start.milli);
+            int startYear = cal.get(Calendar.YEAR);
+            int startMonth = cal.get(Calendar.MONTH);
 
-            int startYear = startCal.get(Calendar.YEAR);
-            int startMonth = startCal.get(Calendar.MONTH);
-
-            final int endYear = endCal.get(Calendar.YEAR);
-            final int endMonth = endCal.get(Calendar.MONTH);
+            cal.setTimeInMillis(end.milli + 31 * TimeUtils.DAY_IN_MILLIS);
+            int endYear = cal.get(Calendar.YEAR);
+            int endMonth = cal.get(Calendar.MONTH);
 
             do {
                 ArrayList<Pair<String, Long>> urls = null;
