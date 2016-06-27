@@ -20,12 +20,10 @@ public class DataSourcesTree extends JTree {
 
     public static class Item {
 
-        public final String key;
         public final String name;
         public final String description;
 
-        public Item(String key, String name, String description) {
-            this.key = key;
+        public Item(String name, String description) {
             this.name = name;
             this.description = description;
         }
@@ -45,8 +43,8 @@ public class DataSourcesTree extends JTree {
         public final long end;
         public final boolean defaultItem;
 
-        public SourceItem(String server, String key, String name, String description, int sourceId, long start, long end, boolean defaultItem) {
-            super(key, name, description);
+        public SourceItem(String server, String name, String description, int sourceId, long start, long end, boolean defaultItem) {
+            super(name, description);
             this.server = server;
             this.sourceId = sourceId;
             this.start = start;
@@ -62,16 +60,16 @@ public class DataSourcesTree extends JTree {
     private final DefaultMutableTreeNode nodeIAS;
 
     public DataSourcesTree() {
-        nodeRoot = new DefaultMutableTreeNode("DataSources");
-        nodeROB = new DefaultMutableTreeNode(new Item("ROB", "ROB", "Royal Observatory of Belgium"));
-        nodeGSFC = new DefaultMutableTreeNode(new Item("GSFC", "GSFC", "Goddard Space Flight Center"));
-        nodeIAS = new DefaultMutableTreeNode(new Item("IAS", "IAS", "Institut d'Astrophysique Spatiale"));
+        nodeRoot = new DefaultMutableTreeNode("Dataset");
+        nodeROB = new DefaultMutableTreeNode(new Item("ROB", "Royal Observatory of Belgium"));
+        nodeGSFC = new DefaultMutableTreeNode(new Item("GSFC", "Goddard Space Flight Center"));
+        nodeIAS = new DefaultMutableTreeNode(new Item("IAS", "Institut d'Astrophysique Spatiale"));
         nodeRoot.add(nodeROB);
         nodeRoot.add(nodeGSFC);
         nodeRoot.add(nodeIAS);
 
         setModel(new DefaultTreeModel(nodeRoot));
-        setRootVisible(false);
+        // setRootVisible(false);
 
         DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
         renderer.setOpenIcon(null);
