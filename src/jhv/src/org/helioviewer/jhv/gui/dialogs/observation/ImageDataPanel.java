@@ -69,8 +69,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
         } else if (first) {
             first = false;
 
-            setStartTime(item.end - TimeUtils.DAY_IN_MILLIS, false);
-            setEndTime(item.end + getCadence() * 1000, false);
+            timeSelectionPanel.setStartTime(item.end - TimeUtils.DAY_IN_MILLIS, false);
+            timeSelectionPanel.setEndTime(item.end + getCadence() * 1000, false);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
                 loadRemote(item);
@@ -94,24 +94,15 @@ public class ImageDataPanel extends ObservationDialogPanel {
         return timeSelectionPanel.getEndTime();
     }
 
-    public void setStartTime(long startTime, boolean byUser) {
-        timeSelectionPanel.setStartTime(startTime, byUser);
-    }
-
-    public void setEndTime(long endTime, boolean byUser) {
-        timeSelectionPanel.setEndTime(endTime, byUser);
-    }
-
     public int getCadence() {
         return cadencePanel.getCadence();
     }
 
-    public void setCadence(int value) {
-        cadencePanel.setCadence(value);
-    }
-
-    public void setSourceSelection(String server, int sourceId) {
-        sourcesTree.setSelectedItem(server, sourceId);
+    public void setAPIRequest(APIRequestManager.APIRequest apiRequest) {
+        sourcesTree.setSelectedItem(apiRequest.server, apiRequest.sourceId);
+        timeSelectionPanel.setStartTime(apiRequest.startTime, false);
+        timeSelectionPanel.setEndTime(apiRequest.endTime, false);
+        cadencePanel.setCadence(apiRequest.cadence);
     }
 
     /**
