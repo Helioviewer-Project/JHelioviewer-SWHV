@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -118,51 +117,43 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     private void updateDrawController() {
-        Interval interval = defineInterval(getDate());
+        Interval interval = defineInterval(getDate().getTime());
         EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
     }
 
-    private Interval defineInterval(Date date) {
+    private Interval defineInterval(long time) {
         JHVDate start = Layers.getStartDate();
         JHVDate end = Layers.getEndDate();
         if (start != null && end != null) {
             Interval movieInterval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
 
-            if (movieInterval.containsPointInclusive(date.getTime())) {
+            if (movieInterval.containsPointInclusive(time)) {
                 return movieInterval;
             }
         }
-        GregorianCalendar gce = new GregorianCalendar();
-        gce.clear();
-        gce.setTime(date);
-        gce.set(Calendar.HOUR, 0);
-        gce.set(Calendar.MINUTE, 0);
-        gce.set(Calendar.SECOND, 0);
-        gce.set(Calendar.MILLISECOND, 0);
-        gce.add(Calendar.DAY_OF_MONTH, 1);
-        Date endDate = gce.getTime();
 
-        if (endDate.after(new Date())) {
-            gce.clear();
-            gce.setTime(new Date());
-            gce.set(Calendar.HOUR, 0);
-            gce.set(Calendar.MINUTE, 0);
-            gce.set(Calendar.SECOND, 0);
-            gce.set(Calendar.MILLISECOND, 0);
-            endDate = gce.getTime();
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(time);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+
+        long endTime = cal.getTimeInMillis();
+        long now = System.currentTimeMillis();
+        if (endTime > now) {
+            cal.setTimeInMillis(now);
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            endTime = cal.getTimeInMillis();
         }
 
-        GregorianCalendar gcs = new GregorianCalendar();
-        gcs.clear();
-        gcs.setTime(endDate);
-        gcs.set(Calendar.HOUR, 0);
-        gcs.set(Calendar.MINUTE, 0);
-        gcs.set(Calendar.SECOND, 0);
-        gcs.set(Calendar.MILLISECOND, 0);
-        gcs.add(Calendar.DAY_OF_MONTH, -2);
-        Date startDate = gcs.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, -2);
 
-        return new Interval(startDate.getTime(), endDate.getTime());
+        return new Interval(cal.getTimeInMillis(), endTime);
     }
 
     @Override
