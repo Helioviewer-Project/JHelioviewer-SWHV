@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -159,7 +158,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     @Override
     public boolean loadButtonPressed() {
-        ObservationDialogDateModel.getInstance().setStartDate(new Date(getTime()), true);
+        ObservationDialogDateModel.getInstance().setStartTime(getTime(), true);
         updateBandController();
         updateDrawController();
         return true;

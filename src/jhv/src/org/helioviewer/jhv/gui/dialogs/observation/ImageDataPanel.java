@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Date;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -133,8 +132,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        ObservationDialogDateModel.getInstance().setStartDate(new Date(getStartTime()), true);
-        ObservationDialogDateModel.getInstance().setEndDate(new Date(getEndTime()), true);
+        ObservationDialogDateModel.getInstance().setStartTime(getStartTime(), true);
+        ObservationDialogDateModel.getInstance().setEndTime(getEndTime(), true);
 
         // check if start date is before end date -> if not show message
         if (!timeSelectionPanel.isStartTimeBeforeEndTime()) {
@@ -232,7 +231,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             calendarEndDate.setTime(endTime);
             textEndTime.setText(TimeUtils.timeDateFormat.format(endTime));
             if (!setFromOutside) {
-                ObservationDialogDateModel.getInstance().setEndDate(new Date(endTime), byUser);
+                ObservationDialogDateModel.getInstance().setEndTime(endTime, byUser);
             } else {
                 setFromOutside = false;
             }
@@ -248,7 +247,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             calendarStartDate.setTime(startTime);
             textStartTime.setText(TimeUtils.timeDateFormat.format(startTime));
             if (!setFromOutside) {
-                ObservationDialogDateModel.getInstance().setStartDate(new Date(startTime), byUser);
+                ObservationDialogDateModel.getInstance().setStartTime(startTime, byUser);
             } else {
                 setFromOutside = false;
             }

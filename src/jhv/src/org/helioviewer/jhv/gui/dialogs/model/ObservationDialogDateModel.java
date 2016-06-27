@@ -1,23 +1,21 @@
 package org.helioviewer.jhv.gui.dialogs.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 
 public class ObservationDialogDateModel {
 
-    private final List<ObservationDialogDateModelListener> listeners;
+    private final HashSet<ObservationDialogDateModelListener> listeners;
 
     private static ObservationDialogDateModel instance;
 
-    private Date startDate;
-    private Date endDate;
+    private long startTime;
+    private long endTime;
 
-    private boolean startDateSetByUser;
-    private boolean endDateSetByUser;
+    private boolean startByUser;
+    private boolean endByUser;
 
     private ObservationDialogDateModel() {
-        listeners = new ArrayList<ObservationDialogDateModelListener>();
+        listeners = new HashSet<ObservationDialogDateModelListener>();
     }
 
     public static ObservationDialogDateModel getInstance() {
@@ -35,52 +33,52 @@ public class ObservationDialogDateModel {
         listeners.remove(listener);
     }
 
-    public void setEndDate(Date endDate, boolean byUser) {
-        if (!endDateSetByUser) {
-            endDateSetByUser = byUser;
-        }
-        if (!endDateSetByUser || byUser) {
-            this.endDate = endDate;
-            fireEndDateChanged();
-        }
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate, boolean byUser) {
-        if (!startDateSetByUser) {
-            startDateSetByUser = byUser;
-        }
-        if (!startDateSetByUser || byUser) {
-            this.startDate = startDate;
-            fireStartDateChanged();
-        }
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public boolean isEndDateSetByUser() {
-        return endDateSetByUser;
-    }
-
-    public boolean isStartDateSetByUser() {
-        return startDateSetByUser;
-    }
-
-    private void fireStartDateChanged() {
+    private void fireStartTimeChanged() {
         for (ObservationDialogDateModelListener l : listeners) {
-            l.startTimeChanged(startDate.getTime());
+            l.startTimeChanged(startTime);
         }
     }
 
-    private void fireEndDateChanged() {
+    private void fireEndTimeChanged() {
         for (ObservationDialogDateModelListener l : listeners) {
-            l.endTimeChanged(endDate.getTime());
+            l.endTimeChanged(endTime);
         }
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime, boolean byUser) {
+        if (!startByUser) {
+            startByUser = byUser;
+        }
+        if (!startByUser || byUser) {
+            this.startTime = startTime;
+            fireStartTimeChanged();
+        }
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(long endTime, boolean byUser) {
+        if (!endByUser) {
+            endByUser = byUser;
+        }
+        if (!endByUser || byUser) {
+            this.endTime = endTime;
+            fireEndTimeChanged();
+        }
+    }
+
+    public boolean isEndTimeSetByUser() {
+        return endByUser;
+    }
+
+    public boolean isStartTimeSetByUser() {
+        return startByUser;
     }
 
 }
