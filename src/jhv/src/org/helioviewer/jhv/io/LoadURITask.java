@@ -25,8 +25,10 @@ public class LoadURITask extends JHVWorker<View, Void> {
             imageLayer = new ImageLayer(this);
             ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
             Displayer.display(); // ensures the dummy text is displayed
-        } else
+        } else {
             imageLayer = _imageLayer;
+            imageLayer.unsetView();
+        }
         setThreadName("MAIN--LoadURI");
     }
 
