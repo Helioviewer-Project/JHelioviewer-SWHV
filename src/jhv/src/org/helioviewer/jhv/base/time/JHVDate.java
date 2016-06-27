@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.base.time;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class JHVDate implements Comparable<JHVDate> {
 
@@ -28,10 +27,6 @@ public class JHVDate implements Comparable<JHVDate> {
             throw new IllegalArgumentException("Argument cannot be negative");
         this.milli = milli;
         string = TimeUtils.utcDateFormat.format(milli);
-    }
-
-    public Date getDate() {
-        return new Date(milli);
     }
 
     @Override
