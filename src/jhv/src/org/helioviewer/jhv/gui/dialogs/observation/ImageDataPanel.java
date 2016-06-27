@@ -6,7 +6,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -70,15 +69,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
         } else if (first) {
             first = false;
 
-            Date endDate = new Date(item.end);
-
-            GregorianCalendar gregorianCalendar = new GregorianCalendar();
-            gregorianCalendar.setTime(endDate);
-
-            gregorianCalendar.add(GregorianCalendar.SECOND, getCadence());
-            setEndDate(gregorianCalendar.getTime(), false);
-            gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-            setStartDate(gregorianCalendar.getTime(), false);
+            setStartTime(item.end - TimeUtils.DAY_IN_MILLIS, false);
+            setEndTime(item.end + getCadence() * 1000, false);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
                 loadRemote(item);
@@ -94,49 +86,22 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return -1;
     }
 
-    /**
-     * Returns the selected start time.
-     *
-     * @return selected start time.
-     * */
     public long getStartTime() {
         return timeSelectionPanel.getStartTime();
     }
 
-    /**
-     * Returns the selected end time.
-     *
-     * @return seleted end time.
-     */
     public long getEndTime() {
         return timeSelectionPanel.getEndTime();
     }
 
-    /**
-     * Set a new end date and time
-     *
-     * @param newEnd
-     *            new start date and time
-     */
-    public void setEndDate(Date newEnd, boolean byUser) {
-        timeSelectionPanel.setEndDate(newEnd, byUser);
+    public void setStartTime(long startTime, boolean byUser) {
+        timeSelectionPanel.setStartTime(startTime, byUser);
     }
 
-    /**
-     * Set a new start date and time
-     *
-     * @param newStart
-     *            new start date and time
-     */
-    public void setStartDate(Date newStart, boolean byUser) {
-        timeSelectionPanel.setStartDate(newStart, byUser);
+    public void setEndTime(long endTime, boolean byUser) {
+        timeSelectionPanel.setEndTime(endTime, byUser);
     }
 
-    /**
-     * Returns the selected cadence.
-     *
-     * @return selected cadence.
-     */
     public int getCadence() {
         return cadencePanel.getCadence();
     }
@@ -263,7 +228,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * @param newEnd
          *            new start date and time
          */
-        public void setEndDate(Date newEnd, boolean byUser) {
+        public void setEndTime(long endTime, boolean byUser) {
+            Date newEnd = new Date(endTime);
             calendarEndDate.setDate(newEnd);
             textEndTime.setText(TimeUtils.timeDateFormat.format(newEnd));
             if (!setFromOutside) {
@@ -279,7 +245,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
          * @param newStart
          *            new start date and time
          */
-        public void setStartDate(Date newStart, boolean byUser) {
+        public void setStartTime(long startTime, boolean byUser) {
+            Date newStart = new Date(startTime);
             calendarStartDate.setDate(newStart);
             textStartTime.setText(TimeUtils.timeDateFormat.format(newStart));
             if (!setFromOutside) {
@@ -297,16 +264,16 @@ public class ImageDataPanel extends ObservationDialogPanel {
         public void actionPerformed(JHVCalendarEvent e) {
             if (e.getSource() == calendarStartDate) {
                 long time = getStartTime();
-                setStartDate(new Date(time), true);
+                setStartTime(time, true);
                 carringtonStart.setTime(time);
             } else if (e.getSource() == calendarEndDate) {
                 long time = getEndTime();
-                setEndDate(new Date(time), true);
+                setEndTime(time, true);
                 carringtonEnd.setTime(time);
             } else if (e.getSource() == carringtonStart) {
-                setStartDate(new Date(carringtonStart.getTime()), true);
+                setStartTime(carringtonStart.getTime(), true);
             } else if (e.getSource() == carringtonEnd) {
-                setEndDate(new Date(carringtonEnd.getTime()), true);
+                setEndTime(carringtonEnd.getTime(), true);
             }
         }
 
@@ -340,15 +307,15 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
 
         @Override
-        public void startDateChanged(Date startDate) {
+        public void startTimeChanged(long startTime) {
             setFromOutside = true;
-            setStartDate(startDate, false);
+            setStartTime(startTime, false);
         }
 
         @Override
-        public void endDateChanged(Date endDate) {
+        public void endTimeChanged(long endTime) {
             setFromOutside = true;
-            setEndDate(endDate, false);
+            setEndTime(endTime, false);
         }
     }
 

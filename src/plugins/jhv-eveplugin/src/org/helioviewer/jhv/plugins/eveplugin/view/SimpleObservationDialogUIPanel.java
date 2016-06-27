@@ -80,12 +80,12 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     @Override
-    public void startDateChanged(Date startDate) {
-        calendarStartDate.setDate(startDate);
+    public void startTimeChanged(long startTime) {
+        calendarStartDate.setDate(new Date(startTime));
     }
 
     @Override
-    public void endDateChanged(Date endDate) {
+    public void endTimeChanged(long endTime) {
     }
 
 }
