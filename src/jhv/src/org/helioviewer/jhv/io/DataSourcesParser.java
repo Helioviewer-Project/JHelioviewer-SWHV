@@ -48,7 +48,7 @@ public class DataSourcesParser {
                 long start = TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime();
                 long end = TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime();
                 String description = json.getString("description") + " [" + TimeUtils.dateFormat.format(start) + " : " + TimeUtils.dateFormat.format(end) + "]";
-                DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, key, mergeNames(str, name),
+                DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
                                                                                  description, json.getInt("sourceId"), start, end,
                                                                                  json.optBoolean("default", false));
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
@@ -57,7 +57,7 @@ public class DataSourcesParser {
                     defaultNode = treeNode;
             } else {
                 if (str == null) { // show only top level, else flatten hierarchy
-                    DataSourcesTree.Item item = new DataSourcesTree.Item(key, name.replace('_', ' '), json.getString("description"));
+                    DataSourcesTree.Item item = new DataSourcesTree.Item(name.replace('_', ' '), json.getString("description"));
                     DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item);
                     parentNode.add(treeNode);
                     parse(treeNode, json.getJSONObject("children"), "");
