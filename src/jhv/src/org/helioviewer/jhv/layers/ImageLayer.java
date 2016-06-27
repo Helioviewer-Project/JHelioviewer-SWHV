@@ -83,18 +83,14 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     public void setView(View _view) {
-        boolean changeOpacity = true;
         if (view != null)
-            changeOpacity = false;
-
-        unsetView();
+            return;
 
         view = _view;
         worker = null; // drop reference
 
         float opacity = 1;
-
-        if (changeOpacity && !Displayer.multiview) {
+        if (!Displayer.multiview) {
             if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
                 int count = 0;
                 for (int i = 0; i < Layers.getNumLayers(); i++) {
@@ -120,7 +116,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
     }
 
-    private void unsetView() {
+    public void unsetView() {
         ComponentUtils.setEnabled(optionsPanel, false);
         if (view != null) {
             Layers.removeLayer(view);
@@ -128,6 +124,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             view.setImageLayer(null);
             view.abolish();
             view = null;
+            ImageViewerGui.getRenderableContainer().fireListeners();
         }
         imageData = prevImageData = baseImageData = null;
     }
