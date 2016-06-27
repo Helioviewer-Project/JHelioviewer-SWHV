@@ -138,7 +138,6 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
     private void showCRPopup() {
         // set up the popup content
         carringtonPanel = new JHVCarrington();
-        carringtonPanel.setPreferredSize(carringtonPanel.getMinimumSize());
         carringtonPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         carringtonPanel.addJHVCalendarListener(this);
         addFocusListenerToAllChildren(carringtonPanel);
