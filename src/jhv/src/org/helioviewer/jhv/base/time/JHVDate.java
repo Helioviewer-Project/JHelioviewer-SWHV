@@ -14,28 +14,20 @@ public class JHVDate implements Comparable<JHVDate> {
      */
     private JHVDate(int _year, int _month, int _day, int _hour, int _minute, int _second) {
         if ((_year | _month | _day | _hour | _minute | _second) < 0)
-            throw new IllegalArgumentException("Arguments cannot be negative!");
+            throw new IllegalArgumentException("Arguments cannot be negative");
 
         Calendar c = Calendar.getInstance(TimeUtils.UTC);
         c.clear();
         c.set(_year, _month, _day, _hour, _minute, _second);
-
-        Date date = c.getTime();
-        string = TimeUtils.utcDateFormat.format(date);
-        milli = date.getTime();
+        milli = c.getTimeInMillis();
+        string = TimeUtils.utcDateFormat.format(milli);
     }
 
-    public JHVDate(long millis) {
-        if (millis < 0)
-            throw new IllegalArgumentException("Arguments cannot be negative!");
-
-        Calendar c = Calendar.getInstance(TimeUtils.UTC);
-        c.clear();
-        c.setTimeInMillis(millis);
-
-        Date date = c.getTime();
-        string = TimeUtils.utcDateFormat.format(date);
-        milli = date.getTime();
+    public JHVDate(long milli) {
+        if (milli < 0)
+            throw new IllegalArgumentException("Argument cannot be negative");
+        this.milli = milli;
+        string = TimeUtils.utcDateFormat.format(milli);
     }
 
     public Date getDate() {

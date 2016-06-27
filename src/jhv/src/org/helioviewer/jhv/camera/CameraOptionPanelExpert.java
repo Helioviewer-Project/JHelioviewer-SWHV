@@ -255,33 +255,33 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         JHVDate startTime = view.getFirstTime();
         beginDatePicker.setDate(new Date(startTime.milli - startTime.milli % TimeUtils.DAY_IN_MILLIS));
-        beginTimePicker.setText(TimeUtils.timeDateFormat.format(startTime.getDate()));
+        beginTimePicker.setText(TimeUtils.timeDateFormat.format(startTime.milli));
         setBeginTime(applyChanges);
     }
 
     private void syncBothLayerNow() {
-        Date nowDate = new Date(System.currentTimeMillis());
-        Date syncDate = new Date(nowDate.getTime() - nowDate.getTime() % TimeUtils.DAY_IN_MILLIS);
+        long now = System.currentTimeMillis();
+        Date syncDate = new Date(now - now % TimeUtils.DAY_IN_MILLIS);
 
         beginDatePicker.setDate(syncDate);
-        beginTimePicker.setText(TimeUtils.timeDateFormat.format(nowDate));
+        beginTimePicker.setText(TimeUtils.timeDateFormat.format(now));
 
         endDatePicker.setDate(syncDate);
-        endTimePicker.setText(TimeUtils.timeDateFormat.format(nowDate));
+        endTimePicker.setText(TimeUtils.timeDateFormat.format(now));
 
         setBeginTime(false);
         setEndTime(true);
     }
 
     private void syncWithLayerCurrentTime() {
-        Date currentDate = Layers.getLastUpdatedTimestamp().getDate();
-        Date syncDate = new Date(currentDate.getTime() - currentDate.getTime() % TimeUtils.DAY_IN_MILLIS);
+        JHVDate currentDate = Layers.getLastUpdatedTimestamp();
+        Date syncDate = new Date(currentDate.milli - currentDate.milli % TimeUtils.DAY_IN_MILLIS);
 
         endDatePicker.setDate(syncDate);
-        endTimePicker.setText(TimeUtils.timeDateFormat.format(currentDate));
+        endTimePicker.setText(TimeUtils.timeDateFormat.format(currentDate.milli));
 
         beginDatePicker.setDate(syncDate);
-        beginTimePicker.setText(TimeUtils.timeDateFormat.format(currentDate));
+        beginTimePicker.setText(TimeUtils.timeDateFormat.format(currentDate.milli));
 
         setBeginTime(false);
         setEndTime(true);
@@ -294,7 +294,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         JHVDate endTime = view.getLastTime();
         endDatePicker.setDate(new Date(endTime.milli - endTime.milli % TimeUtils.DAY_IN_MILLIS));
-        endTimePicker.setText(TimeUtils.timeDateFormat.format(endTime.getDate()));
+        endTimePicker.setText(TimeUtils.timeDateFormat.format(endTime.milli));
         setEndTime(applyChanges);
     }
 
