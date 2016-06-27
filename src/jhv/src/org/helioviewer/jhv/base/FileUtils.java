@@ -360,8 +360,8 @@ public class FileUtils {
     }
 
     public static boolean deleteDir(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
+        String[] children;
+        if (dir.isDirectory() && (children = dir.list()) != null) {
             for (String child : children) {
                 boolean success = deleteDir(new File(dir, child));
                 if (!success) {
