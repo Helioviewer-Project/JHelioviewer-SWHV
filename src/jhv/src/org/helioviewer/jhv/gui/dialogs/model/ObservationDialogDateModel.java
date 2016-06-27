@@ -73,13 +73,13 @@ public class ObservationDialogDateModel {
 
     private void fireStartDateChanged() {
         for (ObservationDialogDateModelListener l : listeners) {
-            l.startDateChanged(startDate);
+            l.startTimeChanged(startDate.getTime());
         }
     }
 
     private void fireEndDateChanged() {
         for (ObservationDialogDateModelListener l : listeners) {
-            l.endDateChanged(endDate);
+            l.endTimeChanged(endDate.getTime());
         }
     }
 
