@@ -82,6 +82,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
     }
 
+    private boolean isCor(String name) {
+        return name.contains("LASCO") || name.contains("COR");
+    }
+
     private float opacity = -1;
 
     public void setView(View _view) {
@@ -91,25 +95,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         view = _view;
         worker = null; // drop reference
 
-        if (opacity == -1) { // first time
-            opacity = 1;
-            if (!Displayer.multiview) {
-                if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
-                    int count = 0;
-                    for (int i = 0; i < Layers.getNumLayers(); i++) {
-                        String name = Layers.getLayer(i).getName();
-                        if (!name.contains("LASCO") && !name.contains("COR"))
-                            count++;
-                    }
-                    opacity = (float) (1. / (1 + count));
-                }
-            }
-        }
-
-        optionsPanel.setOpacity(opacity);
-        optionsPanel.setLUT(view.getDefaultLUT());
-        ComponentUtils.setEnabled(optionsPanel, true);
-
         view.setImageLayer(this);
         view.setDataHandler(this);
         Layers.addLayer(view);
@@ -117,7 +102,21 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
         if (Displayer.multiview) {
             ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+        } else if (opacity == -1) { // first time
+            if (isCor(view.getName()))
+                opacity = 1;
+            else {
+                int count = 0;
+                for (int i = 0; i < Layers.getNumLayers(); i++) {
+                    if (!isCor(Layers.getLayer(i).getName()))
+                        count++;
+                }
+                opacity = (float) (1. / count);
+            }
+            optionsPanel.setOpacity(opacity);
         }
+        optionsPanel.setLUT(view.getDefaultLUT());
+        ComponentUtils.setEnabled(optionsPanel, true);
     }
 
     public void unsetView() {
