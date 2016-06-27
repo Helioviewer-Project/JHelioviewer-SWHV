@@ -82,6 +82,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
     }
 
+    private float opacity = -1;
+
     public void setView(View _view) {
         if (view != null)
             return;
@@ -89,16 +91,18 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         view = _view;
         worker = null; // drop reference
 
-        float opacity = 1;
-        if (!Displayer.multiview) {
-            if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
-                int count = 0;
-                for (int i = 0; i < Layers.getNumLayers(); i++) {
-                    String name = Layers.getLayer(i).getName();
-                    if (!name.contains("LASCO") && !name.contains("COR"))
-                        count++;
+        if (opacity == -1) { // first time
+            opacity = 1;
+            if (!Displayer.multiview) {
+                if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
+                    int count = 0;
+                    for (int i = 0; i < Layers.getNumLayers(); i++) {
+                        String name = Layers.getLayer(i).getName();
+                        if (!name.contains("LASCO") && !name.contains("COR"))
+                            count++;
+                    }
+                    opacity = (float) (1. / (1 + count));
                 }
-                opacity = (float) (1. / (1 + count));
             }
         }
 
