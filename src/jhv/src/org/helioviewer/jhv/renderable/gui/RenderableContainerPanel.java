@@ -204,8 +204,7 @@ public class RenderableContainerPanel extends JPanel {
                     if (apiRequest != null) { // loaded and remote
                         ObservationDialog.getInstance().getObservationImagePane().setStartTime(apiRequest.startTime, false);
                         ObservationDialog.getInstance().getObservationImagePane().setEndTime(apiRequest.endTime, false);
-                        if (apiRequest.cadence != APIRequestManager.CADENCE_ANY)
-                            ObservationDialog.getInstance().getObservationImagePane().setCadence(apiRequest.cadence);
+                        ObservationDialog.getInstance().getObservationImagePane().setCadence(apiRequest.cadence);
                         ObservationDialog.getInstance().getObservationImagePane().setSourceSelection(apiRequest.server, apiRequest.sourceId);
                         ObservationDialog.getInstance().showDialog();
                         return;

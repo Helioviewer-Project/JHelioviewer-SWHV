@@ -386,7 +386,21 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
 
         public void setCadence(int value) {
-            // spinnerCadence.setValue(value); // tbd
+            if (value == APIRequestManager.CADENCE_ANY)
+                comboUnit.setSelectedItem(timeStepUnitStrings[4]);
+            else if (value / 86400 != 0) {
+                comboUnit.setSelectedItem(timeStepUnitStrings[3]);
+                spinnerCadence.setValue(value / 86400);
+            } else if (value / 3600 != 0) {
+                comboUnit.setSelectedItem(timeStepUnitStrings[2]);
+                spinnerCadence.setValue(value / 3600);
+            } else if (value / 60 != 0) {
+                comboUnit.setSelectedItem(timeStepUnitStrings[1]);
+                spinnerCadence.setValue(value / 60);
+            } else {
+                comboUnit.setSelectedItem(timeStepUnitStrings[0]);
+                spinnerCadence.setValue(value);
+            }
         }
 
     }
