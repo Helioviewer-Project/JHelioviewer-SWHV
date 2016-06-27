@@ -260,7 +260,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
                     // set the xml data for the MetaDataDialog
                     xmlDoc = doc;
                     // export file name
-                    outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName() + "__" + TimeUtils.filenameDateFormat.format(m.getViewpoint().time.getDate()) + ".fits.xml";
+                    outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName() + "__" + TimeUtils.filenameDateFormat.format(m.getViewpoint().time.milli) + ".fits.xml";
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

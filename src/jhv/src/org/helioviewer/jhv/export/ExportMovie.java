@@ -3,7 +3,6 @@ package org.helioviewer.jhv.export;
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -120,7 +119,7 @@ public class ExportMovie implements FrameListener {
         grabber = new GLGrab(canvasWidth, canvasHeight);
         ImageViewerGui.getGLListener().attachExport(instance);
 
-        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(new Date());
+        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {
             try {
                 exporter = new PNGExporter();
