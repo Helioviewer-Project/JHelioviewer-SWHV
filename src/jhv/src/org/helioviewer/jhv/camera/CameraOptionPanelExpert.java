@@ -195,7 +195,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
             @Override
             public void focusLost(FocusEvent arg0) {
-                beginDatePicker.checkDateStringInTextField();
                 setBeginTime(true);
             }
         });
@@ -230,14 +229,14 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private void setEndTime(boolean applyChanges) {
         Date dt = endTimePicker.getValue();
-        Date end_date = new Date(endDatePicker.getDate().getTime() + dt.getTime());
+        Date end_date = new Date(endDatePicker.getTime() + dt.getTime());
         positionLoad.setEndDate(end_date, applyChanges);
         // Displayer.render();
     }
 
     private void setBeginTime(boolean applyChanges) {
         Date dt = beginTimePicker.getValue();
-        Date begin_date = new Date(beginDatePicker.getDate().getTime() + dt.getTime());
+        Date begin_date = new Date(beginDatePicker.getTime() + dt.getTime());
         positionLoad.setBeginDate(begin_date, applyChanges);
         // Displayer.render();
     }
@@ -254,34 +253,36 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             return;
 
         JHVDate startTime = view.getFirstTime();
-        beginDatePicker.setDate(new Date(startTime.milli - startTime.milli % TimeUtils.DAY_IN_MILLIS));
+        beginDatePicker.setTime(startTime.milli - startTime.milli % TimeUtils.DAY_IN_MILLIS);
         beginTimePicker.setText(TimeUtils.timeDateFormat.format(startTime.milli));
         setBeginTime(applyChanges);
     }
 
     private void syncBothLayerNow() {
         long now = System.currentTimeMillis();
-        Date syncDate = new Date(now - now % TimeUtils.DAY_IN_MILLIS);
+        long syncTime = now - now % TimeUtils.DAY_IN_MILLIS;
+        String timeText = TimeUtils.timeDateFormat.format(now);
 
-        beginDatePicker.setDate(syncDate);
-        beginTimePicker.setText(TimeUtils.timeDateFormat.format(now));
+        beginDatePicker.setTime(syncTime);
+        beginTimePicker.setText(timeText);
 
-        endDatePicker.setDate(syncDate);
-        endTimePicker.setText(TimeUtils.timeDateFormat.format(now));
+        endDatePicker.setTime(syncTime);
+        endTimePicker.setText(timeText);
 
         setBeginTime(false);
         setEndTime(true);
     }
 
     private void syncWithLayerCurrentTime() {
-        JHVDate currentDate = Layers.getLastUpdatedTimestamp();
-        Date syncDate = new Date(currentDate.milli - currentDate.milli % TimeUtils.DAY_IN_MILLIS);
+        JHVDate currentTime = Layers.getLastUpdatedTimestamp();
+        long syncTime = currentTime.milli - currentTime.milli % TimeUtils.DAY_IN_MILLIS;
+        String timeText = TimeUtils.timeDateFormat.format(currentTime.milli);
 
-        endDatePicker.setDate(syncDate);
-        endTimePicker.setText(TimeUtils.timeDateFormat.format(currentDate.milli));
+        endDatePicker.setTime(syncTime);
+        endTimePicker.setText(timeText);
 
-        beginDatePicker.setDate(syncDate);
-        beginTimePicker.setText(TimeUtils.timeDateFormat.format(currentDate.milli));
+        beginDatePicker.setTime(syncTime);
+        beginTimePicker.setText(timeText);
 
         setBeginTime(false);
         setEndTime(true);
@@ -293,7 +294,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             return;
 
         JHVDate endTime = view.getLastTime();
-        endDatePicker.setDate(new Date(endTime.milli - endTime.milli % TimeUtils.DAY_IN_MILLIS));
+        endDatePicker.setTime(endTime.milli - endTime.milli % TimeUtils.DAY_IN_MILLIS);
         endTimePicker.setText(TimeUtils.timeDateFormat.format(endTime.milli));
         setEndTime(applyChanges);
     }
@@ -307,7 +308,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
             @Override
             public void focusLost(FocusEvent arg0) {
-                beginDatePicker.checkDateStringInTextField();
                 setEndTime(true);
             }
         });

@@ -51,12 +51,12 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         Layers.addLayersListener(this);
     }
 
-    public void setDate(Date start) {
-        calendarStartDate.setDate(start);
+    public void setTime(long start) {
+        calendarStartDate.setTime(start);
     }
 
-    public Date getDate() {
-        return calendarStartDate.getDate();
+    public long getTime() {
+        return calendarStartDate.getTime();
     }
 
     // JHV Calendar Listener
@@ -64,15 +64,15 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     @Override
     public void actionPerformed(JHVCalendarEvent e) {
         if (e.getSource() == calendarStartDate) {
-            ObservationDialogDateModel.getInstance().setStartDate(calendarStartDate.getDate(), true);
+            ObservationDialogDateModel.getInstance().setStartDate(new Date(calendarStartDate.getTime()), true);
         }
     }
 
     @Override
     public void layerAdded(View view) {
-        Date start = view.getFirstTime().getDate();
-        calendarStartDate.setDate(start);
-        ObservationDialogDateModel.getInstance().setStartDate(start, false);
+        long start = view.getFirstTime().milli;
+        calendarStartDate.setTime(start);
+        ObservationDialogDateModel.getInstance().setStartDate(new Date(start), false);
     }
 
     @Override
@@ -81,7 +81,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void startTimeChanged(long startTime) {
-        calendarStartDate.setDate(new Date(startTime));
+        calendarStartDate.setTime(startTime);
     }
 
     @Override
