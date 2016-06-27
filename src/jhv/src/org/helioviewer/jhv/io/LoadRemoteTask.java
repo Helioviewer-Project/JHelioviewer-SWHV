@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 public class LoadRemoteTask extends LoadURITask {
@@ -14,8 +15,8 @@ public class LoadRemoteTask extends LoadURITask {
     private final long endTime;
     private final int cadence;
 
-    public LoadRemoteTask(String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
-        super(null, null);
+    public LoadRemoteTask(ImageLayer _imageLayer, String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
+        super(_imageLayer, null, null);
 
         server = _server;
         sourceId = _sourceId;

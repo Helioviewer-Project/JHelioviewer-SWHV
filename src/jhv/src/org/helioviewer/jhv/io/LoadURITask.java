@@ -17,13 +17,16 @@ public class LoadURITask extends JHVWorker<View, Void> {
     private final URI downloadURI;
     protected final URI uri;
 
-    public LoadURITask(URI _uri, URI _downloadURI) {
+    public LoadURITask(ImageLayer _imageLayer, URI _uri, URI _downloadURI) {
         uri = _uri;
         downloadURI = _downloadURI;
 
-        imageLayer = new ImageLayer(this);
-        ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
-        Displayer.display(); // ensures the dummy text is displayed
+        if (_imageLayer == null) {
+            imageLayer = new ImageLayer(this);
+            ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
+            Displayer.display(); // ensures the dummy text is displayed
+        } else
+            imageLayer = _imageLayer;
         setThreadName("MAIN--LoadURI");
     }
 

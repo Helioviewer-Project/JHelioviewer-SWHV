@@ -26,6 +26,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
@@ -98,11 +99,14 @@ public class ImageDataPanel extends ObservationDialogPanel {
         return cadencePanel.getCadence();
     }
 
-    public void setAPIRequest(APIRequestManager.APIRequest apiRequest) {
+    private ImageLayer imageLayer = null;
+
+    public void setAPIRequest(ImageLayer imageLayer, APIRequestManager.APIRequest apiRequest) {
         sourcesTree.setSelectedItem(apiRequest.server, apiRequest.sourceId);
         timeSelectionPanel.setStartTime(apiRequest.startTime, false);
         timeSelectionPanel.setEndTime(apiRequest.endTime, false);
         cadencePanel.setCadence(apiRequest.cadence);
+        this.imageLayer = imageLayer;
     }
 
     /**
@@ -110,8 +114,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * the GUI which represents the image series.
      * */
     private void loadRemote(DataSourcesTree.SourceItem item) { // valid item
-        LoadRemoteTask remoteTask = new LoadRemoteTask(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
+        LoadRemoteTask remoteTask = new LoadRemoteTask(imageLayer, item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
         JHVGlobals.getExecutorService().execute(remoteTask);
+        imageLayer = null;
     }
 
     // Methods derived from Observation Dialog Panel
