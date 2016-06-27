@@ -83,6 +83,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     public void setView(View _view) {
+        boolean changeOpacity = true;
+        if (view != null)
+            changeOpacity = false;
+
         unsetView();
 
         view = _view;
@@ -90,7 +94,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
         float opacity = 1;
 
-        if (!Displayer.multiview) {
+        if (changeOpacity && !Displayer.multiview) {
             if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
                 int count = 0;
                 for (int i = 0; i < Layers.getNumLayers(); i++) {
@@ -117,6 +121,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     private void unsetView() {
+        ComponentUtils.setEnabled(optionsPanel, false);
         if (view != null) {
             Layers.removeLayer(view);
             view.setDataHandler(null);
@@ -129,7 +134,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public void remove(GL2 gl) {
-        ComponentUtils.setEnabled(optionsPanel, false);
         if (worker != null)
             worker.cancel(true);
         unsetView();
