@@ -26,6 +26,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
+import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.io.LoadRemoteTask;
@@ -375,7 +376,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 value *= 86400;
                 break;
             case 4:
-                value = -1;
+                value = APIRequestManager.CADENCE_ANY;
                 break;
             default:
                 break;
