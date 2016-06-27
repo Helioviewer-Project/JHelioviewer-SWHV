@@ -87,7 +87,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
                 String str = (String) uiSelectionComboBox.getSelectedItem();
                 if (str.equals("Image data")) {
                     String url = Settings.getSingletonInstance().getProperty("availability.images.url");
-
                     int sourceId = imageObservationPanel.getSourceId();
                     if (sourceId != -1)
                         url += "#IID" + sourceId;

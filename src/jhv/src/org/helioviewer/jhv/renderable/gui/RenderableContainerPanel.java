@@ -202,10 +202,7 @@ public class RenderableContainerPanel extends JPanel {
                 if ((col == TITLE_COL || col == TIME_COL) && renderable instanceof ImageLayer && e.getClickCount() == 2) {
                     APIRequestManager.APIRequest apiRequest = ((ImageLayer) renderable).getAPIRequest();
                     if (apiRequest != null) { // loaded and remote
-                        ObservationDialog.getInstance().getObservationImagePane().setStartTime(apiRequest.startTime, false);
-                        ObservationDialog.getInstance().getObservationImagePane().setEndTime(apiRequest.endTime, false);
-                        ObservationDialog.getInstance().getObservationImagePane().setCadence(apiRequest.cadence);
-                        ObservationDialog.getInstance().getObservationImagePane().setSourceSelection(apiRequest.server, apiRequest.sourceId);
+                        ObservationDialog.getInstance().getObservationImagePane().setAPIRequest(apiRequest);
                         ObservationDialog.getInstance().showDialog();
                         return;
                     }
