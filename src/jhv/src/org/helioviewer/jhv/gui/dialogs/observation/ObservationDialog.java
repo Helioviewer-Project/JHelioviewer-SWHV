@@ -44,8 +44,6 @@ public class ObservationDialog extends JDialog implements ActionListener {
     private final JButton btnClose = new JButton("Cancel");
     private final JButton availabilityButton = new JButton("Available data");
 
-    private ObservationDialogPanel selectedPane = null;
-
     private final ImageDataPanel imageObservationPanel;
 
     private static ObservationDialog instance;
@@ -114,36 +112,6 @@ public class ObservationDialog extends JDialog implements ActionListener {
         addUserInterface("Image data", imageObservationPanel);
     }
 
-    /**
-     * Deactivates and activates the old and new displayed panel.
-     * */
-    private void setUIContainerPane(String name) {
-        if (selectedPane != null) {
-            selectedPane = null;
-        }
-        if (name != null) {
-            selectedPane = uiMap.get(name);
-        }
-        resetContentPane();
-    }
-
-    /**
-     * Removes previous panel from the UI and sets the new selected panel to the
-     * UI.
-     * */
-    private void resetContentPane() {
-        contentPane.removeAll();
-
-        contentPane.add(uiSelectionPane);
-        if (selectedPane != null) {
-            contentPane.add(selectedPane);
-        }
-        contentPane.add(buttonPane);
-        contentPane.revalidate();
-
-        pack();
-        getRootPane().setDefaultButton(btnImages);
-    }
 
     /**
      * Allows a component or plug-in to add its panel to the dialog in order to
@@ -197,18 +165,6 @@ public class ObservationDialog extends JDialog implements ActionListener {
 
     private void closeDialog() {
         setVisible(false);
-        // dispose();
-    }
-
-    // Action Listener
-    private void addPressed() {
-        boolean result = true;
-        if (selectedPane != null) {
-            result = selectedPane.loadButtonPressed();
-        }
-        if (result) {
-            closeDialog();
-        }
     }
 
     public void setAvailabilityStatus(boolean status) {
@@ -216,20 +172,33 @@ public class ObservationDialog extends JDialog implements ActionListener {
     }
 
     /**
-     * Reacts on user input.
+     * Removes previous panel from the UI and sets the new selected panel to the
+     * UI.
      * */
+    private void resetContentPane(String name) {
+        contentPane.removeAll();
+
+        contentPane.add(uiSelectionPane);
+        contentPane.add(uiMap.get(name));
+        contentPane.add(buttonPane);
+        contentPane.revalidate();
+
+        pack();
+        getRootPane().setDefaultButton(btnImages);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(uiSelectionComboBox)) {
-            String str = (String) uiSelectionComboBox.getSelectedItem();
-            setUIContainerPane(str);
+            String name = (String) uiSelectionComboBox.getSelectedItem();
+            resetContentPane(name);
 
             // that will do for now
-            if (!str.equals("Image data"))
+            if (!"Image data".equals(name))
                 setAvailabilityStatus(true);
-
         } else if (e.getSource().equals(btnImages)) {
-            addPressed();
+            if (uiMap.get(uiSelectionComboBox.getSelectedItem()).loadButtonPressed())
+                closeDialog();
         } else if (e.getSource().equals(btnClose)) {
             closeDialog();
         }
