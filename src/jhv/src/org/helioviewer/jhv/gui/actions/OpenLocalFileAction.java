@@ -16,6 +16,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.AllSupportedImageTypesFilenameFilter;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.io.LoadURITask;
+import org.helioviewer.jhv.layers.ImageLayer;
 
 /**
  * Action to open a local file
@@ -54,7 +55,7 @@ public class OpenLocalFileAction extends AbstractAction {
                 Settings.getSingletonInstance().save("default.local.path");
 
                 URI uri = selectedFile.toURI();
-                LoadURITask uriTask = new LoadURITask(null, uri, uri);
+                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), uri, uri);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
