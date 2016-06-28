@@ -5,7 +5,6 @@ import java.net.URI;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -50,7 +49,7 @@ public class LoadURITask extends JHVWorker<View, Void> {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            ImageViewerGui.getRenderableContainer().removeRenderable(imageLayer);
+            imageLayer.loadFailed();
         }
     }
 
