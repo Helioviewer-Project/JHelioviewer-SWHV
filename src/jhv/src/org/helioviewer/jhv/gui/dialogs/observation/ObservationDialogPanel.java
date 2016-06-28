@@ -20,4 +20,6 @@ public abstract class ObservationDialogPanel extends JPanel {
      * */
     public abstract boolean loadButtonPressed(Object layer);
 
+    public abstract void setupLayer(Object layer);
+
 }

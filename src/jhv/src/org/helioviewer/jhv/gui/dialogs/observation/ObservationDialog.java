@@ -156,6 +156,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
             btnImages.setText("Change");
         }
         this.layer = layer;
+        uiMap.get(uiSelectionComboBox.getSelectedItem()).setupLayer(layer);
 
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());

@@ -71,7 +71,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             first = false;
 
             timeSelectionPanel.setStartTime(item.end - TimeUtils.DAY_IN_MILLIS, false);
-            timeSelectionPanel.setEndTime(item.end + getCadence() * 1000, false);
+            timeSelectionPanel.setEndTime(item.end + getCadence() * 1000L, false);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
                 loadRemote(null, item);
@@ -107,7 +107,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     // Methods derived from Observation Dialog Panel
 
     @Override
-    public boolean loadButtonPressed(Object layer) {
+    public void setupLayer(Object layer) {
         ImageLayer imageLayer = null;
         if (layer instanceof ImageLayer) {
             imageLayer = (ImageLayer) layer;
@@ -119,7 +119,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 cadencePanel.setCadence(apiRequest.cadence);
             }
         }
+    }
 
+    @Override
+    public boolean loadButtonPressed(Object layer) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
             Message.err("Data is not selected", "There is no information on what to add", false);
@@ -135,7 +138,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        loadRemote(imageLayer, item);
+        loadRemote(layer instanceof ImageLayer ? (ImageLayer) layer : null, item);
         return true;
     }
 

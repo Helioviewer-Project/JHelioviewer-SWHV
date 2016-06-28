@@ -165,6 +165,10 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     @Override
+    public void setupLayer(Object layer) {
+    }
+
+    @Override
     public void lineDataAdded(LineDataSelectorElement element) {
         updateGroupValues();
     }
