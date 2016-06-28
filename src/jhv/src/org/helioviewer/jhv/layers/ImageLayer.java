@@ -64,8 +64,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         setVisible(true);
     }
 
-    public void setWorker(JHVWorker<?, ?> worker) {
-        this.worker = worker;
+    public void setWorker(JHVWorker<?, ?> _worker) {
+        if (worker != null)
+            worker.cancel(true);
+        worker = _worker;
     }
 
     @Override
