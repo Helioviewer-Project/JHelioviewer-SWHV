@@ -60,7 +60,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
     }
 
     private ObservationDialog(JFrame mainFrame) {
-        super(mainFrame, false);
+        super(mainFrame, true);
 
         // set dialog settings
         setContentPane(contentPane);
