@@ -85,7 +85,7 @@ public class DataSourcesTree extends JTree {
                 if (e.getClickCount() == 2 && getRowForLocation(e.getX(), e.getY()) != -1) {
                     Object obj = ((DefaultMutableTreeNode) getPathForLocation(e.getX(), e.getY()).getLastPathComponent()).getUserObject();
                     if (obj instanceof SourceItem)
-                        ObservationDialog.getInstance().getObservationImagePane().loadButtonPressed();
+                        ObservationDialog.getInstance().loadButtonPressed();
                 }
             }
         });

@@ -18,8 +18,6 @@ public abstract class ObservationDialogPanel extends JPanel {
      * This method will be called when the add button within the dialog has been
      * pressed.
      * */
-    public abstract boolean loadButtonPressed();
-
-    public abstract void setLayer(Object layer);
+    public abstract boolean loadButtonPressed(Object layer);
 
 }
