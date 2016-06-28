@@ -155,12 +155,19 @@ public class ObservationDialog extends JDialog implements ActionListener {
             setTitle("Change Layer");
             btnImages.setText("Change");
         }
-        uiMap.get(name).setLayer(layer);
+        this.layer = layer;
 
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         getRootPane().setDefaultButton(btnImages);
         setVisible(true);
+    }
+
+    private Object layer; // tbd if timelines get change layer
+
+    public void loadButtonPressed() {
+        if (uiMap.get(uiSelectionComboBox.getSelectedItem()).loadButtonPressed(layer))
+            closeDialog();
     }
 
     private void closeDialog() {
@@ -197,8 +204,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
             if (!"Image data".equals(name))
                 setAvailabilityStatus(true);
         } else if (e.getSource().equals(btnImages)) {
-            if (uiMap.get(uiSelectionComboBox.getSelectedItem()).loadButtonPressed())
-                closeDialog();
+            loadButtonPressed();
         } else if (e.getSource().equals(btnClose)) {
             closeDialog();
         }

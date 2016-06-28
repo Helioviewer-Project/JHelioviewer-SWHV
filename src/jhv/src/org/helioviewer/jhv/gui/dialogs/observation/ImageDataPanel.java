@@ -74,7 +74,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             timeSelectionPanel.setEndTime(item.end + getCadence() * 1000, false);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                loadRemote(item);
+                loadRemote(null, item);
             }
         }
     }
@@ -99,23 +99,16 @@ public class ImageDataPanel extends ObservationDialogPanel {
         return cadencePanel.getCadence();
     }
 
-    /**
-     * Loads an image series from the Helioviewer server and adds a new layer to
-     * the GUI which represents the image series.
-     * */
-    private void loadRemote(DataSourcesTree.SourceItem item) { // valid item
+    private void loadRemote(ImageLayer imageLayer, DataSourcesTree.SourceItem item) { // valid item
         LoadRemoteTask remoteTask = new LoadRemoteTask(imageLayer, item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
         JHVGlobals.getExecutorService().execute(remoteTask);
-        imageLayer = null;
     }
 
     // Methods derived from Observation Dialog Panel
 
-    private ImageLayer imageLayer = null;
-
     @Override
-    public void setLayer(Object layer) {
-        imageLayer = null;
+    public boolean loadButtonPressed(Object layer) {
+        ImageLayer imageLayer = null;
         if (layer instanceof ImageLayer) {
             imageLayer = (ImageLayer) layer;
             APIRequestManager.APIRequest apiRequest = imageLayer.getAPIRequest();
@@ -126,10 +119,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 cadencePanel.setCadence(apiRequest.cadence);
             }
         }
-    }
 
-    @Override
-    public boolean loadButtonPressed() {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
             Message.err("Data is not selected", "There is no information on what to add", false);
@@ -145,7 +135,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        loadRemote(item);
+        loadRemote(imageLayer, item);
         return true;
     }
 
