@@ -46,6 +46,13 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private static final double vpScale = 0.035;
     private static final String loading = "Loading...";
 
+    public static ImageLayer createImageLayer() {
+        ImageLayer imageLayer = new ImageLayer();
+        ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
+        Displayer.display(); // ensures the dummy text is displayed
+        return imageLayer;
+    }
+
     public ImageLayer() {
         optionsPanel = new ImageLayerOptions(this);
         ComponentUtils.setEnabled(optionsPanel, false);
