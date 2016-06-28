@@ -46,12 +46,14 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private static final double vpScale = 0.035;
     private static final String loading = "Loading...";
 
-    public ImageLayer(JHVWorker<?, ?> _worker) {
-        worker = _worker;
-
+    public ImageLayer() {
         optionsPanel = new ImageLayerOptions(this);
         ComponentUtils.setEnabled(optionsPanel, false);
         setVisible(true);
+    }
+
+    public void setWorker(JHVWorker<?, ?> worker) {
+        this.worker = worker;
     }
 
     @Override
@@ -90,7 +92,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     public void setView(View _view) {
         if (view != null)
-            return;
+            unsetView();
 
         view = _view;
         worker = null; // drop reference
@@ -119,7 +121,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         ComponentUtils.setEnabled(optionsPanel, true);
     }
 
-    public void unsetView() {
+    private void unsetView() {
         ComponentUtils.setEnabled(optionsPanel, false);
         if (view != null) {
             Layers.removeLayer(view);

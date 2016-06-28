@@ -22,13 +22,14 @@ public class LoadURITask extends JHVWorker<View, Void> {
         downloadURI = _downloadURI;
 
         if (_imageLayer == null) {
-            imageLayer = new ImageLayer(this);
+            imageLayer = new ImageLayer();
             ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
             Displayer.display(); // ensures the dummy text is displayed
         } else {
             imageLayer = _imageLayer;
-            imageLayer.unsetView();
         }
+        imageLayer.setWorker(this);
+
         setThreadName("MAIN--LoadURI");
     }
 
