@@ -38,7 +38,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
-import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.layers.ImageLayer;
 
 @SuppressWarnings("serial")
@@ -200,13 +199,9 @@ public class RenderableContainerPanel extends JPanel {
                 Renderable renderable = (Renderable) grid.getValueAt(row, col);
 
                 if ((col == TITLE_COL || col == TIME_COL) && renderable instanceof ImageLayer && e.getClickCount() == 2) {
-                    ImageLayer imageLayer = (ImageLayer) renderable;
-                    APIRequestManager.APIRequest apiRequest = imageLayer.getAPIRequest();
-                    if (apiRequest != null) { // loaded and remote
-                        ObservationDialog.getInstance().getObservationImagePane().setAPIRequest(imageLayer, apiRequest);
-                        ObservationDialog.getInstance().showDialog("Change Layer", "Image data");
-                        return;
-                    }
+                    ObservationDialog.getInstance().getObservationImagePane().setImageLayer((ImageLayer) renderable);
+                    ObservationDialog.getInstance().showDialog("Change Layer", "Image data");
+                    return;
                 }
 
                 if (col == VISIBLE_COL) {
