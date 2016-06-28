@@ -60,7 +60,7 @@ public class DataSourcesTree extends JTree {
     private final DefaultMutableTreeNode nodeIAS;
 
     public DataSourcesTree() {
-        nodeRoot = new DefaultMutableTreeNode("Dataset");
+        nodeRoot = new DefaultMutableTreeNode("Datasets");
         nodeROB = new DefaultMutableTreeNode(new Item("ROB", "Royal Observatory of Belgium"));
         nodeGSFC = new DefaultMutableTreeNode(new Item("GSFC", "Goddard Space Flight Center"));
         nodeIAS = new DefaultMutableTreeNode(new Item("IAS", "Institut d'Astrophysique Spatiale"));

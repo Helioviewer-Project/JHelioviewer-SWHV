@@ -7,7 +7,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DataSourcesParser {
@@ -22,7 +21,7 @@ public class DataSourcesParser {
         rootNode = new DefaultMutableTreeNode(server);
     }
 
-    void parse(JSONObject json) throws ParseException, JSONException {
+    void parse(JSONObject json) throws ParseException {
         parse(rootNode, json, null);
     }
 
@@ -34,7 +33,7 @@ public class DataSourcesParser {
         return str1 + " " + str2;
     }
 
-    private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) throws ParseException, JSONException {
+    private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) throws ParseException {
         TreeSet<String> sorted = new TreeSet<String>(JHVGlobals.alphanumComparator);
         sorted.addAll(root.keySet());
 

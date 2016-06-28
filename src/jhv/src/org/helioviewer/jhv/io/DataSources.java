@@ -1,11 +1,17 @@
 package org.helioviewer.jhv.io;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.FileUtils;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class DataSources {
 
@@ -24,7 +30,7 @@ public class DataSources {
             put("IAS",
                 new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
                     put("default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080");
@@ -88,12 +94,16 @@ public class DataSources {
         }
         saveServerSettings(preferredServer);
 
+        InputStream inputStream = FileUtils.getResourceInputStream("/data/sources_v1.0.json");
+        JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
+        Schema schema = SchemaLoader.load(rawSchema);
+
         DataSourcesTask loadTask;
-        loadTask = new DataSourcesTask("GSFC");
+        loadTask = new DataSourcesTask("GSFC", schema);
         JHVGlobals.getExecutorService().execute(loadTask);
-        loadTask = new DataSourcesTask("ROB");
+        loadTask = new DataSourcesTask("ROB", schema);
         JHVGlobals.getExecutorService().execute(loadTask);
-        loadTask = new DataSourcesTask("IAS");
+        loadTask = new DataSourcesTask("IAS", schema);
         JHVGlobals.getExecutorService().execute(loadTask);
     }
 
