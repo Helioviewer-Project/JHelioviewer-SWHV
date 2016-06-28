@@ -24,15 +24,6 @@ public class TimeUtils {
     public static final JHVDate MINIMAL_DATE = JHVDate.parseDateTime("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = JHVDate.parseDateTime("2050-01-01T00:00:00");
 
-    private static final TimeUtils instance = new TimeUtils();
-
-    public static TimeUtils getSingletonInstance() {
-        return instance;
-    }
-
-    private TimeUtils() {
-    }
-
     public static Interval makeCompleteDay(final long start, final long end) {
         long endDate = end;
         long now = System.currentTimeMillis();
@@ -44,6 +35,17 @@ public class TimeUtils {
         long new_end = endDate - endDate % DAY_IN_MILLIS + DAY_IN_MILLIS;
 
         return new Interval(new_start, new_end);
+    }
+
+    private static TimeUtils instance;
+
+    public static TimeUtils getSingletonInstance() {
+        if (instance == null)
+            instance = new TimeUtils();
+        return instance;
+    }
+
+    private TimeUtils() {
     }
 
 }

@@ -47,9 +47,11 @@ public class KeyShortcuts {
         return false;
     }
 
-    private static final KeyShortcuts instance = new KeyShortcuts();
+    private static KeyShortcuts instance;
 
     public static KeyShortcuts getSingletonInstance() {
+        if (instance == null)
+            instance = new KeyShortcuts();
         return instance;
     }
 
