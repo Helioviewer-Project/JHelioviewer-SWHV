@@ -99,7 +99,13 @@ public class ImageDataPanel extends ObservationDialogPanel {
         return cadencePanel.getCadence();
     }
 
-    private void loadRemote(ImageLayer imageLayer, DataSourcesTree.SourceItem item) { // valid item
+    private void loadRemote(Object layer, DataSourcesTree.SourceItem item) { // valid item
+        ImageLayer imageLayer;
+        if (layer instanceof ImageLayer)
+            imageLayer = (ImageLayer) layer;
+        else
+            imageLayer = ImageLayer.createImageLayer();
+
         LoadRemoteTask remoteTask = new LoadRemoteTask(imageLayer, item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
         JHVGlobals.getExecutorService().execute(remoteTask);
     }
@@ -108,10 +114,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     @Override
     public void setupLayer(Object layer) {
-        ImageLayer imageLayer = null;
         if (layer instanceof ImageLayer) {
-            imageLayer = (ImageLayer) layer;
-            APIRequestManager.APIRequest apiRequest = imageLayer.getAPIRequest();
+            APIRequestManager.APIRequest apiRequest = ((ImageLayer) layer).getAPIRequest();
             if (apiRequest != null) {
                 sourcesTree.setSelectedItem(apiRequest.server, apiRequest.sourceId);
                 timeSelectionPanel.setStartTime(apiRequest.startTime, false);
@@ -138,7 +142,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        loadRemote(layer instanceof ImageLayer ? (ImageLayer) layer : null, item);
+        loadRemote(layer, item);
         return true;
     }
 

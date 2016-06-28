@@ -36,6 +36,7 @@ import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.LoadURITask;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
@@ -208,14 +209,14 @@ public class ImageViewerGui {
         // -jpx
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
-                LoadURITask uriTask = new LoadURITask(null, jpxUrl, jpxUrl);
+                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), jpxUrl, jpxUrl);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
         // -jpip
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
-                LoadURITask uriTask = new LoadURITask(null, jpipUri, jpipUri);
+                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), jpipUri, jpipUri);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
         }

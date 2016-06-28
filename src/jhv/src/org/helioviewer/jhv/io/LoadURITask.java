@@ -20,11 +20,7 @@ public class LoadURITask extends JHVWorker<View, Void> {
         uri = _uri;
         downloadURI = _downloadURI;
 
-        if (_imageLayer == null) {
-            imageLayer = ImageLayer.createImageLayer();
-        } else {
-            imageLayer = _imageLayer;
-        }
+        imageLayer = _imageLayer;
         imageLayer.setWorker(this);
 
         setThreadName("MAIN--LoadURI");
