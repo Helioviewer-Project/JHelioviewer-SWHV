@@ -146,6 +146,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         } else if (detector.equals("EUVI")) {
             observatory = m.get("OBSRVTRY");
             fullName = observatory + " " + detector + " " + measurement;
+        } else if (instrument.equals("TRACE")) {
+            measurement = m.get("WAVE_LEN");
+            fullName = instrument + " " + measurement;
         } else {
             fullName = instrument + " " + measurement;
         }
