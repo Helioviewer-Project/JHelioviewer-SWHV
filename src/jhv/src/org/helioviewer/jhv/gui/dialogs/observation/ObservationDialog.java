@@ -40,7 +40,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
     private final JPanel uiSelectionPane = new JPanel();
     private final JComboBox uiSelectionComboBox = new JComboBox();
     private final JPanel buttonPane = new JPanel();
-    private final JButton btnImages = new JButton("Add");
+    private final JButton btnImages = new JButton();
     private final JButton btnClose = new JButton("Cancel");
     private final JButton availabilityButton = new JButton("Available data");
 
@@ -173,15 +173,21 @@ public class ObservationDialog extends JDialog implements ActionListener {
      * Shows up the dialog and initializes the UI with the panel of the given
      * name.
      * */
-    public void showDialog(String title, String dataSourceName) {
-        setTitle(title);
-
+    public void showDialog(Object layer, String name) {
         if (uiMap.isEmpty()) {
             Message.err("Error", "There are no data sources available!", false);
             return;
         }
 
-        uiSelectionComboBox.setSelectedItem(dataSourceName);
+        uiSelectionComboBox.setSelectedItem(name);
+        if (layer == null) {
+            setTitle("New Layer");
+            btnImages.setText("Add");
+        } else {
+            setTitle("Change Layer");
+            btnImages.setText("Change");
+        }
+        uiMap.get(name).setLayer(layer);
 
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());

@@ -99,19 +99,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
         return cadencePanel.getCadence();
     }
 
-    private ImageLayer imageLayer = null;
-
-    public void setImageLayer(ImageLayer imageLayer) {
-        this.imageLayer = imageLayer;
-        APIRequestManager.APIRequest apiRequest = imageLayer.getAPIRequest();
-        if (apiRequest != null) {
-            sourcesTree.setSelectedItem(apiRequest.server, apiRequest.sourceId);
-            timeSelectionPanel.setStartTime(apiRequest.startTime, false);
-            timeSelectionPanel.setEndTime(apiRequest.endTime, false);
-            cadencePanel.setCadence(apiRequest.cadence);
-        }
-    }
-
     /**
      * Loads an image series from the Helioviewer server and adds a new layer to
      * the GUI which represents the image series.
@@ -123,6 +110,23 @@ public class ImageDataPanel extends ObservationDialogPanel {
     }
 
     // Methods derived from Observation Dialog Panel
+
+    private ImageLayer imageLayer = null;
+
+    @Override
+    public void setLayer(Object layer) {
+        imageLayer = null;
+        if (layer instanceof ImageLayer) {
+            imageLayer = (ImageLayer) layer;
+            APIRequestManager.APIRequest apiRequest = imageLayer.getAPIRequest();
+            if (apiRequest != null) {
+                sourcesTree.setSelectedItem(apiRequest.server, apiRequest.sourceId);
+                timeSelectionPanel.setStartTime(apiRequest.startTime, false);
+                timeSelectionPanel.setEndTime(apiRequest.endTime, false);
+                cadencePanel.setCadence(apiRequest.cadence);
+            }
+        }
+    }
 
     @Override
     public boolean loadButtonPressed() {
