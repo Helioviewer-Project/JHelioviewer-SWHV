@@ -3,7 +3,6 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 
 import org.everit.json.schema.Schema;
 import org.helioviewer.jhv.base.DownloadStream;
@@ -38,8 +37,6 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
                 schema.validate(json);
                 parser.parse(json);
                 return null;
-            } catch (ParseException e) {
-                throw e;
             } catch (IOException e) {
                 try {
                     Thread.sleep(5000);
