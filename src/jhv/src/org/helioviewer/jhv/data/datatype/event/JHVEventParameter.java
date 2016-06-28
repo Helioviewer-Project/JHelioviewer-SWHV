@@ -6,6 +6,9 @@ import java.text.NumberFormat;
 import org.helioviewer.jhv.base.Regex;
 
 public class JHVEventParameter {
+
+    private static final NumberFormat numFormatter = new DecimalFormat("0.###E0");
+
     /** The name of the parameter */
     private final String parameterName;
 
@@ -84,8 +87,7 @@ public class JHVEventParameter {
     private String beautifyValue(String value) {
         if (Regex.FloatingPoint.matcher(value).matches() &&
             !Regex.Integer.matcher(value).matches()) {
-            NumberFormat formatter = new DecimalFormat("0.###E0");
-            String result = formatter.format(Double.parseDouble(value));
+            String result = numFormatter.format(Double.parseDouble(value));
             if (result.contains("E0")) {
                 return result.substring(0, result.length() - 2);
             } else {
