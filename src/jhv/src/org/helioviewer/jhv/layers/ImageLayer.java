@@ -54,7 +54,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     public void loadFailed() {
-        ImageViewerGui.getRenderableContainer().removeRenderable(this);
+        if (view == null) // not changing view
+            ImageViewerGui.getRenderableContainer().removeRenderable(this);
     }
 
     public ImageLayer() {
