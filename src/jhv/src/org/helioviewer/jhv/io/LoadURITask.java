@@ -5,7 +5,6 @@ import java.net.URI;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -22,9 +21,7 @@ public class LoadURITask extends JHVWorker<View, Void> {
         downloadURI = _downloadURI;
 
         if (_imageLayer == null) {
-            imageLayer = new ImageLayer();
-            ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
-            Displayer.display(); // ensures the dummy text is displayed
+            imageLayer = ImageLayer.createImageLayer();
         } else {
             imageLayer = _imageLayer;
         }
