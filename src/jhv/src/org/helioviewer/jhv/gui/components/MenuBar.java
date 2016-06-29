@@ -14,12 +14,13 @@ import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.ShowDialogAction;
 import org.helioviewer.jhv.gui.actions.ToggleFullscreenAction;
+import org.helioviewer.jhv.gui.actions.WindowMinimizeAction;
+import org.helioviewer.jhv.gui.actions.WindowZoomAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
-//import org.helioviewer.jhv.gui.dialogs.OpenRemoteFileDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
 import org.helioviewer.jhv.gui.dialogs.plugins.PluginsDialog;
 import org.helioviewer.jhv.platform.OSXHandler;
@@ -74,6 +75,10 @@ public class MenuBar extends JMenuBar {
 
         if (System.getProperty("jhv.os").equals("mac")) {
             OSXHandler.preferencesHandler();
+            JMenu windowMenu = new JMenu("Window");
+            windowMenu.add(new WindowMinimizeAction());
+            windowMenu.add(new WindowZoomAction());
+            add(windowMenu);
         } else {
             JMenu optionsMenu = new JMenu("Options");
             optionsMenu.setMnemonic(KeyEvent.VK_O);
