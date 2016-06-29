@@ -55,6 +55,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     public void loadFailed() {
         if (view == null) // not changing view
             ImageViewerGui.getRenderableContainer().removeRenderable(this);
+        else {
+            worker = null;
+            Displayer.display();
+        }
     }
 
     private ImageLayer() {
@@ -149,8 +153,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public void remove(GL2 gl) {
-        if (worker != null)
+        if (worker != null) {
             worker.cancel(true);
+            worker = null;
+        }
         unsetView();
         if (Displayer.multiview) {
             ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
