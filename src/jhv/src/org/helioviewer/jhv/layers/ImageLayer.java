@@ -58,7 +58,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             ImageViewerGui.getRenderableContainer().removeRenderable(this);
     }
 
-    public ImageLayer() {
+    private ImageLayer() {
         optionsPanel = new ImageLayerOptions(this);
         ComponentUtils.setEnabled(optionsPanel, false);
         setVisible(true);
