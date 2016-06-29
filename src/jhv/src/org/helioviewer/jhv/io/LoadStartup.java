@@ -10,9 +10,8 @@ public class LoadStartup {
     /**
      * Loads the images which have to be displayed when the program starts.
      *
-     * If there are any images defined in the command line, than this messages
-     * tries to load this images. Otherwise it tries to load a default image
-     * which is defined by the default entries of the observation panel.
+     * If there are any images defined on the command line then this tries
+     * to load those images.
      * */
     public static void loadCommandLine() {
         // -jpx

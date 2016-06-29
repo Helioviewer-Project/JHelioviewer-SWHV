@@ -174,7 +174,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
             // create end time field
             textEndTime = new TimeTextField();
-            textEndTime.setToolTipText("UTC time for observation end.\nIf equal to start time, a single image closest to the time will be added.");
+            textEndTime.setToolTipText("UTC time for observation end. If equal to start time, a single image closest to the time will be added.");
 
             // create end date Carrington picker
             carringtonEnd = new JHVCarringtonPicker();
