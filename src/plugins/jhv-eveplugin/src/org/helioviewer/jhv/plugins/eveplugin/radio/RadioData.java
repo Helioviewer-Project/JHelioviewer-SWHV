@@ -19,6 +19,7 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.APIRequestManager;
+import org.helioviewer.jhv.io.APIRequestManager.APIRequest;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -255,8 +256,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
             for (long date : datesToDownload) {
                 JP2ViewCallisto v = null;
                 try {
-                    v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile("ROB", CallistoID,
-                                                            date, date + 1 /* force JPX (TBD) */, APIRequestManager.CADENCE_ANY, false);
+                    APIRequest req = new APIRequest("ROB", CallistoID, date, date + 1 /* force JPX (TBD) */, APIRequestManager.CADENCE_ANY);
+                    v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(req, false);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file: " + e.getMessage());
                 }

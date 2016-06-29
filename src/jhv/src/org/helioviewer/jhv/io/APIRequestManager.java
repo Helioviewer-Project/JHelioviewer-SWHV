@@ -78,9 +78,8 @@ public class APIRequestManager {
 
     }
 
-    public static View requestAndOpenRemoteFile(String server, int sourceId, long startTime, long endTime, int cadence, boolean errorMessage) throws IOException {
-        APIRequest apiRequest = new APIRequest(server, sourceId, startTime, endTime, cadence);
-        String[] reqStrings = apiRequest.getRequests();
+    public static View requestAndOpenRemoteFile(APIRequest req, boolean errorMessage) throws IOException {
+        String[] reqStrings = req.getRequests();
         String reqJPIP = reqStrings[0], reqDownload = reqStrings[1];
 
         try {
@@ -113,7 +112,7 @@ public class APIRequestManager {
                 if (message != null && errorMessage) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
-                return loadView(response.getURI(), downloadUri, apiRequest);
+                return loadView(response.getURI(), downloadUri, req);
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");

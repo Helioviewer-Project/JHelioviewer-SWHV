@@ -28,6 +28,7 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.io.APIRequestManager;
+import org.helioviewer.jhv.io.APIRequestManager.APIRequest;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.io.LoadRemoteTask;
@@ -106,8 +107,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
         else
             imageLayer = ImageLayer.createImageLayer();
 
-        LoadRemoteTask remoteTask = new LoadRemoteTask(imageLayer, item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
-        JHVGlobals.getExecutorService().execute(remoteTask);
+        APIRequest req = new APIRequest(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
+        if (!req.equals(imageLayer.getAPIRequest())) {
+            LoadRemoteTask remoteTask = new LoadRemoteTask(imageLayer, req);
+            JHVGlobals.getExecutorService().execute(remoteTask);
+        }
     }
 
     // Methods derived from Observation Dialog Panel
@@ -115,12 +119,12 @@ public class ImageDataPanel extends ObservationDialogPanel {
     @Override
     public void setupLayer(Object layer) {
         if (layer instanceof ImageLayer) {
-            APIRequestManager.APIRequest apiRequest = ((ImageLayer) layer).getAPIRequest();
-            if (apiRequest != null) {
-                sourcesTree.setSelectedItem(apiRequest.server, apiRequest.sourceId);
-                timeSelectionPanel.setStartTime(apiRequest.startTime, false);
-                timeSelectionPanel.setEndTime(apiRequest.endTime, false);
-                cadencePanel.setCadence(apiRequest.cadence);
+            APIRequest req = ((ImageLayer) layer).getAPIRequest();
+            if (req != null) {
+                sourcesTree.setSelectedItem(req.server, req.sourceId);
+                timeSelectionPanel.setStartTime(req.startTime, false);
+                timeSelectionPanel.setEndTime(req.endTime, false);
+                cadencePanel.setCadence(req.cadence);
             }
         }
     }
