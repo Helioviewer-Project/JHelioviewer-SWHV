@@ -7,29 +7,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import javax.swing.JFrame;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
 
-/**
- * A class that stores and reads default values in a settings file.
- *
- * To check, whether the default settings have changed, a version string is
- * used. This string always should contain the date of the last change.
- *
- * @author Benjamin Wamsler
- * @author Juan Pablo
- * @author Markus Langenberg
- * @author Andre Dau
- */
 public class Settings {
-    /** The sole instance of this class. */
-    private static final Settings singletonInstance = new Settings();
+
+    private static final Settings instance = new Settings();
+
+    private Settings() {
+    }
+
+    public static Settings getSingletonInstance() {
+        return instance;
+    }
 
     /** The properties object */
     private final Properties defaultProperties = new Properties();
@@ -139,47 +129,6 @@ public class Settings {
             val = defaultProperties.getProperty(key);
         }
         return val;
-    }
-
-    /**
-     * Method returns the sole instance of this class.
-     *
-     * @return the only instance of this class.
-     * */
-    public static Settings getSingletonInstance() {
-        return singletonInstance;
-    }
-
-    /**
-     * Sets the look and feel to all windows of the application.
-     *
-     * @param lookAndFeel
-     *            name of the lookandfeel.
-     */
-    public void setLookAndFeelEverywhere(JFrame frame, String lookAndFeel) {
-        if (lookAndFeel == null) {
-            lookAndFeel = getProperty("display.laf");
-            if (lookAndFeel == null) {
-                lookAndFeel = UIManager.getSystemLookAndFeelClassName();
-            }
-        }
-
-        if (!UIManager.getLookAndFeel().getClass().getName().equals(lookAndFeel)) {
-            try {
-                UIManager.setLookAndFeel(lookAndFeel);
-                if (frame != null) {
-                    SwingUtilities.updateComponentTreeUI(frame);
-                    frame.pack();
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        if (!System.getProperty("jhv.os").equals("mac")) {
-            ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-            JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-        }
     }
 
 }
