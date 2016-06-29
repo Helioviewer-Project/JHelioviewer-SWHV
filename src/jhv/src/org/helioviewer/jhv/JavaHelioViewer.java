@@ -16,6 +16,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.LoadStartup;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
 /**
@@ -106,7 +107,6 @@ public class JavaHelioViewer {
                 Log.info("Start main window");
                 ExitHooks.attach();
                 ImageViewerGui.prepareGui();
-                ImageViewerGui.loadImagesAtStartup();
 
                 DataSources.loadSources();
 
@@ -130,6 +130,8 @@ public class JavaHelioViewer {
                 JComponent leftScrollPane = ImageViewerGui.getLeftScrollPane();
                 leftScrollPane.setMinimumSize(new Dimension(leftScrollPane.getPreferredSize().width + ImageViewerGui.SIDE_PANEL_WIDTH_EXTRA, -1));
                 ImageViewerGui.getMainFrame().pack();
+
+                LoadStartup.loadCommandLine();
 
                 try {
                     JHVUpdate update = new JHVUpdate(false);

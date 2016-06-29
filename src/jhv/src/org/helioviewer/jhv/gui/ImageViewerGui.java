@@ -7,8 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -34,9 +32,6 @@ import org.helioviewer.jhv.gui.components.statusplugins.CarringtonStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
-import org.helioviewer.jhv.io.CommandLineProcessor;
-import org.helioviewer.jhv.io.LoadURITask;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
@@ -185,39 +180,6 @@ public class ImageViewerGui {
             } catch (Exception e) {
                 Log.error("Fullscreen utilities not available");
                 e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Loads the images which have to be displayed when the program starts.
-     *
-     * If there are any images defined in the command line, than this messages
-     * tries to load this images. Otherwise it tries to load a default image
-     * which is defined by the default entries of the observation panel.
-     * */
-    public static void loadImagesAtStartup() {
-        // get values for different command line options
-        List<URI> jpipUris = CommandLineProcessor.getJPIPOptionValues();
-        List<URI> jpxUrls = CommandLineProcessor.getJPXOptionValues();
-
-        // Do nothing if no resource is specified
-        if (jpipUris.isEmpty() && jpxUrls.isEmpty()) {
-            return;
-        }
-
-        // -jpx
-        for (URI jpxUrl : jpxUrls) {
-            if (jpxUrl != null) {
-                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), jpxUrl, jpxUrl);
-                JHVGlobals.getExecutorService().execute(uriTask);
-            }
-        }
-        // -jpip
-        for (URI jpipUri : jpipUris) {
-            if (jpipUri != null) {
-                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), jpipUri, jpipUri);
-                JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
     }
