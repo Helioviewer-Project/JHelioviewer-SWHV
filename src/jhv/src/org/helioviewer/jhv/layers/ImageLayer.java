@@ -49,7 +49,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     public static ImageLayer createImageLayer() {
         ImageLayer imageLayer = new ImageLayer();
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
-        Displayer.display(); // ensures the dummy text is displayed
         return imageLayer;
     }
 
@@ -247,7 +246,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
-        if (imageData == null) {
+        if (imageData == null || worker != null) { // loading something
             int delta = (int) (vp.height * 0.01);
             TextRenderer renderer = GLText.getRenderer(GLText.TEXT_SIZE_LARGE);
             Rectangle2D rect = renderer.getBounds(loading);
