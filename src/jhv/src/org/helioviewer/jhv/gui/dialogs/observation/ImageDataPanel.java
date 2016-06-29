@@ -15,7 +15,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -31,7 +30,6 @@ import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.APIRequestManager.APIRequest;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
-import org.helioviewer.jhv.io.LoadRemoteTask;
 
 /**
  * In order to select and load image data from the Helioviewer server this class
@@ -106,12 +104,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             imageLayer = (ImageLayer) layer;
         else
             imageLayer = ImageLayer.createImageLayer();
-
-        APIRequest req = new APIRequest(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence());
-        if (!req.equals(imageLayer.getAPIRequest())) {
-            LoadRemoteTask remoteTask = new LoadRemoteTask(imageLayer, req);
-            JHVGlobals.getExecutorService().execute(remoteTask);
-        }
+        imageLayer.load(new APIRequest(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence()));
     }
 
     // Methods derived from Observation Dialog Panel

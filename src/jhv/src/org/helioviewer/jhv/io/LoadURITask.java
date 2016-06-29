@@ -19,9 +19,7 @@ public class LoadURITask extends JHVWorker<View, Void> {
     public LoadURITask(ImageLayer _imageLayer, URI _uri, URI _downloadURI) {
         uri = _uri;
         downloadURI = _downloadURI;
-
         imageLayer = _imageLayer;
-        imageLayer.setWorker(this);
 
         Displayer.display(); // ensures the dummy text is displayed
 
