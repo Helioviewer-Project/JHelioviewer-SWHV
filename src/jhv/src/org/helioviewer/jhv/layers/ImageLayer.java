@@ -305,7 +305,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public String getName() {
-        return view == null ? loading : view.getName();
+        return view == null || worker != null ? loading : view.getName();
     }
 
     @Override
