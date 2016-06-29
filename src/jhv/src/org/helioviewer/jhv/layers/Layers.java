@@ -13,6 +13,8 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.io.APIRequestManager.APIRequest;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -61,6 +63,30 @@ public class Layers {
 
     public static View getActiveView() {
         return activeView;
+    }
+
+    public static void syncLayersSpan() {
+        if (activeView != null) {
+            APIRequest areq = activeView.getImageLayer().getAPIRequest();
+            long startTime, endTime;
+            int cadence;
+            if (areq != null) {
+                startTime = areq.startTime;
+                endTime = areq.endTime;
+                cadence = areq.cadence;
+            } else {
+                startTime = activeView.getFirstTime().milli;
+                endTime = activeView.getLastTime().milli;
+                cadence = ObservationDialog.getInstance().getObservationImagePane().getCadence();
+            }
+
+            for (View v : layers) {
+                APIRequest vreq = v.getAPIRequest();
+                if (v != activeView && vreq != null) {
+                    v.getImageLayer().load(new APIRequest(vreq.server, vreq.sourceId, startTime, endTime, cadence));
+                }
+            }
+        }
     }
 
     static void setActiveView(View view) {

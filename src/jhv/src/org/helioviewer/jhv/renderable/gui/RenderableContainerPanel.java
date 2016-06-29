@@ -39,6 +39,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layers;
 
 @SuppressWarnings("serial")
 public class RenderableContainerPanel extends JPanel {
@@ -120,9 +121,23 @@ public class RenderableContainerPanel extends JPanel {
             }
         });
 
+        JButton syncSpanButton = new JButton(IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME));
+        syncSpanButton.setToolTipText("Synchronize layers time span");
+        syncSpanButton.setBorderPainted(false);
+        syncSpanButton.setFocusPainted(false);
+        syncSpanButton.setContentAreaFilled(false);
+        syncSpanButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Layers.syncLayersSpan();
+                renderableContainer.fireListeners();
+            }
+        });
+
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
         addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
+        addLayerButtonWrapper.add(syncSpanButton, BorderLayout.WEST);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
