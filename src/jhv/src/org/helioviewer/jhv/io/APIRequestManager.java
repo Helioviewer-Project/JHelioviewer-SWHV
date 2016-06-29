@@ -24,12 +24,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2View;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
 
-/**
- * This class provides methods to download files from a server.
- *
- * Most of the methods only will work with the current Helioviewer server
- * because they modify links and requests that they will fit with the API.
- */
 public class APIRequestManager {
 
     public static final int CADENCE_ANY = -100;
@@ -50,48 +44,48 @@ public class APIRequestManager {
             this.cadence = cadence;
         }
 
-    }
-
-    /**
-     * Method does remote opening. If image series, file is downloaded.
-     *
-     * @param server
-     * @param sourceId
-     *            sourceId of the requested image
-     * @param startTime
-     *            start time of the requested image
-     * @param endTime
-     *            end time of the requested image
-     * @param cadence
-     *            cadence between two frames
-     * @param message
-     *            display error message
-     * @return new view
-     * @throws IOException
-     */
-    public static View requestAndOpenRemoteFile(String server, int sourceId, long startTime, long endTime, int cadence, boolean message) throws IOException {
-        String fileRequest, jpipRequest;
-
-        if (startTime == endTime) {
-            fileRequest = DataSources.getServerSetting(server, "API.jp2images.path") + "sourceId=" + Integer.toString(sourceId) +
-                          "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
-            jpipRequest = fileRequest + "&jpip=true";
-            cadence = CADENCE_ANY;
-        } else {
-            fileRequest = DataSources.getServerSetting(server, "API.jp2series.path") + "sourceId=" + Integer.toString(sourceId) +
-                         "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
-            if (cadence != CADENCE_ANY) {
-                fileRequest += "&cadence=" + Integer.toString(cadence);
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof APIRequest) {
+                APIRequest r = (APIRequest) o;
+                return server.equals(r.server) && sourceId == r.sourceId && startTime == r.startTime && endTime == r.endTime && cadence == r.cadence;
             }
-            jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
+            return false;
         }
-        return requestData(jpipRequest, fileRequest, new APIRequest(server, sourceId, startTime, endTime, cadence), message);
+
+        @Override
+        public int hashCode() {
+            assert false : "hashCode not designed";
+            return 42;
+        }
+
+        String[] getRequests() {
+            String fileRequest, jpipRequest;
+            if (startTime == endTime) {
+                fileRequest = DataSources.getServerSetting(server, "API.jp2images.path") + "sourceId=" + Integer.toString(sourceId) +
+                                                           "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
+                jpipRequest = fileRequest + "&jpip=true";
+            } else {
+                fileRequest = DataSources.getServerSetting(server, "API.jp2series.path") + "sourceId=" + Integer.toString(sourceId) +
+                                                           "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
+                if (cadence != CADENCE_ANY) {
+                    fileRequest += "&cadence=" + Integer.toString(cadence);
+                }
+                jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
+            }
+            return new String[] { jpipRequest, fileRequest };
+        }
+
     }
 
-    private static View requestData(String _jpipRequest, String fileRequest, APIRequest apiRequest, boolean errorMessage) throws IOException {
+    public static View requestAndOpenRemoteFile(String server, int sourceId, long startTime, long endTime, int cadence, boolean errorMessage) throws IOException {
+        APIRequest apiRequest = new APIRequest(server, sourceId, startTime, endTime, cadence);
+        String[] reqStrings = apiRequest.getRequests();
+        String reqJPIP = reqStrings[0], reqDownload = reqStrings[1];
+
         try {
-            URL jpipRequest = new URL(_jpipRequest);
-            URI downloadUri = new URI(fileRequest);
+            URL jpipRequest = new URL(reqJPIP);
+            URI downloadUri = new URI(reqDownload);
             APIResponse response = new APIResponse(new DownloadStream(jpipRequest).getInput());
 
             // Could we handle the answer from the server
@@ -137,9 +131,9 @@ public class APIRequestManager {
                 }
             }
         } catch (MalformedURLException e) {
-            Log.error("APIRequestManager.requestData() > Malformed JPIP request URL: " + _jpipRequest);
+            Log.error("APIRequestManager.requestData() > Malformed JPIP request URL: " + reqJPIP);
         } catch (URISyntaxException e) {
-            Log.error("APIRequestManager.requestData() > URI syntax exception: " + fileRequest);
+            Log.error("APIRequestManager.requestData() > URI syntax exception: " + reqDownload);
         } catch (UnknownHostException e) {
             Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
             throw new IOException("Unknown Host: " + e.getMessage());
@@ -154,20 +148,6 @@ public class APIRequestManager {
         return null;
     }
 
-    /**
-     * Loads a new image located at the given URI.
-     *
-     * Depending on the file type, a different implementation of the View is
-     * chosen. If there is no implementation available for the given type, an
-     * exception is thrown.
-     *
-     * @param uri
-     *            URI representing the location of the image
-     * @param downloadURI
-     *            URI from which the whole file can be downloaded
-     * @return View containing the image
-     * @throws IOException
-     */
     public static View loadView(URI uri, URI downloadURI, APIRequest apiRequest) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI");
