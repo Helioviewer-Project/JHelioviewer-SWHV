@@ -20,31 +20,13 @@ import org.json.JSONTokener;
  * 
  */
 public class DefaultTable {
-    /**
-     * Singleton instance
-     */
-    private static DefaultTable singleton;
 
-    /**
-     * Returns the only instance of this class and will be initialize on the
-     * first use.
-     * 
-     * @return the only instance of this class.
-     * */
+    private static final DefaultTable instance = new DefaultTable();
+
     public static DefaultTable getSingletonInstance() {
-        if (singleton == null)
-            singleton = new DefaultTable();
-        return singleton;
+        return instance;
     }
 
-    /**
-     * List of rules to apply
-     */
-    private JSONArray colorRules;
-
-    /**
-     * Used as singleton
-     */
     private DefaultTable() {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(FileUtils.getResourceInputStream("/settings/colors.js"), "UTF-8"));
@@ -57,6 +39,11 @@ public class DefaultTable {
             Message.warn("Color Tables", "Error reading the configuration for the default color tables: " + e.getMessage() + "\n" + "There will be no default color tables applied.");
         }
     }
+
+    /**
+     * List of rules to apply
+     */
+    private JSONArray colorRules;
 
     /**
      * Gives back the default color table matching to the meta data
