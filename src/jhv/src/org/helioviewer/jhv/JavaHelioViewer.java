@@ -8,12 +8,10 @@ import java.util.TimeZone;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.logging.LogSettings;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
@@ -103,9 +101,6 @@ public class JavaHelioViewer {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                TimeUtils.getSingletonInstance(); // instantiate class
-                Sun.getSingletonInstance();
-
                 UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
 
                 Log.info("Start main window");

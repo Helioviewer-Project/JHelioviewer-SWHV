@@ -152,15 +152,4 @@ public class Sun {
         return 1.0e-6 * deltaTsec * (2.894 - 0.428 * sin2l - 0.37 * sin4l);
     }
 
-    private static Sun instance;
-
-    public static Sun getSingletonInstance() {
-        if (instance == null)
-            instance = new Sun();
-        return instance;
-    }
-
-    private Sun() {
-    }
-
 }

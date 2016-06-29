@@ -37,15 +37,4 @@ public class TimeUtils {
         return new Interval(new_start, new_end);
     }
 
-    private static TimeUtils instance;
-
-    public static TimeUtils getSingletonInstance() {
-        if (instance == null)
-            instance = new TimeUtils();
-        return instance;
-    }
-
-    private TimeUtils() {
-    }
-
 }
