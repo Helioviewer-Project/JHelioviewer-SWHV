@@ -42,8 +42,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private JCheckBox normalizeRadius;
     private DefaultsSelectionPanel defaultsPanel;
 
-    private final JButton acceptBtn;
-
     private final Settings settings = Settings.getSingletonInstance();
 
     public PreferencesDialog() {
@@ -68,7 +66,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         mainPanel.add(panel, BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        acceptBtn = new JButton("Save");
+        JButton acceptBtn = new JButton("Save");
         JButton cancelBtn = new JButton("Cancel");
 
         acceptBtn.addActionListener(new ActionListener() {
