@@ -16,14 +16,14 @@ import com.jogamp.newt.opengl.GLWindow;
 @SuppressWarnings("serial")
 public class ToggleFullscreenAction extends AbstractAction {
 
-    private final KeyStroke exitKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true);
-    private final KeyStroke playKey = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true);
+    private final KeyStroke exitKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    private final KeyStroke playKey = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
 
     public ToggleFullscreenAction() {
         super("Toggle Full Screen");
         putValue(SHORT_DESCRIPTION, "Toggle full screen");
 
-        KeyStroke toggleKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true);
+        KeyStroke toggleKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, toggleKey);
         KeyShortcuts.registerKey(toggleKey, this);
     }

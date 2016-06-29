@@ -31,7 +31,7 @@ public class OpenLocalFileAction extends AbstractAction {
         super("Open...");
         putValue(SHORT_DESCRIPTION, "Open new image");
 
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true);
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);
         KeyShortcuts.registerKey(key, this);
     }

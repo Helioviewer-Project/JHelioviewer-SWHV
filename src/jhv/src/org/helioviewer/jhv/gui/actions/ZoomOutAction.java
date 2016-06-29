@@ -24,7 +24,7 @@ public class ZoomOutAction extends AbstractAction {
         super("Zoom Out", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_OUT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_OUT)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom out");
 
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true);
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);
         KeyShortcuts.registerKey(key, this);
     }
