@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.math.IcoSphere;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
@@ -18,6 +19,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.APIRequestManager.APIRequest;
+import org.helioviewer.jhv.io.LoadRemoteTask;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
@@ -40,7 +42,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private final GLImage glImage = new GLImage();
     private final ImageLayerOptions optionsPanel;
 
-    private JHVWorker<?, ?> worker;
+    private LoadRemoteTask worker;
     private View view;
 
     private static final double vpScale = 0.035;
@@ -50,6 +52,13 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         ImageLayer imageLayer = new ImageLayer();
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
         return imageLayer;
+    }
+
+    public void load(APIRequest req) {
+        if (!req.equals(getAPIRequest())) {
+            worker = new LoadRemoteTask(this, req);
+            JHVGlobals.getExecutorService().execute(worker);
+        }
     }
 
     public void loadFailed() {
@@ -65,12 +74,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         optionsPanel = new ImageLayerOptions(this);
         ComponentUtils.setEnabled(optionsPanel, false);
         setVisible(true);
-    }
-
-    public void setWorker(JHVWorker<?, ?> _worker) {
-        if (worker != null)
-            worker.cancel(true);
-        worker = _worker;
     }
 
     @Override
