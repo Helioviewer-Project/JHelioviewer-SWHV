@@ -2,17 +2,7 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 
-/**
- * This class describes an Y-axis.
- *
- * @author Bram.Bourgoignie@oma.be
- */
-
 public class YAxis {
-
-    public enum YAxisLocation {
-        LEFT, RIGHT
-    }
 
     public double start;
     public double end;

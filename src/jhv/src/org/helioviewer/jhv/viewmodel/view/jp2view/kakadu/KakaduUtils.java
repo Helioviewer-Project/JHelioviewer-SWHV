@@ -54,29 +54,6 @@ public class KakaduUtils {
     }
 
     /**
-     * Converts a Rectangle object to a Kdu_dims object
-     *
-     * @param _rect
-     *            Rectangle to convert
-     * @return Kdu_dims equivalent to the given Rectangle
-     */
-    public static Kdu_dims rectangleToKdu_dims(Rectangle rect) {
-        Kdu_dims dims = null;
-        try {
-            dims = new Kdu_dims();
-            Kdu_coords pos = dims.Access_pos();
-            Kdu_coords siz = dims.Access_size();
-            pos.Set_x(rect.x);
-            pos.Set_y(rect.y);
-            siz.Set_x(rect.width);
-            siz.Set_y(rect.height);
-        } catch (KduException ex) {
-            ex.printStackTrace();
-        }
-        return dims;
-    }
-
-    /**
      * Converts a SubImage object to a Kdu_dims object
      *
      * @param _roi

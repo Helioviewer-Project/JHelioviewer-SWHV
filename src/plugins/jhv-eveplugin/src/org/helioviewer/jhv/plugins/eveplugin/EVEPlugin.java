@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin;
 
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 
@@ -83,10 +82,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         ImageViewerGui.getLeftContentPane().remove(timelinePluginPanel);
         ImageViewerGui.getLeftContentPane().revalidate();
         pluginPanes.remove(plotOne);
-    }
-
-    public static URL getResourceUrl(String name) {
-        return EVEPlugin.class.getResource(name);
     }
 
     @Override

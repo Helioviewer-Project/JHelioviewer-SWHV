@@ -161,7 +161,7 @@ public class PositionLoad {
         fireLoaded("Loading...");
 
         worker = new LoadPositionWorker(beginTime, endTime, observer);
-        worker.setThreadName("MAIN--GL3DPositionLoading");
+        worker.setThreadName("MAIN--PositionLoad");
         JHVGlobals.getExecutorService().execute(worker);
     }
 

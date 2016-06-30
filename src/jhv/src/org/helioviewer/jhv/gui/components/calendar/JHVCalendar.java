@@ -158,24 +158,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     }
 
     /**
-     * Set the date pattern. The date will be displayed in defined format.
-     *
-     * @param pattern
-     *            pattern how date should be displayed.
-     * @return boolean value if pattern is valid.
-     */
-    public boolean setDateFormat(String pattern) {
-        try {
-            dateFormat.applyPattern(pattern);
-            return true;
-        } catch (NullPointerException e1) {
-        } catch (IllegalArgumentException e2) {
-        }
-
-        return false;
-    }
-
-    /**
      * Sets the current date to the calendar component.
      *
      * @param date

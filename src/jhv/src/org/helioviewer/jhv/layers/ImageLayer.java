@@ -44,7 +44,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private LoadRemoteTask worker;
     private View view;
 
-    private static final double vpScale = 0.035;
     private static final String loading = "Loading...";
 
     public static ImageLayer createImageLayer() {
