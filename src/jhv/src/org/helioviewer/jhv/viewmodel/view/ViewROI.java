@@ -21,9 +21,7 @@ public class ViewROI {
 
     private static final Region unitRadius = new Region(-1, -1, 2, 2);
 
-    private static final ViewROI instance = new ViewROI();
-
-    private ViewROI() {
+    static {
         int count = 0;
         for (int i = 0; i <= resolution; i++) {
             for (int j = 0; j <= 1; j++) {

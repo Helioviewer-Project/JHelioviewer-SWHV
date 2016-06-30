@@ -48,7 +48,7 @@ public class APIRequestManager {
         public boolean equals(Object o) {
             if (o instanceof APIRequest) {
                 APIRequest r = (APIRequest) o;
-                return server.equals(r.server) && sourceId == r.sourceId && startTime == r.startTime && endTime == r.endTime && cadence == r.cadence;
+                return sourceId == r.sourceId && startTime == r.startTime && endTime == r.endTime && cadence == r.cadence && server.equals(r.server);
             }
             return false;
         }

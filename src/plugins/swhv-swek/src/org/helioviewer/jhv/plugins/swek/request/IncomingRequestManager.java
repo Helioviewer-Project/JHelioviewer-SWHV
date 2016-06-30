@@ -21,12 +21,12 @@ import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 
 public class IncomingRequestManager implements JHVEventCacheRequestHandler {
 
-    private static IncomingRequestManager instance;
+    private static final IncomingRequestManager instance = new IncomingRequestManager();
+
+    private IncomingRequestManager() {
+    }
 
     public static IncomingRequestManager getSingletonInstance() {
-        if (instance == null) {
-            instance = new IncomingRequestManager();
-        }
         return instance;
     }
 

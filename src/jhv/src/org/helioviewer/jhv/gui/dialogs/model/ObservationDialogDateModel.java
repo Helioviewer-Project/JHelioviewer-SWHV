@@ -45,10 +45,6 @@ public class ObservationDialogDateModel {
         }
     }
 
-    public long getStartTime() {
-        return startTime;
-    }
-
     public void setStartTime(long startTime, boolean byUser) {
         if (!startByUser) {
             startByUser = byUser;
@@ -57,10 +53,6 @@ public class ObservationDialogDateModel {
             this.startTime = startTime;
             fireStartTimeChanged();
         }
-    }
-
-    public long getEndTime() {
-        return endTime;
     }
 
     public void setEndTime(long endTime, boolean byUser) {

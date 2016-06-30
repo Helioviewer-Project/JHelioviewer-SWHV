@@ -20,7 +20,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
 public class UIGlobals {
 
-    private static UIGlobals instance = new UIGlobals();
+    private static final UIGlobals instance = new UIGlobals();
 
     private UIGlobals() {
         try {

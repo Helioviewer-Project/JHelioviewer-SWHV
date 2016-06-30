@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.pfssplugin;
 
-import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -61,10 +60,6 @@ public class PfssPlugin implements Plugin {
     public String getAboutLicenseText() {
         String description = "<p>The plugin uses the <a href=\"http://heasarc.gsfc.nasa.gov/docs/heasarc/fits/java/v1.0/\">FITS in Java</a> Library, licensed under a <a href=\"https://www.gnu.org/licenses/old-licenses/gpl-1.0-standalone.html\">GPL License</a>.";
         return description + "<p>The plugin uses the <a href=\"http://www.bzip.org\">Bzip2</a> Library, licensed under the <a href=\"http://opensource.org/licenses/bsd-license.php\">BSD License</a>.";
-    }
-
-    public static URL getResourceUrl(String name) {
-        return PfssPlugin.class.getResource(name);
     }
 
     @Override
