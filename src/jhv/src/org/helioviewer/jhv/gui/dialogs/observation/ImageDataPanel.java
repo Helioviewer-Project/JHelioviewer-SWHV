@@ -262,11 +262,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
 
         private long getStartTime() {
-            return (calendarStartDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textStartTime.getValue().getTime();
+            return (calendarStartDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textStartTime.getTime();
         }
 
         private long getEndTime() {
-            return (calendarEndDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textEndTime.getValue().getTime();
+            return (calendarEndDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textEndTime.getTime();
         }
 
         @Override

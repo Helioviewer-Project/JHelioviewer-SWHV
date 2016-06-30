@@ -227,11 +227,11 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     private void setEndTime(boolean applyChanges) {
-        positionLoad.setEndTime(endDatePicker.getTime() + endTimePicker.getValue().getTime(), applyChanges);
+        positionLoad.setEndTime(endDatePicker.getTime() + endTimePicker.getTime(), applyChanges);
     }
 
     private void setBeginTime(boolean applyChanges) {
-        positionLoad.setBeginTime(beginDatePicker.getTime() + beginTimePicker.getValue().getTime(), applyChanges);
+        positionLoad.setBeginTime(beginDatePicker.getTime() + beginTimePicker.getTime(), applyChanges);
     }
 
     @Override
