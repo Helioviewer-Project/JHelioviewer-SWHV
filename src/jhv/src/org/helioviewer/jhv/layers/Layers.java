@@ -65,6 +65,14 @@ public class Layers {
         return activeView;
     }
 
+    public static ImageLayer getImageLayerInViewport(int idx) {
+        for (View v : layers) {
+            if (v.getImageLayer().isVisible(idx))
+                return v.getImageLayer();
+        }
+        return null;
+    }
+
     public static void syncLayersSpan() {
         if (activeView != null) {
             APIRequest areq = activeView.getImageLayer().getAPIRequest();

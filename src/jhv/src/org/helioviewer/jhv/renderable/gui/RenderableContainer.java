@@ -233,15 +233,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         GLText.dispose(gl);
     }
 
-    public ImageLayer getViewportImageLayer(int idx) {
-        for (Renderable r : renderables) {
-            if (r instanceof ImageLayer && r.isVisible(idx)) {
-                return (ImageLayer) r;
-            }
-        }
-        return null;
-    }
-
     public void setRender(Camera camera, double factor) {
         for (Renderable r : renderables) {
             int i;

@@ -6,7 +6,6 @@ import java.awt.Component;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLText;
@@ -30,7 +29,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
 
         String text = Layers.getLastUpdatedTimestamp().toString();
         if (Displayer.multiview) {
-            ImageLayer im = ImageViewerGui.getRenderableContainer().getViewportImageLayer(vp.idx);
+            ImageLayer im = Layers.getImageLayerInViewport(vp.idx);
             if (im != null) {
                 text = im.getTimeString() + " " + im.getName();
             }

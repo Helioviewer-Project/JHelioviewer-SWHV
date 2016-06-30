@@ -145,9 +145,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     // Time Selection Panel
 
-    /**
-     * The panel bundles the components to select the start and end time.
-     * */
     private static class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
 
         private final TimeTextField textStartTime;
@@ -219,12 +216,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
             add(endTimePane);
         }
 
-        /**
-         * Set a new end date and time
-         *
-         * @param newEnd
-         *            new start date and time
-         */
         public void setEndTime(long endTime, boolean byUser) {
             calendarEndDate.setTime(endTime);
             textEndTime.setText(TimeUtils.timeDateFormat.format(endTime));
@@ -235,12 +226,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
             }
         }
 
-        /**
-         * Set a new start date and time
-         *
-         * @param newStart
-         *            new start date and time
-         */
         public void setStartTime(long startTime, boolean byUser) {
             calendarStartDate.setTime(startTime);
             textStartTime.setText(TimeUtils.timeDateFormat.format(startTime));
@@ -272,31 +257,14 @@ public class ImageDataPanel extends ObservationDialogPanel {
             }
         }
 
-        /**
-         * Checks if the selected start date is before or equal to selected end
-         * date.
-         *
-         * @return boolean value if selected start date is before or equal to
-         *         selected end date.
-         */
         boolean isStartTimeBeforeEndTime() {
             return calendarStartDate.getTime() <= calendarEndDate.getTime();
         }
 
-        /**
-         * Returns the selected start time.
-         *
-         * @return selected start time.
-         * */
         private long getStartTime() {
             return (calendarStartDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textStartTime.getValue().getTime();
         }
 
-        /**
-         * Returns the selected end time.
-         *
-         * @return selected end time.
-         */
         private long getEndTime() {
             return (calendarEndDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textEndTime.getValue().getTime();
         }
@@ -316,9 +284,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     // Cadence Panel
 
-    /**
-     * The panel bundles the components to select the cadence.
-     * */
     private static class CadencePanel extends JPanel implements ActionListener {
 
         private static final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
@@ -352,13 +317,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             }
         }
 
-        /**
-         * Returns the number of seconds of the selected cadence.
-         *
-         * If no cadence is specified, returns -1.
-         *
-         * @return number of seconds of the selected cadence.
-         * */
+        // Returns the number of seconds of the selected cadence
         public int getCadence() {
             int value = ((SpinnerNumberModel) spinnerCadence.getModel()).getNumber().intValue();
 
