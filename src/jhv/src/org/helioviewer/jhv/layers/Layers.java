@@ -67,10 +67,19 @@ public class Layers {
 
     public static ImageLayer getImageLayerInViewport(int idx) {
         for (View v : layers) {
-            if (v.getImageLayer().isVisible(idx))
-                return v.getImageLayer();
+            ImageLayer l = v.getImageLayer();
+            if (l.isVisible(idx))
+                return l;
         }
         return null;
+    }
+
+    public static void setRender(Camera camera, double factor) {
+        int i;
+        for (View v : layers) {
+            if ((i = v.getImageLayer().isVisibleIdx()) != -1)
+                v.render(camera, Displayer.getViewports()[i], factor);
+        }
     }
 
     public static void syncLayersSpan() {

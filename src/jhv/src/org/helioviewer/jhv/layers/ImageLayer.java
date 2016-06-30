@@ -166,11 +166,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         dispose(gl);
     }
 
-    public void setRender(Camera camera, Viewport vp, double factor) {
-        if (view != null)
-            view.render(camera, vp, factor);
-    }
-
     @Override
     public void prerender(GL2 gl) {
         if (imageData == null) {
