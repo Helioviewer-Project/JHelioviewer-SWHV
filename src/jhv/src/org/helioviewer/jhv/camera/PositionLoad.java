@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.ParseException;
-import java.util.Date;
 import java.util.Iterator;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -31,10 +30,8 @@ public class PositionLoad {
     private static final String target = "SUN";
     private String observer = "Earth";
 
-    private String beginDate = "2014-05-28T00:00:00";
-    private String endDate = "2014-05-28T00:00:00";
-    private Date beginDatems = new Date(0);
-    private Date endDatems = new Date();
+    private long beginTime = TimeUtils.EPOCH.milli;
+    private long endTime = TimeUtils.EPOCH.milli;
 
     private boolean isLoaded = false;
     private Position.L[] position;
@@ -49,32 +46,29 @@ public class PositionLoad {
     private class LoadPositionWorker extends JHVWorker<Position.L[], Void> {
 
         private String report = null;
-        private final String beginDate;
-        private final String endDate;
-        private final Date beginDatems;
-        private final Date endDatems;
+        private final long start;
+        private final long end;
         private final String observer;
 
-        public LoadPositionWorker(String _beginDate, String _endDate, Date _beginDatems, Date _endDatems, String _observer) {
-            beginDate = _beginDate;
-            endDate = _endDate;
-            beginDatems = _beginDatems;
-            endDatems = _endDatems;
-            observer = _observer;
+        public LoadPositionWorker(long start, long end, String observer) {
+            this.start = start;
+            this.end = end;
+            this.observer = observer;
         }
 
         @Override
-        protected Position.L[] backgroundWork() throws Exception {
+        protected Position.L[] backgroundWork() {
             Position.L[] ret = null;
             JSONObject result;
             try {
-                long deltat = 60, span = (endDatems.getTime() - beginDatems.getTime()) / 1000;
+                long deltat = 60, span = (end - start) / 1000;
                 final long max = 100000;
 
                 if (span / deltat > max)
                     deltat = span / max;
 
-                URL url = new URL(baseURL + "abcorr=LT%2BS&utc=" + beginDate + "&utc_end=" + endDate + "&deltat=" + deltat +
+                URL url = new URL(baseURL + "abcorr=LT%2BS&utc=" + TimeUtils.utcFullDateFormat.format(start) + 
+                                            "&utc_end=" + TimeUtils.utcFullDateFormat.format(end) + "&deltat=" + deltat +
                                             "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
                 DownloadStream ds = new DownloadStream(url, true);
 
@@ -166,7 +160,7 @@ public class PositionLoad {
         }
         fireLoaded("Loading...");
 
-        worker = new LoadPositionWorker(beginDate, endDate, beginDatems, endDatems, observer);
+        worker = new LoadPositionWorker(beginTime, endTime, observer);
         worker.setThreadName("MAIN--GL3DPositionLoading");
         JHVGlobals.getExecutorService().execute(worker);
     }
@@ -188,17 +182,15 @@ public class PositionLoad {
         requestData();
     }
 
-    public void setBeginDate(Date _beginDate, boolean applyChanges) {
-        beginDate = TimeUtils.utcFullDateFormat.format(_beginDate);
-        beginDatems = _beginDate;
+    public void setBeginTime(long beginTime, boolean applyChanges) {
+        this.beginTime = beginTime;
         if (applyChanges) {
             applyChanges();
         }
     }
 
-    public void setEndDate(Date _endDate, boolean applyChanges) {
-        endDate = TimeUtils.utcFullDateFormat.format(_endDate);
-        endDatems = _endDate;
+    public void setEndTime(long endTime, boolean applyChanges) {
+        this.endTime = endTime;
         if (applyChanges) {
             applyChanges();
         }
@@ -206,14 +198,6 @@ public class PositionLoad {
 
     public void fireLoaded(String state) {
         receiver.firePositionLoaded(state);
-    }
-
-    public Date getBeginDate() {
-        return beginDatems;
-    }
-
-    public Date getEndDate() {
-        return endDatems;
     }
 
     public long getStartTime() {
