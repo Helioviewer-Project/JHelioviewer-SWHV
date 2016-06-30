@@ -11,7 +11,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.Date;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -228,17 +227,11 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     private void setEndTime(boolean applyChanges) {
-        Date dt = endTimePicker.getValue();
-        Date end_date = new Date(endDatePicker.getTime() + dt.getTime());
-        positionLoad.setEndDate(end_date, applyChanges);
-        // Displayer.render();
+        positionLoad.setEndTime(endDatePicker.getTime() + endTimePicker.getValue().getTime(), applyChanges);
     }
 
     private void setBeginTime(boolean applyChanges) {
-        Date dt = beginTimePicker.getValue();
-        Date begin_date = new Date(beginDatePicker.getTime() + dt.getTime());
-        positionLoad.setBeginDate(begin_date, applyChanges);
-        // Displayer.render();
+        positionLoad.setBeginTime(beginDatePicker.getTime() + beginTimePicker.getValue().getTime(), applyChanges);
     }
 
     @Override
