@@ -245,7 +245,7 @@ public class Displayer implements JHVEventHighlightListener {
                 toDisplay = false;
             }
             if (renderFactor != -1) {
-                ImageViewerGui.getRenderableContainer().setRender(camera, renderFactor);
+                Layers.setRender(camera, renderFactor);
                 renderFactor = -1;
             }
         }

@@ -233,16 +233,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         GLText.dispose(gl);
     }
 
-    public void setRender(Camera camera, double factor) {
-        for (Renderable r : renderables) {
-            int i;
-            if (r instanceof ImageLayer && (i = r.isVisibleIdx()) != -1) {
-                ImageLayer im = (ImageLayer) r;
-                im.setRender(camera, Displayer.getViewports()[i], factor);
-            }
-        }
-    }
-
     public void arrangeMultiView(boolean multiview) {
         int ctImages = 0;
 
