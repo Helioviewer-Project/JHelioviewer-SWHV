@@ -106,13 +106,14 @@ public class RenderableContainerPanel extends JPanel {
                 layerAction.actionPerformed(new ActionEvent(this, 0, ""));
             }
         });
-        // addLayerButton.setBorder(null);
-        addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
+        addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 0));
+        addLayerButton.setHorizontalTextPosition(SwingConstants.TRAILING);
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
 
         final JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
+        multiview.setBorder(null);
         multiview.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -122,6 +123,7 @@ public class RenderableContainerPanel extends JPanel {
         });
 
         JButton syncSpanButton = new JButton(IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME));
+        syncSpanButton.setBorder(null);
         syncSpanButton.setToolTipText("Synchronize layers time span");
         syncSpanButton.setBorderPainted(false);
         syncSpanButton.setFocusPainted(false);
@@ -135,9 +137,9 @@ public class RenderableContainerPanel extends JPanel {
         });
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
-        addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
-        addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
-        addLayerButtonWrapper.add(syncSpanButton, BorderLayout.WEST);
+        addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
+        addLayerButtonWrapper.add(syncSpanButton, BorderLayout.CENTER);
+        addLayerButtonWrapper.add(multiview, BorderLayout.EAST);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
