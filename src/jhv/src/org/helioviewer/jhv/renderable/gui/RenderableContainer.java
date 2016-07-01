@@ -12,6 +12,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 
@@ -136,7 +137,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         fireListeners();
 
         if (Displayer.multiview) {
-            arrangeMultiView(true);
+            Layers.arrangeMultiView(true);
         }
     }
 
@@ -231,38 +232,6 @@ public class RenderableContainer implements TableModel, Reorderable {
             renderable.dispose(gl);
         }
         GLText.dispose(gl);
-    }
-
-    public void arrangeMultiView(boolean multiview) {
-        int ctImages = 0;
-
-        if (multiview) {
-            for (Renderable r : renderables) {
-                if (r instanceof ImageLayer && r.isVisible()) {
-                    ImageLayer im = (ImageLayer) r;
-                    r.setVisible(ctImages);
-                    im.setOpacity(1);
-                    ctImages++;
-                }
-            }
-        } else {
-            for (Renderable r : renderables) {
-                if (r instanceof ImageLayer && r.isVisible()) {
-                    ImageLayer im = (ImageLayer) r;
-                    r.setVisible(0);
-                    float opacity;
-                    if (im.getName().contains("LASCO") || im.getName().contains("COR"))
-                        opacity = 1;
-                    else {
-                        opacity = (float) (1. / (1. + ctImages));
-                        ctImages++;
-                    }
-                    im.setOpacity(opacity);
-                }
-            }
-        }
-        Displayer.reshapeAll();
-        Displayer.render(1);
     }
 
 }

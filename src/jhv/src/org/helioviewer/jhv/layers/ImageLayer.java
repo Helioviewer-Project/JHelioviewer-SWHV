@@ -98,12 +98,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     public void setVisible(boolean isVisible) {
         super.setVisible(isVisible);
         if (Displayer.multiview) {
-            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+            Layers.arrangeMultiView(true);
         }
-    }
-
-    private boolean isCor(String name) {
-        return name.contains("LASCO") || name.contains("COR");
     }
 
     private float opacity = -1;
@@ -121,14 +117,14 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         ImageViewerGui.getRenderableContainer().fireListeners();
 
         if (Displayer.multiview) {
-            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+            Layers.arrangeMultiView(true);
         } else if (opacity == -1) { // first time
-            if (isCor(view.getName()))
+            if (Layers.isCor(view.getName()))
                 opacity = 1;
             else {
                 int count = 0;
                 for (int i = 0; i < Layers.getNumLayers(); i++) {
-                    if (!isCor(Layers.getLayer(i).getName()))
+                    if (!Layers.isCor(Layers.getLayer(i).getName()))
                         count++;
                 }
                 opacity = (float) (1. / count);
@@ -160,7 +156,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
         unsetView();
         if (Displayer.multiview) {
-            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+            Layers.arrangeMultiView(true);
         }
         dispose(gl);
     }
@@ -369,7 +365,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         Displayer.display();
     }
 
-    public void setOpacity(float opacity) {
+    void setOpacity(float opacity) {
         optionsPanel.setOpacity(opacity);
     }
 
