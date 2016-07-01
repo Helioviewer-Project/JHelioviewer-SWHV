@@ -42,7 +42,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
         container.setMinimumSize(new Dimension());
         container.add(mainComponent, BorderLayout.CENTER);
 
-        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
+        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
         splitPane.setDividerSize(0);
         splitPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
         splitPane.setResizeWeight(0.75);

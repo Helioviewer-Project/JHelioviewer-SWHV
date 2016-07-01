@@ -117,7 +117,7 @@ public class ImageViewerGui {
         inputController = new InputController(glWindow);
         mainContentPanel = new MainContentPanel(glComponent);
 
-        JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
+        JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
         midSplitPane.setDividerSize(2);
         midSplitPane.setBorder(null);
 
