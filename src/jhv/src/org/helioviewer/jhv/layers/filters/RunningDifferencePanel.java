@@ -104,7 +104,6 @@ public class RunningDifferencePanel implements ChangeListener {
         addRadioButtons();
     }
 
-
     private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
         if (showExtraPanel) {
             radPanel.setVisible(true);

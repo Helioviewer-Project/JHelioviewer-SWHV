@@ -44,12 +44,9 @@ public class JHVGlobals {
 
     public static final int hiDpiCutoff = 1024;
 
-    private static ExecutorService executorService;
+    private static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("MAIN", 10);
 
     public static ExecutorService getExecutorService() {
-        if (executorService == null) {
-            executorService = JHVExecutor.getJHVWorkersExecutorService("MAIN", 10);
-        }
         return executorService;
     }
 

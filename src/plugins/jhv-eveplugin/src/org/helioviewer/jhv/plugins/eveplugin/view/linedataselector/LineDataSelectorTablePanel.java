@@ -112,14 +112,14 @@ public class LineDataSelectorTablePanel extends JPanel {
                 ObservationDialog.getInstance().showDialog(null, EVEPlugin.OBSERVATION_UI_NAME);
             }
         });
-        // addLayerButton.setBorder(null);
-        addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
+        addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 0));
+        addLayerButton.setHorizontalTextPosition(SwingConstants.TRAILING);
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
-        addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
+        addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
