@@ -10,6 +10,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -59,7 +60,7 @@ public class RunningDifferencePanel implements ChangeListener {
                 JHVGlobals.getExecutorService().execute(downloadTask);
             }
         });
-        downloadLayerButton.setBorder(null);
+        downloadLayerButton.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
         downloadLayerButton.setText(null);
         downloadLayerButton.setBorderPainted(false);
         downloadLayerButton.setFocusPainted(false);
@@ -77,7 +78,7 @@ public class RunningDifferencePanel implements ChangeListener {
                 dialog.showDialog();
             }
         });
-        showMetaButton.setBorder(null);
+        showMetaButton.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
         showMetaButton.setText(null);
         showMetaButton.setBorderPainted(false);
         showMetaButton.setFocusPainted(false);
@@ -98,6 +99,7 @@ public class RunningDifferencePanel implements ChangeListener {
 
         comboBox = new JComboBox(combolist);
         topPanel = new JPanel(new GridBagLayout());
+        topPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 0, 0));
         radPanel = new JPanel(new FlowLayout());
         radPanel.setVisible(false);
 

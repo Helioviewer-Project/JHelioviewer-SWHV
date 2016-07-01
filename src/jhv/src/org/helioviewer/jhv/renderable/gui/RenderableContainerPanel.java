@@ -112,16 +112,6 @@ public class RenderableContainerPanel extends JPanel {
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
 
-        final JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
-        multiview.setBorder(null);
-        multiview.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Displayer.multiview = multiview.isSelected();
-                Layers.arrangeMultiView(Displayer.multiview);
-            }
-        });
-
         JButton syncSpanButton = new JButton(IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME));
         syncSpanButton.setBorder(null);
         syncSpanButton.setToolTipText("Synchronize layers time span");
@@ -133,6 +123,17 @@ public class RenderableContainerPanel extends JPanel {
             public void actionPerformed(ActionEvent actionEvent) {
                 Layers.syncLayersSpan();
                 renderableContainer.fireListeners();
+            }
+        });
+
+        final JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
+        multiview.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
+        multiview.setHorizontalTextPosition(SwingConstants.LEADING);
+        multiview.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Displayer.multiview = multiview.isSelected();
+                Layers.arrangeMultiView(Displayer.multiview);
             }
         });
 
