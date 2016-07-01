@@ -117,7 +117,7 @@ public class RenderableContainerPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Displayer.multiview = multiview.isSelected();
-                ImageViewerGui.getRenderableContainer().arrangeMultiView(Displayer.multiview);
+                Layers.arrangeMultiView(Displayer.multiview);
             }
         });
 
