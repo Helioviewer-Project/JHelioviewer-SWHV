@@ -60,7 +60,7 @@ public class RunningDifferencePanel implements ChangeListener {
                 JHVGlobals.getExecutorService().execute(downloadTask);
             }
         });
-        downloadLayerButton.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+        downloadLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         downloadLayerButton.setText(null);
         downloadLayerButton.setBorderPainted(false);
         downloadLayerButton.setFocusPainted(false);
@@ -78,7 +78,7 @@ public class RunningDifferencePanel implements ChangeListener {
                 dialog.showDialog();
             }
         });
-        showMetaButton.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+        showMetaButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         showMetaButton.setText(null);
         showMetaButton.setBorderPainted(false);
         showMetaButton.setFocusPainted(false);
@@ -99,8 +99,9 @@ public class RunningDifferencePanel implements ChangeListener {
 
         comboBox = new JComboBox(combolist);
         topPanel = new JPanel(new GridBagLayout());
-        topPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 0, 0));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         radPanel = new JPanel(new FlowLayout());
+        radPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         radPanel.setVisible(false);
 
         addRadioButtons();

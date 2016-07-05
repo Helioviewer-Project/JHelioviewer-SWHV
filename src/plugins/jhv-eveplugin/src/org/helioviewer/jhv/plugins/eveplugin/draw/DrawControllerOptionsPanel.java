@@ -1,10 +1,11 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-import java.awt.FlowLayout;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 
@@ -28,7 +29,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
     }
 
     public DrawControllerOptionsPanel() {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        setLayout(new BorderLayout(0, 0));
 
         ZoomComboboxItem[] items = new ZoomComboboxItem[] {
             new ZoomComboboxItem(ZOOM.CUSTOM, 0),
@@ -45,18 +46,20 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
             new ZoomComboboxItem(ZOOM.Hour, 1)
         };
         zoomCombo = new JComboBox(items);
+        zoomCombo.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         zoomCombo.addActionListener(this);
 
         lockButton = new JToggleButton(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
+        lockButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         lockButton.setBorderPainted(false);
         lockButton.setFocusPainted(false);
         lockButton.setContentAreaFilled(false);
-        lockButton.setToolTipText("Synchronize movie and time series display");
+        lockButton.setToolTipText("Synchronize time series with movie");
         lockButton.setEnabled(Layers.getActiveView() != null);
         lockButton.addActionListener(this);
 
-        add(zoomCombo);
-        add(lockButton);
+        add(lockButton, BorderLayout.CENTER);
+        add(zoomCombo, BorderLayout.EAST);
 
         setSmall();
     }

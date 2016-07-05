@@ -50,7 +50,6 @@ public class LineDataSelectorTablePanel extends JPanel {
     private static final int REMOVE_COL = 4;
 
     private final JPanel optionsPanelWrapper;
-    private Component optionsPanel;
 
     public LineDataSelectorTablePanel() {
         setLayout(new GridBagLayout());
@@ -112,7 +111,7 @@ public class LineDataSelectorTablePanel extends JPanel {
                 ObservationDialog.getInstance().showDialog(null, EVEPlugin.OBSERVATION_UI_NAME);
             }
         });
-        addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 0));
+        addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         addLayerButton.setHorizontalTextPosition(SwingConstants.TRAILING);
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
@@ -120,6 +119,7 @@ public class LineDataSelectorTablePanel extends JPanel {
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
+        addLayerButtonWrapper.add(EVEPlugin.dc.getOptionsPanel(), BorderLayout.EAST);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
@@ -226,7 +226,6 @@ public class LineDataSelectorTablePanel extends JPanel {
         grid.setRowHeight(h);
 
         optionsPanelWrapper = new JPanel(new BorderLayout());
-        optionsPanelWrapper.add(EVEPlugin.dc.getOptionsPanel(), BorderLayout.PAGE_END);
 
         gc.gridy = 1;
         add(optionsPanelWrapper, gc);
@@ -242,9 +241,8 @@ public class LineDataSelectorTablePanel extends JPanel {
     }
 
     private void setOptionsPanel(LineDataSelectorElement lineDataElement) {
-        if (optionsPanel != null)
-            optionsPanelWrapper.remove(optionsPanel);
-        optionsPanel = lineDataElement.getOptionsPanel();
+        optionsPanelWrapper.removeAll();
+        Component optionsPanel = lineDataElement.getOptionsPanel();
         if (optionsPanel != null) {
             ComponentUtils.setEnabled(optionsPanel, lineDataElement.isVisible());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
