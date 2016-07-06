@@ -7,18 +7,12 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
-import com.jogamp.newt.Window;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 
 public class InputController implements MouseListener, KeyListener {
-
-    public InputController(Window window) {
-        window.addMouseListener(this);
-        window.addKeyListener(this);
-  }
 
     @Override
     public void mouseClicked(MouseEvent e) {
