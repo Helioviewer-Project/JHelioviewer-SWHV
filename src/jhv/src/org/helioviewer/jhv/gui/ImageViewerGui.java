@@ -21,6 +21,8 @@ import org.helioviewer.jhv.camera.InteractionPan;
 import org.helioviewer.jhv.camera.InteractionRotate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.input.NEWTKeyAdapter;
+import org.helioviewer.jhv.input.NEWTMouseAdapter;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
@@ -112,12 +114,14 @@ public class ImageViewerGui {
         glListener = new GLListener(glWindow);
         glWindow.addGLEventListener(glListener);
 
-        glComponent = new NewtCanvasAWT(glWindow);
+        inputController = new InputController();
+        glWindow.addMouseListener(new NEWTMouseAdapter(inputController));
+        glWindow.addKeyListener(new NEWTKeyAdapter(inputController));
 
-        inputController = new InputController(glWindow);
+        glComponent = new NewtCanvasAWT(glWindow);
         mainContentPanel = new MainContentPanel(glComponent);
 
-        JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+        JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
         midSplitPane.setDividerSize(2);
         midSplitPane.setBorder(null);
 
