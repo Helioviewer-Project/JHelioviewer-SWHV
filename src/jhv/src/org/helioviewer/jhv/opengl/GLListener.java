@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
+import java.awt.EventQueue;
+
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.scale.GridScale;
@@ -79,11 +81,16 @@ public class GLListener implements GLEventListener {
     }
 
     @Override
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        Displayer.setGLSize(x, y, width, height);
-        Displayer.reshapeAll();
-        ImageViewerGui.getRenderableMiniview().reshapeViewport();
-        Displayer.render(1);
+    public void reshape(GLAutoDrawable drawable, final int x, final int y, final int width, final int height) {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Displayer.setGLSize(x, y, width, height);
+                Displayer.reshapeAll();
+                ImageViewerGui.getRenderableMiniview().reshapeViewport();
+                Displayer.render(1);
+            }
+        });
     }
 
     private static void renderBlackCircle(GL2 gl, double[] matrix) {
@@ -161,6 +168,9 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) {
+        if (!EventQueue.isDispatchThread())
+            return;
+
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(surface);
 
