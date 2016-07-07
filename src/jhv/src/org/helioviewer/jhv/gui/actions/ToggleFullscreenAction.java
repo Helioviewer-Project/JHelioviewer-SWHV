@@ -40,14 +40,7 @@ public class ToggleFullscreenAction extends AbstractAction {
             KeyShortcuts.registerKey(playKey, MoviePanel.getPlayPauseAction());
         }
 
-        new Thread() {
-            @Override
-            public void run() {
-                Thread t = window.setExclusiveContextThread(null);
-                window.setFullscreen(!full);
-                window.setExclusiveContextThread(t);
-            }
-        }.start();
+        window.setFullscreen(!full);
     }
 
 }

@@ -37,8 +37,8 @@ public class MainContentPanel extends JPanel implements ActionListener {
         collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
         collapsiblePane.toggleButton.addActionListener(this);
 
-        // nest in a container to avoid crash of GLCanvas inside JSplitPane
-        final JPanel container = new JPanel(new BorderLayout());
+        // nest in a container to avoid crash of GL drawables inside JSplitPane
+        JPanel container = new JPanel(new BorderLayout());
         container.setMinimumSize(new Dimension());
         container.add(mainComponent, BorderLayout.CENTER);
 

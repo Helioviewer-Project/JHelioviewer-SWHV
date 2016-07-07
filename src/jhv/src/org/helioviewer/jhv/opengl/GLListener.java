@@ -56,7 +56,7 @@ public class GLListener implements GLEventListener {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         GLSLSolarShader.init(gl);
-        ImageViewerGui.getRenderableContainer().init(gl);
+        // ImageViewerGui.getRenderableContainer().init(gl); avoid NEDT
     }
 
     @Override
@@ -166,6 +166,8 @@ public class GLListener implements GLEventListener {
         }
     }
 
+    private boolean inited = false;
+
     @Override
     public void display(GLAutoDrawable drawable) {
         if (!EventQueue.isDispatchThread())
@@ -173,6 +175,11 @@ public class GLListener implements GLEventListener {
 
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(surface);
+
+        if (!inited) {
+            inited = true;
+            ImageViewerGui.getRenderableContainer().init(gl);
+        }
 
         ImageViewerGui.getRenderableContainer().prerender(gl);
 
