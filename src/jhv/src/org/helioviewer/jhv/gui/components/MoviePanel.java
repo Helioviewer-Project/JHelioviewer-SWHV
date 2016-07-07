@@ -296,7 +296,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // It is not included in the main Panel to save space if it is not shown
 
         // Speed
-        speedPanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT));
+        speedPanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         speedPanel.add(new JLabel("Speed", JLabel.RIGHT));
 
         int speedMin = 1, speedMax = 60;
@@ -320,7 +320,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         mainPanel.add(speedPanel);
 
         // Animation mode
-        modePanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT));
+        modePanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
 
         AnimationMode[] modi = { AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING };
@@ -332,7 +332,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         mainPanel.add(modePanel);
 
         recordPanel = new SmallPanel(new GridBagLayout());
-        recordPanel.setBorder(BorderFactory.createTitledBorder(" Recording "));
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -346,11 +345,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         final JRadioButton shotButton = new JRadioButton("Screenshot");
         final JRadioButton freeButton = new JRadioButton("Unlimited");
 
+        c.gridy = 0;
         c.gridx = 0;
-        recordPanel.add(loopButton, c);
+        recordPanel.add(new JLabel("Record", JLabel.RIGHT), c);
         c.gridx = 1;
-        recordPanel.add(shotButton, c);
+        recordPanel.add(loopButton, c);
         c.gridx = 2;
+        recordPanel.add(shotButton, c);
+        c.gridx = 3;
         recordPanel.add(freeButton, c);
 
         ButtonGroup group = new ButtonGroup();
@@ -375,7 +377,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         freeButton.addActionListener(recordModeListener);
 
         c.gridy = 1;
-        c.gridx = 1;
+        c.gridx = 2;
         recordPanel.add(new JLabel("Size", JLabel.RIGHT), c);
 
         RecordSize[] sizes = { RecordSize.ORIGINAL, RecordSize.H720, RecordSize.H1080 };
@@ -387,7 +389,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 recordButton.setRecordSize((RecordSize) (recordSizeCombo.getSelectedItem()));
             }
         });
-        c.gridx = 2;
+        c.gridx = 3;
         recordPanel.add(recordSizeCombo, c);
 
         mainPanel.add(recordPanel);
