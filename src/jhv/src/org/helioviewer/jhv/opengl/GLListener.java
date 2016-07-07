@@ -46,16 +46,13 @@ public class GLListener implements GLEventListener {
     @Override
     public void dispose(GLAutoDrawable drawable) {
         GLText.dispose();
-
-        final GLContext ctx = drawable.getContext();
-        final GL2 gl = ctx.getGL().getGL2();
+        final GL2 gl = drawable.getGL().getGL2();
 
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                ctx.makeCurrent();
                 disposeImpl(gl);
-                ctx.destroy();
+                GLInfo.checkGLErrors(gl, "GLListener.dispose()");
             }
         });
     }
