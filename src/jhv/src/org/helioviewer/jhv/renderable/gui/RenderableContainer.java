@@ -14,7 +14,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.helioviewer.jhv.opengl.GLText;
 
 import com.jogamp.opengl.GL2;
 
@@ -221,7 +220,6 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void init(GL2 gl) {
-        GLText.init(gl);
         for (Renderable renderable : renderables) {
             renderable.init(gl);
         }
@@ -231,7 +229,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         for (Renderable renderable : renderables) {
             renderable.dispose(gl);
         }
-        GLText.dispose(gl);
     }
 
 }

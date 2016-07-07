@@ -16,6 +16,7 @@ import org.helioviewer.jhv.layers.Layers;
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLEventListener;
 
 public class GLListener implements GLEventListener {
@@ -28,19 +29,50 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2(); // try to force an exception
+        final GLContext ctx = drawable.getContext();
+        final GL2 gl = ctx.getGL().getGL2();
+        final boolean multi = drawable.getChosenGLCapabilities().getNumSamples() != 0;
 
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ctx.makeCurrent();
+                initImpl(gl, multi);
+                ctx.release();
+            }
+        });
+    }
+
+    @Override
+    public void dispose(GLAutoDrawable drawable) {
+        GLText.dispose();
+
+        final GLContext ctx = drawable.getContext();
+        final GL2 gl = ctx.getGL().getGL2();
+
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ctx.makeCurrent();
+                disposeImpl(gl);
+                ctx.destroy();
+            }
+        });
+    }
+
+    private void initImpl(GL2 gl, boolean multi) {
         GLInfo.update(gl);
         GLInfo.updatePixelScale(surface);
 
         gl.glDisable(GL2.GL_TEXTURE_1D);
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
-        if (drawable.getChosenGLCapabilities().getNumSamples() == 0) {
+        if (multi)
+            gl.glEnable(GL2.GL_MULTISAMPLE);
+        else {
             gl.glEnable(GL2.GL_LINE_SMOOTH);
             gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
-        } else
-            gl.glEnable(GL2.GL_MULTISAMPLE);
+        }
 
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
@@ -56,12 +88,10 @@ public class GLListener implements GLEventListener {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         GLSLSolarShader.init(gl);
-        // ImageViewerGui.getRenderableContainer().init(gl); avoid NEDT
+        ImageViewerGui.getRenderableContainer().init(gl);
     }
 
-    @Override
-    public void dispose(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
+    private void disposeImpl(GL2 gl) {
         ImageViewerGui.getRenderableContainer().dispose(gl);
         GLSLSolarShader.dispose(gl);
     }
@@ -166,8 +196,6 @@ public class GLListener implements GLEventListener {
         }
     }
 
-    private boolean inited = false;
-
     @Override
     public void display(GLAutoDrawable drawable) {
         if (!EventQueue.isDispatchThread())
@@ -175,11 +203,6 @@ public class GLListener implements GLEventListener {
 
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(surface);
-
-        if (!inited) {
-            inited = true;
-            ImageViewerGui.getRenderableContainer().init(gl);
-        }
 
         ImageViewerGui.getRenderableContainer().prerender(gl);
 
