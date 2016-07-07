@@ -18,9 +18,6 @@ public class GLText {
     private static final int SIZE = (MAX - MIN) / STEP + 1;
     private static final TextRenderer[] renderer = new TextRenderer[SIZE];
 
-    public static void init(GL2 gl) {
-    }
-
     public static TextRenderer getRenderer(int size) {
         size *= GLInfo.pixelScale[1];
 
@@ -40,7 +37,7 @@ public class GLText {
         return renderer[idx];
     }
 
-    public static void dispose(GL2 gl) {
+    public static void dispose() {
         for (int i = 0; i < SIZE; i++) {
             if (renderer[i] != null) {
                 renderer[i].dispose();
