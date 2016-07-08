@@ -7,7 +7,7 @@ import com.jogamp.newt.event.MouseListener;
 
 public class NEWTMouseAdapter implements MouseListener {
 
-    private MouseListener l;
+    private final MouseListener l;
 
     public NEWTMouseAdapter(MouseListener l) {
         this.l = l;

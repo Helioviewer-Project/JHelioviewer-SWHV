@@ -27,6 +27,7 @@ import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -56,8 +57,28 @@ public class RenderableContainerPanel extends JPanel {
     public static final int NUMBER_COLUMNS = 4;
     private static final int NUMBEROFVISIBLEROWS = 7;
 
-    private final JTable grid;
+    private final RenderableContainerTable grid;
     private final JPanel optionsPanelWrapper;
+
+    private static class RenderableContainerTable extends JTable {
+
+        public RenderableContainerTable(TableModel tm) {
+            super(tm);
+        }
+
+        @Override
+        public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+            if (columnIndex != VISIBLE_COL && columnIndex != REMOVE_COL)
+                super.changeSelection(rowIndex, columnIndex, toggle, extend);
+            // otherwise prevent changing selection
+        }
+
+        @Override
+        public void clearSelection() {
+            // prevent losing selection
+        }
+
+    }
 
     public RenderableContainerPanel(final RenderableContainer renderableContainer) {
         setLayout(new GridBagLayout());
@@ -69,19 +90,7 @@ public class RenderableContainerPanel extends JPanel {
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
 
-        grid = new JTable(renderableContainer) {
-            @Override
-            public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                if (columnIndex != VISIBLE_COL && columnIndex != REMOVE_COL)
-                    super.changeSelection(rowIndex, columnIndex, toggle, extend);
-                // otherwise prevent changing selection
-            }
-
-            @Override
-            public void clearSelection() {
-                // prevent losing selection
-            }
-        };
+        grid = new RenderableContainerTable(renderableContainer);
 
         renderableContainer.addTableModelListener(new TableModelListener() {
             @Override
@@ -164,7 +173,6 @@ public class RenderableContainerPanel extends JPanel {
 
         grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new RenderableTimeCellRenderer());
         int timeWidth = (new JLabel("2000-01-01T00:00:00")).getPreferredSize().width;
-        grid.getColumnModel().getColumn(TIME_COL).setMaxWidth(timeWidth);
         grid.getColumnModel().getColumn(TIME_COL).setMinWidth(timeWidth);
 
         grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RenderableRemoveCellRenderer());

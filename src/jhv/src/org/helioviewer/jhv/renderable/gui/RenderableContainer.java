@@ -172,8 +172,8 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        renderables.add(rowIndex, (Renderable) aValue);
-        fireListeners();
+        // renderables.add(rowIndex, (Renderable) aValue);
+        // fireListeners();
     }
 
     @Override
@@ -213,10 +213,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
-    }
-
-    public int getRowIndex(Renderable renderable) {
-        return renderables.indexOf(renderable);
     }
 
     public void init(GL2 gl) {
