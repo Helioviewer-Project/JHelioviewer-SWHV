@@ -49,6 +49,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -587,6 +588,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 cacheChanged = false;
                 timeSlider.repaint();
             }
+            timeSlider.lazyRepaint();
+            ImageViewerGui.getRenderableContainerPanel().lazyRepaint();
 
             int f = 0;
             if (Layers.isMoviePlaying()) {
@@ -702,7 +705,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * This element provides its own look and feel. Therefore, it is independent
      * from the global look and feel.
      */
-    private static class TimeSlider extends JSlider {
+    private static class TimeSlider extends JSlider implements LazyComponent {
         /**
          * Default constructor
          *
@@ -723,6 +726,26 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // Overrides updateUI, to keep own SliderUI
         @Override
         public void updateUI() {
+        }
+
+        @Override
+        public void repaint() {
+            dirty = true;
+        }
+
+        @Override
+        public void repaint(int x, int y, int width, int height) {
+            dirty = true;
+        }
+
+        private boolean dirty = false;
+
+        @Override
+        public void lazyRepaint() {
+            if (dirty) {
+                super.repaint();
+                dirty = false;
+            }
         }
 
     }

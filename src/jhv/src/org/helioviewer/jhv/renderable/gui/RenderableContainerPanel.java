@@ -39,6 +39,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 
@@ -60,7 +61,11 @@ public class RenderableContainerPanel extends JPanel {
     private final RenderableContainerTable grid;
     private final JPanel optionsPanelWrapper;
 
-    private static class RenderableContainerTable extends JTable {
+    public void lazyRepaint() {
+        grid.lazyRepaint();
+    }
+
+    private static class RenderableContainerTable extends JTable implements LazyComponent {
 
         public RenderableContainerTable(TableModel tm) {
             super(tm);
@@ -76,6 +81,26 @@ public class RenderableContainerPanel extends JPanel {
         @Override
         public void clearSelection() {
             // prevent losing selection
+        }
+
+        @Override
+        public void repaint() {
+            dirty = true;
+        }
+
+        @Override
+        public void repaint(int x, int y, int width, int height) {
+            dirty = true;
+        }
+
+        private boolean dirty = false;
+
+        @Override
+        public void lazyRepaint() {
+            if (dirty) {
+                super.repaint();
+                dirty = false;
+            }
         }
 
     }
