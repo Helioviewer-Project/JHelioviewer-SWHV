@@ -67,6 +67,7 @@ public class ImageViewerGui {
     private static CarringtonStatusPanel carringtonStatus;
     private static FramerateStatusPanel framerateStatus;
 
+    private static RenderableContainerPanel renderableContainerPanel;
     private static RenderableContainer renderableContainer;
     private static RenderableViewpoint renderableViewpoint;
     private static RenderableGrid renderableGrid;
@@ -100,7 +101,7 @@ public class ImageViewerGui {
         renderableContainer.addRenderable(new RenderableTimeStamp());
         renderableMiniview = new RenderableMiniview();
         renderableContainer.addRenderable(renderableMiniview);
-        RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
+        renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
 
         leftPane.add("Image Layers", renderableContainerPanel, true);
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -245,6 +246,10 @@ public class ImageViewerGui {
 
     public static RenderableContainer getRenderableContainer() {
         return renderableContainer;
+    }
+
+    public static RenderableContainerPanel getRenderableContainerPanel() {
+        return renderableContainerPanel;
     }
 
     public static void setCurrentInteraction(Interaction _currentInteraction) {

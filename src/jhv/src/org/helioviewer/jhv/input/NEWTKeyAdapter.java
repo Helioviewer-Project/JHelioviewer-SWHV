@@ -7,7 +7,7 @@ import com.jogamp.newt.event.KeyListener;
 
 public class NEWTKeyAdapter implements KeyListener {
 
-    private KeyListener l;
+    private final KeyListener l;
 
     public NEWTKeyAdapter(KeyListener l) {
         this.l = l;
