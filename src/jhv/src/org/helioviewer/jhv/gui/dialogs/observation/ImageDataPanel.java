@@ -69,8 +69,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
         } else if (first) {
             first = false;
 
-            timeSelectionPanel.setStartTime(item.end - TimeUtils.DAY_IN_MILLIS, false);
-            timeSelectionPanel.setEndTime(item.end + getCadence() * 1000L, false);
+            timeSelectionPanel.setStartTime(item.end - 2 * TimeUtils.DAY_IN_MILLIS, false);
+            timeSelectionPanel.setEndTime(item.end, false);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
                 loadRemote(null, item);
