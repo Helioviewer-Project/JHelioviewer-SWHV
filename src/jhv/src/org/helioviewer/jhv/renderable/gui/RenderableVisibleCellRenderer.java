@@ -7,7 +7,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
 @SuppressWarnings("serial")
-public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
+public class RenderableVisibleCellRenderer extends RenderableTableCellRenderer {
 
     @Override
     public void setValue(Object value) {
@@ -21,7 +21,6 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
                 setToolTipText("Click to show");
             }
         }
-        setText(null);
         setHorizontalAlignment(SwingConstants.CENTER);
         setBorder(RenderableContainerPanel.commonBorder);
     }

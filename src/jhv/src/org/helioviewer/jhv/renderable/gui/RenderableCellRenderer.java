@@ -1,12 +1,10 @@
 package org.helioviewer.jhv.renderable.gui;
 
-import javax.swing.table.DefaultTableCellRenderer;
-
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
 
 @SuppressWarnings("serial")
-public class RenderableCellRenderer extends DefaultTableCellRenderer {
+public class RenderableCellRenderer extends RenderableTableCellRenderer {
 
     @Override
     public void setValue(Object value) {
