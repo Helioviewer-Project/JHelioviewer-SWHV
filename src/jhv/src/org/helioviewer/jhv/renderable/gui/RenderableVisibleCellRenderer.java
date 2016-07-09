@@ -1,28 +1,36 @@
 package org.helioviewer.jhv.renderable.gui;
 
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.Component;
 
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 
 @SuppressWarnings("serial")
 public class RenderableVisibleCellRenderer extends RenderableTableCellRenderer {
 
+    private final JCheckBox checkBox = new JCheckBox();
+
+    public RenderableVisibleCellRenderer() {
+        checkBox.setHorizontalAlignment(SwingConstants.CENTER);
+        checkBox.putClientProperty("JComponent.sizeVariant", "mini");
+        checkBox.setBorderPainted(true);
+        checkBox.setBorder(RenderableContainerPanel.commonBorder);
+    }
+
     @Override
-    public void setValue(Object value) {
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof Renderable) {
-            Renderable renderable = (Renderable) value;
-            if (renderable.isVisible()) {
-                setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
-                setToolTipText("Click to hide");
-            } else {
-                setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
-                setToolTipText("Click to show");
-            }
+            checkBox.setBackground(label.getBackground());
+            checkBox.setSelected(((Renderable) value).isVisible());
+            return checkBox;
         }
-        setHorizontalAlignment(SwingConstants.CENTER);
-        setBorder(RenderableContainerPanel.commonBorder);
+
+        label.setBorder(RenderableContainerPanel.commonBorder);
+        return label;
     }
 
 }
