@@ -41,7 +41,7 @@ public class LineDataSelectorTablePanel extends JPanel {
 
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
-    private static final int ICON_WIDTH = 20;
+    private static final int ICON_WIDTH = 12;
 
     private static final int VISIBLE_COL = 0;
     private static final int TITLE_COL = 1;
@@ -150,7 +150,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         grid.getColumnModel().getColumn(LOADING_COL).setPreferredWidth(20);
         grid.getColumnModel().getColumn(LOADING_COL).setMaxWidth(20);
 
-        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RemoveCellRenderer());
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RemoveCellRenderer(ICON_WIDTH));
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 

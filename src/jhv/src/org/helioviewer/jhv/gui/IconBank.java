@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 
 import javax.swing.ImageIcon;
 
@@ -109,9 +108,12 @@ public class IconBank {
      *            enum which represents the image
      * @return the image icon of the given enum
      * */
-    public static ImageIcon getIcon(JHVIcon _icon) {
-        URL imgURL = FileUtils.getResourceUrl(RESOURCE_PATH + _icon.getFilename());
-        return new ImageIcon(imgURL);
+    public static ImageIcon getIcon(JHVIcon icon) {
+        return new ImageIcon(FileUtils.getResourceUrl(RESOURCE_PATH + icon.getFilename()));
+    }
+
+    public static ImageIcon getIcon(JHVIcon icon, int w, int h) {
+        return new ImageIcon(getIcon(icon).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH));
     }
 
     /**

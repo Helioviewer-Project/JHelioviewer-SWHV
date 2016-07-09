@@ -48,7 +48,7 @@ public class RenderableContainerPanel extends JPanel {
 
     static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
-    private static final int ICON_WIDTH = 20;
+    private static final int ICON_WIDTH = 12;
 
     private static final int VISIBLE_COL = 0;
     private static final int TITLE_COL = 1;
@@ -200,7 +200,7 @@ public class RenderableContainerPanel extends JPanel {
         int timeWidth = (new JLabel("2000-01-01T00:00:00")).getPreferredSize().width;
         grid.getColumnModel().getColumn(TIME_COL).setMinWidth(timeWidth);
 
-        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RenderableRemoveCellRenderer());
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RenderableRemoveCellRenderer(ICON_WIDTH));
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 

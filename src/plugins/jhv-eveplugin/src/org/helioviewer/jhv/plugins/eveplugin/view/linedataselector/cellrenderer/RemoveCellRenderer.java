@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer;
 
+import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -11,19 +12,21 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 @SuppressWarnings("serial")
 public class RemoveCellRenderer extends DefaultTableCellRenderer {
 
+    private final ImageIcon icon;
+
+    public RemoveCellRenderer(int w) {
+        icon = IconBank.getIcon(JHVIcon.REMOVE_LAYER, w, w);
+    }
+
     @Override
     public void setValue(Object value) {
         if (value instanceof LineDataSelectorElement) {
-            LineDataSelectorElement lineDataElement = (LineDataSelectorElement) value;
-            if (lineDataElement.isDeletable()) {
-                setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-                setToolTipText("Click to remove");
+            if (((LineDataSelectorElement) value).isDeletable()) {
+                setIcon(icon);
             } else {
                 setIcon(null);
-                setToolTipText(null);
             }
         }
-        setText(null);
         setHorizontalAlignment(SwingConstants.CENTER);
         setBorder(LineDataSelectorTablePanel.commonBorder);
     }
