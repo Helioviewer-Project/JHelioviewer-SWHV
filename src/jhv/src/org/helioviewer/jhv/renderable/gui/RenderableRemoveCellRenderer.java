@@ -13,18 +13,14 @@ public class RenderableRemoveCellRenderer extends RenderableTableCellRenderer {
 
     public RenderableRemoveCellRenderer(int w) {
         icon = IconBank.getIcon(JHVIcon.REMOVE_LAYER, w, w);
+        setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     @Override
     public void setValue(Object value) {
         if (value instanceof Renderable) {
-            if (((Renderable) value).isDeletable()) {
-                setIcon(icon);
-            } else {
-                setIcon(null);
-            }
+            setIcon(((Renderable) value).isDeletable() ? icon : null);
         }
-        setHorizontalAlignment(SwingConstants.CENTER);
         setBorder(RenderableContainerPanel.commonBorder);
     }
 
