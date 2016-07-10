@@ -197,7 +197,7 @@ public class RenderableContainerPanel extends JPanel {
         grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new RenderableCellRenderer());
 
         grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new RenderableTimeCellRenderer());
-        int timeWidth = (new JLabel("2000-01-01T00:00:00")).getPreferredSize().width;
+        int timeWidth = new JLabel("2000-01-01T00:00:00").getPreferredSize().width;
         grid.getColumnModel().getColumn(TIME_COL).setMinWidth(timeWidth);
 
         grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RenderableRemoveCellRenderer(ICON_WIDTH));
