@@ -16,18 +16,14 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
 
     public RemoveCellRenderer(int w) {
         icon = IconBank.getIcon(JHVIcon.REMOVE_LAYER, w, w);
+        setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     @Override
     public void setValue(Object value) {
         if (value instanceof LineDataSelectorElement) {
-            if (((LineDataSelectorElement) value).isDeletable()) {
-                setIcon(icon);
-            } else {
-                setIcon(null);
-            }
+            setIcon(((LineDataSelectorElement) value).isDeletable() ? icon : null);
         }
-        setHorizontalAlignment(SwingConstants.CENTER);
         setBorder(LineDataSelectorTablePanel.commonBorder);
     }
 

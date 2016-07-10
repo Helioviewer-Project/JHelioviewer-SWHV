@@ -28,7 +28,6 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
             if (c != null && ldse instanceof Band) {
                 lineColorPanel.setLineColor(c);
                 lineColorPanel.setBackground(label.getBackground());
-                lineColorPanel.setBorder(LineDataSelectorTablePanel.commonBorder);
                 return lineColorPanel;
             }
         }
@@ -41,6 +40,10 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
     private static class LineColorPanel extends JPanel {
 
         private Color c;
+
+        public LineColorPanel() {
+            setBorder(LineDataSelectorTablePanel.commonBorder);
+        }
 
         public void setLineColor(Color c) {
             this.c = c;
