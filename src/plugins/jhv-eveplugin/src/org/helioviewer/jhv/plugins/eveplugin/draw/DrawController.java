@@ -254,7 +254,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public int getMovieLinePosition() {
-        int movieLinePosition = -1;
+        int movieLinePosition;
         if (latestMovieTime == Long.MIN_VALUE) {
             movieLinePosition = -1;
         } else {

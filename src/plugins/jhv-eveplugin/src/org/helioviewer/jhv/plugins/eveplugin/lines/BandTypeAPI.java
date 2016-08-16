@@ -145,15 +145,17 @@ public class BandTypeAPI {
     }
 
     private void updateDatasets() {
-        try {
-            String jsonString = readJSON();
-            JSONObject jsonmain = new JSONObject(jsonString);
-            JSONArray jsonGroupArray = (JSONArray) jsonmain.get("groups");
-            updateBandGroups(jsonGroupArray);
-            JSONArray jsonObjectArray = (JSONArray) jsonmain.get("objects");
-            updateBandTypes(jsonObjectArray);
-        } catch (JSONException e) {
-            Log.error("JSON parsing error", e);
+        String jsonString = readJSON();
+        if (jsonString != null) {
+            try {
+                JSONObject jsonmain = new JSONObject(jsonString);
+                JSONArray jsonGroupArray = (JSONArray) jsonmain.get("groups");
+                updateBandGroups(jsonGroupArray);
+                JSONArray jsonObjectArray = (JSONArray) jsonmain.get("objects");
+                updateBandTypes(jsonObjectArray);
+            } catch (JSONException e) {
+                Log.error("JSON parsing error", e);
+            }
         }
     }
 
