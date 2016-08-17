@@ -96,4 +96,8 @@ public class ImageLayerOptions extends SmallPanel {
         return imageLayer.getView();
     }
 
+    public void setAutoContrast(boolean b) {
+        imageLayer.setAutoContrast(b);
+    }
+
 }

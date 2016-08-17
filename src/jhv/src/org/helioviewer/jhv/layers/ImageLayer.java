@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 import java.awt.geom.Rectangle2D;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -332,6 +333,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private ImageData prevImageData;
     private ImageData baseImageData;
 
+    private boolean autoContrast = false;
+    private static final double CONTRAST_F1 = 0.001;
+    private static final double CONTRAST_F2 = 128 + 64 + 32;
+
     private void setImageData(ImageData newImageData) {
         int frame = newImageData.getMetaData().getFrameNumber();
         if (frame == 0) {
@@ -345,6 +350,45 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
 
         imageData = newImageData;
+
+        if (autoContrast && imageData != null && imageData.getBuffer() instanceof ByteBuffer) {
+            autoContrast(((ByteBuffer) imageData.getBuffer()).array());
+        }
+    }
+
+    private void autoContrast(byte[] ba) {
+        int len = ba.length;
+        int[] histogram = new int[256];
+        for (int i = 0; i < len; i++) {
+            histogram[getUnsigned(ba[i])]++;
+        }
+
+        long ct = 0;
+        int j;
+        for (j = 255; j >= 0; j--) {
+            ct += histogram[j];
+            if (ct > CONTRAST_F1 * len) {
+                break;
+            }
+        }
+
+        double factor = CONTRAST_F2 / j;
+        // System.out.println(">>> " + factor + " " + j);
+        if (j != 0 && factor > 1) {
+            if (factor > 2)
+                factor = 2;
+            for (int i = 0; i < len; i++) {
+                ba[i] = clipByte((int) (getUnsigned(ba[i]) * factor + 0.5));
+            }
+        }
+    }
+
+    private static final int getUnsigned(byte b) {
+        return (b + 256) & 0xFF;
+    }
+
+    private static final byte clipByte(int val) {
+        return val < 0 ? (byte) 0 : (val > 255 ? (byte) 255 : (byte) (val & 0xFF));
     }
 
     public ImageData getImageData() {
@@ -367,6 +411,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     void setOpacity(float opacity) {
         optionsPanel.setOpacity(opacity);
+    }
+
+    void setAutoContrast(boolean b) {
+        autoContrast = b;
     }
 
     GLImage getGLImage() {
