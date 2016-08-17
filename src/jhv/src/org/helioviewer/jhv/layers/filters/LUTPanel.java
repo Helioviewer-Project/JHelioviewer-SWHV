@@ -12,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.border.Border;
 import javax.swing.border.BevelBorder;
 
 import org.helioviewer.jhv.base.lut.LUT;
@@ -24,6 +25,8 @@ public class LUTPanel implements ActionListener, FilterDetails {
 
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
     private static final Icon enhanceIcon = IconBank.getIcon(JHVIcon.LAYER_IMAGE);
+    private static final Border loweredBorder = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+    private static final Border raisedBorder = BorderFactory.createBevelBorder(BevelBorder.RAISED);
 
     private final Map<String, LUT> lutMap;
 
@@ -42,12 +45,12 @@ public class LUTPanel implements ActionListener, FilterDetails {
 
         invertButton = new JToggleButton(invertIcon);
         invertButton.setToolTipText("Invert color table");
-        invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        invertButton.setBorder(raisedBorder);
         invertButton.addActionListener(this);
 
         enhanceButton = new JToggleButton(enhanceIcon);
         enhanceButton.setToolTipText("Enhance off-disk corona");
-        enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        enhanceButton.setBorder(raisedBorder);
         enhanceButton.addActionListener(this);
 
         buttonPanel = new JPanel();
@@ -58,11 +61,11 @@ public class LUTPanel implements ActionListener, FilterDetails {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == invertButton) {
-            invertButton.setBorder(BorderFactory.createBevelBorder(invertButton.isSelected() ? BevelBorder.LOWERED : BevelBorder.RAISED));
+            invertButton.setBorder(invertButton.isSelected() ? loweredBorder : raisedBorder);
         } else if (e.getSource() == enhanceButton) {
             boolean isSelected = enhanceButton.isSelected();
             ((ImageLayerOptions) getComponent().getParent()).getGLImage().setEnhanced(isSelected);
-            enhanceButton.setBorder(BorderFactory.createBevelBorder(isSelected ? BevelBorder.LOWERED : BevelBorder.RAISED));
+            enhanceButton.setBorder(isSelected ? loweredBorder : raisedBorder);
         }
 
         LUT newMap = lutMap.get(combobox.getSelectedItem());
