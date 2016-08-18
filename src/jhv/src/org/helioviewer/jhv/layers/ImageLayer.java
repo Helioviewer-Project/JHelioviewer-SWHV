@@ -373,7 +373,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
 
         double factor = CONTRAST_F2 / j;
-        // System.out.println(">>> " + factor + " " + j);
+        // System.out.println(">> " + factor + " " + j);
         if (j != 0 && factor > 1) {
             if (factor > 2)
                 factor = 2;
@@ -388,7 +388,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     private static final byte clipByte(int val) {
-        return val < 0 ? (byte) 0 : (val > 255 ? (byte) 255 : (byte) (val & 0xFF));
+        return val > 255 ? (byte) 255 : (byte) (val & 0xFF);
     }
 
     public ImageData getImageData() {
