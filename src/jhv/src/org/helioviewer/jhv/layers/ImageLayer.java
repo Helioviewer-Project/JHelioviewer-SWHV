@@ -351,7 +351,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
         imageData = newImageData;
 
-        if (autoContrast && imageData != null && imageData.getBuffer() instanceof ByteBuffer) {
+        if (autoContrast && imageData.getBuffer() instanceof ByteBuffer) {
             autoContrast(((ByteBuffer) imageData.getBuffer()).array());
         }
     }

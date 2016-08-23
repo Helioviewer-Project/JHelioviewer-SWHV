@@ -72,6 +72,9 @@ public class GimpGradient {
 
         for (int i = 0; i < nSeg; i++) {
             ln = ggr.readLine();
+            if (ln == null)
+                throw new Exception("EOF reached before reading all segments");
+
             String[] nL = ln.split(" ");
             // Either all exist or the last may not
             if (nL.length == 15)
