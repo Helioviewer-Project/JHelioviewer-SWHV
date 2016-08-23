@@ -36,16 +36,23 @@ public class Settings {
             defaultProperties.clear();
             userProperties.clear();
 
-            InputStream defaultPropStream = FileUtils.getResourceInputStream("/settings/defaults.properties");
-            defaultProperties.load(defaultPropStream);
-            defaultPropStream.close();
+            InputStream is = FileUtils.getResourceInputStream("/settings/defaults.properties");
+            try {
+                defaultProperties.load(is);
+            } finally {
+                is.close();
+            }
+
             if (verbose) {
                 Log.debug("Settings.load() > Load default system settings: " + defaultProperties);
             }
             if (propFile.exists()) {
                 FileInputStream fileInput = new FileInputStream(propFile);
-                userProperties.load(fileInput);
-                fileInput.close();
+                try {
+                    userProperties.load(fileInput);
+                } finally {
+                    fileInput.close();
+                }
             }
 
             if (getProperty("default.save.path") == null) {
@@ -74,8 +81,11 @@ public class Settings {
         try {
             propFile.createNewFile();
             FileOutputStream fileOutput = new FileOutputStream(propFile);
-            props.store(fileOutput, null);
-            fileOutput.close();
+            try {
+                props.store(fileOutput, null);
+            } finally {
+                fileOutput.close();
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -92,8 +102,11 @@ public class Settings {
         try {
             if (propFile.exists()) {
                 FileInputStream fileInput = new FileInputStream(propFile);
-                props.load(fileInput);
-                fileInput.close();
+                try {
+                    props.load(fileInput);
+                } finally {
+                    fileInput.close();
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();

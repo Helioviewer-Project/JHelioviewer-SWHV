@@ -76,7 +76,7 @@ public class ARGBInt32ImageData extends AbstractImageData {
      *            source image
      */
     private void readImageTransportFromBufferedImage(BufferedImage newImage) {
-        int[] outputData = null;
+        int[] outputData = new int[1];
 
         DataBuffer dataBuffer = newImage.getRaster().getDataBuffer();
         if (dataBuffer instanceof DataBufferInt) {

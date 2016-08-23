@@ -12,11 +12,15 @@ public class JHVLoader {
 
     public static void loadBundledPlugin(String name) throws IOException {
         InputStream is = JavaHelioViewer.class.getResourceAsStream("/plugins/" + name);
-        String path = JHVDirectory.PLUGINS.getPath() + name;
-        File f = new File(path);
+        try {
+            String path = JHVDirectory.PLUGINS.getPath() + name;
+            File f = new File(path);
 
-        FileUtils.save(is, f);
-        PluginManager.getSingletonInstance().loadPlugin(f.toURI());
+            FileUtils.save(is, f);
+            PluginManager.getSingletonInstance().loadPlugin(f.toURI());
+        } finally {
+            is.close();
+        }
     }
 
     public static void copyKDULibs() throws IOException {
@@ -58,11 +62,13 @@ public class JHVLoader {
 
         for (String kduLib : kduLibs) {
             InputStream is = JavaHelioViewer.class.getResourceAsStream("/natives/" + pathlib + kduLib);
-            String path = JHVDirectory.LIBS.getPath() + kduLib;
-            File f = new File(path);
-
-            FileUtils.save(is, f);
-            System.load(f.getAbsolutePath());
+            try {
+                File f = new File(JHVDirectory.LIBS.getPath() + kduLib);
+                FileUtils.save(is, f);
+                System.load(f.getAbsolutePath());
+            } finally {
+                is.close();
+            }
         }
     }
 
