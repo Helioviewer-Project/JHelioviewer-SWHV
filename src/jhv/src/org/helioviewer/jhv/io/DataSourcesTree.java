@@ -139,9 +139,11 @@ public class DataSourcesTree extends JTree {
 
     @Override
     public String getToolTipText(MouseEvent e) {
-        if (getRowForLocation(e.getX(), e.getY()) == -1)
+        TreePath path;
+        if (getRowForLocation(e.getX(), e.getY()) == -1 || (path = getPathForLocation(e.getX(), e.getY())) == null)
             return null;
-        Object obj = ((DefaultMutableTreeNode) getPathForLocation(e.getX(), e.getY()).getLastPathComponent()).getUserObject();
+
+        Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
         if (obj instanceof Item)
             return ((Item) obj).description;
         return null;
