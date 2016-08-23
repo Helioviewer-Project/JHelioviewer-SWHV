@@ -64,12 +64,14 @@ public class GimpGradient {
         ln = ggr.readLine();
         if (ln == null || !ln.startsWith("Name: "))
             throw new Exception("Not a GIMP gradient file");
-
         name = ln.substring(6);
-        ln = ggr.readLine();
-        int nSeg = Integer.parseInt(ln);
-        segments = new ArrayList<GimpGradientSegment>(nSeg);
 
+        ln = ggr.readLine();
+        int nSeg;
+        if (ln == null || (nSeg = Integer.parseInt(ln)) <= 0)
+            throw new Exception("GIMP gradient file parsing error");
+
+        segments = new ArrayList<GimpGradientSegment>(nSeg);
         for (int i = 0; i < nSeg; i++) {
             ln = ggr.readLine();
             if (ln == null)

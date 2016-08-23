@@ -125,7 +125,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         JHVDate start = Layers.getStartDate();
         JHVDate end = Layers.getEndDate();
         if (start != null && end != null) {
-            Interval movieInterval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
+            Interval movieInterval = new Interval(start.milli, end.milli);
 
             if (movieInterval.containsPointInclusive(time)) {
                 return movieInterval;
