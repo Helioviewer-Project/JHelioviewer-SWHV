@@ -46,7 +46,7 @@ public class FITSImage implements MetaDataContainer {
         // get basic information from file
         BasicHDU hdu = fits.readHDU();
         if (hdu == null)
-            throw new Exception("Could not read FITS " + url);
+            throw new Exception("Could not read FITS: " + url);
 
         int bitsPerPixel = hdu.getBitPix();
         header = hdu.getHeader();
