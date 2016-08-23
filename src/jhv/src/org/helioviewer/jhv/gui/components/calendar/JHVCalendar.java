@@ -120,7 +120,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
         // memorize the selected date if a date is available
         // at the current view controller
         Date date = null;
-
         if (calendarViewController != null)
             date = calendarViewController.getDate();
 
@@ -511,8 +510,9 @@ public class JHVCalendar extends JPanel implements ComponentListener {
             if (displayMode == DisplayMode.DAYS)
                 headerHeight = table.getTableHeader().getHeight();
 
-            int rowHeight = (table.getHeight() - headerHeight) / table.getRowCount();
-            if (rowHeight > 0)
+            int rowCount = table.getRowCount();
+            int rowHeight;
+            if (rowCount > 0 && (rowHeight = (table.getHeight() - headerHeight) / rowCount) > 0)
                 table.setRowHeight(rowHeight);
         }
 
@@ -556,30 +556,18 @@ public class JHVCalendar extends JPanel implements ComponentListener {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void mouseEntered(MouseEvent arg0) {
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void mouseExited(MouseEvent arg0) {
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void mousePressed(MouseEvent arg0) {
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void mouseReleased(MouseEvent arg0) {
         }

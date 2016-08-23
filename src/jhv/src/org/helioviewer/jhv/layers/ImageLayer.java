@@ -383,11 +383,11 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
     }
 
-    private static final int getUnsigned(byte b) {
+    private static int getUnsigned(byte b) {
         return (b + 256) & 0xFF;
     }
 
-    private static final byte clipByte(int val) {
+    private static byte clipByte(int val) {
         return val > 255 ? (byte) 255 : (byte) (val & 0xFF);
     }
 
