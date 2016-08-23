@@ -48,23 +48,27 @@ public class PfssDataLoader implements Runnable {
             }
 
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
             FileOutputStream out = null;
             if (!loadFromFile) {
                 out = new FileOutputStream(cacheFileName);
             }
+
             int nRead;
             byte[] data = new byte[16384];
 
-            while ((nRead = in.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, nRead);
-                if (!loadFromFile) {
-                    out.write(data, 0, nRead);
+            try {
+                while ((nRead = in.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                    if (out != null) {
+                        out.write(data, 0, nRead);
+                    }
                 }
-            }
-
-            buffer.flush();
-            if (!loadFromFile) {
-                out.close();
+                buffer.flush();
+            } finally {
+                if (out != null) {
+                    out.close();
+                }
             }
 
             byte[] gzipFitsFile = buffer.toByteArray();
