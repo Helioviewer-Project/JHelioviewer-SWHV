@@ -76,22 +76,25 @@ public class PfssData {
 
     private int addColor(double bright, float opacity, int countercolor) {
         if (bright > 0) {
-            return this.addColor(new Color(1.f, (float) (1. - bright), (float) (1. - bright), opacity), countercolor);
+            return addColor(new Color(1.f, (float) (1. - bright), (float) (1. - bright), opacity), countercolor);
         } else {
-            return this.addColor(new Color((float) (1. + bright), (float) (1. + bright), 1.f, opacity), countercolor);
+            return addColor(new Color((float) (1. + bright), (float) (1. + bright), 1.f, opacity), countercolor);
         }
     }
 
     private void calculatePositions() {
         int counter = 0;
-        this.lastQuality = PfssSettings.qualityReduction;
-        this.lastFixedColor = PfssSettings.fixedColor;
+        lastQuality = PfssSettings.qualityReduction;
+        lastFixedColor = PfssSettings.fixedColor;
 
         int type = 0;
-        ByteArrayInputStream is = new ByteArrayInputStream(this.gzipFitsFile);
+        ByteArrayInputStream is = new ByteArrayInputStream(gzipFitsFile);
         try {
             Fits fits = new Fits(is, true);
             BasicHDU hdus[] = fits.read();
+            if (hdus == null)
+                throw new Exception("Could not read FITS");
+
             BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
 
             short[] fieldlinex = (short[]) bhdu.getColumn("FIELDLINEx");
@@ -111,7 +114,7 @@ public class PfssData {
 
             double sphi = Math.sin(phi), cphi = Math.cos(phi);
 
-            this.createBuffer(fieldlinex.length);
+            createBuffer(fieldlinex.length);
 
             for (int i = 0; i < fieldlinex.length; i++) {
                 if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {
@@ -131,11 +134,11 @@ public class PfssData {
                     int col = fieldlines[i] + 32768;
                     double bright = (col * 2. / 65535.) - 1.;
                     if (i % PfssSettings.POINTS_PER_LINE == 0) {
-                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
-                        counter = this.addColor(bright, 0.f, counter);
-                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                        counter = addVertex((float) x, (float) z, (float) -y, counter);
+                        counter = addColor(bright, 0, counter);
+                        counter = addVertex((float) x, (float) z, (float) -y, counter);
                         if (!PfssSettings.fixedColor) {
-                            counter = this.addColor(bright, 1.f, counter);
+                            counter = addColor(bright, 1, counter);
                         } else {
                             int rox = fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
                             int roy = fieldliney[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
@@ -148,42 +151,42 @@ public class PfssData {
 
                             if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
                                 type = 0;
-                                counter = this.addColor(PfssData.LOOPCOLOR, counter);
+                                counter = addColor(PfssData.LOOPCOLOR, counter);
                             } else if (bright < 0) {
                                 type = 1;
-                                counter = this.addColor(PfssData.INSIDEFIELDCOLOR, counter);
+                                counter = addColor(PfssData.INSIDEFIELDCOLOR, counter);
                             } else {
                                 type = 2;
-                                counter = this.addColor(PfssData.OPENFIELDCOLOR, counter);
+                                counter = addColor(PfssData.OPENFIELDCOLOR, counter);
                             }
                         }
                     } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
-                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                        counter = addVertex((float) x, (float) z, (float) -y, counter);
                         if (!PfssSettings.fixedColor) {
                             counter = this.addColor(bright, 1.f, counter);
                         } else {
                             if (type == 0) {
-                                counter = this.addColor(PfssData.LOOPCOLOR, counter);
+                                counter = addColor(PfssData.LOOPCOLOR, counter);
                             } else if (type == 1) {
-                                counter = this.addColor(PfssData.INSIDEFIELDCOLOR, counter);
+                                counter = addColor(PfssData.INSIDEFIELDCOLOR, counter);
                             } else {
-                                counter = this.addColor(PfssData.OPENFIELDCOLOR, counter);
+                                counter = addColor(PfssData.OPENFIELDCOLOR, counter);
                             }
                         }
-                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                        counter = addVertex((float) x, (float) z, (float) -y, counter);
 
-                        counter = this.addColor(bright, 0.f, counter);
+                        counter = addColor(bright, 0, counter);
                     } else {
-                        counter = this.addVertex((float) x, (float) z, (float) -y, counter);
+                        counter = addVertex((float) x, (float) z, (float) -y, counter);
                         if (!PfssSettings.fixedColor) {
-                            counter = this.addColor(bright, 1.f, counter);
+                            counter = addColor(bright, 1, counter);
                         } else {
                             if (type == 0) {
-                                counter = this.addColor(PfssData.LOOPCOLOR, counter);
+                                counter = addColor(PfssData.LOOPCOLOR, counter);
                             } else if (type == 1) {
-                                counter = this.addColor(PfssData.INSIDEFIELDCOLOR, counter);
+                                counter = addColor(PfssData.INSIDEFIELDCOLOR, counter);
                             } else {
-                                counter = this.addColor(PfssData.OPENFIELDCOLOR, counter);
+                                counter = addColor(PfssData.OPENFIELDCOLOR, counter);
                             }
                         }
                     }
@@ -222,11 +225,11 @@ public class PfssData {
     }
 
     public void display(GL2 gl) {
-        if (PfssSettings.qualityReduction != this.lastQuality || PfssSettings.fixedColor != this.lastFixedColor) {
-            this.clear(gl);
-            this.init = false;
-            this.read = false;
-            this.init(gl);
+        if (PfssSettings.qualityReduction != lastQuality || PfssSettings.fixedColor != lastFixedColor) {
+            clear(gl);
+            init = false;
+            read = false;
+            init(gl);
         }
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
