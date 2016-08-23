@@ -213,14 +213,17 @@ public class FileUtils {
         InputStream in = new FileInputStream(src);
         OutputStream out = new FileOutputStream(dst);
 
-        // Transfer bytes from in to out
-        byte[] buf = new byte[BUFSIZ];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
+        try {
+            // Transfer bytes from in to out
+            byte[] buf = new byte[BUFSIZ];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } finally {
+            in.close();
+            out.close();
         }
-        in.close();
-        out.close();
     }
 
     public static void copy(InputStream in, OutputStream out) throws IOException {
@@ -274,11 +277,15 @@ public class FileUtils {
 
         // Transfer bytes from in to out
         String str;
-        while ((str = in.readLine()) != null) {
-            sb.append(str);
+
+        try {
+            while ((str = in.readLine()) != null) {
+                sb.append(str);
+            }
+        } finally {
+            in.close();
         }
 
-        in.close();
         return sb.toString();
     }
 
