@@ -221,15 +221,17 @@ public class LUT {
         }
         // User addons
         File addOnDir = JHVDirectory.COLOR_PLUGINS.getFile();
-        for (File f : addOnDir.listFiles(new GGRFilter())) {
-            // Try to add f
-            try {
-                LUT l = readGimpGradientFile(f);
-                standardList.put(l.getName(), l);
-            } catch (Exception e) {
-                Log.warn("Error loading color table plugin dir", e);
+        File[] fileList = addOnDir.listFiles(new GGRFilter());
+
+        if (fileList != null)
+            for (File f : fileList) {
+                try {
+                    LUT l = readGimpGradientFile(f);
+                    standardList.put(l.getName(), l);
+                } catch (Exception e) {
+                    Log.warn("Error loading color table plugin dir", e);
+                }
             }
-        }
     }
 
     public static Map<String, LUT> getStandardList() {
