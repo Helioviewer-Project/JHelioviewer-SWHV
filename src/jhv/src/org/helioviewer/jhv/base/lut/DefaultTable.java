@@ -2,6 +2,7 @@ package org.helioviewer.jhv.base.lut;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.helioviewer.jhv.base.FileUtils;
@@ -29,8 +30,13 @@ public class DefaultTable {
 
     private DefaultTable() {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(FileUtils.getResourceInputStream("/settings/colors.js"), "UTF-8"));
-            colorRules = new JSONArray(new JSONTokener(in));
+            InputStream is = FileUtils.getResourceInputStream("/settings/colors.js");
+            try {
+                BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                colorRules = new JSONArray(new JSONTokener(in));
+            } finally {
+                is.close();
+            }
         } catch (IOException e) {
             Log.warn("Error reading the configuration for the default color tables", e);
             Message.warn("Color Tables", "Error reading the configuration for the default color tables: " + e.getMessage() + "\n" + "There will be no default color tables applied.");

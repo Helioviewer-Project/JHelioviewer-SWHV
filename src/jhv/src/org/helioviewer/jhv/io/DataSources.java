@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.logging.Log;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -94,17 +96,25 @@ public class DataSources {
         }
         saveServerSettings(preferredServer);
 
-        InputStream inputStream = FileUtils.getResourceInputStream("/data/sources_v1.0.json");
-        JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
-        Schema schema = SchemaLoader.load(rawSchema);
+        try {
+            InputStream is = FileUtils.getResourceInputStream("/data/sources_v1.0.json");
+            try {
+                JSONObject rawSchema = new JSONObject(new JSONTokener(is));
+                Schema schema = SchemaLoader.load(rawSchema);
 
-        DataSourcesTask loadTask;
-        loadTask = new DataSourcesTask("GSFC", schema);
-        JHVGlobals.getExecutorService().execute(loadTask);
-        loadTask = new DataSourcesTask("ROB", schema);
-        JHVGlobals.getExecutorService().execute(loadTask);
-        loadTask = new DataSourcesTask("IAS", schema);
-        JHVGlobals.getExecutorService().execute(loadTask);
+                DataSourcesTask loadTask;
+                loadTask = new DataSourcesTask("GSFC", schema);
+                JHVGlobals.getExecutorService().execute(loadTask);
+                loadTask = new DataSourcesTask("ROB", schema);
+                JHVGlobals.getExecutorService().execute(loadTask);
+                loadTask = new DataSourcesTask("IAS", schema);
+                JHVGlobals.getExecutorService().execute(loadTask);
+            } finally {
+                is.close();
+            }
+        } catch (IOException e) {
+            Log.error("Could not load the JSON schema: ", e);
+        }
     }
 
 }
