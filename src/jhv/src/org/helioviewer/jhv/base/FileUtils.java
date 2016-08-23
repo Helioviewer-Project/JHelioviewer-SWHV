@@ -254,11 +254,15 @@ public class FileUtils {
         // Transfer bytes from in to out
         byte[] buf = new byte[BUFSIZ];
         int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
+
+        try {
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } finally {
+            out.close();
         }
         in.close();
-        out.close();
     }
 
     /**
