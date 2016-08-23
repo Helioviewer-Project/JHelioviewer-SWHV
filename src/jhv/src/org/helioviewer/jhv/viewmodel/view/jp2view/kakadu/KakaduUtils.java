@@ -41,16 +41,10 @@ public class KakaduUtils {
      *            Kdu_dims to convert
      * @return Rectangle equivalent to the given Kdu_dims
      */
-    public static Rectangle kdu_dimsToRect(Kdu_dims dims) {
-        Rectangle rect = null;
-        try {
-            Kdu_coords pos = dims.Access_pos();
-            Kdu_coords siz = dims.Access_size();
-            rect = new Rectangle(pos.Get_x(), pos.Get_y(), siz.Get_x(), siz.Get_y());
-        } catch (KduException ex) {
-            ex.printStackTrace();
-        }
-        return rect;
+    public static Rectangle kdu_dimsToRect(Kdu_dims dims) throws KduException {
+        Kdu_coords pos = dims.Access_pos();
+        Kdu_coords siz = dims.Access_size();
+        return new Rectangle(pos.Get_x(), pos.Get_y(), siz.Get_x(), siz.Get_y());
     }
 
     /**
@@ -60,19 +54,16 @@ public class KakaduUtils {
      *            SubImage to convert
      * @return Kdu_dims equivalent to the given SubImage
      */
-    public static Kdu_dims roiToKdu_dims(SubImage roi) {
-        Kdu_dims dims = null;
-        try {
-            dims = new Kdu_dims();
-            Kdu_coords pos = dims.Access_pos();
-            Kdu_coords siz = dims.Access_size();
-            pos.Set_x(roi.x);
-            pos.Set_y(roi.y);
-            siz.Set_x(roi.width);
-            siz.Set_y(roi.height);
-        } catch (KduException ex) {
-            ex.printStackTrace();
-        }
+    public static Kdu_dims roiToKdu_dims(SubImage roi) throws KduException {
+        Kdu_dims dims = new Kdu_dims();
+
+        Kdu_coords pos = dims.Access_pos();
+        pos.Set_x(roi.x);
+        pos.Set_y(roi.y);
+        Kdu_coords siz = dims.Access_size();
+        siz.Set_x(roi.width);
+        siz.Set_y(roi.height);
+
         return dims;
     }
 
