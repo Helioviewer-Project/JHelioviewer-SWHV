@@ -33,7 +33,7 @@ public class FITSView extends AbstractView {
 
         BufferedImage bi = fits.getImage(0, 0, m.getPixelHeight(), m.getPixelWidth());
         if (bi == null)
-            throw new Exception("Could not read FITS " + uri);
+            throw new Exception("Could not read FITS: " + uri);
 
         if (bi.getColorModel().getPixelSize() <= 8) {
             imageData = new SingleChannelByte8ImageData(bi);

@@ -102,6 +102,8 @@ public class PfssData {
             Header header = bhdu.getHeader();
 
             String date = header.findKey("DATE-OBS");
+            if (date == null)
+                throw new Exception("DATE-OBS not found");
             dateString = date.substring(11, 30);
 
             Position.L p = Sun.getEarth(new JHVDate(TimeUtils.utcDateFormat.parse(dateString).getTime()));

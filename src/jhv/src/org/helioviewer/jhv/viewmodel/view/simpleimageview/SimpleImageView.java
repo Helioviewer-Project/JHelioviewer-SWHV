@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.simpleimageview;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URI;
 
 import javax.imageio.ImageIO;
@@ -21,15 +20,16 @@ public class SimpleImageView extends AbstractView {
      *
      * @param _uri
      *            URI where the source image is located
-     * @throws MalformedURLException
-     *             thrown, if the location is not valid
-     * @throws IOException
-     *             thrown, if the image is not readable
+     * @throws Exception
+     *            if the image is not readable
      */
-    public SimpleImageView(URI _uri) throws IOException {
+    public SimpleImageView(URI _uri) throws Exception {
         uri = _uri;
 
         BufferedImage image = ImageIO.read(uri.toURL());
+        if (image == null)
+            throw new Exception("Could not read image: " + uri);
+
         if (image.getColorModel().getPixelSize() <= 8) {
             imageData = new SingleChannelByte8ImageData(image);
         } else if (image.getColorModel().getPixelSize() <= 16) {
