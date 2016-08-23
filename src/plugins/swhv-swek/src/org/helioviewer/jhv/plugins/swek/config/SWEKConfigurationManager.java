@@ -205,8 +205,11 @@ public class SWEKConfigurationManager {
             rbc = Channels.newChannel(url.openStream());
             String saveFile = SWEKSettings.SWEK_HOME + swekProperties.getProperty("plugin.swek.configfilename");
             FileOutputStream fos = new FileOutputStream(saveFile);
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            fos.close();
+            try {
+                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            } finally {
+                fos.close();
+            }
             configFileURL = (new File(saveFile)).toURI().toURL();
             return true;
         } catch (IOException e) {
