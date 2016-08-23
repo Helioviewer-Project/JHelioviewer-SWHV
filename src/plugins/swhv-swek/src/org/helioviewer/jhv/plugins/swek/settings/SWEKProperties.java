@@ -45,9 +45,13 @@ public class SWEKProperties {
      * Loads the overall plugin settings.
      */
     private void loadPluginSettings() {
-        InputStream defaultPropStream = SWEKPlugin.class.getResourceAsStream("/SWEK.properties");
         try {
-            this.swekProperties.load(defaultPropStream);
+            InputStream is = SWEKPlugin.class.getResourceAsStream("/SWEK.properties");
+            try {
+                this.swekProperties.load(is);
+            } finally {
+                is.close();
+            }
         } catch (IOException ex) {
             Log.error("Could not load the swek settings : ", ex);
         }

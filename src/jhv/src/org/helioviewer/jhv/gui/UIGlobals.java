@@ -72,9 +72,13 @@ public class UIGlobals {
 
         UIFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
 
-        InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
         try {
-            UIFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
+            InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
+            try {
+                UIFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
+            } finally {
+                is.close();
+            }
         } catch (Exception e) {
             Log.warn("Font not loaded correctly, fallback to default");
             UIFontRoboto = new Font("SansSerif", Font.PLAIN, defaultSize);
