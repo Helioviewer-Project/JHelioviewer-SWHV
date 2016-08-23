@@ -299,9 +299,12 @@ public class PluginManager {
             // in order to delete it when restarting JHV
             try {
                 FileWriter tempFileWriter = new FileWriter(tempFile, true);
-                tempFileWriter.write(container.getPluginLocation().getPath() + ";");
-                tempFileWriter.flush();
-                tempFileWriter.close();
+                try {
+                    tempFileWriter.write(container.getPluginLocation().getPath() + ";");
+                    tempFileWriter.flush();
+                } finally {
+                    tempFileWriter.close();
+                }
             } catch (IOException e) {
                 return false;
             }

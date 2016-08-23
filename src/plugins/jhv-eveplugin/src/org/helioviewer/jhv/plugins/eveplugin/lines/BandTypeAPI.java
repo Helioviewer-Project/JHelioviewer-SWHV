@@ -44,10 +44,13 @@ public class BandTypeAPI {
     }
 
     private void loadSettings() {
-        InputStream defaultPropStream = EVEPlugin.class.getResourceAsStream("/settings/eveplugin.properties");
         try {
-            defaultProperties.load(defaultPropStream);
-            defaultPropStream.close();
+            InputStream is = EVEPlugin.class.getResourceAsStream("/settings/eveplugin.properties");
+            try {
+                defaultProperties.load(is);
+            } finally {
+                is.close();
+            }
         } catch (IOException e) {
             Log.error("BandTypeAPI.loadSettings() > Could not load settings", e);
         }
