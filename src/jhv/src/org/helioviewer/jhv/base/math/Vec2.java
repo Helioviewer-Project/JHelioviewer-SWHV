@@ -9,6 +9,7 @@ public class Vec2 {
     public static final Vec2 ZERO = new Vec2(0.0, 0.0);
     public static final Vec2 NEGATIVE_INFINITY_VECTOR = new Vec2(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
     public static final Vec2 POSITIVE_INFINITY_VECTOR = new Vec2(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+    public static final Vec2 NAN_VECTOR = new Vec2(Double.NaN, Double.NaN);
 
     /**
      * Coordinates

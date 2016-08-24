@@ -190,7 +190,7 @@ public abstract class GridScale {
         public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridChoiceType gridChoice) {
             Vec3 p = CameraHelper.getVectorFromSphere(camera, vp, px, py, Quat.ZERO, true);
             if (p == null)
-                return null;
+                return Vec2.NAN_VECTOR;
 
             if (gridChoice != GridChoiceType.VIEWPOINT) {
                 Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, RenderableGrid.getGridQuat(camera, gridChoice));
