@@ -22,7 +22,7 @@ public class CollapsiblePaneButton extends JToggleButton {
         setFocusPainted(false); // used for demonstration
 
         color = UIManager.getColor("Panel.background");
-        if (color == null)
+        if (color == null) // satisfy coverity
             color = Color.DARK_GRAY;
         bright = brighter(color, 0.85);
         dark = darker(color, 0.9);
