@@ -50,7 +50,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private String formatOrtho(Vec2 coord, double r, int px, int py) {
         String coordStr;
-        if (coord == null)
+        if (coord == null || Double.isNaN(coord.x) || Double.isNaN(coord.y))
             coordStr = nullCoordStr;
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
