@@ -709,15 +709,14 @@ public class EventDatabase {
         }
     }
 
-    public static JsonEvent event2Program(int event_id) {
+    public static ArrayList<JsonEvent> event2Program(int event_id) {
         FutureTask<JsonEvent> ft = new FutureTask<JsonEvent>(new Event2Program(event_id));
         executor.execute(ft);
+        ArrayList<JsonEvent> arr = new ArrayList<JsonEvent>();
         try {
-            return ft.get();
-        } catch (InterruptedException e) {
-            return null;
-        } catch (ExecutionException e) {
-            return null;
+            arr.add(ft.get());
+        } finally {
+            return arr;
         }
     }
 
