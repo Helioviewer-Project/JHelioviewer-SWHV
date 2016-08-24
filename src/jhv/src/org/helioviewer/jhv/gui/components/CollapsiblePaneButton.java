@@ -12,7 +12,7 @@ import javax.swing.UIManager;
 @SuppressWarnings("serial")
 public class CollapsiblePaneButton extends JToggleButton {
 
-    private final Color color;
+    private Color color;
     private final Color bright;
     private final Color dark;
 
@@ -22,6 +22,8 @@ public class CollapsiblePaneButton extends JToggleButton {
         setFocusPainted(false); // used for demonstration
 
         color = UIManager.getColor("Panel.background");
+        if (color == null)
+            color = Color.DARK_GRAY;
         bright = brighter(color, 0.85);
         dark = darker(color, 0.9);
     }
