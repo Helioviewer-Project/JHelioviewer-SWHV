@@ -12,7 +12,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.AbstractList;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,7 +49,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     private final JTextField textField = new JTextField();
 
     private static final Icon icon = IconBank.getIcon(JHVIcon.DATE);
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public JTextField getTextField() {
         return textField;
@@ -64,7 +62,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         setLayout(new BorderLayout(0, 0));
 
         // set up text field
-        textField.setText(dateFormat.format(calendar.getTime()));
+        textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));
         textField.addFocusListener(this);
         textField.addKeyListener(this);
 
@@ -170,10 +168,10 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     private void setDateFromTextField() {
         try {
-            Date date = dateFormat.parse(textField.getText());
+            Date date = TimeUtils.dateFormat.parse(textField.getText());
             setTime(date.getTime());
         } catch (ParseException e) {
-            textField.setText(dateFormat.format(calendar.getTime()));
+            textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));
         }
     }
 
@@ -261,7 +259,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     public void setTime(long time) {
         if (time > TimeUtils.MINIMAL_DATE.milli && time < TimeUtils.MAXIMAL_DATE.milli)
             calendar.setTimeInMillis(time);
-        textField.setText(dateFormat.format(calendar.getTime()));
+        textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));
     }
 
     /**

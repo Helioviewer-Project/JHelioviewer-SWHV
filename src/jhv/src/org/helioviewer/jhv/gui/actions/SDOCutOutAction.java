@@ -17,23 +17,21 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 public class SDOCutOutAction extends AbstractAction {
 
     private static final String baseURL = "http://www.lmsal.com/get_aia_data/?";
-
     private static final double AIA_CDELT = 0.6;
 
     public SDOCutOutAction(boolean small, boolean useIcon) {
-        super("SDO Cut-out", useIcon ? (small ? IconBank.getIcon(JHVIcon.SDO_CUTOUT) : IconBank.getIcon(JHVIcon.SDO_CUTOUT)) : null);
+        super("SDO Cut-out", useIcon ? IconBank.getIcon(JHVIcon.SDO_CUTOUT) : null);
         putValue(SHORT_DESCRIPTION, "SDO cut-out service");
     }
 
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
         StringBuilder url = new StringBuilder(baseURL);
         JHVDate startdate = Layers.getStartDate();
         if (startdate != null) {
             String start = startdate.toString();
-            String startTime = start.substring(11, 16);
             String startDate = start.substring(0, 10);
+            String startTime = start.substring(11, 16);
             url.append("startDate=").append(startDate);
             url.append("&startTime=").append(startTime);
         }
