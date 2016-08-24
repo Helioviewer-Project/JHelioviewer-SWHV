@@ -61,10 +61,10 @@ public class ParameterTableModel extends AbstractTableModel {
                     return result;
                 }
             } else {
-                return null;
+                return "";
             }
         } else {
-            return null;
+            return "";
         }
     }
 

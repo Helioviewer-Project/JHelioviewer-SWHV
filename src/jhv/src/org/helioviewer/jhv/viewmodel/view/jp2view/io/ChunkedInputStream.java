@@ -71,7 +71,8 @@ public class ChunkedInputStream extends InputStream {
      */
     @Override
     public int read() throws IOException {
-        switch (read(tmpRead, 0, 1)) {
+        int n = read(tmpRead, 0, 1);
+        switch (n) {
             case -1:
                 return -1;
             case 1:

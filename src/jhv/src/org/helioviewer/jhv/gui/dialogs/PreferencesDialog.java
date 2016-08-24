@@ -179,6 +179,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private static class DefaultsSelectionPanel extends JPanel {
 
         private final JTable table;
+        private final TableModel model;
 
         public DefaultsSelectionPanel() {
             super(new BorderLayout());
@@ -187,14 +188,16 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             Settings settings = Settings.getSingletonInstance();
 
             Object[][] tableData = new Object[][] { { "Default recording directory", settings.getProperty("default.save.path") },
-                    { "Default download path", settings.getProperty("default.local.path") } };
+                                                    { "Default download path", settings.getProperty("default.local.path") } };
 
-            table = new JTable(new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
+            model = new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
                     return false;
                 }
-            });
+            };
+
+            table = new JTable(model);
 
             table.setRowHeight(20);
             JScrollPane scrollPane = new JScrollPane(table);
@@ -211,11 +214,11 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                     if (row >= 2)
                         return;
 
-                    JFileChooser chooser = new JFileChooser((String) table.getModel().getValueAt(row, 1));
+                    JFileChooser chooser = new JFileChooser((String) model.getValueAt(row, 1));
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
                     if (chooser.showDialog(null, "Select") == JFileChooser.APPROVE_OPTION)
-                        table.getModel().setValueAt(chooser.getSelectedFile().toString(), row, 1);
+                        model.setValueAt(chooser.getSelectedFile().toString(), row, 1);
                 }
             });
 
@@ -227,21 +230,15 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         }
 
         public void loadSettings() {
-            TableModel model = table.getModel();
             Settings settings = Settings.getSingletonInstance();
             model.setValueAt(settings.getProperty("default.save.path"), 0, 1);
             model.setValueAt(settings.getProperty("default.local.path"), 1, 1);
         }
 
         public void saveSettings() {
-            TableModel model = table.getModel();
             Settings settings = Settings.getSingletonInstance();
-            Object savePath = model.getValueAt(0, 1);
-            if (savePath != null)
-                settings.setProperty("default.save.path", savePath.toString());
-            Object localPath = model.getValueAt(1, 1);
-            if (localPath != null)
-                settings.setProperty("default.local.path", model.getValueAt(1, 1).toString());
+            settings.setProperty("default.save.path", model.getValueAt(0, 1).toString());
+            settings.setProperty("default.local.path", model.getValueAt(1, 1).toString());
         }
 
     }
