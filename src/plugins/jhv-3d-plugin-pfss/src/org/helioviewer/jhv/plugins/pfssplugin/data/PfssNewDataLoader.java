@@ -64,13 +64,17 @@ public class PfssNewDataLoader implements Runnable {
                         URL data = new URL(url);
 
                         BufferedReader in = new BufferedReader(new InputStreamReader(data.openStream(), "UTF-8"));
-                        String inputLine;
-                        while ((inputLine = in.readLine()) != null) {
-                            String[] splitted = inputLine.split(" ");
-                            Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
-                            urls.add(new Pair<String, Long>(splitted[1], dd.getTime()));
+                        try {
+                            String inputLine;
+                            while ((inputLine = in.readLine()) != null) {
+                                String[] splitted = inputLine.split(" ");
+                                Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
+                                urls.add(new Pair<String, Long>(splitted[1], dd.getTime()));
+                            }
+                        } finally {
+                            in.close();
                         }
-                        in.close();
+
                         synchronized (parsedCache) {
                             parsedCache.put(cacheKey, urls);
                         }
