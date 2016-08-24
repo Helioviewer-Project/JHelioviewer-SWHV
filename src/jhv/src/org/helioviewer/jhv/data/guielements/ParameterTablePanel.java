@@ -81,7 +81,11 @@ public class ParameterTablePanel extends JPanel implements MouseListener, MouseM
         int rows = table.getRowCount();
         for (int i = 0; i < rows; i++) {
             Component comp = table.prepareRenderer(table.getCellRenderer(i, 1), i, 1);
-            table.setRowHeight(i, Math.max(rowHeight, comp.getPreferredSize().height + rowMargin));
+
+            int height;
+            Dimension dim = comp.getPreferredSize();
+            if (dim != null /* satisfy coverity */ && (height = dim.height + rowMargin) > rowHeight)
+                table.setRowHeight(i, height);
         }
     }
 
