@@ -121,6 +121,7 @@ public class EventDatabase {
             pstatement.setString(1, eventType.getEventType().getEventName());
             pstatement.setString(2, eventType.getSupplier().getSupplierKey());
             pstatement.executeUpdate();
+
             String dbName = eventType.getSupplier().getDatabaseName();
             StringBuilder createtbl = new StringBuilder();
             createtbl.append("CREATE TABLE ").append(dbName).append(" (");
@@ -130,10 +131,14 @@ public class EventDatabase {
                 createtbl.append(entry.getKey()).append(' ').append(entry.getValue()).append(" DEFAULT NULL,");
             }
             createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );");
+
             Statement statement = connection.createStatement();
-            statement.setQueryTimeout(30);
-            statement.executeUpdate(createtbl.toString());
-            statement.close();
+            try {
+                statement.setQueryTimeout(30);
+                statement.executeUpdate(createtbl.toString());
+            } finally {
+                statement.close();
+            }
             connection.commit();
         } catch (SQLException e) {
             Log.error("Failed to insert event type " + e.getMessage());
@@ -688,8 +693,12 @@ public class EventDatabase {
                     String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.name, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList.toString() + ") AND events.id != " + event_id + ";";
 
                     Statement statement = connection.createStatement();
-                    ArrayList<JsonEvent> ret = getEventJSON(statement.executeQuery(query));
-                    statement.close();
+                    ArrayList<JsonEvent> ret;
+                    try {
+                        ret = getEventJSON(statement.executeQuery(query));
+                    } finally {
+                        statement.close();
+                    }
                     return ret;
                 } catch (SQLException e) {
                     Log.error("Could not fetch associations " + e.getMessage());
