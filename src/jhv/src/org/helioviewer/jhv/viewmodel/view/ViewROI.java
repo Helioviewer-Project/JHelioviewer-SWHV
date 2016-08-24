@@ -61,10 +61,12 @@ public class ViewROI {
             Quat camDiff = Quat.rotateWithConjugate(cameraRotation, imageRotation);
             for (int i = 0; i < pointlist.length; i++) {
                 Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
-                minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-                minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-                maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-                maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                if (hitPoint != null) {
+                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                }
             }
 
             Vec3 startPoint, endPoint, rotationAxis;
@@ -83,40 +85,46 @@ public class ViewROI {
                 camDiff = Quat.rotateWithConjugate(camDiff, Quat.createRotation(Math.PI, imageRotation.getRotationAxis()));
                 for (int i = 0; i < pointlist.length; i++) {
                     Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
-                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                    if (hitPoint != null) {
+                        minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                        minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                        maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                        maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+                    }
                 }
             }
 
             camera.pop();
 
-            double widthxAdd = Math.abs(extraSize * (maxPhysicalX - minPhysicalX));
-            double widthyAdd = Math.abs(extraSize * (maxPhysicalY - minPhysicalY));
-            minPhysicalX = minPhysicalX - widthxAdd;
-            maxPhysicalX = maxPhysicalX + widthxAdd;
-            minPhysicalY = minPhysicalY - widthyAdd;
-            maxPhysicalY = maxPhysicalY + widthyAdd;
-
-            Region r = m.getPhysicalRegion();
-            if (minPhysicalX < r.llx)
-                minPhysicalX = r.llx;
-            if (minPhysicalY < r.lly)
-                minPhysicalY = r.lly;
-            if (maxPhysicalX > r.urx)
-                maxPhysicalX = r.urx;
-            if (maxPhysicalY > r.ury)
-                maxPhysicalY = r.ury;
-
-            double regionWidth = maxPhysicalX - minPhysicalX;
-            double regionHeight = maxPhysicalY - minPhysicalY;
-
-            if (regionWidth > 0 && regionHeight > 0) {
-                newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
+            if (minPhysicalX > maxPhysicalX || minPhysicalY > maxPhysicalY) {
+                newRegion = m.getPhysicalRegion();
             } else {
-                newRegion = new Region(minPhysicalX, minPhysicalY, 0, 0);
-                Log.info("ViewROI.updateROI: empty ROI");
+                double widthxAdd = Math.abs(extraSize * (maxPhysicalX - minPhysicalX));
+                double widthyAdd = Math.abs(extraSize * (maxPhysicalY - minPhysicalY));
+                minPhysicalX = minPhysicalX - widthxAdd;
+                maxPhysicalX = maxPhysicalX + widthxAdd;
+                minPhysicalY = minPhysicalY - widthyAdd;
+                maxPhysicalY = maxPhysicalY + widthyAdd;
+
+                Region r = m.getPhysicalRegion();
+                if (minPhysicalX < r.llx)
+                    minPhysicalX = r.llx;
+                if (minPhysicalY < r.lly)
+                    minPhysicalY = r.lly;
+                if (maxPhysicalX > r.urx)
+                    maxPhysicalX = r.urx;
+                if (maxPhysicalY > r.ury)
+                    maxPhysicalY = r.ury;
+
+                double regionWidth = maxPhysicalX - minPhysicalX;
+                double regionHeight = maxPhysicalY - minPhysicalY;
+
+                if (regionWidth > 0 && regionHeight > 0) {
+                    newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
+                } else {
+                    newRegion = new Region(minPhysicalX, minPhysicalY, 0, 0);
+                    Log.info("ViewROI.updateROI: empty ROI");
+                }
             }
         } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
             newRegion = unitRadius;
