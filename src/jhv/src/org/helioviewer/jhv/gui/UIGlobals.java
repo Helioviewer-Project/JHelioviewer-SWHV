@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -34,7 +35,7 @@ public class UIGlobals {
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
         }
 
-        Font font = UIManager.getDefaults().getFont("Label.font");
+        Font font = new JLabel().getFont();
         int defaultSize = font.getSize();
 
         String defaultFont = "SansSerif";
