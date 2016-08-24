@@ -281,7 +281,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void layerAdded(View view) {
-        setSelectedInterval(Layers.getStartDate().milli, Layers.getEndDate().milli);
+        JHVDate start = Layers.getStartDate();
+        JHVDate end = Layers.getEndDate();
+        if (start != null && end != null) { // satisfy coverity
+            setSelectedInterval(start.milli, end.milli);
+        }
     }
 
     @Override
