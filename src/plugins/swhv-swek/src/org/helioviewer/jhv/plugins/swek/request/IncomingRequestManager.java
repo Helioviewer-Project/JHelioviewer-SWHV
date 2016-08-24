@@ -71,8 +71,9 @@ public class IncomingRequestManager implements JHVEventCacheRequestHandler {
             }
             jsonEvents.clear();
         }
-
-        nEvents.add(parseJSON(EventDatabase.event2Program(event.getUniqueID()), true));
+        ArrayList<JsonEvent> events = EventDatabase.event2Program(event.getUniqueID());
+        for (JsonEvent jsonEvent : events)
+            nEvents.add(parseJSON(jsonEvent, true));
         return nEvents;
 
     }
