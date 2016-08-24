@@ -36,6 +36,8 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
+import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
+import org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser;
 import org.helioviewer.jhv.plugins.swek.view.SWEKIconBank;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -347,8 +349,10 @@ public class SWEKConfigurationManager {
         JSONArray sourcesArray = configJSON.getJSONArray("sources");
         for (int i = 0; i < sourcesArray.length(); i++) {
             SWEKSource source = parseSource(sourcesArray.getJSONObject(i));
-            sources.put(source.getSourceName(), source);
-            swekSources.add(source);
+            if (source != null) {
+                sources.put(source.getSourceName(), source);
+                swekSources.add(source);
+            }
         }
         return swekSources;
     }
@@ -363,7 +367,14 @@ public class SWEKConfigurationManager {
      *             if the source could not be parsed
      */
     private SWEKSource parseSource(JSONObject jsonObject) throws JSONException {
-        return new SWEKSource(parseSourceName(jsonObject), parseProviderName(jsonObject), parseGeneralParameters(jsonObject));
+        String name = parseSourceName(jsonObject);
+
+        if (name.equals("HEK"))
+            return new SWEKSource(name, parseProviderName(jsonObject), parseGeneralParameters(jsonObject), new HEKParser());
+        else if (name.equals("COMESEP"))
+            return new SWEKSource(name, parseProviderName(jsonObject), parseGeneralParameters(jsonObject), new ComesepParser());
+        else
+            return null;
     }
 
     /**

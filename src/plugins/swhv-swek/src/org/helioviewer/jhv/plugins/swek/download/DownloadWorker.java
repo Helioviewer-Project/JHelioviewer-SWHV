@@ -49,11 +49,10 @@ public class DownloadWorker implements Runnable {
     public void run() {
         SWEKSource swekSource = jhvType.getSupplier().getSource();
         SWEKDownloader downloader = SWEKSourceManager.getDownloader(swekSource);
-        SWEKParser parser = SWEKSourceManager.getParser(swekSource);
 
         boolean success = true;
-        if (parser == null || downloader == null) {
-            Log.warn("The swek downloader or swek parser with sourcename " + swekSource.getSourceName() + " could not be loaded");
+        if (downloader == null) {
+            Log.warn("The swek downloader with sourcename " + swekSource.getSourceName() + " could not be loaded");
             success = false;
         }
 
@@ -70,6 +69,7 @@ public class DownloadWorker implements Runnable {
                     }
                 }
             });
+            SWEKParser parser = swekSource.getParser();
             ArrayList<JsonEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
             for (JsonEvent event : eventList) {
                 final JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end, false);

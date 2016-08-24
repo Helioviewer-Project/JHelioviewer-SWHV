@@ -17,7 +17,6 @@ import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.EventDatabase.JsonEvent;
 import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
-import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 
 public class IncomingRequestManager implements JHVEventCacheRequestHandler {
 
@@ -79,7 +78,7 @@ public class IncomingRequestManager implements JHVEventCacheRequestHandler {
     }
 
     private JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) {
-        SWEKParser parser = SWEKSourceManager.getParser(jsonEvent.type.getSupplier().getSource());
+        SWEKParser parser = jsonEvent.type.getSupplier().getSource().getParser();
         return parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
     }
 
