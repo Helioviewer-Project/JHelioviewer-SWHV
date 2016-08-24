@@ -715,9 +715,12 @@ public class EventDatabase {
         ArrayList<JsonEvent> arr = new ArrayList<JsonEvent>();
         try {
             arr.add(ft.get());
-        } finally {
-            return arr;
+        } catch (InterruptedException e) {
+            Log.error(e.getMessage());
+        } catch (ExecutionException e) {
+            Log.error(e.getMessage());
         }
+        return arr;
     }
 
     private static class Event2Program implements Callable<JsonEvent> {
