@@ -34,13 +34,17 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             setText(String.format("(\u03B8,\u03c1) : (%.2f\u00B0,%.2fR\u2299)", coord.x, coord.y));
         } else {
             Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getCurrentDragRotation());
-            double r = Math.sqrt(v.x * v.x + v.y * v.y);
+            if (v == null) {
+                setText(formatOrtho(null, 0, 0, 0));
+            } else {
+                double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
-            double d = camera.getViewpoint().distance;
-            int px = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(v.x, d));
-            int py = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(v.y, d));
+                double d = camera.getViewpoint().distance;
+                int px = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(v.x, d));
+                int py = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(v.y, d));
 
-            setText(formatOrtho(coord, r, px, py));
+                setText(formatOrtho(coord, r, px, py));
+            }
         }
     }
 

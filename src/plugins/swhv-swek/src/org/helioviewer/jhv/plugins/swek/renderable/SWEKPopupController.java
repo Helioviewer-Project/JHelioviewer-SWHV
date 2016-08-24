@@ -148,8 +148,12 @@ public class SWEKPopupController implements MouseListener, TimeListener {
                     distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
 
                     Position.Q p = pi.getEarthPosition();
-                    hitpoint = p.orientation.rotateInverseVector(getHitPointPlane(vp, mouseOverX, mouseOverY));
                     pt = p.orientation.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
+
+                    hitpoint = CameraHelper.getVectorFromPlane(camera, vp, mouseOverX, mouseOverY, Quat.ZERO, true);
+                    if (hitpoint != null) {
+                        hitpoint = p.orientation.rotateInverseVector(hitpoint);
+                    }
                 } else {
                     hitpoint = getHitPoint(vp, mouseOverX, mouseOverY);
                     pt = pi.centralPoint();
@@ -207,10 +211,6 @@ public class SWEKPopupController implements MouseListener, TimeListener {
         } else {
             component.setCursor(lastCursor);
         }
-    }
-
-    private Vec3 getHitPointPlane(Viewport vp, int x, int y) {
-        return CameraHelper.getVectorFromPlane(camera, vp, x, y, Quat.ZERO, true);
     }
 
     private Vec3 getHitPoint(Viewport vp, int x, int y) {
