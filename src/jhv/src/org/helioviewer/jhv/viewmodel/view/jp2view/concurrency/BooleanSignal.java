@@ -65,7 +65,9 @@ public class BooleanSignal {
      * @return Current signal state
      */
     public boolean isSignaled() {
-        return isSignaled;
+        synchronized (lock) {
+            return isSignaled;
+        }
     }
 
 }
