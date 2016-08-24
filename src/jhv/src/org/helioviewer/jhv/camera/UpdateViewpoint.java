@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.astronomy.Position.Q;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -72,7 +73,9 @@ public interface UpdateViewpoint {
                 } else {
                     currentCameraTime = tPositionEnd;
                 }
-                return positionLoad.getInterpolatedPosition(currentCameraTime);
+                Q pos = positionLoad.getInterpolatedPosition(currentCameraTime);
+                if (pos != null)
+                    return pos;
             }
             return Sun.getEarthQuat(time);
         }
