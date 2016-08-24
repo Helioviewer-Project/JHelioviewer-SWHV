@@ -116,6 +116,10 @@ public class JHVThread {
                     }
                 } catch (SQLException e) {
                     Log.error("Could not create database connection" + e);
+                    try {
+                        connection.close();
+                    } catch (SQLException ignore) {
+                    }
                     connection = null;
                 }
             }
