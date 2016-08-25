@@ -19,7 +19,6 @@ import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.helioviewer.jhv.data.datatype.event.SWEKSource;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.EventDatabase.JsonEvent;
-import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 
 /**
  * A download worker will download events for a type of event from a source.
@@ -48,7 +47,7 @@ public class DownloadWorker implements Runnable {
     @Override
     public void run() {
         SWEKSource swekSource = jhvType.getSupplier().getSource();
-        SWEKDownloader downloader = SWEKSourceManager.getDownloader(swekSource);
+        SWEKDownloader downloader = swekSource.getDownloader();
 
         boolean success = true;
         if (downloader == null) {
