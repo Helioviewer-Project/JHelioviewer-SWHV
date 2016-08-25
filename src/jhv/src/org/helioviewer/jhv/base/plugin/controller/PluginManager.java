@@ -190,33 +190,34 @@ public class PluginManager {
         File file = new File(pluginLocation);
         try {
             JarFile jarFile = new JarFile(file);
-            Manifest manifest = jarFile.getManifest();
+            try {
+                Manifest manifest = jarFile.getManifest();
 
-            String className = null;
-            if (manifest != null) {
-                className = manifest.getMainAttributes().getValue("Main-Class");
-                Log.debug("Found Manifest: Main-Class:" + className);
+                String className = null;
+                if (manifest != null) {
+                    className = manifest.getMainAttributes().getValue("Main-Class");
+                    Log.debug("Found Manifest: Main-Class: " + className);
+                }
+
+                if (className == null) {
+                    String name = file.getName().substring(0, file.getName().length() - 4);
+                    className = "org.helioviewer.plugins." + name + "." + name;
+                    Log.debug("No Manifest Information Found, Fallback: Main-Class: " + className);
+                }
+
+                URLClassLoader classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
+                Object obj = classLoader.loadClass(className).newInstance();
+                Log.info("PluginManager: Load plugin class: " + className);
+
+                if (obj instanceof Plugin) {
+                    addPlugin(classLoader, (Plugin) obj, pluginLocation);
+                    return true;
+                } else {
+                    Log.debug("Load failed, was trying to load something that is not a plugin: " + className);
+                }
+            } finally {
+                jarFile.close();
             }
-
-            if (className == null) {
-                String name = file.getName().substring(0, file.getName().length() - 4);
-                className = "org.helioviewer.plugins." + name + "." + name;
-                Log.debug("No Manifest Information Found, Fallback: Main-Class:" + className);
-            }
-
-            URLClassLoader classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
-            Log.info("PluginManager: Load plugin class :" + className);
-            Object o = classLoader.loadClass(className).newInstance();
-
-            jarFile.close();
-
-            if (o instanceof Plugin) {
-                addPlugin(classLoader, (Plugin) o, pluginLocation);
-                return true;
-            } else {
-                Log.debug("Failed trying to load something that is not a plugin " + className);
-            }
-
         } catch (InstantiationException e) {
             Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         } catch (IllegalAccessException e) {
@@ -226,7 +227,6 @@ public class PluginManager {
         } catch (IOException e) {
             Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         }
-
         return false;
     }
 

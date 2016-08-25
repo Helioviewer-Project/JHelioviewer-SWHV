@@ -97,8 +97,11 @@ public class DownloadStream {
             if (output != null) {
                 connection.setDoOutput(true);
                 OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
-                out.write(output);
-                out.close();
+                try {
+                    out.write(output);
+                } finally {
+                    out.close();
+                }
             }
             try {
                 httpC.connect();
@@ -134,8 +137,11 @@ public class DownloadStream {
             if (output != null) {
                 connection.setDoOutput(true);
                 OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
-                out.write(output);
-                out.close();
+                try {
+                    out.write(output);
+                } finally {
+                    out.close();
+                }
             }
             // Okay just normal
             in = connection.getInputStream();

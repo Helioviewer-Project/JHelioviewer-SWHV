@@ -84,13 +84,18 @@ public class JHVUpdate implements Runnable {
         try {
             Log.trace("Start checking for updates");
             URL updateURL = new URL(JHVGlobals.downloadURL + "VERSION");
+
+            final String version;
             BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(updateURL).getInput(), "UTF-8"));
-            final String version = in.readLine();
-            if (version == null || version.equals("")) {
-                throw new IOException("JHVUpdate: Empty version string");
+            try {
+                version = in.readLine();
+                if (version == null || version.equals("")) {
+                    throw new IOException("JHVUpdate: Empty version string");
+                }
+                // String message = in.readLine(); - extra
+            } finally {
+                in.close();
             }
-            // String message = in.readLine(); - extra
-            in.close();
 
             EventQueue.invokeLater(new Runnable() {
                 @Override
