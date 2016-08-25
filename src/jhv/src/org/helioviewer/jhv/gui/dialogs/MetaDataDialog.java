@@ -13,9 +13,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.swing.DefaultListModel;
@@ -35,9 +33,6 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -57,9 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- * Dialog that is used to display meta data for an image.
- */
+// Dialog that is used to display meta data for an image.
 @SuppressWarnings("serial")
 public class MetaDataDialog extends JDialog implements ActionListener, ShowableDialog {
 
@@ -336,49 +329,19 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      *            XML file name
      */
     private boolean saveXMLDocument(DOMSource source, String filename) {
-        // open the output stream where XML Document will be saved
-        File xmlOutFile = new File(filename);
-        FileOutputStream fos;
         try {
-            fos = new FileOutputStream(xmlOutFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        // Use a Transformer for the purpose of output
-        Transformer transformer;
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        try {
-            transformer = transformerFactory.newTransformer();
-        } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
+            FileOutputStream fos = new FileOutputStream(new File(filename));
             try {
+                StreamResult result = new StreamResult(fos);
+                TransformerFactory.newInstance().newTransformer().transform(source, result);
+            } finally {
                 fos.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
             }
-            return false;
+            return true;
+        } catch (Exception e) {
+            Log.error("Failed to write XML: " + e);
         }
-
-        // The source is the fits header
-        // The destination for output
-        StreamResult result = new StreamResult(fos);
-
-        // transform source into result will do a file save
-        try {
-            transformer.transform(source, result);
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            fos.close();
-        } catch (IOException e) {
-            Log.error("Fail at closing file." + e);
-        }
-
-        return true;
+        return false;
     }
 
     @Override
