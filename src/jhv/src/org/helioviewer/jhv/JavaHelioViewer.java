@@ -19,17 +19,7 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.LoadStartup;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
-/**
- * This class starts the applications.
- *
- * @author caplins
- * @author Benjamin Wamsler
- * @author Markus Langenberg
- * @author Stephan Pagel
- * @author Andre Dau
- * @author Helge Dietert
- *
- */
+// Main
 public class JavaHelioViewer {
 
     public static void main(String[] args) {
@@ -57,7 +47,7 @@ public class JavaHelioViewer {
         Locale.setDefault(Locale.US);
 
         // init log
-        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), CommandLineProcessor.isOptionSet("--use-existing-log-time-stamp"));
+        LogSettings logSettings = new LogSettings("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), CommandLineProcessor.isOptionSet("--use-existing-log-time-stamp"));
 
         // Information log message
         StringBuilder argString = new StringBuilder();
@@ -70,15 +60,14 @@ public class JavaHelioViewer {
         JHVGlobals.createDirs();
 
         // Save the log settings. Must be done AFTER the directories are created
-        LogSettings.getSingletonInstance().update();
+        logSettings.update();
 
         // Read the version and revision from the JAR metafile
         JHVGlobals.determineVersionAndRevision();
 
         Log.info("Initializing JHelioviewer");
         // Load settings from file but do not apply them yet
-        // The settings must not be applied before the kakadu engine has been
-        // initialized
+        // The settings must not be applied before the kakadu engine has been initialized
         Settings.getSingletonInstance().load(false);
 
         // Set the platform system properties
