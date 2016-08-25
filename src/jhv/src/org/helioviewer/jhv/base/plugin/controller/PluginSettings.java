@@ -238,17 +238,6 @@ public class PluginSettings {
     }
 
     /**
-     * Checks if for a given plug-in an entry can be found in the XML document.
-     *
-     * @param pluginLocation
-     *            location of the file where the plug-in comes from.
-     * @return true if an entry exists in the XML document; otherwise false.
-     */
-    public boolean isPluginInformationAvailable(URI pluginLocation) {
-        return findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath()) != null;
-    }
-
-    /**
      * Checks the activated value of a given plug-in in the XML document. If
      * there is no entry in the XML document the return value is false.
      *

@@ -100,14 +100,6 @@ public class PluginContainer implements Container {
     }
 
     /**
-     * @return The class loader which was used to load the class files from the
-     *         plugin.
-     */
-    public ClassLoader getClassLoader() {
-        return classLoader;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public String toString() {
