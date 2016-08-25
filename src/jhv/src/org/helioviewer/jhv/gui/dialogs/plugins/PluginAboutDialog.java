@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.dialogs.plugins;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,8 +30,6 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 @SuppressWarnings("serial")
 public class PluginAboutDialog extends JDialog implements ActionListener, HyperlinkListener {
 
-    private static final Dimension DIALOG_SIZE = new Dimension(500, 350);
-
     private final Plugin plugin;
 
     private PluginAboutDialog(Plugin plugin) {
@@ -42,10 +39,6 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
         // dialog
         JPanel contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);
-
-        setMinimumSize(DIALOG_SIZE);
-        setPreferredSize(DIALOG_SIZE);
-        setSize(DIALOG_SIZE);
 
         // content
         JPanel topPane = new JPanel(new BorderLayout());

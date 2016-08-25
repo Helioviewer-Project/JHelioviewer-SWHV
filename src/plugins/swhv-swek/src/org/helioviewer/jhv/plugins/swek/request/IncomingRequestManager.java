@@ -40,7 +40,7 @@ public class IncomingRequestManager implements JHVEventCacheRequestHandler {
         ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
         ArrayList<JsonEvent> jsonEvents = new ArrayList<JsonEvent>();
 
-        for (SWEKRelatedEvents re : evt.getSwekRelatedEvents()) {
+        for (SWEKRelatedEvents re : evt.getSWEKRelatedEvents()) {
             if (re.getEvent() == evt) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
                 for (SWEKRelatedOn swon : relon) {
