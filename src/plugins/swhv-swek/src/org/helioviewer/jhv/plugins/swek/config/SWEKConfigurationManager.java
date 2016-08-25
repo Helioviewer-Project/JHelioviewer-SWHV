@@ -36,7 +36,9 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
+import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
+import org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser;
 import org.helioviewer.jhv.plugins.swek.view.SWEKIconBank;
 import org.json.JSONArray;
@@ -370,9 +372,9 @@ public class SWEKConfigurationManager {
         String name = parseSourceName(jsonObject);
 
         if (name.equals("HEK"))
-            return new SWEKSource(name, parseProviderName(jsonObject), parseGeneralParameters(jsonObject), new HEKParser());
+            return new SWEKSource(name, parseProviderName(jsonObject), parseGeneralParameters(jsonObject), new HEKParser(), new HEKDownloader());
         else if (name.equals("COMESEP"))
-            return new SWEKSource(name, parseProviderName(jsonObject), parseGeneralParameters(jsonObject), new ComesepParser());
+            return new SWEKSource(name, parseProviderName(jsonObject), parseGeneralParameters(jsonObject), new ComesepParser(), new ComesepDownloader());
         else
             return null;
     }
