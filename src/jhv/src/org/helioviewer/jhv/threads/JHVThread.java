@@ -98,11 +98,14 @@ public class JHVThread {
                             pstatement.setQueryTimeout(30);
 
                             ResultSet rs = pstatement.executeQuery();
-                            if (rs.next()) {
-                                found_version = rs.getInt(1);
-                                found_hash = rs.getInt(2);
+                            try {
+                                if (rs.next()) {
+                                    found_version = rs.getInt(1);
+                                    found_hash = rs.getInt(2);
+                                }
+                            } finally {
+                                rs.close();
                             }
-                            rs.close();
                         } finally {
                             pstatement.close();
                         }

@@ -8,7 +8,7 @@ import org.helioviewer.jhv.base.logging.Log;
 
 public class JHVDatabase {
 
-    public static void closeResultSet(ResultSet rs) {
+    public static void close(ResultSet rs) {
         if (rs != null) {
             try {
                 rs.close();
@@ -18,10 +18,10 @@ public class JHVDatabase {
         }
     }
 
-    public static void closeStatement(Statement statement) {
-        if (statement != null) {
+    public static void close(Statement stmt) {
+        if (stmt != null) {
             try {
-                statement.close();
+                stmt.close();
             } catch (SQLException e) {
                 Log.error("The statement cannot be closed " + e.getMessage());
             }
