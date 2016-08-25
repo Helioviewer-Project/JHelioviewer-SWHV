@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.AbstractList;
@@ -139,17 +138,6 @@ public class PluginManager {
     }
 
     /**
-     *
-     * @param plugin
-     *            A loaded plugin
-     * @return The corresponding plugin container or null if the plugin was not
-     *         loaded
-     */
-    public PluginContainer getPluginContainer(Plugin plugin) {
-        return plugins.get(plugin);
-    }
-
-    /**
      * Returns a list with all plug-ins which have the passed active status. If
      * the active status is true all activated plug-ins will be returned
      * otherwise all available and not activated plug-ins will be returned.
@@ -228,26 +216,6 @@ public class PluginManager {
             Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         }
         return false;
-    }
-
-    /**
-     * Adds an internal plug-in to the list of all loaded plug-ins. Internal
-     * plug-ins are installed and activated by default.
-     *
-     * @param classLoader
-     *            The class loader used to load the plugin classes
-     * @param plugin
-     *            internal plug-in to add to the list of all loaded plug-ins.
-     */
-    public void addInternalPlugin(ClassLoader classLoader, Plugin plugin) {
-        try {
-            PluginContainer pluginContainer = new PluginContainer(classLoader, plugin, new URI("internal"), true);
-            plugins.put(plugin, pluginContainer);
-            PluginSettings.getSingletonInstance().pluginSettingsToXML(pluginContainer);
-            plugin.installPlugin();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
