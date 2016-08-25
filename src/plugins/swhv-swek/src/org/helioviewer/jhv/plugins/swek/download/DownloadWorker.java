@@ -7,12 +7,10 @@ import java.util.List;
 import org.helioviewer.jhv.base.GZIPUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKDownloader;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
@@ -47,17 +45,8 @@ public class DownloadWorker implements Runnable {
     @Override
     public void run() {
         SWEKSource swekSource = jhvType.getSupplier().getSource();
-        SWEKDownloader downloader = swekSource.getDownloader();
 
-        boolean success = true;
-        if (downloader == null) {
-            Log.warn("The swek downloader with sourcename " + swekSource.getSourceName() + " could not be loaded");
-            success = false;
-        }
-
-        if (success)
-            success = downloader.extern2db(jhvType, requestInterval.start, requestInterval.end, params);
-
+        boolean success = swekSource.getDownloader().extern2db(jhvType, requestInterval.start, requestInterval.end, params);
         if (success) {
             final ArrayList<JHVAssociation> associationList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, jhvType);
             EventQueue.invokeLater(new Runnable() {
