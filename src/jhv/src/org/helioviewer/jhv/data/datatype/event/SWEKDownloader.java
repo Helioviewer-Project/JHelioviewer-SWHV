@@ -17,8 +17,6 @@ import org.json.JSONObject;
 
 public abstract class SWEKDownloader {
 
-    private boolean overmax = true;
-
     public boolean extern2db(JHVEventType eventType, long start, long end, List<SWEKParam> params) {
         ArrayList<Interval> range = EventDatabase.db2daterange(eventType);
         for (Interval interval : range) {
@@ -26,14 +24,21 @@ public abstract class SWEKDownloader {
                 return true;
             }
         }
-
         try {
             int page = 0;
             boolean success = true;
+            boolean overmax = true;
+
             while (overmax && success) {
                 String urlString = createURL(eventType.getEventType(), start, end, params, page);
-                DownloadStream ds = new DownloadStream(new URL(urlString));
-                success = parseStream(ds.getInput(), eventType);
+                InputStream stream = new DownloadStream(new URL(urlString)).getInput();
+                if (stream == null) {
+                    Log.error("Download input stream was null. Probably HEK is down.");
+                    return false;
+                }
+                JSONObject eventJSON = JSONUtils.getJSONStream(stream);
+                overmax = getOvermax(eventJSON);
+                success = parseEvents(eventJSON, eventType) && parseAssociations(eventJSON);
                 page++;
             }
             return success;
@@ -45,23 +50,17 @@ public abstract class SWEKDownloader {
         return false;
     }
 
-    private boolean parseStream(InputStream stream, JHVEventType type) {
-        if (stream == null) {
-            Log.error("Download input stream was null. Probably HEK is down.");
-            return false;
-        }
-
+    private boolean getOvermax(JSONObject eventJSON) {
+        boolean overmax = true;
         try {
-            JSONObject eventJSON = JSONUtils.getJSONStream(stream);
             overmax = eventJSON.has("overmax") && eventJSON.getBoolean("overmax");
-
-            return parseEvents(eventJSON, type) && parseAssociations(eventJSON);
         } catch (JSONException e) {
             overmax = false;
             Log.error("JSON parsing error " + e);
             e.printStackTrace();
             return false;
         }
+        return overmax;
     }
 
     protected abstract boolean parseEvents(JSONObject eventJSON, JHVEventType type);
