@@ -55,9 +55,6 @@ public class SWEKConfigurationManager {
     /** Config file URL */
     private URL configFileURL;
 
-    /** The loaded configuration */
-    private SWEKConfiguration configuration;
-
     /** Map containing the sources */
     private final Map<String, SWEKSource> sources;
 
@@ -234,33 +231,15 @@ public class SWEKConfigurationManager {
         try {
             JSONObject configJSON = JSONUtils.getJSONStream(configFileURL.openStream());
             EventDatabase.config_hash = Arrays.hashCode(configJSON.toString().toCharArray());
-            return parseJSONConfig(configJSON);
+            SWEKConfiguration config = new SWEKConfiguration(parseVersion(configJSON), parseManuallyChanged(configJSON), parseSources(configJSON), parseEventTypes(configJSON), parseRelatedEvents(configJSON));
+            SWEKEventType.setSwekRelatedEvents(config.getRelatedEvents());
+            return true;
         } catch (IOException e) {
             Log.debug("Configuration file could not be parsed: " + e);
         } catch (JSONException e) {
-            Log.debug("Could not parse JSON: " + e);
+            Log.debug("Could not parse config JSON: " + e);
         }
         return false;
-    }
-
-    /**
-     * Parses the JSON from start
-     *
-     * @param configJSON
-     *            The JSON to parse
-     * @return true if the JSON configuration could be parsed, false if not.
-     */
-    private boolean parseJSONConfig(JSONObject configJSON) {
-        try {
-            configuration = new SWEKConfiguration(parseVersion(configJSON), parseManuallyChanged(configJSON), parseSources(configJSON), parseEventTypes(configJSON), parseRelatedEvents(configJSON));
-            SWEKEventType.setSwekRelatedEvents(configuration.getRelatedEvents());
-            return true;
-        } catch (JSONException e) {
-            Log.error("Could not parse JSON");
-            e.printStackTrace();
-            configuration = new SWEKConfiguration("", false, new ArrayList<SWEKSource>(), new ArrayList<SWEKEventType>(), new ArrayList<SWEKRelatedEvents>());
-            return false;
-        }
     }
 
     /**
@@ -838,7 +817,6 @@ public class SWEKConfigurationManager {
      */
     private SWEKSpatialRegion parseSpatialRegion(JSONObject object) throws JSONException {
         JSONObject jsonObject = object.getJSONObject("spatial_region");
-
         return new SWEKSpatialRegion(parseX1(jsonObject), parseY1(jsonObject), parseX2(jsonObject), parseY2(jsonObject));
     }
 

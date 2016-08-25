@@ -18,7 +18,7 @@ import org.helioviewer.jhv.base.FileUtils;
 public class LogSettings {
 
     private final String logSettingsPath;
-    private Properties settings;
+    private final Properties settings;
 
     /**
      * @param defaultLogSettingsPath
