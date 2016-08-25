@@ -68,16 +68,7 @@ public class DownloadWorker implements Runnable {
                     }
                 });
             }
-        }
 
-        if (!success) {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    SWEKDownloadManager.getSingletonInstance().workerForcedToStop(DownloadWorker.this);
-                }
-            });
-        } else {
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -86,6 +77,13 @@ public class DownloadWorker implements Runnable {
                 }
             });
             EventDatabase.addDaterange2db(requestInterval.start, requestInterval.end, jhvType);
+        } else {
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    SWEKDownloadManager.getSingletonInstance().workerForcedToStop(DownloadWorker.this);
+                }
+            });
         }
     }
 
