@@ -146,17 +146,6 @@ public class SWEKConfigurationManager {
     }
 
     /**
-     * Gives a map with all the event types. The event type name is the key and
-     * the event type is the value.
-     *
-     * @return map containing the event types found in the configuration file
-     */
-    public Map<String, SWEKEventType> getEventTypes() {
-        loadConfiguration();
-        return eventTypes;
-    }
-
-    /**
      * Gives an configuration ordered list with all the event types.
      *
      * @return map containing the event types found in the configuration file
@@ -164,42 +153,6 @@ public class SWEKConfigurationManager {
     public List<SWEKEventType> getOrderedEventTypes() {
         loadConfiguration();
         return orderedEventTypes;
-    }
-
-    /**
-     * Gives a map with all the event sources. The source name is the key and
-     * the source is the value.
-     *
-     * @return map containing the sources found in the configuration file
-     */
-    public Map<String, SWEKSource> getSources() {
-        loadConfiguration();
-        return sources;
-    }
-
-    /**
-     * Gets the related event rules.
-     *
-     * @return the related event rules.
-     */
-    public List<SWEKRelatedEvents> getSWEKRelatedEvents() {
-        loadConfiguration();
-        return configuration.getRelatedEvents();
-    }
-
-    public SWEKEventType getEventType(String eventTypeName) {
-        loadConfiguration();
-        return configuration.getSWEKEventType(eventTypeName);
-    }
-
-    public SWEKSupplier getSWEKSupplier(String supplierName, String eventTypeName) {
-        loadConfiguration();
-        return configuration.getSWEKSupplier(supplierName, eventTypeName);
-    }
-
-    public SWEKSource getSWEKSource(String sourceName) {
-        loadConfiguration();
-        return configuration.getSWEKSource(sourceName);
     }
 
     private boolean checkAndOpenZippedFile() {

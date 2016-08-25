@@ -107,7 +107,7 @@ public class SWEKEventType {
                 fields.put(p.getParameterName().intern(), pf.getDbType());
             }
         }
-        for (SWEKRelatedEvents re : getSwekRelatedEvents()) {
+        for (SWEKRelatedEvents re : getSWEKRelatedEvents()) {
             if (re.getEvent() == this) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
 
@@ -132,7 +132,7 @@ public class SWEKEventType {
         swekrelEvents = _relatedEvents;
     }
 
-    public List<SWEKRelatedEvents> getSwekRelatedEvents() {
+    public List<SWEKRelatedEvents> getSWEKRelatedEvents() {
         return swekrelEvents;
     }
 
