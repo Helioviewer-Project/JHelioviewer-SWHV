@@ -47,7 +47,7 @@ public class JavaHelioViewer {
         Locale.setDefault(Locale.US);
 
         // init log
-        LogSettings logSettings = new LogSettings("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), CommandLineProcessor.isOptionSet("--use-existing-log-time-stamp"));
+        LogSettings logSettings = new LogSettings("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath());
 
         // Information log message
         StringBuilder argString = new StringBuilder();
