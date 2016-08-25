@@ -43,7 +43,7 @@ public class DataSourcesParser {
             if (str == null && !DataSources.SupportedObservatories.contains(name)) // filter top level
                 continue;
 
-            if (json.has("sourceId")) { // leaf
+            if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
                 long start = TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime();
                 long end = TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime();
                 String description = json.getString("description") + " [" + TimeUtils.dateFormat.format(start) + " : " + TimeUtils.dateFormat.format(end) + "]";
