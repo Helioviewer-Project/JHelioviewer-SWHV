@@ -40,6 +40,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         eventCache = JHVEventCache.getSingletonInstance();
         events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         EVEPlugin.ldsm.addLineData(this);
+        fetchData(EVEPlugin.dc.selectedAxis);
     }
 
     public static EventModel getSingletonInstance() {
