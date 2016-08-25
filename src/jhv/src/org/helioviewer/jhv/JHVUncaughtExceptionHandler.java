@@ -22,14 +22,9 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.logging.LogSettings;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
 
-/**
- * Routines to catch and handle all runtime exceptions.
- *
- * @author Malte Nuhn
- */
+// Catch and handle all runtime exceptions
 public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String BUG_URL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
@@ -125,8 +120,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             System.exit(1);
     }
 
-    // we do not use the logger here, since it should work even before logging
-    // initialization
+    // we do not use the logger here, since it should work even before logging initialization
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         StringBuilder stackTrace = new StringBuilder();
@@ -152,14 +146,13 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
         msg += "Stacktrace:\n";
         msg += stackTrace;
 
-        if (LogSettings.getSingletonInstance() != null) {
+        String logName = Log.getCurrentLogFile();
+        if (logName != null) {
             Log.fatal("Runtime exception", e);
 
             msg += "\nLog:\n";
-            LogSettings.getSingletonInstance().getCurrentLogFile();
-
             try {
-                BufferedReader input = new BufferedReader(new FileReader(LogSettings.getSingletonInstance().getCurrentLogFile()));
+                BufferedReader input = new BufferedReader(new FileReader(logName));
                 try {
                     String line;
                     StringBuilder sb = new StringBuilder();
@@ -170,8 +163,8 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
                 } finally {
                     input.close();
                 }
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
         } else {
             System.err.println("Runtime exception");

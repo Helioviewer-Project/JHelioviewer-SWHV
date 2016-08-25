@@ -1,18 +1,31 @@
 package org.helioviewer.jhv.base.logging;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
  * Wrapper class to conveniently access the root logger. For a description of
  * the different methods see {@link org.apache.log4j.Logger}
- * 
- * @author Andre Dau
- * 
  */
 public class Log {
 
-    private static final Logger log = LogSettings.getSingletonInstance().getRootLogger();
+    static final Logger log = Logger.getRootLogger();
+
+    /**
+     * Returns the name of current log file.
+     * If the name could not be retrieved, returns null.
+     *
+     * @return name of the current log file
+     */
+    public static String getCurrentLogFile() {
+        Appender appender = log.getAppender("file");
+        if (appender instanceof FileAppender) {
+            return ((FileAppender) appender).getFile();
+        }
+        return null;
+    }
 
     public static void log(Level logLevel, Object message, Throwable error) {
         if (logLevel.equals(Level.TRACE)) {
