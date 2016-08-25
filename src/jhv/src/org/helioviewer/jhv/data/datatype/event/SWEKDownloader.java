@@ -36,31 +36,21 @@ public abstract class SWEKDownloader {
                     Log.error("Download input stream was null. Probably HEK is down.");
                     return false;
                 }
+
                 JSONObject eventJSON = JSONUtils.getJSONStream(stream);
-                overmax = getOvermax(eventJSON);
+                overmax = eventJSON.has("overmax") && eventJSON.getBoolean("overmax");
                 success = parseEvents(eventJSON, eventType) && parseAssociations(eventJSON);
                 page++;
             }
             return success;
+        } catch (JSONException e) {
+            Log.error("JSON parse error: " + e);
         } catch (MalformedURLException e) {
-            Log.error("Could not create URL from given string error : " + e);
+            Log.error("Could not create URL from given string error: " + e);
         } catch (IOException e) {
-            Log.error("Could not create input stream for given URL error : " + e);
+            Log.error("Could not create input stream for given URL error: " + e);
         }
         return false;
-    }
-
-    private boolean getOvermax(JSONObject eventJSON) {
-        boolean overmax = true;
-        try {
-            overmax = eventJSON.has("overmax") && eventJSON.getBoolean("overmax");
-        } catch (JSONException e) {
-            overmax = false;
-            Log.error("JSON parsing error " + e);
-            e.printStackTrace();
-            return false;
-        }
-        return overmax;
     }
 
     protected abstract boolean parseEvents(JSONObject eventJSON, JHVEventType type);
