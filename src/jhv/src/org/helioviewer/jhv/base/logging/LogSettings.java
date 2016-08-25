@@ -43,10 +43,14 @@ public class LogSettings {
             } finally {
                 is.close();
             }
+        } catch (IOException e) {
+            Log.log.error("Could not load default settings: " + e.getMessage());
+        }
 
+        try {
             File userFile = new File(logSettingsPath);
             if (userFile.exists()) {
-                is = new FileInputStream(userFile);
+                FileInputStream is = new FileInputStream(userFile);
                 try {
                     settings.load(is);
                 } finally {
@@ -54,7 +58,7 @@ public class LogSettings {
                 }
             }
         } catch (IOException e) {
-            Log.log.error("Could not load settings: " + e.getMessage());
+            Log.log.error("Could not load user settings: " + e.getMessage());
         }
 
         String filePattern = "'jhv.'yyyy-MM-dd'T'HH-mm-ss'.log'";

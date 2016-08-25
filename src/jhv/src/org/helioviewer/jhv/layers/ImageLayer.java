@@ -128,7 +128,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
                     if (!Layers.isCor(Layers.getLayer(i).getName()))
                         count++;
                 }
-                opacity = (float) (1. / count);
+                opacity = (float) (1. / (count != 0 ? count : 1 /* satisfy coverity */));
             }
             optionsPanel.setOpacity(opacity);
         }
