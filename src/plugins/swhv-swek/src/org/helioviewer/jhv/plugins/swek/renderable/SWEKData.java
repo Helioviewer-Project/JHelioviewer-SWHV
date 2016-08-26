@@ -90,7 +90,6 @@ public class SWEKData implements LayersListener, JHVEventHandler {
             beginDate = null;
             endDate = null;
             requestEvents();
-            displayEvents();
         }
     }
 
