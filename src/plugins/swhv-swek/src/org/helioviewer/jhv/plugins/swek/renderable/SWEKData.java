@@ -46,25 +46,14 @@ public class SWEKData implements LayersListener, JHVEventHandler {
     }
 
     public void requestEvents() {
-        boolean request = false;
         JHVDate first = Layers.getStartDate();
         JHVDate last = Layers.getEndDate();
+        if (first == null || last == null)
+            return;
 
-        if (first != null) {
-            if (beginDate == null || first.milli < beginDate.milli) {
-                beginDate = first;
-                request = true;
-            }
-        }
-
-        if (last != null) {
-            if (endDate == null || last.milli > endDate.milli) {
-                endDate = last;
-                request = true;
-            }
-        }
-
-        if (request && endDate != null && beginDate != null) {
+        if (beginDate == null || endDate == null || first.milli < beginDate.milli || last.milli > endDate.milli) {
+            beginDate = first;
+            endDate = last;
             JHVEventCache.getSingletonInstance().requestForInterval(beginDate.milli, endDate.milli, SWEKData.this);
         }
     }
