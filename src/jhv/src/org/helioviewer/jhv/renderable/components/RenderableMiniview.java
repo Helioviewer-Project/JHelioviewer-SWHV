@@ -12,6 +12,7 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.viewmodel.view.View;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -21,6 +22,17 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private final Camera miniCamera = new Camera();
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
+    private static String name = "miniview";
+
+    public void deserialize(JSONObject jo) {
+
+    }
+
+    public JSONObject serialize() {
+        JSONObject jo = new JSONObject();
+        jo.put("name", name);
+        return jo;
+    }
 
     public RenderableMiniview() {
         optionsPanel = new RenderableMiniviewOptionsPanel(this);

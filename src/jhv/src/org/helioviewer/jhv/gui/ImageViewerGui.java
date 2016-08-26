@@ -34,6 +34,10 @@ import org.helioviewer.jhv.gui.components.statusplugins.CarringtonStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
+import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.io.CommandLineProcessor;
+import org.helioviewer.jhv.io.LoadURITask;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
@@ -94,7 +98,7 @@ public class ImageViewerGui {
 
         // Layer control
         renderableContainer = new RenderableContainer();
-        renderableGrid = new RenderableGrid();
+        renderableGrid = new RenderableGrid(null);
         renderableContainer.addRenderable(renderableGrid);
         renderableViewpoint = new RenderableViewpoint();
         renderableContainer.addRenderable(renderableViewpoint);
