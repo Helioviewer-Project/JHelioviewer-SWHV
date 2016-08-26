@@ -18,6 +18,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.json.JSONObject;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -60,7 +61,34 @@ public class RenderableGrid extends AbstractRenderable {
     private final Component optionsPanel;
     private static final String name = "Grid";
 
-    public RenderableGrid() {
+    public JSONObject serialize() {
+        JSONObject jo = new JSONObject();
+        jo.put("lonstepDegrees", lonstepDegrees);
+        jo.put("latstepDegrees", latstepDegrees);
+        jo.put("showAxes", showAxes);
+        jo.put("showLabels", showLabels);
+        jo.put("showRadial", showRadial);
+        jo.put("name", name);
+        return jo;
+    }
+
+    public void deserialize(JSONObject jo) {
+        if (jo.has("lonstepDegrees"))
+            lonstepDegrees = (float) jo.getDouble("lonstepDegrees");
+        if (jo.has("latstepDegrees"))
+            latstepDegrees = (float) jo.getDouble("latstepDegrees");
+        if (jo.has("showAxes"))
+            showAxes = jo.getBoolean("showAxes");
+        if (jo.has("showLabels"))
+            showLabels = jo.getBoolean("showLabels");
+        if (jo.has("showRadial"))
+            showRadial = jo.getBoolean("showRadial");
+    }
+
+    public RenderableGrid(JSONObject jo) {
+        if (jo != null) {
+            deserialize(jo);
+        }
         optionsPanel = new RenderableGridOptionsPanel(this);
         setVisible(true);
 
@@ -549,6 +577,18 @@ public class RenderableGrid extends AbstractRenderable {
     public void setLatstepDegrees(double _latstepDegrees) {
         latstepDegrees = (float) _latstepDegrees;
         makeLatLabels();
+    }
+
+    public boolean getShowLabels() {
+        return showLabels;
+    }
+
+    public boolean getShowAxes() {
+        return showAxes;
+    }
+
+    public boolean getShowRadial() {
+        return showRadial;
     }
 
     public void showLabels(boolean show) {

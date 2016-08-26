@@ -48,7 +48,7 @@ public class RenderableGridOptionsPanel extends SmallPanel {
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.EAST;
-        JCheckBox axes = new JCheckBox("Solar axes", true);
+        JCheckBox axes = new JCheckBox("Solar axes", grid.getShowAxes());
         axes.setHorizontalTextPosition(SwingConstants.LEFT);
         axes.addItemListener(new ItemListener() {
             @Override
@@ -61,7 +61,7 @@ public class RenderableGridOptionsPanel extends SmallPanel {
 
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.EAST;
-        JCheckBox labels = new JCheckBox("Grid labels", true);
+        JCheckBox labels = new JCheckBox("Grid labels", grid.getShowLabels());
         labels.setHorizontalTextPosition(SwingConstants.LEFT);
         labels.addItemListener(new ItemListener() {
             @Override
@@ -76,7 +76,7 @@ public class RenderableGridOptionsPanel extends SmallPanel {
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.EAST;
-        JCheckBox radial = new JCheckBox("Radial grid", false);
+        JCheckBox radial = new JCheckBox("Radial grid", grid.getShowRadial());
         radial.setHorizontalTextPosition(SwingConstants.LEFT);
         radial.addItemListener(new ItemListener() {
             @Override

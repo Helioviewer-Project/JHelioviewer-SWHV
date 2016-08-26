@@ -10,6 +10,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
@@ -17,6 +18,16 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableTimeStamp extends AbstractRenderable {
 
     private static final String name = "Timestamp";
+
+    public void deserialize(JSONObject jo) {
+
+    }
+
+    public JSONObject serialize() {
+        JSONObject jo = new JSONObject();
+        jo.put("name", name);
+        return jo;
+    }
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
