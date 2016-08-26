@@ -121,6 +121,13 @@ public class SWEKPopupController implements MouseListener, TimeListener {
     public void mouseDragged(MouseEvent e) {
     }
 
+    private double computeDistSun(JHVEvent evt) {
+        double speed = SWEKData.readCMESpeed(evt);
+        double distSun = 2.4;
+        distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
+        return distSun;
+    }
+
     @Override
     public void mouseMoved(MouseEvent e) {
         ArrayList<JHVRelatedEvents> eventsToDraw = SWEKData.getSingletonInstance().getActiveEvents(currentTime);
@@ -143,9 +150,7 @@ public class SWEKPopupController implements MouseListener, TimeListener {
                 Vec3 hitpoint, pt;
                 if (evt.getName() == "Coronal Mass Ejection") { // interned
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
-                    double speed = SWEKData.readCMESpeed(evt);
-                    double distSun = 2.4;
-                    distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
+                    double distSun = computeDistSun(evt);
 
                     Position.Q p = pi.getEarthPosition();
                     pt = p.orientation.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
@@ -174,9 +179,8 @@ public class SWEKPopupController implements MouseListener, TimeListener {
                 if (evt.getName() == "Coronal Mass Ejection") { // interned
                     if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR) {
                         double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
-                        double speed = SWEKData.readCMESpeed(evt);
-                        double distSun = 2.4;
-                        distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
+                        double distSun = computeDistSun(evt);
+
                         GridScale scale = GridScale.current;
                         tf = new Vec2(scale.getXValueInv(principalAngle), scale.getYValueInv(distSun));
                         mousepos = scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
