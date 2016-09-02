@@ -13,7 +13,6 @@ import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
  */
 public class PluginContainer implements Container {
 
-    private final ClassLoader classLoader;
     private final Plugin plugin;
     private final URI pluginLocation;
     private boolean pluginActive;
@@ -28,8 +27,7 @@ public class PluginContainer implements Container {
      * @param active
      *            Status if plug-in is already activated (installed) or not.
      */
-    public PluginContainer(ClassLoader classLoader, Plugin plugin, URI pluginLocation, boolean active) {
-        this.classLoader = classLoader;
+    public PluginContainer(Plugin plugin, URI pluginLocation, boolean active) {
         this.plugin = plugin;
         this.pluginLocation = pluginLocation;
         this.pluginActive = active;

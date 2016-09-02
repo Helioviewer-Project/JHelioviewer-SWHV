@@ -198,7 +198,7 @@ public class PluginManager {
                 Log.info("PluginManager: Load plugin class: " + className);
 
                 if (obj instanceof Plugin) {
-                    addPlugin(classLoader, (Plugin) obj, pluginLocation);
+                    addPlugin((Plugin) obj, pluginLocation);
                     return true;
                 } else {
                     Log.debug("Load failed, was trying to load something that is not a plugin: " + className);
@@ -223,15 +223,13 @@ public class PluginManager {
      * is not activated. If there is a plug-in entry in the plug-in settings
      * file the status of the plug-in will be set to this value.
      *
-     * @param classLoader
-     *            The class loader used to load the plugin classes
      * @param plugin
      *            Plug-in to add to the list.
      * @param pluginLocation
      *            Location of the corresponding file of the plug-in.
      */
-    public void addPlugin(ClassLoader classLoader, Plugin plugin, URI pluginLocation) {
-        PluginContainer pluginContainer = new PluginContainer(classLoader, plugin, pluginLocation, pluginSettings.isPluginActivated(pluginLocation));
+    public void addPlugin(Plugin plugin, URI pluginLocation) {
+        PluginContainer pluginContainer = new PluginContainer(plugin, pluginLocation, pluginSettings.isPluginActivated(pluginLocation));
         plugins.put(plugin, pluginContainer);
         if (pluginContainer.isActive()) {
             plugin.installPlugin();
