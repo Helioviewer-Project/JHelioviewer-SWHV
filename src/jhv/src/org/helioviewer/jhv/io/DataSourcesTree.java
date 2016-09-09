@@ -10,6 +10,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -114,9 +115,9 @@ public class DataSourcesTree extends JTree {
     }
 
     public void setSelectedItem(String server, int sourceId) {
-        Enumeration<DefaultMutableTreeNode> e = nodeRoot.depthFirstEnumeration();
+        Enumeration e = nodeRoot.depthFirstEnumeration();
         while (e.hasMoreElements()) {
-            DefaultMutableTreeNode node = e.nextElement();
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
             if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
                 SourceItem item = (SourceItem) node.getUserObject();
                 if (item.sourceId == sourceId && item.server.equals(server)) {
