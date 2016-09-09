@@ -133,7 +133,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                     g.setStroke(dashed);
                     g.setColor(Color.black);
                     int sepLinePos = graphArea.y + previousLine * spacePerLine - spacePerLine / 4 + DrawConstants.EVENT_OFFSET;
-                    g.drawLine(graphArea.x, sepLinePos, graphArea.width, sepLinePos);
+                    g.drawLine(graphArea.x, sepLinePos, graphArea.x + graphArea.width, sepLinePos);
                     g.setStroke(normalStroke);
                 }
 
