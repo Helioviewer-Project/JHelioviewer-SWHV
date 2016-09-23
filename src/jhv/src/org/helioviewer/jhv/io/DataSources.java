@@ -42,11 +42,11 @@ public class DataSources {
             put("GSFC",
                 new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
-                    put("API.jp2images.path", "http://api.helioviewer.org/v2/getJP2Image/?");
-                    put("API.jp2series.path", "http://api.helioviewer.org/v2/getJPX/?");
+                    put("API.dataSources.path", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.jp2images.path", "https://api.helioviewer.org/v2/getJP2Image/?");
+                    put("API.jp2series.path", "https://api.helioviewer.org/v2/getJPX/?");
                     put("default.remote.path", "jpip://helioviewer.org:8090");
-                    put("default.httpRemote.path", "http://helioviewer.org/jp2/");
+                    put("default.httpRemote.path", "https://helioviewer.org/jp2/");
                 }
             });
         }
