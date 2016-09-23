@@ -265,26 +265,31 @@ public class FileUtils {
         in.close();
     }
 
-    /**
-     * Method saving a stream to dst.
-     *
-     * @param in
-     *            Input stream, will be closed if finished
-     * @param dst
-     *            Destination file
-     * @throws IOException
-     */
     public static String read(File dst) throws IOException {
         Log.debug("Reading file " + dst.getAbsolutePath());
         BufferedReader in = new BufferedReader(new FileReader(dst));
         StringBuilder sb = new StringBuilder();
 
-        // Transfer bytes from in to out
         String str;
-
         try {
             while ((str = in.readLine()) != null) {
-                sb.append(str);
+                sb.append(str + '\n');
+            }
+        } finally {
+            in.close();
+        }
+
+        return sb.toString();
+    }
+
+    public static String read(InputStream strm) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(strm, "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+
+        String str;
+        try {
+            while ((str = in.readLine()) != null) {
+                sb.append(str + '\n');
             }
         } finally {
             in.close();
