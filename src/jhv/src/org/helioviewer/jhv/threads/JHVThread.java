@@ -36,9 +36,10 @@ public class JHVThread {
     }
 
     public static class ConnectionThread extends Thread {
-        private static Connection connection;
-        private static final int CURRENT_VERSION_SCHEMA = 5;
+
+        private static final int CURRENT_VERSION_SCHEMA = 6;
         public static final HashMap<JHVEventType, RequestCache> downloadedCache = new HashMap<JHVEventType, RequestCache>();
+        private static Connection connection;
 
         public ConnectionThread(Runnable r, String name) {
             super(r, name);
