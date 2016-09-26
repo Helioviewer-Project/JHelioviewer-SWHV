@@ -149,16 +149,14 @@ public class LUT {
      */
     private static LUT readGimpGradientFile(File file) throws Exception {
         FileInputStream fr = null;
-        LUT l;
         try {
             fr = new FileInputStream(file);
-            l = readGimpGradientStream(fr);
+            return readGimpGradientStream(fr);
         } finally {
             if (fr != null) {
                 fr.close();
             }
         }
-        return l;
     }
 
     /**

@@ -52,13 +52,11 @@ public abstract class AbstractAnnotateable implements Annotateable {
     }
 
     protected Vec3 computePoint(int x, int y) {
-        Vec3 pt;
         if (Displayer.mode == DisplayMode.ORTHO) {
-            pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
+            return CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
         } else {
-            pt = GridScale.current.transformInverse(GridScale.current.mouseToGrid(x, y, Displayer.getActiveViewport(), camera, GridChoiceType.VIEWPOINT));
+            return GridScale.current.transformInverse(GridScale.current.mouseToGrid(x, y, Displayer.getActiveViewport(), camera, GridChoiceType.VIEWPOINT));
         }
-        return pt;
     }
 
     protected void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {

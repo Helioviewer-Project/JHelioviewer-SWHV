@@ -273,7 +273,7 @@ public class FileUtils {
         String str;
         try {
             while ((str = in.readLine()) != null) {
-                sb.append(str + '\n');
+                sb.append(str).append('\n');
             }
         } finally {
             in.close();
@@ -289,7 +289,7 @@ public class FileUtils {
         String str;
         try {
             while ((str = in.readLine()) != null) {
-                sb.append(str + '\n');
+                sb.append(str).append('\n');
             }
         } finally {
             in.close();

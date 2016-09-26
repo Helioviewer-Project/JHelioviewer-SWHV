@@ -20,14 +20,13 @@ public class LoadRemoteTask extends LoadURITask {
 
     @Override
     protected View backgroundWork() {
-        View view = null;
         try {
-            view = APIRequestManager.requestAndOpenRemoteFile(req, true);
+            return APIRequestManager.requestAndOpenRemoteFile(req, true);
         } catch (IOException e) {
             Log.error("An error occured while opening the remote file: ", e);
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);
         }
-        return view;
+        return null;
     }
 
 }

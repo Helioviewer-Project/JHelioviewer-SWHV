@@ -58,7 +58,6 @@ public class PositionLoad {
 
         @Override
         protected Position.L[] backgroundWork() {
-            Position.L[] ret = null;
             JSONObject result;
             try {
                 long deltat = 60, span = (end - start) / 1000;
@@ -79,7 +78,7 @@ public class PositionLoad {
                     else
                         report = "Invalid network response";
                 } else {
-                    ret = parseData(result);
+                    return parseData(result);
                 }
             } catch (MalformedURLException e) {
                 Log.error("Malformed URL", e);
@@ -95,7 +94,7 @@ public class PositionLoad {
                 report = FAILEDSTATE + ": JSON parse error";
             }
 
-            return ret;
+            return null;
         }
 
         private Position.L[] parseData(JSONObject jsonResult) throws JSONException, ParseException {

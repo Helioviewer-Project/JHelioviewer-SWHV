@@ -57,7 +57,6 @@ public class BandTypeAPI {
     }
 
     private String readJSON() {
-        String string = null;
         URL url = null;
         try {
             url = new URL(baseURL + "/datasets/index.php");
@@ -75,11 +74,12 @@ public class BandTypeAPI {
         }
 
         try {
-            string = FileUtils.read(dstFile);
+            return FileUtils.read(dstFile);
         } catch (IOException e) {
             Log.debug("Error reading the bandtypes", e);
         }
-        return string;
+
+        return null;
     }
 
     private void updateBandTypes(JSONArray jsonObjectArray) {

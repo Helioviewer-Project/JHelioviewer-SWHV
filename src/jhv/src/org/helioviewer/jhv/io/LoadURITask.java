@@ -28,14 +28,13 @@ public class LoadURITask extends JHVWorker<View, Void> {
 
     @Override
     protected View backgroundWork() {
-        View view = null;
         try {
-            view = APIRequestManager.loadView(uri, downloadURI, null);
+            return APIRequestManager.loadView(uri, downloadURI, null);
         } catch (IOException e) {
             Log.error("An error occurred while opening the remote file: ", e);
             Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);
         }
-        return view;
+        return null;
     }
 
     @Override
