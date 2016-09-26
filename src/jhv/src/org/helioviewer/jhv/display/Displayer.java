@@ -24,24 +24,18 @@ public class Displayer implements JHVEventHighlightListener {
         ORTHO, LATITUDINAL, LOGPOLAR, POLAR;
 
         public String getLabel() {
-            String label;
             switch (this) {
             case ORTHO:
-                label = "Orthographic";
-                break;
+                return "Orthographic";
             case POLAR:
-                label = "Polar";
-                break;
+                return "Polar";
             case LATITUDINAL:
-                label = "Latitudinal";
-                break;
+                return "Latitudinal";
             case LOGPOLAR:
-                label = "LogPolar";
-                break;
+                return "LogPolar";
             default:
-                label = "";
+                return "";
             }
-            return label;
         }
 
         public GLSLSolarShader getSolarShader() {

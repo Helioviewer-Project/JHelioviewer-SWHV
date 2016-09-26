@@ -22,10 +22,9 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private final Camera miniCamera = new Camera();
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
-    private static String name = "miniview";
+    private static final String name = "miniview";
 
     public void deserialize(JSONObject jo) {
-
     }
 
     public JSONObject serialize() {
