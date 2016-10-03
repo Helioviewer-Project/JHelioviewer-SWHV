@@ -195,8 +195,14 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) {
-        if (!EventQueue.isDispatchThread())
-            return;
+        if (!EventQueue.isDispatchThread()) {
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    Displayer.display();
+                }
+            });
+        }
 
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(surface);
