@@ -90,3 +90,22 @@ diff -ur jogl-v2.3.2-orig/src/newt/classes/jogamp/newt/driver/macosx/WindowDrive
                          initWindow0( parentWinHandle, newWin, pS.getX(), pS.getY(), width, height, reqPixelScale[0] /* HiDPI uniformPixelScale */,
                                       isOpaque,
                                       !offscreenInstance && 0 != ( STATE_MASK_ALWAYSONTOP & flags),
+diff -ur jogl-v2.3.2-orig/src/newt/native/MacWindow.m jogl-v2.3.2/src/newt/native/MacWindow.m
+--- jogl-v2.3.2-orig/src/newt/native/MacWindow.m	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2/src/newt/native/MacWindow.m	2016-10-03 15:41:48.000000000 +0200
+@@ -821,10 +821,14 @@
+                                                styleMask: (NSUInteger) styleMask
+                                                backing: (NSBackingStoreType) bufferingType
+                                                defer: YES
+-                                               isFullscreenWindow: fullscreen];
++                                               isFullscreenWindow: false];
+     // DBG_PRINT( "createWindow0.1 - %p, isVisible %d\n", myWindow, [myWindow isVisible]);
+ 
+     DBG_PRINT( "createWindow0.X - %p, isVisible %d\n", myWindow, [myWindow isVisible]);
++    if (fullscreen)
++        [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationAutoHideDock)];
++    else
++        [NSApp setPresentationOptions:NSApplicationPresentationDefault];
+ 
+     [pool release];
+ 
