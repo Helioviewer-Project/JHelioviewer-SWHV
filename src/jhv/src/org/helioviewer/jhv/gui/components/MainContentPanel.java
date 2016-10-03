@@ -39,7 +39,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
         // nest in a container to avoid crash of GL drawables inside JSplitPane
         JPanel container = new JPanel(new BorderLayout());
-        container.setMinimumSize(new Dimension());
+        container.setMinimumSize(new Dimension(1, 1));
         container.add(mainComponent, BorderLayout.CENTER);
 
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
