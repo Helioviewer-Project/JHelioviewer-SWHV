@@ -43,6 +43,18 @@ diff -ur jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m jogl-v2.3.2/s
      [pool release];
  }
  
+diff -ur jogl-v2.3.2-orig/src/newt/classes/com/jogamp/newt/awt/NewtCanvasAWT.java jogl-v2.3.2/src/newt/classes/com/jogamp/newt/awt/NewtCanvasAWT.java
+--- jogl-v2.3.2-orig/src/newt/classes/com/jogamp/newt/awt/NewtCanvasAWT.java	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2/src/newt/classes/com/jogamp/newt/awt/NewtCanvasAWT.java	2016-10-05 10:06:08.000000000 +0200
+@@ -747,7 +747,7 @@
+                 if(DEBUG) {
+                     System.err.println("NewtCanvasAWT.reshape: "+x+"/"+y+" "+width+"x"+height);
+                 }
+-                if( validateComponent(true) ) {
++                if( validateComponent(true) && /* workaround for possible lockup */ !newtChild.isFullscreen()) {
+                     if( !printActive && updatePixelScale(getGraphicsConfiguration()) ) {
+                         // NOP
+                     } else {
 diff -ur jogl-v2.3.2-orig/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java jogl-v2.3.2/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java
 --- jogl-v2.3.2-orig/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java	2015-10-10 03:08:14.000000000 +0200
 +++ jogl-v2.3.2/src/newt/classes/jogamp/newt/driver/macosx/WindowDriver.java	2016-06-20 09:21:16.000000000 +0200
