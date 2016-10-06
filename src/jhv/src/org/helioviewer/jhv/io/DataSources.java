@@ -2,12 +2,9 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -22,8 +19,7 @@ public class DataSources {
 
     private static final HashMap<String, HashMap<String, String>> serverSettings = new HashMap<String, HashMap<String, String>>() {
         {
-            put("ROB",
-                    new HashMap<String, String>() {
+            put("ROB", new HashMap<String, String>() {
                 {
                     put("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&");
@@ -33,8 +29,7 @@ public class DataSources {
                     put("default.label", "Royal Observatory of Belgium");
                 }
             });
-            put("IAS",
-                    new HashMap<String, String>() {
+            put("IAS", new HashMap<String, String>() {
                 {
                     put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
@@ -44,8 +39,7 @@ public class DataSources {
                     put("default.label", "Institut d'Astrophysique Spatiale");
                 }
             });
-            put("GSFC",
-                    new HashMap<String, String>() {
+            put("GSFC", new HashMap<String, String>() {
                 {
                     put("API.dataSources.path", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "https://api.helioviewer.org/v2/getJP2Image/?");
@@ -56,8 +50,7 @@ public class DataSources {
                 }
             });
             /*
-            put("LOCALHOST",
-                    new HashMap<String, String>() {
+            put("LOCALHOST", new HashMap<String, String>() {
                 {
                     put("API.dataSources.path", "http://localhost:8080/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://localhost:8080/helioviewer/api/index.php?action=getJP2Image&");
@@ -78,8 +71,7 @@ public class DataSources {
     }
 
     public static String[] getServers() {
-        Object[] arr = serverSettings.keySet().toArray();
-        return Arrays.copyOf(arr, arr.length, String[].class);
+        return serverSettings.keySet().toArray(new String [0]);
     }
 
     public static String getPreferredServer() {
@@ -129,13 +121,11 @@ public class DataSources {
             try {
                 JSONObject rawSchema = new JSONObject(new JSONTokener(is));
                 Schema schema = SchemaLoader.load(rawSchema);
-                DataSourcesTask loadTask;
 
+                DataSourcesTask loadTask;
                 HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
-                Iterator<Entry<String, HashMap<String, String>>> it = datasourceNode.entrySet().iterator();
-                while (it.hasNext()) {
-                    Entry<String, HashMap<String, String>> v = it.next();
-                    String serverName = v.getKey();
+                for (Map.Entry<String, HashMap<String, String>> entry : datasourceNode.entrySet()) {
+                    String serverName = entry.getKey();
                     loadTask = new DataSourcesTask(serverName, schema);
                     JHVGlobals.getExecutorService().execute(loadTask);
                 }
