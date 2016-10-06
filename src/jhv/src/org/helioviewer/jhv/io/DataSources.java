@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -63,6 +64,7 @@ public class DataSources {
                     put("API.jp2series.path", "http://localhost:8080/helioviewer/api/index.php?action=getJPX&");
                     put("default.remote.path", "jpip://localhost:8090");
                     put("default.httpRemote.path", "http://localhost:8080/helioviewer/jp2/");
+                    put("default.label", "Localhost");
                 }
             });
              */
@@ -76,7 +78,8 @@ public class DataSources {
     }
 
     public static String[] getServers() {
-        return (String[]) serverSettings.keySet().toArray();
+        Object[] arr = serverSettings.keySet().toArray();
+        return Arrays.copyOf(arr, arr.length, String[].class);
     }
 
     public static String getPreferredServer() {
