@@ -3,6 +3,9 @@ package org.helioviewer.jhv.io;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
@@ -54,18 +57,20 @@ public class DataSourcesTree extends JTree {
     }
 
     private final DefaultMutableTreeNode nodeRoot;
-    private final DefaultMutableTreeNode nodeROB;
-    private final DefaultMutableTreeNode nodeGSFC;
-    private final DefaultMutableTreeNode nodeIAS;
+    private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<String, DefaultMutableTreeNode>();
 
     public DataSourcesTree() {
         nodeRoot = new DefaultMutableTreeNode("Datasets");
-        nodeROB = new DefaultMutableTreeNode(new Item("ROB", "Royal Observatory of Belgium"));
-        nodeGSFC = new DefaultMutableTreeNode(new Item("GSFC", "Goddard Space Flight Center"));
-        nodeIAS = new DefaultMutableTreeNode(new Item("IAS", "Institut d'Astrophysique Spatiale"));
-        nodeRoot.add(nodeROB);
-        nodeRoot.add(nodeGSFC);
-        nodeRoot.add(nodeIAS);
+        HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
+        Iterator<Entry<String, HashMap<String, String>>> it = datasourceNode.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, HashMap<String, String>> v = it.next();
+            String serverName = v.getKey();
+            HashMap<String, String> serverProperties = v.getValue();
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Item(serverName, serverProperties.get("default.label")));
+            nodes.put(serverName, node);
+            nodeRoot.add(node);
+        }
 
         setModel(new DefaultTreeModel(nodeRoot));
         // setRootVisible(false);
@@ -99,13 +104,16 @@ public class DataSourcesTree extends JTree {
 
     public boolean setParsedData(DataSourcesParser parser) {
         String server = parser.rootNode.toString();
-        if ("ROB".equals(server))
-            reattach(nodeROB, parser.rootNode);
-        else if ("GSFC".equals(server))
-            reattach(nodeGSFC, parser.rootNode);
-        else
-            reattach(nodeIAS, parser.rootNode);
-
+        HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
+        Iterator<Entry<String, HashMap<String, String>>> it = datasourceNode.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, HashMap<String, String>> v = it.next();
+            String serverName = v.getKey();
+            if (serverName.equals(server)) {
+                reattach(nodes.get(serverName), parser.rootNode);
+                break;
+            }
+        }
         boolean preferred = server.equals(DataSources.getPreferredServer());
         if (preferred && parser.defaultNode != null)
             setSelectionPath(new TreePath(parser.defaultNode.getPath()));

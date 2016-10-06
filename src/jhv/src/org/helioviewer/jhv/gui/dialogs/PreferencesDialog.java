@@ -133,7 +133,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         row_1.add(new JLabel("Preferred server", JLabel.RIGHT));
 
-        final JComboBox combo = new JComboBox(new String[] { "ROB", "GSFC", "IAS" });
+        final JComboBox combo = new JComboBox(DataSources.getServers());
         combo.setSelectedItem(DataSources.getPreferredServer());
         combo.addActionListener(new ActionListener() {
             @Override
@@ -188,7 +188,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             Settings settings = Settings.getSingletonInstance();
 
             Object[][] tableData = new Object[][] { { "Default recording directory", settings.getProperty("default.save.path") },
-                                                    { "Default download path", settings.getProperty("default.local.path") } };
+                    { "Default download path", settings.getProperty("default.local.path") } };
 
             model = new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
                 @Override
