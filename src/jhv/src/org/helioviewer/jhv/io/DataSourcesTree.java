@@ -4,8 +4,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
@@ -61,12 +60,12 @@ public class DataSourcesTree extends JTree {
 
     public DataSourcesTree() {
         nodeRoot = new DefaultMutableTreeNode("Datasets");
+
         HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
-        Iterator<Entry<String, HashMap<String, String>>> it = datasourceNode.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, HashMap<String, String>> v = it.next();
-            String serverName = v.getKey();
-            HashMap<String, String> serverProperties = v.getValue();
+        for (Map.Entry<String, HashMap<String, String>> entry : datasourceNode.entrySet()) {
+            String serverName = entry.getKey();
+            HashMap<String, String> serverProperties = entry.getValue();
+
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Item(serverName, serverProperties.get("default.label")));
             nodes.put(serverName, node);
             nodeRoot.add(node);
@@ -104,16 +103,16 @@ public class DataSourcesTree extends JTree {
 
     public boolean setParsedData(DataSourcesParser parser) {
         String server = parser.rootNode.toString();
+
         HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
-        Iterator<Entry<String, HashMap<String, String>>> it = datasourceNode.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, HashMap<String, String>> v = it.next();
-            String serverName = v.getKey();
+        for (Map.Entry<String, HashMap<String, String>> entry : datasourceNode.entrySet()) {
+            String serverName = entry.getKey();
             if (serverName.equals(server)) {
                 reattach(nodes.get(serverName), parser.rootNode);
                 break;
             }
         }
+
         boolean preferred = server.equals(DataSources.getPreferredServer());
         if (preferred && parser.defaultNode != null)
             setSelectionPath(new TreePath(parser.defaultNode.getPath()));
