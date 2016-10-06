@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -20,39 +22,62 @@ public class DataSources {
     private static final HashMap<String, HashMap<String, String>> serverSettings = new HashMap<String, HashMap<String, String>>() {
         {
             put("ROB",
-                new HashMap<String, String>() {
+                    new HashMap<String, String>() {
                 {
                     put("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php?action=getJPX&");
                     put("default.remote.path", "jpip://swhv.oma.be:8090");
                     put("default.httpRemote.path", "http://swhv.oma.be/hv/jp2/");
+                    put("default.label", "Royal Observatory of Belgium");
                 }
             });
             put("IAS",
-                new HashMap<String, String>() {
+                    new HashMap<String, String>() {
                 {
                     put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
                     put("default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080");
                     put("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
+                    put("default.label", "Institut d'Astrophysique Spatiale");
                 }
             });
             put("GSFC",
-                new HashMap<String, String>() {
+                    new HashMap<String, String>() {
                 {
                     put("API.dataSources.path", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "https://api.helioviewer.org/v2/getJP2Image/?");
                     put("API.jp2series.path", "https://api.helioviewer.org/v2/getJPX/?");
                     put("default.remote.path", "jpip://helioviewer.org:8090");
                     put("default.httpRemote.path", "https://helioviewer.org/jp2/");
+                    put("default.label", "Goddard Space Flight Center");
                 }
             });
+            /*
+            put("LOCALHOST",
+                    new HashMap<String, String>() {
+                {
+                    put("API.dataSources.path", "http://localhost:8080/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
+                    put("API.jp2images.path", "http://localhost:8080/helioviewer/api/index.php?action=getJP2Image&");
+                    put("API.jp2series.path", "http://localhost:8080/helioviewer/api/index.php?action=getJPX&");
+                    put("default.remote.path", "jpip://localhost:8090");
+                    put("default.httpRemote.path", "http://localhost:8080/helioviewer/jp2/");
+                }
+            });
+             */
         }
     };
 
     private static String preferredServer;
+
+    public static HashMap<String, HashMap<String, String>> getConfiguration() {
+        return serverSettings;
+    }
+
+    public static String[] getServers() {
+        return (String[]) serverSettings.keySet().toArray();
+    }
 
     public static String getPreferredServer() {
         return preferredServer;
@@ -101,14 +126,16 @@ public class DataSources {
             try {
                 JSONObject rawSchema = new JSONObject(new JSONTokener(is));
                 Schema schema = SchemaLoader.load(rawSchema);
-
                 DataSourcesTask loadTask;
-                loadTask = new DataSourcesTask("GSFC", schema);
-                JHVGlobals.getExecutorService().execute(loadTask);
-                loadTask = new DataSourcesTask("ROB", schema);
-                JHVGlobals.getExecutorService().execute(loadTask);
-                loadTask = new DataSourcesTask("IAS", schema);
-                JHVGlobals.getExecutorService().execute(loadTask);
+
+                HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
+                Iterator<Entry<String, HashMap<String, String>>> it = datasourceNode.entrySet().iterator();
+                while (it.hasNext()) {
+                    Entry<String, HashMap<String, String>> v = it.next();
+                    String serverName = v.getKey();
+                    loadTask = new DataSourcesTask(serverName, schema);
+                    JHVGlobals.getExecutorService().execute(loadTask);
+                }
             } finally {
                 is.close();
             }
