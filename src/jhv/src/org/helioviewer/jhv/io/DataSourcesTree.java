@@ -105,8 +105,7 @@ public class DataSourcesTree extends JTree {
         String server = parser.rootNode.toString();
 
         HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
-        for (Map.Entry<String, HashMap<String, String>> entry : datasourceNode.entrySet()) {
-            String serverName = entry.getKey();
+        for (String serverName : datasourceNode.keySet()) {
             if (serverName.equals(server)) {
                 reattach(nodes.get(serverName), parser.rootNode);
                 break;

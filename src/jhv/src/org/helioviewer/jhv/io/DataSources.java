@@ -124,8 +124,7 @@ public class DataSources {
 
                 DataSourcesTask loadTask;
                 HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
-                for (Map.Entry<String, HashMap<String, String>> entry : datasourceNode.entrySet()) {
-                    String serverName = entry.getKey();
+                for (String serverName : datasourceNode.keySet()) {
                     loadTask = new DataSourcesTask(serverName, schema);
                     JHVGlobals.getExecutorService().execute(loadTask);
                 }
