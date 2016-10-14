@@ -118,7 +118,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         H1080 {
             @Override
             public String toString() {
-                return "1920x1080";
+                return "1920×1080";
             }
 
             @Override
@@ -134,7 +134,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         H720 {
             @Override
             public String toString() {
-                return "1280x720";
+                return "1280×720";
             }
 
             @Override
@@ -150,7 +150,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         ORIGINAL {
             @Override
             public String toString() {
-                return "Original";
+                return "On screen";
             }
 
             @Override
