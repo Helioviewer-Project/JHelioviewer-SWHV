@@ -2,6 +2,7 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.helioviewer.jhv.base.Regex;
 
@@ -75,18 +76,18 @@ public class JHVEventParameter {
     public String getDisplayParameterValue() {
         if (parameterDisplayValue == null) {
             parameterDisplayValue = getSimpleDisplayParameterValue();
-            if (parameterName == "ar_noaanum")
+            if (parameterName.toLowerCase(Locale.ENGLISH).equals("ar_noaanum"))
                 parameterDisplayValue = ("<a href=\"https://ui.adsabs.harvard.edu/#search/q=%22NOAA%20" +
-                                        parameterDisplayValue +
-                                        "%22&sort=date%20desc\">" +
-                                        parameterDisplayValue + "</a>").intern();
+                        parameterDisplayValue +
+                        "%22&sort=date%20desc\">" +
+                        parameterDisplayValue + "</a>").intern();
         }
         return parameterDisplayValue;
     }
 
     private String beautifyValue(String value) {
         if (Regex.FloatingPoint.matcher(value).matches() &&
-            !Regex.Integer.matcher(value).matches()) {
+                !Regex.Integer.matcher(value).matches()) {
             String result = numFormatter.format(Double.parseDouble(value));
             if (result.contains("E0")) {
                 return result.substring(0, result.length() - 2);
