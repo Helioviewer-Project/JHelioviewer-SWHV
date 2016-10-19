@@ -1,128 +1,31 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.Color;
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.GraphicsConfiguration;
 import java.awt.GridLayout;
-import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
-import org.helioviewer.jhv.plugins.swek.view.filter.AbstractFilterPanel;
+import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
 
-/**
- * Creates a filter dialog.
- * 
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
- */
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
-
-    /** The event type */
     private final SWEKEventType eventType;
+    private List<FilterPanel> filterPanels;
+    private final JButton filterApplyButton = new JButton("Apply");;
 
     public FilterDialog(SWEKEventType eventType) {
         super();
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Dialog owner, boolean modal, SWEKEventType eventType) {
-        super(owner, modal);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Dialog owner, String title, boolean modal, GraphicsConfiguration gc, SWEKEventType eventType) {
-        super(owner, title, modal, gc);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Dialog owner, String title, boolean modal, SWEKEventType eventType) {
-        super(owner, title, modal);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Dialog owner, String title, SWEKEventType eventType) {
-        super(owner, title);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Dialog owner, SWEKEventType eventType) {
-        super(owner);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Frame owner, boolean modal, SWEKEventType eventType) {
-        super(owner, modal);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Frame owner, String title, boolean modal, GraphicsConfiguration gc, SWEKEventType eventType) {
-        super(owner, title, modal, gc);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Frame owner, String title, boolean modal, SWEKEventType eventType) {
-        super(owner, title, modal);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Frame owner, String title, SWEKEventType eventType) {
-        super(owner, title);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Frame owner, SWEKEventType eventType) {
-        super(owner);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Window owner, ModalityType modalityType, SWEKEventType eventType) {
-        super(owner, modalityType);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Window owner, String title, ModalityType modalityType, GraphicsConfiguration gc, SWEKEventType eventType) {
-        super(owner, title, modalityType, gc);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Window owner, String title, ModalityType modalityType, SWEKEventType eventType) {
-        super(owner, title, modalityType);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Window owner, String title, SWEKEventType eventType) {
-        super(owner, title);
-        this.eventType = eventType;
-        initFilterDialog();
-    }
-
-    public FilterDialog(Window owner, SWEKEventType eventType) {
-        super(owner);
         this.eventType = eventType;
         initFilterDialog();
     }
@@ -134,7 +37,6 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
     @Override
     public void focusLost(FocusEvent arg0) {
         setVisible(false);
-        // dispose();
     }
 
     @Override
@@ -144,28 +46,49 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
     @Override
     public void windowLostFocus(WindowEvent arg0) {
         setVisible(false);
-        // dispose();
+    }
+
+    private void initButton() {
+        filterApplyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (FilterPanel afp : filterPanels) {
+                    afp.remove_filter();
+                }
+                for (FilterPanel afp : filterPanels) {
+                    afp.add_filter();
+                }
+                for (FilterPanel afp : filterPanels) {
+                    afp.fireFilter();
+                }
+                filterApplyButton.setEnabled(false);
+            }
+        });
+    }
+
+    public void filterParameterChanged() {
+        filterApplyButton.setEnabled(true);
     }
 
     private void initFilterDialog() {
         super.setUndecorated(true);
-        // super.setPreferredSize(new Dimension(200, 100));
         super.addFocusListener(this);
         super.addWindowFocusListener(this);
-        List<AbstractFilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(eventType);
+        filterPanels = FilterPanelFactory.createFilterPanel(eventType, this);
 
         SmallPanel filterPanel = new SmallPanel();
-        filterPanel.setLayout(new GridLayout(filterPanels.size(), 1));
+        filterPanel.setLayout(new GridLayout(filterPanels.size() + 1, 1));
         filterPanel.setOpaque(false);
         filterPanel.setBackground(Color.white);
-        for (AbstractFilterPanel afp : filterPanels) {
+        for (FilterPanel afp : filterPanels) {
             filterPanel.add(afp);
         }
+        initButton();
+        filterPanel.add(filterApplyButton);
         filterPanel.setSmall();
 
         super.setContentPane(filterPanel);
         super.pack();
         super.validate();
     }
-
 }
