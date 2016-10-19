@@ -55,7 +55,7 @@ public class JHVEventCache {
         @Override
         public int hashCode() {
             assert false : "hashCode not designed";
-            return 42;
+        return 42;
         }
 
         @Override
@@ -159,10 +159,6 @@ public class JHVEventCache {
 
     public void registerHandler(JHVEventCacheRequestHandler incomingRequestManager) {
         this.incomingRequestManager = incomingRequestManager;
-    }
-
-    public ArrayList<JHVEvent> getOtherRelations(JHVEvent event) {
-        return incomingRequestManager.getOtherRelations(event);
     }
 
     public void add(JHVEvent event) {

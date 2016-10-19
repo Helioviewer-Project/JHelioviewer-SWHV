@@ -19,6 +19,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
 import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
+import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.threads.JHVWorker;
 
@@ -226,7 +227,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         JHVWorker<ArrayList<JHVEvent>, Void> worker = new JHVWorker<ArrayList<JHVEvent>, Void>() {
             @Override
             public ArrayList<JHVEvent> backgroundWork() {
-                return JHVEventCache.getSingletonInstance().getOtherRelations(event);
+                return EventDatabase.getOtherRelations(event.getUniqueID(), event.getJHVEventType(), false);
             }
 
             @Override

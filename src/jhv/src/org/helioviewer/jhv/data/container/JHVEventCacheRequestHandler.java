@@ -1,9 +1,6 @@
 package org.helioviewer.jhv.data.container;
 
-import java.util.ArrayList;
-
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 /**
@@ -24,7 +21,5 @@ public interface JHVEventCacheRequestHandler {
      *            the end date of the interval
      */
     void handleRequestForInterval(JHVEventType eventType, Interval interval);
-
-    ArrayList<JHVEvent> getOtherRelations(JHVEvent event);
 
 }

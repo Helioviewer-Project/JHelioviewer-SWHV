@@ -18,14 +18,20 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.helioviewer.jhv.base.GZIPUtils;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
+import org.helioviewer.jhv.data.datatype.event.SWEKParser;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedEvents;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
@@ -188,6 +194,49 @@ public class EventDatabase {
         }
     }
 
+    private static Integer dump_associationint2db(ArrayList<Pair<Integer, Integer>> assocs) {
+        Connection connection = ConnectionThread.getConnection();
+        if (connection == null) {
+            return -1;
+        }
+        int len = assocs.size();
+        int i = 0;
+        int errorcode = 0;
+        while (i < len && errorcode == 0) {
+            Pair<Integer, Integer> assoc = assocs.get(i);
+            int id0 = assoc.a;
+            int id1 = assoc.b;
+
+            if (id0 != -1 && id1 != -1 && id0 != id1) {
+                try {
+                    PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
+                    if (id0 < id1) {
+                        pstatement.setInt(1, id0);
+                        pstatement.setInt(2, id1);
+                    } else {
+                        pstatement.setInt(1, id1);
+                        pstatement.setInt(2, id0);
+                    }
+                    pstatement.executeUpdate();
+                } catch (SQLException e) {
+                    Log.error("Failed to insert event type " + e.getMessage());
+                    errorcode = -1;
+                }
+            } else if (id0 != id1) {
+                errorcode = -1;
+                Log.error("Could not add association to database ");
+            }
+            i++;
+        }
+        try {
+            connection.commit();
+        } catch (SQLException e1) {
+            Log.error("Could not reset autocommit");
+            errorcode = -1;
+        }
+        return errorcode;
+    }
+
     public static Integer dump_association2db(Pair<String, String>[] assocs) {
         FutureTask<Integer> ft = new FutureTask<Integer>(new DumpAssociation2Db(assocs));
         executor.execute(ft);
@@ -274,21 +323,30 @@ public class EventDatabase {
         return generatedKey;
     }
 
-    public static Integer dump_event2db(ArrayList<Event2Db> event2db_list, JHVEventType type) {
-        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(event2db_list, type));
+    private static int[] get_id_init_list(int sz) {
+        int[] inserted_ids = new int[sz];
+        for (int i = 0; i < sz; i++) {
+            inserted_ids[i] = -1;
+        }
+        return inserted_ids;
+    }
+
+    public static int[] dump_event2db(ArrayList<Event2Db> event2db_list, JHVEventType type) {
+        FutureTask<int[]> ft = new FutureTask<int[]>(new DumpEvent2Db(event2db_list, type));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            return -1;
+            return get_id_init_list(event2db_list.size());
         } catch (ExecutionException e) {
             e.printStackTrace();
-            return -1;
+            return get_id_init_list(event2db_list.size());
+
         }
     }
 
-    private static class DumpEvent2Db implements Callable<Integer> {
+    private static class DumpEvent2Db implements Callable<int[]> {
         private final JHVEventType type;
         private final ArrayList<Event2Db> event2db_list;
 
@@ -298,17 +356,20 @@ public class EventDatabase {
         }
 
         @Override
-        public Integer call() {
+        public int[] call() {
+            int[] inserted_ids = get_id_init_list(event2db_list.size());
             Connection connection = ConnectionThread.getConnection();
             if (connection == null) {
-                return -1;
+                return inserted_ids;
             }
-            int errorcode = 0;
             try {
                 int typeId = getEventTypeId(connection, type);
-                for (Event2Db event2db : event2db_list) {
+                int llen = event2db_list.size();
+                for (int i = 0; i < llen; i++) {
+                    Event2Db event2db = event2db_list.get(i);
+                    int generatedKey = -1;
                     if (typeId != -1) {
-                        int generatedKey = getEventId(event2db.uid);
+                        generatedKey = getEventId(event2db.uid);
 
                         if (generatedKey == -1) {
                             {
@@ -370,14 +431,86 @@ public class EventDatabase {
                     } else {
                         Log.error("Failed to insert event");
                     }
+                    inserted_ids[i] = generatedKey;
                 }
                 connection.commit();
             } catch (SQLException e) {
                 Log.error("Could not insert event " + e.getMessage());
-                errorcode = -1;
             }
-            return errorcode;
+            ArrayList<Pair<Integer, Integer>> assocs = new ArrayList<Pair<Integer, Integer>>();
+            for (int id : inserted_ids) {
+                if (id == -1) {
+                    Log.error("failed to dump to database");
+                    assocs.add(new Pair<Integer, Integer>(1, 1));
+                } else {
+                    ArrayList<JHVEvent> rels = getOtherRelations(id, type, true);
+                    for (JHVEvent rel : rels) {
+                        assocs.add(new Pair<Integer, Integer>(id, rel.getUniqueID()));
+                    }
+                }
+            }
+            EventDatabase.dump_associationint2db(assocs);
+
+            return inserted_ids;
         }
+    }
+
+    private static JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) {
+        SWEKParser parser = jsonEvent.type.getSupplier().getSource().getParser();
+        return parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
+    }
+
+    private static ArrayList<JHVEvent> createUniqueList(ArrayList<JHVEvent> events) {
+        HashMap<Integer, JHVEvent> ids = new HashMap<Integer, JHVEvent>();
+        ArrayList<JHVEvent> uniqueEvents = new ArrayList<JHVEvent>();
+        for (JHVEvent ev : events) {
+            if (!ids.containsKey(ev.getUniqueID())) {
+                ids.put(ev.getUniqueID(), ev);
+                uniqueEvents.add(ev);
+            }
+        }
+        return uniqueEvents;
+    }
+
+    //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
+    public static ArrayList<JHVEvent> getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype) {
+        SWEKEventType evt = jhvEventType.getEventType();
+        ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
+        ArrayList<JsonEvent> jsonEvents = new ArrayList<JsonEvent>();
+
+        for (SWEKRelatedEvents re : evt.getSWEKRelatedEvents()) {
+            if (re.getEvent() == evt) {
+                List<SWEKRelatedOn> relon = re.getRelatedOnList();
+                for (SWEKRelatedOn swon : relon) {
+                    String f = swon.parameterFrom.getParameterName().toLowerCase();
+                    String w = swon.parameterWith.getParameterName().toLowerCase();
+                    SWEKEventType reType = re.getRelatedWith();
+                    for (SWEKSupplier supplier : reType.getSuppliers()) {
+                        JHVEventType othert = JHVEventType.getJHVEventType(reType, supplier);
+                        if (similartype == (othert == jhvEventType))
+                            jsonEvents.addAll(rel2prog(id, jhvEventType, othert, f, w));
+                    }
+                }
+            }
+            if (re.getRelatedWith() == evt) {
+                List<SWEKRelatedOn> relon = re.getRelatedOnList();
+                for (SWEKRelatedOn swon : relon) {
+                    String f = swon.parameterFrom.getParameterName().toLowerCase();
+                    String w = swon.parameterWith.getParameterName().toLowerCase();
+                    SWEKEventType reType = re.getEvent();
+                    for (SWEKSupplier supplier : reType.getSuppliers()) {
+                        JHVEventType fromt = JHVEventType.getJHVEventType(reType, supplier);
+                        if (similartype == (fromt == jhvEventType))
+                            jsonEvents.addAll(rel2prog(id, fromt, jhvEventType, f, w));
+                    }
+                }
+            }
+            for (JsonEvent jsonEvent : jsonEvents) {
+                nEvents.add(parseJSON(jsonEvent, false));
+            }
+            jsonEvents.clear();
+        }
+        return createUniqueList(nEvents);
     }
 
     public static void addDaterange2db(long start, long end, JHVEventType type) {
@@ -677,6 +810,58 @@ public class EventDatabase {
         }
     }
 
+    private static ArrayList<JsonEvent> rel2prog(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
+        Connection connection = ConnectionThread.getConnection();
+        if (connection == null) {
+            return new ArrayList<JsonEvent>();
+        }
+
+        int type_left_id = getEventTypeId(connection, type_left);
+        int type_right_id = getEventTypeId(connection, type_right);
+
+        if (type_left_id != -1 && type_right_id != -1) {
+            try {
+                String table_left_name = type_left.getSupplier().getDatabaseName();
+                String table_right_name = type_right.getSupplier().getDatabaseName();
+
+                String sqlt = "SELECT tl.event_id, tr.event_id FROM " + table_left_name + " AS tl," + table_right_name + " AS tr" + " WHERE tl." + param_left + "=tr." + param_right + " AND tl.event_id!=tr.event_id AND (tl.event_id=? OR tr.event_id=?)";
+                PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
+                pstatement.setLong(1, event_id);
+                pstatement.setLong(2, event_id);
+
+                StringBuilder idList = new StringBuilder();
+
+                ResultSet rs = pstatement.executeQuery();
+                try {
+                    boolean next = rs.next();
+                    while (next) {
+                        idList.append(rs.getInt(1)).append(',').append(rs.getInt(2));
+                        next = rs.next();
+                        if (next) {
+                            idList.append(',');
+                        }
+                    }
+                } finally {
+                    rs.close();
+                }
+
+                String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.name, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList.toString() + ") AND events.id != " + event_id + ";";
+                Statement statement = connection.createStatement();
+                ArrayList<JsonEvent> ret;
+                try {
+                    ret = getEventJSON(statement.executeQuery(query));
+                } finally {
+                    statement.close();
+                }
+                return ret;
+            } catch (SQLException e) {
+                Log.error("Could not fetch associations " + e.getMessage());
+                return new ArrayList<JsonEvent>();
+            }
+        }
+        return new ArrayList<JsonEvent>();
+    }
+
     private static class Relations2Program implements Callable<ArrayList<JsonEvent>> {
         private final JHVEventType type_left;
         private final JHVEventType type_right;
@@ -695,55 +880,7 @@ public class EventDatabase {
 
         @Override
         public ArrayList<JsonEvent> call() {
-            Connection connection = ConnectionThread.getConnection();
-            if (connection == null) {
-                return new ArrayList<JsonEvent>();
-            }
-
-            int type_left_id = getEventTypeId(connection, type_left);
-            int type_right_id = getEventTypeId(connection, type_right);
-
-            if (type_left_id != -1 && type_right_id != -1) {
-                try {
-                    String table_left_name = type_left.getSupplier().getDatabaseName();
-                    String table_right_name = type_right.getSupplier().getDatabaseName();
-
-                    String sqlt = "SELECT tl.event_id, tr.event_id FROM " + table_left_name + " AS tl," + table_right_name + " AS tr" + " WHERE tl." + param_left + "=tr." + param_right + " AND tl.event_id!=tr.event_id AND (tl.event_id=? OR tr.event_id=?)";
-                    PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
-                    pstatement.setLong(1, event_id);
-                    pstatement.setLong(2, event_id);
-
-                    StringBuilder idList = new StringBuilder();
-
-                    ResultSet rs = pstatement.executeQuery();
-                    try {
-                        boolean next = rs.next();
-                        while (next) {
-                            idList.append(rs.getInt(1)).append(',').append(rs.getInt(2));
-                            next = rs.next();
-                            if (next) {
-                                idList.append(',');
-                            }
-                        }
-                    } finally {
-                        rs.close();
-                    }
-
-                    String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.name, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList.toString() + ") AND events.id != " + event_id + ";";
-                    Statement statement = connection.createStatement();
-                    ArrayList<JsonEvent> ret;
-                    try {
-                        ret = getEventJSON(statement.executeQuery(query));
-                    } finally {
-                        statement.close();
-                    }
-                    return ret;
-                } catch (SQLException e) {
-                    Log.error("Could not fetch associations " + e.getMessage());
-                    return new ArrayList<JsonEvent>();
-                }
-            }
-            return new ArrayList<JsonEvent>();
+            return rel2prog(event_id, type_left, type_right, param_left, param_right);
         }
     }
 
@@ -761,6 +898,37 @@ public class EventDatabase {
         return arr;
     }
 
+    private static JsonEvent event2prog(int event_id) {
+        Connection connection = ConnectionThread.getConnection();
+        if (connection == null) {
+            return null;
+        }
+
+        try {
+            PreparedStatement ps = getPreparedStatement(connection, SELECT_EVENT_BY_ID);
+            ps.setLong(1, event_id);
+
+            JsonEvent je = null;
+
+            ResultSet rs = ps.executeQuery();
+            try {
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    long start = rs.getLong(2);
+                    long end = rs.getLong(3);
+                    byte[] json = rs.getBytes(4);
+                    je = new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end);
+                }
+            } finally {
+                rs.close();
+            }
+            return je;
+        } catch (SQLException e) {
+            Log.error("Could not fetch associations " + e.getMessage());
+            return null;
+        }
+    }
+
     private static class Event2Program implements Callable<JsonEvent> {
         private final int event_id;
 
@@ -770,34 +938,7 @@ public class EventDatabase {
 
         @Override
         public JsonEvent call() {
-            Connection connection = ConnectionThread.getConnection();
-            if (connection == null) {
-                return null;
-            }
-
-            try {
-                PreparedStatement ps = getPreparedStatement(connection, SELECT_EVENT_BY_ID);
-                ps.setLong(1, event_id);
-
-                JsonEvent je = null;
-
-                ResultSet rs = ps.executeQuery();
-                try {
-                    if (rs.next()) {
-                        int id = rs.getInt(1);
-                        long start = rs.getLong(2);
-                        long end = rs.getLong(3);
-                        byte[] json = rs.getBytes(4);
-                        je = new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end);
-                    }
-                } finally {
-                    rs.close();
-                }
-                return je;
-            } catch (SQLException e) {
-                Log.error("Could not fetch associations " + e.getMessage());
-                return null;
-            }
+            return event2prog(event_id);
         }
     }
 

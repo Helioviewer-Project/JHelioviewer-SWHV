@@ -89,11 +89,8 @@ public class HEKDownloader extends SWEKDownloader {
             event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, paramList));
         }
 
-        int id = EventDatabase.dump_event2db(event2db_list, type);
-        if (id == -1) {
-            Log.error("failed to dump to database");
-            return false;
-        }
+        int[] ids = EventDatabase.dump_event2db(event2db_list, type);
+
         return true;
     }
 
