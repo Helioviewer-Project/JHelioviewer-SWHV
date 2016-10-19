@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
+import org.helioviewer.jhv.base.conversion.GOESLevelConversion;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
@@ -162,19 +163,8 @@ public class Band extends AbstractLineDataSelectorElement {
             return "--";
         else if (!bandType.getName().contains("XRSB"))
             return DrawConstants.valueFormatter.format(yAxis.scale(val));
-        else {
-            double v = val * 1e8;
-            if (v < 1e1)
-                return String.format("A%.1f", v);
-            else if (v < 1e2)
-                return String.format("B%.1f", v * 1e-1);
-            else if (v < 1e3)
-                return String.format("C%.1f", v * 1e-2);
-            else if (v < 1e4)
-                return String.format("M%.1f", v * 1e-3);
-            else
-                return String.format("X%.1f", v * 1e-4);
-        }
+        else
+            return GOESLevelConversion.getStringValue(val);
     }
 
     private void setWarn(LinkedList<Integer> _warnLevels, LinkedList<String> _warnLabels) {

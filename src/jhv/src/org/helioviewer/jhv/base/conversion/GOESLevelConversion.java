@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.base.conversion;
 
-public class FlareConversion {
+public class GOESLevelConversion {
+
     public static String getStringValue(double v) {
         if (v < 1e-7)
             return String.format("A%.1f", v * 1e8);
