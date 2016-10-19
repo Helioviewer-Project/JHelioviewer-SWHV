@@ -262,11 +262,13 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                     }
                 }
                 g.setColor(DrawConstants.TEXT_BACKGROUND_COLOR);
-                g.fillRect(mousePosition.x + 5, y + 5, width + 10, txts.size() * 10 + 10);
-                g.setColor(DrawConstants.LABEL_TEXT_COLOR);
-                y += 10;
+                g.fillRect(mousePosition.x + 5, y, width + 21 + 10, (txts.size()) * 10 + 11);
+                g.setColor(DrawConstants.TEXT_COLOR);
+                y += 5;
+                ImageIcon icon = event.getIcon();
+                g.drawImage(icon.getImage(), mousePosition.x + 8, y - 2, mousePosition.x + 24, y + 14, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
                 for (String txt : txts) {
-                    g.drawString(txt, mousePosition.x + 10, y += 10);
+                    g.drawString(txt, mousePosition.x + 26, y += 10);
                 }
             }
         }
