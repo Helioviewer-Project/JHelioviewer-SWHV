@@ -45,6 +45,13 @@ public class HEKDownloader extends SWEKDownloader {
 
         for (int i = 0; i < results.length(); i++) {
             JSONObject result = results.getJSONObject(i);
+            byte[] compressed;
+            try {
+                compressed = JSONUtils.compressJSON(result);
+            } catch (IOException e) {
+                Log.error("compression error");
+                return false;
+            }
             patch_event(result, type);
             String uid;
             long start;
@@ -78,18 +85,10 @@ public class HEKDownloader extends SWEKDownloader {
                 return false;
             }
 
-            byte[] compressed;
-            try {
-                compressed = JSONUtils.compressJSON(result);
-            } catch (IOException e) {
-                Log.error("compression error");
-                return false;
-            }
-
             event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, paramList));
         }
 
-        int[] ids = EventDatabase.dump_event2db(event2db_list, type);
+        EventDatabase.dump_event2db(event2db_list, type);
 
         return true;
     }
