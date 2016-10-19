@@ -18,6 +18,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
+import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
@@ -48,6 +49,11 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             instance = new EventModel();
         }
         return instance;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return events.isEmpty();
     }
 
     @Override
@@ -86,22 +92,21 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         int nrEventTypes = events.size();
         if (nrEventTypes > 0) {
             int eventTypeNr = 0;
-            int previousLine = 0;
 
             Stroke normalStroke = g.getStroke();
             int spacePerLine = 6;
             JHVRelatedEvents highlightedEvent = null;
+            int highlightedEventPosition = -1;
             EventPlotConfiguration shouldRedraw = null;
 
             ArrayList<Long> endDates = new ArrayList<Long>();
+            int nrLines = 0;
 
             for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> entry : events.entrySet()) {
-                JHVEventType eventType = entry.getKey();
+                //JHVEventType eventType = entry.getKey();
                 SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = entry.getValue();
 
-                endDates.clear();
-
-                int nrLines = 0;
+                //endDates.clear();
 
                 for (JHVRelatedEvents event : eventMap.values()) {
                     int i = 0;
@@ -118,12 +123,14 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
                     int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
                     int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
-                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, previousLine, mousePosition, event.isHighlighted());
+                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition, event.isHighlighted());
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                         highlightedEvent = rEvent;
+                        highlightedEventPosition = eventPosition;
                     }
                 }
+                /*
                 int spaceNeeded = spacePerLine * nrLines;
                 ImageIcon icon = eventType.getEventType().getEventIcon();
                 fullG.drawImage(icon.getImage(), 0, graphArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 4, icon.getIconWidth() / 2, graphArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 4, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
@@ -138,10 +145,16 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                 }
 
                 eventTypeNr++;
+                 */
             }
 
             eventUnderMouse = shouldRedraw;
             if (mousePosition != null) {
+                if (highlightedEvent != null) {
+                    int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
+                    int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getEnd());
+                    EventPlotConfiguration.draw(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition, highlightedEvent.isHighlighted());
+                }
                 JHVEventCache.highlight(highlightedEvent);
             }
         }
@@ -211,10 +224,10 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             this.yPosition = yPosition;
         }
 
-        public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, int nrPreviousLines, Point mousePosition, boolean highlight) {
+        public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight) {
             JHVRelatedEvents highlightedEvent = null;
             int spacePerLine = 3;
-            int y = graphArea.y + spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
+            int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
             int w = Math.max(x1 - x0, 1);
             int h = spacePerLine;
             if (w < 5) {
@@ -228,18 +241,51 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                 highlightedEvent = event;
             }
 
+            int sz = Math.min(w, 8);
+
             if (eventWasHightlighted && highlight) {
                 x0 = x0 - 10;
                 y = y - 1;
                 w = w + 20;
                 h = h + 2;
+                sz = 12;
                 spacePerLine = h;
             }
 
             g.setColor(event.getColor());
             g.fillRect(x0, y, w, spacePerLine);
 
+            ImageIcon icon = event.getIcon();
+            g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+
+            if (eventWasHightlighted && highlight) {
+                drawText(graphArea, g, event, x0, y, w, h, mousePosition);
+            }
             return highlightedEvent;
+        }
+
+        private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int x, int y, int w, int h, Point mousePosition) {
+            if (mousePosition != null) {
+                long ts = EVEPlugin.dc.selectedAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
+                ArrayList<String> txts = new ArrayList<String>();
+                JHVEventParameter[] params = event.getClosestTo(ts).getSimpleVisibleEventParameters();
+                int width = 1;
+                for (JHVEventParameter p : params) {
+                    String name = p.getParameterName();
+                    if (name != "event_description" && name != "event_title") { // interned
+                        String str = p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue();
+                        txts.add(str);
+                        width = Math.max(width, g.getFontMetrics().stringWidth(str));
+                    }
+                }
+                g.setColor(DrawConstants.TEXT_BACKGROUND_COLOR);
+                g.fillRect(mousePosition.x + 5, y + 5, width, txts.size() * 10 + 10);
+                g.setColor(DrawConstants.LABEL_TEXT_COLOR);
+                y += 10;
+                for (String txt : txts) {
+                    g.drawString(txt, mousePosition.x + 10, y += 10);
+                }
+            }
         }
 
         private static boolean containsPoint(Point p, int clickx, int clicky, int clickw, int clickh) {

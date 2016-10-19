@@ -43,6 +43,11 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
     public void resetAxis() {
         yAxis.reset(bandType.getMin(), bandType.getMax());
         updateGraphsData();
