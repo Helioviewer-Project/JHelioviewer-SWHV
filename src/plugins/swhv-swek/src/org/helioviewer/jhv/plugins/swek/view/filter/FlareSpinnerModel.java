@@ -24,7 +24,6 @@ public class FlareSpinnerModel extends AbstractSpinnerModel {
 
     private String compose_next(double pv, String start, String alternative) {
         if (pv < 9.9) {
-
             pv += incr;
             return start + String.format("%.1f", pv);
         } else {
