@@ -25,7 +25,8 @@ public class DrawConstants {
 
     public static final Color TICK_LINE_COLOR = Color.LIGHT_GRAY;
     public static final Color LABEL_TEXT_COLOR = Color.BLACK;
-    public static final Color TEXT_BACKGROUND_COLOR = Color.LIGHT_GRAY;
+    public static final Color TEXT_COLOR = Color.WHITE;
+    public static final Color TEXT_BACKGROUND_COLOR = Color.GRAY;
 
     public static final Color MOVIE_FRAME_COLOR = Color.BLACK;
     public static final Color MOVIE_INTERVAL_COLOR = Color.LIGHT_GRAY;
