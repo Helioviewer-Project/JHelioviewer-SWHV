@@ -36,7 +36,7 @@ public class FilterPanelFactory {
         return spinnerFormat.toString();
     }
 
-    private static JSpinner generateFlareSpinner(FilterDialog filterDialog, SWEKParameter parameter) {
+    private static JSpinner generateFlareSpinner(final FilterDialog filterDialog, SWEKParameter parameter) {
         /*
         double min = parameter.getParameterFilter().getMin() == null ? 1e-8 : parameter.getParameterFilter().getMin();
         double max = parameter.getParameterFilter().getMax() == null ? 1e-3 : parameter.getParameterFilter().getMin();
@@ -56,7 +56,7 @@ public class FilterPanelFactory {
         return spinner;
     }
 
-    private static JSpinner generateMinOrMaxSpinner(FilterDialog filterDialog, SWEKParameter parameter) {
+    private static JSpinner generateMinOrMaxSpinner(final FilterDialog filterDialog, SWEKParameter parameter) {
         double min = parameter.getParameterFilter().getMin() == null ? Double.MIN_VALUE : parameter.getParameterFilter().getMin();
         double max = parameter.getParameterFilter().getMax() == null ? Double.MAX_VALUE : parameter.getParameterFilter().getMax();
         double start = parameter.getParameterFilter().getStartValue() == null ? (max - min) * 0.5 : parameter.getParameterFilter().getStartValue();

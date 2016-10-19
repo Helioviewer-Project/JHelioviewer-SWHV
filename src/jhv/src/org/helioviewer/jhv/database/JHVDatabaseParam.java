@@ -39,11 +39,11 @@ public class JHVDatabaseParam {
     }
 
     public int getIntValue() {
-        return (int) value;
+        return (Integer) value;
     }
 
     public double getDoubleValue() {
-        return (double) value;
+        return (Double) value;
     }
 
     public String getParamName() {
