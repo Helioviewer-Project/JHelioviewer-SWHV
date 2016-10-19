@@ -50,6 +50,11 @@ public class RadioData extends AbstractLineDataSelectorElement {
         EVEPlugin.ldsm.addLineData(this);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return !isVisible();
+    }
+
     private IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
         return new IndexColorModel(8, lut2.getLut8().length, lut2.getLut8(), 0, false, -1, DataBuffer.TYPE_BYTE);
     }

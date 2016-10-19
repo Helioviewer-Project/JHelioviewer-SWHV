@@ -208,10 +208,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
         List<LineDataSelectorElement> els = EVEPlugin.ldsm.getAllLineDataSelectorElements();
+        boolean isEmpty = true;
         for (LineDataSelectorElement el : els) {
             el.draw(plotG, fullG, graphArea, drawController.selectedAxis, mousePosition);
+            isEmpty = isEmpty && el.isEmpty();
         }
-        drawLabels(fullG, graphArea, drawController.selectedAxis);
+        drawLabels(fullG, graphArea, drawController.selectedAxis, isEmpty);
     }
 
     private void drawBackground(Graphics2D g, int width, int height) {
@@ -219,7 +221,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.fillRect(0, 0, width, height);
     }
 
-    private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
+    private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, boolean isEmpty) {
         Stroke stroke = g.getStroke();
         g.setStroke(thinStroke);
         {
@@ -233,7 +235,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
             }
 
-            if (ct == -1) {
+            if (isEmpty) {
                 drawNoData(g, graphArea);
             }
         }

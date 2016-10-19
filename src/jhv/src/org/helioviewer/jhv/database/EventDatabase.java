@@ -210,6 +210,7 @@ public class EventDatabase {
             if (id0 != -1 && id1 != -1 && id0 != id1) {
                 try {
                     PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
+                    /* Avoid circular insertions by pre-ordering events */
                     if (id0 < id1) {
                         pstatement.setInt(1, id0);
                         pstatement.setInt(2, id1);
@@ -271,7 +272,6 @@ public class EventDatabase {
                 Pair<String, String> assoc = assocs[i];
                 int id0 = getIdFromUID(connection, assoc.a);
                 int id1 = getIdFromUID(connection, assoc.b);
-
                 if (id0 != -1 && id1 != -1) {
                     try {
                         PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);

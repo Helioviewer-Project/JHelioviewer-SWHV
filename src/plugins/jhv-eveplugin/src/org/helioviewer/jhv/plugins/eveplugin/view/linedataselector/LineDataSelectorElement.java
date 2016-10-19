@@ -45,4 +45,6 @@ public interface LineDataSelectorElement {
 
     boolean highLightChanged(Point p);
 
+    boolean isEmpty();
+
 }
