@@ -33,6 +33,8 @@ public interface LineDataSelectorElement {
 
     void draw(Graphics2D graphG, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
+    void drawHighlighted(Graphics2D graphG, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+
     YAxis getYAxis();
 
     void fetchData(TimeAxis selectedAxis);
