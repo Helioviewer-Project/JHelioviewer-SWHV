@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -15,6 +16,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,14 +47,26 @@ public class HEKParser implements SWEKParser {
         Vec3 hgsCentralPoint = null;
         Double hgsX = null;
         Double hgsY = null;
-
+        //First iterate over parameters in the config file.
         Iterator<?> keys = result.keys();
-        while (keys.hasNext()) {
-            Object key = keys.next();
+        List<SWEKParameter> plist = currentEvent.getJHVEventType().getEventType().getParameterList();
+        Iterator<SWEKParameter> paramIterator = plist.iterator();
+        HashSet<String> insertedKeys = new HashSet<String>();
+        while (paramIterator.hasNext() || keys.hasNext()) {
+            Object key;
+            if (paramIterator.hasNext()) {
+                key = paramIterator.next().getParameterName();
+            }
+            else
+                key = keys.next();
+            if (insertedKeys.contains(key))
+                continue;
             if (key instanceof String) {
                 String originalKeyString = (String) key;
-
                 String keyString = originalKeyString.toLowerCase(Locale.ENGLISH);
+                insertedKeys.add(keyString);
+                if (!result.has(keyString))
+                    continue;
                 if (keyString.equals("refs")) {
                     parseRefs(currentEvent, result.getJSONArray(originalKeyString));
                 } else {
@@ -84,6 +98,7 @@ public class HEKParser implements SWEKParser {
                 }
             }
         }
+
         handleCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
     }
 
