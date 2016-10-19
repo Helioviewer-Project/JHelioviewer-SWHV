@@ -6,7 +6,6 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +35,9 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     private static final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
 
     private EventPlotConfiguration eventUnderMouse;
+
+    private JHVRelatedEvents highlightedEvent = null;
+    private int highlightedEventPosition = -1;
 
     private EventModel() {
         eventCache = JHVEventCache.getSingletonInstance();
@@ -88,25 +90,17 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         if (!isVisible) {
             return;
         }
-
+        highlightedEvent = null;
+        highlightedEventPosition = -1;
         int nrEventTypes = events.size();
         if (nrEventTypes > 0) {
-            int eventTypeNr = 0;
-
-            Stroke normalStroke = g.getStroke();
-            int spacePerLine = 6;
-            JHVRelatedEvents highlightedEvent = null;
-            int highlightedEventPosition = -1;
             EventPlotConfiguration shouldRedraw = null;
 
             ArrayList<Long> endDates = new ArrayList<Long>();
             int nrLines = 0;
 
             for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> entry : events.entrySet()) {
-                //JHVEventType eventType = entry.getKey();
                 SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = entry.getValue();
-
-                //endDates.clear();
 
                 for (JHVRelatedEvents event : eventMap.values()) {
                     int i = 0;
@@ -123,40 +117,29 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
                     int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
                     int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
-                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition, event.isHighlighted());
+                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition, event.isHighlighted(), false);
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                         highlightedEvent = rEvent;
                         highlightedEventPosition = eventPosition;
                     }
                 }
-                /*
-                int spaceNeeded = spacePerLine * nrLines;
-                ImageIcon icon = eventType.getEventType().getEventIcon();
-                fullG.drawImage(icon.getImage(), 0, graphArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 4, icon.getIconWidth() / 2, graphArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 4, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
-
-                previousLine += nrLines;
-                if (eventTypeNr != nrEventTypes - 1) {
-                    g.setStroke(dashed);
-                    g.setColor(Color.black);
-                    int sepLinePos = graphArea.y + previousLine * spacePerLine - spacePerLine / 4 + DrawConstants.EVENT_OFFSET;
-                    g.drawLine(graphArea.x, sepLinePos, graphArea.x + graphArea.width, sepLinePos);
-                    g.setStroke(normalStroke);
-                }
-
-                eventTypeNr++;
-                 */
             }
 
             eventUnderMouse = shouldRedraw;
-            if (mousePosition != null) {
-                if (highlightedEvent != null) {
-                    int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
-                    int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getEnd());
-                    EventPlotConfiguration.draw(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition, highlightedEvent.isHighlighted());
-                }
-                JHVEventCache.highlight(highlightedEvent);
+
+        }
+    }
+
+    @Override
+    public void drawHighlighted(Graphics2D g, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+        if (mousePosition != null) {
+            if (highlightedEvent != null) {
+                int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
+                int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getEnd());
+                EventPlotConfiguration.draw(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition, highlightedEvent.isHighlighted(), true);
             }
+            JHVEventCache.highlight(highlightedEvent);
         }
     }
 
@@ -224,7 +207,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             this.yPosition = yPosition;
         }
 
-        public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight) {
+        public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight, boolean drawHighlighted) {
             JHVRelatedEvents highlightedEvent = null;
             int spacePerLine = 3;
             int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
@@ -236,14 +219,14 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             }
 
             boolean containsMouse = containsPoint(mousePosition, x0 - 1, y - 1, w + 2, h + 2);
-            boolean eventWasHightlighted = containsMouse || event.isHighlighted();
+            boolean eventWasHightlighted = containsMouse || (mousePosition == null && event.isHighlighted());
             if (mousePosition != null && containsMouse) {
                 highlightedEvent = event;
             }
 
             int sz = Math.min(w, 8);
-
-            if (eventWasHightlighted && highlight) {
+            boolean hl = eventWasHightlighted && highlight;
+            if (hl) {
                 x0 = x0 - 10;
                 y = y - 1;
                 w = w + 20;
@@ -251,16 +234,16 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                 sz = 12;
                 spacePerLine = h;
             }
-
             g.setColor(event.getColor());
             g.fillRect(x0, y, w, spacePerLine);
 
             ImageIcon icon = event.getIcon();
             g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
-            if (eventWasHightlighted && highlight) {
+            if (hl) {
                 drawText(graphArea, g, event, x0, y, w, h, mousePosition);
             }
+
             return highlightedEvent;
         }
 
@@ -279,7 +262,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                     }
                 }
                 g.setColor(DrawConstants.TEXT_BACKGROUND_COLOR);
-                g.fillRect(mousePosition.x + 5, y + 5, width, txts.size() * 10 + 10);
+                g.fillRect(mousePosition.x + 5, y + 5, width + 10, txts.size() * 10 + 10);
                 g.setColor(DrawConstants.LABEL_TEXT_COLOR);
                 y += 10;
                 for (String txt : txts) {

@@ -31,6 +31,7 @@ import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -214,6 +215,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             isEmpty = isEmpty && el.isEmpty();
         }
         drawLabels(fullG, graphArea, drawController.selectedAxis, isEmpty);
+        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            el.drawHighlighted(plotG, fullG, graphArea, drawController.selectedAxis, mousePosition);
+        }
     }
 
     private void drawBackground(Graphics2D g, int width, int height) {
@@ -454,6 +458,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseExited(MouseEvent e) {
+        JHVEventCache.highlight(null);
         mousePosition = null;
         updateGraph();
     }
