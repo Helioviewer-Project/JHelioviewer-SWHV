@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
+import org.helioviewer.jhv.base.conversion.FlareConversion;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -28,6 +29,15 @@ import org.json.JSONObject;
 public class HEKDownloader extends SWEKDownloader {
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
+    private void patch_event(JSONObject result, JHVEventType type) {
+        boolean c1 = type.getEventType().getEventName().equals("Flare");
+        boolean c2 = type.getSupplier().getSupplierName().equals("SWPC");
+        boolean c = c1 && c2;
+        if (c && result.has("fl_goescls")) {
+            result.put("fl_val", FlareConversion.getFloatValue(result.getString("fl_goescls")));
+        }
+    }
+
     @Override
     protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
         JSONArray results = eventJSON.getJSONArray("result");
@@ -35,7 +45,7 @@ public class HEKDownloader extends SWEKDownloader {
 
         for (int i = 0; i < results.length(); i++) {
             JSONObject result = results.getJSONObject(i);
-
+            patch_event(result, type);
             String uid;
             long start;
             long end;
@@ -51,13 +61,14 @@ public class HEKDownloader extends SWEKDownloader {
                 for (Map.Entry<String, String> entry : dbFields.entrySet()) {
                     String dbType = entry.getValue();
                     String fieldName = entry.getKey();
-
                     String lfieldName = fieldName.toLowerCase(Locale.ENGLISH);
                     if (!result.isNull(lfieldName)) {
                         if (dbType.equals(JHVDatabaseParam.DBINTTYPE)) {
                             paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBINTTYPE, result.getInt(lfieldName), fieldName));
                         } else if (dbType.equals(JHVDatabaseParam.DBSTRINGTYPE)) {
                             paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBSTRINGTYPE, result.getString(lfieldName), fieldName));
+                        } else if (dbType.equals(JHVDatabaseParam.DBDOUBLETYPE)) {
+                            paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBDOUBLETYPE, result.getDouble(lfieldName), fieldName));
                         }
                     }
                 }
@@ -123,14 +134,14 @@ public class HEKDownloader extends SWEKDownloader {
         int paramCount = 1;
 
         for (SWEKParam param : params) {
-            if (param.getParam().toLowerCase().equals("provider")) {
+            if (param.param.toLowerCase().equals("provider")) {
                 String encodedValue;
                 try {
-                    encodedValue = URLEncoder.encode(param.getValue(), "UTF-8");
+                    encodedValue = URLEncoder.encode(param.value, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
-                    encodedValue = param.getValue();
+                    encodedValue = param.value;
                 }
-                baseURL.append("param").append(paramCount).append('=').append("frm_name").append('&').append("op").append(paramCount).append('=').append(param.getOperand().URLEncodedRepresentation()).append('&').append("value").append(paramCount).append('=').append(encodedValue).append('&');
+                baseURL.append("param").append(paramCount).append('=').append("frm_name").append('&').append("op").append(paramCount).append('=').append(param.operand.URLEncodedRepresentation()).append('&').append("value").append(paramCount).append('=').append(encodedValue).append('&');
                 paramCount++;
             }
         }

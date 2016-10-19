@@ -4,28 +4,30 @@ public class JHVDatabaseParam {
 
     public static final String DBSTRINGTYPE = "TEXT";
     public static final String DBINTTYPE = "INTEGER";
+    public static final String DBDOUBLETYPE = "REAL";
 
-    private int intp;
-    private String stringp;
+    private final Object value;
+
     private final String dbType;
     private final String paramName;
-    private final boolean isInt;
-    private final boolean isString;
 
-    public JHVDatabaseParam(String _dbType, int value, String _paramName) {
+    public JHVDatabaseParam(String _dbType, int _value, String _paramName) {
         dbType = _dbType;
-        intp = value;
+        value = _value;
         paramName = _paramName;
-        isInt = true;
-        isString = false;
+
     }
 
-    public JHVDatabaseParam(String _dbType, String value, String _paramName) {
+    public JHVDatabaseParam(String _dbType, String _value, String _paramName) {
         dbType = _dbType;
-        stringp = value;
+        value = _value;
         paramName = _paramName;
-        isInt = false;
-        isString = true;
+    }
+
+    public JHVDatabaseParam(String _dbType, double _value, String _paramName) {
+        dbType = _dbType;
+        value = _value;
+        paramName = _paramName;
     }
 
     public String getDbTyp() {
@@ -33,11 +35,15 @@ public class JHVDatabaseParam {
     }
 
     public String getStringValue() {
-        return stringp;
+        return (String) value;
     }
 
     public int getIntValue() {
-        return intp;
+        return (int) value;
+    }
+
+    public double getDoubleValue() {
+        return (double) value;
     }
 
     public String getParamName() {
@@ -45,11 +51,14 @@ public class JHVDatabaseParam {
     }
 
     public boolean isInt() {
-        return isInt;
+        return value instanceof Integer;
     }
 
     public boolean isString() {
-        return isString;
+        return value instanceof String;
     }
 
+    public boolean isDouble() {
+        return value instanceof Double;
+    }
 }

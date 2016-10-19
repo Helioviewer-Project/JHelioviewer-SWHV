@@ -402,7 +402,7 @@
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVel",
                     "parameter_display_name"    : "Radial Linear Velocity",
-                    "filter"                    :
+                    "filter"                    : 
                         {
                             "filter_type"   : "doubleminmaxfilter",
                             "min"           : 0,
@@ -412,6 +412,7 @@
                             "units"         : "km/s",
                             "dbtype"        : "INTEGER"
                         },
+
                     "default_visible"           : true
                 },
                 {
@@ -425,30 +426,14 @@
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVelMin",
                     "parameter_display_name"    : "Minimum Radial Linear Velocity",
-                    "filter"                    : {
-                            "filter_type"   : "doubleminmaxfilter",
-                            "min"           : 0,
-                            "max"           : 3000,
-                            "start_value"   : 1000,
-                            "step_size"     : 1,
-                            "units"         : "km/s",
-                            "dbtype"        : "INTEGER"
-                        },
+                    "filter"                    : null,
                     "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVelMax",
                     "parameter_display_name"    : "Maximum Radial Linear Velocity",
-                    "filter"                    : {
-                            "filter_type"   : "doubleminmaxfilter",
-                            "min"           : 0,
-                            "max"           : 3000,
-                            "start_value"   : 1000,
-                            "step_size"     : 1,
-                            "units"         : "km/s",
-                            "dbtype"        : "INTEGER"
-                        },
+                    "filter"                    : null,
                     "default_visible"           : false
                 },
                 {
@@ -849,14 +834,8 @@
             "color" : "colorname://pink"
         },
         {
-            "event_name"    : "Flare",
+            "event_name"    : "Flare Trigger",
             "suppliers"     : [
-                {
-                    "supplier_name" : "SWPC",
-                    "supplier_display_name" : "NOAA SWPC",
-                    "source"        : "HEK",
-                    "db": "flare_swpc"
-                },
                 {
                     "supplier_name" : "Flare Detective - Trigger Module",
                     "supplier_display_name" : "Flare Detective",
@@ -920,6 +899,110 @@
                     "parameter_display_name"    : "GOES Classification",
                     "filter"                    : null,
                     "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FL_PeakFlux",
+                    "parameter_display_name"    : "Peak Flux",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                }
+            ],
+            "request_interval_extension"    : 36000000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://Flare",
+            "color" : "colorname://yellow"
+        },
+        {
+            "event_name"    : "Flare",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "SWPC",
+                    "supplier_display_name" : "NOAA SWPC",
+                    "source"        : "HEK",
+                    "db": "flare_swpc"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NOAANum",
+                    "parameter_display_name"    : "NOAA Number",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FL_GOESCLs",
+                    "parameter_display_name"    : "GOES Classification",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                { 
+                    "source"                    : "HEK",
+                    "parameter_name"            : "fl_val",
+                    "parameter_display_name"    : "GOES value",
+                    "filter"                    :
+                        {
+                            "filter_type"   : "flarefilter",
+                            "min"           : 1e-8,
+                            "max"           : 1e-3,
+                            "start_value"   : 1e-5,
+                            "step_size"     : 0.2,
+                            "units"         : "W/m^2",
+                            "dbtype"        : "REAL"
+                        },
+                   "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",

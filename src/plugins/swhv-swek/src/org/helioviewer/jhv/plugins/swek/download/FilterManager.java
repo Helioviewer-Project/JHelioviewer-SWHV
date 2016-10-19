@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,11 +20,7 @@ import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 public class FilterManager {
 
     private static FilterManager instance;
-
-    /** the filters */
     private final Map<SWEKEventType, Map<SWEKParameter, List<SWEKParam>>> filters;
-
-    /** The listeners */
     private final Set<FilterManagerListener> listeners;
 
     private FilterManager() {
@@ -38,72 +35,35 @@ public class FilterManager {
         return instance;
     }
 
-    /**
-     * Adds a FilterManager listener to the Filter manager.
-     *
-     * @param listener
-     *            the listener to add
-     */
     public void addFilterManagerListener(FilterManagerListener listener) {
         listeners.add(listener);
     }
 
-    /**
-     * Removes a FilterManager listener from the Filter manager.
-     *
-     * @param listener
-     *            the listener to remove
-     */
     public void removeFilterManagerListener(FilterManagerListener listener) {
         listeners.remove(listener);
     }
 
-    /**
-     * Adds a new filter to the list of filters. If the parameter was already
-     * filtered this filter is replaced.
-     *
-     * @param swekEventType
-     *            the event type for which this list of filters is meant
-     * @param parameter
-     *            the parameter for which this list of filters is meant
-     * @param filters
-     *            the list with filters
-     */
-    public void addFilter(SWEKEventType swekEventType, SWEKParameter parameter, List<SWEKParam> downloadFilters) {
-        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = new HashMap<SWEKParameter, List<SWEKParam>>();
-        if (filters.containsKey(swekEventType)) {
+    public void addFilter(SWEKEventType swekEventType, SWEKParameter parameter, SWEKParam filter) {
+        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType;
+        if (filters.containsKey(swekEventType))
             filteredParameterPerEventType = filters.get(swekEventType);
-        }
-        filteredParameterPerEventType.put(parameter, downloadFilters);
+        else
+            filteredParameterPerEventType = new HashMap<SWEKParameter, List<SWEKParam>>();
         filters.put(swekEventType, filteredParameterPerEventType);
-        fireFilterAdded(swekEventType);
+        if (!filteredParameterPerEventType.containsKey(parameter)) {
+            filteredParameterPerEventType.put(parameter, new ArrayList<SWEKParam>());
+        }
+        filteredParameterPerEventType.get(parameter).add(filter);
     }
 
-    /**
-     * Removes the filters for a Swek event type parameter.
-     *
-     * @param swekEventType
-     *            the event type for which to remove the parameter filter
-     * @param parameter
-     *            the parameter for which to remove the parameter filter
-     */
-    public void removedFilter(SWEKEventType swekEventType, SWEKParameter parameter) {
-        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = new HashMap<SWEKParameter, List<SWEKParam>>();
-        if (filters.containsKey(swekEventType)) {
-            filteredParameterPerEventType = filters.get(swekEventType);
-            filteredParameterPerEventType.remove(parameter);
-        }
-        filters.put(swekEventType, filteredParameterPerEventType);
-        fireFilterRemoved(swekEventType, parameter);
+    public void removeFilters(SWEKEventType swekEventType) {
+        filters.remove(swekEventType);
     }
 
-    /**
-     * Gets the list of filters for for the given event type.
-     *
-     * @param eventType
-     *            event type for which the filters are needed
-     * @return the list with parameter filters
-     */
+    public void fireFilters(SWEKEventType swekEventType) {
+        fireFilterChanged(swekEventType);
+    }
+
     public Map<SWEKParameter, List<SWEKParam>> getFilterForEventType(SWEKEventType eventType) {
         if (filters.containsKey(eventType)) {
             return filters.get(eventType);
@@ -115,29 +75,9 @@ public class FilterManager {
         return filters.containsKey(eventType) && filters.get(eventType).containsKey(parameter);
     }
 
-    /**
-     * Inform the listeners about newly added filters.
-     *
-     * @param swekEventType
-     *            the event type for which the events were added
-     */
-    private void fireFilterAdded(final SWEKEventType swekEventType) {
+    private void fireFilterChanged(final SWEKEventType swekEventType) {
         for (FilterManagerListener fml : listeners) {
-            fml.filtersAdded(swekEventType);
-        }
-    }
-
-    /**
-     * Inform the listeners about removed filters.
-     *
-     * @param swekEventType
-     *            the event type for which the filter was removed
-     * @param parameter
-     *            the parameter for which the filter was removed
-     */
-    private void fireFilterRemoved(SWEKEventType swekEventType, SWEKParameter parameter) {
-        for (FilterManagerListener fml : listeners) {
-            fml.filtersRemoved(swekEventType, parameter);
+            fml.filtersChanged(swekEventType);
         }
     }
 

@@ -360,6 +360,8 @@ public class EventDatabase {
                                     pstatement.setInt(index, p.getIntValue());
                                 } else if (p.isString()) {
                                     pstatement.setString(index, p.getStringValue());
+                                } else if (p.isDouble()) {
+                                    pstatement.setDouble(index, p.getDoubleValue());
                                 }
                                 index++;
                             }
