@@ -5,7 +5,7 @@ import javax.swing.AbstractSpinnerModel;
 public class FlareSpinnerModel extends AbstractSpinnerModel {
 
     private String curval;
-    private final double incr = 0.1;
+    private static final double incr = 0.1;
 
     public FlareSpinnerModel(String _start, String _end, String startval, double _stepsize) {
         curval = startval;
