@@ -20,6 +20,7 @@ import java.util.Properties;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
@@ -34,7 +35,6 @@ import org.helioviewer.jhv.data.datatype.event.SWEKSpatialRegion;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader;
@@ -154,7 +154,7 @@ public class SWEKConfigurationManager {
         ReadableByteChannel rbc;
         try {
             rbc = Channels.newChannel(url.openStream());
-            String saveFile = SWEKSettings.SWEK_HOME + configFileName;
+            String saveFile = JHVDirectory.SETTINGS.getPath() + configFileName;
             FileOutputStream fos = new FileOutputStream(saveFile);
             try {
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
@@ -178,7 +178,7 @@ public class SWEKConfigurationManager {
      *         found.
      */
     private boolean checkAndOpenHomeDirectoryFile() {
-        String configFile = SWEKSettings.SWEK_HOME + configFileName;
+        String configFile = JHVDirectory.SETTINGS.getPath() + configFileName;
         try {
             File f = new File(configFile);
             if (f.exists()) {
