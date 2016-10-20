@@ -34,7 +34,6 @@ import org.helioviewer.jhv.data.datatype.event.SWEKSpatialRegion;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
@@ -48,6 +47,8 @@ import org.json.JSONObject;
 public class SWEKConfigurationManager {
 
     private static SWEKConfigurationManager singletonInstance;
+
+    private static final String configFileName = "SWEKSettings.json";
 
     /** Config loaded */
     private boolean configLoaded;
@@ -66,15 +67,11 @@ public class SWEKConfigurationManager {
 
     private final List<SWEKEventType> orderedEventTypes;
 
-    /** The properties of the swek plugin */
-    private final Properties swekProperties;
-
     private SWEKConfigurationManager() {
         configLoaded = false;
         sources = new HashMap<String, SWEKSource>();
         parameters = new HashMap<String, SWEKParameter>();
         eventTypes = new HashMap<String, SWEKEventType>();
-        swekProperties = SWEKProperties.getSingletonInstance().getSWEKProperties();
         orderedEventTypes = new ArrayList<SWEKEventType>();
     }
 
@@ -153,11 +150,11 @@ public class SWEKConfigurationManager {
     }
 
     private boolean checkAndOpenZippedFile() {
-        URL url = SWEKPlugin.class.getResource(swekProperties.getProperty("plugin.swek.zipconfigfile"));
+        URL url = SWEKPlugin.class.getResource("/" + configFileName);
         ReadableByteChannel rbc;
         try {
             rbc = Channels.newChannel(url.openStream());
-            String saveFile = SWEKSettings.SWEK_HOME + swekProperties.getProperty("plugin.swek.configfilename");
+            String saveFile = SWEKSettings.SWEK_HOME + configFileName;
             FileOutputStream fos = new FileOutputStream(saveFile);
             try {
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
@@ -181,7 +178,7 @@ public class SWEKConfigurationManager {
      *         found.
      */
     private boolean checkAndOpenHomeDirectoryFile() {
-        String configFile = SWEKSettings.SWEK_HOME + swekProperties.getProperty("plugin.swek.configfilename");
+        String configFile = SWEKSettings.SWEK_HOME + configFileName;
         try {
             File f = new File(configFile);
             if (f.exists()) {

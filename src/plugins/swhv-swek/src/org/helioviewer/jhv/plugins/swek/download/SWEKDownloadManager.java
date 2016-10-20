@@ -25,12 +25,12 @@ import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModelListener;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
-import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.threads.JHVThread;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class SWEKDownloadManager implements EventTypePanelModelListener, FilterManagerListener {
 
+    private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
     private static SWEKDownloadManager instance;
     private final ExecutorService downloadEventPool;
@@ -48,9 +48,9 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         filterManager = FilterManager.getSingletonInstance();
         filterManager.addFilterManagerListener(this);
         treeModel = SWEKTreeModel.getSingletonInstance();
+
         PriorityBlockingQueue<Runnable> priorityQueue = new PriorityBlockingQueue<Runnable>(2048, new ComparePriority());
-        int numOfThread = Integer.parseInt(SWEKProperties.getSingletonInstance().getSWEKProperties().getProperty("plugin.swek.numberofthreads"));
-        downloadEventPool = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, priorityQueue, new JHVThread.NamedThreadFactory("SWEK Download"), new ThreadPoolExecutor.DiscardPolicy());
+        downloadEventPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS, priorityQueue, new JHVThread.NamedThreadFactory("SWEK Download"), new ThreadPoolExecutor.DiscardPolicy());
     }
 
     public static SWEKDownloadManager getSingletonInstance() {
