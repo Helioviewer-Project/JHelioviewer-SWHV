@@ -23,6 +23,7 @@ import org.helioviewer.jhv.plugins.swek.view.FilterDialog;
 
 @SuppressWarnings("serial")
 public class FilterPanel extends JPanel {
+
     private JButton filterEnableButton;
     private boolean enabled = false;
 
@@ -42,8 +43,14 @@ public class FilterPanel extends JPanel {
         parameter = _parameter;
         eventType = _eventType;
         filterManager = FilterManager.getSingletonInstance();
-        initVisualComponents();
 
+        setLayout(new BorderLayout());
+        setOpaque(false);
+        setBackground(Color.white);
+
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(initFilterComponents(), BorderLayout.CENTER);
+        add(contentPanel, BorderLayout.CENTER);
     }
 
     public void remove_filter() {
@@ -88,7 +95,7 @@ public class FilterPanel extends JPanel {
         });
     }
 
-    public JComponent initFilterComponents() {
+    private JComponent initFilterComponents() {
         label = new JLabel(parameter.getParameterDisplayName() + " " + operand.getStringRepresentation());
         initEnableButton();
         spinner.setEnabled(enabled);
@@ -105,16 +112,6 @@ public class FilterPanel extends JPanel {
         c.gridx = 2;
         p.add(filterEnableButton, c);
         return p;
-    }
-
-    private void initVisualComponents() {
-        setLayout(new BorderLayout());
-        setOpaque(false);
-        setBackground(Color.white);
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout());
-        contentPanel.add(initFilterComponents(), BorderLayout.CENTER);
-        add(contentPanel, BorderLayout.CENTER);
     }
 
 }

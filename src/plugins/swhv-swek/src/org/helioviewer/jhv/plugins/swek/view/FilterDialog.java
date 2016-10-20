@@ -18,16 +18,50 @@ import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
 
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
+
     private final SWEKEventType eventType;
-    private List<FilterPanel> filterPanels;
-    private final JButton filterApplyButton = new JButton("Apply");;
+    private final JButton filterApplyButton = new JButton("Apply");
 
     public FilterDialog(SWEKEventType eventType) {
-        super();
         this.eventType = eventType;
-        initFilterDialog();
+
+        setUndecorated(true);
+        addFocusListener(this);
+        addWindowFocusListener(this);
+
+        final List<FilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(eventType, this);
+        SmallPanel filterPanel = new SmallPanel();
+        filterPanel.setLayout(new GridLayout(filterPanels.size() + 1, 1));
+        filterPanel.setOpaque(false);
+        filterPanel.setBackground(Color.white);
+        for (FilterPanel afp : filterPanels) {
+            filterPanel.add(afp);
+        }
+
+        filterApplyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (FilterPanel afp : filterPanels) {
+                    afp.remove_filter();
+                }
+                for (FilterPanel afp : filterPanels) {
+                    afp.add_filter();
+                }
+                for (FilterPanel afp : filterPanels) {
+                    afp.fireFilter();
+                }
+                filterApplyButton.setEnabled(false);
+            }
+        });
+
+        filterPanel.add(filterApplyButton);
+        filterPanel.setSmall();
+
+        setContentPane(filterPanel);
+        pack();
+        validate();
     }
 
     @Override
@@ -48,47 +82,8 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
         setVisible(false);
     }
 
-    private void initButton() {
-        filterApplyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (FilterPanel afp : filterPanels) {
-                    afp.remove_filter();
-                }
-                for (FilterPanel afp : filterPanels) {
-                    afp.add_filter();
-                }
-                for (FilterPanel afp : filterPanels) {
-                    afp.fireFilter();
-                }
-                filterApplyButton.setEnabled(false);
-            }
-        });
-    }
-
     public void filterParameterChanged() {
         filterApplyButton.setEnabled(true);
     }
 
-    private void initFilterDialog() {
-        super.setUndecorated(true);
-        super.addFocusListener(this);
-        super.addWindowFocusListener(this);
-        filterPanels = FilterPanelFactory.createFilterPanel(eventType, this);
-
-        SmallPanel filterPanel = new SmallPanel();
-        filterPanel.setLayout(new GridLayout(filterPanels.size() + 1, 1));
-        filterPanel.setOpaque(false);
-        filterPanel.setBackground(Color.white);
-        for (FilterPanel afp : filterPanels) {
-            filterPanel.add(afp);
-        }
-        initButton();
-        filterPanel.add(filterApplyButton);
-        filterPanel.setSmall();
-
-        super.setContentPane(filterPanel);
-        super.pack();
-        super.validate();
-    }
 }
