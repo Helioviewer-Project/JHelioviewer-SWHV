@@ -9,7 +9,7 @@ public class CancelTask extends FutureTask<Boolean> {
         super(new Callable<Boolean>() {
            private FutureTask<?> _cancelTask;
 
-           public Callable init(FutureTask<?> _cancelTask) {
+           public Callable<Boolean> init(FutureTask<?> _cancelTask) {
                this._cancelTask = _cancelTask;
                return this;
            }
