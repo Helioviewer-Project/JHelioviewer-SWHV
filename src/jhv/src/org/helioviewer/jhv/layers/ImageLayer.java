@@ -107,7 +107,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private float opacity = -1;
 
-    public void setView1(View _view) {
+    public void setView(View _view) {
         if (view != null)
             unsetView();
 
