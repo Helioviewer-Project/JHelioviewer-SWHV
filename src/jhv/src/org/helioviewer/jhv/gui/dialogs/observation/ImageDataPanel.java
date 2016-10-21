@@ -16,6 +16,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
@@ -73,7 +74,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             timeSelectionPanel.setEndTime(item.end, false);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                loadRemote(null, item);
+                loadRemote(ImageLayer.createImageLayer(), item);
             }
         }
     }
@@ -98,13 +99,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
         return cadencePanel.getCadence();
     }
 
-    private void loadRemote(Object layer, DataSourcesTree.SourceItem item) { // valid item
-        ImageLayer imageLayer;
-        if (layer instanceof ImageLayer)
-            imageLayer = (ImageLayer) layer;
-        else
-            imageLayer = ImageLayer.createImageLayer();
-        imageLayer.load(new APIRequest(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence()));
+    private void loadRemote(ImageLayer layer, DataSourcesTree.SourceItem item) { // valid item
+        layer.load(new APIRequest(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence()));
     }
 
     // Methods derived from Observation Dialog Panel
@@ -139,7 +135,12 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        loadRemote(layer, item);
+        if (!(layer instanceof ImageLayer)) { // can't happen
+            Log.error("Not ImageLayer");
+            return false;
+        }
+
+        loadRemote((ImageLayer) layer, item);
         return true;
     }
 

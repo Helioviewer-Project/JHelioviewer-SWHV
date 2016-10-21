@@ -92,12 +92,9 @@ public class ObservationDialog extends JDialog implements ActionListener {
         imageObservationPanel = new ImageDataPanel();
     }
 
-    /**
-     * Shows up the dialog and initializes the UI with the panel of the given
-     * name.
-     * */
-    public void showDialog(Object layer, ObservationDialogPanel observationPanel) {
-        if (layer == null) {
+    // Shows up the dialog and initializes the UI with the given panel.
+    public void showDialog(boolean newLayer, Object layer, ObservationDialogPanel observationPanel) {
+        if (newLayer) {
             setTitle("New Layer");
             btnImages.setText("Add");
         } else {

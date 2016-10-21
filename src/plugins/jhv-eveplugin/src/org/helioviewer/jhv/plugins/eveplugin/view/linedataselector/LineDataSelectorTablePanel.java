@@ -111,7 +111,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         addLayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ObservationDialog.getInstance().showDialog(null, observationPanel);
+                ObservationDialog.getInstance().showDialog(true, null, observationPanel);
             }
         });
         addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
