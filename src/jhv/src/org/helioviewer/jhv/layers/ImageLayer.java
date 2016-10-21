@@ -57,7 +57,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         if (!req.equals(getAPIRequest())) {
             if (worker != null)
                 worker.cancel(true);
-            worker = new LoadRemoteTask(this, req);
+            worker = new LoadRemoteTask(this, req, 0);
             JHVGlobals.getExecutorService().execute(worker);
         }
     }
