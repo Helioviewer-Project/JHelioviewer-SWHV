@@ -21,12 +21,9 @@ import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
 @SuppressWarnings("serial")
 public class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
 
-    private final SWEKEventType eventType;
-    private final JButton filterApplyButton = new JButton("Apply");
+    private final JButton applyButton = new JButton("Apply");
 
     public FilterDialog(SWEKEventType eventType) {
-        this.eventType = eventType;
-
         setUndecorated(true);
         addFocusListener(this);
         addWindowFocusListener(this);
@@ -40,7 +37,7 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
             filterPanel.add(afp);
         }
 
-        filterApplyButton.addActionListener(new ActionListener() {
+        applyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (FilterPanel afp : filterPanels) {
@@ -52,16 +49,15 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
                 for (FilterPanel afp : filterPanels) {
                     afp.fireFilter();
                 }
-                filterApplyButton.setEnabled(false);
+                applyButton.setEnabled(false);
             }
         });
 
-        filterPanel.add(filterApplyButton);
+        filterPanel.add(applyButton);
         filterPanel.setSmall();
 
         setContentPane(filterPanel);
         pack();
-        validate();
     }
 
     @Override
@@ -83,7 +79,7 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
     }
 
     public void filterParameterChanged() {
-        filterApplyButton.setEnabled(true);
+        applyButton.setEnabled(true);
     }
 
 }
