@@ -55,6 +55,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     public void load(APIRequest req) {
         if (!req.equals(getAPIRequest())) {
+            if (worker != null)
+                worker.cancel(true);
             worker = new LoadRemoteTask(this, req);
             JHVGlobals.getExecutorService().execute(worker);
         }
@@ -105,7 +107,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private float opacity = -1;
 
-    public void setView(View _view) {
+    public void setView1(View _view) {
         if (view != null)
             unsetView();
 
