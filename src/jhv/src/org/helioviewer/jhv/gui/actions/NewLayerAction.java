@@ -13,6 +13,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.input.KeyShortcuts;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -49,7 +50,7 @@ public class NewLayerAction extends AbstractAction {
                 }
             }
         }
-        ObservationDialog.getInstance().showDialog(null, ObservationDialog.getInstance().getObservationImagePane());
+        ObservationDialog.getInstance().showDialog(true, ImageLayer.createImageLayer(), ObservationDialog.getInstance().getObservationImagePane());
     }
 
 }
