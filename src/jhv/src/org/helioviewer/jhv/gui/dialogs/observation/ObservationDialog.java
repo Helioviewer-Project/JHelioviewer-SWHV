@@ -24,7 +24,6 @@ public class ObservationDialog extends JDialog implements ActionListener {
     private ObservationDialogPanel observationPanel;
 
     private final JPanel contentPane = new JPanel();
-    private final JPanel uiSelectionPane = new JPanel();
     private final JPanel buttonPane = new JPanel();
     private final JButton btnImages = new JButton();
     private final JButton btnClose = new JButton("Cancel");
@@ -54,10 +53,6 @@ public class ObservationDialog extends JDialog implements ActionListener {
         contentPane.setBorder(BorderFactory.createEmptyBorder(3, 9, 1, 9));
         contentPane.setFocusable(true);
 
-        // set up components
-        uiSelectionPane.setBorder(BorderFactory.createEtchedBorder());
-        uiSelectionPane.add(availabilityButton);
-
         availabilityButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -76,6 +71,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
         });
 
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT, 3, 3));
+        buttonPane.add(availabilityButton);
         buttonPane.add(btnClose);
         buttonPane.add(btnImages);
 
@@ -109,7 +105,6 @@ public class ObservationDialog extends JDialog implements ActionListener {
             this.observationPanel = observationPanel;
 
             contentPane.removeAll();
-            contentPane.add(uiSelectionPane);
             contentPane.add(observationPanel);
             contentPane.add(buttonPane);
         }
