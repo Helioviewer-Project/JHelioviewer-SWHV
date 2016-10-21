@@ -30,6 +30,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
@@ -40,6 +41,8 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.
 public class LineDataSelectorTablePanel extends JPanel {
 
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
+
+    private static final ObservationDialogUIPanel observationPanel = new ObservationDialogUIPanel();
 
     private static final int ICON_WIDTH = 12;
 
@@ -108,7 +111,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         addLayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ObservationDialog.getInstance().showDialog(null, EVEPlugin.OBSERVATION_UI_NAME);
+                ObservationDialog.getInstance().showDialog(null, observationPanel);
             }
         });
         addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));

@@ -22,9 +22,8 @@ import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
-    private static final int MAX_WORKER_THREADS = 12;
-    public static final String OBSERVATION_UI_NAME = "1D time series";
 
+    private static final int MAX_WORKER_THREADS = 12;
     public static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("EVE", MAX_WORKER_THREADS);
 
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
@@ -50,19 +49,12 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         JHVRelatedEvents.addHighlightListener(dc);
 
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
-
             @Override
             protected Void backgroundWork() {
                 // call BandType API in background => loads the datasets
                 BandTypeAPI.getSingletonInstance();
                 return null;
             }
-
-            @Override
-            public void done() {
-                ObservationDialog.getInstance().addUserInterface(OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-            }
-
         };
 
         loadSources.setThreadName("EVE--LoadSources");
@@ -74,8 +66,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         JHVRelatedEvents.removeHighlightListener(dc);
         Layers.removeTimeListener(dc);
         Layers.removeLayersListener(dc);
-
-        ObservationDialog.getInstance().removeUserInterface(OBSERVATION_UI_NAME);
 
         ImageViewerGui.getMainContentPanel().removePlugin(this);
 
