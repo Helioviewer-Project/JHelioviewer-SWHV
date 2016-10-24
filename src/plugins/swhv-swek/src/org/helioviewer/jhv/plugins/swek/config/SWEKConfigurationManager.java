@@ -52,8 +52,6 @@ public class SWEKConfigurationManager {
 
     private final Map<String, SWEKSource> sources;
 
-    private final Map<String, SWEKParameter> parameters;
-
     private final Map<String, SWEKEventType> eventTypes;
 
     private final List<SWEKEventType> orderedEventTypes;
@@ -61,7 +59,6 @@ public class SWEKConfigurationManager {
     private SWEKConfigurationManager() {
         configLoaded = false;
         sources = new HashMap<String, SWEKSource>();
-        parameters = new HashMap<String, SWEKParameter>();
         eventTypes = new HashMap<String, SWEKEventType>();
         orderedEventTypes = new ArrayList<SWEKEventType>();
     }
@@ -82,8 +79,7 @@ public class SWEKConfigurationManager {
             } else if (checkAndOpenHomeDirectoryFile()) {
                 boolean manuallyChanged = isManuallyChanged();
                 if (!manuallyChanged) {
-                    // check if the file is manually changed if not we download
-                    // the latest version anyway.
+                    // check if the file is manually changed if not we download the latest version anyway
                     if (checkAndOpenZippedFile()) {
                         isConfigParsed = parseConfigFile();
                     } else {
@@ -225,7 +221,7 @@ public class SWEKConfigurationManager {
         else
             return null;
     }
-    
+
     private String parseSourceName(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("name");
     }
@@ -238,9 +234,7 @@ public class SWEKConfigurationManager {
         List<SWEKParameter> parameterList = new ArrayList<SWEKParameter>();
         JSONArray parameterArray = jsonObject.getJSONArray("general_parameters");
         for (int i = 0; i < parameterArray.length(); i++) {
-            SWEKParameter parameter = parseParameter(parameterArray.getJSONObject(i));
-            parameterList.add(parameter);
-            parameters.put(parameter.getParameterName(), parameter);
+            parameterList.add(parseParameter(parameterArray.getJSONObject(i)));
         }
         return parameterList;
     }
@@ -313,9 +307,7 @@ public class SWEKConfigurationManager {
         List<SWEKParameter> parameterList = new ArrayList<SWEKParameter>();
         JSONArray parameterListArray = object.getJSONArray("parameter_list");
         for (int i = 0; i < parameterListArray.length(); i++) {
-            SWEKParameter parameter = parseParameter((JSONObject) parameterListArray.get(i));
-            parameterList.add(parameter);
-            parameters.put(parameter.getParameterName(), parameter);
+            parameterList.add(parseParameter((JSONObject) parameterListArray.get(i)));
         }
         return parameterList;
     }

@@ -3,7 +3,6 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.concurrent.Callable;

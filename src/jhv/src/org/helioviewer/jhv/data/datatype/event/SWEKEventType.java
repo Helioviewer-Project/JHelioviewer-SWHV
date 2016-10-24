@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.data.datatype.event;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.List;
 
