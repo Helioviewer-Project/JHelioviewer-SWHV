@@ -1,10 +1,8 @@
 package org.helioviewer.jhv.io;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Locale;
@@ -27,12 +25,11 @@ public class APIRequestManager {
 
     public static View requestAndOpenRemoteFile(APIRequest req, boolean errorMessage) throws IOException {
         try {
-            URL jpipRequest = new URL(req.jpipRequest);
-            APIResponse response = new APIResponse(new DownloadStream(jpipRequest).getInput());
+            APIResponse response = new APIResponse(new DownloadStream(req.jpipRequest).getInput());
 
             // Could we handle the answer from the server
             if (!response.hasData()) {
-                Log.error("Could not understand server answer from " + jpipRequest);
+                Log.error("Could not understand server answer from " + req.jpipRequest);
                 if (errorMessage) {
                     Message.err("Invalid Server reply", "The server data could not be parsed.", false);
                 }
@@ -55,27 +52,23 @@ public class APIRequestManager {
                 if (message != null && errorMessage) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
-                return loadView(response.getURI(), new URI(req.fileRequest), req);
+                return loadView(response.getURI(), req);
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");
                 if (message != null) {
-                    Log.error("No data to load returned from " + jpipRequest);
+                    Log.error("No data to load returned from " + req.jpipRequest);
                     Log.error("Server message: " + message);
                     if (errorMessage) {
                         Message.err("Server could not return data", Message.formatMessageString(message), false);
                     }
                 } else {
-                    Log.error("Did not find URI in response to " + jpipRequest);
+                    Log.error("Did not find URI in response to " + req.jpipRequest);
                     if (errorMessage) {
                         Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
                     }
                 }
             }
-        } catch (MalformedURLException e) {
-            Log.error("APIRequestManager.requestData() > Malformed JPIP request URL: " + req.jpipRequest);
-        } catch (URISyntaxException e) {
-            Log.error("APIRequestManager.requestData() > URI syntax exception: " + req.fileRequest);
         } catch (UnknownHostException e) {
             Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
             throw new IOException("Unknown Host: " + e.getMessage());
@@ -90,10 +83,16 @@ public class APIRequestManager {
         return null;
     }
 
-    static View loadView(URI uri, URI downloadURI, APIRequest apiRequest) throws IOException {
+    static View loadView(URI uri, APIRequest req) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI");
         }
+
+        URI downloadURI;
+        if (req != null)
+            downloadURI = req.fileRequest;
+        else
+            downloadURI = uri;
 
         try {
             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
@@ -109,7 +108,7 @@ public class APIRequestManager {
                     jp2Image = new JP2Image(uri, downloadURI);
 
                 JP2View view = EventDispatchQueue.invokeAndWait(new AllocateJP2View(jp2Image));
-                view.setAPIRequest(apiRequest);
+                view.setAPIRequest(req);
                 return view;
             }
         } catch (InterruptedException e) {
