@@ -45,7 +45,7 @@ public class SWEKParameterFilter {
         this.min = min;
         this.max = max;
         this.startValue = startValue;
-        stepSize = stepsize;
+        this.stepSize = stepsize;
         this.units = units;
         this.dbType = dbType;
     }

@@ -101,23 +101,6 @@ public class SWEKEventType {
     }
 
     /**
-     * Contains this source the following parameter.
-     *
-     * @param name
-     *            the name of the parameter
-     * @return true if the parameter is configured for this source, false if the
-     *         parameter is not configured for this source
-     */
-    public boolean containsParameter(String name) {
-        for (SWEKParameter parameter : parameterList) {
-            if (parameter.getParameterName().equalsIgnoreCase(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Gets a parameter from the event type.
      *
      * @param name

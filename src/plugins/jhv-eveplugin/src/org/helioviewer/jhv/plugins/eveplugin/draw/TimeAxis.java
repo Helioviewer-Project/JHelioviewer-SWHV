@@ -12,10 +12,6 @@ public class TimeAxis {
         end = _max;
     }
 
-    public double getRatio(double size) {
-        return size / (end - start);
-    }
-
     public int value2pixel(int x0, int w, long val) {
         return (int) ((double) w * (val - start) / (end - start) + x0);
     }

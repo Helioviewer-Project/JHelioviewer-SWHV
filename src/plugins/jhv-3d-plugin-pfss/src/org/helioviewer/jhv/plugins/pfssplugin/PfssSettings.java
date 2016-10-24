@@ -1,10 +1,6 @@
 package org.helioviewer.jhv.plugins.pfssplugin;
 
-// Important settings
 public class PfssSettings {
-
-    // Needed for the JHV plugin initialization
-    public static final String PLUGIN_LOCATION = "PfssPlugin";
 
     // Maximal preload of cache data
     public static final int CACHE_SIZE = 365 * 4;

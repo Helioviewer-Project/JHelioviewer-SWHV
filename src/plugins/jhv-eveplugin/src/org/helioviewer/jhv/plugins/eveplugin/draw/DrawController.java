@@ -189,10 +189,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    public Interval getSelectedInterval() {
-        return new Interval(selectedAxis.start, selectedAxis.end);
-    }
-
     public void setGraphInformation(Rectangle graphSize) {
         this.graphSize = graphSize;
         createGraphArea();

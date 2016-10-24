@@ -37,10 +37,6 @@ public class LineDataSelectorModel implements TableModel {
         fireListeners();
     }
 
-    public int getNumberOfAvailableLineData() {
-        return elements.size();
-    }
-
     public void addLineData(LineDataSelectorElement element) {
         elements.add(element);
         fireLineDataSelectorElementAdded(element);
@@ -57,15 +53,6 @@ public class LineDataSelectorModel implements TableModel {
 
         fireLineDataSelectorElementRemoved(element);
         fireListeners();
-    }
-
-    public boolean atLeastOneDownloading() {
-        for (LineDataSelectorElement el : elements) {
-            if (el.isDownloading()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void fireListeners() {
