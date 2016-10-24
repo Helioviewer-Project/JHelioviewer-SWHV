@@ -21,7 +21,6 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.data.datatype.event.SWEKConfiguration;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameterFilter;
@@ -179,8 +178,11 @@ public class SWEKConfigurationManager {
         try {
             JSONObject configJSON = JSONUtils.getJSONStream(configFileURL.openStream());
             EventDatabase.config_hash = Arrays.hashCode(configJSON.toString().toCharArray());
-            SWEKConfiguration config = new SWEKConfiguration(parseVersion(configJSON), parseManuallyChanged(configJSON), parseSources(configJSON), parseEventTypes(configJSON), parseRelatedEvents(configJSON));
-            SWEKEventType.setSwekRelatedEvents(config.getRelatedEvents());
+
+            parseSources(configJSON); // side effects
+            parseEventTypes(configJSON);
+
+            SWEKEventType.setSwekRelatedEvents(parseRelatedEvents(configJSON));
             return true;
         } catch (IOException e) {
             Log.debug("Configuration file could not be parsed: " + e);
@@ -192,10 +194,6 @@ public class SWEKConfigurationManager {
 
     private boolean parseManuallyChanged(JSONObject configJSON) throws JSONException {
         return configJSON.getBoolean("manually_changed");
-    }
-
-    private String parseVersion(JSONObject configJSON) throws JSONException {
-        return configJSON.getString("config_version");
     }
 
     private List<SWEKSource> parseSources(JSONObject configJSON) throws JSONException {
@@ -309,11 +307,7 @@ public class SWEKConfigurationManager {
     }
 
     private SWEKParameter parseParameter(JSONObject jsonObject) throws JSONException {
-        return new SWEKParameter(parseSourceInParameter(jsonObject), parseParameterName(jsonObject), parseParameterDisplayName(jsonObject), parseParameterFilter(jsonObject), parseDefaultVisible(jsonObject));
-    }
-
-    private String parseSourceInParameter(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("source");
+        return new SWEKParameter(parseParameterName(jsonObject), parseParameterDisplayName(jsonObject), parseParameterFilter(jsonObject), parseDefaultVisible(jsonObject));
     }
 
     private String parseParameterName(JSONObject jsonObject) throws JSONException {
@@ -400,12 +394,12 @@ public class SWEKConfigurationManager {
 
     private SWEKParameter parseParameterFrom(JSONObject jsonObject) throws JSONException {
         String parameterName = jsonObject.getString("parameter_from");
-        return new SWEKParameter("", parameterName, parameterName, null, false);
+        return new SWEKParameter(parameterName, parameterName, null, false);
     }
 
     private SWEKParameter parseParameterWith(JSONObject jsonObject) throws JSONException {
         String parameterName = jsonObject.getString("parameter_with");
-        return new SWEKParameter("", parameterName, parameterName, null, false);
+        return new SWEKParameter(parameterName, parameterName, null, false);
     }
 
 }
