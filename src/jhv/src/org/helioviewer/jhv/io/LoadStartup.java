@@ -17,14 +17,14 @@ public class LoadStartup {
         // -jpx
         for (URI jpxUrl : CommandLineProcessor.getJPXOptionValues()) {
             if (jpxUrl != null) {
-                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), jpxUrl, jpxUrl);
+                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), jpxUrl);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
         // -jpip
         for (URI jpipUri : CommandLineProcessor.getJPIPOptionValues()) {
             if (jpipUri != null) {
-                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), jpipUri, jpipUri);
+                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), jpipUri);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
         }

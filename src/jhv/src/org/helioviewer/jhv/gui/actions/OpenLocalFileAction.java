@@ -55,7 +55,7 @@ public class OpenLocalFileAction extends AbstractAction {
                 Settings.getSingletonInstance().save("default.local.path");
 
                 URI uri = selectedFile.toURI();
-                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), uri, uri);
+                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), uri);
                 JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
