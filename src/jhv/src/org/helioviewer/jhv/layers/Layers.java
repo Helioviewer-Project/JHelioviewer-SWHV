@@ -14,7 +14,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
-import org.helioviewer.jhv.io.APIRequestManager.APIRequest;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
