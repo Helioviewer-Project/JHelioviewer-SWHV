@@ -2,7 +2,6 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Locale;
 
 import org.helioviewer.jhv.base.Regex;
 
@@ -76,7 +75,7 @@ public class JHVEventParameter {
     public String getDisplayParameterValue() {
         if (parameterDisplayValue == null) {
             parameterDisplayValue = getSimpleDisplayParameterValue();
-            if (parameterName.toLowerCase(Locale.ENGLISH).equals("ar_noaanum"))
+            if (parameterName == "ar_noaanum")
                 parameterDisplayValue = ("<a href=\"https://ui.adsabs.harvard.edu/#search/q=%22NOAA%20" +
                         parameterDisplayValue +
                         "%22&sort=date%20desc\">" +
