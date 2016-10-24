@@ -327,8 +327,7 @@
                     "default_visible"           : false
                 }
             ],
-            "icon" : "iconbank://ActiveRegion",
-            "color" : "colorcode://0x5E5E5E"
+            "icon" : "iconbank://ActiveRegion"
         },
         {
             "event_name"    : "Coronal Mass Ejection",
@@ -457,8 +456,7 @@
                     "default_visible"           : true
                 }
             ],
-            "icon" : "iconbank://CME",
-            "color" : "colorname://orange"
+            "icon" : "iconbank://CME"
         },
         {
             "event_name"    : "Coronal Dimming",
@@ -527,8 +525,7 @@
                     "default_visible"           : true
                 }
             ],
-            "icon" : "iconbank://CoronalDimming",
-            "color" : "colorname://cyan"
+            "icon" : "iconbank://CoronalDimming"
         },
         {
             "event_name"    : "Coronal Hole",
@@ -577,8 +574,7 @@
                     "default_visible"           : false
                 }
             ],
-            "icon" : "iconbank://CoronalHole",
-            "color" : "colorname://green"
+            "icon" : "iconbank://CoronalHole"
         },
         {
             "event_name"    : "Coronal Wave",
@@ -627,8 +623,7 @@
                     "default_visible"           : false
                 }
             ],
-            "icon" : "iconbank://CoronalWave",
-            "color" : "colorname://red"
+            "icon" : "iconbank://CoronalWave"
         },
         {
             "event_name"    : "Filament",
@@ -698,8 +693,7 @@
                     "default_visible"           : true
                 }
             ],
-            "icon" : "iconbank://Filament",
-            "color" : "colorname://blue"
+            "icon" : "iconbank://Filament"
         },
         {
             "event_name"    : "Filament Eruption",
@@ -748,8 +742,7 @@
                     "default_visible"           : false
                 }
             ],
-            "icon" : "iconbank://FilamentEruption",
-            "color" : "colorname://pink"
+            "icon" : "iconbank://FilamentEruption"
         },
         {
             "event_name"    : "Flare Trigger",
@@ -826,8 +819,7 @@
                     "default_visible"           : true
                 }
             ],
-            "icon" : "iconbank://Flare",
-            "color" : "colorname://yellow"
+            "icon" : "iconbank://Flare"
         },
         {
             "event_name"    : "Flare",
@@ -920,8 +912,7 @@
                     "default_visible"           : true
                 }
             ],
-            "icon" : "iconbank://Flare",
-            "color" : "colorname://yellow"
+            "icon" : "iconbank://Flare"
         },
         {
             "event_name"    : "Sunspot",
@@ -977,8 +968,7 @@
                     "default_visible"           : false
                 }
             ],
-            "icon" : "iconbank://SunSpot",
-            "color" : "colorname://magenta"
+            "icon" : "iconbank://SunSpot"
         },
         {
             "event_name"    : "Emerging Flux",
@@ -1027,8 +1017,7 @@
                     "default_visible"           : false
                 }
             ],
-            "icon" : "iconbank://EmergingFlux",
-            "color" : "colorcode://0x68C3FC"
+            "icon" : "iconbank://EmergingFlux"
         },
         {
             "event_name"    : "Eruption",
@@ -1076,8 +1065,7 @@
                     "filter"                    : null,
                     "default_visible"           : false
                 }],
-            "icon" : "iconbank://Eruption",
-            "color" : "colorcode://0xB4FC68"
+            "icon" : "iconbank://Eruption"
         },
         {
             "event_name"    : "COMESEP",
@@ -1127,8 +1115,7 @@
                 }
             ],
             "parameter_list"        : [],
-            "icon" : "iconbank://Comesep",
-            "color" : "colorcode://0x5E5E5E"
+            "icon" : "iconbank://Comesep"
         }
     ],
     "related_events" : [

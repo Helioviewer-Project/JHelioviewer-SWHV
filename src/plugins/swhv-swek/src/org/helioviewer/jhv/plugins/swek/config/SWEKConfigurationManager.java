@@ -384,70 +384,7 @@ public class SWEKConfigurationManager {
      * @throws JSONException
      */
     private SWEKEventType parseEventType(JSONObject object) throws JSONException {
-        return new SWEKEventType(parseEventName(object), parseSuppliers(object), parseParameterList(object), parseEventIcon(object), parseColor(object));
-    }
-
-    /**
-     * Parses the color from the json.
-     *
-     * @param object
-     *            the json to parse from
-     * @return the color of the event type or black if something went wrong.
-     * @throws JSONException
-     *             If the parsing went wrong
-     */
-    private Color parseColor(JSONObject object) throws JSONException {
-        String color = object.getString("color");
-        try {
-            URI colorURI = new URI(color);
-            String colorScheme = colorURI.getScheme().toLowerCase();
-            if (colorScheme.equals("colorname")) {
-                return parseColorName(colorURI.getHost());
-            } else if (colorScheme.equals("colorcode")) {
-                return parseColorCode(colorURI.getHost());
-            } else {
-                Log.info("Could not understand: " + color + ", black returned");
-                return Color.black;
-            }
-        } catch (URISyntaxException e) {
-            Log.info("Could not parse the URI " + color + ", black returned");
-        }
-        return Color.black;
-    }
-
-    /**
-     * Parses a hexadecimal or octal string to a color.
-     *
-     * @param colorCode
-     *            the code to parse into a color
-     * @return the color represented by the hex st ring or black if something
-     *         went wrong
-     */
-    private Color parseColorCode(String colorCode) {
-        try {
-            return Color.decode(colorCode);
-        } catch (NumberFormatException ex) {
-            Log.info("Could not parse the color code " + colorCode + ", black returned");
-        }
-        return Color.black;
-    }
-
-    /**
-     * Parses a color name into a color.
-     *
-     * @param colorName
-     *            the name to parse into a color
-     * @return the color represented by the color name or black if something
-     *         went wrong
-     */
-    private Color parseColorName(String colorName) {
-        try {
-            Field field = Class.forName("java.awt.Color").getField(colorName);
-            return (Color) field.get(null);
-        } catch (Exception e) {
-            Log.info("Could not parse the color name " + colorName + ", black returned");
-        }
-        return Color.black; // Not defined
+        return new SWEKEventType(parseEventName(object), parseSuppliers(object), parseParameterList(object), parseEventIcon(object));
     }
 
     /**

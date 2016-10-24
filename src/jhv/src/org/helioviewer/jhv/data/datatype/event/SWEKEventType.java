@@ -12,18 +12,16 @@ public class SWEKEventType {
     private final List<SWEKSupplier> suppliers;
     private final List<SWEKParameter> parameterList;
     private final ImageIcon eventIcon;
-    private final Color color;
 
     private final boolean containsParameterFilter;
     private HashMap<String, String> databaseFields;
     private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<String, SWEKEventType>();
 
-    public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, ImageIcon eventIcon, Color color) {
+    public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, ImageIcon eventIcon) {
         this.eventName = eventName.intern();
         this.suppliers = suppliers;
         this.parameterList = parameterList;
         this.eventIcon = eventIcon;
-        this.color = color;
         containsParameterFilter = checkFilters(parameterList);
         swekEventTypes.put(this.eventName, this);
     }
@@ -144,15 +142,6 @@ public class SWEKEventType {
      */
     public ImageIcon getEventIcon() {
         return eventIcon;
-    }
-
-    /**
-     * Gets the color of the event type.
-     *
-     * @return the color of the event type
-     */
-    public Color getColor() {
-        return color;
     }
 
     /**
