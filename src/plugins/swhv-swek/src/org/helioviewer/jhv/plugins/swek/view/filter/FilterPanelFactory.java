@@ -36,7 +36,7 @@ public class FilterPanelFactory {
         return spinnerFormat.toString();
     }
 
-    private static JSpinner generateFlareSpinner(final FilterDialog filterDialog, SWEKParameter parameter) {
+    private static JSpinner generateFlareSpinner(final FilterDialog filterDialog) {
         /*
         double min = parameter.getParameterFilter().getMin() == null ? 1e-8 : parameter.getParameterFilter().getMin();
         double max = parameter.getParameterFilter().getMax() == null ? 1e-3 : parameter.getParameterFilter().getMin();
@@ -89,7 +89,7 @@ public class FilterPanelFactory {
                     panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
                     panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL));
                 } else if (filterType.equals("flarefilter")) {
-                    panels.add(new FilterPanel(eventType, parameter, generateFlareSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
+                    panels.add(new FilterPanel(eventType, parameter, generateFlareSpinner(filterDialog), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
                 }
             }
         }

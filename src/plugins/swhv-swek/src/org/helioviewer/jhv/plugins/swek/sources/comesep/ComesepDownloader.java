@@ -51,8 +51,7 @@ public class ComesepDownloader extends SWEKDownloader {
             }
 
             int[] ids = EventDatabase.dump_event2db(event2db_list, type);
-            for (int i = 0; i < ids.length; i++) {
-                int id = ids[i];
+            for (int id : ids) {
                 if (id == -1) {
                     Log.error("failed to dump to database");
                 }

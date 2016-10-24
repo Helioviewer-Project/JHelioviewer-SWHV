@@ -197,20 +197,6 @@ public class DownloadStream {
     }
 
     /**
-     * @return the read timeout
-     */
-    public int getReadTimeout() {
-        return readTimeout;
-    }
-
-    /**
-     * @return the connect timeout
-     */
-    public int getConnectTimeout() {
-        return connectTimeout;
-    }
-
-    /**
      * Set the output to send to the server (in HTTP as POST)
      *
      * @param output

@@ -25,7 +25,6 @@ public class APIRequestManager {
     public static View requestAndOpenRemoteFile(APIRequest req, boolean errorMessage) throws IOException {
         try {
             APIResponse response = new APIResponse(new DownloadStream(req.jpipRequest).getInput());
-
             // Could we handle the answer from the server
             if (!response.hasData()) {
                 Log.error("Could not understand server answer from " + req.jpipRequest);

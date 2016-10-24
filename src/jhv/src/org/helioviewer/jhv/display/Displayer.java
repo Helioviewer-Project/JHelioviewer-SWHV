@@ -247,7 +247,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     @Override
-    public void eventHightChanged(JHVRelatedEvents event) {
+    public void eventHightChanged() {
         display();
     }
 
