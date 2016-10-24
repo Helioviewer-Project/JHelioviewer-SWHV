@@ -31,10 +31,10 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * @author Stephan Pagel
  * */
 @SuppressWarnings("serial")
-public class PluginListEntry extends AbstractListEntry implements MouseListener {
+class PluginsListEntry extends AbstractPluginsListEntry implements MouseListener {
 
     private final PluginContainer plugin;
-    private final List list;
+    private final PluginsList list;
 
     private final LinkLabel infoLabel = new LinkLabel("More");
 
@@ -42,7 +42,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
     private final JLabel enableLabel = new JLabel();
     private final JLabel removeLabel = new JLabel();
 
-    public PluginListEntry(PluginContainer plugin, List list) {
+    public PluginsListEntry(PluginContainer plugin, PluginsList list) {
         this.plugin = plugin;
         this.list = list;
 
