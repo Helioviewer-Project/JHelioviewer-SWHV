@@ -62,7 +62,7 @@ public class HEKParser implements SWEKParser {
 
             if (key instanceof String) {
                 String originalKeyString = (String) key;
-                String keyString = originalKeyString.toLowerCase(Locale.ENGLISH);
+                String keyString = originalKeyString.toLowerCase(Locale.ENGLISH).intern();
                 if (insertedKeys.contains(keyString))
                     continue;
                 insertedKeys.add(keyString);
@@ -94,7 +94,7 @@ public class HEKParser implements SWEKParser {
                     } else {
                         value = value.trim();
                         if (value.length() != 0)
-                            currentEvent.addParameter(originalKeyString, value, full);
+                            currentEvent.addParameter(keyString, value, full);
                     }
                 }
             }
