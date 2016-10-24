@@ -10,42 +10,31 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-/**
- * Represents a visual list which manages inherited components from {@link AbstractListEntry). 
- * 
- * @author Stephan Pagel
- * */
 @SuppressWarnings({"rawtypes","serial"})
-public class List extends JScrollPane {
+class PluginsList extends JScrollPane {
 
-    private final LinkedList<ListEntryChangeListener> listeners = new LinkedList<ListEntryChangeListener>();
+    private final LinkedList<PluginsListEntryChangeListener> listeners = new LinkedList<PluginsListEntryChangeListener>();
 
     private final Color selectionBackgroundColor = new JList().getSelectionBackground();
     private final Color selectionForegroundColor = new JList().getSelectionForeground();
-    private final HashMap<String, AbstractListEntry> entryMap = new HashMap<String, AbstractListEntry>();
+    private final HashMap<String, AbstractPluginsListEntry> entryMap = new HashMap<String, AbstractPluginsListEntry>();
 
     private final JPanel contentPane = new JPanel();
 
     private String selectedEntryName = null;
 
-    public List() {
+    public PluginsList() {
         super(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         setViewportView(contentPane);
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         contentPane.setBackground(Color.WHITE);
     }
 
-    /**
-     * Adds the given {@link ListEntryChangeListener} to the list.
-     * */
-    public void addListEntryChangeListener(final ListEntryChangeListener listener) {
+    public void addListEntryChangeListener(PluginsListEntryChangeListener listener) {
         listeners.add(listener);
     }
 
-    /**
-     * Removes the given {@link ListEntryChangeListener} from the list.
-     * */
-    public void removeListEntryChangeListener(final ListEntryChangeListener listener) {
+    public void removeListEntryChangeListener(PluginsListEntryChangeListener listener) {
         listeners.remove(listener);
     }
 
@@ -56,10 +45,10 @@ public class List extends JScrollPane {
     private void updateList() {
         contentPane.removeAll();
 
-        final String[] pluginNames = entryMap.keySet().toArray(new String[0]);
+        String[] pluginNames = entryMap.keySet().toArray(new String[0]);
         Arrays.sort(pluginNames);
 
-        for (final String name : pluginNames) {
+        for (String name : pluginNames) {
             contentPane.add(entryMap.get(name));
         }
 
@@ -73,7 +62,7 @@ public class List extends JScrollPane {
     /**
      * Adds a new item to the list.
      * */
-    public void addEntry(final String name, final AbstractListEntry entry) {
+    public void addEntry(String name, AbstractPluginsListEntry entry) {
         if (name == null || entry == null) {
             return;
         }
@@ -85,7 +74,7 @@ public class List extends JScrollPane {
     /**
      * Removes an item from the list.
      * */
-    public void removeEntry(final String name) {
+    public void removeEntry(String name) {
         if (name == null) {
             return;
         }
@@ -112,11 +101,11 @@ public class List extends JScrollPane {
     /**
      * Selects the corresponding entry of the given name.
      * */
-    public void selectItem(final String pluginName) {
+    public void selectItem(String pluginName) {
         String newSelectedEntryName = pluginName;
 
         if (pluginName == null || !entryMap.keySet().contains(pluginName)) {
-            final String[] pluginNames = entryMap.keySet().toArray(new String[0]);
+            String[] pluginNames = entryMap.keySet().toArray(new String[0]);
             Arrays.sort(pluginNames);
 
             if (pluginNames.length == 0) {
@@ -126,15 +115,14 @@ public class List extends JScrollPane {
         }
 
         // deselect all
-        for (final AbstractListEntry entry : entryMap.values()) {
+        for (AbstractPluginsListEntry entry : entryMap.values()) {
             entry.setForeground(Color.BLACK);
             entry.setBackground(Color.WHITE);
         }
 
         // select given one
         selectedEntryName = newSelectedEntryName;
-        final AbstractListEntry selected = entryMap.get(newSelectedEntryName);
-
+        AbstractPluginsListEntry selected = entryMap.get(newSelectedEntryName);
         if (selected != null) {
             selected.setForeground(selectionForegroundColor);
             selected.setBackground(selectionBackgroundColor);
@@ -146,7 +134,7 @@ public class List extends JScrollPane {
     /**
      * Returns the selected entry.
      * */
-    public AbstractListEntry getSelectedEntry() {
+    public AbstractPluginsListEntry getSelectedEntry() {
         return entryMap.get(selectedEntryName);
     }
 
@@ -161,7 +149,7 @@ public class List extends JScrollPane {
      * Informs all registered listeners that an item has changed.
      * */
     public void fireItemChanged() {
-        for (final ListEntryChangeListener listener : listeners) {
+        for (PluginsListEntryChangeListener listener : listeners) {
             listener.itemChanged();
         }
     }
@@ -170,7 +158,7 @@ public class List extends JScrollPane {
      * Informs all registered listeners that the list has changed.
      * */
     private void fireListChanged() {
-        for (final ListEntryChangeListener listener : listeners) {
+        for (PluginsListEntryChangeListener listener : listeners) {
             listener.listChanged();
         }
     }
