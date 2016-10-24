@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugins.swek.sources.comesep;
 import java.util.Iterator;
 import java.util.Locale;
 
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
@@ -44,8 +45,16 @@ public class ComesepParser implements SWEKParser {
                   lowerkey.equals("begin_time_value") || lowerkey.equals("end_time_value") ||
                   lowerkey.startsWith("liftoff"))) {
                 value = value.trim();
-                if (value.length() != 0)
-                    currentEvent.addParameter(keyString, value, true);
+                if (value.length() != 0) {
+                    if (lowerkey.equals("atstrongest")) {
+                        try {
+                            String t = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);
+                            value = t;
+                        } catch (Exception ignore) {
+                        }
+                    }
+                    currentEvent.addParameter(lowerkey, value, true);
+                }
             }
         }
     }
