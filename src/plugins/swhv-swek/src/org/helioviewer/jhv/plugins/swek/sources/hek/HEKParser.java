@@ -59,11 +59,12 @@ public class HEKParser implements SWEKParser {
             }
             else
                 key = keys.next();
-            if (insertedKeys.contains(key))
-                continue;
+
             if (key instanceof String) {
                 String originalKeyString = (String) key;
                 String keyString = originalKeyString.toLowerCase(Locale.ENGLISH);
+                if (insertedKeys.contains(keyString))
+                    continue;
                 insertedKeys.add(keyString);
                 if (!result.has(keyString))
                     continue;

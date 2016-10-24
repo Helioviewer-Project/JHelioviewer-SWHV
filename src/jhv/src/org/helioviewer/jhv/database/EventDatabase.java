@@ -443,7 +443,7 @@ public class EventDatabase {
                     Log.error("failed to dump to database");
                     assocs.add(new Pair<Integer, Integer>(1, 1));
                 } else {
-                    ArrayList<JHVEvent> rels = getOtherRelations(id, type, true);
+                    ArrayList<JHVEvent> rels = getOtherRelations(id, type, true, false);
                     for (JHVEvent rel : rels) {
                         assocs.add(new Pair<Integer, Integer>(id, rel.getUniqueID()));
                     }
@@ -473,7 +473,8 @@ public class EventDatabase {
     }
 
     //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
-    public static ArrayList<JHVEvent> getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype) {
+    public static ArrayList<JHVEvent> getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype, boolean full) {
+
         SWEKEventType evt = jhvEventType.getEventType();
         ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
         ArrayList<JsonEvent> jsonEvents = new ArrayList<JsonEvent>();
@@ -505,11 +506,18 @@ public class EventDatabase {
                     }
                 }
             }
+
             for (JsonEvent jsonEvent : jsonEvents) {
-                nEvents.add(parseJSON(jsonEvent, false));
+                nEvents.add(parseJSON(jsonEvent, full));
             }
             jsonEvents.clear();
         }
+        if(full){
+        	JsonEvent ev = event2prog(id);
+        	jsonEvents.add(ev);
+            nEvents.add(parseJSON(ev, full));
+        }
+
         return createUniqueList(nEvents);
     }
 
