@@ -15,7 +15,6 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.EventDispatchQueue;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.fitsview.FITSView;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
@@ -26,65 +25,9 @@ import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
 
 public class APIRequestManager {
 
-    public static final int CADENCE_ANY = -100;
-
-    public static class APIRequest {
-
-        public final String server;
-        public final int sourceId;
-        public final long startTime;
-        public final long endTime;
-        public final int cadence;
-
-        public APIRequest(String server, int sourceId, long startTime, long endTime, int cadence) {
-            this.server = server;
-            this.sourceId = sourceId;
-            this.startTime = startTime;
-            this.endTime = endTime;
-            this.cadence = cadence;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof APIRequest) {
-                APIRequest r = (APIRequest) o;
-                return sourceId == r.sourceId && startTime == r.startTime && endTime == r.endTime && cadence == r.cadence && server.equals(r.server);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            assert false : "hashCode not designed";
-            return 42;
-        }
-
-        String[] getRequests() {
-            String fileRequest, jpipRequest;
-            if (startTime == endTime) {
-                fileRequest = DataSources.getServerSetting(server, "API.jp2images.path") + "sourceId=" + Integer.toString(sourceId) +
-                                                           "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
-                jpipRequest = fileRequest + "&jpip=true";
-            } else {
-                fileRequest = DataSources.getServerSetting(server, "API.jp2series.path") + "sourceId=" + Integer.toString(sourceId) +
-                                                           "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
-                if (cadence != CADENCE_ANY) {
-                    fileRequest += "&cadence=" + Integer.toString(cadence);
-                }
-                jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
-            }
-            return new String[] { jpipRequest, fileRequest };
-        }
-
-    }
-
     public static View requestAndOpenRemoteFile(APIRequest req, boolean errorMessage) throws IOException {
-        String[] reqStrings = req.getRequests();
-        String reqJPIP = reqStrings[0], reqDownload = reqStrings[1];
-
         try {
-            URL jpipRequest = new URL(reqJPIP);
-            URI downloadUri = new URI(reqDownload);
+            URL jpipRequest = new URL(req.jpipRequest);
             APIResponse response = new APIResponse(new DownloadStream(jpipRequest).getInput());
 
             // Could we handle the answer from the server
@@ -112,7 +55,7 @@ public class APIRequestManager {
                 if (message != null && errorMessage) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
-                return loadView(response.getURI(), downloadUri, req);
+                return loadView(response.getURI(), new URI(req.fileRequest), req);
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");
@@ -130,9 +73,9 @@ public class APIRequestManager {
                 }
             }
         } catch (MalformedURLException e) {
-            Log.error("APIRequestManager.requestData() > Malformed JPIP request URL: " + reqJPIP);
+            Log.error("APIRequestManager.requestData() > Malformed JPIP request URL: " + req.jpipRequest);
         } catch (URISyntaxException e) {
-            Log.error("APIRequestManager.requestData() > URI syntax exception: " + reqDownload);
+            Log.error("APIRequestManager.requestData() > URI syntax exception: " + req.fileRequest);
         } catch (UnknownHostException e) {
             Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
             throw new IOException("Unknown Host: " + e.getMessage());

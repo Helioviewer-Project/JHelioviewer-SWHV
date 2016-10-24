@@ -19,7 +19,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.io.APIRequestManager.APIRequest;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.LoadRemoteTask;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;

@@ -27,8 +27,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.io.APIRequestManager;
-import org.helioviewer.jhv.io.APIRequestManager.APIRequest;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
 
@@ -333,7 +332,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
                 value *= 86400;
                 break;
             case 4:
-                value = APIRequestManager.CADENCE_ANY;
+                value = APIRequest.CADENCE_ANY;
                 break;
             default:
                 break;
@@ -343,7 +342,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
 
         public void setCadence(int value) {
-            if (value == APIRequestManager.CADENCE_ANY)
+            if (value == APIRequest.CADENCE_ANY)
                 comboUnit.setSelectedItem(timeStepUnitStrings[4]);
             else if (value / 86400 != 0) {
                 comboUnit.setSelectedItem(timeStepUnitStrings[3]);
