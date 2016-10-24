@@ -111,11 +111,11 @@ public class HEKDownloader extends SWEKDownloader {
         baseURL.append("cmd=search&");
         baseURL.append("type=column&");
         baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()).getAbbreviation()).append('&');
-        baseURL.append("event_coordsys=").append(eventType.getCoordinateSystem()).append('&');
-        baseURL.append("x1=").append(eventType.getSpatialRegion().x1).append('&');
-        baseURL.append("x2=").append(eventType.getSpatialRegion().x2).append('&');
-        baseURL.append("y1=").append(eventType.getSpatialRegion().y1).append('&');
-        baseURL.append("y2=").append(eventType.getSpatialRegion().y2).append('&');
+        baseURL.append("event_coordsys=").append("helioprojective").append('&');
+        baseURL.append("x1=").append(-3600).append('&');
+        baseURL.append("x2=").append(3600).append('&');
+        baseURL.append("y1=").append(-3600).append('&');
+        baseURL.append("y2=").append(3600).append('&');
         baseURL.append("cosec=2&");
         baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.utcDateFormat.format(end)).append('&');
         baseURL = appendParams(baseURL, params);
