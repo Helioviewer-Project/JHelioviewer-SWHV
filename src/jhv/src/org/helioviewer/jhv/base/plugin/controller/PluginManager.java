@@ -65,38 +65,6 @@ public class PluginManager {
      * @param file
      *            File object where to search in (usually it describes a
      *            folder).
-     * @param recursively
-     *            Specifies if to search for plug-ins recursively in sub
-     *            folders.
-     * @param deactivatedPlugins
-     *            Set with file names of plugins which should be deactivated
-     * @throws IOException
-     *             This exception will be thrown if at least one plug-in could
-     *             not be loaded. The relevant plug-ins are named in the
-     *             exception message.
-     */
-    public void searchForPlugins(File file, Set<String> deactivatedPlugins) throws IOException {
-        // search and load plug-ins
-        LinkedList<String> list = searchAndLoadPlugins(file, deactivatedPlugins);
-
-        // if there is at least one plug-in which could not be loaded throw an
-        // exception and add plug-in names to the message of the exception.
-        if (!list.isEmpty()) {
-            StringBuilder message = new StringBuilder();
-            for (String item : list) {
-                message.append(item).append("\n");
-            }
-            throw new IOException(message.toString());
-        }
-    }
-
-    /**
-     * Method searches for files which contains JHV plug-ins and loads the
-     * plug-in if applicable.
-     *
-     * @param file
-     *            File object where to search in (usually it describes a
-     *            folder).
      * @param recursivly
      *            Specifies if to search for plug-ins recursively in sub
      *            folders.
