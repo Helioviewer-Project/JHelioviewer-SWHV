@@ -47,7 +47,7 @@ public class FlareSpinnerModel extends AbstractSpinnerModel {
             } else if (v == 'X') {
                 if (pv <= 20.0) {
                     pv += 0.1;
-                    return v + "" + String.format("%.1f", pv);
+                    return v + String.format("%.1f", pv);
                 } else {
                     return null;
                 }
