@@ -196,22 +196,18 @@ public class SWEKConfigurationManager {
         return configJSON.getBoolean("manually_changed");
     }
 
-    private List<SWEKSource> parseSources(JSONObject configJSON) throws JSONException {
-        ArrayList<SWEKSource> swekSources = new ArrayList<SWEKSource>();
+    private void parseSources(JSONObject configJSON) throws JSONException {
         JSONArray sourcesArray = configJSON.getJSONArray("sources");
         for (int i = 0; i < sourcesArray.length(); i++) {
             SWEKSource source = parseSource(sourcesArray.getJSONObject(i));
             if (source != null) {
                 sources.put(source.getSourceName(), source);
-                swekSources.add(source);
             }
         }
-        return swekSources;
     }
 
     private SWEKSource parseSource(JSONObject jsonObject) throws JSONException {
         String name = parseSourceName(jsonObject);
-
         if (name.equals("HEK"))
             return new SWEKSource(name, parseGeneralParameters(jsonObject), new HEKParser(), new HEKDownloader());
         else if (name.equals("COMESEP"))
@@ -233,16 +229,13 @@ public class SWEKConfigurationManager {
         return parameterList;
     }
 
-    private List<SWEKEventType> parseEventTypes(JSONObject configJSON) throws JSONException {
-        List<SWEKEventType> result = new ArrayList<SWEKEventType>();
+    private void parseEventTypes(JSONObject configJSON) throws JSONException {
         JSONArray eventJSONArray = configJSON.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
             SWEKEventType eventType = parseEventType(eventJSONArray.getJSONObject(i));
-            result.add(eventType);
             eventTypes.put(eventType.getEventName(), eventType);
             orderedEventTypes.add(eventType);
         }
-        return result;
     }
 
     private SWEKEventType parseEventType(JSONObject object) throws JSONException {
