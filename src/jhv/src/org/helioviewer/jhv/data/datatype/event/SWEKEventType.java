@@ -11,8 +11,6 @@ public class SWEKEventType {
     private final String eventName;
     private final List<SWEKSupplier> suppliers;
     private final List<SWEKParameter> parameterList;
-    private final Long requestIntervalExtension;
-    private final boolean standardSelected;
     private final ImageIcon eventIcon;
     private final Color color;
 
@@ -20,12 +18,10 @@ public class SWEKEventType {
     private HashMap<String, String> databaseFields;
     private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<String, SWEKEventType>();
 
-    public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, Long requestIntervalExtension, boolean standardSelected, ImageIcon eventIcon, Color color) {
+    public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, ImageIcon eventIcon, Color color) {
         this.eventName = eventName.intern();
         this.suppliers = suppliers;
         this.parameterList = parameterList;
-        this.requestIntervalExtension = requestIntervalExtension;
-        this.standardSelected = standardSelected;
         this.eventIcon = eventIcon;
         this.color = color;
         containsParameterFilter = checkFilters(parameterList);
@@ -105,25 +101,6 @@ public class SWEKEventType {
      */
     public List<SWEKParameter> getParameterList() {
         return parameterList;
-    }
-
-    /**
-     * Gets the time extension of the requested time interval.
-     *
-     * @return the requestIntervalExtension
-     */
-    public Long getRequestIntervalExtension() {
-        return requestIntervalExtension;
-    }
-
-    /**
-     * Is this event type standard selected.
-     *
-     * @return the standardSelected True if the event type is standard selected,
-     *         false if not
-     */
-    public boolean isStandardSelected() {
-        return standardSelected;
     }
 
     /**
