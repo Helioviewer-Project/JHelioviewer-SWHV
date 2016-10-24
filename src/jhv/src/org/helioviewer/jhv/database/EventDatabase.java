@@ -474,7 +474,6 @@ public class EventDatabase {
 
     //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
     public static ArrayList<JHVEvent> getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype, boolean full) {
-
         SWEKEventType evt = jhvEventType.getEventType();
         ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
         ArrayList<JsonEvent> jsonEvents = new ArrayList<JsonEvent>();
@@ -493,6 +492,7 @@ public class EventDatabase {
                     }
                 }
             }
+
             if (re.getRelatedWith() == evt) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
                 for (SWEKRelatedOn swon : relon) {
@@ -512,9 +512,10 @@ public class EventDatabase {
             }
             jsonEvents.clear();
         }
-        if(full){
-        	JsonEvent ev = event2prog(id);
-        	jsonEvents.add(ev);
+
+        if (full) {
+            JsonEvent ev = event2prog(id);
+            jsonEvents.add(ev);
             nEvents.add(parseJSON(ev, full));
         }
 
