@@ -327,8 +327,6 @@
                     "default_visible"           : false
                 }
             ],
-            "request_interval_extension"    : 86400000,
-            "standard_selected"             : true,
             "icon" : "iconbank://ActiveRegion",
             "color" : "colorcode://0x5E5E5E"
         },
@@ -459,8 +457,6 @@
                     "default_visible"           : true
                 }
             ],
-            "request_interval_extension"    : 43200000,
-            "standard_selected" : true,
             "icon" : "iconbank://CME",
             "color" : "colorname://orange"
         },
@@ -531,8 +527,6 @@
                     "default_visible"           : true
                 }
             ],
-            "request_interval_extension"    : 3000,
-            "standard_selected" : true,
             "icon" : "iconbank://CoronalDimming",
             "color" : "colorname://cyan"
         },
@@ -583,8 +577,6 @@
                     "default_visible"           : false
                 }
             ],
-            "request_interval_extension"    : 86400000,
-            "standard_selected"             : true,
             "icon" : "iconbank://CoronalHole",
             "color" : "colorname://green"
         },
@@ -635,8 +627,6 @@
                     "default_visible"           : false
                 }
             ],
-            "request_interval_extension"    : 3000,
-            "standard_selected"             : true,
             "icon" : "iconbank://CoronalWave",
             "color" : "colorname://red"
         },
@@ -708,8 +698,6 @@
                     "default_visible"           : true
                 }
             ],
-            "request_interval_extension"    : 3000,
-            "standard_selected"             : true,
             "icon" : "iconbank://Filament",
             "color" : "colorname://blue"
         },
@@ -760,8 +748,6 @@
                     "default_visible"           : false
                 }
             ],
-            "request_interval_extension"    : 3000,
-            "standard_selected"             : true,
             "icon" : "iconbank://FilamentEruption",
             "color" : "colorname://pink"
         },
@@ -840,8 +826,6 @@
                     "default_visible"           : true
                 }
             ],
-            "request_interval_extension"    : 36000000,
-            "standard_selected"             : true,
             "icon" : "iconbank://Flare",
             "color" : "colorname://yellow"
         },
@@ -936,8 +920,6 @@
                     "default_visible"           : true
                 }
             ],
-            "request_interval_extension"    : 36000000,
-            "standard_selected"             : true,
             "icon" : "iconbank://Flare",
             "color" : "colorname://yellow"
         },
@@ -995,8 +977,6 @@
                     "default_visible"           : false
                 }
             ],
-            "request_interval_extension"    : 432000000,
-            "standard_selected"             : true,
             "icon" : "iconbank://SunSpot",
             "color" : "colorname://magenta"
         },
@@ -1047,8 +1027,6 @@
                     "default_visible"           : false
                 }
             ],
-            "request_interval_extension"    : 3000,
-            "standard_selected"             : true,
             "icon" : "iconbank://EmergingFlux",
             "color" : "colorcode://0x68C3FC"
         },
@@ -1098,8 +1076,6 @@
                     "filter"                    : null,
                     "default_visible"           : false
                 }],
-            "request_interval_extension"    : 36000000,
-            "standard_selected"             : true,
             "icon" : "iconbank://Eruption",
             "color" : "colorcode://0xB4FC68"
         },
@@ -1151,8 +1127,6 @@
                 }
             ],
             "parameter_list"        : [],
-            "request_interval_extension"    : 0,
-            "standard_selected"             : false,
             "icon" : "iconbank://Comesep",
             "color" : "colorcode://0x5E5E5E"
         }

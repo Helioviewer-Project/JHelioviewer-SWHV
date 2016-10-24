@@ -384,7 +384,7 @@ public class SWEKConfigurationManager {
      * @throws JSONException
      */
     private SWEKEventType parseEventType(JSONObject object) throws JSONException {
-        return new SWEKEventType(parseEventName(object), parseSuppliers(object), parseParameterList(object), parseRequestIntervalExtension(object), parseStandardSelected(object), parseEventIcon(object), parseColor(object));
+        return new SWEKEventType(parseEventName(object), parseSuppliers(object), parseParameterList(object), parseEventIcon(object), parseColor(object));
     }
 
     /**
@@ -742,33 +742,6 @@ public class SWEKConfigurationManager {
      */
     private boolean parseDefaultVisible(JSONObject jsonObject) throws JSONException {
         return jsonObject.getBoolean("default_visible");
-    }
-
-    /**
-     * Parses the request interval extension from the json.
-     *
-     * @param object
-     *            the json from which to parse the request interval extension
-     * @return the parsed request interval extension
-     * @throws JSONException
-     *             if the request interval extension could not be parsed
-     */
-    private Long parseRequestIntervalExtension(JSONObject object) throws JSONException {
-        return object.getLong("request_interval_extension");
-    }
-
-    /**
-     * Parses the standard selected from the json.
-     *
-     * @param object
-     *            the json from which to parse the standard selected
-     * @return true if standard selected is true in json, false if standard
-     *         selected is false in json
-     * @throws JSONException
-     *             if the standard selected could not be parsed from json.
-     */
-    private boolean parseStandardSelected(JSONObject object) throws JSONException {
-        return object.getBoolean("standard_selected");
     }
     
     /**
