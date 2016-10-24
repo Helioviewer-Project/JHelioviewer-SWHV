@@ -97,10 +97,6 @@ public class Band extends AbstractLineDataSelectorElement {
         return DownloadController.getSingletonInstance().isDownloadActive(this);
     }
 
-    public String getUnitLabel() {
-        return bandType.getUnitLabel();
-    }
-
     @Override
     public Component getOptionsPanel() {
         return optionsPanel;

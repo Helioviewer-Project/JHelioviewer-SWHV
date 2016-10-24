@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.events;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -31,8 +30,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     private static EventModel instance;
     private final JHVEventCache eventCache;
     private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
-    private static final float dash1[] = { 10f };
-    private static final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
 
     private EventPlotConfiguration eventUnderMouse;
 

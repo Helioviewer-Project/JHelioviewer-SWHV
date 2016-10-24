@@ -9,7 +9,6 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
-import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
@@ -275,7 +274,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void eventHightChanged(JHVRelatedEvents event) {
+    public void eventHightChanged() {
         fireRedrawRequest();
     }
 
