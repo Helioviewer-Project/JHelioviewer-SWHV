@@ -50,15 +50,12 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     private static final Dimension DIALOG_SIZE_MINIMUM = new Dimension(400, 500);
     private static final Dimension DIALOG_SIZE_PREFERRED = new Dimension(400, 500);
 
-    private final JPanel contentPane = new JPanel();
-
     private final JComboBox filterComboBox = new JComboBox(new String[] { "All", "Enabled", "Disabled" });
     private final JButton addButton = new JButton("Add plug-in", IconBank.getIcon(JHVIcon.ADD));
     private final JButton downloadButton = new JButton("Download");
 
     private final JLabel emptyLabel = new JLabel("No plug-ins available", JLabel.CENTER);
     private final PluginsList pluginList = new PluginsList();
-    private final JScrollPane emptyScrollPane = new JScrollPane(emptyLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     private final JPanel listContainerPane = new JPanel();
     private final CardLayout listLayout = new CardLayout();
 
@@ -70,6 +67,8 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         // dialog
         setMinimumSize(DIALOG_SIZE_MINIMUM);
         setPreferredSize(DIALOG_SIZE_PREFERRED);
+
+        JPanel contentPane = new JPanel();
         setContentPane(contentPane);
         addWindowListener(this);
 
@@ -86,6 +85,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         filterComboBox.addActionListener(this);
 
         pluginList.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        JScrollPane emptyScrollPane = new JScrollPane(emptyLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         emptyScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         emptyLabel.setFont(emptyLabel.getFont().deriveFont(Font.ITALIC));
