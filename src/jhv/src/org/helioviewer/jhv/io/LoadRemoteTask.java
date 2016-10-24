@@ -13,7 +13,7 @@ public class LoadRemoteTask extends LoadURITask {
     private final int delay;
 
     public LoadRemoteTask(ImageLayer _imageLayer, APIRequest _req, int _delay) {
-        super(_imageLayer, null, null);
+        super(_imageLayer, null);
         req = _req;
         delay = _delay;
         setThreadName("MAIN--LoadRemote");

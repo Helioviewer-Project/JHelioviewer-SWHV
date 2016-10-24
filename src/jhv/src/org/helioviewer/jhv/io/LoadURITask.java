@@ -13,12 +13,10 @@ import org.helioviewer.jhv.viewmodel.view.View;
 public class LoadURITask extends JHVWorker<View, Void> {
 
     private final ImageLayer imageLayer;
-    private final URI downloadURI;
     protected final URI uri;
 
-    public LoadURITask(ImageLayer _imageLayer, URI _uri, URI _downloadURI) {
+    public LoadURITask(ImageLayer _imageLayer, URI _uri) {
         uri = _uri;
-        downloadURI = _downloadURI;
         imageLayer = _imageLayer;
 
         Displayer.display(); // ensures the dummy text is displayed
@@ -29,7 +27,7 @@ public class LoadURITask extends JHVWorker<View, Void> {
     @Override
     protected View backgroundWork() {
         try {
-            return APIRequestManager.loadView(uri, downloadURI, null);
+            return APIRequestManager.loadView(uri, uri, null);
         } catch (IOException e) {
             Log.error("An error occurred while opening the remote file: ", e);
             Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);
