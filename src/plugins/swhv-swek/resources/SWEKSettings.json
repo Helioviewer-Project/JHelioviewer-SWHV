@@ -5,9 +5,6 @@
         {
             "name"                  : "HEK",
             "provider_name"         : "HEK",
-            "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader",
-            "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser",
-            "base_url"              : "http://www.lmsal.com/hek/her",
             "general_parameters"    : [
                 {
                     "source"                    : "HEK",
@@ -188,9 +185,6 @@
         },{
             "name"                  : "COMESEP",
             "provider_name"         : "COMESEP",
-            "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader",
-            "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser",
-            "base_url"              : "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php",
             "general_parameters"    : [
                 {
                     "source"                    : "COMESEP",
@@ -335,14 +329,6 @@
             ],
             "request_interval_extension"    : 86400000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://ActiveRegion",
             "color" : "colorcode://0x5E5E5E"
         },
@@ -475,14 +461,6 @@
             ],
             "request_interval_extension"    : 43200000,
             "standard_selected" : true,
-            "group_on"          : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -3600,
-                "y1" : -3600,
-                "x2" : 3600,
-                "y2" : 3600
-            },
             "icon" : "iconbank://CME",
             "color" : "colorname://orange"
         },
@@ -555,14 +533,6 @@
             ],
             "request_interval_extension"    : 3000,
             "standard_selected" : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://CoronalDimming",
             "color" : "colorname://cyan"
         },
@@ -615,14 +585,6 @@
             ],
             "request_interval_extension"    : 86400000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://CoronalHole",
             "color" : "colorname://green"
         },
@@ -675,14 +637,6 @@
             ],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://CoronalWave",
             "color" : "colorname://red"
         },
@@ -756,14 +710,6 @@
             ],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://Filament",
             "color" : "colorname://blue"
         },
@@ -816,14 +762,6 @@
             ],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://FilamentEruption",
             "color" : "colorname://pink"
         },
@@ -904,14 +842,6 @@
             ],
             "request_interval_extension"    : 36000000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://Flare",
             "color" : "colorname://yellow"
         },
@@ -1008,14 +938,6 @@
             ],
             "request_interval_extension"    : 36000000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://Flare",
             "color" : "colorname://yellow"
         },
@@ -1075,14 +997,6 @@
             ],
             "request_interval_extension"    : 432000000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://SunSpot",
             "color" : "colorname://magenta"
         },
@@ -1135,14 +1049,6 @@
             ],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://EmergingFlux",
             "color" : "colorcode://0x68C3FC"
         },
@@ -1194,14 +1100,6 @@
                 }],
             "request_interval_extension"    : 36000000,
             "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://Eruption",
             "color" : "colorcode://0xB4FC68"
         },
@@ -1255,14 +1153,6 @@
             "parameter_list"        : [],
             "request_interval_extension"    : 0,
             "standard_selected"             : false,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
             "icon" : "iconbank://Comesep",
             "color" : "colorcode://0x5E5E5E"
         }

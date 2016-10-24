@@ -6,85 +6,29 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-/**
- * Describes a SWEK event type.
- *
- * @author Bram Bourgoignie (Bram.bourgoignie@oma.be)
- *
- */
 public class SWEKEventType {
     private static List<SWEKRelatedEvents> swekrelEvents;
-    /** The name of the event */
     private final String eventName;
-
-    /** List of suppliers of the event */
     private final List<SWEKSupplier> suppliers;
-
-    /** List of event specific parameters */
     private final List<SWEKParameter> parameterList;
-
-    /** Extension of the request interval for this event type */
     private final Long requestIntervalExtension;
-
-    /** Is the event type standard selected */
     private final boolean standardSelected;
-
-    /** On what should events be grouped on */
-    private final SWEKParameter groupOn;
-
-    /** The coordinate system */
-    private final String coordinateSystem;
-
-    /** The spatial region over which the event can be found */
-    private final SWEKSpatialRegion spatialRegion;
-
-    /** The icon corresponding with the event type */
     private final ImageIcon eventIcon;
-
-    /** The color used for this event type */
     private final Color color;
 
     private final boolean containsParameterFilter;
     private HashMap<String, String> databaseFields;
     private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<String, SWEKEventType>();
 
-    /**
-     * Creates an event type for the given event name, suppliers list, parameter
-     * list, request interval extension, standard selected indication, group on
-     * parameter, coordinate system, icon and color.
-     *
-     * @param eventName
-     *            The name of the event
-     * @param suppliers
-     *            The list of suppliers for this event type
-     * @param parameterList
-     *            The list of parameters for this event
-     * @param requestIntervalExtension
-     *            The extension of the requested interval
-     * @param standardSelected
-     *            Is the event type standard selected
-     * @param groupOn
-     *            On what are corresponding events grouped
-     * @param coordinateSystem
-     *            The coordinate system
-     * @param eventIcon
-     *            the icon of the event type
-     * @param color
-     *            the color of the event type
-     * @param list
-     */
-    public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, Long requestIntervalExtension, boolean standardSelected, SWEKParameter groupOn, String coordinateSystem, ImageIcon eventIcon, Color color, SWEKSpatialRegion spatialRegion) {
+    public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, Long requestIntervalExtension, boolean standardSelected, ImageIcon eventIcon, Color color) {
         this.eventName = eventName.intern();
         this.suppliers = suppliers;
         this.parameterList = parameterList;
         this.requestIntervalExtension = requestIntervalExtension;
         this.standardSelected = standardSelected;
-        this.groupOn = groupOn;
-        this.coordinateSystem = coordinateSystem;
         this.eventIcon = eventIcon;
         this.color = color;
         containsParameterFilter = checkFilters(parameterList);
-        this.spatialRegion = spatialRegion;
         swekEventTypes.put(this.eventName, this);
     }
 
@@ -180,33 +124,6 @@ public class SWEKEventType {
      */
     public boolean isStandardSelected() {
         return standardSelected;
-    }
-
-    /**
-     * Gives the parameter on which corresponding events should be grouped.
-     *
-     * @return the groupOn
-     */
-    public SWEKParameter getGroupOn() {
-        return groupOn;
-    }
-
-    /**
-     * Gets the coordinate system.
-     *
-     * @return the coordinate system
-     */
-    public String getCoordinateSystem() {
-        return coordinateSystem;
-    }
-
-    /**
-     * Gets the spatial region for this event type.
-     *
-     * @return The spatial region
-     */
-    public SWEKSpatialRegion getSpatialRegion() {
-        return spatialRegion;
     }
 
     /**
