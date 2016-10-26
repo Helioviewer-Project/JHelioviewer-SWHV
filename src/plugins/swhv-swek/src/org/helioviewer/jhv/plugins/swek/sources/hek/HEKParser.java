@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -22,13 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Parser able to parse events coming from the HEK server.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
 public class HEKParser implements SWEKParser {
+
+    private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
 
     @Override
     public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
@@ -47,6 +45,10 @@ public class HEKParser implements SWEKParser {
         Vec3 hgsCentralPoint = null;
         Double hgsX = null;
         Double hgsY = null;
+
+        boolean waveCM = false;
+        String waveValue = null;
+
         //First iterate over parameters in the config file.
         Iterator<?> keys = result.keys();
         List<SWEKParameter> plist = currentEvent.getJHVEventType().getEventType().getParameterList();
@@ -93,11 +95,27 @@ public class HEKParser implements SWEKParser {
                         // nothing, delete
                     } else {
                         value = value.trim();
-                        if (value.length() != 0)
-                            currentEvent.addParameter(keyString, value, full);
+                        if (value.length() != 0) {
+                            if (keyString.equals("obs_wavelunit") && value.equals("cm"))
+                                waveCM = true;
+
+                            if (keyString.equals("obs_meanwavel"))
+                                waveValue = value;
+                            else
+                                currentEvent.addParameter(keyString, value, full);
+                        }
                     }
                 }
             }
+        }
+
+        if (waveValue != null) {
+            try {
+                if (waveCM)
+                    waveValue = formatter1.format(Double.parseDouble(waveValue) * 1e-2 /*m*/ * 1e9 /*nm*/) + "nm";
+            } catch (Exception ignore) {
+            }
+            currentEvent.addParameter("obs_meanwavel", waveValue, full);
         }
 
         handleCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);

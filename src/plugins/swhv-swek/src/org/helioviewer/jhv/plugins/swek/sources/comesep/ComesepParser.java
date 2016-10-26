@@ -48,8 +48,7 @@ public class ComesepParser implements SWEKParser {
                 if (value.length() != 0) {
                     if (lowerkey.equals("atstrongest")) {
                         try {
-                            String t = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);
-                            value = t;
+                            value = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);
                         } catch (Exception ignore) {
                         }
                     }
