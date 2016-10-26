@@ -13,6 +13,7 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 public class SDOCutOutAction extends AbstractAction {
 
@@ -47,22 +48,24 @@ public class SDOCutOutAction extends AbstractAction {
 
         url.append("&wavelengths=").append(Layers.getSDOCutoutString());
         url.append("&cadence=").append(ObservationDialog.getInstance().getObservationImagePane().getCadence()).append("&cadenceUnits=s");
+        View av = Layers.getActiveView();
+        if(av!=null){
+            ImageData imd = Layers.getActiveView().getImageLayer().getImageData();
+            if (imd != null) {
+                Region region = imd.getRegion();
+                MetaData md = imd.getMetaData();
+                Region fullregion = md.getPhysicalRegion();
+                double arcsec_in_image = AIA_CDELT * 4096;
+                double centr_x = region.llx + region.width / 2.;
+                double centr_y = region.lly + region.height / 2.;
+                double arc_w = arcsec_in_image / fullregion.width;
+                double arc_h = arcsec_in_image / fullregion.height;
 
-        ImageData imd = Layers.getActiveView().getImageLayer().getImageData();
-        if (imd != null) {
-            Region region = imd.getRegion();
-            MetaData md = imd.getMetaData();
-            Region fullregion = md.getPhysicalRegion();
-            double arcsec_in_image = AIA_CDELT * 4096;
-            double centr_x = region.llx + region.width / 2.;
-            double centr_y = region.lly + region.height / 2.;
-            double arc_w = arcsec_in_image / fullregion.width;
-            double arc_h = arcsec_in_image / fullregion.height;
-
-            url.append(String.format("&width=%.1f", region.width * arc_w));
-            url.append(String.format("&height=%.1f", region.height * arc_h));
-            url.append(String.format("&xCen=%.1f", centr_x * arc_w - AIA_CDELT / 2.));
-            url.append(String.format("&yCen=%.1f", -centr_y * arc_h + AIA_CDELT / 2.));
+                url.append(String.format("&width=%.1f", region.width * arc_w));
+                url.append(String.format("&height=%.1f", region.height * arc_h));
+                url.append(String.format("&xCen=%.1f", centr_x * arc_w - AIA_CDELT / 2.));
+                url.append(String.format("&yCen=%.1f", -centr_y * arc_h + AIA_CDELT / 2.));
+            }
         }
 
         JHVGlobals.openURL(url.toString());
