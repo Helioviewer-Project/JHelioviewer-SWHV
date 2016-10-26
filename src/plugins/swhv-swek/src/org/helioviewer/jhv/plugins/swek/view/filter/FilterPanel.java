@@ -7,8 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -24,11 +23,11 @@ import org.helioviewer.jhv.plugins.swek.view.FilterDialog;
 @SuppressWarnings("serial")
 public class FilterPanel extends JPanel {
 
-    private JButton filterEnableButton;
+    private final JLabel label;
+    private final JSpinner spinner;
+
     private boolean enabled = false;
 
-    private final JSpinner spinner;
-    private JLabel label;
     private final SWEKParameter parameter;
     private final SWEKEventType eventType;
 
@@ -48,12 +47,34 @@ public class FilterPanel extends JPanel {
         setOpaque(false);
         setBackground(Color.white);
 
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.add(initFilterComponents(), BorderLayout.CENTER);
-        add(contentPanel, BorderLayout.CENTER);
+        JCheckBox enableButton = new JCheckBox();
+        enableButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleEnabled();
+            }
+        });
+
+        label = new JLabel(parameter.getParameterDisplayName() + " " + operand.getStringRepresentation());
+
+        spinner.setEnabled(enabled);
+        label.setEnabled(enabled);
+
+        JPanel p = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0.5;
+        p.add(enableButton, c);
+        c.gridx = 1;
+        p.add(label, c);
+        c.gridx = 2;
+        p.add(spinner, c);
+
+        add(p, BorderLayout.CENTER);
     }
 
-    public void remove_filter() {
+    public void removeFilter() {
         filterManager.removeFilters(eventType);
     }
 
@@ -61,7 +82,7 @@ public class FilterPanel extends JPanel {
         filterManager.fireFilters(eventType);
     }
 
-    public void add_filter() {
+    public void addFilter() {
         if (enabled) {
             String pval;
             Object sval = spinner.getValue();
@@ -76,42 +97,9 @@ public class FilterPanel extends JPanel {
 
     private void toggleEnabled() {
         enabled = !enabled;
-        spinner.setEnabled(enabled);
         label.setEnabled(enabled);
-        if (!enabled)
-            filterEnableButton.setText("Activate");
-        else
-            filterEnableButton.setText("Disable ");
+        spinner.setEnabled(enabled);
         filterDialog.filterParameterChanged();
-    }
-
-    private void initEnableButton() {
-        filterEnableButton = new JButton("Activate");
-        filterEnableButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toggleEnabled();
-            }
-        });
-    }
-
-    private JComponent initFilterComponents() {
-        label = new JLabel(parameter.getParameterDisplayName() + " " + operand.getStringRepresentation());
-        initEnableButton();
-        spinner.setEnabled(enabled);
-        label.setEnabled(enabled);
-        JPanel p = new JPanel();
-        p.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0.5;
-        p.add(label, c);
-        c.gridx = 1;
-        p.add(spinner, c);
-        c.gridx = 2;
-        p.add(filterEnableButton, c);
-        return p;
     }
 
 }

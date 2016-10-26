@@ -48,9 +48,10 @@ public class SDOCutOutAction extends AbstractAction {
 
         url.append("&wavelengths=").append(Layers.getSDOCutoutString());
         url.append("&cadence=").append(ObservationDialog.getInstance().getObservationImagePane().getCadence()).append("&cadenceUnits=s");
-        View av = Layers.getActiveView();
-        if(av!=null){
-            ImageData imd = Layers.getActiveView().getImageLayer().getImageData();
+
+        View v = Layers.getActiveView();
+        if (v != null) {
+            ImageData imd = v.getImageLayer().getImageData();
             if (imd != null) {
                 Region region = imd.getRegion();
                 MetaData md = imd.getMetaData();

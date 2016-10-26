@@ -41,10 +41,10 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (FilterPanel afp : filterPanels) {
-                    afp.remove_filter();
+                    afp.removeFilter();
                 }
                 for (FilterPanel afp : filterPanels) {
-                    afp.add_filter();
+                    afp.addFilter();
                 }
                 for (FilterPanel afp : filterPanels) {
                     afp.fireFilter();

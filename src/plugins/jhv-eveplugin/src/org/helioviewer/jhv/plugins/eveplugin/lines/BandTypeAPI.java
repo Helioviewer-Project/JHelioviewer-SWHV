@@ -121,7 +121,6 @@ public class BandTypeAPI {
                 if (job.has("group")) {
                     BandGroup group = groups.get(job.getString("group"));
                     group.add(bandtypes[i]);
-                    bandtypes[i].setGroup(group);
                 }
             }
         } catch (JSONException e) {
