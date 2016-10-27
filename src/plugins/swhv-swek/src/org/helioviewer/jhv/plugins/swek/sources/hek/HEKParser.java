@@ -112,7 +112,7 @@ public class HEKParser implements SWEKParser {
         if (waveValue != null) {
             try {
                 if (waveCM)
-                    waveValue = formatter1.format(Double.parseDouble(waveValue) * 1e-2 /*m*/ * 1e9 /*nm*/) + "nm";
+                    waveValue = formatter1.format(Double.parseDouble(waveValue) * (1e-2 /*m*/ * 1e9 /*nm*/)) + "nm";
             } catch (Exception ignore) {
             }
             currentEvent.addParameter("obs_meanwavel", waveValue, full);
