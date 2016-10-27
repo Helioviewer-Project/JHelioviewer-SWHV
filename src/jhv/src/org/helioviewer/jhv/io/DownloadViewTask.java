@@ -17,8 +17,10 @@ import javax.swing.JProgressBar;
 import javax.swing.JWindow;
 
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -31,10 +33,12 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
     private final URI uri;
     private final URI downloadURI;
+    private final ImageLayer layer;
 
     public DownloadViewTask(View view) {
         uri = view.getURI();
         downloadURI = view.getDownloadURI();
+        layer = view.getImageLayer();
 
         dialog = new JWindow(ImageViewerGui.getMainFrame());
         dialog.setLayout(new FlowLayout());
@@ -115,6 +119,11 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
                         }
                     });
                 }
+            }
+
+            if (!isCancelled()) { // reload JPX from disk
+                LoadURITask uriTask = new LoadURITask(layer, dstFile.toURI());
+                JHVGlobals.getExecutorService().execute(uriTask);
             }
         } catch (Exception e) {
             failed = true;
