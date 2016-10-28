@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
@@ -27,84 +26,82 @@ public class PfssNewDataLoader implements Runnable {
 
     private static final int TIMEOUT_DOWNLOAD_SECONDS = 120;
 
-    private final JHVDate start;
-    private final JHVDate end;
+    private final long start;
+    private final long end;
     private final static SortedMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<Integer, ArrayList<Pair<String, Long>>>();
 
-    public PfssNewDataLoader(JHVDate _start, JHVDate _end) {
+    public PfssNewDataLoader(long _start, long _end) {
         start = _start;
         end = _end;
     }
 
     @Override
     public void run() {
-        if (start != null && end != null && start.milli <= end.milli) {
-            Calendar cal = GregorianCalendar.getInstance();
+        Calendar cal = GregorianCalendar.getInstance();
 
-            cal.setTimeInMillis(start.milli);
-            int startYear = cal.get(Calendar.YEAR);
-            int startMonth = cal.get(Calendar.MONTH);
+        cal.setTimeInMillis(start);
+        int startYear = cal.get(Calendar.YEAR);
+        int startMonth = cal.get(Calendar.MONTH);
 
-            cal.setTimeInMillis(end.milli + 31 * TimeUtils.DAY_IN_MILLIS);
-            int endYear = cal.get(Calendar.YEAR);
-            int endMonth = cal.get(Calendar.MONTH);
+        cal.setTimeInMillis(end + 31 * TimeUtils.DAY_IN_MILLIS);
+        int endYear = cal.get(Calendar.YEAR);
+        int endMonth = cal.get(Calendar.MONTH);
 
-            do {
-                ArrayList<Pair<String, Long>> urls = null;
+        do {
+            ArrayList<Pair<String, Long>> urls = null;
 
-                try {
-                    Integer cacheKey = startYear * 10000 + startMonth;
+            try {
+                Integer cacheKey = startYear * 10000 + startMonth;
+                synchronized (parsedCache) {
+                    urls = parsedCache.get(cacheKey);
+                }
+                if (urls == null || urls.isEmpty()) {
+                    urls = new ArrayList<Pair<String, Long>>();
+                    String m = (startMonth) < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
+                    String url = PfssSettings.baseURL + startYear + "/" + m + "/list.txt";
+                    URL data = new URL(url);
+
+                    BufferedReader in = new BufferedReader(new InputStreamReader(data.openStream(), "UTF-8"));
+                    try {
+                        String inputLine;
+                        while ((inputLine = in.readLine()) != null) {
+                            String[] splitted = inputLine.split(" ");
+                            Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
+                            urls.add(new Pair<String, Long>(splitted[1], dd.getTime()));
+                        }
+                    } finally {
+                        in.close();
+                    }
+
                     synchronized (parsedCache) {
-                        urls = parsedCache.get(cacheKey);
-                    }
-                    if (urls == null || urls.isEmpty()) {
-                        urls = new ArrayList<Pair<String, Long>>();
-                        String m = (startMonth) < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
-                        String url = PfssSettings.baseURL + startYear + "/" + m + "/list.txt";
-                        URL data = new URL(url);
-
-                        BufferedReader in = new BufferedReader(new InputStreamReader(data.openStream(), "UTF-8"));
-                        try {
-                            String inputLine;
-                            while ((inputLine = in.readLine()) != null) {
-                                String[] splitted = inputLine.split(" ");
-                                Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
-                                urls.add(new Pair<String, Long>(splitted[1], dd.getTime()));
-                            }
-                        } finally {
-                            in.close();
-                        }
-
-                        synchronized (parsedCache) {
-                            parsedCache.put(cacheKey, urls);
-                        }
-                    }
-                } catch (MalformedURLException e) {
-                    Log.warn("Could not read PFSS entries : URL unavailable");
-                } catch (IOException e) {
-                    Log.warn("Could not read PFSS entries");
-                } catch (ParseException e) {
-                    Log.warn("Could not parse date time during PFSS loading");
-                }
-
-                for (Pair<String, Long> pair : urls) {
-                    Long dd = pair.b;
-                    String url = pair.a;
-                    if (dd > start.milli - TimeUtils.DAY_IN_MILLIS && dd < end.milli + TimeUtils.DAY_IN_MILLIS) {
-                        FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssDataLoader(url, dd), null);
-                        PfssPlugin.pfssDataPool.submit(dataLoaderTask);
-                        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
+                        parsedCache.put(cacheKey, urls);
                     }
                 }
+            } catch (MalformedURLException e) {
+                Log.warn("Could not read PFSS entries : URL unavailable");
+            } catch (IOException e) {
+                Log.warn("Could not read PFSS entries");
+            } catch (ParseException e) {
+                Log.warn("Could not parse date time during PFSS loading");
+            }
 
-                if (startMonth == 11) {
-                    startMonth = 0;
-                    startYear++;
-                } else {
-                    startMonth++;
+            for (Pair<String, Long> pair : urls) {
+                Long dd = pair.b;
+                String url = pair.a;
+                if (dd > start - TimeUtils.DAY_IN_MILLIS && dd < end + TimeUtils.DAY_IN_MILLIS) {
+                    FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssDataLoader(url, dd), null);
+                    PfssPlugin.pfssDataPool.submit(dataLoaderTask);
+                    PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
                 }
-            } while (startYear < endYear || (startYear == endYear && startMonth <= endMonth));
-        }
+            }
+
+            if (startMonth == 11) {
+                startMonth = 0;
+                startYear++;
+            } else {
+                startMonth++;
+            }
+        } while (startYear < endYear || (startYear == endYear && startMonth <= endMonth));
     }
 
 }

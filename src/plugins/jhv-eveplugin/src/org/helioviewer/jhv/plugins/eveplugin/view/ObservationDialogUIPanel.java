@@ -15,7 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
@@ -122,14 +121,9 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     private Interval defineInterval(long time) {
-        JHVDate start = Layers.getStartDate();
-        JHVDate end = Layers.getEndDate();
-        if (start != null && end != null) {
-            Interval movieInterval = new Interval(start.milli, end.milli);
-
-            if (movieInterval.containsPointInclusive(time)) {
-                return movieInterval;
-            }
+        Interval movieInterval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
+        if (movieInterval.containsPointInclusive(time)) {
+            return movieInterval;
         }
 
         GregorianCalendar cal = new GregorianCalendar();

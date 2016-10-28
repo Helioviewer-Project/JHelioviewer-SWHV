@@ -73,7 +73,7 @@ public class PfssRenderable extends AbstractRenderable implements LayersListener
     public void layerAdded(View view) {
         PfssPlugin.getPfsscache().clear();
 
-        FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssNewDataLoader(Layers.getStartDate(), Layers.getEndDate()), null);
+        FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssNewDataLoader(Layers.getStartDate().milli, Layers.getEndDate().milli), null);
         PfssPlugin.pfssNewLoadPool.submit(dataLoaderTask);
         PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), 60 * 5, TimeUnit.SECONDS);
     }

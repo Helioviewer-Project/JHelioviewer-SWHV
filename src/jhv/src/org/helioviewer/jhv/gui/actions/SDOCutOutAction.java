@@ -6,7 +6,6 @@ import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
@@ -28,23 +27,18 @@ public class SDOCutOutAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         StringBuilder url = new StringBuilder(baseURL);
-        JHVDate startdate = Layers.getStartDate();
-        if (startdate != null) {
-            String start = startdate.toString();
-            String startDate = start.substring(0, 10);
-            String startTime = start.substring(11, 16);
-            url.append("startDate=").append(startDate);
-            url.append("&startTime=").append(startTime);
-        }
 
-        JHVDate enddate = Layers.getEndDate();
-        if (enddate != null) {
-            String end = enddate.toString();
-            String endDate = end.substring(0, 10);
-            String endTime = end.substring(11, 16);
-            url.append("&stopDate=").append(endDate);
-            url.append("&stopTime=").append(endTime);
-        }
+        String start = Layers.getStartDate().toString();
+        String startDate = start.substring(0, 10);
+        String startTime = start.substring(11, 16);
+        url.append("startDate=").append(startDate);
+        url.append("&startTime=").append(startTime);
+
+        String end = Layers.getEndDate().toString();
+        String endDate = end.substring(0, 10);
+        String endTime = end.substring(11, 16);
+        url.append("&stopDate=").append(endDate);
+        url.append("&stopTime=").append(endTime);
 
         url.append("&wavelengths=").append(Layers.getSDOCutoutString());
         url.append("&cadence=").append(ObservationDialog.getInstance().getObservationImagePane().getCadence()).append("&cadenceUnits=s");
