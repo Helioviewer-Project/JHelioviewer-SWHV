@@ -48,9 +48,6 @@ public class SWEKData implements LayersListener, JHVEventHandler {
     public void requestEvents() {
         JHVDate first = Layers.getStartDate();
         JHVDate last = Layers.getEndDate();
-        if (first == null || last == null)
-            return;
-
         if (beginDate == null || endDate == null || first.milli < beginDate.milli || last.milli > endDate.milli) {
             beginDate = first;
             endDate = last;
@@ -110,7 +107,7 @@ public class SWEKData implements LayersListener, JHVEventHandler {
             JHVEventParameter p = evt.getParameter("cme_radiallinvel");
             if (p != null)
                 speed = Double.parseDouble(p.getParameterValue());
-        } catch (Exception e) {
+        } catch (Exception ignore) {
         }
         return speed;
     }
@@ -122,7 +119,7 @@ public class SWEKData implements LayersListener, JHVEventHandler {
         try {
             if (p != null)
                 principalAngle = Double.parseDouble(p.getParameterValue()) + 90;
-        } catch (Exception e) {
+        } catch (Exception ignore) {
         }
         return principalAngle;
     }
@@ -133,7 +130,7 @@ public class SWEKData implements LayersListener, JHVEventHandler {
         try {
             if (p != null)
                 angularWidthDegree = Double.parseDouble(p.getParameterValue());
-        } catch (Exception e) {
+        } catch (Exception ignore) {
         }
         return angularWidthDegree;
     }
