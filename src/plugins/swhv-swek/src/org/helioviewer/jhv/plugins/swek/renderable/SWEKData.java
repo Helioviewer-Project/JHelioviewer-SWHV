@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.SortedMap;
 
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
@@ -18,18 +17,11 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-/**
- * This class intercepts changes of the layers and request data from the
- * JHVEventContainer.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
 public class SWEKData implements LayersListener, JHVEventHandler {
 
     private static SWEKData instance;
-    private JHVDate beginDate = null;
-    private JHVDate endDate = null;
+    private long beginTime = Layers.getLastUpdatedTimestamp().milli;
+    private long endTime = beginTime;
 
     private SWEKData() {
     }
@@ -45,19 +37,19 @@ public class SWEKData implements LayersListener, JHVEventHandler {
         instance = null;
     }
 
-    public void requestEvents() {
-        JHVDate first = Layers.getStartDate();
-        JHVDate last = Layers.getEndDate();
-        if (beginDate == null || endDate == null || first.milli < beginDate.milli || last.milli > endDate.milli) {
-            beginDate = first;
-            endDate = last;
-            JHVEventCache.getSingletonInstance().requestForInterval(beginDate.milli, endDate.milli, SWEKData.this);
+    public void requestEvents(boolean force) {
+        long first = Layers.getStartDate().milli;
+        long last = Layers.getEndDate().milli;
+        if (force || first < beginTime || last > endTime) {
+            beginTime = first;
+            endTime = last;
+            JHVEventCache.getSingletonInstance().requestForInterval(first, last, SWEKData.this);
         }
     }
 
     @Override
     public void layerAdded(View view) {
-        requestEvents();
+        requestEvents(false);
     }
 
     @Override
@@ -66,36 +58,24 @@ public class SWEKData implements LayersListener, JHVEventHandler {
 
     @Override
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventList) {
-        requestEvents();
-        displayEvents();
+        // requestEvents(false);
+        Displayer.display();
     }
 
     @Override
     public void cacheUpdated() {
-        if (beginDate != null && endDate != null) {
-            beginDate = null;
-            endDate = null;
-            requestEvents();
-        }
-    }
-
-    private void displayEvents() {
-        if (beginDate != null && endDate != null) {
-            Displayer.display();
-        }
+        requestEvents(true);
     }
 
     public ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<JHVRelatedEvents>();
-        if (beginDate != null && endDate != null) {
-            JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate.milli, endDate.milli, beginDate.milli, endDate.milli);
-            Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> data = result.getAvailableEvents();
-            for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
-                for (Map.Entry<JHVEventCache.SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
-                    JHVRelatedEvents evr = v2.getValue();
-                    if (evr.getStart() <= timestamp && timestamp <= evr.getEnd())
-                        activeEvents.add(evr);
-                }
+        JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginTime, endTime, beginTime, endTime);
+        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> data = result.getAvailableEvents();
+        for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
+            for (Map.Entry<JHVEventCache.SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
+                JHVRelatedEvents evr = v2.getValue();
+                if (evr.getStart() <= timestamp && timestamp <= evr.getEnd())
+                    activeEvents.add(evr);
             }
         }
         return activeEvents;
