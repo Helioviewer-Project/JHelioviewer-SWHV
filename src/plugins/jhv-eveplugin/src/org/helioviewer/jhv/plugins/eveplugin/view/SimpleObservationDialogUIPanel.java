@@ -14,11 +14,10 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.layers.TimespanListener;
 
 @SuppressWarnings("serial")
-public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
+public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, TimespanListener, ObservationDialogDateModelListener {
 
     private final JHVCalendarDatePicker calendarStartDate;
 
@@ -47,7 +46,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         add(timePane);
         add(plotPane);
 
-        Layers.addLayersListener(this);
+        Layers.addTimespanListener(this);
     }
 
     public void setTime(long start) {
@@ -68,14 +67,9 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     @Override
-    public void layerAdded(View view) {
-        long start = view.getFirstTime().milli;
+    public void timespanChanged(long start, long end) {
         calendarStartDate.setTime(start);
         ObservationDialogDateModel.getInstance().setStartTime(start, false);
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
     }
 
     @Override

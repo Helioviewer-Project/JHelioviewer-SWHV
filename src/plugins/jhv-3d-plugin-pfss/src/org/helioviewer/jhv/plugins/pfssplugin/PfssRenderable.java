@@ -8,16 +8,15 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.CancelTask;
-import org.helioviewer.jhv.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
-public class PfssRenderable extends AbstractRenderable implements LayersListener {
+public class PfssRenderable extends AbstractRenderable implements TimespanListener {
 
     private final PfssPluginPanel optionsPanel;
     private PfssData previousPfssData = null;
@@ -70,16 +69,12 @@ public class PfssRenderable extends AbstractRenderable implements LayersListener
     }
 
     @Override
-    public void layerAdded(View view) {
+    public void timespanChanged(long start, long end) {
         PfssPlugin.getPfsscache().clear();
 
-        FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssNewDataLoader(Layers.getStartDate().milli, Layers.getEndDate().milli), null);
+        FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssNewDataLoader(start, end), null);
         PfssPlugin.pfssNewLoadPool.submit(dataLoaderTask);
         PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), 60 * 5, TimeUnit.SECONDS);
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
     }
 
     @Override
