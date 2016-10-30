@@ -102,11 +102,6 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     @Override
-    public void layerAdded(View view) {
-        activeLayerChanged(view);
-    }
-
-    @Override
     public void activeLayerChanged(View view) {
         CameraHelper.zoomToFit(miniCamera);
     }

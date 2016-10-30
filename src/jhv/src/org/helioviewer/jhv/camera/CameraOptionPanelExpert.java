@@ -158,10 +158,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     @Override
-    public void layerAdded(View view) {
-    }
-
-    @Override
     public void activeLayerChanged(View view) {
         if (exactDateCheckBox.isSelected()) {
             syncWithLayer();

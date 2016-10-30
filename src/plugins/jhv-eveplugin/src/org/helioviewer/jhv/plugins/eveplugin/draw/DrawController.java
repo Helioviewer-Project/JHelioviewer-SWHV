@@ -12,13 +12,14 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
+import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
+public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {
 
     public final TimeAxis selectedAxis;
     public final TimeAxis availableAxis;
@@ -275,8 +276,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void layerAdded(View view) {
-        setSelectedInterval(Layers.getStartDate().milli, Layers.getEndDate().milli);
+    public void timespanChanged(long start, long end) {
+        setSelectedInterval(start, end);
     }
 
     @Override

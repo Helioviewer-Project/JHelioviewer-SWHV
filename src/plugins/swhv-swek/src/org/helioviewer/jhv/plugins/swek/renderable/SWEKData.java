@@ -14,10 +14,9 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.layers.TimespanListener;
 
-public class SWEKData implements LayersListener, JHVEventHandler {
+public class SWEKData implements TimespanListener, JHVEventHandler {
 
     private static SWEKData instance;
     private long beginTime = Layers.getLastUpdatedTimestamp().milli;
@@ -48,12 +47,8 @@ public class SWEKData implements LayersListener, JHVEventHandler {
     }
 
     @Override
-    public void layerAdded(View view) {
+    public void timespanChanged(long start, long end) {
         requestEvents(false);
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
     }
 
     @Override

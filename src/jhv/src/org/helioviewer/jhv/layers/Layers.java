@@ -168,6 +168,7 @@ public class Layers {
 
     static void removeLayer(View view) {
         layers.remove(view);
+        fireTimespanChanged();
         if (view == activeView) {
             setActiveView(getLayer(layers.size() - 1));
         }
@@ -175,14 +176,16 @@ public class Layers {
 
     static void addLayer(View view) {
         layers.add(view);
-        fireLayerAdded(view);
+        fireTimespanChanged();
         setActiveView(view);
         setFrame(0);
     }
 
-    private static void fireLayerAdded(View view) {
-        for (LayersListener ll : layerListeners) {
-            ll.layerAdded(view);
+    private static void fireTimespanChanged() {
+        long start = getStartDate().milli;
+        long end = getEndDate().milli;
+        for (TimespanListener ll : timespanListeners) {
+            ll.timespanChanged(start, end);
         }
     }
 
@@ -334,7 +337,7 @@ public class Layers {
         timespanListeners.add(listener);
     }
 
-    public static void removeTimeListener(TimespanListener listener) {
+    public static void removeTimespanListener(TimespanListener listener) {
         timespanListeners.remove(listener);
     }
 
@@ -392,7 +395,7 @@ public class Layers {
         StringBuilder str = new StringBuilder();
         for (View v : layers) {
             if (v.getImageLayer().isVisible()) {
-                MetaData md = v.getMetaData(Layers.getLastUpdatedTimestamp());
+                MetaData md = v.getMetaData(lastTimestamp);
                 if (md instanceof HelioviewerMetaData) {
                     HelioviewerMetaData hmd = (HelioviewerMetaData) md;
                     if (hmd.getObservatory().contains("SDO") && hmd.getInstrument().contains("AIA"))

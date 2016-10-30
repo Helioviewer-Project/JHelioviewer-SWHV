@@ -44,6 +44,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
         Layers.addLayersListener(dc);
         Layers.addTimeListener(dc);
+        Layers.addTimespanListener(dc);
         JHVRelatedEvents.addHighlightListener(dc);
 
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {

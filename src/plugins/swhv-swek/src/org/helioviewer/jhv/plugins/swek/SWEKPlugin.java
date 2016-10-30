@@ -49,7 +49,7 @@ public class SWEKPlugin implements Plugin {
                 ImageViewerGui.getLeftContentPane().revalidate();
 
                 SWEKData.getSingletonInstance().requestEvents(true);
-                Layers.addLayersListener(SWEKData.getSingletonInstance());
+                Layers.addTimespanListener(SWEKData.getSingletonInstance());
                 ImageViewerGui.getRenderableContainer().addRenderable(renderable);
             }
 
@@ -61,7 +61,7 @@ public class SWEKPlugin implements Plugin {
     @Override
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
-        Layers.removeLayersListener(SWEKData.getSingletonInstance());
+        Layers.removeTimespanListener(SWEKData.getSingletonInstance());
         SWEKData.getSingletonInstance().reset();
 
         ImageViewerGui.getLeftContentPane().remove(SWEKPluginPanel.getSWEKPluginPanelInstance());

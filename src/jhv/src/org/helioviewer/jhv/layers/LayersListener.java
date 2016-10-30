@@ -8,16 +8,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
  */
 public interface LayersListener {
     /**
-     * Gets fired if a new layer has been added.
-     *
-     * @param idx
-     *            - view of the added layer
-     */
-    void layerAdded(View view);
-
-    /**
-     * Gets fired if the active layer has changed (meaning, a new layer has
-     * become the new active layer).
+     * Gets fired if another layer has become the new active layer
      *
      * @param view
      *            - view of the new active layer, null if none

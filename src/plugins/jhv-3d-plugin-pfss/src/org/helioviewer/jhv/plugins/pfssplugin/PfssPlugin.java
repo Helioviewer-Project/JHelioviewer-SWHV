@@ -36,14 +36,14 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
-        Layers.addLayersListener(renderable);
+        Layers.addTimespanListener(renderable);
         ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
 
     @Override
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
-        Layers.removeLayersListener(renderable);
+        Layers.removeTimespanListener(renderable);
     }
 
     @Override
