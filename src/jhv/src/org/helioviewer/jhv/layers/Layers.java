@@ -303,30 +303,39 @@ public class Layers {
     private static final HashSet<FrameListener> frameListeners = new HashSet<FrameListener>();
     private static final HashSet<LayersListener> layerListeners = new HashSet<LayersListener>();
     private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
+    private static final HashSet<TimespanListener> timespanListeners = new HashSet<TimespanListener>();
 
-    public static void addFrameListener(FrameListener frameListener) {
-        frameListeners.add(frameListener);
+    public static void addFrameListener(FrameListener listener) {
+        frameListeners.add(listener);
     }
 
-    public static void removeFrameListener(FrameListener frameListener) {
-        frameListeners.remove(frameListener);
+    public static void removeFrameListener(FrameListener listener) {
+        frameListeners.remove(listener);
     }
 
-    public static void addLayersListener(LayersListener layerListener) {
-        layerListeners.add(layerListener);
+    public static void addLayersListener(LayersListener listener) {
+        layerListeners.add(listener);
     }
 
-    public static void removeLayersListener(LayersListener layerListener) {
-        layerListeners.remove(layerListener);
+    public static void removeLayersListener(LayersListener listener) {
+        layerListeners.remove(listener);
     }
 
-    public static JHVDate addTimeListener(TimeListener timeListener) {
-        timeListeners.add(timeListener);
+    public static JHVDate addTimeListener(TimeListener listener) {
+        timeListeners.add(listener);
         return lastTimestamp;
     }
 
-    public static void removeTimeListener(TimeListener timeListener) {
-        timeListeners.remove(timeListener);
+    public static void removeTimeListener(TimeListener listener) {
+        timeListeners.remove(listener);
+    }
+
+    public static void addTimespanListener(TimespanListener listener) {
+        timespanListeners.add(listener);
+    }
+
+    public static void removeTimeListener(TimespanListener listener) {
+        timespanListeners.remove(listener);
     }
 
     public static void setDesiredRelativeSpeed(int fps) {
