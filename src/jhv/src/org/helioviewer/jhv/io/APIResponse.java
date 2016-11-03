@@ -51,7 +51,7 @@ public class APIResponse {
     public String getString(String key) {
         try {
             return data.getString(key);
-        } catch (JSONException e) {
+        } catch (JSONException ignore) {
         }
         return null;
     }
