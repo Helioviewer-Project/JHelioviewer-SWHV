@@ -47,7 +47,7 @@ public class LoadURITask extends JHVWorker<View, Void> {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            imageLayer.loadFailed();
+            imageLayer.unload();
         }
     }
 

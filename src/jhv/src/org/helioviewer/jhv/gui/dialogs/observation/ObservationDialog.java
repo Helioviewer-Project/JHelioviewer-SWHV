@@ -17,6 +17,7 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.Layer;
 
 @SuppressWarnings("serial")
 public class ObservationDialog extends JDialog implements ActionListener {
@@ -135,6 +136,8 @@ public class ObservationDialog extends JDialog implements ActionListener {
         if (e.getSource().equals(btnImages)) {
             loadButtonPressed();
         } else if (e.getSource().equals(btnClose)) {
+            if (layer instanceof Layer)
+                ((Layer) layer).unload();
             closeDialog();
         }
     }
