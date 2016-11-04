@@ -76,10 +76,10 @@
 
     <target name="compile" depends="init, bootclasspath.check" if="bootclasspath.exists">
         <echo message="compile with bootclasspath"/>
-        <javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.6" source="1.6" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
-            <!-- <compilerarg value="-Xlint:all"/> -->
+        <javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.8" source="1.8" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
+            <compilerarg value="-Xlint:all"/>
             <compilerarg value="-Xbootclasspath/p:${toString:lib.path.ref}"/>
-            <compilerarg value="-XDignore.symbol.file"/>
+            <!-- <compilerarg value="-XDignore.symbol.file"/> -->
             <classpath>
                 <fileset dir="${lib}">
                     <include name="**/*.jar"/>
@@ -90,9 +90,9 @@
 
     <target name="compile_without" depends="init, bootclasspath.check" unless="bootclasspath.exists">
         <echo message="compile without bootclasspath"/>
-        <javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.6" source="1.6" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
-            <!-- <compilerarg value="-Xlint:all"/> -->
-            <compilerarg value="-XDignore.symbol.file"/>
+        <javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.8" source="1.8" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
+            <compilerarg value="-Xlint:all"/>
+            <!-- <compilerarg value="-XDignore.symbol.file"/> -->
             <classpath>
                 <fileset dir="${lib}">
                     <include name="**/*.jar"/>
