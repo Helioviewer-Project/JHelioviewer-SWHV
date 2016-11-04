@@ -6,7 +6,7 @@ import java.net.URISyntaxException;
 
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.json.JSONArray;
+// import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,6 +22,7 @@ public class APIResponse {
             if (!data.isNull("uri")) {
                 uri = new URI(data.getString("uri"));
             }
+/*
             if (!data.isNull("frames")) {
                 JSONArray arr = data.getJSONArray("frames");
                 int len = arr.length();
@@ -30,7 +31,7 @@ public class APIResponse {
                 for (int i = 0; i < len; i++)
                     frames[i] = arr.getLong(i) * 1000L;
             }
-
+*/
             Log.debug("answer : " + data);
         } catch (JSONException e) {
             Log.error("Invalid JSON response " + data, e);
