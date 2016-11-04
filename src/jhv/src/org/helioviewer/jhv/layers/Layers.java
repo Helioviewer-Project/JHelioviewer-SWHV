@@ -168,7 +168,7 @@ public class Layers {
 
     static void removeLayer(View view) {
         layers.remove(view);
-        fireTimespanChanged();
+        // fireTimespanChanged();
         if (view == activeView) {
             setActiveView(getLayer(layers.size() - 1));
         }
@@ -393,13 +393,14 @@ public class Layers {
 
     public static String getSDOCutoutString() {
         StringBuilder str = new StringBuilder();
+
         for (View v : layers) {
             if (v.getImageLayer().isVisible()) {
-                MetaData md = v.getMetaData(lastTimestamp);
-                if (md instanceof HelioviewerMetaData) {
-                    HelioviewerMetaData hmd = (HelioviewerMetaData) md;
-                    if (hmd.getObservatory().contains("SDO") && hmd.getInstrument().contains("AIA"))
-                        str.append(',').append(hmd.getMeasurement());
+                MetaData m = v.getImageLayer().getMetaData();
+                if (m instanceof HelioviewerMetaData) {
+                    HelioviewerMetaData hm = (HelioviewerMetaData) m;
+                    if (hm.getObservatory().contains("SDO") && hm.getInstrument().contains("AIA"))
+                        str.append(',').append(hm.getMeasurement());
                 }
             }
         }
