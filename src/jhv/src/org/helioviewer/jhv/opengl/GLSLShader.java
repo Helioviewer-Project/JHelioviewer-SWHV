@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
@@ -90,7 +91,7 @@ public class GLSLShader {
             byte[] abInfoLog = new byte[params[0]];
             gl.glGetShaderInfoLog(iID, params[0], params, 0, abInfoLog, 0);
 
-            String log = new String(abInfoLog);
+            String log = new String(abInfoLog, StandardCharsets.UTF_8);
             Log.error(log);
             throw new GLException("Cannot compile vertex shader : " + log);
         }
@@ -119,7 +120,7 @@ public class GLSLShader {
             byte[] abInfoLog = new byte[params[0]];
             gl.glGetShaderInfoLog(iID, params[0], params, 0, abInfoLog, 0);
 
-            String log = new String(abInfoLog);
+            String log = new String(abInfoLog, StandardCharsets.UTF_8);
             Log.error(log);
             throw new GLException("Cannot compile fragment shader : " + log);
         }
@@ -144,7 +145,7 @@ public class GLSLShader {
             byte[] abInfoLog = new byte[params[0]];
             gl.glGetProgramInfoLog(progID, params[0], params, 0, abInfoLog, 0);
 
-            String log = new String(abInfoLog);
+            String log = new String(abInfoLog, StandardCharsets.UTF_8);
             Log.error(log);
             throw new GLException("Cannot link shaders : " + log);
         }

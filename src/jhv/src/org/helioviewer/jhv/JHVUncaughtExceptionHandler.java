@@ -7,8 +7,10 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -151,7 +153,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             Log.fatal("Runtime exception", e);
 
             msg += "\nLog:\n";
-            try (BufferedReader input = new BufferedReader(new FileReader(logName))) {
+            try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(logName), StandardCharsets.UTF_8))) {
                 String line;
                 StringBuilder sb = new StringBuilder();
                 while ((line = input.readLine()) != null) {
