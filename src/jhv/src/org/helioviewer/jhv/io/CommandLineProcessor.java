@@ -42,8 +42,7 @@ public class CommandLineProcessor {
      */
     public static List<URI> getJPXOptionValues() {
         List<String> jpxURLs = getOptionValues("jpx");
-        LinkedList<URI> result = new LinkedList<URI>();
-
+        LinkedList<URI> result = new LinkedList<>();
         for (String jpxURL : jpxURLs) {
             if (!jpxURL.equals("")) {
                 try {
@@ -63,8 +62,7 @@ public class CommandLineProcessor {
      */
     public static List<URI> getJPIPOptionValues() {
         List<String> jpipURIs = getOptionValues("jpip");
-        LinkedList<URI> uris = new LinkedList<URI>();
-
+        LinkedList<URI> uris = new LinkedList<>();
         for (String jpipURI : jpipURIs) {
             if (!jpipURI.equals("")) {
                 try {
@@ -103,8 +101,7 @@ public class CommandLineProcessor {
      * */
     public static List<String> getOptionValues(String param) {
         param = "-" + param;
-        LinkedList<String> values = new LinkedList<String>();
-
+        LinkedList<String> values = new LinkedList<>();
         if (arguments != null) {
             for (int i = 0; i < arguments.length; i++) {
                 if (param.equals(arguments[i])) {

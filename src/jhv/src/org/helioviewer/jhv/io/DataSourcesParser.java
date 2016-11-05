@@ -34,7 +34,7 @@ public class DataSourcesParser {
     }
 
     private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) throws ParseException {
-        TreeSet<String> sorted = new TreeSet<String>(JHVGlobals.alphanumComparator);
+        TreeSet<String> sorted = new TreeSet<>(JHVGlobals.alphanumComparator);
         sorted.addAll(root.keySet());
 
         for (String key : sorted) {

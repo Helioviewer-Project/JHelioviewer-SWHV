@@ -6,7 +6,7 @@ import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelL
 
 public class DataCollapsiblePanelModel {
 
-    private final HashSet<DataCollapsiblePanelModelListener> listeners = new HashSet<DataCollapsiblePanelModelListener>();
+    private final HashSet<DataCollapsiblePanelModelListener> listeners = new HashSet<>();
 
     public void repackCollapsiblePanels() {
         for (DataCollapsiblePanelModelListener l : listeners) {

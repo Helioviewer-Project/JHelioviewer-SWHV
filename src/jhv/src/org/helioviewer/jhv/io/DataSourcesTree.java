@@ -57,7 +57,7 @@ public class DataSourcesTree extends JTree {
     }
 
     private final DefaultMutableTreeNode nodeRoot;
-    private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<String, DefaultMutableTreeNode>();
+    private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
 
     public DataSourcesTree() {
         nodeRoot = new DefaultMutableTreeNode("Datasets");

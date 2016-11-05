@@ -233,7 +233,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
                         cache.add(ev);
                     }
 
-                    ArrayList<JHVRelatedEvents> rEvents = new ArrayList<JHVRelatedEvents>();
+                    ArrayList<JHVRelatedEvents> rEvents = new ArrayList<>();
                     int id = event.getUniqueID();
                     for (JHVEvent jhvEvent : events) {
                         int jid = jhvEvent.getUniqueID();

@@ -14,7 +14,7 @@ public class SWEKEventType {
 
     private final boolean containsParameterFilter;
     private HashMap<String, String> databaseFields;
-    private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<String, SWEKEventType>();
+    private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<>();
 
     public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, ImageIcon eventIcon) {
         this.eventName = eventName.intern();
@@ -37,7 +37,7 @@ public class SWEKEventType {
     }
 
     private void createAllDatabaseFields() {
-        HashMap<String, String> fields = new HashMap<String, String>();
+        HashMap<String, String> fields = new HashMap<>();
         for (SWEKParameter p : getParameterList()) {
             SWEKParameterFilter pf = p.getParameterFilter();
             if (pf != null) {

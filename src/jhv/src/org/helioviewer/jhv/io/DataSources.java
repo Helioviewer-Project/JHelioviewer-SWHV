@@ -94,7 +94,7 @@ public class DataSources {
         }
     }
 
-    static final HashSet<String> SupportedObservatories = new HashSet<String>();
+    static final HashSet<String> SupportedObservatories = new HashSet<>();
 
     public static void loadSources() {
         String prop = Settings.getSingletonInstance().getProperty("supported.data.sources");
