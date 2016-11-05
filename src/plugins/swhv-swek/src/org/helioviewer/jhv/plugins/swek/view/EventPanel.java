@@ -75,8 +75,8 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
         }
 
         add(eventTypeTree, BorderLayout.CENTER);
-        final FilterDialog filterDialog = new FilterDialog(eventType);
 
+        FilterDialog filterDialog = new FilterDialog(eventType);
         SmallPanel filterPanel = new SmallPanel();
         filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
         filterPanel.setOpaque(true);
@@ -84,12 +84,7 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
 
         if (eventType.containsFilter()) {
             JButton filterButton = new JButton("Filter");
-            filterButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    filterDialog.setVisible(true);
-                }
-            });
+            filterButton.addActionListener(e -> filterDialog.setVisible(true));
             filterButton.addMouseListener(new MouseListener() {
 
                 @Override

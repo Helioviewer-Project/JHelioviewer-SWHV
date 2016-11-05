@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -48,12 +46,7 @@ public class FilterPanel extends JPanel {
         setBackground(Color.white);
 
         JCheckBox enableButton = new JCheckBox();
-        enableButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toggleEnabled();
-            }
-        });
+        enableButton.addActionListener(e -> toggleEnabled());
 
         label = new JLabel(parameter.getParameterDisplayName() + " " + operand.getStringRepresentation());
 

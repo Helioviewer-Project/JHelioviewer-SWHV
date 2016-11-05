@@ -74,23 +74,19 @@ import sun.awt.AppContext;
                     final ExecutorService executorService = executorServiceRef.get();
                     if (executorService != null) {
                         AccessController.doPrivileged(
-                            new PrivilegedAction<Void>() {
-                                public Void run() {
+                                (PrivilegedAction<Void>) () -> {
                                     executorService.shutdown();
                                     return null;
-                                }
-                        });
+                                });
                     }
                 }
             };
 
         AccessController.doPrivileged(
-            new PrivilegedAction<Void>() {
-                public Void run() {
+                (PrivilegedAction<Void>) () -> {
                     Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
                     return null;
-                }
-        });
+                });
     }
 
 }
