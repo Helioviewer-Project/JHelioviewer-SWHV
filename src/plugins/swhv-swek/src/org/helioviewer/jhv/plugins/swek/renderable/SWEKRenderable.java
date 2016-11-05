@@ -45,7 +45,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final float LINEWIDTH_HIGHLIGHT = 2;
     private static final float LINEWIDTH_CACTUS = 2.02f;
 
-    private static final HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
+    private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
@@ -354,7 +354,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private final static int MOUSE_OFFSET_Y = 25;
 
     private void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
-        ArrayList<String> txts = new ArrayList<String>();
+        ArrayList<String> txts = new ArrayList<>();
         JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
         JHVEventParameter[] params = evt.getSimpleVisibleEventParameters();
         for (JHVEventParameter p : params) {

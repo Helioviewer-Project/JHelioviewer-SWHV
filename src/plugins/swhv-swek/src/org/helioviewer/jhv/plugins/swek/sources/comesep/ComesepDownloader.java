@@ -26,7 +26,7 @@ public class ComesepDownloader extends SWEKDownloader {
     protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
         JSONArray results = eventJSON.getJSONArray("results");
         try {
-            ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<EventDatabase.Event2Db>();
+            ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
             for (int i = 0; i < results.length(); i++) {
                 JSONObject result = results.getJSONObject(i);
 
@@ -70,7 +70,7 @@ public class ComesepDownloader extends SWEKDownloader {
         Pair<String, String>[] assocs = new Pair[len];
         for (int i = 0; i < len; i++) {
             JSONObject asobj = associations.getJSONObject(i);
-            assocs[i] = new Pair<String, String>(asobj.getString("parent"), asobj.getString("child"));
+            assocs[i] = new Pair<>(asobj.getString("parent"), asobj.getString("child"));
         }
         return EventDatabase.dump_association2db(assocs) != -1;
     }

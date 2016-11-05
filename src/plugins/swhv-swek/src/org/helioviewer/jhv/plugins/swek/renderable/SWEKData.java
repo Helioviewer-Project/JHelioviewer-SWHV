@@ -63,7 +63,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
     }
 
     public ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
-        ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<JHVRelatedEvents>();
+        ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
         JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginTime, endTime, beginTime, endTime);
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> data = result.getAvailableEvents();
         for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
