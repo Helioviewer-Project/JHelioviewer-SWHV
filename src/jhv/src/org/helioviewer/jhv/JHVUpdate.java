@@ -97,25 +97,22 @@ public class JHVUpdate implements Runnable {
                 in.close();
             }
 
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    String runningVersion = JHVGlobals.getJhvVersion() + "." + JHVGlobals.getJhvRevision();
-                    if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
-                        Log.info("Found newer version " + version);
+            EventQueue.invokeLater(() -> {
+                String runningVersion = JHVGlobals.getJhvVersion() + "." + JHVGlobals.getJhvRevision();
+                if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
+                    Log.info("Found newer version " + version);
 
-                        NewVersionDialog dialog = new NewVersionDialog(verbose);
-                        dialog.init("JHelioviewer " + version + " is now available (you have " + runningVersion + ").");
-                        dialog.showDialog();
-                        if (!verbose) {
-                            Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(dialog.getNextCheck()));
-                            Settings.getSingletonInstance().save("update.check.next");
-                        }
-                    } else {
-                        Log.info("Running the newest version of JHelioviewer");
-                        if (verbose)
-                            JOptionPane.showMessageDialog(null, "You are running the latest JHelioviewer version (" + runningVersion + ")");
+                    NewVersionDialog dialog = new NewVersionDialog(verbose);
+                    dialog.init("JHelioviewer " + version + " is now available (you have " + runningVersion + ").");
+                    dialog.showDialog();
+                    if (!verbose) {
+                        Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(dialog.getNextCheck()));
+                        Settings.getSingletonInstance().save("update.check.next");
                     }
+                } else {
+                    Log.info("Running the newest version of JHelioviewer");
+                    if (verbose)
+                        JOptionPane.showMessageDialog(null, "You are running the latest JHelioviewer version (" + runningVersion + ")");
                 }
             });
         } catch (IOException e) {

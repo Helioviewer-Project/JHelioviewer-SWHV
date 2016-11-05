@@ -2,10 +2,7 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -14,8 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
@@ -50,12 +45,9 @@ public class RenderableGridOptionsPanel extends SmallPanel {
         c0.anchor = GridBagConstraints.EAST;
         JCheckBox axes = new JCheckBox("Solar axes", grid.getShowAxes());
         axes.setHorizontalTextPosition(SwingConstants.LEFT);
-        axes.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                grid.showAxes(e.getStateChange() == ItemEvent.SELECTED);
-                Displayer.display();
-            }
+        axes.addItemListener(e -> {
+            grid.showAxes(e.getStateChange() == ItemEvent.SELECTED);
+            Displayer.display();
         });
         add(axes, c0);
 
@@ -63,12 +55,9 @@ public class RenderableGridOptionsPanel extends SmallPanel {
         c0.anchor = GridBagConstraints.EAST;
         JCheckBox labels = new JCheckBox("Grid labels", grid.getShowLabels());
         labels.setHorizontalTextPosition(SwingConstants.LEFT);
-        labels.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                grid.showLabels(e.getStateChange() == ItemEvent.SELECTED);
-                Displayer.display();
-            }
+        labels.addItemListener(e -> {
+            grid.showLabels(e.getStateChange() == ItemEvent.SELECTED);
+            Displayer.display();
         });
         add(labels, c0);
 
@@ -78,12 +67,9 @@ public class RenderableGridOptionsPanel extends SmallPanel {
         c0.anchor = GridBagConstraints.EAST;
         JCheckBox radial = new JCheckBox("Radial grid", grid.getShowRadial());
         radial.setHorizontalTextPosition(SwingConstants.LEFT);
-        radial.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                grid.showRadial(e.getStateChange() == ItemEvent.SELECTED);
-                Displayer.display();
-            }
+        radial.addItemListener(e -> {
+            grid.showRadial(e.getStateChange() == ItemEvent.SELECTED);
+            Displayer.display();
         });
         add(radial, c0);
 
@@ -126,35 +112,26 @@ public class RenderableGridOptionsPanel extends SmallPanel {
         gridChoiceBox = new JComboBox<RenderableGrid.GridChoiceType>(RenderableGrid.GridChoiceType.values());
         gridChoiceBox.setToolTipText("Choose grid options");
         gridChoiceBox.setSelectedItem(RenderableGrid.GridChoiceType.VIEWPOINT);
-        gridChoiceBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                grid.setCoordinates((RenderableGrid.GridChoiceType) gridChoiceBox.getSelectedItem());
-                Displayer.display();
-            }
+        gridChoiceBox.addActionListener(e -> {
+            grid.setCoordinates((RenderableGrid.GridChoiceType) gridChoiceBox.getSelectedItem());
+            Displayer.display();
         });
     }
 
     private void createGridResolutionX(RenderableGrid renderableGrid) {
         gridResolutionXSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLonstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
-        gridResolutionXSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                grid.setLonstepDegrees((Double) gridResolutionXSpinner.getValue());
-                Displayer.display();
-            }
+        gridResolutionXSpinner.addChangeListener(e -> {
+            grid.setLonstepDegrees((Double) gridResolutionXSpinner.getValue());
+            Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(gridResolutionXSpinner);
     }
 
     private void createGridResolutionY(RenderableGrid renderableGrid) {
         gridResolutionYSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLatstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
-        gridResolutionYSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                grid.setLatstepDegrees((Double) gridResolutionYSpinner.getValue());
-                Displayer.display();
-            }
+        gridResolutionYSpinner.addChangeListener(e -> {
+            grid.setLatstepDegrees((Double) gridResolutionYSpinner.getValue());
+            Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(gridResolutionYSpinner);
     }

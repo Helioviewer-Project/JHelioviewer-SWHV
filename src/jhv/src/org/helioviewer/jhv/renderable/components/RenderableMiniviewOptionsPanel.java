@@ -7,8 +7,6 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
@@ -55,13 +53,10 @@ public class RenderableMiniviewOptionsPanel extends SmallPanel {
         JFormattedTextField f = ((JSpinner.DefaultEditor) xSpinner.getEditor()).getTextField();
         f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%", min, max));
 
-        xSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                scale = ((Double) xSpinner.getValue()).intValue();
-                miniview.reshapeViewport();
-                Displayer.display();
-            }
+        xSpinner.addChangeListener(e -> {
+            scale = ((Double) xSpinner.getValue()).intValue();
+            miniview.reshapeViewport();
+            Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(xSpinner);
     }
