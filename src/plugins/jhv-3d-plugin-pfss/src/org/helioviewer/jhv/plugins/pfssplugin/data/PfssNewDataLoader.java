@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -60,7 +61,7 @@ public class PfssNewDataLoader implements Runnable {
                 String m = (startMonth) < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
                 String url = PfssSettings.baseURL + startYear + "/" + m + "/list.txt";
 
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"))) {
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream(), StandardCharsets.UTF_8))) {
                     String inputLine;
                     while ((inputLine = in.readLine()) != null) {
                         String[] splitted = inputLine.split(" ");

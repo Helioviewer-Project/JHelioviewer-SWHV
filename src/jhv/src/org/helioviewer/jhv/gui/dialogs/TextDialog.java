@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import javax.swing.JButton;
@@ -31,7 +32,7 @@ public class TextDialog extends JDialog implements ActionListener, ShowableDialo
         String linebreak = System.getProperty("line.separator");
 
         try {
-            Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream(), "UTF-8")));
+            Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream(), StandardCharsets.UTF_8)));
             while (scanner.hasNext()) {
                 text.append(scanner.nextLine()).append(linebreak);
             }

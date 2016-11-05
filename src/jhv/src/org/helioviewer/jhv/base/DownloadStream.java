@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
@@ -104,7 +105,7 @@ public class DownloadStream {
             // Write post data if necessary
             if (output != null) {
                 connection.setDoOutput(true);
-                try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
+                try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8)) {
                     out.write(output);
                 }
             }
@@ -141,7 +142,7 @@ public class DownloadStream {
             // Write post data if necessary
             if (output != null) {
                 connection.setDoOutput(true);
-                try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
+                try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8)) {
                     out.write(output);
                 }
             }

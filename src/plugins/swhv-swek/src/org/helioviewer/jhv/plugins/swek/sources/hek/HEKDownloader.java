@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugins.swek.sources.hek;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -135,7 +136,7 @@ public class HEKDownloader extends SWEKDownloader {
             if (param.param.toLowerCase().equals("provider")) {
                 String encodedValue;
                 try {
-                    encodedValue = URLEncoder.encode(param.value, "UTF-8");
+                    encodedValue = URLEncoder.encode(param.value, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
                     encodedValue = param.value;
                 }

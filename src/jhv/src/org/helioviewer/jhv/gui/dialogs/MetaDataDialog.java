@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -234,7 +235,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
             if (xmlText != null) {
                 try {
-                    InputStream in = new ByteArrayInputStream(xmlText.trim().replace("&", "&amp;").getBytes("UTF-8"));
+                    InputStream in = new ByteArrayInputStream(xmlText.trim().replace("&", "&amp;").getBytes(StandardCharsets.UTF_8));
                     DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     Document doc = builder.parse(in);
 
