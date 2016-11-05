@@ -3,6 +3,7 @@ package org.helioviewer.jhv.base.plugin.controller;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -160,7 +161,7 @@ public class PluginManager {
             }
 
             URLClassLoader classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
-            Object obj = classLoader.loadClass(className).newInstance();
+            Object obj = classLoader.loadClass(className).getConstructor().newInstance();
             Log.info("PluginManager: Load plugin class: " + className);
 
             if (obj instanceof Plugin) {
@@ -169,7 +170,7 @@ public class PluginManager {
             } else {
                 Log.debug("Load failed, was trying to load something that is not a plugin: " + className);
             }
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | IOException e) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | IOException e) {
             Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         }
         return false;

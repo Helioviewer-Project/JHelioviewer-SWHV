@@ -6,9 +6,7 @@ import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
-/**
- * Action to show any given dialog
- */
+// Action to show any given dialog
 @SuppressWarnings("serial")
 public class ShowDialogAction extends AbstractAction {
 
@@ -31,11 +29,11 @@ public class ShowDialogAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         try {
             if (dialog == null)
-                dialog = dialogToShow.newInstance();
+                dialog = dialogToShow.getConstructor().newInstance();
             dialog.init();
             dialog.showDialog();
-        } catch (Exception e1) {
-            e1.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
