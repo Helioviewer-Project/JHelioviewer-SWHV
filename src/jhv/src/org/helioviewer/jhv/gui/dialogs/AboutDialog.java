@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
@@ -33,17 +31,9 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
-/**
- * Dialog that is used to display information about the program.
- *
- * <p>
- * This includes version and contact informations.
- *
- * @author Markus Langenberg
- * @author Andre Dau
- */
+// Dialog that is used to display information about the program, including version and contact information
 @SuppressWarnings("serial")
-public final class AboutDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
+public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkListener {
 
     private final JButton closeButton = new JButton("Close");
     private final JScrollPane scrollPane;
@@ -118,7 +108,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
         boxPanel.add(license);
 
         JPanel closeButtonContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        closeButton.addActionListener(this);
+        closeButton.addActionListener(e -> dispose());
         closeButtonContainer.add(closeButton);
         boxPanel.add(closeButtonContainer);
 
@@ -131,42 +121,17 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
 
         setPreferredSize(new Dimension(getPreferredSize().width + 50, 600));
 
-        getRootPane().registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
         getRootPane().setFocusable(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showDialog() {
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                scrollPane.getVerticalScrollBar().setValue(0);
-            }
-        });
-
+        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
         setVisible(true);
-    }
-
-    /**
-     * Closes the dialog.
-     */
-    @Override
-    public void actionPerformed(ActionEvent a) {
-        if (a.getSource() == closeButton) {
-            dispose();
-        }
     }
 
     /**
