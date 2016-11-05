@@ -72,8 +72,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
     private final DefaultTableModel fitsModel = new LocalTableModel(null, new Object[] { "FITS Key", "value" });
-    private final DefaultListModel<String> jhList = new DefaultListModel<String>();
-    private final DefaultListModel<String> basicList = new DefaultListModel<String>();
+    private final DefaultListModel<String> jhList = new DefaultListModel<>();
+    private final DefaultListModel<String> basicList = new DefaultListModel<>();
 
     private Document xmlDoc = null;
     private boolean metaDataOK;
@@ -89,9 +89,9 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         bottomPanel.add(exportFitsButton);
         bottomPanel.add(closeButton);
 
-        JList<String> basicBox = new JList<String>(basicList);
+        JList<String> basicBox = new JList<>(basicList);
         basicBox.setCellRenderer(new WrappedTextCellRenderer());
-        JList<String> jhBox = new JList<String>(jhList);
+        JList<String> jhBox = new JList<>(jhList);
         jhBox.setCellRenderer(new WrappedTextCellRenderer());
 
         ComponentListener cl = new ComponentAdapter() {
@@ -105,7 +105,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         jhBox.addComponentListener(cl);
 
         JTable fTable = new JTable(fitsModel);
-        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(fitsModel);
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(fitsModel);
         fTable.setRowSorter(sorter);
 
         JPanel sp = new JPanel(new GridBagLayout());

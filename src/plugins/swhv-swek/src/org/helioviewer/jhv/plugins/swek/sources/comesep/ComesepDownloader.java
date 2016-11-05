@@ -47,7 +47,7 @@ public class ComesepDownloader extends SWEKDownloader {
 
                 long archiv = start;
                 String uid = result.getString("alertid");
-                event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, new ArrayList<JHVDatabaseParam>()));
+                event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, new ArrayList<>()));
             }
 
             int[] ids = EventDatabase.dump_event2db(event2db_list, type);

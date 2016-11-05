@@ -53,7 +53,7 @@ public class HEKParser implements SWEKParser {
         Iterator<?> keys = result.keys();
         List<SWEKParameter> plist = currentEvent.getJHVEventType().getEventType().getParameterList();
         Iterator<SWEKParameter> paramIterator = plist.iterator();
-        HashSet<String> insertedKeys = new HashSet<String>();
+        HashSet<String> insertedKeys = new HashSet<>();
         while (paramIterator.hasNext() || keys.hasNext()) {
             Object key;
             if (paramIterator.hasNext()) {
@@ -173,7 +173,7 @@ public class HEKParser implements SWEKParser {
      * @return a list of JHV points
      */
     private List<Vec3> parsePolygon(String value) {
-        List<Vec3> polygonPoints = new ArrayList<Vec3>();
+        List<Vec3> polygonPoints = new ArrayList<>();
         if (value.toLowerCase(Locale.ENGLISH).contains("polygon")) {
             String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
             String coordinates = coordinatesString.substring(coordinatesString.indexOf('(') + 1, coordinatesString.lastIndexOf(')'));
@@ -278,13 +278,13 @@ public class HEKParser implements SWEKParser {
             if (hgsBoundedBox != null) {
                 localHGSBoundedBox = hgsBoundedBox;
             } else {
-                localHGSBoundedBox = new ArrayList<Vec3>();
+                localHGSBoundedBox = new ArrayList<>();
             }
 
             if (hgsBoundCC != null) {
                 localHGSBoundCC = hgsBoundCC;
             } else {
-                localHGSBoundCC = new ArrayList<Vec3>();
+                localHGSBoundCC = new ArrayList<>();
             }
 
             if (hgsCentralPoint != null) {
@@ -297,12 +297,12 @@ public class HEKParser implements SWEKParser {
 
             Position.L p = Sun.getEarth(new JHVDate(currentEvent.start));
 
-            ArrayList<Vec3> jhvBoundedBox = new ArrayList<Vec3>(localHGSBoundedBox.size());
+            ArrayList<Vec3> jhvBoundedBox = new ArrayList<>(localHGSBoundedBox.size());
             for (Vec3 el : localHGSBoundedBox) {
                 jhvBoundedBox.add(convertHGSJHV(el, p));
             }
 
-            ArrayList<Vec3> jhvBoundCC = new ArrayList<Vec3>(localHGSBoundCC.size());
+            ArrayList<Vec3> jhvBoundCC = new ArrayList<>(localHGSBoundCC.size());
             for (Vec3 el : localHGSBoundCC) {
                 jhvBoundCC.add(convertHGSJHV(el, p));
             }
