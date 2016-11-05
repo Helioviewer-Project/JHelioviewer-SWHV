@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+@SuppressWarnings("rawtypes")
 public class OSXAdapter implements InvocationHandler {
 
     protected final Object targetObject;
@@ -146,4 +147,5 @@ public class OSXAdapter implements InvocationHandler {
             }
         }
     }
+
 }

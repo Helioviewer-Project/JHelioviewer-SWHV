@@ -6,6 +6,7 @@ import org.helioviewer.jhv.ExitHooks;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
 
+@SuppressWarnings("rawtypes")
 public class OSXHandler {
 
     public static void aboutHandler() {
