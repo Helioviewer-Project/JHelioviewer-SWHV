@@ -25,12 +25,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 class J2KRender implements Runnable {
 
-    private static final ThreadLocal<int[]> bufferLocal = new ThreadLocal<int[]>() {
-        @Override
-        protected int[] initialValue() {
-            return new int[KakaduConstants.MAX_RENDER_SAMPLES];
-        }
-    };
+    private static final ThreadLocal<int[]> bufferLocal = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
 
     private static final int[] firstComponent = new int[] { 0 };
 

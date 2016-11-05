@@ -9,16 +9,13 @@ import org.helioviewer.jhv.layers.Layers;
 
 public class ExitHooks {
 
-    private static final Thread finishMovieThread = new Thread() {
-        @Override
-        public void run() {
-            try {
-                ExportMovie.getInstance().disposeMovieWriter(false);
-            } catch (Exception e) {
-                Log.warn("Movie was not shut down properly");
-            }
+    private static final Thread finishMovieThread = new Thread(() -> {
+        try {
+            ExportMovie.getInstance().disposeMovieWriter(false);
+        } catch (Exception e) {
+            Log.warn("Movie was not shut down properly");
         }
-    };
+    });
 
     public static void attach() {
         // At the moment this runs, the EventQueue is blocked (by enforcing to run System.exit on it which is blocking)
