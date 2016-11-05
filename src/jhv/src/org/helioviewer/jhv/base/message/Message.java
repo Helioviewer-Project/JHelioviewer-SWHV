@@ -45,16 +45,14 @@ public class Message {
      * @param _exitImmediately
      *            the program exits when the value true will be passed.
      */
-    public static void err(final String _title, final Object _msg, final boolean _exitImmediately) {
+    public static void err(String _title, Object _msg, boolean _exitImmediately) {
         if (Thread.currentThread().isInterrupted())
             return;
 
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (_msg == null ? "No error details available." : _msg.toString())), (_exitImmediately ? "Fatal Error" : "Error"), JOptionPane.ERROR_MESSAGE);
-                if (_exitImmediately)
-                    System.exit(-1);
-            }
+        EventQueue.invokeLater(() -> {
+            JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (_msg == null ? "No error details available." : _msg.toString())), (_exitImmediately ? "Fatal Error" : "Error"), JOptionPane.ERROR_MESSAGE);
+            if (_exitImmediately)
+                System.exit(-1);
         });
     }
 
@@ -66,17 +64,12 @@ public class Message {
      * @param _msg
      *            the message which has to be displayed.
      */
-    public static void warn(final String _title, final Object _msg) {
+    public static void warn(String _title, Object _msg) {
         if (Thread.currentThread().isInterrupted())
             return;
 
-        final String msg = _msg.toString();
-
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (msg == null || msg.equals("") ? "No warning details available." : msg)), "Warning", JOptionPane.WARNING_MESSAGE);
-            }
-        });
+        String msg = _msg.toString();
+        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (msg == null || msg.equals("") ? "No warning details available." : msg)), "Warning", JOptionPane.WARNING_MESSAGE));
     }
 
     /**
@@ -87,17 +80,12 @@ public class Message {
      * @param _msg
      *            the message which has to be displayed.
      */
-    public static void warnTitle(final String _title, final Object _msg) {
+    public static void warnTitle(String _title, Object _msg) {
         if (Thread.currentThread().isInterrupted())
             return;
 
-        final String msg = _msg.toString();
-
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                JOptionPane.showMessageDialog(null, (msg == null || msg.equals("") ? "No warning details available." : msg), _title, JOptionPane.WARNING_MESSAGE);
-            }
-        });
+        String msg = _msg.toString();
+        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, (msg == null || msg.equals("") ? "No warning details available." : msg), _title, JOptionPane.WARNING_MESSAGE));
     }
 
 }

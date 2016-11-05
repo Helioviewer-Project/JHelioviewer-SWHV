@@ -52,20 +52,12 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
             JButton laterButton = new JButton("Remind me later");
             closeButtonContainer.add(laterButton);
             laterButton.addActionListener(this);
-            laterButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent arg) {
-                    nextCheck = suspendedStarts;
-                }
-            });
+            laterButton.addActionListener(e -> nextCheck = suspendedStarts);
         }
 
         JButton downloadButton = new JButton("Download");
         downloadButton.addActionListener(this);
-        downloadButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                JHVGlobals.openURL(JHVGlobals.downloadURL);
-            }
-        });
+        downloadButton.addActionListener(e -> JHVGlobals.openURL(JHVGlobals.downloadURL));
         closeButtonContainer.add(downloadButton);
         add(closeButtonContainer, BorderLayout.SOUTH);
 
