@@ -35,30 +35,19 @@ public class LogSettings {
         BasicConfigurator.configure();
 
         settings = new Properties();
-
-        try {
-            InputStream is = FileUtils.getResourceInputStream(defaultLogSettingsPath);
-            try {
-                settings.load(is);
-            } finally {
-                is.close();
-            }
+        try (InputStream is = FileUtils.getResourceInputStream(defaultLogSettingsPath)) {
+            settings.load(is);
         } catch (IOException e) {
             Log.log.error("Could not load default settings: " + e.getMessage());
         }
 
-        try {
-            File userFile = new File(logSettingsPath);
-            if (userFile.exists()) {
-                FileInputStream is = new FileInputStream(userFile);
-                try {
-                    settings.load(is);
-                } finally {
-                    is.close();
-                }
+        File userFile = new File(logSettingsPath);
+        if (userFile.exists()) {
+            try (FileInputStream is = new FileInputStream(userFile)) {
+                settings.load(is);
+            } catch (IOException e) {
+                Log.log.error("Could not load user settings: " + e.getMessage());
             }
-        } catch (IOException e) {
-            Log.log.error("Could not load user settings: " + e.getMessage());
         }
 
         String filePattern = "'jhv.'yyyy-MM-dd'T'HH-mm-ss'.log'";
@@ -75,13 +64,8 @@ public class LogSettings {
 
     public void update() {
         Log.info("Store log settings to " + logSettingsPath);
-        try {
-            FileOutputStream os = new FileOutputStream(logSettingsPath);
-            try {
-                settings.store(os, "Logging settings for JHelioviewer.");
-            } finally {
-                os.close();
-            }
+        try (FileOutputStream os = new FileOutputStream(logSettingsPath)) {
+            settings.store(os, "Logging settings for JHelioviewer.");
         } catch (IOException e) {
             Log.error("Could not write logging settings to file. The current changes will be discarded after program termination.", e);
         }

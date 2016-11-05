@@ -36,22 +36,16 @@ public class Settings {
             defaultProperties.clear();
             userProperties.clear();
 
-            InputStream is = FileUtils.getResourceInputStream("/settings/defaults.properties");
-            try {
+            try (InputStream is = FileUtils.getResourceInputStream("/settings/defaults.properties")) {
                 defaultProperties.load(is);
-            } finally {
-                is.close();
             }
 
             if (verbose) {
                 Log.debug("Settings.load() > Load default system settings: " + defaultProperties);
             }
             if (propFile.exists()) {
-                FileInputStream fileInput = new FileInputStream(propFile);
-                try {
+                try (FileInputStream fileInput = new FileInputStream(propFile)) {
                     userProperties.load(fileInput);
-                } finally {
-                    fileInput.close();
                 }
             }
 
@@ -80,11 +74,8 @@ public class Settings {
     private void save(Properties props) {
         try {
             propFile.createNewFile();
-            FileOutputStream fileOutput = new FileOutputStream(propFile);
-            try {
+            try (FileOutputStream fileOutput = new FileOutputStream(propFile)) {
                 props.store(fileOutput, null);
-            } finally {
-                fileOutput.close();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -99,17 +90,12 @@ public class Settings {
 
     private Properties loadCopyUser() {
         Properties props = new Properties();
-        try {
-            if (propFile.exists()) {
-                FileInputStream fileInput = new FileInputStream(propFile);
-                try {
-                    props.load(fileInput);
-                } finally {
-                    fileInput.close();
-                }
+        if (propFile.exists()) {
+            try (FileInputStream fileInput = new FileInputStream(propFile)) {
+                props.load(fileInput);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
         return props;
     }

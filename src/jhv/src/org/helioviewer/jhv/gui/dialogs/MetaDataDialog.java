@@ -329,14 +329,9 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      *            XML file name
      */
     private boolean saveXMLDocument(DOMSource source, String filename) {
-        try {
-            FileOutputStream fos = new FileOutputStream(new File(filename));
-            try {
-                StreamResult result = new StreamResult(fos);
-                TransformerFactory.newInstance().newTransformer().transform(source, result);
-            } finally {
-                fos.close();
-            }
+        try (FileOutputStream fos = new FileOutputStream(new File(filename))) {
+            StreamResult result = new StreamResult(fos);
+            TransformerFactory.newInstance().newTransformer().transform(source, result);
             return true;
         } catch (Exception e) {
             Log.error("Failed to write XML: " + e);
