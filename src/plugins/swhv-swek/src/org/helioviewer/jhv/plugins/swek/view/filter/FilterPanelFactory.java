@@ -8,8 +8,6 @@ import java.util.List;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.data.container.cache.SWEKOperand;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -36,7 +34,7 @@ public class FilterPanelFactory {
         return spinnerFormat.toString();
     }
 
-    private static JSpinner generateFlareSpinner(final FilterDialog filterDialog) {
+    private static JSpinner generateFlareSpinner(FilterDialog filterDialog) {
         /*
         double min = parameter.getParameterFilter().getMin() == null ? 1e-8 : parameter.getParameterFilter().getMin();
         double max = parameter.getParameterFilter().getMax() == null ? 1e-3 : parameter.getParameterFilter().getMin();
@@ -46,17 +44,12 @@ public class FilterPanelFactory {
         FlareSpinnerModel minimumSpinnerModel = new FlareSpinnerModel("A1.0", "X20.0", "C1.0", 0.2);
         JSpinner spinner = new JSpinner(minimumSpinnerModel);
         spinner.setEditor(new JSpinner.DefaultEditor(spinner));
-        spinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                filterDialog.filterParameterChanged();
-            }
-        });
+        spinner.addChangeListener(e -> filterDialog.filterParameterChanged());
         WheelSupport.installMouseWheelSupport(spinner);
         return spinner;
     }
 
-    private static JSpinner generateMinOrMaxSpinner(final FilterDialog filterDialog, SWEKParameter parameter) {
+    private static JSpinner generateMinOrMaxSpinner(FilterDialog filterDialog, SWEKParameter parameter) {
         double min = parameter.getParameterFilter().getMin() == null ? Double.MIN_VALUE : parameter.getParameterFilter().getMin();
         double max = parameter.getParameterFilter().getMax() == null ? Double.MAX_VALUE : parameter.getParameterFilter().getMax();
         double start = parameter.getParameterFilter().getStartValue() == null ? (max - min) * 0.5 : parameter.getParameterFilter().getStartValue();
@@ -65,13 +58,7 @@ public class FilterPanelFactory {
         SpinnerModel minimumSpinnerModel = new SpinnerNumberModel(start, min, max, step);
         JSpinner spinner = new JSpinner(minimumSpinnerModel);
         spinner.setEditor(new JSpinner.NumberEditor(spinner, getSpinnerFormat(min, max)));
-        spinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                filterDialog.filterParameterChanged();
-            }
-        });
-
+        spinner.addChangeListener(e -> filterDialog.filterParameterChanged());
         WheelSupport.installMouseWheelSupport(spinner);
         return spinner;
     }
@@ -100,4 +87,5 @@ public class FilterPanelFactory {
         }
         return panels;
     }
+
 }
