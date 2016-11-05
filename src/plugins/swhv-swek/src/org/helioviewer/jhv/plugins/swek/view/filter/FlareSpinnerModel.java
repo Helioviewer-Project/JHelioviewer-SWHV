@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.swek.view.filter;
 
 import javax.swing.AbstractSpinnerModel;
 
+@SuppressWarnings("serial")
 public class FlareSpinnerModel extends AbstractSpinnerModel {
 
     private String curval;
