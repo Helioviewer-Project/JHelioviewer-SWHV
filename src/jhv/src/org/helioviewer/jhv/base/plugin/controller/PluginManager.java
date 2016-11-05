@@ -144,35 +144,30 @@ public class PluginManager {
         Log.info("PluginManager is trying to load the plugin located at " + pluginLocation);
 
         File file = new File(pluginLocation);
-        try {
-            JarFile jarFile = new JarFile(file);
-            try {
-                Manifest manifest = jarFile.getManifest();
+        try (JarFile jarFile = new JarFile(file)) {
+            Manifest manifest = jarFile.getManifest();
 
-                String className = null;
-                if (manifest != null) {
-                    className = manifest.getMainAttributes().getValue("Main-Class");
-                    Log.debug("Found Manifest: Main-Class: " + className);
-                }
+            String className = null;
+            if (manifest != null) {
+                className = manifest.getMainAttributes().getValue("Main-Class");
+                Log.debug("Found Manifest: Main-Class: " + className);
+            }
 
-                if (className == null) {
-                    String name = file.getName().substring(0, file.getName().length() - 4);
-                    className = "org.helioviewer.plugins." + name + "." + name;
-                    Log.debug("No Manifest Information Found, Fallback: Main-Class: " + className);
-                }
+            if (className == null) {
+                String name = file.getName().substring(0, file.getName().length() - 4);
+                className = "org.helioviewer.plugins." + name + "." + name;
+                Log.debug("No Manifest Information Found, Fallback: Main-Class: " + className);
+            }
 
-                URLClassLoader classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
-                Object obj = classLoader.loadClass(className).newInstance();
-                Log.info("PluginManager: Load plugin class: " + className);
+            URLClassLoader classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
+            Object obj = classLoader.loadClass(className).newInstance();
+            Log.info("PluginManager: Load plugin class: " + className);
 
-                if (obj instanceof Plugin) {
-                    addPlugin((Plugin) obj, pluginLocation);
-                    return true;
-                } else {
-                    Log.debug("Load failed, was trying to load something that is not a plugin: " + className);
-                }
-            } finally {
-                jarFile.close();
+            if (obj instanceof Plugin) {
+                addPlugin((Plugin) obj, pluginLocation);
+                return true;
+            } else {
+                Log.debug("Load failed, was trying to load something that is not a plugin: " + className);
             }
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | IOException e) {
             Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
@@ -204,12 +199,12 @@ public class PluginManager {
      * @param container
      *            Plug-in container to remove from the list.
      */
-    public void removePluginContainer(PluginContainer container) {
+    private void removePluginContainer(PluginContainer container) {
         plugins.remove(container.getPlugin());
         pluginSettings.removePluginFromXML(container);
     }
 
-    public boolean deletePlugin(final PluginContainer container, final File tempFile) {
+    public boolean deletePlugin(PluginContainer container, File tempFile) {
         // deactivate plug-in if it is still active
         if (container.isActive()) {
             container.setActive(false);
@@ -217,22 +212,16 @@ public class PluginManager {
         }
 
         // remove plug-in
-        PluginManager.getSingletonInstance().removePluginContainer(container);
+        removePluginContainer(container);
 
         // delete corresponding JAR file
         File file = new File(container.getPluginLocation());
         if (!file.delete()) {
-            // when JAR file cannot be deleted note file by using a temporary
-            // file
+            // when JAR file cannot be deleted note file by using a temporary file
             // in order to delete it when restarting JHV
-            try {
-                FileWriter tempFileWriter = new FileWriter(tempFile, true);
-                try {
-                    tempFileWriter.write(container.getPluginLocation().getPath() + ";");
-                    tempFileWriter.flush();
-                } finally {
-                    tempFileWriter.close();
-                }
+            try (FileWriter tempFileWriter = new FileWriter(tempFile, true)) {
+                tempFileWriter.write(container.getPluginLocation().getPath() + ";");
+                tempFileWriter.flush();
             } catch (IOException e) {
                 return false;
             }
