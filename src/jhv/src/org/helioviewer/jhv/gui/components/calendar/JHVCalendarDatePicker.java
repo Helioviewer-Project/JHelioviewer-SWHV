@@ -12,11 +12,11 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.ParseException;
-import java.util.AbstractList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -42,7 +42,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 @SuppressWarnings("serial")
 public class JHVCalendarDatePicker extends JPanel implements FocusListener, ActionListener, KeyListener, JHVCalendarListener {
 
-    private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
+    private final List<JHVCalendarListener> listeners = new LinkedList<>();
     private final Calendar calendar = new GregorianCalendar();
 
     private JHVCalendar jhvCalendar = null;

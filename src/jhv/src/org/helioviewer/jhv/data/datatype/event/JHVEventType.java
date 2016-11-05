@@ -15,7 +15,7 @@ public class JHVEventType {
         this.supplier = supplier;
     }
 
-    private static final ArrayList<JHVEventType> evtList = new ArrayList<JHVEventType>();
+    private static final ArrayList<JHVEventType> evtList = new ArrayList<>();
 
     public static JHVEventType getJHVEventType(SWEKEventType eventType, SWEKSupplier supplier) {
         for (JHVEventType evt : evtList) {

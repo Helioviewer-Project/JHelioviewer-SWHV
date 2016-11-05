@@ -14,11 +14,11 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval
 
 public class JHVRelatedEvents {
 
-    private static final HashSet<JHVEventHighlightListener> listeners = new HashSet<JHVEventHighlightListener>();
+    private static final HashSet<JHVEventHighlightListener> listeners = new HashSet<>();
 
-    private final ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
+    private final ArrayList<JHVEvent> events = new ArrayList<>();
     private final SortedDateInterval interval = new SortedDateInterval(Long.MAX_VALUE, Long.MIN_VALUE);
-    private final ArrayList<JHVAssociation> associations = new ArrayList<JHVAssociation>();
+    private final ArrayList<JHVAssociation> associations = new ArrayList<>();
 
     private final JHVEventType eventType;
     private final Color color;
@@ -124,7 +124,7 @@ public class JHVRelatedEvents {
     }
 
     public ArrayList<JHVEvent> getNextEvents(JHVEvent event) {
-        ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
+        ArrayList<JHVEvent> nEvents = new ArrayList<>();
         for (JHVAssociation assoc : associations) {
             if (assoc.left == event.getUniqueID()) {
                 JHVEvent newEvt = findEvent(assoc.right);
@@ -137,7 +137,7 @@ public class JHVRelatedEvents {
     }
 
     public ArrayList<JHVEvent> getPreviousEvents(JHVEvent event) {
-        ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
+        ArrayList<JHVEvent> nEvents = new ArrayList<>();
         for (JHVAssociation assoc : associations) {
             if (assoc.right == event.getUniqueID()) {
                 JHVEvent newEvt = findEvent(assoc.left);
