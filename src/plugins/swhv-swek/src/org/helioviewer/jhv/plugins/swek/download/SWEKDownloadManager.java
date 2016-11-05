@@ -33,22 +33,19 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
     private static SWEKDownloadManager instance;
     private final ExecutorService downloadEventPool;
-    private final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap;
-    private final ArrayList<JHVEventType> activeEventTypes;
+    private final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap = new HashMap<>();
+    private final ArrayList<JHVEventType> activeEventTypes = new ArrayList<>();
     private final JHVEventCache eventCache;
     private final FilterManager filterManager;
     private final SWEKTreeModel treeModel;
 
     private SWEKDownloadManager() {
-        dwMap = new HashMap<SWEKEventType, ArrayList<DownloadWorker>>();
-        activeEventTypes = new ArrayList<JHVEventType>();
-
         eventCache = JHVEventCache.getSingletonInstance();
         filterManager = FilterManager.getSingletonInstance();
         filterManager.addFilterManagerListener(this);
         treeModel = SWEKTreeModel.getSingletonInstance();
 
-        PriorityBlockingQueue<Runnable> priorityQueue = new PriorityBlockingQueue<Runnable>(2048, new ComparePriority());
+        PriorityBlockingQueue<Runnable> priorityQueue = new PriorityBlockingQueue<>(2048, new ComparePriority());
         downloadEventPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS, priorityQueue, new JHVThread.NamedThreadFactory("SWEK Download"), new ThreadPoolExecutor.DiscardPolicy());
     }
 
@@ -133,7 +130,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         if (dwMap.containsKey(eventType)) {
             dwMapList = dwMap.get(eventType);
         } else {
-            dwMapList = new ArrayList<DownloadWorker>();
+            dwMapList = new ArrayList<>();
             dwMap.put(eventType, dwMapList);
         }
         dwMapList.add(dw);
@@ -148,7 +145,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     private List<SWEKParam> defineParameters(SWEKEventType eventType, SWEKSupplier supplier) {
-        List<SWEKParam> params = new ArrayList<SWEKParam>();
+        List<SWEKParam> params = new ArrayList<>();
         params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
         Map<SWEKParameter, List<SWEKParam>> paramsPerEventParameter = filterManager.getFilterForEventType(eventType);
         for (List<SWEKParam> paramPerParameter : paramsPerEventParameter.values()) {

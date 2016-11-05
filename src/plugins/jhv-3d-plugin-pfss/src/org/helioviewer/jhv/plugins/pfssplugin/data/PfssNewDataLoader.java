@@ -28,7 +28,7 @@ public class PfssNewDataLoader implements Runnable {
 
     private final long start;
     private final long end;
-    private final static SortedMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<Integer, ArrayList<Pair<String, Long>>>();
+    private final static SortedMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<>();
 
     public PfssNewDataLoader(long _start, long _end) {
         start = _start;
@@ -56,7 +56,7 @@ public class PfssNewDataLoader implements Runnable {
             }
 
             if (urls == null || urls.isEmpty()) {
-                urls = new ArrayList<Pair<String, Long>>();
+                urls = new ArrayList<>();
                 String m = (startMonth) < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
                 String url = PfssSettings.baseURL + startYear + "/" + m + "/list.txt";
 
@@ -65,7 +65,7 @@ public class PfssNewDataLoader implements Runnable {
                     while ((inputLine = in.readLine()) != null) {
                         String[] splitted = inputLine.split(" ");
                         Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
-                        urls.add(new Pair<String, Long>(splitted[1], dd.getTime()));
+                        urls.add(new Pair<>(splitted[1], dd.getTime()));
                     }
                 } catch (MalformedURLException e) {
                     Log.warn("Could not read PFSS entries : URL unavailable");
@@ -84,7 +84,7 @@ public class PfssNewDataLoader implements Runnable {
                 Long dd = pair.b;
                 String url = pair.a;
                 if (dd > start - TimeUtils.DAY_IN_MILLIS && dd < end + TimeUtils.DAY_IN_MILLIS) {
-                    FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssDataLoader(url, dd), null);
+                    FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(url, dd), null);
                     PfssPlugin.pfssDataPool.submit(dataLoaderTask);
                     PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
                 }

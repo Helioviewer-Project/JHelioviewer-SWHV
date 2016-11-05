@@ -45,21 +45,15 @@ public class SWEKConfigurationManager {
 
     private static final String configFileName = "SWEKSettings.json";
 
-    private boolean configLoaded;
+    private boolean configLoaded = false;
 
     private URL configFileURL;
 
-    private final Map<String, SWEKSource> sources;
-
-    private final Map<String, SWEKEventType> eventTypes;
-
-    private final List<SWEKEventType> orderedEventTypes;
+    private final Map<String, SWEKSource> sources = new HashMap<>();
+    private final Map<String, SWEKEventType> eventTypes = new HashMap<>();
+    private final List<SWEKEventType> orderedEventTypes = new ArrayList<>();
 
     private SWEKConfigurationManager() {
-        configLoaded = false;
-        sources = new HashMap<String, SWEKSource>();
-        eventTypes = new HashMap<String, SWEKEventType>();
-        orderedEventTypes = new ArrayList<SWEKEventType>();
     }
 
     public static SWEKConfigurationManager getSingletonInstance() {
@@ -220,7 +214,7 @@ public class SWEKConfigurationManager {
     }
 
     private List<SWEKParameter> parseGeneralParameters(JSONObject jsonObject) throws JSONException {
-        List<SWEKParameter> parameterList = new ArrayList<SWEKParameter>();
+        List<SWEKParameter> parameterList = new ArrayList<>();
         JSONArray parameterArray = jsonObject.getJSONArray("general_parameters");
         for (int i = 0; i < parameterArray.length(); i++) {
             parameterList.add(parseParameter(parameterArray.getJSONObject(i)));
@@ -261,7 +255,7 @@ public class SWEKConfigurationManager {
     }
 
     private List<SWEKSupplier> parseSuppliers(JSONObject object) throws JSONException {
-        List<SWEKSupplier> suppliers = new ArrayList<SWEKSupplier>();
+        List<SWEKSupplier> suppliers = new ArrayList<>();
         JSONArray suppliersArray = object.getJSONArray("suppliers");
         for (int i = 0; i < suppliersArray.length(); i++) {
             suppliers.add(parseSupplier(suppliersArray.getJSONObject(i)));
@@ -290,7 +284,7 @@ public class SWEKConfigurationManager {
     }
 
     private List<SWEKParameter> parseParameterList(JSONObject object) throws JSONException {
-        List<SWEKParameter> parameterList = new ArrayList<SWEKParameter>();
+        List<SWEKParameter> parameterList = new ArrayList<>();
         JSONArray parameterListArray = object.getJSONArray("parameter_list");
         for (int i = 0; i < parameterListArray.length(); i++) {
             parameterList.add(parseParameter((JSONObject) parameterListArray.get(i)));
@@ -351,7 +345,7 @@ public class SWEKConfigurationManager {
     }
 
     private List<SWEKRelatedEvents> parseRelatedEvents(JSONObject configJSON) throws JSONException {
-        List<SWEKRelatedEvents> relatedEventsList = new ArrayList<SWEKRelatedEvents>();
+        List<SWEKRelatedEvents> relatedEventsList = new ArrayList<>();
         JSONArray relatedEventsArray = configJSON.getJSONArray("related_events");
         for (int i = 0; i < relatedEventsArray.length(); i++) {
             relatedEventsList.add(parseRelatedEvent(relatedEventsArray.getJSONObject(i)));
@@ -372,7 +366,7 @@ public class SWEKConfigurationManager {
     }
 
     private List<SWEKRelatedOn> parseRelatedOnList(JSONObject jsonObject) throws JSONException {
-        List<SWEKRelatedOn> relatedOnList = new ArrayList<SWEKRelatedOn>();
+        List<SWEKRelatedOn> relatedOnList = new ArrayList<>();
         JSONArray relatedOnArray = jsonObject.getJSONArray("related_on");
         for (int i = 0; i < relatedOnArray.length(); i++) {
             relatedOnList.add(parseRelatedOn(relatedOnArray.getJSONObject(i)));

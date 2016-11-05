@@ -16,7 +16,7 @@ import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 public class SWEKTreeModel {
 
     private static SWEKTreeModel singletonInstance;
-    private static final HashSet<SWEKTreeModelListener> listeners = new HashSet<SWEKTreeModelListener>();
+    private static final HashSet<SWEKTreeModelListener> listeners = new HashSet<>();
 
     private SWEKTreeModel() {
     }

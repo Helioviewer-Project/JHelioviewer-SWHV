@@ -18,10 +18,9 @@ public class SWEKIconBank {
     private static SWEKIconBank singletonInstance;
 
     /** the icon bank */
-    private final Map<String, ImageIcon> iconBank;
+    private final Map<String, ImageIcon> iconBank = new HashMap<>();
 
     private SWEKIconBank() {
-        iconBank = new HashMap<String, ImageIcon>();
         initIconBank();
     }
 

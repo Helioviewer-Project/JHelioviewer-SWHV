@@ -17,7 +17,7 @@ public class SWEKTreeModelEventType extends AbstractSWEKTreeModelElement {
     private final SWEKEventType swekEventType;
 
     /** List with SWEKSuppliers for this event type */
-    private final List<SWEKTreeModelSupplier> swekTreeSuppliers;
+    private final List<SWEKTreeModelSupplier> swekTreeSuppliers = new ArrayList<>();
 
     /**
      * Creates a SWEK tree model event type for the given SWEK event type.
@@ -29,7 +29,6 @@ public class SWEKTreeModelEventType extends AbstractSWEKTreeModelElement {
     public SWEKTreeModelEventType(SWEKEventType swekEventType) {
         super(false, swekEventType.getEventIcon());
         this.swekEventType = swekEventType;
-        swekTreeSuppliers = new ArrayList<SWEKTreeModelSupplier>();
         fillSWEKTreeSuppliers();
     }
 

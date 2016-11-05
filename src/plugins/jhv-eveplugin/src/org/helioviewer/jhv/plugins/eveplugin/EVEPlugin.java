@@ -24,7 +24,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private static final int MAX_WORKER_THREADS = 12;
     public static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("EVE", MAX_WORKER_THREADS);
 
-    private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
+    private final LinkedList<JComponent> pluginPanes = new LinkedList<>();
     private final PlotPanel plotOne = new PlotPanel();
 
     public static final LineDataSelectorModel ldsm = new LineDataSelectorModel();
