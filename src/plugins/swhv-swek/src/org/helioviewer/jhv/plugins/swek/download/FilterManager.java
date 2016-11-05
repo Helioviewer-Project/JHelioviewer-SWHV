@@ -5,27 +5,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 
-/**
- * Manages the filters for the different event types.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
+// Manages the filters for the different event types.
 public class FilterManager {
 
     private static FilterManager instance;
-    private final Map<SWEKEventType, Map<SWEKParameter, List<SWEKParam>>> filters;
-    private final Set<FilterManagerListener> listeners;
+    private final Map<SWEKEventType, Map<SWEKParameter, List<SWEKParam>>> filters = new HashMap<>();
+    private final HashSet<FilterManagerListener> listeners = new HashSet<>();
 
     private FilterManager() {
-        filters = new HashMap<SWEKEventType, Map<SWEKParameter, List<SWEKParam>>>();
-        listeners = new HashSet<FilterManagerListener>();
     }
 
     public static FilterManager getSingletonInstance() {
@@ -48,10 +40,10 @@ public class FilterManager {
         if (filters.containsKey(swekEventType))
             filteredParameterPerEventType = filters.get(swekEventType);
         else
-            filteredParameterPerEventType = new HashMap<SWEKParameter, List<SWEKParam>>();
+            filteredParameterPerEventType = new HashMap<>();
         filters.put(swekEventType, filteredParameterPerEventType);
         if (!filteredParameterPerEventType.containsKey(parameter)) {
-            filteredParameterPerEventType.put(parameter, new ArrayList<SWEKParam>());
+            filteredParameterPerEventType.put(parameter, new ArrayList<>());
         }
         filteredParameterPerEventType.get(parameter).add(filter);
     }
@@ -68,7 +60,7 @@ public class FilterManager {
         if (filters.containsKey(eventType)) {
             return filters.get(eventType);
         }
-        return new HashMap<SWEKParameter, List<SWEKParam>>();
+        return new HashMap<>();
     }
 
     public boolean isFiltered(SWEKEventType eventType, SWEKParameter parameter) {

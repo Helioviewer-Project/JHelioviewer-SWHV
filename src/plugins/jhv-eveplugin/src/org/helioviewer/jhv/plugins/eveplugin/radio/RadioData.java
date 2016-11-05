@@ -32,7 +32,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     private final YAxis yAxis;
 
     public static final int CallistoID = 5000;
-    private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<Long, DownloadedJPXData>();
+    private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<>();
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
@@ -89,8 +89,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
             return;
         latest_cache_start = start - start % TimeUtils.DAY_IN_MILLIS - 2 * TimeUtils.DAY_IN_MILLIS;
         latest_cache_end = latest_cache_start + DAYS_IN_CACHE * TimeUtils.DAY_IN_MILLIS;
-        ArrayList<Long> toDownloadStartDates = new ArrayList<Long>();
-        ArrayList<Long> incomingStartDates = new ArrayList<Long>(DAYS_IN_CACHE);
+        ArrayList<Long> toDownloadStartDates = new ArrayList<>();
+        ArrayList<Long> incomingStartDates = new ArrayList<>(DAYS_IN_CACHE);
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             incomingStartDates.add(latest_cache_start + i * TimeUtils.DAY_IN_MILLIS);
         }
@@ -257,7 +257,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
         @Override
         protected ArrayList<JP2ViewCallisto> backgroundWork() {
-            ArrayList<JP2ViewCallisto> jpList = new ArrayList<JP2ViewCallisto>();
+            ArrayList<JP2ViewCallisto> jpList = new ArrayList<>();
             for (long date : datesToDownload) {
                 JP2ViewCallisto v = null;
                 try {

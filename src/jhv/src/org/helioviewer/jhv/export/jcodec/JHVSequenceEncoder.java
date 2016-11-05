@@ -55,10 +55,9 @@ public class JHVSequenceEncoder {
 
         toEncode = Picture.create(w, h, encoder.getSupportedColorSpaces()[0]);
 
-        // Encoder extra data ( SPS, PPS ) to be stored in a special place of
-        // MP4
-        spsList = new ArrayList<ByteBuffer>();
-        ppsList = new ArrayList<ByteBuffer>();
+        // Encoder extra data ( SPS, PPS ) to be stored in a special place of MP4
+        spsList = new ArrayList<>();
+        ppsList = new ArrayList<>();
     }
 
     public void encodeNativeFrame(BufferedImage img) throws IOException {

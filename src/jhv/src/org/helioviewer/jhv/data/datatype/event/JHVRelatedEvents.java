@@ -30,7 +30,7 @@ public class JHVRelatedEvents {
         highlighted = false;
 
         if (!eventsMap.containsKey(eventType)) {
-            eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
+            eventsMap.put(eventType, new TreeMap<>());
         }
         interval.start = event.start;
         interval.end = event.end;
@@ -60,7 +60,7 @@ public class JHVRelatedEvents {
 
     public void merge(JHVRelatedEvents found, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         if (!eventsMap.containsKey(eventType)) {
-            eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
+            eventsMap.put(eventType, new TreeMap<>());
         }
         eventsMap.get(eventType).remove(interval);
         eventsMap.get(eventType).remove(found.interval);
@@ -161,7 +161,7 @@ public class JHVRelatedEvents {
 
     private void resetTime(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         if (!eventsMap.containsKey(eventType)) {
-            eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
+            eventsMap.put(eventType, new TreeMap<>());
         }
         eventsMap.get(eventType).remove(interval);
         interval.start = Long.MAX_VALUE;

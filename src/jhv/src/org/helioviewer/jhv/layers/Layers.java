@@ -23,7 +23,7 @@ import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
 public class Layers {
 
     private static View activeView;
-    private static final ArrayList<View> layers = new ArrayList<View>();
+    private static final ArrayList<View> layers = new ArrayList<>();
 
     public static JHVDate getStartDate() {
         JHVDate earliest = null;
@@ -303,10 +303,10 @@ public class Layers {
         MoviePanel.setFrameSlider(activeFrame);
     }
 
-    private static final HashSet<FrameListener> frameListeners = new HashSet<FrameListener>();
-    private static final HashSet<LayersListener> layerListeners = new HashSet<LayersListener>();
-    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
-    private static final HashSet<TimespanListener> timespanListeners = new HashSet<TimespanListener>();
+    private static final HashSet<FrameListener> frameListeners = new HashSet<>();
+    private static final HashSet<LayersListener> layerListeners = new HashSet<>();
+    private static final HashSet<TimeListener> timeListeners = new HashSet<>();
+    private static final HashSet<TimespanListener> timespanListeners = new HashSet<>();
 
     public static void addFrameListener(FrameListener listener) {
         frameListeners.add(listener);
