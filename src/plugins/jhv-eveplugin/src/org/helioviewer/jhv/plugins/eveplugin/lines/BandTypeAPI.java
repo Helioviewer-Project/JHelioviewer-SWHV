@@ -2,20 +2,17 @@ package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,11 +21,10 @@ public class BandTypeAPI {
 
     private static BandTypeAPI singletonInstance;
 
+    private static final String baseURL = "http://swhv.oma.be/datasets/index.php";
+
     private static final HashMap<String, BandGroup> groups = new HashMap<>();
     private static final ArrayList<BandGroup> orderedGroups = new ArrayList<>();
-
-    private final Properties defaultProperties = new Properties();
-    private final String baseURL;
 
     public static BandTypeAPI getSingletonInstance() {
         if (singletonInstance == null) {
@@ -38,23 +34,24 @@ public class BandTypeAPI {
     }
 
     private BandTypeAPI() {
-        loadSettings();
-        baseURL = defaultProperties.getProperty("plugin.eve.dataseturl");
-        updateDatasets();
-    }
-
-    private void loadSettings() {
-        try (InputStream is = EVEPlugin.class.getResourceAsStream("/settings/eveplugin.properties")) {
-            defaultProperties.load(is);
-        } catch (IOException e) {
-            Log.error("BandTypeAPI.loadSettings() > Could not load settings", e);
+        String jsonString = readJSON();
+        if (jsonString != null) {
+            try {
+                JSONObject jsonmain = new JSONObject(jsonString);
+                JSONArray jsonGroupArray = (JSONArray) jsonmain.get("groups");
+                updateBandGroups(jsonGroupArray);
+                JSONArray jsonObjectArray = (JSONArray) jsonmain.get("objects");
+                updateBandTypes(jsonObjectArray);
+            } catch (JSONException e) {
+                Log.error("JSON parsing error", e);
+            }
         }
     }
 
     private String readJSON() {
         URL url = null;
         try {
-            url = new URL(baseURL + "/datasets/index.php");
+            url = new URL(baseURL);
         } catch (MalformedURLException e) {
             Log.error("Malformed URL", e);
         }
@@ -138,21 +135,6 @@ public class BandTypeAPI {
             }
         } catch (JSONException e) {
             Log.error("JSON parsing error", e);
-        }
-    }
-
-    private void updateDatasets() {
-        String jsonString = readJSON();
-        if (jsonString != null) {
-            try {
-                JSONObject jsonmain = new JSONObject(jsonString);
-                JSONArray jsonGroupArray = (JSONArray) jsonmain.get("groups");
-                updateBandGroups(jsonGroupArray);
-                JSONArray jsonObjectArray = (JSONArray) jsonmain.get("objects");
-                updateBandTypes(jsonObjectArray);
-            } catch (JSONException e) {
-                Log.error("JSON parsing error", e);
-            }
         }
     }
 
