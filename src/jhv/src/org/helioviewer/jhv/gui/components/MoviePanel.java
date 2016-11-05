@@ -339,10 +339,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         c.weighty = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        final JRadioButton loopButton = new JRadioButton("One loop");
+        JRadioButton loopButton = new JRadioButton("One loop");
+        JRadioButton shotButton = new JRadioButton("Screenshot");
+        JRadioButton freeButton = new JRadioButton("Unlimited");
         loopButton.setSelected(true);
-        final JRadioButton shotButton = new JRadioButton("Screenshot");
-        final JRadioButton freeButton = new JRadioButton("Unlimited");
 
         c.gridy = 0;
         c.gridx = 0;
@@ -359,17 +359,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         group.add(shotButton);
         group.add(freeButton);
 
-        ActionListener recordModeListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JRadioButton aButton = (JRadioButton) e.getSource();
-                if (aButton.equals(loopButton))
-                    recordButton.setRecordMode(RecordMode.LOOP);
-                else if (aButton.equals(shotButton))
-                    recordButton.setRecordMode(RecordMode.SHOT);
-                else if (aButton.equals(freeButton))
-                    recordButton.setRecordMode(RecordMode.FREE);
-            }
+        ActionListener recordModeListener = e -> {
+            JRadioButton aButton = (JRadioButton) e.getSource();
+            if (aButton.equals(loopButton))
+                recordButton.setRecordMode(RecordMode.LOOP);
+            else if (aButton.equals(shotButton))
+                recordButton.setRecordMode(RecordMode.SHOT);
+            else if (aButton.equals(freeButton))
+                recordButton.setRecordMode(RecordMode.FREE);
         };
         loopButton.addActionListener(recordModeListener);
         shotButton.addActionListener(recordModeListener);
@@ -379,15 +376,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         c.gridx = 2;
         recordPanel.add(new JLabel("Size", JLabel.RIGHT), c);
 
-        RecordSize[] sizes = { RecordSize.ORIGINAL, RecordSize.H720, RecordSize.H1080 };
-        final JComboBox<RecordSize> recordSizeCombo = new JComboBox<RecordSize>(sizes);
+        JComboBox<RecordSize> recordSizeCombo = new JComboBox<RecordSize>(new RecordSize[] { RecordSize.ORIGINAL, RecordSize.H720, RecordSize.H1080 });
         recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
-        recordSizeCombo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                recordButton.setRecordSize((RecordSize) (recordSizeCombo.getSelectedItem()));
-            }
-        });
+        recordSizeCombo.addActionListener(e -> recordButton.setRecordSize((RecordSize) (recordSizeCombo.getSelectedItem())));
         c.gridx = 3;
         recordPanel.add(recordSizeCombo, c);
 

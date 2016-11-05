@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.swek.renderable;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
@@ -29,12 +27,9 @@ public class SWEKRenderableOptionsPanel extends SmallPanel {
 
         JCheckBox check = new JCheckBox("Icons", icons);
         check.setHorizontalTextPosition(SwingConstants.LEFT);
-        check.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                icons = !icons;
-                Displayer.display();
-            }
+        check.addItemListener(e -> {
+            icons = !icons;
+            Displayer.display();
         });
         add(check, c0);
 

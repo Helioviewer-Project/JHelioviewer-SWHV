@@ -7,8 +7,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -21,8 +19,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
@@ -108,12 +104,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         jsp.getViewport().setBackground(Color.WHITE);
 
         JButton addLayerButton = new JButton("New Layer", IconBank.getIcon(JHVIcon.ADD));
-        addLayerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ObservationDialog.getInstance().showDialog(true, null, observationPanel);
-            }
-        });
+        addLayerButton.addActionListener(e -> ObservationDialog.getInstance().showDialog(true, null, observationPanel));
         addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         addLayerButton.setHorizontalTextPosition(SwingConstants.TRAILING);
         addLayerButton.setBorderPainted(false);
@@ -215,12 +206,9 @@ public class LineDataSelectorTablePanel extends JPanel {
         // grid.setDropMode(DropMode.INSERT_ROWS);
         // grid.setTransferHandler(new TableRowTransferHandler(grid));
 
-        grid.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    setOptionsPanel((LineDataSelectorElement) grid.getValueAt(grid.getSelectedRow(), 0));
-                }
+        grid.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                setOptionsPanel((LineDataSelectorElement) grid.getValueAt(grid.getSelectedRow(), 0));
             }
         });
 

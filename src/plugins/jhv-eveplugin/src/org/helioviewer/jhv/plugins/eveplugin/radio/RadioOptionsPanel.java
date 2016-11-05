@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.eveplugin.radio;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -27,24 +25,16 @@ class RadioOptionsPanel extends SmallPanel {
         c.weighty = 1;
         c.fill = GridBagConstraints.NONE;
 
-        final JComboBox<String> lutBox = new JComboBox<String>(LUT.getStandardList().keySet().toArray(new String[0]));
+        JComboBox<String> lutBox = new JComboBox<String>(LUT.getStandardList().keySet().toArray(new String[0]));
         lutBox.setSelectedItem(selected);
-        lutBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                EVEPlugin.rdm.setLUT(LUT.getStandardList().get(lutBox.getSelectedItem()));
-            }
-        });
+        lutBox.addActionListener(e -> EVEPlugin.rdm.setLUT(LUT.getStandardList().get(lutBox.getSelectedItem())));
 
-        final JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String url = Settings.getSingletonInstance().getProperty("availability.images.url");
-                url += "#IID" + RadioData.CallistoID;
+        JButton availabilityButton = new JButton("Available data");
+        availabilityButton.addActionListener(e -> {
+            String url = Settings.getSingletonInstance().getProperty("availability.images.url");
+            url += "#IID" + RadioData.CallistoID;
 
-                JHVGlobals.openURL(url);
-            }
+            JHVGlobals.openURL(url);
         });
 
         add(lutBox, c);
