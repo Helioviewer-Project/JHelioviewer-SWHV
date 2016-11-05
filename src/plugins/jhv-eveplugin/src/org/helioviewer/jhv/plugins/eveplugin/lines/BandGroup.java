@@ -6,7 +6,7 @@ import java.util.List;
 public class BandGroup {
 
     private String groupLabel;
-    public final List<BandType> bandtypes = new ArrayList<BandType>();
+    public final List<BandType> bandtypes = new ArrayList<>();
 
     public void add(BandType bandtype) {
         bandtypes.add(bandtype);

@@ -23,7 +23,7 @@ public class BandCache {
     private static final int FACTOR_STEP = 2;
     private boolean hasData = false;
 
-    private final HashMap<Long, DataChunk> cacheMap = new HashMap<Long, DataChunk>();
+    private final HashMap<Long, DataChunk> cacheMap = new HashMap<>();
 
     private static long date2key(long date) {
         return date / MILLIS_PER_CHUNK;
@@ -92,8 +92,8 @@ public class BandCache {
             elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
             noelements = (timeAxis.end - timeAxis.start) / (elsz);
         }
-        ArrayList<Integer> tvalues = new ArrayList<Integer>();
-        ArrayList<Integer> tdates = new ArrayList<Integer>();
+        ArrayList<Integer> tvalues = new ArrayList<>();
+        ArrayList<Integer> tdates = new ArrayList<>();
         while (key <= keyEnd) {
             DataChunk cache = cacheMap.get(key);
             key++;
