@@ -50,7 +50,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     private static final Dimension DIALOG_SIZE_MINIMUM = new Dimension(400, 500);
     private static final Dimension DIALOG_SIZE_PREFERRED = new Dimension(400, 500);
 
-    private final JComboBox<String> filterComboBox = new JComboBox<String>(new String[] { "All", "Enabled", "Disabled" });
+    private final JComboBox<String> filterComboBox = new JComboBox<>(new String[]{"All", "Enabled", "Disabled"});
     private final JButton addButton = new JButton("Add plug-in", IconBank.getIcon(JHVIcon.ADD));
     private final JButton downloadButton = new JButton("Download");
 

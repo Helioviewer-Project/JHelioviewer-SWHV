@@ -414,9 +414,9 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private final ArrayList<GridLabel> latLabels = new ArrayList<GridLabel>();
-    private final ArrayList<GridLabel> lonLabels = new ArrayList<GridLabel>();
-    private final ArrayList<GridLabel> radialLabels = new ArrayList<GridLabel>();
+    private final ArrayList<GridLabel> latLabels = new ArrayList<>();
+    private final ArrayList<GridLabel> lonLabels = new ArrayList<>();
+    private final ArrayList<GridLabel> radialLabels = new ArrayList<>();
 
     private void makeRadialLabels() {
         double size = Sun.Radius;

@@ -64,7 +64,7 @@ public class FilterPanelFactory {
     }
 
     public static List<FilterPanel> createFilterPanel(SWEKEventType eventType, FilterDialog filterDialog) {
-        List<FilterPanel> panels = new ArrayList<FilterPanel>();
+        List<FilterPanel> panels = new ArrayList<>();
         for (SWEKParameter parameter : eventType.getParameterList()) {
             if (parameter.getParameterFilter() != null) {
                 String filterType = parameter.getParameterFilter().getFilterType().toLowerCase();
