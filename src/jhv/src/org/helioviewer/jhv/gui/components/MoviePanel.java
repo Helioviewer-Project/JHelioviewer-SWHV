@@ -312,7 +312,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         WheelSupport.installMouseWheelSupport(speedSpinner);
         speedPanel.add(speedSpinner);
 
-        speedUnitComboBox = new JComboBox<SpeedUnit>(new SpeedUnit[] { SpeedUnit.FRAMESPERSECOND /*, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND */});
+        speedUnitComboBox = new JComboBox<>(new SpeedUnit[]{SpeedUnit.FRAMESPERSECOND /*, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND */});
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(this);
         speedPanel.add(speedUnitComboBox);
@@ -323,7 +323,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         modePanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
 
-        animationModeComboBox = new JComboBox<AnimationMode>(new AnimationMode[] { AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING });
+        animationModeComboBox = new JComboBox<>(new AnimationMode[]{AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING});
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
         animationModeComboBox.addActionListener(this);
         modePanel.add(animationModeComboBox);
@@ -376,7 +376,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         c.gridx = 2;
         recordPanel.add(new JLabel("Size", JLabel.RIGHT), c);
 
-        JComboBox<RecordSize> recordSizeCombo = new JComboBox<RecordSize>(new RecordSize[] { RecordSize.ORIGINAL, RecordSize.H720, RecordSize.H1080 });
+        JComboBox<RecordSize> recordSizeCombo = new JComboBox<>(new RecordSize[]{RecordSize.ORIGINAL, RecordSize.H720, RecordSize.H1080});
         recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
         recordSizeCombo.addActionListener(e -> recordButton.setRecordSize((RecordSize) (recordSizeCombo.getSelectedItem())));
         c.gridx = 3;

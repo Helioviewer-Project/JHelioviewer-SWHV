@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class JPIPQuery {
 
     /** HashMap holding the jpip-request-fields */
-    private final HashMap<String, String> fields = new HashMap<String, String>();
+    private final HashMap<String, String> fields = new HashMap<>();
 
     public JPIPQuery() {
         fields.put("len", Integer.toString(JPIPConstants.MIN_REQUEST_LEN));
