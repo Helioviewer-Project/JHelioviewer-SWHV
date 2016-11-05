@@ -15,6 +15,7 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+@SuppressWarnings("serial")
 public class DataSources {
 
     private static final HashMap<String, HashMap<String, String>> serverSettings = new HashMap<String, HashMap<String, String>>() {

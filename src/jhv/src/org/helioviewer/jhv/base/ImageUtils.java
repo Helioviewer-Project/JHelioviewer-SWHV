@@ -27,8 +27,8 @@ public class ImageUtils {
     }
 
     public static void writePNG(BufferedImage image, String name) throws IOException {
-        Iterator iter = ImageIO.getImageWritersByFormatName("png");
-        ImageWriter writer = (ImageWriter) iter.next();
+        Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("png");
+        ImageWriter writer = iter.next();
 
         ImageWriteParam iwp = writer.getDefaultWriteParam();
         // iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);

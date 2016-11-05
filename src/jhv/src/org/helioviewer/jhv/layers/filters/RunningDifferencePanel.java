@@ -45,7 +45,7 @@ public class RunningDifferencePanel implements ChangeListener {
     private final JButton showMetaButton;
     private final JPanel topPanel;
     private final JPanel radPanel;
-    private final JComboBox comboBox;
+    private final JComboBox<String> comboBox;
 
     public RunningDifferencePanel() {
         downloadLayerButton = new JButton(new AbstractAction() {
@@ -97,7 +97,7 @@ public class RunningDifferencePanel implements ChangeListener {
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
 
-        comboBox = new JComboBox(combolist);
+        comboBox = new JComboBox<String>(combolist);
         topPanel = new JPanel(new GridBagLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         radPanel = new JPanel(new FlowLayout());

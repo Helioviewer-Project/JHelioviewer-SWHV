@@ -133,7 +133,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         row_1.add(new JLabel("Preferred server", JLabel.RIGHT));
 
-        final JComboBox combo = new JComboBox(DataSources.getServers());
+        final JComboBox<String> combo = new JComboBox<String>(DataSources.getServers());
         combo.setSelectedItem(DataSources.getPreferredServer());
         combo.addActionListener(new ActionListener() {
             @Override

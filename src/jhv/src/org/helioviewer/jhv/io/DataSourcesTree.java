@@ -17,6 +17,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 
+@SuppressWarnings("serial")
 public class DataSourcesTree extends JTree {
 
     public static class Item {
@@ -119,7 +120,7 @@ public class DataSourcesTree extends JTree {
     }
 
     public void setSelectedItem(String server, int sourceId) {
-        Enumeration e = nodeRoot.depthFirstEnumeration();
+        Enumeration<?> e = nodeRoot.depthFirstEnumeration();
         while (e.hasMoreElements()) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
             if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {

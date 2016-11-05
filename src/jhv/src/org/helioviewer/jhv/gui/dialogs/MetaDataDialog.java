@@ -70,10 +70,11 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
     private final JButton closeButton = new JButton("Close");
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
-    private final DefaultTableModel fitsModel = new LocalTableModel(null, new Object[] { "FITS Key", "value" });
-    private final DefaultListModel jhList = new DefaultListModel();
 
-    private final DefaultListModel basicList = new DefaultListModel();
+    private final DefaultTableModel fitsModel = new LocalTableModel(null, new Object[] { "FITS Key", "value" });
+    private final DefaultListModel<String> jhList = new DefaultListModel<String>();
+    private final DefaultListModel<String> basicList = new DefaultListModel<String>();
+
     private Document xmlDoc = null;
     private boolean metaDataOK;
     private String outFileName;
@@ -88,9 +89,9 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         bottomPanel.add(exportFitsButton);
         bottomPanel.add(closeButton);
 
-        JList basicBox = new JList(basicList);
+        JList<String> basicBox = new JList<String>(basicList);
         basicBox.setCellRenderer(new WrappedTextCellRenderer());
-        JList jhBox = new JList(jhList);
+        JList<String> jhBox = new JList<String>(jhList);
         jhBox.setCellRenderer(new WrappedTextCellRenderer());
 
         ComponentListener cl = new ComponentAdapter() {
@@ -144,7 +145,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         getRootPane().setFocusable(true);
     }
 
-    private static class WrappedTextCellRenderer extends JTextArea implements ListCellRenderer {
+    private static class WrappedTextCellRenderer extends JTextArea implements ListCellRenderer<Object> {
 
         public WrappedTextCellRenderer() {
             setLineWrap(true);
@@ -153,7 +154,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }
 
         @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             if (value != null) {
                 setText(value.toString().trim());
                 int width = list.getWidth();
@@ -173,7 +174,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }
     }
 
-    private void addDataItem(String key, DefaultListModel model) {
+    private void addDataItem(String key, DefaultListModel<String> model) {
         model.addElement(key);
     }
 
