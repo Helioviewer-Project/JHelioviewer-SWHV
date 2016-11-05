@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -31,16 +29,14 @@ class LineOptionPanel extends SmallPanel {
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.NONE;
+
         JButton pickColor = new JButton("Line color");
         pickColor.setMargin(new Insets(0, 0, 0, 0));
         pickColor.setToolTipText("Change the color of the current line");
-        pickColor.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Color newColor = JColorChooser.showDialog(ImageViewerGui.getMainFrame(), "Choose Line Color", band.getDataColor());
-                if (newColor != null) {
-                    band.setDataColor(newColor);
-                }
+        pickColor.addActionListener(e -> {
+            Color newColor = JColorChooser.showDialog(ImageViewerGui.getMainFrame(), "Choose Line Color", band.getDataColor());
+            if (newColor != null) {
+                band.setDataColor(newColor);
             }
         });
         add(pickColor, c);
@@ -49,13 +45,10 @@ class LineOptionPanel extends SmallPanel {
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
         JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
-                url += "#" + band.getBandType().getName();
-                JHVGlobals.openURL(url);
-            }
+        availabilityButton.addActionListener(e -> {
+            String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
+            url += "#" + band.getBandType().getName();
+            JHVGlobals.openURL(url);
         });
         add(availabilityButton, c);
 

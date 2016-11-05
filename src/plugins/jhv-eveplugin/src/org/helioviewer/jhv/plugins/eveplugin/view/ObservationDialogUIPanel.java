@@ -3,8 +3,6 @@ package org.helioviewer.jhv.plugins.eveplugin.view;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -37,19 +35,14 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         JLabel labelData = new JLabel("Dataset", JLabel.RIGHT);
 
         comboBoxGroup = new JComboBox<BandGroup>(BandTypeAPI.getSingletonInstance().getOrderedGroups().toArray(new BandGroup[0]));
+        comboBoxGroup.addActionListener(e -> updateGroupValues());
+
         comboBoxData = new JComboBox<BandType>();
+
         JPanel dataPane = new JPanel();
-
-        comboBoxGroup.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateGroupValues();
-            }
-        });
-
+        dataPane.setLayout(new GridBagLayout());
         JPanel container = new JPanel();
         container.setLayout(new BorderLayout());
-        dataPane.setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
