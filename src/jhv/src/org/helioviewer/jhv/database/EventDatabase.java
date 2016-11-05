@@ -111,13 +111,10 @@ public class EventDatabase {
             pstatement.setString(1, event.getEventType().getEventName());
             pstatement.setString(2, event.getSupplier().getSupplierKey());
 
-            ResultSet rs = pstatement.executeQuery();
-            try {
+            try (ResultSet rs = pstatement.executeQuery()) {
                 if (rs.next()) {
                     typeId = rs.getInt(1);
                 }
-            } finally {
-                rs.close();
             }
         } catch (SQLException e) {
             Log.error("Could not fetch event type " + event.getEventType().getEventName() + event.getSupplier().getSupplierKey() + e.getMessage());
@@ -142,12 +139,9 @@ public class EventDatabase {
             }
             createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );");
 
-            Statement statement = connection.createStatement();
-            try {
+            try (Statement statement = connection.createStatement()) {
                 statement.setQueryTimeout(30);
                 statement.executeUpdate(createtbl.toString());
-            } finally {
-                statement.close();
             }
             connection.commit();
         } catch (SQLException e) {
@@ -170,13 +164,10 @@ public class EventDatabase {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_ID_FROM_UID);
             pstatement.setString(1, uid);
 
-            ResultSet rs = pstatement.executeQuery();
-            try {
+            try (ResultSet rs = pstatement.executeQuery()) {
                 if (rs.next()) {
                     id = rs.getInt(1);
                 }
-            } finally {
-                rs.close();
             }
         } catch (SQLException e) {
             Log.error("Could not fetch id from uid " + e.getMessage());
@@ -306,13 +297,10 @@ public class EventDatabase {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_ID_FROM_UID);
             pstatement.setString(1, uid);
 
-            ResultSet rs = pstatement.executeQuery();
-            try {
+            try (ResultSet rs = pstatement.executeQuery()) {
                 if (rs.next()) {
                     generatedKey = rs.getInt(1);
                 }
-            } finally {
-                rs.close();
             }
         } catch (SQLException e) {
             Log.error("Could not select event with uid " + uid + e.getMessage());
@@ -378,13 +366,10 @@ public class EventDatabase {
                             {
                                 PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_INSERT);
 
-                                ResultSet rs = pstatement.executeQuery();
-                                try {
+                                try (ResultSet rs = pstatement.executeQuery()) {
                                     if (rs.next()) {
                                         generatedKey = rs.getInt(1);
                                     }
-                                } finally {
-                                    rs.close();
                                 }
                             }
                         } else {
@@ -609,15 +594,12 @@ public class EventDatabase {
                         PreparedStatement pstatement = getPreparedStatement(connection, SELECT_DATERANGE);
                         pstatement.setInt(1, typeId);
 
-                        ResultSet rs = pstatement.executeQuery();
-                        try {
+                        try (ResultSet rs = pstatement.executeQuery()) {
                             while (rs.next()) {
                                 long beginDate = Math.min(invalidationDate, rs.getLong(1));
                                 long endDate = Math.min(invalidationDate, rs.getLong(2));
                                 typedCache.adaptRequestCache(beginDate, endDate);
                             }
-                        } finally {
-                            rs.close();
                         }
                     } catch (SQLException e) {
                         Log.error("Could db2daterange " + e.getMessage());
@@ -638,13 +620,10 @@ public class EventDatabase {
                 PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_EVENT);
                 pstatement.setInt(1, typeId);
 
-                ResultSet rs = pstatement.executeQuery();
-                try {
+                try (ResultSet rs = pstatement.executeQuery()) {
                     if (rs.next()) {
                         last_timestamp = rs.getLong(1);
                     }
-                } finally {
-                    rs.close();
                 }
             } catch (SQLException e) {
                 Log.error("Could not fetch id from uid " + e.getMessage());
@@ -718,8 +697,7 @@ public class EventDatabase {
                     pstatement.setLong(2, end);
                     pstatement.setInt(3, typeId);
 
-                    ResultSet rs = pstatement.executeQuery();
-                    try {
+                    try (ResultSet rs = pstatement.executeQuery()) {
                         while (rs.next()) {
                             int id = rs.getInt(1);
                             long start = rs.getLong(2);
@@ -727,8 +705,6 @@ public class EventDatabase {
                             byte[] json = rs.getBytes(4);
                             eventList.add(new JsonEvent(json, type, id, start, end));
                         }
-                    } finally {
-                        rs.close();
                     }
                 } catch (SQLException e) {
                     Log.error("Could not fetch events " + e.getMessage());
@@ -776,13 +752,10 @@ public class EventDatabase {
                     pstatement.setLong(2, end);
                     pstatement.setInt(3, typeId);
 
-                    ResultSet rs = pstatement.executeQuery();
-                    try {
+                    try (ResultSet rs = pstatement.executeQuery()) {
                         while (rs.next()) {
                             assocList.add(new JHVAssociation(rs.getInt(1), rs.getInt(2)));
                         }
-                    } finally {
-                        rs.close();
                     }
                 } catch (SQLException e) {
                     Log.error("Could not fetch associations " + e.getMessage());
@@ -824,8 +797,7 @@ public class EventDatabase {
 
                 StringBuilder idList = new StringBuilder();
 
-                ResultSet rs = pstatement.executeQuery();
-                try {
+                try (ResultSet rs = pstatement.executeQuery()) {
                     boolean next = rs.next();
                     while (next) {
                         idList.append(rs.getInt(1)).append(',').append(rs.getInt(2));
@@ -834,17 +806,20 @@ public class EventDatabase {
                             idList.append(',');
                         }
                     }
-                } finally {
-                    rs.close();
                 }
 
                 String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.name, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList.toString() + ") AND events.id != " + event_id + ";";
-                Statement statement = connection.createStatement();
-                ArrayList<JsonEvent> ret;
-                try {
-                    ret = getEventJSON(statement.executeQuery(query));
-                } finally {
-                    statement.close();
+                ArrayList<JsonEvent> ret = new ArrayList<>();
+                try (Statement statement = connection.createStatement()) {
+                    try (ResultSet rs = statement.executeQuery(query)) {
+                        while (rs.next()) {
+                            int id = rs.getInt(1);
+                            long start = rs.getLong(2);
+                            long end = rs.getLong(3);
+                            byte[] json = rs.getBytes(4);
+                            ret.add(new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end));
+                        }
+                    }
                 }
                 return ret;
             } catch (SQLException e) {
@@ -900,9 +875,7 @@ public class EventDatabase {
             ps.setLong(1, event_id);
 
             JsonEvent je = null;
-
-            ResultSet rs = ps.executeQuery();
-            try {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int id = rs.getInt(1);
                     long start = rs.getLong(2);
@@ -910,8 +883,6 @@ public class EventDatabase {
                     byte[] json = rs.getBytes(4);
                     je = new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end);
                 }
-            } finally {
-                rs.close();
             }
             return je;
         } catch (SQLException e) {
@@ -931,26 +902,6 @@ public class EventDatabase {
         public JsonEvent call() {
             return event2prog(event_id);
         }
-    }
-
-    private static ArrayList<JsonEvent> getEventJSON(ResultSet rs) {
-        ArrayList<JsonEvent> eventList = new ArrayList<>();
-        try {
-            try {
-                while (rs.next()) {
-                    int id = rs.getInt(1);
-                    long start = rs.getLong(2);
-                    long end = rs.getLong(3);
-                    byte[] json = rs.getBytes(4);
-                    eventList.add(new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end));
-                }
-            } finally {
-                rs.close();
-            }
-        } catch (SQLException e) {
-            Log.error("Could not fetch event JSON " + e.getMessage());
-        }
-        return eventList;
     }
 
 }
