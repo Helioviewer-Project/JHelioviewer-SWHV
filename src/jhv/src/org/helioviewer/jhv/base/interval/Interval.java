@@ -55,7 +55,7 @@ public class Interval implements Comparable<Interval> {
     }
 
     public static ArrayList<Interval> splitInterval(Interval interval, int days) {
-        ArrayList<Interval> intervals = new ArrayList<Interval>();
+        ArrayList<Interval> intervals = new ArrayList<>();
         long startDate = interval.start;
 
         while (true) {

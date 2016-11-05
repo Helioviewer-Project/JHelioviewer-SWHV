@@ -54,7 +54,7 @@ public class ParameterTablePanel extends JPanel implements MouseListener, MouseM
         table.setPreferredScrollableViewportSize(new Dimension(table.getWidth(), 150));
         // table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        TableRowSorter<ParameterTableModel> sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
+        TableRowSorter<ParameterTableModel> sorter = new TableRowSorter<>(parameterModel);
         sorter.toggleSortOrder(0);
         table.setRowSorter(sorter);
 

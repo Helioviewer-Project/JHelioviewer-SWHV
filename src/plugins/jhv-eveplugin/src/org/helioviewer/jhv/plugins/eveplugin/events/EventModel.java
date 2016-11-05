@@ -29,7 +29,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     private static EventModel instance;
     private final JHVEventCache eventCache;
-    private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
+    private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
 
     private EventPlotConfiguration eventUnderMouse;
 
@@ -38,7 +38,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     private EventModel() {
         eventCache = JHVEventCache.getSingletonInstance();
-        events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         EVEPlugin.ldsm.addLineData(this);
         fetchData(EVEPlugin.dc.selectedAxis);
     }

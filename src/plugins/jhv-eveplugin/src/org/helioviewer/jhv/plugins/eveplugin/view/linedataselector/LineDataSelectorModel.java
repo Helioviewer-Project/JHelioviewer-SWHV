@@ -14,10 +14,9 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.BandType;
 
 public class LineDataSelectorModel implements TableModel {
 
-    private static final HashSet<LineDataSelectorModelListener> listeners = new HashSet<LineDataSelectorModelListener>();
-    private static final HashSet<TableModelListener> tableListeners = new HashSet<TableModelListener>();
-
-    private static final ArrayList<LineDataSelectorElement> elements = new ArrayList<LineDataSelectorElement>();
+    private static final HashSet<LineDataSelectorModelListener> listeners = new HashSet<>();
+    private static final HashSet<TableModelListener> tableListeners = new HashSet<>();
+    private static final ArrayList<LineDataSelectorElement> elements = new ArrayList<>();
 
     private static final int NUMBEROFCOLUMNS = 5;
 

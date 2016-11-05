@@ -71,7 +71,7 @@ public class GimpGradient {
         if (ln == null || (nSeg = Integer.parseInt(ln)) <= 0)
             throw new Exception("GIMP gradient file parsing error");
 
-        segments = new ArrayList<GimpGradientSegment>(nSeg);
+        segments = new ArrayList<>(nSeg);
         for (int i = 0; i < nSeg; i++) {
             ln = ggr.readLine();
             if (ln == null)
