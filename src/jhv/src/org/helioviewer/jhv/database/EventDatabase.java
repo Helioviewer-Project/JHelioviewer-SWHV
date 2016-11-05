@@ -57,7 +57,7 @@ public class EventDatabase {
 
     }
 
-    private final static ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(10000);
+    private final static ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(10000);
     private final static ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
@@ -78,7 +78,7 @@ public class EventDatabase {
     private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link " + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id " + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id " + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
     private static final String SELECT_EVENT_BY_ID = "SELECT e.id, e.start, e.end, e.data, event_type.name, event_type.supplier FROM events AS e LEFT JOIN event_type ON e.type_id = event_type.id WHERE e.id=?";
 
-    private static final HashMap<Object, PreparedStatement> statements = new HashMap<Object, PreparedStatement>();
+    private static final HashMap<Object, PreparedStatement> statements = new HashMap<>();
 
     private static PreparedStatement getPreparedStatement(Connection connection, String statement) {
         statement = statement.intern();
@@ -239,7 +239,7 @@ public class EventDatabase {
     }
 
     public static Integer dump_association2db(Pair<String, String>[] assocs) {
-        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpAssociation2Db(assocs));
+        FutureTask<Integer> ft = new FutureTask<>(new DumpAssociation2Db(assocs));
         executor.execute(ft);
         try {
             return ft.get();
@@ -329,7 +329,7 @@ public class EventDatabase {
     }
 
     public static int[] dump_event2db(ArrayList<Event2Db> event2db_list, JHVEventType type) {
-        FutureTask<int[]> ft = new FutureTask<int[]>(new DumpEvent2Db(event2db_list, type));
+        FutureTask<int[]> ft = new FutureTask<>(new DumpEvent2Db(event2db_list, type));
         executor.execute(ft);
         try {
             return ft.get();
@@ -430,15 +430,15 @@ public class EventDatabase {
             } catch (SQLException e) {
                 Log.error("Could not insert event " + e.getMessage());
             }
-            ArrayList<Pair<Integer, Integer>> assocs = new ArrayList<Pair<Integer, Integer>>();
+            ArrayList<Pair<Integer, Integer>> assocs = new ArrayList<>();
             for (int id : inserted_ids) {
                 if (id == -1) {
                     Log.error("failed to dump to database");
-                    assocs.add(new Pair<Integer, Integer>(1, 1));
+                    assocs.add(new Pair<>(1, 1));
                 } else {
                     ArrayList<JHVEvent> rels = getOtherRelations(id, type, true, false);
                     for (JHVEvent rel : rels) {
-                        assocs.add(new Pair<Integer, Integer>(id, rel.getUniqueID()));
+                        assocs.add(new Pair<>(id, rel.getUniqueID()));
                     }
                 }
             }
@@ -454,8 +454,8 @@ public class EventDatabase {
     }
 
     private static ArrayList<JHVEvent> createUniqueList(ArrayList<JHVEvent> events) {
-        HashMap<Integer, JHVEvent> ids = new HashMap<Integer, JHVEvent>();
-        ArrayList<JHVEvent> uniqueEvents = new ArrayList<JHVEvent>();
+        HashMap<Integer, JHVEvent> ids = new HashMap<>();
+        ArrayList<JHVEvent> uniqueEvents = new ArrayList<>();
         for (JHVEvent ev : events) {
             if (!ids.containsKey(ev.getUniqueID())) {
                 ids.put(ev.getUniqueID(), ev);
@@ -468,8 +468,8 @@ public class EventDatabase {
     //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
     public static ArrayList<JHVEvent> getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype, boolean full) {
         SWEKEventType evt = jhvEventType.getEventType();
-        ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
-        ArrayList<JsonEvent> jsonEvents = new ArrayList<JsonEvent>();
+        ArrayList<JHVEvent> nEvents = new ArrayList<>();
+        ArrayList<JsonEvent> jsonEvents = new ArrayList<>();
 
         for (SWEKRelatedEvents re : evt.getSWEKRelatedEvents()) {
             if (re.getEvent() == evt) {
@@ -566,12 +566,12 @@ public class EventDatabase {
     }
 
     public static ArrayList<Interval> db2daterange(JHVEventType type) {
-        FutureTask<ArrayList<Interval>> ft = new FutureTask<ArrayList<Interval>>(new Db2DateRange(type));
+        FutureTask<ArrayList<Interval>> ft = new FutureTask<>(new Db2DateRange(type));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            return new ArrayList<Interval>();
+            return new ArrayList<>();
         }
     }
 
@@ -587,7 +587,7 @@ public class EventDatabase {
         public ArrayList<Interval> call() {
             Connection connection = ConnectionThread.getConnection();
             if (connection == null) {
-                return new ArrayList<Interval>();
+                return new ArrayList<>();
             }
 
             HashMap<JHVEventType, RequestCache> dCache = ConnectionThread.downloadedCache;
@@ -626,7 +626,7 @@ public class EventDatabase {
             }
 
             /* for usage in other thread return full copy! */
-            return new ArrayList<Interval>(typedCache.getAllRequestIntervals());
+            return new ArrayList<>(typedCache.getAllRequestIntervals());
         }
     }
 
@@ -654,13 +654,13 @@ public class EventDatabase {
     }
 
     public static ArrayList<JsonEvent> events2Program(long start, long end, JHVEventType type, List<SWEKParam> params) {
-        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<ArrayList<JsonEvent>>(new Events2Program(start, end, type, params));
+        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<>(new Events2Program(start, end, type, params));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
             Log.error(e.getMessage());
-            return new ArrayList<JsonEvent>();
+            return new ArrayList<>();
         }
     }
 
@@ -697,7 +697,7 @@ public class EventDatabase {
         @Override
         public ArrayList<JsonEvent> call() {
             Connection connection = ConnectionThread.getConnection();
-            ArrayList<JsonEvent> eventList = new ArrayList<JsonEvent>();
+            ArrayList<JsonEvent> eventList = new ArrayList<>();
             if (connection == null) {
                 return eventList;
             }
@@ -740,12 +740,12 @@ public class EventDatabase {
     }
 
     public static ArrayList<JHVAssociation> associations2Program(long start, long end, JHVEventType type) {
-        FutureTask<ArrayList<JHVAssociation>> ft = new FutureTask<ArrayList<JHVAssociation>>(new Associations2Program(start, end, type));
+        FutureTask<ArrayList<JHVAssociation>> ft = new FutureTask<>(new Associations2Program(start, end, type));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            return new ArrayList<JHVAssociation>();
+            return new ArrayList<>();
         }
     }
 
@@ -763,7 +763,7 @@ public class EventDatabase {
         @Override
         public ArrayList<JHVAssociation> call() {
             Connection connection = ConnectionThread.getConnection();
-            ArrayList<JHVAssociation> assocList = new ArrayList<JHVAssociation>();
+            ArrayList<JHVAssociation> assocList = new ArrayList<>();
             if (connection == null) {
                 return assocList;
             }
@@ -794,19 +794,19 @@ public class EventDatabase {
     }
 
     public static ArrayList<JsonEvent> relations2Program(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
-        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<ArrayList<JsonEvent>>(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
+        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<>(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            return new ArrayList<JsonEvent>();
+            return new ArrayList<>();
         }
     }
 
     private static ArrayList<JsonEvent> rel2prog(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
         Connection connection = ConnectionThread.getConnection();
         if (connection == null) {
-            return new ArrayList<JsonEvent>();
+            return new ArrayList<>();
         }
 
         int type_left_id = getEventTypeId(connection, type_left);
@@ -849,10 +849,10 @@ public class EventDatabase {
                 return ret;
             } catch (SQLException e) {
                 Log.error("Could not fetch associations " + e.getMessage());
-                return new ArrayList<JsonEvent>();
+                return new ArrayList<>();
             }
         }
-        return new ArrayList<JsonEvent>();
+        return new ArrayList<>();
     }
 
     private static class Relations2Program implements Callable<ArrayList<JsonEvent>> {
@@ -878,9 +878,9 @@ public class EventDatabase {
     }
 
     public static ArrayList<JsonEvent> event2Program(int event_id) {
-        FutureTask<JsonEvent> ft = new FutureTask<JsonEvent>(new Event2Program(event_id));
+        FutureTask<JsonEvent> ft = new FutureTask<>(new Event2Program(event_id));
         executor.execute(ft);
-        ArrayList<JsonEvent> arr = new ArrayList<JsonEvent>();
+        ArrayList<JsonEvent> arr = new ArrayList<>();
         try {
             arr.add(ft.get());
         } catch (InterruptedException | ExecutionException e) {
@@ -934,7 +934,7 @@ public class EventDatabase {
     }
 
     private static ArrayList<JsonEvent> getEventJSON(ResultSet rs) {
-        ArrayList<JsonEvent> eventList = new ArrayList<JsonEvent>();
+        ArrayList<JsonEvent> eventList = new ArrayList<>();
         try {
             try {
                 while (rs.next()) {
