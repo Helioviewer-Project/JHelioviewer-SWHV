@@ -49,7 +49,7 @@ public class UIGlobals {
         }
         openHandCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 
-        HashMap<TextAttribute, Object> map = new HashMap<TextAttribute, Object>();
+        HashMap<TextAttribute, Object> map = new HashMap<>();
         map.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
         map.put(TextAttribute.FAMILY, defaultFont);
 

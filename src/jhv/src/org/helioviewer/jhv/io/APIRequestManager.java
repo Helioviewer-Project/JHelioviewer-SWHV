@@ -119,7 +119,7 @@ public class APIRequestManager {
     }
 
     private static class AllocateJP2View implements Callable<JP2View> {
-        private final AtomicReference<JP2Image> refJP2Image = new AtomicReference<JP2Image>();
+        private final AtomicReference<JP2Image> refJP2Image = new AtomicReference<>();
 
         public AllocateJP2View(JP2Image jp2Image) {
             refJP2Image.set(jp2Image);
