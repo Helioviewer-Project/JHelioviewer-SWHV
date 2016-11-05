@@ -104,11 +104,8 @@ public class DownloadStream {
             // Write post data if necessary
             if (output != null) {
                 connection.setDoOutput(true);
-                OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
-                try {
+                try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
                     out.write(output);
-                } finally {
-                    out.close();
                 }
             }
             try {
@@ -144,11 +141,8 @@ public class DownloadStream {
             // Write post data if necessary
             if (output != null) {
                 connection.setDoOutput(true);
-                OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
-                try {
+                try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
                     out.write(output);
-                } finally {
-                    out.close();
                 }
             }
             // Okay just normal
