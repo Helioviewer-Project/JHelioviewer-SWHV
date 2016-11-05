@@ -11,8 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.AbstractList;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -29,7 +29,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 @SuppressWarnings("serial")
 public class JHVCarringtonPicker extends JPanel implements FocusListener, ActionListener, JHVCalendarListener {
 
-    private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
+    private final List<JHVCalendarListener> listeners = new LinkedList<>();
 
     private final JButton crPopupButton;
     private Popup crPopup = null;
@@ -188,13 +188,13 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     private class JHVCarrington extends JPanel implements ActionListener {
 
-        private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
+        private final List<JHVCalendarListener> listeners = new LinkedList<>();
         private final JComboBox<Integer> crCombo;
 
         public JHVCarrington() {
             setLayout(new BorderLayout());
 
-            crCombo = new JComboBox<Integer>(createCRList());
+            crCombo = new JComboBox<>(createCRList());
             double cr = Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL;
             crCombo.setSelectedIndex((int) Math.round(cr));
 

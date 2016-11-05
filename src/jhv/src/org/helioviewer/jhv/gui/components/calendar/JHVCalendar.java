@@ -13,9 +13,9 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
-import java.util.AbstractList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -59,7 +59,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private DisplayMode displayMode;
     private CalendarViewController calendarViewController = null;
-    private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
+    private final List<JHVCalendarListener> listeners = new LinkedList<>();
 
     private final NavigationPanel navigationPanel = new NavigationPanel();
     private final SelectionPanel selectionPanel = new SelectionPanel();

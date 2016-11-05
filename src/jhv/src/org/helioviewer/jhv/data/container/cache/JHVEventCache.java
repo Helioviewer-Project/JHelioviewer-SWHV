@@ -23,7 +23,8 @@ import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 
 public class JHVEventCache {
-    private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<JHVEventHandler>();
+
+    private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<>();
 
     private JHVEventCacheRequestHandler incomingRequestManager;
 
@@ -74,20 +75,13 @@ public class JHVEventCache {
 
     }
 
-    private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
-
-    private final Map<Integer, JHVRelatedEvents> relEvents = new HashMap<Integer, JHVRelatedEvents>();
-
-    private final Set<JHVEventType> activeEventTypes;
-
-    private final Map<JHVEventType, RequestCache> downloadedCache;
-
-    private final ArrayList<JHVAssociation> assocs = new ArrayList<JHVAssociation>();
+    private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
+    private final Map<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
+    private final Set<JHVEventType> activeEventTypes = new HashSet<>();
+    private final Map<JHVEventType, RequestCache> downloadedCache = new HashMap<>();
+    private final ArrayList<JHVAssociation> assocs = new ArrayList<>();
 
     private JHVEventCache() {
-        events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
-        activeEventTypes = new HashSet<JHVEventType>();
-        downloadedCache = new HashMap<JHVEventType, RequestCache>();
     }
 
     public static JHVEventCache getSingletonInstance() {
@@ -224,8 +218,8 @@ public class JHVEventCache {
     }
 
     public JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
-        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
-        Map<JHVEventType, List<Interval>> missingIntervals = new HashMap<JHVEventType, List<Interval>>();
+        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<>();
+        Map<JHVEventType, List<Interval>> missingIntervals = new HashMap<>();
 
         for (JHVEventType evt : activeEventTypes) {
             SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
