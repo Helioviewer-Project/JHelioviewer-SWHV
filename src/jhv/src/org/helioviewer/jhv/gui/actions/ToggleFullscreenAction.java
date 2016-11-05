@@ -43,14 +43,11 @@ public class ToggleFullscreenAction extends AbstractAction {
         final int w = ImageViewerGui.getGLComponent().getWidth();
         final int h = ImageViewerGui.getGLComponent().getHeight();
 
-        new Thread() {
-            @Override
-            public void run() {
-                window.setFullscreen(!full);
-                if (full) // it may have ignored size requests in full screen
-                    window.setSize(w, h);
-            }
-        }.start();
+        new Thread(() -> {
+            window.setFullscreen(!full);
+            if (full) // it may have ignored size requests in full screen
+                window.setSize(w, h);
+        }).start();
     }
 
 }
