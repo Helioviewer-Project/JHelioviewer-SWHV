@@ -19,10 +19,10 @@ import com.jogamp.opengl.GL2;
 
 public class RenderableContainer implements TableModel, Reorderable {
 
-    private final ArrayList<Renderable> renderables = new ArrayList<Renderable>();
-    private final ArrayList<Renderable> newRenderables = new ArrayList<Renderable>();
-    private final ArrayList<Renderable> removedRenderables = new ArrayList<Renderable>();
-    private final ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
+    private final ArrayList<Renderable> renderables = new ArrayList<>();
+    private final ArrayList<Renderable> newRenderables = new ArrayList<>();
+    private final ArrayList<Renderable> removedRenderables = new ArrayList<>();
+    private final ArrayList<TableModelListener> listeners = new ArrayList<>();
 
     public void addBeforeRenderable(Renderable renderable) {
         int lastImagelayerIndex = -1;

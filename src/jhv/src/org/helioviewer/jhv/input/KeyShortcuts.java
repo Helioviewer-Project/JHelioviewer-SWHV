@@ -9,7 +9,7 @@ import javax.swing.KeyStroke;
 
 public class KeyShortcuts {
 
-    private static final HashMap<KeyStroke, Action> actionMap = new HashMap<KeyStroke, Action>();
+    private static final HashMap<KeyStroke, Action> actionMap = new HashMap<>();
 
     public static void registerKey(KeyStroke key, Action act) {
         actionMap.put(key, act);

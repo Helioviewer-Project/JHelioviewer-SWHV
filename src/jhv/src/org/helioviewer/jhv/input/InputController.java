@@ -105,8 +105,8 @@ public class InputController implements MouseListener, KeyListener {
             listener.keyReleased(e);
     }
 
-    private final HashSet<MouseListener> mouseListeners = new HashSet<MouseListener>();
-    private final HashSet<KeyListener> keyListeners = new HashSet<KeyListener>();
+    private final HashSet<MouseListener> mouseListeners = new HashSet<>();
+    private final HashSet<KeyListener> keyListeners = new HashSet<>();
 
     public void addPlugin(Object plugin) {
         if (plugin instanceof MouseListener)

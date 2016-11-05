@@ -289,7 +289,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         private static final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
 
         private final JSpinner spinnerCadence = new JSpinner();
-        private final JComboBox<String> comboUnit = new JComboBox<String>(timeStepUnitStrings);
+        private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
         public CadencePanel() {
             setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));

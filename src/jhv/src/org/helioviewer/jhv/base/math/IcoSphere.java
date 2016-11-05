@@ -20,8 +20,8 @@ public class IcoSphere {
             v[2] /= length;
         }
         int[][] icosahedronFaceList = new int[][] { { 3, 7, 1 }, { 4, 7, 3 }, { 6, 7, 4 }, { 8, 7, 6 }, { 7, 8, 1 }, { 9, 4, 3 }, { 2, 9, 3 }, { 2, 3, 1 }, { 11, 2, 1 }, { 10, 2, 11 }, { 10, 9, 2 }, { 9, 5, 4 }, { 6, 4, 5 }, { 0, 6, 5 }, { 0, 11, 8 }, { 11, 1, 8 }, { 10, 0, 5 }, { 10, 5, 9 }, { 0, 8, 6 }, { 0, 10, 11 }, };
-        ArrayList<Float> vertices = new ArrayList<Float>();
-        ArrayList<Integer> faceIndices = new ArrayList<Integer>();
+        ArrayList<Float> vertices = new ArrayList<>();
+        ArrayList<Integer> faceIndices = new ArrayList<>();
         for (float[] v : icosahedronVertexList) {
             vertices.add(v[0]);
             vertices.add(v[2]);
@@ -70,7 +70,7 @@ public class IcoSphere {
         }
         indexBuffer.flip();
 
-        return new Pair<FloatBuffer, IntBuffer>(positionBuffer, indexBuffer);
+        return new Pair<>(positionBuffer, indexBuffer);
     }
 
     private static void subdivide(int vx, int vy, int vz, ArrayList<Float> vertexList, ArrayList<Integer> faceList, int level) {
