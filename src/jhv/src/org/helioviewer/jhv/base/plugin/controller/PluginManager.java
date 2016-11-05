@@ -29,7 +29,7 @@ public class PluginManager {
     private static final PluginManager singletonInstance = new PluginManager();
 
     private final PluginSettings pluginSettings = PluginSettings.getSingletonInstance();
-    private final Map<Plugin, PluginContainer> plugins = new HashMap<Plugin, PluginContainer>();
+    private final Map<Plugin, PluginContainer> plugins = new HashMap<>();
 
     private PluginManager() {
     }
@@ -73,7 +73,7 @@ public class PluginManager {
      * @return list with file names where the plug-in could not be loaded.
      */
     private LinkedList<String> searchAndLoadPlugins(File file, Set<String> deactivedPlugins) {
-        LinkedList<String> result = new LinkedList<String>();
+        LinkedList<String> result = new LinkedList<>();
         File[] files = file.listFiles();
         if (files == null) {
             return result;
@@ -116,7 +116,7 @@ public class PluginManager {
      * @return list with all plug-ins which have the passed active status.
      */
     public AbstractList<PluginContainer> getPlugins(boolean activated) {
-        AbstractList<PluginContainer> result = new LinkedList<PluginContainer>();
+        AbstractList<PluginContainer> result = new LinkedList<>();
         for (PluginContainer container : plugins.values()) {
             if (container.isActive() == activated) {
                 result.add(container);

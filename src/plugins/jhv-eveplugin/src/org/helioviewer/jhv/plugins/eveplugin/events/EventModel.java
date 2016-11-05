@@ -93,7 +93,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         if (nrEventTypes > 0) {
             EventPlotConfiguration shouldRedraw = null;
 
-            ArrayList<Long> endDates = new ArrayList<Long>();
+            ArrayList<Long> endDates = new ArrayList<>();
             int nrLines = 0;
 
             for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> entry : events.entrySet()) {
@@ -247,7 +247,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int x, int y, int w, int h, Point mousePosition) {
             if (mousePosition != null) {
                 long ts = EVEPlugin.dc.selectedAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
-                ArrayList<String> txts = new ArrayList<String>();
+                ArrayList<String> txts = new ArrayList<>();
                 JHVEventParameter[] params = event.getClosestTo(ts).getSimpleVisibleEventParameters();
                 int width = 1;
                 for (JHVEventParameter p : params) {

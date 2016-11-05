@@ -27,7 +27,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     // private final List<TreeModelListener> listeners = new HashSet<TreeModelListener>();
 
     /** Holds the EventPanelModelListeners */
-    private final HashSet<EventTypePanelModelListener> panelModelListeners = new HashSet<EventTypePanelModelListener>();
+    private final HashSet<EventTypePanelModelListener> panelModelListeners = new HashSet<>();
 
     /** Local instance of the tree model */
     private final SWEKTreeModel treeModelInstance;

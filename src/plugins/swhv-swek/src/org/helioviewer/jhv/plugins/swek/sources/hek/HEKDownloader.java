@@ -41,7 +41,7 @@ public class HEKDownloader extends SWEKDownloader {
     @Override
     protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
         JSONArray results = eventJSON.getJSONArray("result");
-        ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<EventDatabase.Event2Db>();
+        ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
 
         for (int i = 0; i < results.length(); i++) {
             JSONObject result = results.getJSONObject(i);
@@ -57,7 +57,7 @@ public class HEKDownloader extends SWEKDownloader {
             long start;
             long end;
             long archiv;
-            ArrayList<JHVDatabaseParam> paramList = new ArrayList<JHVDatabaseParam>();
+            ArrayList<JHVDatabaseParam> paramList = new ArrayList<>();
             try {
                 start = TimeUtils.utcDateFormat.parse(result.getString("event_starttime")).getTime();
                 end = TimeUtils.utcDateFormat.parse(result.getString("event_endtime")).getTime();
@@ -102,7 +102,7 @@ public class HEKDownloader extends SWEKDownloader {
         Pair<String, String>[] assocs = new Pair[len];
         for (int i = 0; i < len; i++) {
             JSONObject asobj = associations.getJSONObject(i);
-            assocs[i] = new Pair<String, String>(asobj.getString("first_ivorn"), asobj.getString("second_ivorn"));
+            assocs[i] = new Pair<>(asobj.getString("first_ivorn"), asobj.getString("second_ivorn"));
         }
         return EventDatabase.dump_association2db(assocs) != -1;
     }

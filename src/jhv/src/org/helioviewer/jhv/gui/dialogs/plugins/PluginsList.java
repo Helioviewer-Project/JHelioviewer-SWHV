@@ -16,8 +16,8 @@ class PluginsList extends JScrollPane {
     private static final Color selectionBackgroundColor = new JList<JPanel>().getSelectionBackground();
     private static final Color selectionForegroundColor = new JList<JPanel>().getSelectionForeground();
 
-    private final LinkedList<PluginsListEntryChangeListener> listeners = new LinkedList<PluginsListEntryChangeListener>();
-    private final HashMap<String, AbstractPluginsListEntry> entryMap = new HashMap<String, AbstractPluginsListEntry>();
+    private final LinkedList<PluginsListEntryChangeListener> listeners = new LinkedList<>();
+    private final HashMap<String, AbstractPluginsListEntry> entryMap = new HashMap<>();
 
     private final JPanel contentPane = new JPanel();
 
