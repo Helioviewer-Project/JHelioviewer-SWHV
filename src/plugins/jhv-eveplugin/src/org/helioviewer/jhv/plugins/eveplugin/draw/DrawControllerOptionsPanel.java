@@ -21,7 +21,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
 @SuppressWarnings("serial")
 class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
 
-    private final JComboBox zoomCombo;
+    private final JComboBox<ZoomComboboxItem> zoomCombo;
     final JToggleButton lockButton;
 
     private enum ZOOM {
@@ -45,7 +45,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
             new ZoomComboboxItem(ZOOM.Hour, 6),
             new ZoomComboboxItem(ZOOM.Hour, 1)
         };
-        zoomCombo = new JComboBox(items);
+        zoomCombo = new JComboBox<ZoomComboboxItem>(items);
         zoomCombo.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         zoomCombo.addActionListener(this);
 

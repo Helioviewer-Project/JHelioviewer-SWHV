@@ -27,7 +27,7 @@ class RadioOptionsPanel extends SmallPanel {
         c.weighty = 1;
         c.fill = GridBagConstraints.NONE;
 
-        final JComboBox lutBox = new JComboBox(LUT.getStandardList().keySet().toArray());
+        final JComboBox<String> lutBox = new JComboBox<String>(LUT.getStandardList().keySet().toArray(new String[0]));
         lutBox.setSelectedItem(selected);
         lutBox.addActionListener(new ActionListener() {
             @Override

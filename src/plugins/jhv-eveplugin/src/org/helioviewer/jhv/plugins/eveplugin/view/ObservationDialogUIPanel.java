@@ -30,15 +30,15 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 @SuppressWarnings("serial")
 public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements LineDataSelectorModelListener {
 
-    private final JComboBox comboBoxGroup;
-    private final JComboBox comboBoxData;
+    private final JComboBox<BandGroup> comboBoxGroup;
+    private final JComboBox<BandType> comboBoxData;
 
     public ObservationDialogUIPanel() {
         JLabel labelGroup = new JLabel("Group", JLabel.RIGHT);
         JLabel labelData = new JLabel("Dataset", JLabel.RIGHT);
 
-        comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
-        comboBoxData = new JComboBox(new DefaultComboBoxModel());
+        comboBoxGroup = new JComboBox<BandGroup>(BandTypeAPI.getSingletonInstance().getOrderedGroups().toArray(new BandGroup[0]));
+        comboBoxData = new JComboBox<BandType>();
         JPanel dataPane = new JPanel();
 
         comboBoxGroup.addActionListener(new ActionListener() {
@@ -76,24 +76,13 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         container.add(dataPane, BorderLayout.CENTER);
         this.add(container);
 
-        initGroups();
         EVEPlugin.ldsm.addLineDataSelectorModelListener(this);
     }
 
-    private void initGroups() {
-        DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxGroup.getModel();
-        model.removeAllElements();
-
-        List<BandGroup> groups = BandTypeAPI.getSingletonInstance().getOrderedGroups();
-        for (BandGroup group : groups) {
-            model.addElement(group);
-        }
-    }
-
     private void updateGroupValues() {
-        final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxData.getModel();
-        final BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
-        final BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
+        DefaultComboBoxModel<BandType> model = (DefaultComboBoxModel<BandType>) comboBoxData.getModel();
+        BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
+        BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
 
         model.removeAllElements();
 
