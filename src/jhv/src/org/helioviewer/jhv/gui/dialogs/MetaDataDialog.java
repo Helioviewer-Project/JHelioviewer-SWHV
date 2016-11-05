@@ -278,15 +278,19 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         String nodeName = node.getNodeName();
         String nodeValue = getElementValue(node);
 
-        if (nodeName.equals("fits")) {
-            lastNodeSeen = nodeName;
-        } else if (nodeName.equals("helioviewer")) {
-            lastNodeSeen = nodeName;
-            addDataItem("-------------------------------", jhList);
-            addDataItem("      Helioviewer Header", jhList);
-            addDataItem("-------------------------------", jhList);
-        } else {
-            addDataItem(nodeName, nodeValue, lastNodeSeen.equals("fits"));
+        switch (nodeName) {
+            case "fits":
+                lastNodeSeen = nodeName;
+                break;
+            case "helioviewer":
+                lastNodeSeen = nodeName;
+                addDataItem("-------------------------------", jhList);
+                addDataItem("      Helioviewer Header", jhList);
+                addDataItem("-------------------------------", jhList);
+                break;
+            default:
+                addDataItem(nodeName, nodeValue, lastNodeSeen.equals("fits"));
+                break;
         }
 
         // write the child nodes recursively

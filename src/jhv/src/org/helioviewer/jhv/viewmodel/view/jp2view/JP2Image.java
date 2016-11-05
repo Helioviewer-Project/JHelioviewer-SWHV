@@ -118,16 +118,20 @@ public class JP2Image {
         try {
             ImageCacheStatusInitial initialCacheStatus = new ImageCacheStatusInitial();
             String scheme = uri.getScheme().toLowerCase();
-            if (scheme.equals("jpip")) {
-                cacheReader = new JHV_Kdu_cache();
-                cacheRender = new Kdu_cache();
-                cacheRender.Attach_to(cacheReader);
-                // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
-                initRemote(cacheReader, initialCacheStatus);
-            } else if (scheme.equals("file")) {
-                // nothing
-            } else
-                throw new JHV_KduException(scheme + " scheme not supported!");
+            switch (scheme) {
+                case "jpip":
+                    cacheReader = new JHV_Kdu_cache();
+                    cacheRender = new Kdu_cache();
+                    cacheRender.Attach_to(cacheReader);
+                    // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
+                    initRemote(cacheReader, initialCacheStatus);
+                    break;
+                case "file":
+                    // nothing
+                    break;
+                default:
+                    throw new JHV_KduException(scheme + " scheme not supported!");
+            }
 
             kduReader = new KakaduEngine(cacheReader, uri, null);
 

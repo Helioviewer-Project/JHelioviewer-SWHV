@@ -208,12 +208,14 @@ public class SWEKConfigurationManager {
 
     private SWEKSource parseSource(JSONObject jsonObject) throws JSONException {
         String name = parseSourceName(jsonObject);
-        if (name.equals("HEK"))
-            return new SWEKSource(name, parseGeneralParameters(jsonObject), new HEKParser(), new HEKDownloader());
-        else if (name.equals("COMESEP"))
-            return new SWEKSource(name, parseGeneralParameters(jsonObject), new ComesepParser(), new ComesepDownloader());
-        else
-            return null;
+        switch (name) {
+            case "HEK":
+                return new SWEKSource(name, parseGeneralParameters(jsonObject), new HEKParser(), new HEKDownloader());
+            case "COMESEP":
+                return new SWEKSource(name, parseGeneralParameters(jsonObject), new ComesepParser(), new ComesepDownloader());
+            default:
+                return null;
+        }
     }
 
     private String parseSourceName(JSONObject jsonObject) throws JSONException {
