@@ -4,7 +4,7 @@ import java.util.HashSet;
 
 public class ObservationDialogDateModel {
 
-    private final HashSet<ObservationDialogDateModelListener> listeners;
+    private final HashSet<ObservationDialogDateModelListener> listeners = new HashSet<>();
 
     private static ObservationDialogDateModel instance;
 
@@ -15,7 +15,6 @@ public class ObservationDialogDateModel {
     private boolean endByUser;
 
     private ObservationDialogDateModel() {
-        listeners = new HashSet<ObservationDialogDateModelListener>();
     }
 
     public static ObservationDialogDateModel getInstance() {

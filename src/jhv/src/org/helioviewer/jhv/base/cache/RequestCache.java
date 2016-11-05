@@ -8,10 +8,10 @@ import org.helioviewer.jhv.base.interval.Interval;
 
 public class RequestCache {
 
-    private ArrayList<Interval> cache = new ArrayList<Interval>();
+    private ArrayList<Interval> cache = new ArrayList<>();
 
     public List<Interval> adaptRequestCache(long startDate, long endDate) {
-        ArrayList<Interval> missingIntervals = new ArrayList<Interval>();
+        ArrayList<Interval> missingIntervals = new ArrayList<>();
         Interval interval = new Interval(startDate, endDate);
 
         if (cache.isEmpty()) {
@@ -45,7 +45,7 @@ public class RequestCache {
     }
 
     private static ArrayList<Interval> getInvertedCache(ArrayList<Interval> toInvert) {
-        ArrayList<Interval> newCache = new ArrayList<Interval>();
+        ArrayList<Interval> newCache = new ArrayList<>();
         int len = toInvert.size();
         if (len == 0) {
             newCache.add(new Interval(Long.MIN_VALUE, Long.MAX_VALUE));
@@ -81,7 +81,7 @@ public class RequestCache {
 
         Collections.sort(intervals);
 
-        ArrayList<Interval> result = new ArrayList<Interval>();
+        ArrayList<Interval> result = new ArrayList<>();
         Interval prev = intervals.get(0);
         for (int i = 1; i < intervals.size(); i++) {
             Interval curr = intervals.get(i);

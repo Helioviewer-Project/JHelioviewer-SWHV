@@ -22,7 +22,7 @@ public class SpaceObject {
     }
 
     private static void createObjectList() {
-        objectList = new ArrayList<Object>();
+        objectList = new ArrayList<>();
 
         objectList.add(new SpaceObject("Mercury", "Mercury", 2439700));
         objectList.add(new SpaceObject("Venus", "Venus", 6051800));
