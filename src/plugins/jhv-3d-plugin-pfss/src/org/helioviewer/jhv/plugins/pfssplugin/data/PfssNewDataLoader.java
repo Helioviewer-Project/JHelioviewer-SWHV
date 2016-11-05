@@ -49,7 +49,7 @@ public class PfssNewDataLoader implements Runnable {
 
         do {
             Integer cacheKey = startYear * 10000 + startMonth;
-            ArrayList<Pair<String, Long>> urls = null;
+            ArrayList<Pair<String, Long>> urls;
 
             synchronized (parsedCache) {
                 urls = parsedCache.get(cacheKey);

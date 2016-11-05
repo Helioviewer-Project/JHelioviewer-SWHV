@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import org.helioviewer.jhv.base.logging.Log;
@@ -101,7 +101,7 @@ public class FileUtils {
 
     public static String read(InputStream strm) throws IOException {
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(strm, "UTF-8"))) {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(strm, StandardCharsets.UTF_8))) {
             String str;
             while ((str = in.readLine()) != null) {
                 sb.append(str).append('\n');
@@ -127,7 +127,7 @@ public class FileUtils {
     }
 
     public static String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is, "UTF-8");
+        Scanner s = new Scanner(is, StandardCharsets.UTF_8.name());
         s.useDelimiter("\\A");
         String next = s.hasNext() ? s.next() : "";
         s.close();
@@ -179,13 +179,7 @@ public class FileUtils {
             hex[index++] = HEX_CHAR_TABLE[v >>> 4];
             hex[index++] = HEX_CHAR_TABLE[v & 0xF];
         }
-
-        try {
-            return new String(hex, "ASCII");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new String(hex, StandardCharsets.US_ASCII);
     }
 
     public static boolean deleteDir(File dir) {
