@@ -26,7 +26,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
     private static final int DIVIDER_SIZE = 3;
 
-    private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();
+    private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<>();
 
     private final JSplitPane splitPane;
     private final JPanel pluginContainer;

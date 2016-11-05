@@ -34,10 +34,10 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         JLabel labelGroup = new JLabel("Group", JLabel.RIGHT);
         JLabel labelData = new JLabel("Dataset", JLabel.RIGHT);
 
-        comboBoxGroup = new JComboBox<BandGroup>(BandTypeAPI.getSingletonInstance().getOrderedGroups().toArray(new BandGroup[0]));
+        comboBoxGroup = new JComboBox<>(BandTypeAPI.getSingletonInstance().getOrderedGroups().toArray(new BandGroup[0]));
         comboBoxGroup.addActionListener(e -> updateGroupValues());
 
-        comboBoxData = new JComboBox<BandType>();
+        comboBoxData = new JComboBox<>();
 
         JPanel dataPane = new JPanel();
         dataPane.setLayout(new GridBagLayout());

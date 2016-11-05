@@ -94,7 +94,7 @@ public class RunningDifferencePanel implements ChangeListener {
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
 
-        comboBox = new JComboBox<String>(combolist);
+        comboBox = new JComboBox<>(combolist);
         topPanel = new JPanel(new GridBagLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         radPanel = new JPanel(new FlowLayout());

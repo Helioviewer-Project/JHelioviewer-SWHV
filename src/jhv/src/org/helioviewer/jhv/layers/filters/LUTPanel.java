@@ -38,10 +38,10 @@ public class LUTPanel implements ActionListener, FilterDetails {
 
     public LUTPanel() {
         // duplicate
-        lutMap = new TreeMap<String, LUT>(JHVGlobals.alphanumComparator);
+        lutMap = new TreeMap<>(JHVGlobals.alphanumComparator);
         lutMap.putAll(LUT.getStandardList());
 
-        combobox = new JComboBox<String>(lutMap.keySet().toArray(new String [0]));
+        combobox = new JComboBox<>(lutMap.keySet().toArray(new String[0]));
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
         combobox.addActionListener(this);
