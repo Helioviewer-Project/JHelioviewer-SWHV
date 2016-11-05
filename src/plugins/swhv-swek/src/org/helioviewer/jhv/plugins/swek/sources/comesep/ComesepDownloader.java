@@ -13,7 +13,6 @@ import org.helioviewer.jhv.data.datatype.event.SWEKDownloader;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
