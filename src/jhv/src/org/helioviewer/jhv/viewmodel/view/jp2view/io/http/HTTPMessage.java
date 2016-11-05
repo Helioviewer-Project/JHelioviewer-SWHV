@@ -18,7 +18,7 @@ import java.util.Set;
 public abstract class HTTPMessage {
 
     /** A hash table with the headers of the message */
-    private final HashMap<String, String> headers = new HashMap<String, String>();
+    private final HashMap<String, String> headers = new HashMap<>();
 
     /** Returns <code>true</code> if the message is a request. */
     public abstract boolean isRequest();

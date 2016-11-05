@@ -20,7 +20,7 @@ public class JHVLoader {
 
     public static void copyKDULibs() throws IOException {
         String pathlib = "";
-        ArrayList<String> kduLibs = new ArrayList<String>();
+        ArrayList<String> kduLibs = new ArrayList<>();
 
         if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-64")) {
             kduLibs.add("libkdu_v77R.so");

@@ -35,7 +35,7 @@ public class InteractionAnnotate extends Interaction {
         }
     }
 
-    private final ArrayList<Annotateable> annotateables = new ArrayList<Annotateable>();
+    private final ArrayList<Annotateable> annotateables = new ArrayList<>();
     private Annotateable newAnnotateable = null;
     private AnnotationMode mode = AnnotationMode.RECTANGLE;
     private int activeIndex = -1;

@@ -14,10 +14,10 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPResponse;
 public class JPIPResponse extends HTTPResponse {
 
     /** The status... could be EOR_WINDOW_DONE or EOR_IMAGE_DONE */
-    private long status;
+    private long status = -1;
 
     /** A list of the data segments. */
-    private final LinkedList<JPIPDataSegment> jpipDataList;
+    private final LinkedList<JPIPDataSegment> jpipDataList = new LinkedList<>();
     private long size = 0;
 
     /**
@@ -31,9 +31,6 @@ public class JPIPResponse extends HTTPResponse {
 
         for (String key : res.getHeaders())
             this.setHeader(key, res.getHeader(key));
-
-        status = -1;
-        jpipDataList = new LinkedList<JPIPDataSegment>();
     }
 
     /**

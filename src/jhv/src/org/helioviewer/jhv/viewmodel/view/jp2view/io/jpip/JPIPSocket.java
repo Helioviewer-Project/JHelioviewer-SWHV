@@ -78,7 +78,7 @@ public class JPIPSocket extends HTTPSocket {
         HashMap<String, String> map = null;
         String cnew = res.getHeader("JPIP-cnew");
         if (cnew != null) {
-            map = new HashMap<String, String>();
+            map = new HashMap<>();
             String[] parts = cnew.split(",");
             for (String part : parts)
                 for (String cnewParam : cnewParams)

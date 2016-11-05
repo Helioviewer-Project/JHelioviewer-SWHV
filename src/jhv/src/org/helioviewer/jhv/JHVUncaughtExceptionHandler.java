@@ -58,8 +58,8 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
      * @param msg
      *            Object to display in the main area of the dialog.
      */
-    private static void showErrorDialog(final String title, final Object msg) {
-        ArrayList<Object> objects = new ArrayList<Object>();
+    private static void showErrorDialog(String title, Object msg) {
+        ArrayList<Object> objects = new ArrayList<>();
 
         JLabel fatal = new JLabel("Fatal error detected.");
         objects.add(fatal);
