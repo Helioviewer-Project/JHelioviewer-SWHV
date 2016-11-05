@@ -5,9 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -144,31 +141,25 @@ public class RunningDifferencePanel implements ChangeListener {
         c.gridx = 0;
         c.gridwidth = 3;
 
-        comboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (comboBox.getSelectedItem().equals(combolist[0])) {
-                    setDifferenceModetoJP2View(false, false, false);
-                } else if (comboBox.getSelectedItem().equals(combolist[1])) {
-                    setDifferenceModetoJP2View(true, true, false);
-                } else if (comboBox.getSelectedItem().equals(combolist[2])) {
-                    setDifferenceModetoJP2View(true, true, true);
-                }
-                Displayer.display();
-                topPanel.revalidate();
-                topPanel.repaint();
+        comboBox.addActionListener(e -> {
+            if (comboBox.getSelectedItem().equals(combolist[0])) {
+                setDifferenceModetoJP2View(false, false, false);
+            } else if (comboBox.getSelectedItem().equals(combolist[1])) {
+                setDifferenceModetoJP2View(true, true, false);
+            } else if (comboBox.getSelectedItem().equals(combolist[2])) {
+                setDifferenceModetoJP2View(true, true, true);
             }
+            Displayer.display();
+            topPanel.revalidate();
+            topPanel.repaint();
         });
-        diffRot.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (comboBox.getSelectedItem().equals(combolist[2])) {
-                    ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceNoRot(!diffRot.isSelected());
-                } else {
-                    ((ImageLayerOptions) getComponent().getParent()).getGLImage().setRunDiffNoRot(!diffRot.isSelected());
-                }
-                Displayer.display();
+        diffRot.addItemListener(e -> {
+            if (comboBox.getSelectedItem().equals(combolist[2])) {
+                ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceNoRot(!diffRot.isSelected());
+            } else {
+                ((ImageLayerOptions) getComponent().getParent()).getGLImage().setRunDiffNoRot(!diffRot.isSelected());
             }
+            Displayer.display();
         });
 
         radPanel.setLayout(new GridBagLayout());

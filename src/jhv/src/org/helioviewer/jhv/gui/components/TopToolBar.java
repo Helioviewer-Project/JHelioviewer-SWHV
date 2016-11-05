@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.components;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -36,7 +35,6 @@ import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 
 /**
  * Toolbar containing the most common actions.
- *
  * The toolbar provides a context menu to change its appearance.
  */
 @SuppressWarnings("serial")
@@ -367,42 +365,27 @@ public class TopToolBar extends JToolBar implements MouseListener {
      * @param e
      *            MouseEvent that triggered the event
      */
-    private void maybeShowPopup(MouseEvent e) {
-        if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3) {
+    private void maybeShowPopup(MouseEvent me) {
+        if (me.isPopupTrigger() || me.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu popUpMenu = new JPopupMenu();
             ButtonGroup group = new ButtonGroup();
 
             JRadioButtonMenuItem iconAndText = new JRadioButtonMenuItem("Icon and Text", displayMode == DisplayMode.ICONANDTEXT);
-            iconAndText.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    setDisplayMode(DisplayMode.ICONANDTEXT);
-                }
-            });
+            iconAndText.addActionListener(e -> setDisplayMode(DisplayMode.ICONANDTEXT));
             group.add(iconAndText);
             popUpMenu.add(iconAndText);
 
             JRadioButtonMenuItem iconOnly = new JRadioButtonMenuItem("Icon Only", displayMode == DisplayMode.ICONONLY);
-            iconOnly.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    setDisplayMode(DisplayMode.ICONONLY);
-                }
-            });
+            iconOnly.addActionListener(e -> setDisplayMode(DisplayMode.ICONONLY));
             group.add(iconOnly);
             popUpMenu.add(iconOnly);
 
             JRadioButtonMenuItem textOnly = new JRadioButtonMenuItem("Text Only", displayMode == DisplayMode.TEXTONLY);
-            textOnly.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    setDisplayMode(DisplayMode.TEXTONLY);
-                }
-            });
+            textOnly.addActionListener(e -> setDisplayMode(DisplayMode.TEXTONLY));
             group.add(textOnly);
             popUpMenu.add(textOnly);
 
-            popUpMenu.show(e.getComponent(), e.getX(), e.getY());
+            popUpMenu.show(me.getComponent(), me.getX(), me.getY());
         }
     }
 

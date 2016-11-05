@@ -2,8 +2,6 @@ package org.helioviewer.jhv.data.guielements;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -185,14 +183,11 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
 
     private JPanel createEventPanel(final JHVRelatedEvents rEvents, final JHVEvent event) {
         JButton detailsButton = new JButton("Details");
-        detailsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvents, event);
-                dialog.validate();
-                dialog.pack();
-                dialog.setVisible(true);
-            }
+        detailsButton.addActionListener(e -> {
+            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvents, event);
+            dialog.validate();
+            dialog.pack();
+            dialog.setVisible(true);
         });
 
         JPanel eventAndButtonPanel = new JPanel(new GridBagLayout());
