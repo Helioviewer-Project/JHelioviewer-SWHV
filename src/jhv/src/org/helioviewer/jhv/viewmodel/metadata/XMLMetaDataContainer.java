@@ -2,6 +2,7 @@ package org.helioviewer.jhv.viewmodel.metadata;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,7 +25,7 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         }
 
         try {
-            InputStream in = new ByteArrayInputStream(xml.trim().replace("&", "&amp;").getBytes("UTF-8"));
+            InputStream in = new ByteArrayInputStream(xml.trim().replace("&", "&amp;").getBytes(StandardCharsets.UTF_8));
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             nodeList = builder.parse(in).getElementsByTagName("meta");
         } catch (Exception e) {
