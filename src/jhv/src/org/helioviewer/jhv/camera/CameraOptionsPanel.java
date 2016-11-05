@@ -17,8 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
@@ -122,18 +120,16 @@ public class CameraOptionsPanel extends SmallPanel implements PositionLoadFire {
         fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
         fovPanel.add(new JLabel("FOV angle"));
 
-        final JSpinner fovSpinner = new JSpinner();
+        JSpinner fovSpinner = new JSpinner();
         fovSpinner.setModel(new SpinnerNumberModel(Double.valueOf(FOVAngleDefault), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
+        fovSpinner.addChangeListener(e -> {
+            FOVAngle = (Double) fovSpinner.getValue() * Math.PI / 180.;
+            Displayer.display();
+        });
+
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
         f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", min, max));
 
-        fovSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                FOVAngle = (Double) fovSpinner.getValue() * Math.PI / 180.;
-                Displayer.display();
-            }
-        });
         WheelSupport.installMouseWheelSupport(fovSpinner);
         fovPanel.add(fovSpinner);
 

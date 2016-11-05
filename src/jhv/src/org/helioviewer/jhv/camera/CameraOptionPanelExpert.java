@@ -5,12 +5,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -26,8 +23,6 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.base.JSeparatorComboBox;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -90,17 +85,15 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         addSyncButtons(c);
         buttonPanel.setVisible(false);
-        exactDateCheckBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                boolean selected = !exactDateCheckBox.isSelected();
-                addBeginDatePanel.setVisible(selected);
-                addEndDatePanel.setVisible(selected);
-                buttonPanel.setVisible(selected);
-                if (selected) {
-                    setBeginTime(false);
-                    setEndTime(true);
-                }
+
+        exactDateCheckBox.addActionListener(e -> {
+            boolean selected = !exactDateCheckBox.isSelected();
+            addBeginDatePanel.setVisible(selected);
+            addEndDatePanel.setVisible(selected);
+            buttonPanel.setVisible(selected);
+            if (selected) {
+                setBeginTime(false);
+                setEndTime(true);
             }
         });
 
@@ -110,30 +103,16 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     private void addSyncButtons(GridBagConstraints c) {
         JButton synchronizeWithLayersButton = new JButton("Sync");
         synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
-        synchronizeWithLayersButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                syncWithLayer();
-            }
-        });
+        synchronizeWithLayersButton.addActionListener(e -> syncWithLayer());
 
         JButton synchronizeWithNowButton = new JButton("Now");
         synchronizeWithNowButton.setToolTipText("Fill twice current time");
-        synchronizeWithNowButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                syncBothLayerNow();
-            }
-        });
+        synchronizeWithNowButton.addActionListener(e -> syncBothLayerNow());
 
         JButton synchronizeWithCurrentButton = new JButton("Current");
         synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
-        synchronizeWithCurrentButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                syncWithLayerCurrentTime();
-            }
-        });
+        synchronizeWithCurrentButton.addActionListener(e -> syncWithLayerCurrentTime());
+
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(0, 3));
 
@@ -168,14 +147,11 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     private void addObjectCombobox(GridBagConstraints c) {
         JSeparatorComboBox objectCombobox = new JSeparatorComboBox(SpaceObject.getObjectList().toArray());
         objectCombobox.setSelectedItem(SpaceObject.earth);
-        objectCombobox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent event) {
-                if (event.getStateChange() == ItemEvent.SELECTED) {
-                    String object = ((SpaceObject) event.getItem()).getUrlName();
-                    positionLoad.setObserver(object, true);
-                    // Displayer.render();
-                }
+        objectCombobox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                String object = ((SpaceObject) e.getItem()).getUrlName();
+                positionLoad.setObserver(object, true);
+                // Displayer.render();
             }
         });
         add(objectCombobox, c);
@@ -204,18 +180,10 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         JPanel beginDatetimePanel = new JPanel();
         beginDatetimePanel.setLayout(new GridLayout(0, 2));
-        beginDatePicker.addJHVCalendarListener(new JHVCalendarListener() {
-            @Override
-            public void actionPerformed(JHVCalendarEvent e) {
-                setBeginTime(true);
-            }
-        });
-        beginTimePicker.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setBeginTime(true);
-            }
-        });
+
+        beginDatePicker.addJHVCalendarListener(e -> setBeginTime(true));
+        beginTimePicker.addActionListener(e -> setBeginTime(true));
+
         addBeginDatePanel.add(beginDatePicker);
         addBeginDatePanel.add(beginTimePicker);
         addBeginDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
@@ -310,18 +278,10 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         JPanel endDatetimePanel = new JPanel();
         endDatetimePanel.setLayout(new GridLayout(0, 2));
-        endDatePicker.addJHVCalendarListener(new JHVCalendarListener() {
-            @Override
-            public void actionPerformed(JHVCalendarEvent e) {
-                setEndTime(true);
-            }
-        });
-        endTimePicker.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setEndTime(true);
-            }
-        });
+
+        endDatePicker.addJHVCalendarListener(e -> setEndTime(true));
+        endTimePicker.addActionListener(e -> setEndTime(true));
+
         addEndDatePanel.add(endDatePicker);
         addEndDatePanel.add(endTimePicker);
         addEndDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
