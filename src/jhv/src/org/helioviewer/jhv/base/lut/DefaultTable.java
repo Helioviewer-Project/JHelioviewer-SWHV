@@ -14,12 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-/**
- * Singleton class which gives for a given layer the default layer back
- * 
- * @author Helge Dietert
- * 
- */
 public class DefaultTable {
 
     private static final DefaultTable instance = new DefaultTable();
@@ -29,18 +23,10 @@ public class DefaultTable {
     }
 
     private DefaultTable() {
-        try {
-            InputStream is = FileUtils.getResourceInputStream("/settings/colors.js");
-            try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                colorRules = new JSONArray(new JSONTokener(in));
-            } finally {
-                is.close();
-            }
-        } catch (IOException e) {
-            Log.warn("Error reading the configuration for the default color tables", e);
-            Message.warn("Color Tables", "Error reading the configuration for the default color tables: " + e.getMessage() + "\n" + "There will be no default color tables applied.");
-        } catch (JSONException e) {
+        try (InputStream is = FileUtils.getResourceInputStream("/settings/colors.js")) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            colorRules = new JSONArray(new JSONTokener(in));
+        } catch (IOException | JSONException e) {
             Log.warn("Error reading the configuration for the default color tables", e);
             Message.warn("Color Tables", "Error reading the configuration for the default color tables: " + e.getMessage() + "\n" + "There will be no default color tables applied.");
         }

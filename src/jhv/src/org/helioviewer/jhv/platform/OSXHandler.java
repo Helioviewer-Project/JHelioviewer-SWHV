@@ -14,9 +14,7 @@ public class OSXHandler {
             Class[] cArg = new Class[0];
             Method m = AboutDialog.class.getMethod("dialogShow", cArg);
             OSXAdapter.setAboutHandler("", m);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
+        } catch (NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
         }
     }
@@ -26,9 +24,7 @@ public class OSXHandler {
             Class[] cArg = new Class[0];
             Method m = PreferencesDialog.class.getMethod("dialogShow", cArg);
             OSXAdapter.setPreferencesHandler("", m);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
+        } catch (NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
         }
     }
@@ -38,9 +34,7 @@ public class OSXHandler {
             Class[] cArg = new Class[0];
             Method m = ExitHooks.class.getMethod("exitProgram", cArg);
             OSXAdapter.setQuitHandler("", m);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
+        } catch (NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
         }
     }

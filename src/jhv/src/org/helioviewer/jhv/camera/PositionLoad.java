@@ -86,11 +86,7 @@ public class PositionLoad {
                 Log.debug("Unknown host, network down?", e);
             } catch (IOException e) {
                 report = FAILEDSTATE + ": server error";
-            } catch (JSONException e) {
-                report = FAILEDSTATE + ": JSON parse error";
-            } catch (ParseException e) {
-                report = FAILEDSTATE + ": JSON parse error";
-            } catch (NumberFormatException e) {
+            } catch (JSONException | ParseException | NumberFormatException e) {
                 report = FAILEDSTATE + ": JSON parse error";
             }
 

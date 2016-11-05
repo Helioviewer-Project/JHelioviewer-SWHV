@@ -194,9 +194,7 @@ public class DownloadController {
                 }
 
                 return new Pair<float[], long[]>(values, dates);
-            } catch (JSONException e) {
-                Log.error("Error Parsing the EVE Response ", e);
-            } catch (IOException e) {
+            } catch (JSONException | IOException e) {
                 Log.error("Error Parsing the EVE Response ", e);
             }
             return null;

@@ -83,9 +83,7 @@ public class HEKDownloader extends SWEKDownloader {
                         }
                     }
                 }
-            } catch (JSONException e) {
-                return false;
-            } catch (ParseException e) {
+            } catch (JSONException | ParseException e) {
                 return false;
             }
 

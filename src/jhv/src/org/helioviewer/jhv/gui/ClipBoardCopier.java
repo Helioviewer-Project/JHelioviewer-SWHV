@@ -59,9 +59,7 @@ public final class ClipBoardCopier implements ClipboardOwner {
         if (hasTransferableText) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            } catch (UnsupportedFlavorException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (UnsupportedFlavorException | IOException e) {
                 e.printStackTrace();
             }
         }
