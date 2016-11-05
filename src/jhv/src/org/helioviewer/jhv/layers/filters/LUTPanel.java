@@ -31,7 +31,7 @@ public class LUTPanel implements ActionListener, FilterDetails {
 
     private final Map<String, LUT> lutMap;
 
-    private final JComboBox combobox;
+    private final JComboBox<String> combobox;
     private final JPanel buttonPanel;
     private final JToggleButton invertButton;
     private final JToggleButton enhanceButton;
@@ -41,7 +41,7 @@ public class LUTPanel implements ActionListener, FilterDetails {
         lutMap = new TreeMap<String, LUT>(JHVGlobals.alphanumComparator);
         lutMap.putAll(LUT.getStandardList());
 
-        combobox = new JComboBox(lutMap.keySet().toArray());
+        combobox = new JComboBox<String>(lutMap.keySet().toArray(new String [0]));
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
         combobox.addActionListener(this);

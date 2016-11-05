@@ -6,13 +6,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
+import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-import javax.swing.UIManager;
 
 @SuppressWarnings("serial")
 public class CollapsiblePaneButton extends JToggleButton {
 
-    private Color color;
+    private final static Color color = new JPanel().getBackground();
     private final Color bright;
     private final Color dark;
 
@@ -21,9 +21,6 @@ public class CollapsiblePaneButton extends JToggleButton {
         setContentAreaFilled(false);
         setFocusPainted(false); // used for demonstration
 
-        color = UIManager.getColor("Panel.background");
-        if (color == null) // satisfy coverity
-            color = Color.DARK_GRAY;
         bright = brighter(color, 0.85);
         dark = darker(color, 0.9);
     }

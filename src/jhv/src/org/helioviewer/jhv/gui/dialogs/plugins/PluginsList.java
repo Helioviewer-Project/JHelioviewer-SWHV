@@ -10,13 +10,13 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-@SuppressWarnings({"rawtypes","serial"})
+@SuppressWarnings("serial")
 class PluginsList extends JScrollPane {
 
     private final LinkedList<PluginsListEntryChangeListener> listeners = new LinkedList<PluginsListEntryChangeListener>();
 
-    private final Color selectionBackgroundColor = new JList().getSelectionBackground();
-    private final Color selectionForegroundColor = new JList().getSelectionForeground();
+    private static final Color selectionBackgroundColor = new JList<JPanel>().getSelectionBackground();
+    private static final Color selectionForegroundColor = new JList<JPanel>().getSelectionForeground();
     private final HashMap<String, AbstractPluginsListEntry> entryMap = new HashMap<String, AbstractPluginsListEntry>();
 
     private final JPanel contentPane = new JPanel();

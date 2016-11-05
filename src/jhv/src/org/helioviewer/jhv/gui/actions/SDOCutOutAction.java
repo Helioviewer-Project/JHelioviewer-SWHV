@@ -14,6 +14,7 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 
+@SuppressWarnings("serial")
 public class SDOCutOutAction extends AbstractAction {
 
     private static final String baseURL = "http://www.lmsal.com/get_aia_data/?";

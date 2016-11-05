@@ -26,6 +26,7 @@ import org.helioviewer.jhv.base.astronomy.Carrington;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
+@SuppressWarnings("serial")
 public class JHVCarringtonPicker extends JPanel implements FocusListener, ActionListener, JHVCalendarListener {
 
     private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
@@ -185,16 +186,15 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         }
     }
 
-    @SuppressWarnings("serial")
     private class JHVCarrington extends JPanel implements ActionListener {
 
         private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
-        private final JComboBox crCombo;
+        private final JComboBox<Integer> crCombo;
 
         public JHVCarrington() {
             setLayout(new BorderLayout());
 
-            crCombo = new JComboBox(createCRList());
+            crCombo = new JComboBox<Integer>(createCRList());
             double cr = Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL;
             crCombo.setSelectedIndex((int) Math.round(cr));
 

@@ -29,7 +29,7 @@ public class RenderableGridOptionsPanel extends SmallPanel {
 
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
-    private JComboBox gridChoiceBox;
+    private JComboBox<RenderableGrid.GridChoiceType> gridChoiceBox;
     private final RenderableGrid grid;
 
     public RenderableGridOptionsPanel(RenderableGrid renderableGrid) {
@@ -123,7 +123,7 @@ public class RenderableGridOptionsPanel extends SmallPanel {
     }
 
     private void createGridChoiceBox() {
-        gridChoiceBox = new JComboBox(RenderableGrid.GridChoiceType.values());
+        gridChoiceBox = new JComboBox<RenderableGrid.GridChoiceType>(RenderableGrid.GridChoiceType.values());
         gridChoiceBox.setToolTipText("Choose grid options");
         gridChoiceBox.setSelectedItem(RenderableGrid.GridChoiceType.VIEWPOINT);
         gridChoiceBox.addActionListener(new ActionListener() {

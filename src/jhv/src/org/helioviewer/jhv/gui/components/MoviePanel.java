@@ -183,8 +183,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     private static JButton advancedButton;
     private static JSpinner speedSpinner;
-    private static JComboBox speedUnitComboBox;
-    private static JComboBox animationModeComboBox;
+    private static JComboBox<SpeedUnit> speedUnitComboBox;
+    private static JComboBox<AnimationMode> animationModeComboBox;
 
     private static SmallPanel speedPanel;
     private static SmallPanel modePanel;
@@ -312,8 +312,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         WheelSupport.installMouseWheelSupport(speedSpinner);
         speedPanel.add(speedSpinner);
 
-        SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND /*, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND */};
-        speedUnitComboBox = new JComboBox(units);
+        speedUnitComboBox = new JComboBox<SpeedUnit>(new SpeedUnit[] { SpeedUnit.FRAMESPERSECOND /*, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND */});
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(this);
         speedPanel.add(speedUnitComboBox);
@@ -324,8 +323,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         modePanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
 
-        AnimationMode[] modi = { AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING };
-        animationModeComboBox = new JComboBox(modi);
+        animationModeComboBox = new JComboBox<AnimationMode>(new AnimationMode[] { AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING });
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
         animationModeComboBox.addActionListener(this);
         modePanel.add(animationModeComboBox);
@@ -382,7 +380,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         recordPanel.add(new JLabel("Size", JLabel.RIGHT), c);
 
         RecordSize[] sizes = { RecordSize.ORIGINAL, RecordSize.H720, RecordSize.H1080 };
-        final JComboBox recordSizeCombo = new JComboBox(sizes);
+        final JComboBox<RecordSize> recordSizeCombo = new JComboBox<RecordSize>(sizes);
         recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
         recordSizeCombo.addActionListener(new ActionListener() {
             @Override
