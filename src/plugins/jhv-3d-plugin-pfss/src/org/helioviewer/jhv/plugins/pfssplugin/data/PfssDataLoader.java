@@ -71,15 +71,8 @@ public class PfssDataLoader implements Runnable {
                 }
             }
 
-            byte[] gzipFitsFile = buffer.toByteArray();
-            final PfssData pfssData = new PfssData(gzipFitsFile, time);
-
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    PfssPlugin.getPfsscache().addData(pfssData);
-                }
-            });
+            PfssData pfssData = new PfssData(buffer.toByteArray(), time);
+            EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

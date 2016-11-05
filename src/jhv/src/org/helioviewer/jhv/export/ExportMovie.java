@@ -214,12 +214,7 @@ public class ExportMovie implements FrameListener {
             try {
                 if (keep) {
                     movieExporter.close();
-                    EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            JHVGlobals.displayNotification(movieExporter.getPath());
-                        }
-                    });
+                    EventQueue.invokeLater(() -> JHVGlobals.displayNotification(movieExporter.getPath()));
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -25,11 +25,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
 import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -105,7 +102,7 @@ public class RenderableContainerPanel extends JPanel {
 
     }
 
-    public RenderableContainerPanel(final RenderableContainer renderableContainer) {
+    public RenderableContainerPanel(RenderableContainer renderableContainer) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -117,14 +114,11 @@ public class RenderableContainerPanel extends JPanel {
 
         grid = new RenderableContainerTable(renderableContainer);
 
-        renderableContainer.addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                if (e.getType() == TableModelEvent.INSERT) {
-                    int idx = e.getFirstRow();
-                    if (grid.getValueAt(idx, 0) instanceof ImageLayer)
-                        grid.getSelectionModel().setSelectionInterval(idx, idx);
-                }
+        renderableContainer.addTableModelListener(e -> {
+            if (e.getType() == TableModelEvent.INSERT) {
+                int idx = e.getFirstRow();
+                if (grid.getValueAt(idx, 0) instanceof ImageLayer)
+                    grid.getSelectionModel().setSelectionInterval(idx, idx);
             }
         });
 
@@ -152,23 +146,17 @@ public class RenderableContainerPanel extends JPanel {
         syncSpanButton.setBorderPainted(false);
         syncSpanButton.setFocusPainted(false);
         syncSpanButton.setContentAreaFilled(false);
-        syncSpanButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Layers.syncLayersSpan();
-                renderableContainer.fireListeners();
-            }
+        syncSpanButton.addActionListener(e -> {
+            Layers.syncLayersSpan();
+            renderableContainer.fireListeners();
         });
 
-        final JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
+        JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
-        multiview.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Displayer.multiview = multiview.isSelected();
-                Layers.arrangeMultiView(Displayer.multiview);
-            }
+        multiview.addActionListener(e -> {
+            Displayer.multiview = multiview.isSelected();
+            Layers.arrangeMultiView(Displayer.multiview);
         });
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
@@ -204,12 +192,9 @@ public class RenderableContainerPanel extends JPanel {
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
-        grid.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    setOptionsPanel((Renderable) grid.getValueAt(grid.getSelectedRow(), 0));
-                }
+        grid.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                setOptionsPanel((Renderable) grid.getValueAt(grid.getSelectedRow(), 0));
             }
         });
 

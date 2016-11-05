@@ -130,12 +130,7 @@ class J2KReader implements Runnable {
         if (stop)
             return;
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                parentViewRef.signalRenderFromReader(parentImageRef, factor);
-            }
-        });
+        EventQueue.invokeLater(() -> parentViewRef.signalRenderFromReader(parentImageRef, factor));
     }
 
     void signalReader(JP2ImageParameter params) {

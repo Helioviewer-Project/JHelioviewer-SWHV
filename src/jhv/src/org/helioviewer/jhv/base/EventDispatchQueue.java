@@ -12,16 +12,14 @@ public class EventDispatchQueue {
         final AtomicReference<E> ret = new AtomicReference<E>();
         final AtomicReference<Exception> except = new AtomicReference<Exception>();
 
-        EventQueue.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ret.set(r.call());
-                } catch (Exception e) {
-                    // pass exception to original thread
-                    except.set(e);
-                }
-            }});
+        EventQueue.invokeAndWait(() -> {
+            try {
+                ret.set(r.call());
+            } catch (Exception e) {
+                // pass exception to original thread
+                except.set(e);
+            }
+        });
 
         Exception e = except.get();
         if (e != null) // there was an exception on EDT thread, rethrow it
