@@ -253,8 +253,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
 
                     SWEKEventInformationDialog.this.repack();
                     SWEKEventInformationDialog.this.repaint();
-                } catch (InterruptedException ignore) {
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException ignore) {
                 }
 
             }

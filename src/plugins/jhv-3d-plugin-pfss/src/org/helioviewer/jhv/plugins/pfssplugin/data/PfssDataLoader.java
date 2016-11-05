@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
@@ -73,8 +72,6 @@ public class PfssDataLoader implements Runnable {
 
             PfssData pfssData = new PfssData(buffer.toByteArray(), time);
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

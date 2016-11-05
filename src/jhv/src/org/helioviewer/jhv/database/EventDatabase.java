@@ -243,10 +243,7 @@ public class EventDatabase {
         executor.execute(ft);
         try {
             return ft.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return -1;
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return -1;
         }
@@ -336,13 +333,9 @@ public class EventDatabase {
         executor.execute(ft);
         try {
             return ft.get();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return get_id_init_list(event2db_list.size());
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return get_id_init_list(event2db_list.size());
-
         }
     }
 
@@ -577,9 +570,7 @@ public class EventDatabase {
         executor.execute(ft);
         try {
             return ft.get();
-        } catch (InterruptedException e) {
-            return new ArrayList<Interval>();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             return new ArrayList<Interval>();
         }
     }
@@ -667,10 +658,7 @@ public class EventDatabase {
         executor.execute(ft);
         try {
             return ft.get();
-        } catch (InterruptedException e) {
-            Log.error(e.getMessage());
-            return new ArrayList<JsonEvent>();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Log.error(e.getMessage());
             return new ArrayList<JsonEvent>();
         }
@@ -756,9 +744,7 @@ public class EventDatabase {
         executor.execute(ft);
         try {
             return ft.get();
-        } catch (InterruptedException e) {
-            return new ArrayList<JHVAssociation>();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             return new ArrayList<JHVAssociation>();
         }
     }
@@ -812,9 +798,7 @@ public class EventDatabase {
         executor.execute(ft);
         try {
             return ft.get();
-        } catch (InterruptedException e) {
-            return new ArrayList<JsonEvent>();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             return new ArrayList<JsonEvent>();
         }
     }
@@ -899,9 +883,7 @@ public class EventDatabase {
         ArrayList<JsonEvent> arr = new ArrayList<JsonEvent>();
         try {
             arr.add(ft.get());
-        } catch (InterruptedException e) {
-            Log.error(e.getMessage());
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Log.error(e.getMessage());
         }
         return arr;

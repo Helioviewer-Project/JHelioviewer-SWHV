@@ -117,20 +117,15 @@ public class DataSources {
         }
         saveServerSettings(preferredServer);
 
-        try {
-            InputStream is = FileUtils.getResourceInputStream("/data/sources_v1.0.json");
-            try {
-                JSONObject rawSchema = new JSONObject(new JSONTokener(is));
-                Schema schema = SchemaLoader.load(rawSchema);
+        try (InputStream is = FileUtils.getResourceInputStream("/data/sources_v1.0.json")) {
+            JSONObject rawSchema = new JSONObject(new JSONTokener(is));
+            Schema schema = SchemaLoader.load(rawSchema);
 
-                DataSourcesTask loadTask;
-                HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
-                for (String serverName : datasourceNode.keySet()) {
-                    loadTask = new DataSourcesTask(serverName, schema);
-                    JHVGlobals.getExecutorService().execute(loadTask);
-                }
-            } finally {
-                is.close();
+            DataSourcesTask loadTask;
+            HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
+            for (String serverName : datasourceNode.keySet()) {
+                loadTask = new DataSourcesTask(serverName, schema);
+                JHVGlobals.getExecutorService().execute(loadTask);
             }
         } catch (IOException e) {
             Log.error("Could not load the JSON schema: ", e);

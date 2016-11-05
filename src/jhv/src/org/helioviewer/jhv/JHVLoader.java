@@ -11,15 +11,10 @@ import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 public class JHVLoader {
 
     public static void loadBundledPlugin(String name) throws IOException {
-        InputStream is = JavaHelioViewer.class.getResourceAsStream("/plugins/" + name);
-        try {
-            String path = JHVDirectory.PLUGINS.getPath() + name;
-            File f = new File(path);
-
+        try (InputStream is = JavaHelioViewer.class.getResourceAsStream("/plugins/" + name)) {
+            File f = new File(JHVDirectory.PLUGINS.getPath() + name);
             FileUtils.save(is, f);
             PluginManager.getSingletonInstance().loadPlugin(f.toURI());
-        } finally {
-            is.close();
         }
     }
 

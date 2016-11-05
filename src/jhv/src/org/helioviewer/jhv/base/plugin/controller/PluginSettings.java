@@ -10,7 +10,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -81,11 +80,7 @@ public class PluginSettings {
             try {
                 DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                 xmlDocument = docBuilder.parse(settingsFileName);
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ParserConfigurationException | SAXException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -226,13 +221,7 @@ public class PluginSettings {
             StreamResult result = new StreamResult(fos);
 
             transformer.transform(source, result);
-        } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerFactoryConfigurationError e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
+        } catch (TransformerFactoryConfigurationError | TransformerException | FileNotFoundException e) {
             e.printStackTrace();
         }
     }

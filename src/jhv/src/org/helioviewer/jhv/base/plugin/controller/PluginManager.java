@@ -174,13 +174,7 @@ public class PluginManager {
             } finally {
                 jarFile.close();
             }
-        } catch (InstantiationException e) {
-            Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
-        } catch (IllegalAccessException e) {
-            Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
-        } catch (ClassNotFoundException e) {
-            Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
-        } catch (IOException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | IOException e) {
             Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         }
         return false;
