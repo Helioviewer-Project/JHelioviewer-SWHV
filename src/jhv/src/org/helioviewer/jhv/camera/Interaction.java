@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.display.Displayer;
@@ -22,12 +19,7 @@ public class Interaction implements MouseListener, KeyListener {
     public Interaction(Camera _camera) {
         camera = _camera;
 
-        wheelTimer = new Timer(1000/2, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Displayer.render(1);
-            }
-        });
+        wheelTimer = new Timer(1000/2, e -> Displayer.render(1));
         wheelTimer.setRepeats(false);
     }
 

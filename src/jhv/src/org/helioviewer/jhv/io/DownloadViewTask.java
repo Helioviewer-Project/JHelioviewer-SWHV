@@ -2,8 +2,6 @@ package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -50,12 +48,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
         JButton cancelBtn = new JButton("Cancel");
         cancelBtn.setBorder(BorderFactory.createEtchedBorder());
-        cancelBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cancel(true);
-            }
-        });
+        cancelBtn.addActionListener(e -> cancel(true));
         dialog.add(cancelBtn);
 
         dialog.pack();
@@ -94,12 +87,9 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
             final int contentLength = ds.getContentLength();
             if (contentLength > 0) {
-                EventQueue.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressBar.setIndeterminate(false);
-                        progressBar.setMaximum(contentLength);
-                    }
+                EventQueue.invokeLater(() -> {
+                    progressBar.setIndeterminate(false);
+                    progressBar.setMaximum(contentLength);
                 });
             }
 
@@ -112,12 +102,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
                 if (contentLength > 0) {
                     final int finalTotalRead = numTotalRead;
-                    EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setValue(finalTotalRead);
-                        }
-                    });
+                    EventQueue.invokeLater(() -> progressBar.setValue(finalTotalRead));
                 }
             }
 
