@@ -14,23 +14,13 @@ public class NEWTKeyAdapter implements KeyListener {
     }
 
     @Override
-    public void keyPressed(final KeyEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.keyPressed(e);
-            }
-        });
+    public void keyPressed(KeyEvent e) {
+        EventQueue.invokeLater(() -> l.keyPressed(e));
     }
 
     @Override
-    public void keyReleased(final KeyEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.keyReleased(e);
-            }
-        });
+    public void keyReleased(KeyEvent e) {
+        EventQueue.invokeLater(() -> l.keyReleased(e));
     }
 
 }

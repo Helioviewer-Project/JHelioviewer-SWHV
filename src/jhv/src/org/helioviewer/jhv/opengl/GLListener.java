@@ -29,17 +29,14 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        final GLContext ctx = drawable.getContext();
-        final GL2 gl = ctx.getGL().getGL2();
-        final boolean multi = drawable.getChosenGLCapabilities().getNumSamples() != 0;
+        GLContext ctx = drawable.getContext();
+        GL2 gl = ctx.getGL().getGL2();
+        boolean multi = drawable.getChosenGLCapabilities().getNumSamples() != 0;
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                ctx.makeCurrent();
-                initImpl(gl, multi);
-                ctx.release();
-            }
+        EventQueue.invokeLater(() -> {
+            ctx.makeCurrent();
+            initImpl(gl, multi);
+            ctx.release();
         });
     }
 
@@ -48,12 +45,9 @@ public class GLListener implements GLEventListener {
         GLText.dispose();
         final GL2 gl = drawable.getGL().getGL2();
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                disposeImpl(gl);
-                GLInfo.checkGLErrors(gl, "GLListener.dispose()");
-            }
+        EventQueue.invokeLater(() -> {
+            disposeImpl(gl);
+            GLInfo.checkGLErrors(gl, "GLListener.dispose()");
         });
     }
 
@@ -109,14 +103,11 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, final int x, final int y, final int width, final int height) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Displayer.setGLSize(x, y, width, height);
-                Displayer.reshapeAll();
-                ImageViewerGui.getRenderableMiniview().reshapeViewport();
-                Displayer.render(1);
-            }
+        EventQueue.invokeLater(() -> {
+            Displayer.setGLSize(x, y, width, height);
+            Displayer.reshapeAll();
+            ImageViewerGui.getRenderableMiniview().reshapeViewport();
+            Displayer.render(1);
         });
     }
 
@@ -196,12 +187,7 @@ public class GLListener implements GLEventListener {
     @Override
     public void display(GLAutoDrawable drawable) {
         if (!EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    Displayer.display();
-                }
-            });
+            EventQueue.invokeLater(Displayer::display);
         }
 
         GL2 gl = (GL2) drawable.getGL();
