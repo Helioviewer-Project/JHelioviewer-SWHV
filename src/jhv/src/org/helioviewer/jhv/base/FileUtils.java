@@ -41,19 +41,14 @@ public class FileUtils {
      */
     public static void copy(File src, File dst) throws IOException {
         Log.debug("Copy file " + src.getAbsolutePath() + " to " + dst.getAbsolutePath());
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
 
-        try {
+        try (InputStream in = new FileInputStream(src); OutputStream out = new FileOutputStream(dst)) {
             // Transfer bytes from in to out
             byte[] buf = new byte[BUFSIZ];
             int len;
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
-        } finally {
-            in.close();
-            out.close();
         }
     }
 
@@ -80,50 +75,37 @@ public class FileUtils {
     public static void save(InputStream in, File dst) throws IOException {
         Log.debug("Saving stream to " + dst.getAbsolutePath());
         dst.getParentFile().mkdirs();
-        OutputStream out = new FileOutputStream(dst);
 
         // Transfer bytes from in to out
-        byte[] buf = new byte[BUFSIZ];
-        int len;
-
-        try {
+        try (OutputStream out = new FileOutputStream(dst)) {
+            byte[] buf = new byte[BUFSIZ];
+            int len;
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
-        } finally {
-            out.close();
         }
         in.close();
     }
 
     public static String read(File dst) throws IOException {
-        Log.debug("Reading file " + dst.getAbsolutePath());
-        BufferedReader in = new BufferedReader(new FileReader(dst));
         StringBuilder sb = new StringBuilder();
-
-        String str;
-        try {
+        try (BufferedReader in = new BufferedReader(new FileReader(dst))) {
+            String str;
             while ((str = in.readLine()) != null) {
                 sb.append(str).append('\n');
             }
-        } finally {
-            in.close();
         }
 
         return sb.toString();
     }
 
     public static String read(InputStream strm) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(strm, "UTF-8"));
         StringBuilder sb = new StringBuilder();
-
-        String str;
-        try {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(strm, "UTF-8"))) {
+            String str;
             while ((str = in.readLine()) != null) {
                 sb.append(str).append('\n');
             }
-        } finally {
-            in.close();
         }
 
         return sb.toString();

@@ -122,11 +122,8 @@ public class SWEKConfigurationManager {
         try {
             rbc = Channels.newChannel(url.openStream());
             String saveFile = JHVDirectory.SETTINGS.getPath() + configFileName;
-            FileOutputStream fos = new FileOutputStream(saveFile);
-            try {
+            try (FileOutputStream fos = new FileOutputStream(saveFile)) {
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            } finally {
-                fos.close();
             }
             configFileURL = (new File(saveFile)).toURI().toURL();
             return true;
