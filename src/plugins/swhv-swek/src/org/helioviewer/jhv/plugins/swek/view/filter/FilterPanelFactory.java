@@ -81,15 +81,20 @@ public class FilterPanelFactory {
         for (SWEKParameter parameter : eventType.getParameterList()) {
             if (parameter.getParameterFilter() != null) {
                 String filterType = parameter.getParameterFilter().getFilterType().toLowerCase();
-                if (filterType.equals("doublemaxfilter")) {
-                    panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
-                } else if (filterType.equals("doubleminfilter")) {
-                    panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL));
-                } else if (filterType.equals("doubleminmaxfilter")) {
-                    panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
-                    panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL));
-                } else if (filterType.equals("flarefilter")) {
-                    panels.add(new FilterPanel(eventType, parameter, generateFlareSpinner(filterDialog), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
+                switch (filterType) {
+                    case "doublemaxfilter":
+                        panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
+                        break;
+                    case "doubleminfilter":
+                        panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL));
+                        break;
+                    case "doubleminmaxfilter":
+                        panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
+                        panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL));
+                        break;
+                    case "flarefilter":
+                        panels.add(new FilterPanel(eventType, parameter, generateFlareSpinner(filterDialog), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
+                        break;
                 }
             }
         }
