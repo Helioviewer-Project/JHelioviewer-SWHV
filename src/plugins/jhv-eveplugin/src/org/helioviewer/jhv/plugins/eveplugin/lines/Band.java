@@ -18,7 +18,6 @@ import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.lines.BandCache.GraphPolyline;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
 
 public class Band extends AbstractLineDataSelectorElement {
@@ -28,7 +27,7 @@ public class Band extends AbstractLineDataSelectorElement {
 
     private Color graphColor = Color.BLACK;
     private final YAxis yAxis;
-    private final ArrayList<BandCache.GraphPolyline> graphPolylines = new ArrayList<BandCache.GraphPolyline>();
+    private final ArrayList<BandCache.GraphPolyline> graphPolylines = new ArrayList<>();
     private final RequestCache requestCache = new RequestCache();
     private int[] warnLevels;
     private String[] warnLabels;
@@ -123,7 +122,7 @@ public class Band extends AbstractLineDataSelectorElement {
             return;
         }
         g.setColor(graphColor);
-        for (GraphPolyline line : graphPolylines) {
+        for (BandCache.GraphPolyline line : graphPolylines) {
             g.drawPolyline(line.xPoints, line.yPoints, line.yPoints.length);
         }
         for (int j = 0; j < warnLevels.length; j++) {
@@ -133,8 +132,8 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     private void updateWarnLevels(Rectangle graphArea) {
-        LinkedList<Integer> warnLevels = new LinkedList<Integer>();
-        LinkedList<String> warnLabels = new LinkedList<String>();
+        LinkedList<Integer> warnLevels = new LinkedList<>();
+        LinkedList<String> warnLabels = new LinkedList<>();
         HashMap<String, Double> unconvertedWarnLevels = bandType.getWarnLevels();
         for (Map.Entry<String, Double> pairs : unconvertedWarnLevels.entrySet()) {
             warnLevels.add(yAxis.value2pixel(graphArea.y, graphArea.height, pairs.getValue()));

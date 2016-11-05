@@ -45,7 +45,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
             new ZoomComboboxItem(ZOOM.Hour, 6),
             new ZoomComboboxItem(ZOOM.Hour, 1)
         };
-        zoomCombo = new JComboBox<ZoomComboboxItem>(items);
+        zoomCombo = new JComboBox<>(items);
         zoomCombo.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         zoomCombo.addActionListener(this);
 

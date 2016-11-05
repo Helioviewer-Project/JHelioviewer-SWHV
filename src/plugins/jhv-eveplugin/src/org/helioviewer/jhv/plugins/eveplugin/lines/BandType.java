@@ -8,7 +8,7 @@ public class BandType {
     private String label;
     private String name;
     private String unitLabel;
-    public HashMap<String, Double> warnLevels = new HashMap<String, Double>();
+    public HashMap<String, Double> warnLevels = new HashMap<>();
     private double min;
     private double max;
     private boolean isLog = false;

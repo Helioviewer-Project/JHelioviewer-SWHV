@@ -26,8 +26,8 @@ public class DownloadController {
 
     private static final DownloadController singletonInstance = new DownloadController();
 
-    private static final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<Band, ArrayList<Interval>>();
-    private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
+    private static final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<>();
+    private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<>();
 
     public static DownloadController getSingletonInstance() {
         return singletonInstance;
@@ -63,7 +63,7 @@ public class DownloadController {
     }
 
     private void addFutureJobs(List<Future<?>> newFutureJobs, Band band) {
-        List<Future<?>> fj = new ArrayList<Future<?>>();
+        List<Future<?>> fj = new ArrayList<>();
         if (futureJobs.containsKey(band)) {
             fj = futureJobs.get(band);
         }
@@ -77,7 +77,7 @@ public class DownloadController {
             return null;
         }
 
-        ArrayList<Interval> intervals = new ArrayList<Interval>();
+        ArrayList<Interval> intervals = new ArrayList<>();
         for (Interval i : missingIntervals) {
             intervals.addAll(Interval.splitInterval(i, DOWNLOADER_MAX_DAYS_PER_BLOCK));
         }
@@ -115,14 +115,14 @@ public class DownloadController {
     }
 
     private List<Future<?>> addDownloads(DownloadThread[] jobs) {
-        List<Future<?>> futureJobs = new ArrayList<Future<?>>();
+        List<Future<?>> futureJobs = new ArrayList<>();
         for (DownloadThread job : jobs) {
             Band band = job.getBand();
             Interval interval = job.getInterval();
 
             ArrayList<Interval> list = downloadMap.get(band);
             if (list == null) {
-                list = new ArrayList<Interval>();
+                list = new ArrayList<>();
             }
             list.add(interval);
 
@@ -193,7 +193,7 @@ public class DownloadController {
                     values[i] = (float) (entry.getDouble(1) * multiplier);
                 }
 
-                return new Pair<float[], long[]>(values, dates);
+                return new Pair<>(values, dates);
             } catch (JSONException | IOException e) {
                 Log.error("Error Parsing the EVE Response ", e);
             }

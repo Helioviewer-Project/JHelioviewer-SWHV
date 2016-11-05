@@ -24,7 +24,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     public final TimeAxis selectedAxis;
     public final TimeAxis availableAxis;
 
-    private static final HashSet<DrawControllerListener> listeners = new HashSet<DrawControllerListener>();
+    private static final HashSet<DrawControllerListener> listeners = new HashSet<>();
 
     private final DrawControllerOptionsPanel optionsPanel;
 
