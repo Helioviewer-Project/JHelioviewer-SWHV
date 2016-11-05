@@ -151,18 +151,13 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             Log.fatal("Runtime exception", e);
 
             msg += "\nLog:\n";
-            try {
-                BufferedReader input = new BufferedReader(new FileReader(logName));
-                try {
-                    String line;
-                    StringBuilder sb = new StringBuilder();
-                    while ((line = input.readLine()) != null) {
-                        sb.append(line).append('\n');
-                    }
-                    msg += sb;
-                } finally {
-                    input.close();
+            try (BufferedReader input = new BufferedReader(new FileReader(logName))) {
+                String line;
+                StringBuilder sb = new StringBuilder();
+                while ((line = input.readLine()) != null) {
+                    sb.append(line).append('\n');
                 }
+                msg += sb;
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
