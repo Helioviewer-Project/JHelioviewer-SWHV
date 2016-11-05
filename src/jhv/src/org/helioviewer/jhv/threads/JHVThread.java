@@ -47,8 +47,7 @@ public class JHVThread {
 
         private static void createSchema() {
             try {
-                Statement statement = connection.createStatement();
-                try {
+                try (Statement statement = connection.createStatement()) {
                     statement.setQueryTimeout(30);
                     statement.executeUpdate("CREATE TABLE if not exists event_type (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING , supplier STRING, UNIQUE(name, supplier) ON CONFLICT IGNORE)");
                     statement.executeUpdate("CREATE TABLE if not exists events (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER, uid STRING , start BIGINTEGER, end BIGINTEGER, archiv BIGINTEGER , data BLOB, FOREIGN KEY(type_id) REFERENCES event_type(id), UNIQUE(uid) ON CONFLICT FAIL)");
@@ -60,18 +59,13 @@ public class JHVThread {
                     statement.executeUpdate("CREATE INDEX if not exists evt_left ON event_link (right_id);");
                     statement.executeUpdate("CREATE TABLE if not exists date_range (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER , start BIGINTEGER , end BIGINTEGER, FOREIGN KEY(type_id) REFERENCES event_type(id))");
                     statement.executeUpdate("CREATE TABLE if not exists version (version INTEGER PRIMARY KEY, hash INTEGER );");
-                } finally {
-                    statement.close();
                 }
 
-                PreparedStatement pstatement = connection.prepareStatement("INSERT INTO version(version, hash) VALUES(?, ?)");
-                try {
+                try (PreparedStatement pstatement = connection.prepareStatement("INSERT INTO version(version, hash) VALUES(?, ?)")) {
                     pstatement.setQueryTimeout(30);
                     pstatement.setInt(1, CURRENT_VERSION_SCHEMA);
                     pstatement.setInt(2, EventDatabase.config_hash);
                     pstatement.executeUpdate();
-                } finally {
-                    pstatement.close();
                 }
             } catch (SQLException e) {
                 Log.error("Could not create database connection" + e);
@@ -94,21 +88,15 @@ public class JHVThread {
                         int found_version = -1;
                         int found_hash = -1;
 
-                        PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                        try {
+                        try (PreparedStatement pstatement = connection.prepareStatement(sqlt)) {
                             pstatement.setQueryTimeout(30);
 
-                            ResultSet rs = pstatement.executeQuery();
-                            try {
+                            try (ResultSet rs = pstatement.executeQuery()) {
                                 if (rs.next()) {
                                     found_version = rs.getInt(1);
                                     found_hash = rs.getInt(2);
                                 }
-                            } finally {
-                                rs.close();
                             }
-                        } finally {
-                            pstatement.close();
                         }
 
                         if (found_version != CURRENT_VERSION_SCHEMA || EventDatabase.config_hash != found_hash) {

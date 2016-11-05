@@ -48,41 +48,36 @@ public class PfssNewDataLoader implements Runnable {
         int endMonth = cal.get(Calendar.MONTH);
 
         do {
+            Integer cacheKey = startYear * 10000 + startMonth;
             ArrayList<Pair<String, Long>> urls = null;
 
-            try {
-                Integer cacheKey = startYear * 10000 + startMonth;
-                synchronized (parsedCache) {
-                    urls = parsedCache.get(cacheKey);
-                }
-                if (urls == null || urls.isEmpty()) {
-                    urls = new ArrayList<Pair<String, Long>>();
-                    String m = (startMonth) < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
-                    String url = PfssSettings.baseURL + startYear + "/" + m + "/list.txt";
-                    URL data = new URL(url);
+            synchronized (parsedCache) {
+                urls = parsedCache.get(cacheKey);
+            }
 
-                    BufferedReader in = new BufferedReader(new InputStreamReader(data.openStream(), "UTF-8"));
-                    try {
-                        String inputLine;
-                        while ((inputLine = in.readLine()) != null) {
-                            String[] splitted = inputLine.split(" ");
-                            Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
-                            urls.add(new Pair<String, Long>(splitted[1], dd.getTime()));
-                        }
-                    } finally {
-                        in.close();
-                    }
+            if (urls == null || urls.isEmpty()) {
+                urls = new ArrayList<Pair<String, Long>>();
+                String m = (startMonth) < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
+                String url = PfssSettings.baseURL + startYear + "/" + m + "/list.txt";
 
-                    synchronized (parsedCache) {
-                        parsedCache.put(cacheKey, urls);
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"))) {
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        String[] splitted = inputLine.split(" ");
+                        Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
+                        urls.add(new Pair<String, Long>(splitted[1], dd.getTime()));
                     }
+                } catch (MalformedURLException e) {
+                    Log.warn("Could not read PFSS entries : URL unavailable");
+                } catch (IOException e) {
+                    Log.warn("Could not read PFSS entries");
+                } catch (ParseException e) {
+                    Log.warn("Could not parse date time during PFSS loading");
                 }
-            } catch (MalformedURLException e) {
-                Log.warn("Could not read PFSS entries : URL unavailable");
-            } catch (IOException e) {
-                Log.warn("Could not read PFSS entries");
-            } catch (ParseException e) {
-                Log.warn("Could not parse date time during PFSS loading");
+            }
+
+            synchronized (parsedCache) {
+                parsedCache.put(cacheKey, urls);
             }
 
             for (Pair<String, Long> pair : urls) {
