@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -69,20 +67,12 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         JButton acceptBtn = new JButton("Save");
         JButton cancelBtn = new JButton("Cancel");
 
-        acceptBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveSettings();
-                dispose();
-            }
+        acceptBtn.addActionListener(e -> {
+            saveSettings();
+            dispose();
         });
 
-        cancelBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
+        cancelBtn.addActionListener(e -> dispose());
 
         if (System.getProperty("jhv.os").equals("windows")) {
             btnPanel.add(acceptBtn);
@@ -95,12 +85,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         mainPanel.add(btnPanel, BorderLayout.SOUTH);
 
         getContentPane().add(mainPanel);
-        getRootPane().registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(acceptBtn);
         getRootPane().setFocusable(true);
     }
@@ -133,14 +118,9 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         row_1.add(new JLabel("Preferred server", JLabel.RIGHT));
 
-        final JComboBox<String> combo = new JComboBox<String>(DataSources.getServers());
+        JComboBox<String> combo = new JComboBox<String>(DataSources.getServers());
         combo.setSelectedItem(DataSources.getPreferredServer());
-        combo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DataSources.saveServerSettings((String) combo.getSelectedItem());
-            }
-        });
+        combo.addActionListener(e -> DataSources.saveServerSettings((String) combo.getSelectedItem()));
         row_1.add(combo);
         paramsPanel.add(row_1);
 

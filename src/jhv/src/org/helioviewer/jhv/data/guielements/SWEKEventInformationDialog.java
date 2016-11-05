@@ -181,11 +181,10 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         return new DataCollapsiblePanel(relation, new JScrollPane(allPrecedingEvents), false, model);
     }
 
-    private JPanel createEventPanel(final JHVRelatedEvents rEvents, final JHVEvent event) {
+    private JPanel createEventPanel(JHVRelatedEvents rEvents, JHVEvent event) {
         JButton detailsButton = new JButton("Details");
         detailsButton.addActionListener(e -> {
             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvents, event);
-            dialog.validate();
             dialog.pack();
             dialog.setVisible(true);
         });

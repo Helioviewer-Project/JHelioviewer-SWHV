@@ -135,12 +135,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         contentPane.add(centerPane, BorderLayout.CENTER);
         contentPane.add(footer, BorderLayout.PAGE_END);
 
-        getRootPane().registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                closeDialog();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> closeDialog(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     /**
@@ -213,42 +208,39 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
      * not be copied.
      */
     private void importPlugin() {
-        final JFileChooser fileChooser = new JFileChooser();
+        JFileChooser fileChooser = new JFileChooser();
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.addChoosableFileFilter(new JARFilter());
         fileChooser.setMultiSelectionEnabled(false);
 
-        fileChooser.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent _e) {
-                if (_e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION) && fileChooser.getSelectedFile().exists() && fileChooser.getSelectedFile().isFile()) {
-                    fileChooser.setVisible(false);
+        fileChooser.addActionListener(_e -> {
+            if (_e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION) && fileChooser.getSelectedFile().exists() && fileChooser.getSelectedFile().isFile()) {
+                fileChooser.setVisible(false);
 
-                    File dstFile = new File(JHVDirectory.PLUGINS.getPath() + fileChooser.getSelectedFile().getName());
-                    if (dstFile.exists()) {
-                        Message.err("An error occured while importing the plugin.", "A plugin with the same name already exists!", false);
-                        return;
-                    }
-
-                    try {
-                        FileUtils.copy(fileChooser.getSelectedFile(), dstFile);
-                    } catch (IOException e) {
-                        Message.err("An error occured while importing the plugin.", "Copying the plugin file to the plugin directory failed!", false);
-                        return;
-                    }
-
-                    try {
-                        PluginManager.getSingletonInstance().loadPlugin(dstFile.toURI());
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        Message.err("An error occured while loading the plugin.", "The plugin file is corrupt!", false);
-                        return;
-                    }
-
-                    updatePluginList();
-                    pluginList.fireItemChanged();
+                File dstFile = new File(JHVDirectory.PLUGINS.getPath() + fileChooser.getSelectedFile().getName());
+                if (dstFile.exists()) {
+                    Message.err("An error occured while importing the plugin.", "A plugin with the same name already exists!", false);
+                    return;
                 }
+
+                try {
+                    FileUtils.copy(fileChooser.getSelectedFile(), dstFile);
+                } catch (IOException e) {
+                    Message.err("An error occured while importing the plugin.", "Copying the plugin file to the plugin directory failed!", false);
+                    return;
+                }
+
+                try {
+                    PluginManager.getSingletonInstance().loadPlugin(dstFile.toURI());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Message.err("An error occured while loading the plugin.", "The plugin file is corrupt!", false);
+                    return;
+                }
+
+                updatePluginList();
+                pluginList.fireItemChanged();
             }
         });
 

@@ -85,7 +85,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
             InputStream in = ds.getInput();
             out = new FileOutputStream(dstFile);
 
-            final int contentLength = ds.getContentLength();
+            int contentLength = ds.getContentLength();
             if (contentLength > 0) {
                 EventQueue.invokeLater(() -> {
                     progressBar.setIndeterminate(false);
@@ -101,7 +101,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
                 numTotalRead += numCurrentRead;
 
                 if (contentLength > 0) {
-                    final int finalTotalRead = numTotalRead;
+                    int finalTotalRead = numTotalRead;
                     EventQueue.invokeLater(() -> progressBar.setValue(finalTotalRead));
                 }
             }

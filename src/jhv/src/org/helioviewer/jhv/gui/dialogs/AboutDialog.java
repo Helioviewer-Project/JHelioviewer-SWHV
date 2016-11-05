@@ -35,7 +35,6 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 @SuppressWarnings("serial")
 public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkListener {
 
-    private final JButton closeButton = new JButton("Close");
     private final JScrollPane scrollPane;
 
     public AboutDialog() {
@@ -108,6 +107,7 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
         boxPanel.add(license);
 
         JPanel closeButtonContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dispose());
         closeButtonContainer.add(closeButton);
         boxPanel.add(closeButtonContainer);
