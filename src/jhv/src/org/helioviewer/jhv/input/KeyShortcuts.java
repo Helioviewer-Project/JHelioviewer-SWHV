@@ -20,14 +20,9 @@ public class KeyShortcuts {
     }
 
     static boolean handleKeyStroke(KeyStroke keyStroke, final Object source, final int id) {
-        final Action action = actionMap.get(keyStroke);
+        Action action = actionMap.get(keyStroke);
         if (action != null) {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    action.actionPerformed(new ActionEvent(source, id, null));
-                }
-            });
+            EventQueue.invokeLater(() -> action.actionPerformed(new ActionEvent(source, id, null)));
             return true;
         }
         return false;

@@ -14,83 +14,43 @@ public class NEWTMouseAdapter implements MouseListener {
     }
 
     @Override
-    public void mouseClicked(final MouseEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.mouseClicked(e);
-            }
-        });
+    public void mouseClicked(MouseEvent e) {
+        EventQueue.invokeLater(() -> l.mouseClicked(e));
     }
 
     @Override
-    public void mouseEntered(final MouseEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.mouseEntered(e);
-            }
-        });
+    public void mouseEntered(MouseEvent e) {
+        EventQueue.invokeLater(() -> l.mouseEntered(e));
     }
 
     @Override
-    public void mouseExited(final MouseEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.mouseExited(e);
-            }
-        });
+    public void mouseExited(MouseEvent e) {
+        EventQueue.invokeLater(() -> l.mouseExited(e));
     }
 
     @Override
-    public void mousePressed(final MouseEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.mousePressed(e);
-            }
-        });
+    public void mousePressed(MouseEvent e) {
+        EventQueue.invokeLater(() -> l.mousePressed(e));
     }
 
     @Override
-    public void mouseReleased(final MouseEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.mouseReleased(e);
-            }
-        });
+    public void mouseReleased(MouseEvent e) {
+        EventQueue.invokeLater(() -> l.mouseReleased(e));
     }
 
     @Override
-    public void mouseDragged(final MouseEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.mouseDragged(e);
-            }
-        });
+    public void mouseDragged(MouseEvent e) {
+        EventQueue.invokeLater(() -> l.mouseDragged(e));
     }
 
     @Override
-    public void mouseMoved(final MouseEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.mouseMoved(e);
-            }
-        });
+    public void mouseMoved(MouseEvent e) {
+        EventQueue.invokeLater(() -> l.mouseMoved(e));
     }
 
     @Override
-    public void mouseWheelMoved(final MouseEvent e) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                l.mouseWheelMoved(e);
-            }
-        });
+    public void mouseWheelMoved(MouseEvent e) {
+        EventQueue.invokeLater(() -> l.mouseWheelMoved(e));
     }
 
 }
