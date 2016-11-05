@@ -3,7 +3,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.kakadu;
 import java.awt.Rectangle;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import kdu_jni.Jp2_input_box;
 import kdu_jni.Jp2_family_src;
@@ -262,14 +262,11 @@ public class KakaduUtils {
                 if (len > 0) {
                     byte[] buf = new byte[len];
                     xmlBox.Read(buf, len);
-                    xml = new String(buf, "UTF-8");
+                    xml = new String(buf, StandardCharsets.UTF_8);
                 }
                 xmlBox.Native_destroy();
             } catch (KduException ex) {
                 throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
-            } catch (UnsupportedEncodingException ex) {
-                ex.printStackTrace();
-                xml = null;
             }
         }
 
@@ -312,13 +309,10 @@ public class KakaduUtils {
             if (len > 0) {
                 byte[] buf = new byte[len];
                 xmlBox.Read(buf, len);
-                xml = new String(buf, "UTF-8");
+                xml = new String(buf, StandardCharsets.UTF_8);
             }
         } catch (KduException ex) {
             throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
-        } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
-            xml = null;
         }
 
         if (xml != null) {
