@@ -2,6 +2,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
@@ -151,7 +152,7 @@ public class JPIPSocket extends HTTPSocket {
             if (!req.headerExists(HTTPHeaderKey.CONTENT_TYPE.toString()))
                 req.setHeader(HTTPHeaderKey.CONTENT_TYPE.toString(), "application/x-www-form-urlencoded");
             if (!req.headerExists(HTTPHeaderKey.CONTENT_LENGTH.toString()))
-                req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(queryStr.getBytes("UTF-8").length));
+                req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(queryStr.getBytes(StandardCharsets.UTF_8).length));
         }
 
         StringBuilder str = new StringBuilder();
@@ -177,7 +178,7 @@ public class JPIPSocket extends HTTPSocket {
         //    reconnect();
 
         // Writes the result to the output stream
-        getOutputStream().write(str.toString().getBytes("UTF-8"));
+        getOutputStream().write(str.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     /** Receives a JPIPResponse returning null if EOS reached */

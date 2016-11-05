@@ -3,6 +3,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class LineRead {
 
@@ -31,7 +32,7 @@ public class LineRead {
                 offset++;
             }
         }
-        return new String(rawdata, 0, len - offset, "US-ASCII");
+        return new String(rawdata, 0, len - offset, StandardCharsets.US_ASCII);
     }
 
     public static void readCRLF(InputStream in) throws IOException {
