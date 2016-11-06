@@ -77,37 +77,33 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
     }
 
     public static double readCMESpeed(JHVEvent evt) {
-        double speed = 500;
+        JHVEventParameter p = evt.getParameter("cme_radiallinvel");
         try {
-            JHVEventParameter p = evt.getParameter("cme_radiallinvel");
             if (p != null)
-                speed = Double.parseDouble(p.getParameterValue());
+                return Double.parseDouble(p.getParameterValue());
         } catch (Exception ignore) {
         }
-        return speed;
+        return 500;
     }
 
     public static double readCMEPrincipalAngleDegree(JHVEvent evt) {
-        double principalAngle = 0;
         JHVEventParameter p = evt.getParameter("event_coord1");
-
         try {
             if (p != null)
-                principalAngle = Double.parseDouble(p.getParameterValue()) + 90;
+                return Double.parseDouble(p.getParameterValue()) + 90;
         } catch (Exception ignore) {
         }
-        return principalAngle;
+        return 0;
     }
 
     public static double readCMEAngularWidthDegree(JHVEvent evt) {
-        double angularWidthDegree = 0;
         JHVEventParameter p = evt.getParameter("cme_angularwidth");
         try {
             if (p != null)
-                angularWidthDegree = Double.parseDouble(p.getParameterValue());
+                return Double.parseDouble(p.getParameterValue());
         } catch (Exception ignore) {
         }
-        return angularWidthDegree;
+        return 0;
     }
 
 }

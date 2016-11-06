@@ -262,8 +262,9 @@ public class HEKParser implements SWEKParser {
                     maxY = Math.max(maxY, p.y);
                 }
             }
+
             if ((maxX - minX) > 160 && (maxY - minY) > 160) {
-                hgsBoundedBox = null;
+                return null;
             }
         }
         return hgsBoundedBox;

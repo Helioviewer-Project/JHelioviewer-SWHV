@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
-import org.helioviewer.jhv.base.conversion.GOESLevelConversion;
+import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.data.container.cache.SWEKOperand;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
@@ -80,7 +80,7 @@ public class FilterPanel extends JPanel {
             String pval;
             Object sval = spinner.getValue();
             if (sval instanceof String)
-                pval = String.valueOf(GOESLevelConversion.getFloatValue(String.valueOf(spinner.getValue())));
+                pval = String.valueOf(GOESLevel.getFloatValue(String.valueOf(spinner.getValue())));
             else
                 pval = String.valueOf(spinner.getValue());
             SWEKParam param = new SWEKParam(parameter.getParameterName(), pval, operand);

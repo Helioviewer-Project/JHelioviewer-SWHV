@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.base.conversion;
 
-public class GOESLevelConversion {
+public class GOESLevel {
 
     public static String getStringValue(double v) {
         if (v < 1e-7)
@@ -16,23 +16,27 @@ public class GOESLevelConversion {
     }
 
     public static double getFloatValue(String s) {
-        double pv = -1;
         if (s.length() >= 2) {
             char v = s.charAt(0);
-            double val = Double.parseDouble(s.substring(1));
-            if (v == 'A') {
-                pv = 1e-8 * val;
-            } else if (v == 'B') {
-                pv = 1e-7 * val;
-            } else if (v == 'C') {
-                pv = 1e-6 * val;
-            } else if (v == 'M') {
-                pv = 1e-5 * val;
-            } else if (v == 'X') {
-                pv = 1e-4 * val;
+
+            try {
+                double val = Double.parseDouble(s.substring(1));
+                switch (v) {
+                    case 'A':
+                        return 1e-8 * val;
+                    case 'B':
+                        return 1e-7 * val;
+                    case 'C':
+                        return 1e-6 * val;
+                    case 'M':
+                        return 1e-5 * val;
+                    case 'X':
+                        return 1e-4 * val;
+                }
+            } catch (Exception ignore) {
             }
         }
-        return pv;
+        return -1;
     }
 
 }
