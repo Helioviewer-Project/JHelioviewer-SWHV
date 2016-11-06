@@ -13,6 +13,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
+import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
@@ -30,6 +31,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     public static final LineDataSelectorModel ldsm = new LineDataSelectorModel();
     public static final DrawController dc = new DrawController();
     public static final RadioData rdm = new RadioData();
+    public static final ObservationDialogUIPanel op = new ObservationDialogUIPanel();
 
     private static final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
 
@@ -47,13 +49,21 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         Layers.addTimespanListener(dc);
         JHVRelatedEvents.addHighlightListener(dc);
 
+        ldsm.addLineDataSelectorModelListener(op);
+
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
+
             @Override
             protected Void backgroundWork() {
-                // call BandType API in background => loads the datasets
-                BandTypeAPI.getSingletonInstance();
+                BandTypeAPI.getSingletonInstance().getDatasets();
                 return null;
             }
+
+            @Override
+            protected void done() {
+                op.setupDatasets();
+            }
+
         };
 
         loadSources.setThreadName("EVE--LoadSources");

@@ -34,6 +34,9 @@ public class BandTypeAPI {
     }
 
     private BandTypeAPI() {
+    }
+
+    public void getDatasets() {
         String jsonString = readJSON();
         if (jsonString != null) {
             try {

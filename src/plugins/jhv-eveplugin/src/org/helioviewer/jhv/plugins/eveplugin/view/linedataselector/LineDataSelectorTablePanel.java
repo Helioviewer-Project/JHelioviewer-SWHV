@@ -26,7 +26,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
@@ -38,10 +37,7 @@ public class LineDataSelectorTablePanel extends JPanel {
 
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
-    private static final ObservationDialogUIPanel observationPanel = new ObservationDialogUIPanel();
-
     private static final int ICON_WIDTH = 12;
-
     private static final int VISIBLE_COL = 0;
     private static final int TITLE_COL = 1;
     private static final int LOADING_COL = 2;
@@ -104,7 +100,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         jsp.getViewport().setBackground(Color.WHITE);
 
         JButton addLayerButton = new JButton("New Layer", IconBank.getIcon(JHVIcon.ADD));
-        addLayerButton.addActionListener(e -> ObservationDialog.getInstance().showDialog(true, null, observationPanel));
+        addLayerButton.addActionListener(e -> ObservationDialog.getInstance().showDialog(true, null, EVEPlugin.op));
         addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         addLayerButton.setHorizontalTextPosition(SwingConstants.TRAILING);
         addLayerButton.setBorderPainted(false);
