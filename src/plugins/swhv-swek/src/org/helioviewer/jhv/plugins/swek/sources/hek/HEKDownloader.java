@@ -13,7 +13,7 @@ import java.util.Map;
 
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.conversion.GOESLevelConversion;
+import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -35,7 +35,7 @@ public class HEKDownloader extends SWEKDownloader {
         boolean c2 = type.getSupplier().getSupplierName().equals("SWPC");
         boolean c = c1 && c2;
         if (c && result.has("fl_goescls")) {
-            result.put("fl_val", GOESLevelConversion.getFloatValue(result.getString("fl_goescls")));
+            result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
         }
     }
 

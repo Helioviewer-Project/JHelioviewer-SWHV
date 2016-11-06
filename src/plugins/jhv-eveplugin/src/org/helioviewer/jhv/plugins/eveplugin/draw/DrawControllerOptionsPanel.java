@@ -76,9 +76,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
             }
         } else if (source.equals(zoomCombo)) {
             ZoomComboboxItem item = (ZoomComboboxItem) zoomCombo.getSelectedItem();
-            if (item != null) {
-                zoomTo(item.zoom, item.number);
-            }
+            zoomTo(item.zoom, item.number);
         }
     }
 

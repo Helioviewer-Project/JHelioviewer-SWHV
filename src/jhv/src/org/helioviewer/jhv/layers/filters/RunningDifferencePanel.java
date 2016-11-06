@@ -120,7 +120,8 @@ public class RunningDifferencePanel implements ChangeListener {
         comboBox.setSelectedItem(0);
         diffRot = new JCheckBox("Rotation correction");
         diffRot.setSelected(true);
-        final GridBagConstraints c = new GridBagConstraints();
+
+        GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
         c.weighty = 1;
 
