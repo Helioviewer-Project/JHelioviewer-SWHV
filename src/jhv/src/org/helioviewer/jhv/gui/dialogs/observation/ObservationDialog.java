@@ -79,7 +79,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
         btnImages.addActionListener(this);
         btnClose.addActionListener(this);
 
-        getRootPane().registerKeyboardAction(e -> closeDialog(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         imageObservationPanel = new ImageDataPanel();
     }
@@ -105,6 +105,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
             contentPane.add(buttonPane);
         }
 
+        setMinimumSize(getPreferredSize());
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         getRootPane().setDefaultButton(btnImages);
@@ -115,11 +116,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
 
     public void loadButtonPressed() {
         if (observationPanel.loadButtonPressed(layer))
-            closeDialog();
-    }
-
-    private void closeDialog() {
-        setVisible(false);
+            dispose();
     }
 
     public void setAvailabilityStatus(boolean status) {
@@ -133,7 +130,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
         } else if (e.getSource().equals(btnClose)) {
             if (layer instanceof Layer)
                 ((Layer) layer).unload();
-            closeDialog();
+            dispose();
         }
     }
 
