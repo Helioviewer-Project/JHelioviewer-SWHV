@@ -27,22 +27,16 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 @SuppressWarnings("serial")
 public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements LineDataSelectorModelListener {
 
-    private final JComboBox<BandGroup> comboBoxGroup;
-    private final JComboBox<BandType> comboBoxData;
+    private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
+    private final JComboBox<BandType> comboBoxData = new JComboBox<>();
 
     public ObservationDialogUIPanel() {
         JLabel labelGroup = new JLabel("Group", JLabel.RIGHT);
         JLabel labelData = new JLabel("Dataset", JLabel.RIGHT);
 
-        comboBoxGroup = new JComboBox<>(BandTypeAPI.getSingletonInstance().getOrderedGroups().toArray(new BandGroup[0]));
         comboBoxGroup.addActionListener(e -> updateGroupValues());
 
-        comboBoxData = new JComboBox<>();
-
-        JPanel dataPane = new JPanel();
-        dataPane.setLayout(new GridBagLayout());
-        JPanel container = new JPanel();
-        container.setLayout(new BorderLayout());
+        JPanel dataPane = new JPanel(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -50,34 +44,36 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
-
         dataPane.add(labelGroup, c);
-
         c.gridx = 1;
         c.gridy = 0;
         dataPane.add(comboBoxGroup, c);
-
         c.gridx = 0;
         c.gridy = 1;
         dataPane.add(labelData, c);
-
         c.gridx = 1;
         c.gridy = 1;
         dataPane.add(comboBoxData, c);
+        add(dataPane, BorderLayout.CENTER);
+    }
 
-        container.add(dataPane, BorderLayout.CENTER);
-        this.add(container);
-
-        EVEPlugin.ldsm.addLineDataSelectorModelListener(this);
+    public void setupDatasets() {
+        DefaultComboBoxModel<BandGroup> model = new DefaultComboBoxModel<>(BandTypeAPI.getSingletonInstance().getOrderedGroups().toArray(new BandGroup[0]));
+        if (model.getSize() > 0) {
+            comboBoxGroup.setModel(model);
+            comboBoxGroup.setSelectedIndex(0);
+        }
     }
 
     private void updateGroupValues() {
-        DefaultComboBoxModel<BandType> model = (DefaultComboBoxModel<BandType>) comboBoxData.getModel();
         BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
-        BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
+        if (selectedGroup == null) // datasets not downloaded
+             return;
 
+        DefaultComboBoxModel<BandType> model = (DefaultComboBoxModel<BandType>) comboBoxData.getModel();
         model.removeAllElements();
 
+        BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
         for (BandType value : values) {
             if (!EVEPlugin.ldsm.containsBandType(value)) {
                 model.addElement(value);
@@ -91,6 +87,9 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     private void updateBandController() {
         BandType bandType = (BandType) comboBoxData.getSelectedItem();
+        if (bandType == null) // datasets not downloaded
+            return;
+
         Band band = new Band(bandType);
         band.setDataColor(BandColors.getNextColor());
         DownloadController.getSingletonInstance().updateBand(band, EVEPlugin.dc.availableAxis.start, EVEPlugin.dc.availableAxis.end);
