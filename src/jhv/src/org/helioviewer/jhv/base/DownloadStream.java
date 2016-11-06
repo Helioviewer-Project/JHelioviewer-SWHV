@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.base;
 
+import java.awt.EventQueue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -90,6 +92,9 @@ public class DownloadStream {
      *             From accessing the network
      */
     private void connect() throws IOException {
+        if (EventQueue.isDispatchThread())
+            throw new IOException("Don't do that");
+
         //Log.debug("Connect to " + url);
         URLConnection connection = url.openConnection();
         // Set timeouts
