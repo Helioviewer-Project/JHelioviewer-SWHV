@@ -204,7 +204,7 @@ public class JHVGlobals {
             ExportReadyDialog dialog = new ExportReadyDialog();
             dialog.init("Export of <a href=\"" + openURL + "\">" + moviePath + "</a> finished.");
             dialog.showDialog();
-        } catch (Exception e) {
+        } catch (Exception ignore) {
         }
     }
 
