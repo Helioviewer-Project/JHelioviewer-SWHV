@@ -16,12 +16,9 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 @SuppressWarnings("serial")
 class LineOptionPanel extends SmallPanel {
 
-    private final Band band;
-
-    public LineOptionPanel(Band _band) {
-        band = _band;
-
+    public LineOptionPanel(Band band) {
         setLayout(new GridBagLayout());
+
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
         c.gridx = 0;

@@ -19,7 +19,7 @@ public class JHVEventType {
 
     public static JHVEventType getJHVEventType(SWEKEventType eventType, SWEKSupplier supplier) {
         for (JHVEventType evt : evtList) {
-            if (evt.supplier == supplier && evt.getEventType() == eventType) {
+            if (evt.supplier == supplier && evt.eventType == eventType) {
                 return evt;
             }
         }

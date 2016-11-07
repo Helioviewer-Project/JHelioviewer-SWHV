@@ -333,7 +333,7 @@ public class JP2Image {
         if (m instanceof ObserverMetaData) {
             return ((ObserverMetaData) m).getFullName();
         } else {
-            String name = getURI().getPath();
+            String name = uri.getPath();
             return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
         }
     }
