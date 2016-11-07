@@ -38,13 +38,13 @@ public class SWEKEventType {
 
     private void createAllDatabaseFields() {
         HashMap<String, String> fields = new HashMap<>();
-        for (SWEKParameter p : getParameterList()) {
+        for (SWEKParameter p : parameterList) {
             SWEKParameterFilter pf = p.getParameterFilter();
             if (pf != null) {
                 fields.put(p.getParameterName().intern(), pf.getDbType());
             }
         }
-        for (SWEKRelatedEvents re : getSWEKRelatedEvents()) {
+        for (SWEKRelatedEvents re : swekrelEvents) {
             if (re.getEvent() == this) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
 

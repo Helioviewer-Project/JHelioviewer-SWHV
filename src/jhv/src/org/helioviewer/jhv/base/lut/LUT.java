@@ -213,7 +213,7 @@ public class LUT {
         for (String file : ggrFiles) {
             try (InputStream is = FileUtils.getResourceInputStream("/ggr/" + file + ".ggr")) {
                 LUT l = readGimpGradientStream(is);
-                standardList.put(l.getName(), l);
+                standardList.put(l.lutName, l);
             } catch (Exception e) {
                 Log.warn("Could not restore gimp gradient file " + file, e);
             }
@@ -226,7 +226,7 @@ public class LUT {
             for (File f : fileList) {
                 try {
                     LUT l = readGimpGradientFile(f);
-                    standardList.put(l.getName(), l);
+                    standardList.put(l.lutName, l);
                 } catch (Exception e) {
                     Log.warn("Error loading color table plugin dir", e);
                 }

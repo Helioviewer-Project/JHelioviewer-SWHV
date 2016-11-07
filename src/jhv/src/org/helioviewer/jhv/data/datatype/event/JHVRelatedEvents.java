@@ -67,7 +67,7 @@ public class JHVRelatedEvents {
 
         interval.start = Math.min(interval.start, found.getStart());
         interval.end = Math.max(interval.end, found.getEnd());
-        events.addAll(found.getEvents());
+        events.addAll(found.events);
         associations.addAll(found.associations);
         eventsMap.get(eventType).put(interval, this);
     }
