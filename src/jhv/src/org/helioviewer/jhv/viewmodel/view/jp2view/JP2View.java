@@ -137,7 +137,7 @@ public class JP2View extends AbstractView {
                     abolish();
                     try {
                         super.finalize();
-                    } catch (Throwable t) {}
+                    } catch (Throwable ignore) {}
                 }
             });
         } else {

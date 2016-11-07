@@ -102,7 +102,7 @@ public class TimestampRollingFileAppender extends FileAppender {
                                     Logger.getRootLogger().error("Could not delete log file " + f.getAbsolutePath());
                                 }
                             }
-                        } catch (ParseException e) {
+                        } catch (ParseException ignore) {
                         }
                     }
                 }

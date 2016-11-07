@@ -384,7 +384,7 @@ public class JP2Image {
                     abolish();
                     try {
                         super.finalize();
-                    } catch (Throwable t) {}
+                    } catch (Throwable ignore) {}
                 }
             });
         } else {
