@@ -24,11 +24,7 @@ public class CommandLineProcessor {
         arguments = args;
         usageMessage = "The following command-line options are available: \n\n" +
         "-jpx   JPX_REQUEST_URL\n" + "       Allows users to pass a JPX request URL for a JPX movie which will be opened upon program start. The option can be used multiple times." + "\n\n" +
-        "       Example:\n" +
-        "       -jpx \"http://helioviewer.nascom.nasa.gov/api/index.php?action=getJPX&observatory=SOHO&instrument=MDI&detector=MDI&measurement=magnetogram&startTime=2003-10-05T00:00:00Z&endTime=2003-10-20T00:00:00Z&cadence=3600&linked=true&jpip=true&frames=true\"" + "\n\n\n" +
-        "-jpip  JPIP_URL\n" + "       Allows users to pass a JPIP URL of a JP2 or JPX image to be opened upon program start. The option can be used multiple times." +
-        "\n\nExample:\n" +
-        "       -jpip \"jpip://delphi.nascom.nasa.gov:8090/test/images/JP2_v20090917/2003_10_05__00_00_10_653__SOHO_EIT_EIT_195.jp2\"";
+        "-jpip  JPIP_URL\n" + "       Allows users to pass a JPIP URL of a JP2 or JPX image to be opened upon program start. The option can be used multiple times.";
     }
 
     /**
