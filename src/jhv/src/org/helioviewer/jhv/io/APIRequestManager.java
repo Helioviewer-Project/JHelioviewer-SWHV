@@ -3,7 +3,6 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
@@ -67,15 +66,9 @@ public class APIRequestManager {
                     }
                 }
             }
-        } catch (UnknownHostException e) {
-            Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
-            throw new IOException("Unknown Host: " + e.getMessage());
         } catch (SocketTimeoutException e) {
             Log.error("Socket timeout while requesting JPIP URL", e);
             Message.err("Socket timeout", "Socket timeout while requesting JPIP URL", false);
-        } catch (IOException e) {
-            Log.debug("APIRequestManager.requestData() > Error will be thrown", e);
-            throw new IOException("Error in the server communication: " + e.getMessage());
         }
 
         return null;
@@ -109,7 +102,7 @@ public class APIRequestManager {
                 view.setAPIRequest(req);
                 return view;
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignore) {
             // nothing
         } catch (Exception e) {
             Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
