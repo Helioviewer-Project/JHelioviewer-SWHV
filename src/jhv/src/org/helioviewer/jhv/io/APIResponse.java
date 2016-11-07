@@ -14,7 +14,7 @@ public class APIResponse {
 
     private JSONObject data;
     private URI uri;
-    private long[] frames;
+//    private long[] frames;
 
     public APIResponse(InputStream in) {
         try {
@@ -67,11 +67,11 @@ public class APIResponse {
     public URI getURI() {
         return uri;
     }
-
+/*
     public long[] getFrames() {
         return frames;
     }
-
+*/
     /**
      * Checks if a JSON object could be created
      *
