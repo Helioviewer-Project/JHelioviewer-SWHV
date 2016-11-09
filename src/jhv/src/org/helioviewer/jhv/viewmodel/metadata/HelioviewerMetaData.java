@@ -233,6 +233,14 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             double sunX = m.tryGetDouble("CRPIX1") - 0.5;
             double sunY = m.tryGetDouble("CRPIX2") - 0.5;
 
+            if (observatory.equals("HINODE")) { // until CRVALx of all datasets can be tested
+                double crval1 = m.tryGetDouble("CRVAL1") / arcsecPerPixelX;
+                double crval2 = m.tryGetDouble("CRVAL2") / arcsecPerPixelY;
+
+                sunX -= crval1;
+                sunY -= crval2;
+            }
+
             sunPositionX = unitPerPixelX * sunX;
             sunPositionY = unitPerPixelY * (pixelHeight - 1 - sunY);
 
