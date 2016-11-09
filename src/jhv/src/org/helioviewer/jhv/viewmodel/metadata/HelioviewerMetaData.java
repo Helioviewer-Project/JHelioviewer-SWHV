@@ -149,6 +149,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         } else if (instrument.equals("TRACE")) {
             measurement = m.get("WAVE_LEN");
             fullName = instrument + " " + measurement;
+        } else if (instrument.equals("XRT")) {
+            measurement = m.get("EC_FW1_") + " " + m.get("EC_FW2_");
+            fullName = instrument + " " + measurement;
         } else {
             fullName = instrument + " " + measurement;
         }
@@ -233,7 +236,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             double sunX = m.tryGetDouble("CRPIX1") - 0.5;
             double sunY = m.tryGetDouble("CRPIX2") - 0.5;
 
-            if (observatory.equals("HINODE")) { // until CRVALx of all datasets can be tested
+            if (instrument.equals("XRT")) { // until CRVALx of all datasets can be tested
                 double crval1 = m.tryGetDouble("CRVAL1") / arcsecPerPixelX;
                 double crval2 = m.tryGetDouble("CRVAL2") / arcsecPerPixelY;
 
