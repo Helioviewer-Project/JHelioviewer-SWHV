@@ -35,6 +35,6 @@ void main(void)
         discard;
     texcoord.x = xcartrot.y + 0.5;
     texcoord.y = xcartrot.z + 0.5;
-
+    clamp_texcoord(texcoord);
     gl_FragColor = getColor(texcoord, texcoord, 1.);
 }
