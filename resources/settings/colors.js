@@ -68,11 +68,9 @@
   "measurement":"4500",
   "color":"SDO-AIA 4500 Å"},
  {"instrument":"SXT",
-  "measurement":"AlMg",
   "color":"Yohkoh SXT"},
- {"instrument":"SXT",
-  "measurement":"Al.1",
-  "color":"Yohkoh SXT"}]
+ {"instrument":"XRT",
+  "color":"Hinode XRT"}]
 // Configuration about the used default color tables
 // This must be an array and the fist matching rule will be used
 // A rule can query "observatory", "instrument", "detector", "measurement"

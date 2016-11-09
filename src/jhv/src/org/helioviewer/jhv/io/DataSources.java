@@ -32,7 +32,7 @@ public class DataSources {
             });
             put("IAS", new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
                     put("default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080");
@@ -42,7 +42,7 @@ public class DataSources {
             });
             put("GSFC", new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.dataSources.path", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "https://api.helioviewer.org/v2/getJP2Image/?");
                     put("API.jp2series.path", "https://api.helioviewer.org/v2/getJPX/?");
                     put("default.remote.path", "jpip://helioviewer.org:8090");
