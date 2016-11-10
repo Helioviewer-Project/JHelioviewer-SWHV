@@ -3,7 +3,7 @@ package org.helioviewer.jhv.export.jcodec;
 import java.awt.image.BufferedImage;
 
 import org.jcodec.common.model.Picture;
-import static org.jcodec.common.tools.MathUtil.clip;
+import org.jcodec.common.tools.MathUtil;
 
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
@@ -85,9 +85,9 @@ public class JHVRgbToYuv420j8Bit {
         u = (u + 128) >> 8;
         v = (v + 128) >> 8;
 
-        out[0] = clip(y + 16, 0, 255);
-        out[1] = clip(u + 128, 0, 255);
-        out[2] = clip(v + 128, 0, 255);
+        out[0] = MathUtil.clip(y + 16, 0, 255);
+        out[1] = MathUtil.clip(u + 128, 0, 255);
+        out[2] = MathUtil.clip(v + 128, 0, 255);
     }
 
 /*

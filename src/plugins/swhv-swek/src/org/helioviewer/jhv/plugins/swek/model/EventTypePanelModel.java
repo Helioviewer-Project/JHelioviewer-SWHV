@@ -14,9 +14,6 @@ import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 /**
  * The model of the event type panel. This model is a TreeModel and is used by
  * the tree on the event type panel.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
  */
 public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
@@ -29,9 +26,6 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     /** Holds the EventPanelModelListeners */
     private final HashSet<EventTypePanelModelListener> panelModelListeners = new HashSet<>();
 
-    /** Local instance of the tree model */
-    private final SWEKTreeModel treeModelInstance;
-
     /**
      * Creates a SWEKTreeModel for the given SWEK event type.
      *
@@ -40,7 +34,6 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     public EventTypePanelModel(SWEKTreeModelEventType eventType) {
         this.eventType = eventType;
-        treeModelInstance = SWEKTreeModel.getSingletonInstance();
     }
 
     /*
@@ -115,7 +108,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
                 for (SWEKTreeModelSupplier stms : eventType.getSwekTreeSuppliers()) {
                     eventTypeSelected = eventTypeSelected || stms.isCheckboxSelected();
                 }
-                SWEKTreeModel.getSingletonInstance().resetEventType(eventType.getSwekEventType());
+                SWEKTreeModel.resetEventType(eventType.getSwekEventType());
                 eventType.setCheckboxSelected(eventTypeSelected);
             }
             if (supplier.isCheckboxSelected()) {
@@ -208,7 +201,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     @Override
     public void treeCollapsed(TreeExpansionEvent event) {
-        treeModelInstance.subTreeCollapsed();
+        SWEKTreeModel.subTreeCollapsed();
     }
 
     /*
@@ -220,7 +213,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     @Override
     public void treeExpanded(TreeExpansionEvent event) {
-        treeModelInstance.subTreeExpanded();
+        SWEKTreeModel.subTreeExpanded();
     }
 
     /**
