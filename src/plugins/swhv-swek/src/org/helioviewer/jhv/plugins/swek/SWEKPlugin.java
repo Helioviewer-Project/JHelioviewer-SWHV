@@ -14,9 +14,6 @@ import org.helioviewer.jhv.threads.JHVWorker;
 
 public class SWEKPlugin implements Plugin {
 
-    /** Instance of the SWEKConfiguration */
-    private final SWEKConfigurationManager SWEKConfig;
-
     /** the incoming request manager */
     private final IncomingRequestManager incomingRequestManager;
 
@@ -26,7 +23,6 @@ public class SWEKPlugin implements Plugin {
     private final SWEKRenderable renderable;
 
     public SWEKPlugin() {
-        SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
         renderable = new SWEKRenderable();
@@ -38,7 +34,7 @@ public class SWEKPlugin implements Plugin {
 
             @Override
             protected Void backgroundWork() {
-                SWEKConfig.loadConfiguration();
+                SWEKConfigurationManager.loadConfiguration();
                 return null;
             }
 

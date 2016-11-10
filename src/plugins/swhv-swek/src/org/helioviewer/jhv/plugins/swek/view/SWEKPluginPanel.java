@@ -28,8 +28,7 @@ public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
         BoxLayout boxLayout = new BoxLayout(eventTypePanel, BoxLayout.Y_AXIS);
         eventTypePanel.setLayout(boxLayout);
 
-        SWEKConfigurationManager configManager = SWEKConfigurationManager.getSingletonInstance();
-        for (SWEKEventType eventType : configManager.getOrderedEventTypes()) {
+        for (SWEKEventType eventType : SWEKConfigurationManager.getOrderedEventTypes()) {
             EventPanel eventPanel = new EventPanel(eventType);
             eventPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             eventTypePanel.add(eventPanel);
