@@ -14,9 +14,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssCache;
 import org.helioviewer.jhv.threads.JHVThread;
 
-/**
- * @author Stefan Meier (stefan.meier@fhnw.ch)
- * */
 public class PfssPlugin implements Plugin {
 
     private static final PfssCache pfssCache = new PfssCache();
