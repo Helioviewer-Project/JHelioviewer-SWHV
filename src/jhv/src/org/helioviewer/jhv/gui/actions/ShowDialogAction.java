@@ -13,12 +13,6 @@ public class ShowDialogAction extends AbstractAction {
     private final Class<ShowableDialog> dialogToShow;
     private ShowableDialog dialog;
 
-    /**
-     * @param name
-     *            name of the action that shall be displayed on a button
-     * @param dialog
-     *            Dialog to open on click
-     */
     @SuppressWarnings("unchecked")
     public <T extends ShowableDialog> ShowDialogAction(String name, Class<T> dialog) {
         super(name);

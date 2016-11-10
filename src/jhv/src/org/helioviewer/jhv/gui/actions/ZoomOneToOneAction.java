@@ -19,11 +19,6 @@ import org.helioviewer.jhv.viewmodel.view.View;
 @SuppressWarnings("serial")
 public class ZoomOneToOneAction extends AbstractAction {
 
-    /**
-     * @param small
-     *            - if true, chooses a small (16x16), otherwise a large (24x24)
-     *            icon for the action
-     */
     public ZoomOneToOneAction(boolean small, boolean useIcon) {
         super("Actual Size", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_1TO1_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_1TO1)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom to native resolution");

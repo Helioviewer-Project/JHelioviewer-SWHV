@@ -26,35 +26,33 @@ public class Layers {
     private static final ArrayList<View> layers = new ArrayList<>();
 
     public static JHVDate getStartDate() {
-        JHVDate earliest = null;
-
+        JHVDate min = null;
         for (View view : layers) {
-            JHVDate start = view.getFirstTime();
-            if (earliest == null || start.compareTo(earliest) < 0) {
-                earliest = start;
+            JHVDate d = view.getFirstTime();
+            if (min == null || d.milli < min.milli) {
+                min = d;
             }
         }
 
-        if (earliest == null)
+        if (min == null)
             return lastTimestamp;
         else
-            return earliest;
+            return min;
     }
 
     public static JHVDate getEndDate() {
-        JHVDate latest = null;
-
+        JHVDate max = null;
         for (View view : layers) {
-            JHVDate end = view.getLastTime();
-            if (latest == null || end.compareTo(latest) > 0) {
-                latest = end;
+            JHVDate d = view.getLastTime();
+            if (max == null || d.milli > max.milli) {
+                max = d;
             }
         }
 
-        if (latest == null)
+        if (max == null)
             return lastTimestamp;
         else
-            return latest;
+            return max;
     }
 
     public static int getNumLayers() {

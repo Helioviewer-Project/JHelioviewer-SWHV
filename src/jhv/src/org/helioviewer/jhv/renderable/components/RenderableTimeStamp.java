@@ -20,7 +20,6 @@ public class RenderableTimeStamp extends AbstractRenderable {
     private static final String name = "Timestamp";
 
     public void deserialize(JSONObject jo) {
-
     }
 
     public JSONObject serialize() {
