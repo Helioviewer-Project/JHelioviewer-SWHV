@@ -31,7 +31,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     public static final LineDataSelectorModel ldsm = new LineDataSelectorModel();
     public static final DrawController dc = new DrawController();
-    public static final RadioData rdm = new RadioData();
+    public static final RadioData rd = new RadioData();
     public static final EventModel em = new EventModel();
     public static final ObservationDialogUIPanel op = new ObservationDialogUIPanel();
 
@@ -53,6 +53,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
         LineDataSelectorModel.addLineDataSelectorModelListener(dc);
         LineDataSelectorModel.addLineDataSelectorModelListener(op);
+        LineDataSelectorModel.addLineData(rd);
         LineDataSelectorModel.addLineData(em);
 
         // em.fetchData(DrawController.selectedAxis);

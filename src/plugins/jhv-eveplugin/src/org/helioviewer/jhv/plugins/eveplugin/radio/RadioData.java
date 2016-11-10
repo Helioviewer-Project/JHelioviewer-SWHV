@@ -31,7 +31,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 
 public class RadioData extends AbstractLineDataSelectorElement {
 
-    private final YAxis yAxis;
+    private static YAxis yAxis;
 
     public static final int CallistoID = 5000;
     private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<>();
@@ -39,8 +39,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
-    private final RadioOptionsPanel optionsPanel;
-    private IndexColorModel colorModel;
+    private static RadioOptionsPanel optionsPanel;
+    private static IndexColorModel colorModel;
 
     public RadioData() {
         isVisible = false;
@@ -49,7 +49,6 @@ public class RadioData extends AbstractLineDataSelectorElement {
         colorModel = createIndexColorModelFromLUT(LUT.getStandardList().get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
         yAxis = new YAxis(400, 20, "Mhz", false);
-        LineDataSelectorModel.addLineData(this);
     }
 
     @Override
@@ -61,7 +60,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         return new IndexColorModel(8, lut2.getLut8().length, lut2.getLut8(), 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 
-    void setLUT(LUT lut) {
+    static void setLUT(LUT lut) {
         colorModel = createIndexColorModelFromLUT(lut);
         for (Entry<Long, DownloadedJPXData> entry : cache.entrySet()) {
             DownloadedJPXData jpxData = entry.getValue();
@@ -70,7 +69,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         DrawController.fireRedrawRequest();
     }
 
-    IndexColorModel getColorModel() {
+    static IndexColorModel getColorModel() {
         return colorModel;
     }
 
