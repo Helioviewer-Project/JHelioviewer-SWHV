@@ -11,10 +11,12 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 import javax.swing.DefaultListModel;
@@ -330,8 +332,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      *            XML file name
      */
     private boolean saveXMLDocument(DOMSource source, String filename) {
-        try (FileOutputStream fos = new FileOutputStream(new File(filename))) {
-            StreamResult result = new StreamResult(fos);
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(new File(filename)))) {
+            StreamResult result = new StreamResult(os);
             TransformerFactory.newInstance().newTransformer().transform(source, result);
             return true;
         } catch (Exception e) {
