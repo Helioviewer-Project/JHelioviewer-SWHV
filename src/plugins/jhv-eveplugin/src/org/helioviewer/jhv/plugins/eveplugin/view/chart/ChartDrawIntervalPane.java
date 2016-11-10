@@ -20,7 +20,7 @@ import javax.swing.event.MouseInputListener;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 
@@ -45,7 +45,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        EVEPlugin.dc.addDrawControllerListener(this);
+        DrawController.addDrawControllerListener(this);
     }
 
     @Override
@@ -57,8 +57,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         g.setFont(DrawConstants.font);
         drawBackground(g);
 
-        TimeAxis availableAxis = EVEPlugin.dc.availableAxis;
-        TimeAxis selectedAxis = EVEPlugin.dc.selectedAxis;
+        TimeAxis availableAxis = DrawController.availableAxis;
+        TimeAxis selectedAxis = DrawController.selectedAxis;
 
         computeIntervalBorderPositions(availableAxis, selectedAxis);
         drawIntervalBackground(g);
@@ -76,7 +76,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     }
 
     private void computeIntervalBorderPositions(TimeAxis availableInterval, TimeAxis selectedInterval) {
-        final double diffMin = (availableInterval.end - availableInterval.start) / 60000.0;
+        double diffMin = (availableInterval.end - availableInterval.start) / 60000.0;
 
         long start = selectedInterval.start - availableInterval.start;
         start = Math.round(start / 60000.0);
@@ -84,7 +84,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         long end = selectedInterval.end - availableInterval.start;
         end = Math.round(end / 60000.0);
 
-        final int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
+        int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         leftIntervalBorderPosition = (int) ((start / diffMin) * availableIntervalSpace) + DrawConstants.GRAPH_LEFT_SPACE;
         rightIntervalBorderPosition = (int) ((end / diffMin) * availableIntervalSpace) + DrawConstants.GRAPH_LEFT_SPACE;
     }
@@ -97,7 +97,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     }
 
     private void drawInterval(Graphics2D g) {
-        // final int availableIntervalSpace = getWidth() -
+        // int availableIntervalSpace = getWidth() -
         // (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE +
         // DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         g.setColor(Color.black);
@@ -147,7 +147,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         }
     }
 
-    private void drawBorders(Graphics2D g) {
+    private static void drawBorders(Graphics2D g) {
         g.setColor(DrawConstants.BORDER_COLOR);
     }
 
@@ -168,10 +168,10 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
             return;
         }
 
-        final int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date()), g).getWidth();
-        final int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
-        final int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
-        final double ratioX = availableIntervalWidth / (double) (availableInterval.end - availableInterval.start);
+        int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date()), g).getWidth();
+        int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
+        int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
+        double ratioX = availableIntervalWidth / (double) (availableInterval.end - availableInterval.start);
 
         long ts = availableInterval.start + TimeUtils.DAY_IN_MILLIS * 366 * 3;
         if (availableInterval.start <= ts && ts <= availableInterval.end) {
@@ -192,15 +192,15 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         drawLabelsTime(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
     }
 
-    private void drawLabelsTime(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
-        final long timeDiff = availableInterval.end - availableInterval.start;
-        final double ratioTime = timeDiff / (double) maxTicks;
+    private void drawLabelsTime(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
+        long timeDiff = availableInterval.end - availableInterval.start;
+        double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
 
         GregorianCalendar tickGreg = new GregorianCalendar();
         String tickText;
         for (int i = 0; i < maxTicks; ++i) {
-            final Date tickValue = new Date(availableInterval.start + (long) (i * ratioTime));
+            Date tickValue = new Date(availableInterval.start + (long) (i * ratioTime));
             tickGreg.setTime(tickValue);
             int currentday = tickGreg.get(GregorianCalendar.DAY_OF_MONTH);
             if (day != currentday) {
@@ -213,9 +213,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         }
     }
 
-    private void drawLabelsDay(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
-        final Calendar calendar = new GregorianCalendar();
-
+    private void drawLabelsDay(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
+        Calendar calendar = new GregorianCalendar();
         calendar.clear();
         calendar.setTime(new Date(availableInterval.start));
 
@@ -234,10 +233,10 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         startMonth = calendar.get(Calendar.MONTH);
         startDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-        final long diffMillis = availableInterval.end - calendar.getTimeInMillis();
-        final int numberOfDays = (int) Math.round(diffMillis / (double) TimeUtils.DAY_IN_MILLIS);
-        final int tickCount = Math.min(numberOfDays, maxTicks);
-        final double ratioDays = Math.ceil(numberOfDays / (double) tickCount);
+        long diffMillis = availableInterval.end - calendar.getTimeInMillis();
+        int numberOfDays = (int) Math.round(diffMillis / (double) TimeUtils.DAY_IN_MILLIS);
+        int tickCount = Math.min(numberOfDays, maxTicks);
+        double ratioDays = Math.ceil(numberOfDays / (double) tickCount);
         for (int i = 0; i < maxTicks; ++i) {
             calendar.clear();
             calendar.set(startYear, startMonth, startDay);
@@ -248,9 +247,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         }
     }
 
-    private void drawLabelsMonth(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
-        final Calendar calendar = new GregorianCalendar();
-
+    private void drawLabelsMonth(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
+        Calendar calendar = new GregorianCalendar();
         calendar.clear();
         calendar.setTime(new Date(availableInterval.start));
 
@@ -270,14 +268,14 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         calendar.clear();
         calendar.setTime(new Date(availableInterval.end));
 
-        final int endYear = calendar.get(Calendar.YEAR);
-        final int endMonth = calendar.get(Calendar.MONTH);
+        int endYear = calendar.get(Calendar.YEAR);
+        int endMonth = calendar.get(Calendar.MONTH);
 
-        final int yearDifference = endYear - startYear;
-        final int monthDifference = endMonth - startMonth;
-        final int numberOfMonths = monthDifference > 0 ? yearDifference * 12 + monthDifference + 1 : yearDifference * 12 - monthDifference + 1;
-        final int tickCount = Math.min(numberOfMonths, maxTicks);
-        final double ratioMonth = Math.ceil(numberOfMonths / (double) tickCount);
+        int yearDifference = endYear - startYear;
+        int monthDifference = endMonth - startMonth;
+        int numberOfMonths = monthDifference > 0 ? yearDifference * 12 + monthDifference + 1 : yearDifference * 12 - monthDifference + 1;
+        int tickCount = Math.min(numberOfMonths, maxTicks);
+        double ratioMonth = Math.ceil(numberOfMonths / (double) tickCount);
 
         for (int i = 0; i < maxTicks; ++i) {
             calendar.clear();
@@ -289,11 +287,11 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         }
     }
 
-    private void drawLabelsYear(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
-        final Calendar calendar = new GregorianCalendar();
-
+    private void drawLabelsYear(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, int availableIntervalWidth, double ratioX) {
+        Calendar calendar = new GregorianCalendar();
         calendar.clear();
         calendar.setTime(new Date(availableInterval.start));
+
         int startYear = calendar.get(Calendar.YEAR);
 
         calendar.clear();
@@ -307,9 +305,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         calendar.setTime(new Date(availableInterval.end));
         int endYear = calendar.get(Calendar.YEAR);
 
-        final int hticks = Math.min(Math.max(endYear - startYear + 1, 2), maxTicks);
-        final int yearDifference = (endYear - startYear) / (hticks - 1);
-
+        int hticks = Math.min(Math.max(endYear - startYear + 1, 2), maxTicks);
+        int yearDifference = (endYear - startYear) / (hticks - 1);
         for (int i = 0; i < hticks; ++i) {
             calendar.clear();
             calendar.set(startYear + i * yearDifference, 0, 1);
@@ -319,9 +316,9 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         }
     }
 
-    private void drawLabel(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, final String tickText, final int availableIntervalWidth, final long date, final double ratioX) {
-        final int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        final int x = DrawConstants.GRAPH_LEFT_SPACE + (int) ((date - availableInterval.start) * ratioX);
+    private void drawLabel(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, String tickText, int availableIntervalWidth, long date, double ratioX) {
+        int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
+        int x = DrawConstants.GRAPH_LEFT_SPACE + (int) ((date - availableInterval.start) * ratioX);
         if (selectedInterval.start <= date && date <= selectedInterval.end) {
             g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         } else {
@@ -338,9 +335,9 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         }
     }
 
-    private void moveSelectedInterval(final Point newMousePosition) {
+    private void moveSelectedInterval(Point newMousePosition) {
         if (mousePressed != null) {
-            EVEPlugin.dc.moveXAvailableBased(mousePressed.x, newMousePosition.x);
+            DrawController.moveXAvailableBased(mousePressed.x, newMousePosition.x);
             mousePressed = newMousePosition;
         }
     }
@@ -362,9 +359,9 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     }
 
     private void jumpSelectedInterval(Point point) {
-        final double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
+        double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
         double middle = leftIntervalBorderPosition + 0.5 * intervalWidthPixel;
-        EVEPlugin.dc.moveXAvailableBased(point.x, (int) middle);
+        DrawController.moveXAvailableBased(point.x, (int) middle);
     }
 
     @Override

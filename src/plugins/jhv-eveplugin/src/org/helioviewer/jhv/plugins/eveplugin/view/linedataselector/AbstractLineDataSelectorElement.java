@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector;
 
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 
 public abstract class AbstractLineDataSelectorElement implements LineDataSelectorElement {
 
@@ -14,7 +14,7 @@ public abstract class AbstractLineDataSelectorElement implements LineDataSelecto
     @Override
     public void setVisibility(boolean visible) {
         isVisible = visible;
-        EVEPlugin.dc.fireRedrawRequest();
+        DrawController.fireRedrawRequest();
     }
 
 }

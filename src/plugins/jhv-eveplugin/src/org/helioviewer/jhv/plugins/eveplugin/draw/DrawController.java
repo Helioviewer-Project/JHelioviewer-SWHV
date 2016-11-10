@@ -14,26 +14,26 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {
 
-    public final TimeAxis selectedAxis;
-    public final TimeAxis availableAxis;
+    public static final TimeAxis selectedAxis;
+    public static final TimeAxis availableAxis;
 
     private static final HashSet<DrawControllerListener> listeners = new HashSet<>();
 
-    private final DrawControllerOptionsPanel optionsPanel;
+    private static final DrawControllerOptionsPanel optionsPanel;
 
-    private Rectangle graphSize;
-    private boolean isLocked;
-    private long latestMovieTime;
-    private Rectangle graphArea;
+    private static Rectangle graphSize;
+    private static boolean isLocked;
+    private static long latestMovieTime;
+    private static Rectangle graphArea;
 
-    public DrawController() {
+    static {
         graphSize = new Rectangle();
 
         long d = System.currentTimeMillis();
@@ -44,50 +44,48 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         latestMovieTime = Long.MIN_VALUE;
 
         optionsPanel = new DrawControllerOptionsPanel();
-
-        EVEPlugin.ldsm.addLineDataSelectorModelListener(this);
     }
 
-    public Component getOptionsPanel() {
+    public static Component getOptionsPanel() {
         return optionsPanel;
     }
 
-    public void addDrawControllerListener(DrawControllerListener listener) {
+    public static void addDrawControllerListener(DrawControllerListener listener) {
         listeners.add(listener);
     }
 
-    public void removeDrawControllerListener(DrawControllerListener listener) {
+    public static void removeDrawControllerListener(DrawControllerListener listener) {
         listeners.remove(listener);
     }
 
-    public void setSelectedInterval(long newStart, long newEnd) {
+    public static void setSelectedInterval(long newStart, long newEnd) {
         selectedAxis.set(newStart, newEnd, true);
         setAvailableInterval();
     }
 
-    public void moveX(double pixelDistance) {
+    public static void moveX(double pixelDistance) {
         selectedAxis.move(graphArea.width, pixelDistance);
         setAvailableInterval();
     }
 
-    public void moveXAvailableBased(int x0, int x1) {
+    public static void moveXAvailableBased(int x0, int x1) {
         long av_diff = availableAxis.pixel2value(0, graphSize.width, x1) - availableAxis.pixel2value(0, graphSize.width, x0);
         selectedAxis.move(av_diff);
         setAvailableInterval();
     }
 
-    private void zoomX(int x, double factor) {
+    private static void zoomX(int x, double factor) {
         selectedAxis.zoom(graphArea.x, graphArea.width, x, factor);
         setAvailableInterval();
     }
 
-    private void moveAndZoomY(Point p, double distanceY, int scrollDistance, boolean zoom, boolean move) {
+    private static void moveAndZoomY(Point p, double distanceY, int scrollDistance, boolean zoom, boolean move) {
         boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
         boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
         int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         int ct = -1;
-        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
                     if (move)
@@ -108,13 +106,13 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fireRedrawRequest();
     }
 
-    public void resetAxis(Point p) {
+    public static void resetAxis(Point p) {
         boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
         boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
         int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         int ct = -1;
-        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
                     el.resetAxis();
@@ -127,15 +125,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fireRedrawRequest();
     }
 
-    public void moveY(Point p, double distanceY) {
+    public static void moveY(Point p, double distanceY) {
         moveAndZoomY(p, distanceY, 0, false, true);
     }
 
-    private void zoomY(Point p, int scrollDistance) {
+    private static void zoomY(Point p, int scrollDistance) {
         moveAndZoomY(p, 0, scrollDistance, true, false);
     }
 
-    public void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
+    public static void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
         double zoomTimeFactor = 10;
         boolean inGraphArea = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
         boolean inXAxisOrAboveGraph = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height));
@@ -152,15 +150,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    public void moveAllAxes(double distanceY) {
-        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+    public static void moveAllAxes(double distanceY) {
+        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
             }
         }
     }
 
-    private void setAvailableInterval() {
+    private static void setAvailableInterval() {
         long availableStart = availableAxis.start;
         long availableEnd = availableAxis.end;
 
@@ -173,46 +171,46 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
         optionsPanel.updateSelectedInterval();
 
-        for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
             el.fetchData(selectedAxis);
         }
         fireRedrawRequest();
     }
 
-    private void centraliseSelected(long time) {
+    private static void centraliseSelected(long time) {
         if (time != Long.MIN_VALUE && isLocked && availableAxis.start <= time && availableAxis.end >= time) {
             long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
             selectedAxis.set(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)), false);
             fireRedrawRequest();
-            for (LineDataSelectorElement el : EVEPlugin.ldsm.getAllLineDataSelectorElements()) {
+            for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
                 el.fetchData(selectedAxis);
             }
         }
     }
 
-    public void setGraphInformation(Rectangle graphSize) {
-        this.graphSize = graphSize;
+    public static void setGraphInformation(Rectangle _graphSize) {
+        graphSize = _graphSize;
         createGraphArea();
         fireRedrawRequest();
     }
 
-    private void createGraphArea() {
+    private static void createGraphArea() {
         int height = graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE);
-        int noRightAxes = Math.max(0, (EVEPlugin.ldsm.getNumberOfAxes() - 1));
+        int noRightAxes = Math.max(0, (LineDataSelectorModel.getNumberOfAxes() - 1));
         int width = (graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + noRightAxes * DrawConstants.RIGHT_AXIS_WIDTH));
         graphArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, width, height);
     }
 
-    public Rectangle getGraphArea() {
+    public static Rectangle getGraphArea() {
         return graphArea;
     }
 
-    public Rectangle getGraphSize() {
+    public static Rectangle getGraphSize() {
         return graphSize;
     }
 
-    public void setLocked(boolean isLocked) {
-        this.isLocked = isLocked;
+    public static void setLocked(boolean _isLocked) {
+        isLocked = _isLocked;
         if (isLocked && latestMovieTime != Long.MIN_VALUE) {
             centraliseSelected(latestMovieTime);
         }
@@ -239,13 +237,13 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         timeChanged(date.milli);
     }
 
-    private void timeChanged(long milli) {
+    private static void timeChanged(long milli) {
         latestMovieTime = milli;
         centraliseSelected(latestMovieTime);
         fireRedrawRequestMovieFrameChanged();
     }
 
-    public int getMovieLinePosition() {
+    public static int getMovieLinePosition() {
         int movieLinePosition;
         if (latestMovieTime == Long.MIN_VALUE) {
             return -1;
@@ -258,7 +256,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return movieLinePosition;
     }
 
-    public void setMovieFrame(Point point) {
+    public static void setMovieFrame(Point point) {
         if (latestMovieTime == Long.MIN_VALUE || !graphArea.contains(point)) {
             return;
         }
@@ -289,19 +287,19 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    public void fireRedrawRequest() {
+    public static void fireRedrawRequest() {
         for (DrawControllerListener l : listeners) {
             l.drawRequest();
         }
     }
 
-    private void fireRedrawRequestMovieFrameChanged() {
+    private static void fireRedrawRequestMovieFrameChanged() {
         for (DrawControllerListener l : listeners) {
             l.drawMovieLineRequest();
         }
     }
 
-    private void fireMovieIntervalChanged(long start, long end) {
+    private static void fireMovieIntervalChanged(long start, long end) {
         for (DrawControllerListener l : listeners) {
             l.movieIntervalChanged(start, end);
         }

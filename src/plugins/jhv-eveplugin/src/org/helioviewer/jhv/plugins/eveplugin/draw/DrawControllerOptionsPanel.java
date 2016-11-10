@@ -15,7 +15,6 @@ import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
@@ -68,7 +67,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if (source.equals(lockButton)) {
-            EVEPlugin.dc.setLocked(lockButton.isSelected());
+            DrawController.setLocked(lockButton.isSelected());
             if (lockButton.isSelected()) {
                 lockButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_LINK));
             } else {
@@ -120,13 +119,13 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         zoomCombo.setSelectedItem(zoomCombo.getItemAt(0));
     }
 
-    private void zoomTo(ZOOM zoom, long value) {
-        TimeAxis selectedInterval = EVEPlugin.dc.selectedAxis;
-        TimeAxis availableInterval = EVEPlugin.dc.availableAxis;
+    private static void zoomTo(ZOOM zoom, long value) {
+        TimeAxis selectedInterval = DrawController.selectedAxis;
+        TimeAxis availableInterval = DrawController.availableAxis;
 
         switch (zoom) {
         case All:
-            EVEPlugin.dc.setSelectedInterval(availableInterval.start, availableInterval.end);
+            DrawController.setSelectedInterval(availableInterval.start, availableInterval.end);
             break;
         case Day:
             computeZoomInterval(selectedInterval.end, Calendar.DAY_OF_MONTH, value);
@@ -152,33 +151,33 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         }
     }
 
-    private void computeMovieInterval() {
+    private static void computeMovieInterval() {
         View view = Layers.getActiveView();
         long now = System.currentTimeMillis();
         if (view != null) {
             if (view.isMultiFrame()) {
-                EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
+                DrawController.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
             }
             else {
                 long end = view.getFirstTime().milli + TimeUtils.DAY_IN_MILLIS / 2;
                 if (end > now)
                     end = now;
-                EVEPlugin.dc.setSelectedInterval(view.getFirstTime().milli - TimeUtils.DAY_IN_MILLIS / 2, end);
+                DrawController.setSelectedInterval(view.getFirstTime().milli - TimeUtils.DAY_IN_MILLIS / 2, end);
             }
         } else {
-            EVEPlugin.dc.setSelectedInterval(now - TimeUtils.DAY_IN_MILLIS, now);
+            DrawController.setSelectedInterval(now - TimeUtils.DAY_IN_MILLIS, now);
         }
     }
 
-    private void computeCarringtonInterval(long end, long value) {
+    private static void computeCarringtonInterval(long end, long value) {
         computeZoomForMilliSeconds(end, (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
     }
 
-    private void computeZoomInterval(long end, int calendarField, long difference) {
+    private static void computeZoomInterval(long end, int calendarField, long difference) {
         computeZoomForMilliSeconds(end, differenceInMilliseconds(calendarField, difference));
     }
 
-    private void computeZoomForMilliSeconds(long end, long differenceMilli) {
+    private static void computeZoomForMilliSeconds(long end, long differenceMilli) {
         long endDate = end;
         long now = System.currentTimeMillis();
         if (endDate > now) {
@@ -186,10 +185,10 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         }
 
         long startDate = endDate - differenceMilli;
-        EVEPlugin.dc.setSelectedInterval(startDate, endDate);
+        DrawController.setSelectedInterval(startDate, endDate);
     }
 
-    private long differenceInMilliseconds(int calendarField, long value) {
+    private static long differenceInMilliseconds(int calendarField, long value) {
         switch (calendarField) {
         case Calendar.YEAR:
             return value * 365 * TimeUtils.DAY_IN_MILLIS;

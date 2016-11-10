@@ -15,10 +15,11 @@ import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
 public class Band extends AbstractLineDataSelectorElement {
 
@@ -37,8 +38,8 @@ public class Band extends AbstractLineDataSelectorElement {
         bandType = _bandType;
         optionsPanel = new LineOptionPanel(this);
 
-        EVEPlugin.dc.fireRedrawRequest();
-        EVEPlugin.ldsm.addLineData(this);
+        DrawController.fireRedrawRequest();
+        LineDataSelectorModel.addLineData(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
     }
 
@@ -55,7 +56,7 @@ public class Band extends AbstractLineDataSelectorElement {
 
     @Override
     public void zoomToFitAxis() {
-        float[] bounds = bandCache.getBounds(EVEPlugin.dc.selectedAxis);
+        float[] bounds = bandCache.getBounds(DrawController.selectedAxis);
         if (bounds[0] == bounds[1]) {
             resetAxis();
             return;
@@ -73,7 +74,7 @@ public class Band extends AbstractLineDataSelectorElement {
 
     @Override
     public void removeLineData() {
-        EVEPlugin.ldsm.removeLineData(this);
+        LineDataSelectorModel.removeLineData(this);
     }
 
     @Override
@@ -88,7 +89,7 @@ public class Band extends AbstractLineDataSelectorElement {
 
     public void setDataColor(Color c) {
         graphColor = c;
-        EVEPlugin.dc.fireRedrawRequest();
+        DrawController.fireRedrawRequest();
     }
 
     @Override
@@ -143,8 +144,8 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     private void updateGraphsData() {
-        Rectangle graphArea = EVEPlugin.dc.getGraphArea();
-        TimeAxis timeAxis = EVEPlugin.dc.selectedAxis;
+        Rectangle graphArea = DrawController.getGraphArea();
+        TimeAxis timeAxis = DrawController.selectedAxis;
         if (isVisible) {
             updateWarnLevels(graphArea);
             graphPolylines.clear();
@@ -206,7 +207,7 @@ public class Band extends AbstractLineDataSelectorElement {
     public void addToCache(float[] values, long[] dates) {
         bandCache.addToCache(values, dates);
         updateGraphsData();
-        EVEPlugin.dc.fireRedrawRequest();
+        DrawController.fireRedrawRequest();
     }
 
     @Override

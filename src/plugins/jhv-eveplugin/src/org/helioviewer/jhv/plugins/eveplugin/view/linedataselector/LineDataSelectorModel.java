@@ -8,6 +8,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandType;
@@ -20,33 +21,33 @@ public class LineDataSelectorModel implements TableModel {
 
     private static final int NUMBEROFCOLUMNS = 5;
 
-    public void addLineDataSelectorModelListener(LineDataSelectorModelListener listener) {
+    public static void addLineDataSelectorModelListener(LineDataSelectorModelListener listener) {
         listeners.add(listener);
     }
 
-    public void removeLineDataSelectorModelListener(LineDataSelectorModelListener listener) {
+    public static void removeLineDataSelectorModelListener(LineDataSelectorModelListener listener) {
         listeners.remove(listener);
     }
 
-    public void downloadStarted(LineDataSelectorElement element) {
+    public static void downloadStarted(LineDataSelectorElement element) {
         fireListeners();
     }
 
-    public void downloadFinished(LineDataSelectorElement element) {
+    public static void downloadFinished(LineDataSelectorElement element) {
         fireListeners();
     }
 
-    public void addLineData(LineDataSelectorElement element) {
+    public static void addLineData(LineDataSelectorElement element) {
         elements.add(element);
         fireLineDataSelectorElementAdded(element);
         fireListeners();
     }
 
-    public List<LineDataSelectorElement> getAllLineDataSelectorElements() {
+    public static List<LineDataSelectorElement> getAllLineDataSelectorElements() {
         return elements;
     }
 
-    public void removeLineData(LineDataSelectorElement element) {
+    public static void removeLineData(LineDataSelectorElement element) {
         elements.remove(element);
         BandColors.resetColor(element.getDataColor());
 
@@ -54,26 +55,26 @@ public class LineDataSelectorModel implements TableModel {
         fireListeners();
     }
 
-    private void fireListeners() {
-        TableModelEvent e = new TableModelEvent(this);
+    private static void fireListeners() {
+        TableModelEvent e = new TableModelEvent(EVEPlugin.ldsm);
         for (TableModelListener listener : tableListeners) {
             listener.tableChanged(e);
         }
     }
 
-    private void fireLineDataSelectorElementRemoved(LineDataSelectorElement element) {
+    private static void fireLineDataSelectorElementRemoved(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataRemoved(element);
         }
     }
 
-    private void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
+    private static void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataAdded(element);
         }
     }
 
-    void fireLineDataSelectorElementVisibility(LineDataSelectorElement element, boolean flag) {
+    static void fireLineDataSelectorElementVisibility(LineDataSelectorElement element, boolean flag) {
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataVisibility(element, flag);
         }
@@ -124,12 +125,12 @@ public class LineDataSelectorModel implements TableModel {
         tableListeners.remove(l);
     }
 
-    public void removeRow(int row) {
+    public static void removeRow(int row) {
         LineDataSelectorElement el = elements.get(row);
         el.removeLineData();
     }
 
-    public boolean containsBandType(BandType bandType) {
+    public static boolean containsBandType(BandType bandType) {
         for (LineDataSelectorElement el : elements) {
             if (el instanceof Band) {
                 Band band = (Band) el;
@@ -141,7 +142,7 @@ public class LineDataSelectorModel implements TableModel {
         return false;
     }
 
-    public int getNumberOfAxes() {
+    public static int getNumberOfAxes() {
         int ct = 0;
         for (LineDataSelectorElement el : elements) {
             if (el.showYAxis()) {
@@ -151,7 +152,7 @@ public class LineDataSelectorModel implements TableModel {
         return ct;
     }
 
-    int getRowIndex(LineDataSelectorElement element) {
+    static int getRowIndex(LineDataSelectorElement element) {
         return elements.indexOf(element);
     }
 

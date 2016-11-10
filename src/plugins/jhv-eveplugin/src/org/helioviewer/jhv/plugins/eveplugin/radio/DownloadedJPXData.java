@@ -14,8 +14,10 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -98,13 +100,13 @@ class DownloadedJPXData implements ImageDataHandler {
 
             if (!hasData) {
                 hasData = true;
-                EVEPlugin.ldsm.downloadFinished(EVEPlugin.rdm);
+                LineDataSelectorModel.downloadFinished(EVEPlugin.rdm);
             }
-            EVEPlugin.dc.fireRedrawRequest();
+            DrawController.fireRedrawRequest();
         }
     }
 
-    private BufferedImage createBufferedImage(int width, int height, byte[] data) {
+    private static BufferedImage createBufferedImage(int width, int height, byte[] data) {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, EVEPlugin.rdm.getColorModel());
         DataBufferByte dataBuffer = new DataBufferByte(data, width * height);
         Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xff }, new Point(0, 0));
@@ -115,7 +117,7 @@ class DownloadedJPXData implements ImageDataHandler {
     void requestData() {
         if (view != null) {
             JP2ImageCallisto image = view.getJP2Image();
-            TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
+            TimeAxis xAxis = DrawController.selectedAxis;
             Rectangle roi = getROI(xAxis, EVEPlugin.rdm.getYAxis());
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
                 image.setRegion(roi);

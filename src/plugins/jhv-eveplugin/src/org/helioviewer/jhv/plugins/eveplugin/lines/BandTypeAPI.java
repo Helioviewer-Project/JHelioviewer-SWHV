@@ -19,24 +19,12 @@ import org.json.JSONObject;
 
 public class BandTypeAPI {
 
-    private static BandTypeAPI singletonInstance;
-
     private static final String baseURL = "http://swhv.oma.be/datasets/index.php";
 
     private static final HashMap<String, BandGroup> groups = new HashMap<>();
     private static final ArrayList<BandGroup> orderedGroups = new ArrayList<>();
 
-    public static BandTypeAPI getSingletonInstance() {
-        if (singletonInstance == null) {
-            singletonInstance = new BandTypeAPI();
-        }
-        return singletonInstance;
-    }
-
-    private BandTypeAPI() {
-    }
-
-    public void getDatasets() {
+    public static void getDatasets() {
         String jsonString = readJSON();
         if (jsonString != null) {
             try {
@@ -51,7 +39,7 @@ public class BandTypeAPI {
         }
     }
 
-    private String readJSON() {
+    private static String readJSON() {
         URL url = null;
         try {
             url = new URL(baseURL);
@@ -77,7 +65,7 @@ public class BandTypeAPI {
         return null;
     }
 
-    private void updateBandTypes(JSONArray jsonObjectArray) {
+    private static void updateBandTypes(JSONArray jsonObjectArray) {
         BandType[] bandtypes = new BandType[jsonObjectArray.length()];
         try {
             for (int i = 0; i < jsonObjectArray.length(); i++) {
@@ -123,7 +111,7 @@ public class BandTypeAPI {
         }
     }
 
-    private void updateBandGroups(JSONArray jsonGroupArray) {
+    private static void updateBandGroups(JSONArray jsonGroupArray) {
         try {
             for (int i = 0; i < jsonGroupArray.length(); i++) {
                 BandGroup group = new BandGroup();
@@ -141,11 +129,11 @@ public class BandTypeAPI {
         }
     }
 
-    public BandType[] getBandTypes(BandGroup group) {
+    public static BandType[] getBandTypes(BandGroup group) {
         return group.bandtypes.toArray(new BandType[group.bandtypes.size()]);
     }
 
-    public List<BandGroup> getOrderedGroups() {
+    public static List<BandGroup> getOrderedGroups() {
         return orderedGroups;
     }
 
