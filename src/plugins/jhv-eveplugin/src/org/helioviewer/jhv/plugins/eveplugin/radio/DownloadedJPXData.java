@@ -100,14 +100,14 @@ class DownloadedJPXData implements ImageDataHandler {
 
             if (!hasData) {
                 hasData = true;
-                LineDataSelectorModel.downloadFinished(EVEPlugin.rdm);
+                LineDataSelectorModel.downloadFinished(EVEPlugin.rd);
             }
             DrawController.fireRedrawRequest();
         }
     }
 
     private static BufferedImage createBufferedImage(int width, int height, byte[] data) {
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, EVEPlugin.rdm.getColorModel());
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, RadioData.getColorModel());
         DataBufferByte dataBuffer = new DataBufferByte(data, width * height);
         Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xff }, new Point(0, 0));
         newImage.setData(raster);
@@ -118,7 +118,7 @@ class DownloadedJPXData implements ImageDataHandler {
         if (view != null) {
             JP2ImageCallisto image = view.getJP2Image();
             TimeAxis xAxis = DrawController.selectedAxis;
-            Rectangle roi = getROI(xAxis, EVEPlugin.rdm.getYAxis());
+            Rectangle roi = getROI(xAxis, EVEPlugin.rd.getYAxis());
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
                 image.setRegion(roi);
                 view.render(null, null, last_resolution);

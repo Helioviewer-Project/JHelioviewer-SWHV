@@ -10,7 +10,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 
 @SuppressWarnings("serial")
 class RadioOptionsPanel extends SmallPanel {
@@ -27,7 +26,7 @@ class RadioOptionsPanel extends SmallPanel {
 
         JComboBox<String> lutBox = new JComboBox<>(LUT.getStandardList().keySet().toArray(new String[0]));
         lutBox.setSelectedItem(selected);
-        lutBox.addActionListener(e -> EVEPlugin.rdm.setLUT(LUT.getStandardList().get(lutBox.getSelectedItem())));
+        lutBox.addActionListener(e -> RadioData.setLUT(LUT.getStandardList().get(lutBox.getSelectedItem())));
 
         JButton availabilityButton = new JButton("Available data");
         availabilityButton.addActionListener(e -> {
