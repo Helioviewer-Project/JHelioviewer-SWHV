@@ -2,11 +2,16 @@ package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -78,13 +83,17 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         if (srcURI.equals(dstFile.toURI())) // avoid self-destruction
             return null;
 
-        boolean failed = false;
-        FileOutputStream out = null;
+        URL srcURL;
         try {
-            DownloadStream ds = new DownloadStream(srcURI.toURL());
-            InputStream in = ds.getInput();
-            out = new FileOutputStream(dstFile);
+            srcURL = srcURI.toURL();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
 
+        boolean failed = false;
+        DownloadStream ds = new DownloadStream(srcURL);
+        try (InputStream in = new BufferedInputStream(ds.getInput(), BUFSIZ)) {
             int contentLength = ds.getContentLength();
             if (contentLength > 0) {
                 EventQueue.invokeLater(() -> {
@@ -96,29 +105,28 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
             byte[] buffer = new byte[BUFSIZ];
             int numTotalRead = 0, numCurrentRead;
 
-            while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, numCurrentRead);
-                numTotalRead += numCurrentRead;
+            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(dstFile), BUFSIZ)) {
+                while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, numCurrentRead);
+                    numTotalRead += numCurrentRead;
 
-                if (contentLength > 0) {
-                    int finalTotalRead = numTotalRead;
-                    EventQueue.invokeLater(() -> progressBar.setValue(finalTotalRead));
+                    if (contentLength > 0) {
+                        int finalTotalRead = numTotalRead;
+                        EventQueue.invokeLater(() -> progressBar.setValue(finalTotalRead));
+                    }
                 }
-            }
-
-            if (!isCancelled()) { // reload JPX from disk
-                LoadURITask uriTask = new LoadURITask(layer, dstFile.toURI());
-                JHVGlobals.getExecutorService().execute(uriTask);
             }
         } catch (Exception e) {
             failed = true;
             e.printStackTrace();
         } finally {
             try {
-                if (out != null)
-                    out.close();
                 if (failed || isCancelled())
                     dstFile.delete();
+                else { // reload JPX from disk
+                    LoadURITask uriTask = new LoadURITask(layer, dstFile.toURI());
+                    JHVGlobals.getExecutorService().execute(uriTask);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
