@@ -92,7 +92,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
         Band band = new Band(bandType);
         band.setDataColor(BandColors.getNextColor());
-        DownloadController.getSingletonInstance().updateBand(band, EVEPlugin.dc.availableAxis.start, EVEPlugin.dc.availableAxis.end);
+        DownloadController.updateBand(band, EVEPlugin.dc.availableAxis.start, EVEPlugin.dc.availableAxis.end);
     }
 
     private void updateDrawController() {

@@ -55,7 +55,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         return !isVisible();
     }
 
-    private IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
+    private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
         return new IndexColorModel(8, lut2.getLut8().length, lut2.getLut8(), 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 
@@ -121,7 +121,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         }
     }
 
-    private void initJPX(ArrayList<JP2ViewCallisto> jpList, ArrayList<Long> datesToDownload) {
+    private static void initJPX(ArrayList<JP2ViewCallisto> jpList, ArrayList<Long> datesToDownload) {
         for (int i = 0; i < jpList.size(); i++) {
             JP2ViewCallisto v = jpList.get(i);
             long date = datesToDownload.get(i);
@@ -139,7 +139,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         }
     }
 
-    private void requestForData() {
+    private static void requestForData() {
         for (DownloadedJPXData jpxData : cache.values()) {
             jpxData.requestData();
         }

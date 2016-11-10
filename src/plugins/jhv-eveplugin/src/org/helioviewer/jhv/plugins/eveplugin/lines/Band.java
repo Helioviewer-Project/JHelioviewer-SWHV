@@ -93,7 +93,7 @@ public class Band extends AbstractLineDataSelectorElement {
 
     @Override
     public boolean isDownloading() {
-        return DownloadController.getSingletonInstance().isDownloadActive(this);
+        return DownloadController.isDownloadActive(this);
     }
 
     @Override
@@ -194,7 +194,7 @@ public class Band extends AbstractLineDataSelectorElement {
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        DownloadController.getSingletonInstance().updateBand(this, selectedAxis.start, selectedAxis.end);
+        DownloadController.updateBand(this, selectedAxis.start, selectedAxis.end);
         updateGraphsData();
     }
 
