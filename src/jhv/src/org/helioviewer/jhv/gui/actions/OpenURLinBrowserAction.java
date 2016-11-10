@@ -11,12 +11,6 @@ public class OpenURLinBrowserAction extends AbstractAction {
 
     private final String urlToOpen;
 
-    /**
-     * @param name
-     *            name of the action that should be displayed on a button
-     * @param url
-     *            URL to open on click
-     */
     public OpenURLinBrowserAction(String name, String url) {
         super(name);
         urlToOpen = url;

@@ -211,10 +211,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return graphSize;
     }
 
-    public boolean isLocked() {
-        return isLocked;
-    }
-
     public void setLocked(boolean isLocked) {
         this.isLocked = isLocked;
         if (isLocked && latestMovieTime != Long.MIN_VALUE) {

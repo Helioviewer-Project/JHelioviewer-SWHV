@@ -15,11 +15,6 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 @SuppressWarnings("serial")
 public class ZoomOutAction extends AbstractAction {
 
-    /**
-     * @param small
-     *            - if true, chooses a small (16x16), otherwise a large (24x24)
-     *            icon for the action
-     */
     public ZoomOutAction(boolean small, boolean useIcon) {
         super("Zoom Out", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_OUT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_OUT)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom out");

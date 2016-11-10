@@ -16,11 +16,6 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 @SuppressWarnings("serial")
 public class ZoomFitAction extends AbstractAction {
 
-    /**
-     * @param small
-     *            - if true, chooses a small (16x16), otherwise a large (24x24)
-     *            icon for the action
-     */
     public ZoomFitAction(boolean small, boolean useIcon) {
         super("Zoom to Fit", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_FIT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_FIT)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom to fit");

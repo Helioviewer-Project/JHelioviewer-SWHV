@@ -9,15 +9,11 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
-/**
- * Action that resets the view transformation of the current camera
- * to its default settings
- */
 @SuppressWarnings("serial")
 public class ClearAnnotationsAction extends AbstractAction {
 
     public ClearAnnotationsAction(boolean small, boolean useIcon) {
-        super("Clear Annotations", useIcon ? (IconBank.getIcon(JHVIcon.RESET)) : null);
+        super("Clear Annotations", useIcon ? IconBank.getIcon(JHVIcon.RESET) : null);
         putValue(SHORT_DESCRIPTION, "Clear any annotation");
     }
 
