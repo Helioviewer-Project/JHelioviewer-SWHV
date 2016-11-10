@@ -95,7 +95,7 @@ public class JHVRelatedEvents {
         return highlighted;
     }
 
-    private void fireHighlightChanged() {
+    private static void fireHighlightChanged() {
         for (JHVEventHighlightListener l : listeners) {
             l.eventHightChanged();
         }

@@ -17,14 +17,10 @@ public class SWEKPlugin implements Plugin {
     /** the incoming request manager */
     private final IncomingRequestManager incomingRequestManager;
 
-    /** instance of the event container */
-    private final JHVEventCache eventCache;
-
     private final SWEKRenderable renderable;
 
     public SWEKPlugin() {
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
-        eventCache = JHVEventCache.getSingletonInstance();
         renderable = new SWEKRenderable();
     }
 
@@ -40,7 +36,7 @@ public class SWEKPlugin implements Plugin {
 
             @Override
             protected void done() {
-                eventCache.registerHandler(incomingRequestManager);
+                JHVEventCache.registerHandler(incomingRequestManager);
                 ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), true);
                 ImageViewerGui.getLeftContentPane().revalidate();
 

@@ -22,14 +22,12 @@ import org.helioviewer.jhv.database.EventDatabase.JsonEvent;
 public class DownloadWorker implements Runnable {
 
     private final JHVEventType jhvType;
-    private final JHVEventCache eventCache;
     private final List<SWEKParam> params;
     private final Interval requestInterval;
 
-    public DownloadWorker(JHVEventType _jhvType, Interval interval, List<SWEKParam> params, JHVEventCache _eventCache) {
+    public DownloadWorker(JHVEventType _jhvType, Interval interval, List<SWEKParam> params) {
         requestInterval = interval;
         jhvType = _jhvType;
-        eventCache = _eventCache;
         this.params = params;
     }
 
@@ -46,7 +44,7 @@ public class DownloadWorker implements Runnable {
             ArrayList<JHVAssociation> associationList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, jhvType);
             EventQueue.invokeLater(() -> {
                 for (JHVAssociation assoc : associationList) {
-                    eventCache.add(assoc);
+                    JHVEventCache.add(assoc);
                 }
             });
 
@@ -54,11 +52,11 @@ public class DownloadWorker implements Runnable {
             ArrayList<JsonEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
             for (JsonEvent event : eventList) {
                 JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end, false);
-                EventQueue.invokeLater(() -> eventCache.add(ev));
+                EventQueue.invokeLater(() -> JHVEventCache.add(ev));
             }
 
             EventQueue.invokeLater(() -> {
-                eventCache.finishedDownload(false);
+                JHVEventCache.finishedDownload(false);
                 SWEKDownloadManager.getSingletonInstance().workerFinished(DownloadWorker.this);
             });
             EventDatabase.addDaterange2db(requestInterval.start, requestInterval.end, jhvType);

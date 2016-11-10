@@ -84,7 +84,7 @@ public class JHVEventParameter {
         return parameterDisplayValue;
     }
 
-    private String beautifyValue(String value) {
+    private static String beautifyValue(String value) {
         if (Regex.FloatingPoint.matcher(value).matches() &&
                 !Regex.Integer.matcher(value).matches()) {
             String result = numFormatter.format(Double.parseDouble(value));

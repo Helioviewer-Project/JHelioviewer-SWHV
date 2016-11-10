@@ -42,7 +42,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         if (force || first < beginTime || last > endTime) {
             beginTime = first;
             endTime = last;
-            JHVEventCache.getSingletonInstance().requestForInterval(first, last, SWEKData.this);
+            JHVEventCache.requestForInterval(first, last, SWEKData.this);
         }
     }
 
@@ -64,7 +64,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
 
     public ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
-        JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginTime, endTime, beginTime, endTime);
+        JHVEventCacheResult result = JHVEventCache.get(beginTime, endTime, beginTime, endTime);
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> data = result.getAvailableEvents();
         for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
             for (Map.Entry<JHVEventCache.SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
