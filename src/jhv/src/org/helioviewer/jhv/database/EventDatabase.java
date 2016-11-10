@@ -456,7 +456,7 @@ public class EventDatabase {
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
         ArrayList<JsonEvent> jsonEvents = new ArrayList<>();
 
-        for (SWEKRelatedEvents re : evt.getSWEKRelatedEvents()) {
+        for (SWEKRelatedEvents re : SWEKEventType.getSWEKRelatedEvents()) {
             if (re.getEvent() == evt) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
                 for (SWEKRelatedOn swon : relon) {
@@ -817,7 +817,7 @@ public class EventDatabase {
                             long start = rs.getLong(2);
                             long end = rs.getLong(3);
                             byte[] json = rs.getBytes(4);
-                            ret.add(new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end));
+                            ret.add(new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getSWEKEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end));
                         }
                     }
                 }
@@ -881,7 +881,7 @@ public class EventDatabase {
                     long start = rs.getLong(2);
                     long end = rs.getLong(3);
                     byte[] json = rs.getBytes(4);
-                    je = new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end);
+                    je = new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getSWEKEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end);
                 }
             }
             return je;
