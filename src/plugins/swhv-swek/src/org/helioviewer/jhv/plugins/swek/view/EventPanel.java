@@ -26,9 +26,6 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 
 /**
  * Panel display one event type.
- * 
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
  */
 @SuppressWarnings("serial")
 public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelListener, ActionListener {
@@ -55,7 +52,7 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
      */
     public EventPanel(SWEKEventType eventType) {
         this.eventType = eventType;
-        SWEKTreeModel.getSingletonInstance().addSWEKTreeModelListener(this);
+        SWEKTreeModel.addSWEKTreeModelListener(this);
         eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(this.eventType));
         eventPanelModel.addEventPanelModelListener(SWEKDownloadManager.getSingletonInstance());
         loadingTimer = new Timer(500, this);

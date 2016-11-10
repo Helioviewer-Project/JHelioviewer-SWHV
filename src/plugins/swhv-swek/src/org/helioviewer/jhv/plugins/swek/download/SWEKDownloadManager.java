@@ -37,13 +37,11 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private final ArrayList<JHVEventType> activeEventTypes = new ArrayList<>();
     private final JHVEventCache eventCache;
     private final FilterManager filterManager;
-    private final SWEKTreeModel treeModel;
 
     private SWEKDownloadManager() {
         eventCache = JHVEventCache.getSingletonInstance();
         filterManager = FilterManager.getSingletonInstance();
         filterManager.addFilterManagerListener(this);
-        treeModel = SWEKTreeModel.getSingletonInstance();
 
         PriorityBlockingQueue<Runnable> priorityQueue = new PriorityBlockingQueue<>(2048, new ComparePriority());
         downloadEventPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS, priorityQueue, new JHVThread.NamedThreadFactory("SWEK Download"), new ThreadPoolExecutor.DiscardPolicy());
@@ -74,7 +72,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
                 }
             }
             if (dwMap.get(eventType).isEmpty()) {
-                treeModel.setStopLoading(eventType);
+                SWEKTreeModel.setStopLoading(eventType);
                 dwMap.remove(eventType);
             }
         }
@@ -122,7 +120,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
 
         boolean loadingCondition = (dwMapList != null) && !dwMapList.isEmpty();
         if (!loadingCondition)
-            treeModel.setStopLoading(worker.getEventType());
+            SWEKTreeModel.setStopLoading(worker.getEventType());
     }
 
     private void addToDownloaderMap(SWEKEventType eventType, DownloadWorker dw) {
@@ -185,7 +183,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {
                 DownloadWorker dw = new DownloadWorker(jhvType, intt, params, eventCache);
-                treeModel.setStartLoading(eventType);
+                SWEKTreeModel.setStartLoading(eventType);
                 addToDownloaderMap(eventType, dw);
                 downloadEventPool.execute(dw);
             }
