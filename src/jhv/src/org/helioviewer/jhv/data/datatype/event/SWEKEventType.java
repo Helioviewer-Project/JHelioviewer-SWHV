@@ -143,7 +143,7 @@ public class SWEKEventType {
      *            the list of parameter for this event type
      * @return true if there are filters in this event type, false if not
      */
-    private boolean checkFilters(List<SWEKParameter> parameters) {
+    private static boolean checkFilters(List<SWEKParameter> parameters) {
         for (SWEKParameter parameter : parameters) {
             if (parameter.getParameterFilter() != null) {
                 return true;

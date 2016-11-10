@@ -39,7 +39,7 @@ public class HEKParser implements SWEKParser {
         return currentEvent;
     }
 
-    private void parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
+    private static void parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
         List<Vec3> hgsBoundedBox = null;
         List<Vec3> hgsBoundCC = null;
         Vec3 hgsCentralPoint = null;
@@ -121,13 +121,13 @@ public class HEKParser implements SWEKParser {
         handleCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
     }
 
-    private void parseRefs(JHVEvent currentEvent, JSONArray refs) throws JSONException {
+    private static void parseRefs(JHVEvent currentEvent, JSONArray refs) throws JSONException {
         for (int i = 0; i < refs.length(); i++) {
             parseRef(currentEvent, refs.getJSONObject(i));
         }
     }
 
-    private void parseRef(JHVEvent currentEvent, JSONObject ref) throws JSONException {
+    private static void parseRef(JHVEvent currentEvent, JSONObject ref) throws JSONException {
         Iterator<?> keys = ref.keys();
         String url = "", type = "";
         boolean ok = false;
@@ -172,7 +172,7 @@ public class HEKParser implements SWEKParser {
      *            the value to parse
      * @return a list of JHV points
      */
-    private List<Vec3> parsePolygon(String value) {
+    private static List<Vec3> parsePolygon(String value) {
         List<Vec3> polygonPoints = new ArrayList<>();
         if (value.toLowerCase(Locale.ENGLISH).contains("polygon")) {
             String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
@@ -199,7 +199,7 @@ public class HEKParser implements SWEKParser {
      *            the point to parse
      * @return The GL3DVec3 or null if it could not be parsed.
      */
-    private Vec3 parsePoint(String value) {
+    private static Vec3 parsePoint(String value) {
         if (value.toLowerCase(Locale.ENGLISH).contains("point")) {
             String coordinates = value.substring(value.indexOf('(') + 1, value.indexOf(')'));
             return parseCoordinates(coordinates);
@@ -215,7 +215,7 @@ public class HEKParser implements SWEKParser {
      *            the string to parse
      * @return the GL3DVec3 or null of it could not be parsed
      */
-    private Vec3 parseCoordinates(String coordinateString) {
+    private static Vec3 parseCoordinates(String coordinateString) {
         double[] coordinate = new double[] { 0., 0., 0. };
         boolean notnull = false;
 
@@ -236,12 +236,12 @@ public class HEKParser implements SWEKParser {
         return null;
     }
 
-    private void handleCoordinates(JHVEvent currentEvent, List<Vec3> hgsBoundedBox, List<Vec3> hgsBoundCC, Vec3 hgsCentralPoint, Double hgsX, Double hgsY) {
+    private static void handleCoordinates(JHVEvent currentEvent, List<Vec3> hgsBoundedBox, List<Vec3> hgsBoundCC, Vec3 hgsCentralPoint, Double hgsX, Double hgsY) {
         hgsBoundedBox = checkAndFixBoundingBox(hgsBoundedBox);
         handleHGSCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
     }
 
-    private List<Vec3> checkAndFixBoundingBox(List<Vec3> hgsBoundedBox) {
+    private static List<Vec3> checkAndFixBoundingBox(List<Vec3> hgsBoundedBox) {
         if (hgsBoundedBox != null) {
             double minX = 0.0;
             double minY = 0.0;
@@ -270,7 +270,7 @@ public class HEKParser implements SWEKParser {
         return hgsBoundedBox;
     }
 
-    private void handleHGSCoordinates(JHVEvent currentEvent, List<Vec3> hgsBoundedBox, List<Vec3> hgsBoundCC, Vec3 hgsCentralPoint, Double hgsX, Double hgsY) {
+    private static void handleHGSCoordinates(JHVEvent currentEvent, List<Vec3> hgsBoundedBox, List<Vec3> hgsBoundCC, Vec3 hgsCentralPoint, Double hgsX, Double hgsY) {
         if (hgsBoundedBox != null || hgsCentralPoint != null || (hgsX != null && hgsY != null) || hgsBoundCC != null) {
             List<Vec3> localHGSBoundedBox;
             List<Vec3> localHGSBoundCC;
@@ -318,7 +318,7 @@ public class HEKParser implements SWEKParser {
         }
     }
 
-    private Vec3 convertHGSJHV(Vec3 el, Position.L p) {
+    private static Vec3 convertHGSJHV(Vec3 el, Position.L p) {
         double theta = Math.PI / 180 * el.y;
         double phi = Math.PI / 180 * el.x - p.lon;
 

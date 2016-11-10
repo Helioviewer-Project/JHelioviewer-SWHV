@@ -23,14 +23,14 @@ public class ComesepParser implements SWEKParser {
         return currentEvent;
     }
 
-    private void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
+    private static void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
         Iterator<?> keys = result.keys();
         while (keys.hasNext()) {
             parseParameter(result, keys.next(), currentEvent);
         }
     }
 
-    private void parseParameter(JSONObject result, Object key, JHVEvent currentEvent) throws JSONException {
+    private static void parseParameter(JSONObject result, Object key, JHVEvent currentEvent) throws JSONException {
         if (key instanceof String) {
             String keyString = ((String) key).intern();
             String value;

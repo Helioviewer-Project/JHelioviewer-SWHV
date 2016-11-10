@@ -28,9 +28,10 @@ import org.json.JSONObject;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class HEKDownloader extends SWEKDownloader {
+
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
-    private void patch_event(JSONObject result, JHVEventType type) {
+    private static void patch_event(JSONObject result, JHVEventType type) {
         boolean c1 = type.getEventType().getEventName().equals("Flare");
         boolean c2 = type.getSupplier().getSupplierName().equals("SWPC");
         boolean c = c1 && c2;

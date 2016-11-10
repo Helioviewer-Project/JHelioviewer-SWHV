@@ -32,7 +32,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         return instance;
     }
 
-    public void reset() {
+    public static void reset() {
         instance = null;
     }
 
