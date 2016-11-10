@@ -49,7 +49,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
-    private void bindTexture(GL2 gl, String key, ImageIcon icon) {
+    private static void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
             BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -66,7 +66,7 @@ public class SWEKRenderable extends AbstractRenderable {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q) {
+    private static void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q) {
         gl.glBegin(GL2.GL_LINE_STRIP);
         {
             Vec3 v = new Vec3();
@@ -87,7 +87,7 @@ public class SWEKRenderable extends AbstractRenderable {
 
     private static final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
-    private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
+    private static void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
@@ -152,7 +152,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private static void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -197,7 +197,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private static void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -215,7 +215,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
+    private static void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
         double width2 = width / 4.;
         double height2 = height / 4.;
 
@@ -235,7 +235,7 @@ public class SWEKRenderable extends AbstractRenderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
+    private static void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -253,7 +253,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale, Viewport vp) {
+    private static void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale, Viewport vp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
         double speed = SWEKData.readCMESpeed(evt);
@@ -309,7 +309,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
+    private static void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
         y = -y;
 
         double width2 = width / 2.;
@@ -353,7 +353,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private final static int MOUSE_OFFSET_X = 25;
     private final static int MOUSE_OFFSET_Y = 25;
 
-    private void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
+    private static void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<>();
         JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
         JHVEventParameter[] params = evt.getSimpleVisibleEventParameters();

@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ComesepDownloader extends SWEKDownloader {
+
     private static final String _baseurl = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
@@ -83,7 +84,7 @@ public class ComesepDownloader extends SWEKDownloader {
         return baseURL.toString();
     }
 
-    private StringBuilder appendModel(StringBuilder baseURL, List<SWEKParam> params) {
+    private static StringBuilder appendModel(StringBuilder baseURL, List<SWEKParam> params) {
         String model = "";
         for (SWEKParam p : params) {
             if (p.param.equals("provider")) {

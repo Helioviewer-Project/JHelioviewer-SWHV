@@ -14,9 +14,7 @@ import org.helioviewer.jhv.threads.JHVWorker;
 
 public class SWEKPlugin implements Plugin {
 
-    /** the incoming request manager */
     private final IncomingRequestManager incomingRequestManager;
-
     private final SWEKRenderable renderable;
 
     public SWEKPlugin() {
@@ -54,15 +52,12 @@ public class SWEKPlugin implements Plugin {
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         Layers.removeTimespanListener(SWEKData.getSingletonInstance());
-        SWEKData.getSingletonInstance().reset();
+        SWEKData.reset();
 
         ImageViewerGui.getLeftContentPane().remove(SWEKPluginPanel.getSWEKPluginPanelInstance());
         ImageViewerGui.getLeftContentPane().revalidate();
     }
 
-    /*
-     * Plugin interface
-     */
     @Override
     public String getName() {
         return "Space Weather Event Knowledgebase " + "$Rev$";
