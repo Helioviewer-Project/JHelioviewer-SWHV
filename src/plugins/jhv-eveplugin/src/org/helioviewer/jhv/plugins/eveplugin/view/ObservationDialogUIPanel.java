@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandGroup;
@@ -22,6 +22,7 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.lines.DownloadController;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
@@ -58,7 +59,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     public void setupDatasets() {
-        DefaultComboBoxModel<BandGroup> model = new DefaultComboBoxModel<>(BandTypeAPI.getSingletonInstance().getOrderedGroups().toArray(new BandGroup[0]));
+        DefaultComboBoxModel<BandGroup> model = new DefaultComboBoxModel<>(BandTypeAPI.getOrderedGroups().toArray(new BandGroup[0]));
         if (model.getSize() > 0) {
             comboBoxGroup.setModel(model);
             comboBoxGroup.setSelectedIndex(0);
@@ -73,9 +74,9 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         DefaultComboBoxModel<BandType> model = (DefaultComboBoxModel<BandType>) comboBoxData.getModel();
         model.removeAllElements();
 
-        BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
+        BandType[] values = BandTypeAPI.getBandTypes(selectedGroup);
         for (BandType value : values) {
-            if (!EVEPlugin.ldsm.containsBandType(value)) {
+            if (!LineDataSelectorModel.containsBandType(value)) {
                 model.addElement(value);
             }
         }
@@ -92,15 +93,15 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
         Band band = new Band(bandType);
         band.setDataColor(BandColors.getNextColor());
-        DownloadController.updateBand(band, EVEPlugin.dc.availableAxis.start, EVEPlugin.dc.availableAxis.end);
+        DownloadController.updateBand(band, DrawController.availableAxis.start, DrawController.availableAxis.end);
     }
 
     private void updateDrawController() {
         Interval interval = defineInterval(getTime());
-        EVEPlugin.dc.setSelectedInterval(interval.start, interval.end);
+        DrawController.setSelectedInterval(interval.start, interval.end);
     }
 
-    private Interval defineInterval(long time) {
+    private static Interval defineInterval(long time) {
         Interval movieInterval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
         if (movieInterval.containsPointInclusive(time)) {
             return movieInterval;

@@ -21,31 +21,19 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
 public class EventModel extends AbstractLineDataSelectorElement implements JHVEventHandler {
 
-    private static EventModel instance;
-    private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
+    private static Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
 
-    private EventPlotConfiguration eventUnderMouse;
-
-    private JHVRelatedEvents highlightedEvent = null;
-    private int highlightedEventPosition = -1;
-
-    private EventModel() {
-        EVEPlugin.ldsm.addLineData(this);
-        fetchData(EVEPlugin.dc.selectedAxis);
-    }
-
-    public static EventModel getSingletonInstance() {
-        if (instance == null) {
-            instance = new EventModel();
-        }
-        return instance;
-    }
+    private static EventPlotConfiguration eventUnderMouse;
+    private static JHVRelatedEvents highlightedEvent = null;
+    private static int highlightedEventPosition = -1;
 
     @Override
     public boolean isEmpty() {
@@ -54,26 +42,26 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        JHVEventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, this);
+        JHVEventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, EVEPlugin.em);
     }
 
     @Override
-    public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
-        this.events = events;
-        EVEPlugin.ldsm.downloadFinished(this);
+    public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> _events) {
+        events = _events;
+        LineDataSelectorModel.downloadFinished(EVEPlugin.em);
         if (isVisible) {
-            EVEPlugin.dc.fireRedrawRequest();
+            DrawController.fireRedrawRequest();
         }
     }
 
     @Override
     public void cacheUpdated() {
-        TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
-        JHVEventCache.requestForInterval(xAxis.start, xAxis.end, this);
-        EVEPlugin.dc.fireRedrawRequest();
+        TimeAxis xAxis = DrawController.selectedAxis;
+        JHVEventCache.requestForInterval(xAxis.start, xAxis.end, EVEPlugin.em);
+        DrawController.fireRedrawRequest();
     }
 
-    public JHVRelatedEvents getEventUnderMouse() {
+    public static JHVRelatedEvents getEventUnderMouse() {
         if (eventUnderMouse == null)
             return null;
         return eventUnderMouse.event;
@@ -243,7 +231,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
         private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int x, int y, int w, int h, Point mousePosition) {
             if (mousePosition != null) {
-                long ts = EVEPlugin.dc.selectedAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
+                long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
                 ArrayList<String> txts = new ArrayList<>();
                 JHVEventParameter[] params = event.getClosestTo(ts).getSimpleVisibleEventParameters();
                 int width = 1;

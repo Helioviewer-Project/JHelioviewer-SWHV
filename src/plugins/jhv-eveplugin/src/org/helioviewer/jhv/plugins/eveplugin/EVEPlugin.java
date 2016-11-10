@@ -11,8 +11,9 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
+import org.helioviewer.jhv.plugins.eveplugin.events.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
+import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
 import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -31,6 +32,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     public static final LineDataSelectorModel ldsm = new LineDataSelectorModel();
     public static final DrawController dc = new DrawController();
     public static final RadioData rdm = new RadioData();
+    public static final EventModel em = new EventModel();
     public static final ObservationDialogUIPanel op = new ObservationDialogUIPanel();
 
     private static final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
@@ -49,13 +51,17 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         Layers.addTimespanListener(dc);
         JHVRelatedEvents.addHighlightListener(dc);
 
-        ldsm.addLineDataSelectorModelListener(op);
+        LineDataSelectorModel.addLineDataSelectorModelListener(dc);
+        LineDataSelectorModel.addLineDataSelectorModelListener(op);
+        LineDataSelectorModel.addLineData(em);
+
+        // em.fetchData(DrawController.selectedAxis);
 
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
             @Override
             protected Void backgroundWork() {
-                BandTypeAPI.getSingletonInstance().getDatasets();
+                BandTypeAPI.getDatasets();
                 return null;
             }
 

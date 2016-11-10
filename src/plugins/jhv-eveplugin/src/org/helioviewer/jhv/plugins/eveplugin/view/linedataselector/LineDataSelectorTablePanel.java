@@ -26,6 +26,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
@@ -67,11 +68,11 @@ public class LineDataSelectorTablePanel extends JPanel {
 
         };
 
-        EVEPlugin.ldsm.addLineDataSelectorModelListener(new LineDataSelectorModelListener() {
+        LineDataSelectorModel.addLineDataSelectorModelListener(new LineDataSelectorModelListener() {
 
             @Override
             public void lineDataAdded(LineDataSelectorElement element) {
-                int i = EVEPlugin.ldsm.getRowIndex(element);
+                int i = LineDataSelectorModel.getRowIndex(element);
                 grid.getSelectionModel().setSelectionInterval(i, i);
             }
 
@@ -109,7 +110,7 @@ public class LineDataSelectorTablePanel extends JPanel {
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
-        addLayerButtonWrapper.add(EVEPlugin.dc.getOptionsPanel(), BorderLayout.EAST);
+        addLayerButtonWrapper.add(DrawController.getOptionsPanel(), BorderLayout.EAST);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
@@ -185,14 +186,14 @@ public class LineDataSelectorTablePanel extends JPanel {
                     boolean visible = !lineDataElement.isVisible();
 
                     lineDataElement.setVisibility(visible);
-                    model.fireLineDataSelectorElementVisibility(lineDataElement, visible);
+                    LineDataSelectorModel.fireLineDataSelectorElementVisibility(lineDataElement, visible);
                 }
                 if (col == TITLE_COL || col == LOADING_COL || col == LINECOLOR_COL) {
                     LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
                     setOptionsPanel(lineDataElement);
                 }
                 if (col == REMOVE_COL) {
-                    model.removeRow(row);
+                    LineDataSelectorModel.removeRow(row);
                 }
                 revalidate();
                 repaint();

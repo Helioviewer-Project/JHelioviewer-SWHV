@@ -21,9 +21,11 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 
@@ -47,7 +49,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         colorModel = createIndexColorModelFromLUT(LUT.getStandardList().get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
         yAxis = new YAxis(400, 20, "Mhz", false);
-        EVEPlugin.ldsm.addLineData(this);
+        LineDataSelectorModel.addLineData(this);
     }
 
     @Override
@@ -65,7 +67,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
             DownloadedJPXData jpxData = entry.getValue();
             jpxData.changeColormap(colorModel);
         }
-        EVEPlugin.dc.fireRedrawRequest();
+        DrawController.fireRedrawRequest();
     }
 
     IndexColorModel getColorModel() {
@@ -114,7 +116,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         }
 
         if (!toDownloadStartDates.isEmpty()) {
-            EVEPlugin.ldsm.downloadStarted(this);
+            LineDataSelectorModel.downloadStarted(this);
             JHVWorker<ArrayList<JP2ViewCallisto>, Void> imageDownloadWorker = new RadioJPXDownload(toDownloadStartDates);
             imageDownloadWorker.setThreadName("EVE--RadioDownloader");
             EVEPlugin.executorService.execute(imageDownloadWorker);
@@ -165,8 +167,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
     public void setVisibility(boolean visible) {
         isVisible = visible;
         clearCache();
-        fetchData(EVEPlugin.dc.selectedAxis);
-        EVEPlugin.dc.fireRedrawRequest();
+        fetchData(DrawController.selectedAxis);
+        DrawController.fireRedrawRequest();
     }
 
     @Override
