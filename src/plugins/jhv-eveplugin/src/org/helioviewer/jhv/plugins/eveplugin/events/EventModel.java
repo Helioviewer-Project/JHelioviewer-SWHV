@@ -28,7 +28,6 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineD
 public class EventModel extends AbstractLineDataSelectorElement implements JHVEventHandler {
 
     private static EventModel instance;
-    private final JHVEventCache eventCache;
     private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
 
     private EventPlotConfiguration eventUnderMouse;
@@ -37,7 +36,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     private int highlightedEventPosition = -1;
 
     private EventModel() {
-        eventCache = JHVEventCache.getSingletonInstance();
         EVEPlugin.ldsm.addLineData(this);
         fetchData(EVEPlugin.dc.selectedAxis);
     }
@@ -56,7 +54,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        eventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, EventModel.this);
+        JHVEventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, this);
     }
 
     @Override
@@ -71,7 +69,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     @Override
     public void cacheUpdated() {
         TimeAxis xAxis = EVEPlugin.dc.selectedAxis;
-        eventCache.requestForInterval(xAxis.start, xAxis.end, this);
+        JHVEventCache.requestForInterval(xAxis.start, xAxis.end, this);
         EVEPlugin.dc.fireRedrawRequest();
     }
 
@@ -171,7 +169,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     @Override
     public boolean hasData() {
-        return eventCache.hasData();
+        return JHVEventCache.hasData();
     }
 
     @Override

@@ -24,17 +24,19 @@ import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 
 public class JHVEventCache {
 
-    private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<>();
-
-    private JHVEventCacheRequestHandler incomingRequestManager;
-
     private static final double factor = 0.2;
+
+    private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<>();
+    private static final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
+    private static final Map<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
+    private static final Set<JHVEventType> activeEventTypes = new HashSet<>();
+    private static final Map<JHVEventType, RequestCache> downloadedCache = new HashMap<>();
+    private static final ArrayList<JHVAssociation> assocs = new ArrayList<>();
+
+    private static JHVEventCacheRequestHandler incomingRequestManager;
 
     private static JHVRelatedEvents lastHighlighted = null;
 
-    private static JHVEventCache instance;
-
-    /** The events received for a certain date */
     public static class SortedDateInterval implements Comparable<SortedDateInterval> {
 
         public long start;
@@ -75,26 +77,15 @@ public class JHVEventCache {
 
     }
 
-    private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
-    private final Map<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
-    private final Set<JHVEventType> activeEventTypes = new HashSet<>();
-    private final Map<JHVEventType, RequestCache> downloadedCache = new HashMap<>();
-    private final ArrayList<JHVAssociation> assocs = new ArrayList<>();
-
-    private JHVEventCache() {
+    public static void registerHandler(JHVEventCacheRequestHandler _incomingRequestManager) {
+        incomingRequestManager = _incomingRequestManager;
     }
 
-    public static JHVEventCache getSingletonInstance() {
-        if (instance == null) {
-            instance = new JHVEventCache();
-        }
-        return instance;
-    }
-
-    public void requestForInterval(final long startDate, final long endDate, final JHVEventHandler handler) {
+    public static void requestForInterval(long startDate, long endDate, JHVEventHandler handler) {
         long deltaT = Math.max((long) ((endDate - startDate) * factor), TimeUtils.DAY_IN_MILLIS);
         long newStartDate = startDate - deltaT;
         long newEndDate = endDate + deltaT;
+
         cacheEventHandlers.add(handler);
 
         JHVEventCacheResult result = get(startDate, endDate, newStartDate, newEndDate);
@@ -108,31 +99,31 @@ public class JHVEventCache {
         }
     }
 
-    public void finishedDownload(boolean partially) {
+    public static void finishedDownload(boolean partially) {
         fireEventCacheChanged();
     }
 
-    public void removeEvents(final JHVEventType eventType, boolean keepActive) {
+    public static void removeEvents(JHVEventType eventType, boolean keepActive) {
         removeEventType(eventType, keepActive);
         fireEventCacheChanged();
     }
 
-    private void requestEvents(JHVEventType eventType, Interval interval) {
+    private static void requestEvents(JHVEventType eventType, Interval interval) {
         incomingRequestManager.handleRequestForInterval(eventType, interval);
     }
 
-    private void fireEventCacheChanged() {
+    private static void fireEventCacheChanged() {
         for (JHVEventHandler handler : cacheEventHandlers) {
             handler.cacheUpdated();
         }
     }
 
-    public void intervalsNotDownloaded(JHVEventType eventType, Interval interval) {
+    public static void intervalsNotDownloaded(JHVEventType eventType, Interval interval) {
         removeRequestedIntervals(eventType, interval);
         get(interval.start, interval.end, interval.start, interval.end);
     }
 
-    public void eventTypeActivated(JHVEventType eventType) {
+    public static void eventTypeActivated(JHVEventType eventType) {
         _eventTypeActivated(eventType);
         fireEventCacheChanged();
     }
@@ -151,11 +142,8 @@ public class JHVEventCache {
         lastHighlighted = event;
     }
 
-    public void registerHandler(JHVEventCacheRequestHandler incomingRequestManager) {
-        this.incomingRequestManager = incomingRequestManager;
-    }
 
-    public void add(JHVEvent event) {
+    public static void add(JHVEvent event) {
         Integer id = event.getUniqueID();
         if (relEvents.containsKey(id)) {
             relEvents.get(id).swapEvent(event, events);
@@ -165,11 +153,11 @@ public class JHVEventCache {
         checkAssociation(event);
     }
 
-    public JHVRelatedEvents getRelatedEvents(int id) {
+    public static JHVRelatedEvents getRelatedEvents(int id) {
         return relEvents.get(id);
     }
 
-    private void checkAssociation(JHVEvent event) {
+    private static void checkAssociation(JHVEvent event) {
         int uid = event.getUniqueID();
         JHVRelatedEvents rEvent = relEvents.get(uid);
         for (Iterator<JHVAssociation> iterator = assocs.iterator(); iterator.hasNext();) {
@@ -187,12 +175,12 @@ public class JHVEventCache {
         }
     }
 
-    private void createNewRelatedEvent(JHVEvent event) {
+    private static void createNewRelatedEvent(JHVEvent event) {
         JHVRelatedEvents revent = new JHVRelatedEvents(event, events);
         relEvents.put(event.getUniqueID(), revent);
     }
 
-    private void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
+    private static void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
         if (current == found) {
             return;
         }
@@ -204,7 +192,7 @@ public class JHVEventCache {
         }
     }
 
-    public void add(JHVAssociation association) {
+    public static void add(JHVAssociation association) {
         if (relEvents.containsKey(association.left) && relEvents.containsKey(association.right)) {
             JHVRelatedEvents ll = relEvents.get(association.left);
             JHVRelatedEvents rr = relEvents.get(association.right);
@@ -217,7 +205,7 @@ public class JHVEventCache {
         }
     }
 
-    public JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
+    public static JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<>();
         Map<JHVEventType, List<Interval>> missingIntervals = new HashMap<>();
 
@@ -237,7 +225,7 @@ public class JHVEventCache {
         return new JHVEventCacheResult(eventsResult, missingIntervals);
     }
 
-    private void removeEventType(JHVEventType eventType, boolean keepActive) {
+    private static void removeEventType(JHVEventType eventType, boolean keepActive) {
         if (!keepActive) {
             activeEventTypes.remove(eventType);
         } else {
@@ -245,7 +233,7 @@ public class JHVEventCache {
         }
     }
 
-    private void deleteFromCache(JHVEventType eventType) {
+    private static void deleteFromCache(JHVEventType eventType) {
         RequestCache cache = new RequestCache();
         downloadedCache.put(eventType, cache);
         events.remove(eventType);
@@ -259,15 +247,15 @@ public class JHVEventCache {
         }
     }
 
-    public Collection<Interval> getAllRequestIntervals(JHVEventType eventType) {
+    public static Collection<Interval> getAllRequestIntervals(JHVEventType eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
     }
 
-    private void removeRequestedIntervals(JHVEventType eventType, Interval interval) {
+    private static void removeRequestedIntervals(JHVEventType eventType, Interval interval) {
         downloadedCache.get(eventType).removeRequestedInterval(interval);
     }
 
-    private void _eventTypeActivated(JHVEventType eventType) {
+    private static void _eventTypeActivated(JHVEventType eventType) {
         activeEventTypes.add(eventType);
         if (!downloadedCache.containsKey(eventType)) {
             RequestCache cache = new RequestCache();
@@ -275,7 +263,7 @@ public class JHVEventCache {
         }
     }
 
-    public void reset(SWEKEventType eventType) {
+    public static void reset(SWEKEventType eventType) {
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
             JHVEventType evt = JHVEventType.getJHVEventType(eventType, supplier);
             downloadedCache.remove(evt);
@@ -283,7 +271,7 @@ public class JHVEventCache {
         }
     }
 
-    public boolean hasData() {
+    public static boolean hasData() {
         return !events.isEmpty();
     }
 

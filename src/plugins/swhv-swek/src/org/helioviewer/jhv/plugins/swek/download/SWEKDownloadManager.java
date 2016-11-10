@@ -35,11 +35,9 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private final ExecutorService downloadEventPool;
     private final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap = new HashMap<>();
     private final ArrayList<JHVEventType> activeEventTypes = new ArrayList<>();
-    private final JHVEventCache eventCache;
     private final FilterManager filterManager;
 
     private SWEKDownloadManager() {
-        eventCache = JHVEventCache.getSingletonInstance();
         filterManager = FilterManager.getSingletonInstance();
         filterManager.addFilterManagerListener(this);
 
@@ -67,7 +65,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
                 DownloadWorker dw = it.next();
                 if (dw.getJHVEventType().getSupplier().equals(supplier)) {
                     dw.stopWorker();
-                    eventCache.intervalsNotDownloaded(dw.getJHVEventType(), dw.getRequestInterval());
+                    JHVEventCache.intervalsNotDownloaded(dw.getJHVEventType(), dw.getRequestInterval());
                     it.remove();
                 }
             }
@@ -76,12 +74,12 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
                 dwMap.remove(eventType);
             }
         }
-        eventCache.removeEvents(JHVEventType.getJHVEventType(eventType, supplier), keepActive);
+        JHVEventCache.removeEvents(JHVEventType.getJHVEventType(eventType, supplier), keepActive);
     }
 
     public void workerForcedToStop(DownloadWorker worker) {
         removeFromDownloaderMap(worker);
-        eventCache.intervalsNotDownloaded(worker.getJHVEventType(), worker.getRequestInterval());
+        JHVEventCache.intervalsNotDownloaded(worker.getJHVEventType(), worker.getRequestInterval());
     }
 
     public void workerFinished(DownloadWorker worker) {
@@ -92,7 +90,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     public void newEventTypeAndSourceActive(SWEKEventType eventType, SWEKSupplier supplier) {
         JHVEventType jhvType = JHVEventType.getJHVEventType(eventType, supplier);
         addEventTypeToActiveEventTypeMap(jhvType);
-        eventCache.eventTypeActivated(jhvType);
+        JHVEventCache.eventTypeActivated(jhvType);
     }
 
     @Override
@@ -108,7 +106,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     @Override
     public void filtersChanged(SWEKEventType swekEventType) {
         stopDownloadingEventType(swekEventType, true);
-        eventCache.reset(swekEventType);
+        JHVEventCache.reset(swekEventType);
         downloadSelectedSuppliers(swekEventType);
     }
 
@@ -170,7 +168,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     private void downloadForAllDates(JHVEventType jhvType) {
-        Collection<Interval> allIntervals = eventCache.getAllRequestIntervals(jhvType);
+        Collection<Interval> allIntervals = JHVEventCache.getAllRequestIntervals(jhvType);
         for (Interval interval : allIntervals) {
             startDownloadEventType(jhvType, interval);
         }
@@ -182,7 +180,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         List<SWEKParam> params = defineParameters(eventType, supplier);
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {
-                DownloadWorker dw = new DownloadWorker(jhvType, intt, params, eventCache);
+                DownloadWorker dw = new DownloadWorker(jhvType, intt, params);
                 SWEKTreeModel.setStartLoading(eventType);
                 addToDownloaderMap(eventType, dw);
                 downloadEventPool.execute(dw);
