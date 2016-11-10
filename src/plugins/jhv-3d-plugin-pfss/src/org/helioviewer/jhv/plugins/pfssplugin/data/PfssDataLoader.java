@@ -5,16 +5,14 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
@@ -31,24 +29,20 @@ public class PfssDataLoader implements Runnable {
 
     @Override
     public void run() {
-        InputStream in = null;
-        try {
-            String cacheFileName = JHVDirectory.PLUGINSCACHE.getPath() + url.replace('/', '_');
-            boolean loadFromFile = false;
-            File f = new File(cacheFileName);
-            if (f.exists() && !f.isDirectory() && f.canRead()) {
-                in = new BufferedInputStream(new FileInputStream(f), BUFSIZ);
-                loadFromFile = true;
-            } else {
-                URL u = new URL(PfssSettings.baseURL + url);
-                URLConnection uc = u.openConnection();
-                in = new BufferedInputStream(uc.getInputStream(), BUFSIZ);
-                String encoding = uc.getHeaderField("Content-Encoding");
-                if ("gzip".equals(encoding)) {
-                    in = new GZIPInputStream(in);
-                }
-            }
+        String cacheFileName = JHVDirectory.PLUGINSCACHE.getPath() + url.replace('/', '_');
+        File f = new File(cacheFileName);
 
+        String remote;
+        boolean loadFromFile;
+        if (f.exists() && !f.isDirectory() && f.canRead()) {
+            loadFromFile = true;
+            remote = f.toURI().toString();
+        } else {
+            loadFromFile = false;
+            remote = PfssSettings.baseURL + url;
+        }
+
+        try (InputStream in = new BufferedInputStream(new DownloadStream(new URL(remote)).getInput(), BUFSIZ)) {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             int nRead;
             byte[] data = new byte[BUFSIZ];
@@ -61,19 +55,11 @@ public class PfssDataLoader implements Runnable {
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
 
             if (!loadFromFile)
-                try (OutputStream out = new BufferedOutputStream(new FileOutputStream(cacheFileName), BUFSIZ)) {
+                try (OutputStream out = new BufferedOutputStream(new FileOutputStream(f), BUFSIZ)) {
                     buffer.writeTo(out);
                 }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
