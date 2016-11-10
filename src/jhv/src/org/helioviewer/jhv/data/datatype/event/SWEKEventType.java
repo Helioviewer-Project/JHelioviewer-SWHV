@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 public class SWEKEventType {
+
     private static List<SWEKRelatedEvents> swekrelEvents;
     private final String eventName;
     private final List<SWEKSupplier> suppliers;
@@ -25,7 +26,7 @@ public class SWEKEventType {
         swekEventTypes.put(this.eventName, this);
     }
 
-    public static SWEKEventType getEventType(String name) {
+    public static SWEKEventType getSWEKEventType(String name) {
         return swekEventTypes.get(name);
     }
 
@@ -69,7 +70,7 @@ public class SWEKEventType {
         swekrelEvents = _relatedEvents;
     }
 
-    public List<SWEKRelatedEvents> getSWEKRelatedEvents() {
+    public static List<SWEKRelatedEvents> getSWEKRelatedEvents() {
         return swekrelEvents;
     }
 

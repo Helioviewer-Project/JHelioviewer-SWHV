@@ -64,7 +64,7 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
      *            What to be displayed
      * @return The panel to be placed in the tree
      */
-    private JPanel createLeaf(String name, Object whatToDisplay) {
+    private static JPanel createLeaf(String name, Object whatToDisplay) {
         SmallPanel panel = new SmallPanel(new BorderLayout());
         panel.setOpaque(false);
 
