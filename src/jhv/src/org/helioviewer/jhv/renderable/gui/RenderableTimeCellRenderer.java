@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.renderable.gui;
 
 @SuppressWarnings("serial")
-public class RenderableTimeCellRenderer extends RenderableTableCellRenderer {
+class RenderableTimeCellRenderer extends RenderableTableCellRenderer {
 
     @Override
     public void setValue(Object value) {

@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-public class RenderableMiniviewOptionsPanel extends SmallPanel {
+class RenderableMiniviewOptionsPanel extends SmallPanel {
 
     private static final int DEFAULT = 10;
     int scale = DEFAULT;

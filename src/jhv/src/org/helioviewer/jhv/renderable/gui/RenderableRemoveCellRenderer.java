@@ -7,7 +7,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
 @SuppressWarnings("serial")
-public class RenderableRemoveCellRenderer extends RenderableTableCellRenderer {
+class RenderableRemoveCellRenderer extends RenderableTableCellRenderer {
 
     private final ImageIcon icon;
 

@@ -72,7 +72,7 @@ public class RenderableGrid extends AbstractRenderable {
         return jo;
     }
 
-    public void deserialize(JSONObject jo) {
+    private void deserialize(JSONObject jo) {
         if (jo.has("lonstepDegrees"))
             lonstepDegrees = (float) jo.getDouble("lonstepDegrees");
         if (jo.has("latstepDegrees"))
@@ -401,12 +401,12 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private static class GridLabel {
-        protected final String txt;
-        protected final float x;
-        protected final float y;
-        protected final float theta;
+        final String txt;
+        final float x;
+        final float y;
+        final float theta;
 
-        protected GridLabel(String _txt, float _x, float _y, float _theta) {
+        GridLabel(String _txt, float _x, float _y, float _theta) {
             txt = _txt;
             x = _x;
             y = _y;

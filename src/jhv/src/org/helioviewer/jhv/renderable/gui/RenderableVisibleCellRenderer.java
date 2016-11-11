@@ -8,7 +8,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
 @SuppressWarnings("serial")
-public class RenderableVisibleCellRenderer extends RenderableTableCellRenderer {
+class RenderableVisibleCellRenderer extends RenderableTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
 

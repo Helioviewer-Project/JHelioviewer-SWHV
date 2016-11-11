@@ -20,7 +20,7 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelSupplier;
 
 @SuppressWarnings("serial")
-public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
+class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object whatToDisplay, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {

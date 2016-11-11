@@ -18,7 +18,7 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-public class RenderableGridOptionsPanel extends SmallPanel {
+class RenderableGridOptionsPanel extends SmallPanel {
 
     private static final double min = 5, max = 90;
 
