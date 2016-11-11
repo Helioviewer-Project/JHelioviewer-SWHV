@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 
-public final class HTTPConstants {
+public class HTTPConstants {
 
     /** The maximum HTTP version supported */
     public static final double version = 1.1;

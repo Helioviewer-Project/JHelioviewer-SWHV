@@ -16,7 +16,7 @@ import java.net.ProtocolException;
  * @version 0.1
  * 
  */
-public class JPIPDataInputStream {
+class JPIPDataInputStream {
 
     /** The last class identifier read. */
     private long classId = 0;
