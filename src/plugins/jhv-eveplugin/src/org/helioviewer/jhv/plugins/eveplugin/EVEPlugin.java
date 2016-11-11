@@ -30,7 +30,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private final PlotPanel plotOne = new PlotPanel();
 
     public static final LineDataSelectorModel ldsm = new LineDataSelectorModel();
-    public static final DrawController dc = new DrawController();
+    private static final DrawController dc = new DrawController();
     public static final RadioData rd = new RadioData();
     public static final EventModel em = new EventModel();
     public static final ObservationDialogUIPanel op = new ObservationDialogUIPanel();

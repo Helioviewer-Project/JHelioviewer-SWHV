@@ -31,8 +31,8 @@ public class PfssData {
 
     private int VBOVertices;
     private int lastQuality;
-    public boolean read = false;
-    public boolean init = false;
+    private boolean read = false;
+    private boolean init = false;
 
     private boolean lastFixedColor;
 

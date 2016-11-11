@@ -9,14 +9,15 @@ public class BandColors {
     private static int minValue = 0;
 
     public static Color getNextColor() {
-        for (int i = 0; i < bandColorArray.length; i++) {
-            if (usedArray[i] == minValue) {
-                usedArray[i]++;
-                return bandColorArray[i];
+        while (true) {
+            for (int i = 0; i < bandColorArray.length; i++) {
+                if (usedArray[i] == minValue) {
+                    usedArray[i]++;
+                    return bandColorArray[i];
+                }
             }
+            minValue++;
         }
-        minValue++;
-        return BandColors.getNextColor();
     }
 
     public static void resetColor(Color c) {

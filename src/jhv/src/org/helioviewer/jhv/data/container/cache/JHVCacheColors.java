@@ -9,14 +9,15 @@ public class JHVCacheColors {
     private static int minValue = 0;
 
     public static Color getNextColor() {
-        for (int i = 0; i < hekColorArray.length; i++) {
-            if (usedArray[i] == minValue) {
-                usedArray[i]++;
-                return hekColorArray[i];
+        while (true) {
+            for (int i = 0; i < hekColorArray.length; i++) {
+                if (usedArray[i] == minValue) {
+                    usedArray[i]++;
+                    return hekColorArray[i];
+                }
             }
+            minValue++;
         }
-        minValue++;
-        return JHVCacheColors.getNextColor();
     }
 
     public static void resetColor(Color c) {

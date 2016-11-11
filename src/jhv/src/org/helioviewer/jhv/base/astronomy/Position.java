@@ -5,7 +5,7 @@ import org.helioviewer.jhv.base.time.JHVDate;
 
 public class Position {
 
-    public static final class L {
+    public static class L {
 
         public final double rad;
         public final double lon;
@@ -26,7 +26,7 @@ public class Position {
 
     }
 
-    public static final class Q {
+    public static class Q {
 
         public final double distance;
         public final Quat orientation;
