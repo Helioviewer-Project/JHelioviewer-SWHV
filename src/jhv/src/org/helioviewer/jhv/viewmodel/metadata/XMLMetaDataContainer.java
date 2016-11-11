@@ -24,8 +24,7 @@ public class XMLMetaDataContainer implements MetaDataContainer {
             throw new Exception("XML data incomplete");
         }
 
-        try {
-            InputStream in = new ByteArrayInputStream(xml.trim().replace("&", "&amp;").getBytes(StandardCharsets.UTF_8));
+        try (InputStream in = new ByteArrayInputStream(xml.trim().replace("&", "&amp;").getBytes(StandardCharsets.UTF_8))) {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             nodeList = builder.parse(in).getElementsByTagName("meta");
         } catch (Exception e) {

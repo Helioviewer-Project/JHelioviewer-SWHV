@@ -58,7 +58,7 @@ public class KakaduEngine {
         }
     }
 
-    private Kdu_region_compositor createCompositor(Jpx_source jpx, Kdu_thread_env threadEnv) throws KduException {
+    private static Kdu_region_compositor createCompositor(Jpx_source jpx, Kdu_thread_env threadEnv) throws KduException {
         Kdu_region_compositor compositor = new Kdu_region_compositor();
         // System.out.println(">>>> compositor create " + compositor + " " + Thread.currentThread().getName());
         compositor.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
@@ -67,7 +67,7 @@ public class KakaduEngine {
         return compositor;
     }
 
-    private void destroyCompositor(Kdu_region_compositor compositor) throws KduException {
+    private static void destroyCompositor(Kdu_region_compositor compositor) throws KduException {
         // System.out.println(">>>> compositor destroy " + compositor + " " + Thread.currentThread().getName());
         compositor.Halt_processing();
         compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);

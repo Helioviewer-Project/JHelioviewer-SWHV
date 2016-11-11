@@ -20,7 +20,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 
 // Handles DnD row reordering
 @SuppressWarnings("serial")
-public class TableRowTransferHandler extends TransferHandler {
+class TableRowTransferHandler extends TransferHandler {
 
     private final JTable grid;
     private BufferedImage image;

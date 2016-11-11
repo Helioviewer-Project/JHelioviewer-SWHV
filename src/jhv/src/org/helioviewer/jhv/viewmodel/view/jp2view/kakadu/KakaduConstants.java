@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.kakadu;
 
-public final class KakaduConstants {
+public class KakaduConstants {
 
     /** Kakadu constant */
     public static final int KDU_PRECINCT_DATABIN = 0;

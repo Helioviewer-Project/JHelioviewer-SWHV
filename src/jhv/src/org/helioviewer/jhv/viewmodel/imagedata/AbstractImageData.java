@@ -9,11 +9,12 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public abstract class AbstractImageData implements ImageData {
 
-    protected final int width, height;
-    protected final int bpp;
-    protected Buffer buffer;
+    final int width;
+    final int height;
+    private final int bpp;
+    Buffer buffer;
 
-    protected BufferedImage image = null;
+    BufferedImage image = null;
 
     private Region region;
     private MetaData metaData;
@@ -28,7 +29,7 @@ public abstract class AbstractImageData implements ImageData {
      * @param newHeight
      *            height of the image
      */
-    protected AbstractImageData(int newWidth, int newHeight, int newBpp) {
+    AbstractImageData(int newWidth, int newHeight, int newBpp) {
         width = newWidth;
         height = newHeight;
         bpp = newBpp;

@@ -66,7 +66,7 @@ import sun.awt.AppContext;
         return executorService;
     }
 
-    public static void shutdownOnDisposal(final ExecutorService es) {
+    private static void shutdownOnDisposal(final ExecutorService es) {
         final Runnable shutdownHook =
             new Runnable() {
                 final WeakReference<ExecutorService> executorServiceRef = new WeakReference<>(es);
