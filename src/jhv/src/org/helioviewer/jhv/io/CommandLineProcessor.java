@@ -36,7 +36,7 @@ public class CommandLineProcessor {
         List<String> jpxURLs = getOptionValues("jpx");
         LinkedList<URI> result = new LinkedList<>();
         for (String jpxURL : jpxURLs) {
-            if (!jpxURL.equals("")) {
+            if (!jpxURL.isEmpty()) {
                 try {
                     result.add(new URI(jpxURL));
                 } catch (URISyntaxException e) {
@@ -56,7 +56,7 @@ public class CommandLineProcessor {
         List<String> jpipURIs = getOptionValues("jpip");
         LinkedList<URI> uris = new LinkedList<>();
         for (String jpipURI : jpipURIs) {
-            if (!jpipURI.equals("")) {
+            if (!jpipURI.isEmpty()) {
                 try {
                     uris.add(new URI(jpipURI));
                 } catch (URISyntaxException e) {

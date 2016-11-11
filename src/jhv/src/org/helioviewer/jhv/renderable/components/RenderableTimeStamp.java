@@ -22,7 +22,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
     public void deserialize(JSONObject jo) {
     }
 
-    public JSONObject serialize() {
+    public static JSONObject serialize() {
         JSONObject jo = new JSONObject();
         jo.put("name", name);
         return jo;

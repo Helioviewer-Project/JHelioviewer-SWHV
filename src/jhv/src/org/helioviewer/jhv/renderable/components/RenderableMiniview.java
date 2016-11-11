@@ -27,7 +27,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     public void deserialize(JSONObject jo) {
     }
 
-    public JSONObject serialize() {
+    public static JSONObject serialize() {
         JSONObject jo = new JSONObject();
         jo.put("name", name);
         return jo;
@@ -51,7 +51,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     public void render(Camera camera, Viewport vp, GL2 gl) {
     }
 
-    public void renderBackground(Camera camera, Viewport vp, GL2 gl) {
+    public static void renderBackground(Camera camera, Viewport vp, GL2 gl) {
         Mat4 cameraMatrix = camera.getViewpoint().orientation.toMatrix();
         gl.glDepthRange(0, 0);
         gl.glPushMatrix();

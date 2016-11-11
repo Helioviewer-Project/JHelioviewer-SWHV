@@ -808,7 +808,7 @@ public class EventDatabase {
                     }
                 }
 
-                String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.name, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList.toString() + ") AND events.id != " + event_id + ";";
+                String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.name, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList + ") AND events.id != " + event_id + ";";
                 ArrayList<JsonEvent> ret = new ArrayList<>();
                 try (Statement statement = connection.createStatement()) {
                     try (ResultSet rs = statement.executeQuery(query)) {

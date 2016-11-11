@@ -89,7 +89,7 @@ public class JHVUpdate implements Runnable {
             String version;
             try (BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(updateURL).getInput(), StandardCharsets.UTF_8))) {
                 version = in.readLine();
-                if (version == null || version.equals("")) {
+                if (version == null || version.isEmpty()) {
                     throw new IOException("JHVUpdate: Empty version string");
                 }
                 // String message = in.readLine(); - extra

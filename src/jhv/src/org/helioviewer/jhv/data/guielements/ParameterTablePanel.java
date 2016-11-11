@@ -89,7 +89,7 @@ public class ParameterTablePanel extends JPanel implements MouseListener, MouseM
         }
     }
 
-    private String extractURL(JTable table, int col, int row) {
+    private static String extractURL(JTable table, int col, int row) {
         Object value = table.getValueAt(row, col);
         if (value instanceof String) {
             String strValue = (String) value;

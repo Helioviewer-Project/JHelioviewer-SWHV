@@ -91,7 +91,7 @@ public class JavaHelioViewer {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
+                UIGlobals.setUIFont(UIGlobals.UIFont);
 
                 Log.info("Start main window");
                 ExitHooks.attach();
