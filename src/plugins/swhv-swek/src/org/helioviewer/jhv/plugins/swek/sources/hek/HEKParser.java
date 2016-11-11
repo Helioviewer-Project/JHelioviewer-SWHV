@@ -26,7 +26,7 @@ import org.json.JSONObject;
 
 public class HEKParser implements SWEKParser {
 
-    private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
+    private static final ThreadLocal<DecimalFormat> formatter1 = ThreadLocal.withInitial(() -> MathUtils.numberFormatter("0", 1));
 
     @Override
     public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
@@ -112,7 +112,7 @@ public class HEKParser implements SWEKParser {
         if (waveValue != null) {
             try {
                 if (waveCM)
-                    waveValue = formatter1.format(Double.parseDouble(waveValue) * (1e-2 /*m*/ * 1e9 /*nm*/)) + "nm";
+                    waveValue = formatter1.get().format(Double.parseDouble(waveValue) * (1e-2 /*m*/ * 1e9 /*nm*/)) + "nm";
             } catch (Exception ignore) {
             }
             currentEvent.addParameter("obs_meanwavel", waveValue, full);
