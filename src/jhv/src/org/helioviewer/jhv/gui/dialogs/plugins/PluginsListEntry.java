@@ -141,7 +141,7 @@ class PluginsListEntry extends AbstractPluginsListEntry implements MouseListener
     /**
      * Enables or disables the corresponding plug-in.
      * */
-    public void setPluginActive(boolean active) {
+    private void setPluginActive(boolean active) {
         if (plugin.isActive() == active) {
             return;
         }

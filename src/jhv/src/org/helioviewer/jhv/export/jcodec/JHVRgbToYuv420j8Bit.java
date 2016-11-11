@@ -18,7 +18,7 @@ import org.jcodec.common.tools.MathUtil;
  * @author The JCodec project
  * 
  */
-public class JHVRgbToYuv420j8Bit {
+class JHVRgbToYuv420j8Bit {
 
     public static void transform(BufferedImage img, Picture dst) {
         int[][] dstData = dst.getData(); // byte for 0.2

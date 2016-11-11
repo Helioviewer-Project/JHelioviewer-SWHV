@@ -2,23 +2,14 @@ package org.helioviewer.jhv.plugins.swek.model;
 
 import javax.swing.ImageIcon;
 
-/**
- * Abstract class combining general functionality of the SWEK tree elements
- * 
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
- */
+// Abstract class combining general functionality of the SWEK tree elements
 public abstract class AbstractSWEKTreeModelElement {
-    /** Is the check box selected */
+
     private boolean checkboxSelected;
 
-    /** The icon */
     private final ImageIcon icon;
 
-    /**
-     * Default constructor
-     */
-    public AbstractSWEKTreeModelElement() {
+    AbstractSWEKTreeModelElement() {
         checkboxSelected = false;
         icon = null;
     }
@@ -29,7 +20,7 @@ public abstract class AbstractSWEKTreeModelElement {
      * @param isCheckBoxSelected
      *            Is the checkbox selected
      */
-    public AbstractSWEKTreeModelElement(boolean isCheckBoxSelected) {
+    AbstractSWEKTreeModelElement(boolean isCheckBoxSelected) {
         checkboxSelected = isCheckBoxSelected;
         icon = null;
     }
@@ -54,7 +45,7 @@ public abstract class AbstractSWEKTreeModelElement {
      * @param icon
      *            the icon for this SWEKTreeModel element
      */
-    public AbstractSWEKTreeModelElement(boolean isCheckBoxSelected, ImageIcon icon) {
+    AbstractSWEKTreeModelElement(boolean isCheckBoxSelected, ImageIcon icon) {
         checkboxSelected = isCheckBoxSelected;
         this.icon = icon;
     }

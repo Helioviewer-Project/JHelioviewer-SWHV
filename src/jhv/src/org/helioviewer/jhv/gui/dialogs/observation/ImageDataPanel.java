@@ -44,7 +44,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     private final DataSourcesTree sourcesTree = new DataSourcesTree();
     private static boolean first = true;
 
-    protected ImageDataPanel() {
+    ImageDataPanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         JPanel timePane = new JPanel();

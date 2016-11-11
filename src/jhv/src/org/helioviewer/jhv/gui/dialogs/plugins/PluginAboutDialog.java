@@ -28,7 +28,7 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
  * @author Stephan Pagel
  */
 @SuppressWarnings("serial")
-public class PluginAboutDialog extends JDialog implements ActionListener, HyperlinkListener {
+class PluginAboutDialog extends JDialog implements ActionListener, HyperlinkListener {
 
     private final Plugin plugin;
 

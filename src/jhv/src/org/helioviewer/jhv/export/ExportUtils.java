@@ -10,7 +10,7 @@ import org.helioviewer.jhv.opengl.GLInfo;
 
 import com.jogamp.opengl.util.awt.ImageUtil;
 
-public class ExportUtils {
+class ExportUtils {
 
     public static BufferedImage pasteCanvases(BufferedImage im1, BufferedImage im2, int movieLinePosition, int height) {
         ImageUtil.flipImageVertically(im1);

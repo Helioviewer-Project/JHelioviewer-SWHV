@@ -16,7 +16,7 @@ import org.helioviewer.jhv.renderable.components.RenderableGrid.GridChoiceType;
 
 import com.jogamp.opengl.GL2;
 
-public abstract class AbstractAnnotateable implements Annotateable {
+abstract class AbstractAnnotateable implements Annotateable {
 
     private static final Color colorActive = Color.red;
     private static final Color colorDrag = Color.yellow;
@@ -26,17 +26,17 @@ public abstract class AbstractAnnotateable implements Annotateable {
     static final float[] dragColor = new float[] { colorDrag.getRed() / 255f, colorDrag.getGreen() / 255f, colorDrag.getBlue() / 255f };
     static final float[] baseColor = new float[] { colorBase.getRed() / 255f, colorBase.getGreen() / 255f, colorBase.getBlue() / 255f };
 
-    protected static final float lineWidth = 2;
-    protected static final double radius = Sun.Radius * 1.01;
-    protected static final double lineWidthSR = Sun.Radius * 0.002;
+    static final float lineWidth = 2;
+    static final double radius = Sun.Radius * 1.01;
+    private static final double lineWidthSR = Sun.Radius * 0.002;
 
-    protected final Camera camera;
+    final Camera camera;
 
-    public AbstractAnnotateable(Camera _camera) {
+    AbstractAnnotateable(Camera _camera) {
         camera = _camera;
     }
 
-    protected static Vec3 toSpherical(Vec3 p) {
+    static Vec3 toSpherical(Vec3 p) {
         Vec3 pt = new Vec3();
         pt.x = p.length();
         pt.y = Math.acos(p.y / pt.x);
@@ -45,13 +45,13 @@ public abstract class AbstractAnnotateable implements Annotateable {
         return pt;
     }
 
-    protected static Vec3 toCart(double y, double z) {
+    static Vec3 toCart(double y, double z) {
         return new Vec3(radius * Math.sin(y) * Math.sin(z),
                         radius * Math.cos(y),
                         radius * Math.sin(y) * Math.cos(z));
     }
 
-    protected Vec3 computePoint(int x, int y) {
+    Vec3 computePoint(int x, int y) {
         if (Displayer.mode == DisplayMode.ORTHO) {
             return CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
         } else {
@@ -59,7 +59,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
         }
     }
 
-    protected void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
+    void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
         if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
             gl.glBegin(GL2.GL_LINE_STRIP);
 

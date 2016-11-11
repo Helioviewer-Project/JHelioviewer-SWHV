@@ -19,7 +19,7 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.EventDatabase.JsonEvent;
 
 // A download worker will download events for a type of event from a source.
-public class DownloadWorker implements Runnable {
+class DownloadWorker implements Runnable {
 
     private final JHVEventType jhvType;
     private final List<SWEKParam> params;

@@ -13,7 +13,7 @@ import java.util.List;
  * 
  * @author Helge Dietert
  */
-public class GimpGradient {
+class GimpGradient {
     /**
      * List of segments uses in this gradient
      */

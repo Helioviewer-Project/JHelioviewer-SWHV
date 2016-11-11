@@ -1,12 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-/**
- * Factory creates a HEKEvent from a String.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
-public class HEKEventFactory {
+// Factory creates a HEKEvent from a String
+class HEKEventFactory {
     /**
      * Creates a HEK event from a String.
      *

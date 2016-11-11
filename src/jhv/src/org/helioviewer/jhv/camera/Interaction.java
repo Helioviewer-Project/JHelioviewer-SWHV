@@ -13,10 +13,10 @@ import com.jogamp.opengl.GL2;
 
 public class Interaction implements MouseListener, KeyListener {
 
-    protected final Camera camera;
+    final Camera camera;
     private final Timer wheelTimer;
 
-    public Interaction(Camera _camera) {
+    Interaction(Camera _camera) {
         camera = _camera;
 
         wheelTimer = new Timer(1000/2, e -> Displayer.render(1));
