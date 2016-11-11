@@ -37,13 +37,13 @@ public class JHVSequenceEncoder {
     private final MP4Muxer muxer;
     private final int fps;
 
-    public JHVSequenceEncoder(File out, int w, int h, int fps) throws IOException {
-        this.ch = NIOUtils.writableFileChannel(out);
+    public JHVSequenceEncoder(File out, int w, int h, int _fps) throws IOException {
+        ch = NIOUtils.writableFileChannel(out);
 
         // Muxer that will store the encoded frames
         muxer = new MP4Muxer(ch, Brand.MP4);
 
-        this.fps = fps;
+        fps = _fps;
         // Add video track to muxer
         outTrack = muxer.addTrack(TrackType.VIDEO, fps);
 

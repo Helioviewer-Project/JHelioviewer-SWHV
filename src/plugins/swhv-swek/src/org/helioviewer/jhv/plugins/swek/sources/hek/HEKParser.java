@@ -95,7 +95,7 @@ public class HEKParser implements SWEKParser {
                         // nothing, delete
                     } else {
                         value = value.trim();
-                        if (value.length() != 0) {
+                        if (!value.isEmpty()) {
                             if (keyString.equals("obs_wavelunit") && value.equals("cm"))
                                 waveCM = true;
 
@@ -216,7 +216,7 @@ public class HEKParser implements SWEKParser {
      * @return the GL3DVec3 or null of it could not be parsed
      */
     private static Vec3 parseCoordinates(String coordinateString) {
-        double[] coordinate = new double[] { 0., 0., 0. };
+        double[] coordinate = {0, 0, 0};
         boolean notnull = false;
 
         Scanner coordinatesScanner = new Scanner(coordinateString);

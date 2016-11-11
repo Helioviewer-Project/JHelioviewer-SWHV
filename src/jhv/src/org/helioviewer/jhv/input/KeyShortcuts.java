@@ -19,7 +19,7 @@ public class KeyShortcuts {
         actionMap.remove(key);
     }
 
-    static boolean handleKeyStroke(KeyStroke keyStroke, final Object source, final int id) {
+    static boolean handleKeyStroke(KeyStroke keyStroke, Object source, int id) {
         Action action = actionMap.get(keyStroke);
         if (action != null) {
             EventQueue.invokeLater(() -> action.actionPerformed(new ActionEvent(source, id, null)));

@@ -17,7 +17,7 @@ public enum JHVDirectory {
 
         @Override
         public String getPath() {
-            return this.path + File.separator + "JHelioviewer-SWHV" + File.separator;
+            return path + File.separator + "JHelioviewer-SWHV" + File.separator;
         }
 
         @Override

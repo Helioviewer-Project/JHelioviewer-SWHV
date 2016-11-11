@@ -61,7 +61,7 @@ public class PositionLoad {
             JSONObject result;
             try {
                 long deltat = 60, span = (end - start) / 1000;
-                final long max = 100000;
+                long max = 100000;
 
                 if (span / deltat > max)
                     deltat = span / max;

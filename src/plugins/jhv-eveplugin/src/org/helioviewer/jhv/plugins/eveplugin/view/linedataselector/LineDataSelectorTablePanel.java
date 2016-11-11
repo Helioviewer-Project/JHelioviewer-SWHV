@@ -50,7 +50,7 @@ public class LineDataSelectorTablePanel extends JPanel {
     public LineDataSelectorTablePanel() {
         setLayout(new GridBagLayout());
 
-        final JTable grid = new JTable(EVEPlugin.ldsm) {
+        JTable grid = new JTable(EVEPlugin.ldsm) {
 
             @Override
             public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {

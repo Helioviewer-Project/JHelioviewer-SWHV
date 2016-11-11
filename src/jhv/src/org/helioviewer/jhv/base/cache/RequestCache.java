@@ -24,7 +24,7 @@ public class RequestCache {
         return missingIntervals;
     }
 
-    private void updateRequestCache(final long startDate, final long endDate) {
+    private void updateRequestCache(long startDate, long endDate) {
         cache.add(new Interval(startDate, endDate));
         cache = merge(cache);
     }

@@ -42,7 +42,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         if (force || first < beginTime || last > endTime) {
             beginTime = first;
             endTime = last;
-            JHVEventCache.requestForInterval(first, last, SWEKData.this);
+            JHVEventCache.requestForInterval(first, last, this);
         }
     }
 

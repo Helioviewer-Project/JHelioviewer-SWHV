@@ -57,11 +57,11 @@ class DownloadWorker implements Runnable {
 
             EventQueue.invokeLater(() -> {
                 JHVEventCache.finishedDownload(false);
-                SWEKDownloadManager.getSingletonInstance().workerFinished(DownloadWorker.this);
+                SWEKDownloadManager.getSingletonInstance().workerFinished(this);
             });
             EventDatabase.addDaterange2db(requestInterval.start, requestInterval.end, jhvType);
         } else {
-            EventQueue.invokeLater(() -> SWEKDownloadManager.getSingletonInstance().workerForcedToStop(DownloadWorker.this));
+            EventQueue.invokeLater(() -> SWEKDownloadManager.getSingletonInstance().workerForcedToStop(this));
         }
     }
 

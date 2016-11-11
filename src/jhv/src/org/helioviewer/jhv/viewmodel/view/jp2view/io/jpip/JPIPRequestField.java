@@ -11,7 +11,7 @@ public enum JPIPRequestField {
     CNEW("cnew"), CCLOSE("cclose"), TYPE("type"), TID("tid"), STREAM("stream"), LEN("len"), CID("cid"), METAREQ("metareq"), ROFF("roff"), RSIZ("rsiz"), FSIZ("fsiz"), MODEL("model"), CONTEXT("context"), LAYERS("layers");
     private final String str;
 
-    JPIPRequestField(final String _str) {
+    JPIPRequestField(String _str) {
         str = _str;
     }
 

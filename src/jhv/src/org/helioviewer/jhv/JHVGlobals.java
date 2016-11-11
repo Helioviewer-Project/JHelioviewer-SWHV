@@ -174,7 +174,7 @@ public class JHVGlobals {
             try {
                 String msg = "Export of " + moviePath + " finished.";
                 File jarPath = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-                String[] cmd = new String[] {
+                String[] cmd = {
                     jarPath.getCanonicalFile().getParentFile().getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
                     "-message", "\"" + msg + "\"",
                     "-execute", "open " + "\"" + openURL + "\"",

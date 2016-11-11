@@ -20,7 +20,7 @@ public class InteractionAnnotate extends Interaction {
         private static final AnnotationMode[] vals = values();
 
         AnnotationMode next() {
-            return vals[(this.ordinal() + 1) % vals.length];
+            return vals[(ordinal() + 1) % vals.length];
         }
 
         public Annotateable generateAnnotateable(Camera camera) {

@@ -44,7 +44,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
 
-        ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
+        ImageViewerGui.getMainContentPanel().addPlugin(this);
 
         Layers.addLayersListener(dc);
         Layers.addTimeListener(dc);

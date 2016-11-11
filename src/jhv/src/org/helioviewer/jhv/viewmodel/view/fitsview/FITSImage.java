@@ -220,7 +220,7 @@ public class FITSImage implements MetaDataContainer {
      * @return XML string including all FITS header information.
      * */
     public String getHeaderAsXML() {
-        final String sep = System.getProperty("line.separator");
+        String sep = System.getProperty("line.separator");
         StringBuilder builder = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + sep + "<meta>" + sep + "<fits>" + sep);
 
         HeaderCard headerCard;

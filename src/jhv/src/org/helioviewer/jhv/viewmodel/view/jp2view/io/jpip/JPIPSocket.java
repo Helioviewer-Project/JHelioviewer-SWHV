@@ -104,7 +104,7 @@ public class JPIPSocket extends HTTPSocket {
     /** Closes the JPIPSocket */
     @Override
     public void close() throws IOException {
-        if (this.isClosed())
+        if (isClosed())
             return;
 
         try {

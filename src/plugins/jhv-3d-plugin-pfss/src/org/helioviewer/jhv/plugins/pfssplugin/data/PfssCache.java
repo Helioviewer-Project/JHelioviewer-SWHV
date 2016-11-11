@@ -16,7 +16,7 @@ public class PfssCache {
 
     public void addData(PfssData pfssData) {
         if (numberOfElementsInCache < PfssSettings.CACHE_SIZE) {
-            this.data[numberOfElementsInCache] = pfssData;
+            data[numberOfElementsInCache] = pfssData;
             numberOfElementsInCache++;
             bubbleSort();
         }

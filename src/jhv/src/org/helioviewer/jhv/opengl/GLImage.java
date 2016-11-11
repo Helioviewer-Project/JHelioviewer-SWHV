@@ -221,11 +221,11 @@ public class GLImage {
     }
 
     public boolean getDifferenceMode() {
-        return this.differenceMode;
+        return differenceMode;
     }
 
     public void setBaseDifferenceMode(boolean selected) {
-        this.baseDifferenceMode = selected;
+        baseDifferenceMode = selected;
     }
 
     public boolean getBaseDifferenceMode() {

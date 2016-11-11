@@ -15,7 +15,7 @@ public class Carrington {
     public static final int CR_MINIMAL = 1557;
     public static final int CR_MAXIMAL = 2627;
 
-    public static final long[] CR_start = new long[] {
+    public static final long[] CR_start = {
         /* 1557 */ 1753091000L, /* 1970-01-21T06:58:11 */
         /* 1558 */ 4115389920L, /* 1970-02-17T15:09:49 */
         /* 1559 */ 6476373340L, /* 1970-03-16T22:59:33 */

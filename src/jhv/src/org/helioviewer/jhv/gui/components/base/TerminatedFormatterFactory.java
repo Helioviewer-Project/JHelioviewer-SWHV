@@ -15,7 +15,6 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
     private final double min, max;
 
     public TerminatedFormatterFactory(String format, String terminator, double min, double max) {
-        super();
         this.format = format;
         this.terminator = terminator;
 

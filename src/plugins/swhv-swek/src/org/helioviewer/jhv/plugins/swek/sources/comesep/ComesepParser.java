@@ -45,7 +45,7 @@ public class ComesepParser implements SWEKParser {
                   lowerkey.equals("begin_time_value") || lowerkey.equals("end_time_value") ||
                   lowerkey.startsWith("liftoff"))) {
                 value = value.trim();
-                if (value.length() != 0) {
+                if (!value.isEmpty()) {
                     if (lowerkey.equals("atstrongest")) {
                         try {
                             value = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);

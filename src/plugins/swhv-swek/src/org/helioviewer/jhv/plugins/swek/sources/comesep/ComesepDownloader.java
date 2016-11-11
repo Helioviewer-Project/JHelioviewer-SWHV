@@ -34,7 +34,7 @@ public class ComesepDownloader extends SWEKDownloader {
                 long end = result.getLong("atlatest") * 1000;
                 if (result.has("liftoffduration_value")) {
                     long cactusLiftOff = result.getLong("liftoffduration_value");
-                    end = end + cactusLiftOff * 60000;
+                    end += cactusLiftOff * 60000;
                 }
 
                 byte[] compressed;
