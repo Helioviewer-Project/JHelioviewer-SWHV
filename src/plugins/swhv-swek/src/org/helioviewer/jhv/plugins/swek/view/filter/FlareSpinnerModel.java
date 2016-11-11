@@ -23,7 +23,7 @@ public class FlareSpinnerModel extends AbstractSpinnerModel {
         fireStateChanged();
     }
 
-    private String compose_next(double pv, String start, String alternative) {
+    private static String compose_next(double pv, String start, String alternative) {
         if (pv < 9.9) {
             pv += incr;
             return start + String.format("%.1f", pv);
@@ -58,7 +58,7 @@ public class FlareSpinnerModel extends AbstractSpinnerModel {
         return null;
     }
 
-    private String compose_prev(double pv, String start, String alternative) {
+    private static String compose_prev(double pv, String start, String alternative) {
         if (pv >= 1.1) {
             pv -= incr;
             return start + String.format("%.1f", pv);

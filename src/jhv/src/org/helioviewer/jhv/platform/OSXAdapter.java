@@ -134,7 +134,7 @@ public class OSXAdapter implements InvocationHandler {
 
     // It is important to mark the ApplicationEvent as handled and cancel the default behavior
     // This method checks for a boolean result from the proxy method and sets the event accordingly
-    protected void setApplicationEventHandled(Object event, boolean handled) {
+    protected static void setApplicationEventHandled(Object event, boolean handled) {
         if (event != null) {
             try {
                 Method setHandledMethod = event.getClass().getDeclaredMethod("setHandled", boolean.class);

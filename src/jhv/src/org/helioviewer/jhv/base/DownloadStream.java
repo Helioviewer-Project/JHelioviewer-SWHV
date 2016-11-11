@@ -75,7 +75,7 @@ public class DownloadStream {
         return response400;
     }
 
-    private InputStream getEncodedStream(String encoding, InputStream httpStream) throws IOException {
+    private static InputStream getEncodedStream(String encoding, InputStream httpStream) throws IOException {
         if (encoding != null) {
             if (encoding.equalsIgnoreCase("gzip"))
                 return new GZIPInputStream(httpStream);

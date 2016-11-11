@@ -57,7 +57,7 @@ public class TimestampRollingFileAppender extends FileAppender {
         return directory;
     }
 
-    public String getTimeStamp(String timeStampString) {
+    public static String getTimeStamp(String timeStampString) {
         return timeStampString;
     }
 

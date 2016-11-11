@@ -96,7 +96,7 @@ public class DataSourcesTree extends JTree {
         });
     }
 
-    private void reattach(DefaultMutableTreeNode tgt, DefaultMutableTreeNode src) {
+    private static void reattach(DefaultMutableTreeNode tgt, DefaultMutableTreeNode src) {
         tgt.removeAllChildren();
         while (src.getChildCount() > 0)
             tgt.add((DefaultMutableTreeNode) src.getFirstChild());

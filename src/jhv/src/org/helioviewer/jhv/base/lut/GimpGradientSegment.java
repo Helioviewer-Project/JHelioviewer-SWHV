@@ -159,7 +159,7 @@ class GimpGradientSegment {
      *            value
      * @return approximated as byte
      */
-    private int appD(double x) {
+    private static int appD(double x) {
         return ((int) (x * 0xff)) & 0xff;
     }
 

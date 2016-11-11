@@ -51,7 +51,7 @@ public final class ClipBoardCopier implements ClipboardOwner {
      * 
      * @return clipboard content
      */
-    public String getString() {
+    public static String getString() {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable contents = clipboard.getContents(null);
         boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);

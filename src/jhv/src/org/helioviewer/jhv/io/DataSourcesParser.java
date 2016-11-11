@@ -25,7 +25,7 @@ public class DataSourcesParser {
         parse(rootNode, json, null);
     }
 
-    private String mergeNames(String str1, String str2) {
+    private static String mergeNames(String str1, String str2) {
         if (str1.equals(str2))
             return str1;
         else if (str1.equals(""))

@@ -180,7 +180,7 @@ class J2KReader implements Runnable {
         lastResponseTime = replyDataTime;
     }
 
-    private JPIPQuery createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
+    private static JPIPQuery createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
         JPIPQuery query = new JPIPQuery();
         query.setField(JPIPRequestField.CONTEXT.toString(), "jpxl<" + iniLayer + "-" + endLayer + ">");
         query.setField(JPIPRequestField.FSIZ.toString(), Integer.toString(currParams.resolution.width) + "," + Integer.toString(currParams.resolution.height) + "," + "closest");
@@ -190,7 +190,7 @@ class J2KReader implements Runnable {
         return query;
     }
 
-    private JPIPQuery[] createSingleQuery(JP2ImageParameter currParams) {
+    private static JPIPQuery[] createSingleQuery(JP2ImageParameter currParams) {
         return new JPIPQuery[] { createQuery(currParams, currParams.compositionLayer, currParams.compositionLayer) };
     }
 
