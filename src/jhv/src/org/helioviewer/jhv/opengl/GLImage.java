@@ -162,7 +162,7 @@ public class GLImage {
             lastLut = currlut;
             lastInverted = invertLUT;
 
-            lutTex.copyBuffer1D(gl, lutBuffer);
+            GLTexture.copyBuffer1D(gl, lutBuffer);
         }
         lutChanged = false;
     }

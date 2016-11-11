@@ -94,7 +94,7 @@ public class GLTexture {
         gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
     }
 
-    public void copyBufferedImage2D(GL2 gl, BufferedImage source) {
+    public static void copyBufferedImage2D(GL2 gl, BufferedImage source) {
         int w = source.getWidth();
         int h = source.getHeight();
         if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
@@ -126,7 +126,7 @@ public class GLTexture {
         genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
     }
 
-    public void copyBuffer1D(GL2 gl, IntBuffer source) {
+    public static void copyBuffer1D(GL2 gl, IntBuffer source) {
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
         gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, GL2.GL_RGBA, source.limit(), 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, source);
         gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);

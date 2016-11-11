@@ -114,7 +114,7 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
      * @param component
      *            the component to add
      */
-    private void addLineToSummaryPanel(JPanel panel, int y, String fieldName, Component component) {
+    private static void addLineToSummaryPanel(JPanel panel, int y, String fieldName, Component component) {
         GridBagConstraints shortPanelLabelConstraint = new GridBagConstraints();
         shortPanelLabelConstraint.weightx = 0;
         shortPanelLabelConstraint.weighty = 0;

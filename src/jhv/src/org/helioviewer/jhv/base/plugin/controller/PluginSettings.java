@@ -202,7 +202,7 @@ public class PluginSettings {
      *            Plug-in container whose information have to be updated in the
      *            internal XML document.
      */
-    private void editPluginInXML(Node pluginNode, PluginContainer pluginContainer) {
+    private static void editPluginInXML(Node pluginNode, PluginContainer pluginContainer) {
         NodeList list = ((Element) pluginNode).getElementsByTagName(NODES_PLUGINACTIVATED);
         if (list.getLength() == 1) {
             Node textNode = list.item(0).getFirstChild();
@@ -262,7 +262,7 @@ public class PluginSettings {
      * @return The first found node whose text node has the given value or null
      *         if no node could be found with the given values.
      */
-    private Node findNode(Node root, String nodeName, String compareValue) {
+    private static Node findNode(Node root, String nodeName, String compareValue) {
         NodeList list = ((Element) root).getElementsByTagName(nodeName);
 
         for (int i = 0; i < list.getLength(); i++) {
@@ -286,7 +286,7 @@ public class PluginSettings {
      * @return The boolean value of the first found given node. If no entry
      *         could be found the return value is false.
      */
-    private boolean isActivated(Node root, String nodeName) {
+    private static boolean isActivated(Node root, String nodeName) {
         NodeList list = ((Element) root).getElementsByTagName(nodeName);
 
         if (list.getLength() == 1) {

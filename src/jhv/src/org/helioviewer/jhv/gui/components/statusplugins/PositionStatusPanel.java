@@ -48,7 +48,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         }
     }
 
-    private String formatOrtho(Vec2 coord, double r, int px, int py) {
+    private static String formatOrtho(Vec2 coord, double r, int px, int py) {
         String coordStr;
         if (coord == null || Double.isNaN(coord.x) || Double.isNaN(coord.y))
             coordStr = nullCoordStr;

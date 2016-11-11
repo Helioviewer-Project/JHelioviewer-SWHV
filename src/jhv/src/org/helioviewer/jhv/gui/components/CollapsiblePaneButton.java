@@ -25,7 +25,7 @@ public class CollapsiblePaneButton extends JToggleButton {
         dark = darker(color, 0.9);
     }
 
-    private Color brighter(Color c, double FACTOR) {
+    private static Color brighter(Color c, double FACTOR) {
         int r = c.getRed();
         int g = c.getGreen();
         int b = c.getBlue();
@@ -45,7 +45,7 @@ public class CollapsiblePaneButton extends JToggleButton {
         return new Color(Math.min((int) (r / FACTOR), 255), Math.min((int) (g / FACTOR), 255), Math.min((int) (b / FACTOR), 255), alpha);
     }
 
-    private Color darker(Color c, double FACTOR) {
+    private static Color darker(Color c, double FACTOR) {
         return new Color(Math.max((int) (c.getRed() * FACTOR), 0), Math.max((int) (c.getGreen() * FACTOR), 0), Math.max((int) (c.getBlue() * FACTOR), 0), c.getAlpha());
     }
 

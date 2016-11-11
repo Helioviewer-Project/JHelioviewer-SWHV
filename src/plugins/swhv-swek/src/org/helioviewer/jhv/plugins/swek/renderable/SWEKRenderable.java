@@ -60,7 +60,7 @@ public class SWEKRenderable extends AbstractRenderable {
             tex = new GLTexture(gl);
             tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
 
-            tex.copyBufferedImage2D(gl, bi);
+            GLTexture.copyBufferedImage2D(gl, bi);
             iconCacheId.put(key, tex);
         }
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
