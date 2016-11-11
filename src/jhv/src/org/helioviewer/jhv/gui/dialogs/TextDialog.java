@@ -31,12 +31,10 @@ public class TextDialog extends JDialog implements ActionListener, ShowableDialo
         StringBuilder text = new StringBuilder();
         String linebreak = System.getProperty("line.separator");
 
-        try {
-            Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream(), StandardCharsets.UTF_8)));
+        try (Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream(), StandardCharsets.UTF_8)))) {
             while (scanner.hasNext()) {
                 text.append(scanner.nextLine()).append(linebreak);
             }
-            scanner.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

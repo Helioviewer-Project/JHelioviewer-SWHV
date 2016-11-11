@@ -17,14 +17,9 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 
-/**
- * This is a panel describing an event in short.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
+// This is a panel describing an event in short
 @SuppressWarnings("serial")
-public class EventDescriptionPanel extends JPanel implements MouseListener {
+class EventDescriptionPanel extends JPanel implements MouseListener {
 
     private final JHVRelatedEvents revent;
 
