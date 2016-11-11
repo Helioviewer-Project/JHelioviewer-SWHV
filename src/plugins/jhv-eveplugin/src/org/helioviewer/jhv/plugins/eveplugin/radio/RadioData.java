@@ -248,7 +248,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         }
     }
 
-    private class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
+    private static class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
 
         private final ArrayList<Long> datesToDownload;
 

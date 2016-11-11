@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 @SuppressWarnings("serial")
-public class CollapsiblePaneButton extends JToggleButton {
+class CollapsiblePaneButton extends JToggleButton {
 
     private final static Color color = new JPanel().getBackground();
     private final Color bright;

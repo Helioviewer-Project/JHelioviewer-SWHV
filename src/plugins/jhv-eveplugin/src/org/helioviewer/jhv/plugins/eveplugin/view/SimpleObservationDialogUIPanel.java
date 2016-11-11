@@ -21,7 +21,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     private final JHVCalendarDatePicker calendarStartDate;
 
-    public SimpleObservationDialogUIPanel() {
+    SimpleObservationDialogUIPanel() {
         ObservationDialogDateModel.getInstance().addListener(this);
 
         JLabel labelStartDate = new JLabel("Start date");
@@ -53,7 +53,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         calendarStartDate.setTime(start);
     }
 
-    public long getTime() {
+    long getTime() {
         return calendarStartDate.getTime();
     }
 

@@ -10,9 +10,9 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 
 @SuppressWarnings("serial")
-public class SWEKRenderableOptionsPanel extends SmallPanel {
+class SWEKRenderableOptionsPanel extends SmallPanel {
 
-    protected boolean icons = true;
+    boolean icons = true;
 
     public SWEKRenderableOptionsPanel() {
         GridBagLayout gridBagLayout = new GridBagLayout();

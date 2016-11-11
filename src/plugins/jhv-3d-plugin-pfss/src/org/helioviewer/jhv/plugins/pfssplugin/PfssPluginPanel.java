@@ -17,7 +17,7 @@ import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-public class PfssPluginPanel extends SmallPanel {
+class PfssPluginPanel extends SmallPanel {
 
     public PfssPluginPanel() {
         setLayout(new GridBagLayout());

@@ -3,7 +3,7 @@ package org.helioviewer.jhv.renderable.gui;
 import javax.swing.table.DefaultTableCellRenderer;
 
 @SuppressWarnings("serial")
-public class RenderableTableCellRenderer extends DefaultTableCellRenderer {
+class RenderableTableCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}

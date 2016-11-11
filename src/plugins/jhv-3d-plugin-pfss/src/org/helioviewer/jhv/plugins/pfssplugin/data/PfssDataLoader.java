@@ -16,7 +16,7 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
-public class PfssDataLoader implements Runnable {
+class PfssDataLoader implements Runnable {
 
     private static final int BUFSIZ = 65536;
     private final String url;

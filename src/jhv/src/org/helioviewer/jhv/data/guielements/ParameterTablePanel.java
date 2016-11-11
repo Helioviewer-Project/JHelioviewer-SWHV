@@ -24,7 +24,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 
 @SuppressWarnings("serial")
-public class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionListener {
+class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionListener {
 
     private final JTable table;
 
