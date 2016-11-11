@@ -57,8 +57,8 @@ public class EventDatabase {
 
     }
 
-    private final static ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(10000);
-    private final static ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
+    private static final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(10000);
+    private static final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     public static int config_hash;
@@ -79,6 +79,8 @@ public class EventDatabase {
     private static final String SELECT_EVENT_BY_ID = "SELECT e.id, e.start, e.end, e.data, event_type.name, event_type.supplier FROM events AS e LEFT JOIN event_type ON e.type_id = event_type.id WHERE e.id=?";
 
     private static final HashMap<Object, PreparedStatement> statements = new HashMap<>();
+
+    private static final HashMap<JHVEventType, RequestCache> downloadedCache = new HashMap<>();
 
     private static PreparedStatement getPreparedStatement(Connection connection, String statement) {
         statement = statement.intern();
@@ -117,7 +119,7 @@ public class EventDatabase {
                 }
             }
         } catch (SQLException e) {
-            Log.error("Could not fetch event type " + event.getEventType().getEventName() + event.getSupplier().getSupplierKey() + e.getMessage());
+            Log.error("Could not fetch event type " + event.getEventType().getEventName() + ' ' + event.getSupplier().getSupplierKey() + ' ' + e.getMessage());
         }
         return typeId;
     }
@@ -522,8 +524,7 @@ public class EventDatabase {
                 return;
             }
 
-            HashMap<JHVEventType, RequestCache> dCache = ConnectionThread.downloadedCache;
-            RequestCache typedCache = dCache.get(type);
+            RequestCache typedCache = downloadedCache.get(type);
             if (typedCache == null) {
                 return;
             }
@@ -575,8 +576,7 @@ public class EventDatabase {
                 return new ArrayList<>();
             }
 
-            HashMap<JHVEventType, RequestCache> dCache = ConnectionThread.downloadedCache;
-            RequestCache typedCache = dCache.get(type);
+            RequestCache typedCache = downloadedCache.get(type);
             if (typedCache == null) {
                 typedCache = new RequestCache();
                 long last_timestamp = getLastEvent(connection, type);
@@ -587,7 +587,8 @@ public class EventDatabase {
                     lastEvent = Long.MAX_VALUE;
                 }
                 long invalidationDate = lastEvent - ONEWEEK * 2;
-                dCache.put(type, typedCache);
+                downloadedCache.put(type, typedCache);
+
                 int typeId = getEventTypeId(connection, type);
                 if (typeId != -1) {
                     try {

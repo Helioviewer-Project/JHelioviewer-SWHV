@@ -7,13 +7,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.concurrent.ThreadFactory;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.database.EventDatabase;
 
 public class JHVThread {
@@ -38,7 +35,6 @@ public class JHVThread {
     public static class ConnectionThread extends Thread {
 
         private static final int CURRENT_VERSION_SCHEMA = 7;
-        public static final HashMap<JHVEventType, RequestCache> downloadedCache = new HashMap<>();
         private static Connection connection;
 
         public ConnectionThread(Runnable r, String name) {
