@@ -33,7 +33,7 @@ class BandCache {
         return hasData;
     }
 
-    void addToCache(final float[] values, final long[] dates) {
+    void addToCache(float[] values, long[] dates) {
         if (values.length != 0) {
             hasData = true;
         }
@@ -48,7 +48,6 @@ class BandCache {
                 cache.setValue((int) ((dates[i] % (MILLIS_PER_CHUNK)) / MILLIS_PER_TICK), values[i]);
             }
         }
-
     }
 
     public float[] getBounds(TimeAxis timeAxis) {
@@ -145,7 +144,7 @@ class BandCache {
                 values[i] = new float[(int) CHUNKED_SIZE / factor];
                 Arrays.fill(values[i], Float.MIN_VALUE);
                 dates[i] = new long[(int) CHUNKED_SIZE / factor];
-                factor = factor * FACTOR_STEP;
+                factor *= FACTOR_STEP;
             }
 
             long startdate = key * MILLIS_PER_CHUNK;
@@ -154,7 +153,7 @@ class BandCache {
                 for (int i = 0; i < values[j].length; i++) {
                     dates[j][i] = startdate + i * MILLIS_PER_TICK * factor;
                 }
-                factor = factor * FACTOR_STEP;
+                factor *= FACTOR_STEP;
             }
         }
 
@@ -166,7 +165,7 @@ class BandCache {
                     idx = values[i].length - 1;
                 }
                 values[i][idx] = Math.max(values[i][idx], value);
-                factor = factor * FACTOR_STEP;
+                factor *= FACTOR_STEP;
             }
 
         }

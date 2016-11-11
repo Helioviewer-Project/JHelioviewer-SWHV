@@ -185,7 +185,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         setActiveInteractionMode(interactionMode);
 
-        final JPopupMenu annotatePopup = new JPopupMenu();
+        JPopupMenu annotatePopup = new JPopupMenu();
         ButtonGroup annotateGroup = new ButtonGroup();
 
         JRadioButtonMenuItem rectangleItem = new JRadioButtonMenuItem(new AbstractAction("Rectangle") {
@@ -268,9 +268,9 @@ public class TopToolBar extends JToolBar implements MouseListener {
         projectionButton.setToolTipText("Projection");
         addButton(projectionButton);
 
-        final JPopupMenu projectionPopup = new JPopupMenu();
+        JPopupMenu projectionPopup = new JPopupMenu();
         ButtonGroup projectionGroup = new ButtonGroup();
-        for (final Displayer.DisplayMode el : Displayer.DisplayMode.values()) {
+        for (Displayer.DisplayMode el : Displayer.DisplayMode.values()) {
             JRadioButtonMenuItem projectionItem = new JRadioButtonMenuItem(new AbstractAction(el.getLabel()) {
                 @Override
                 public void actionPerformed(ActionEvent e) {

@@ -93,7 +93,7 @@ public class ColorMask {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof ColorMask)) {
             return false;
         }

@@ -78,7 +78,7 @@ public class JPIPQuery {
         }
 
         String ret = buf.toString();
-        if (ret.length() > 0)
+        if (!ret.isEmpty())
             ret = ret.substring(0, ret.length() - 1);
 
         return ret;

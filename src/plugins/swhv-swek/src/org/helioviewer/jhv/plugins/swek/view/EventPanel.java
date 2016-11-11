@@ -118,7 +118,7 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
     }
 
     @Override
-    public void mouseClicked(final MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
         int clickedOnRow = eventTypeTree.getRowForLocation(e.getX(), e.getY());
         eventPanelModel.rowClicked(clickedOnRow);
         eventTypeTree.revalidate();

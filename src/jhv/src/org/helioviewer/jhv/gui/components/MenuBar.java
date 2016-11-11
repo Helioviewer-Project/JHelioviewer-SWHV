@@ -25,15 +25,11 @@ import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
 import org.helioviewer.jhv.gui.dialogs.plugins.PluginsDialog;
 import org.helioviewer.jhv.platform.OSXHandler;
 
-/**
- * Menu bar of the main window.
- */
+// Menu bar of the main window
 @SuppressWarnings("serial")
 public class MenuBar extends JMenuBar {
 
     public MenuBar() {
-        super();
-
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(new NewLayerAction(true, false));

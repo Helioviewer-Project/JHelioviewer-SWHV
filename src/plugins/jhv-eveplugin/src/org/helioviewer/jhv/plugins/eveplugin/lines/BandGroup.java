@@ -13,12 +13,12 @@ public class BandGroup {
     }
 
     public void setGroupLabel(String label) {
-        this.groupLabel = label;
+        groupLabel = label;
     }
 
     @Override
     public String toString() {
-        return this.groupLabel;
+        return groupLabel;
     }
 
 }

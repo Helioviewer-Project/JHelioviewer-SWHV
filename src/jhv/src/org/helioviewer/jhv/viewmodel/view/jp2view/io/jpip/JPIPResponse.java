@@ -30,7 +30,7 @@ public class JPIPResponse extends HTTPResponse {
         super(res.getCode(), res.getReason());
 
         for (String key : res.getHeaders())
-            this.setHeader(key, res.getHeader(key));
+            setHeader(key, res.getHeader(key));
     }
 
     /**

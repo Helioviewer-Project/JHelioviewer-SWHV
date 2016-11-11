@@ -180,7 +180,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 lastWidth = width;
                 lastHeight = height;
             }
-            final Graphics2D g = screenImage.createGraphics();
+            Graphics2D g = screenImage.createGraphics();
             AffineTransform tf = g.getTransform();
             tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
             g.setTransform(tf);
@@ -283,9 +283,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         long previousDate = Long.MIN_VALUE;
         for (int i = 0; i < horizontalTickCount; ++i) {
-            final long tickValue = xAxis.start + i * tickDifferenceHorizontal;
-            final int x = DrawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, tickValue);
-            final String tickText;
+            long tickValue = xAxis.start + i * tickDifferenceHorizontal;
+            int x = DrawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, tickValue);
+            String tickText;
             if (previousDate == Long.MIN_VALUE) {
                 tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
             } else {
@@ -356,7 +356,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             double startv = (Math.floor(start / step)) * step;
             double endv = (Math.ceil(end / step)) * step;
             if ((endv - startv) / step < 5) {
-                step = step / 2;
+                step /= 2;
             }
             double tick = startv;
             int ct = 0;
@@ -373,7 +373,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // Label and axis
         {
             String verticalLabel = yAxis.getLabel();
-            final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
+            Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
             int vWidth = (int) verticalLabelBounds.getWidth();
             int vHeight = (int) verticalLabelBounds.getHeight();
             int labelCompensation = vWidth / 2;
@@ -527,7 +527,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return false;
         }
         for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
-            if (el.highLightChanged(this.mousePosition))
+            if (el.highLightChanged(mousePosition))
                 return true;
         }
         return false;

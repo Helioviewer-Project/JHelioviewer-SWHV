@@ -30,8 +30,8 @@ public class ToggleFullscreenAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        final GLWindow window = ImageViewerGui.getGLWindow();
-        final boolean full = window.isFullscreen();
+        GLWindow window = ImageViewerGui.getGLWindow();
+        boolean full = window.isFullscreen();
         if (full) {
             KeyShortcuts.unregisterKey(exitKey);
             KeyShortcuts.unregisterKey(playKey);
@@ -40,8 +40,8 @@ public class ToggleFullscreenAction extends AbstractAction {
             KeyShortcuts.registerKey(playKey, MoviePanel.getPlayPauseAction());
         }
 
-        final int w = ImageViewerGui.getGLComponent().getWidth();
-        final int h = ImageViewerGui.getGLComponent().getHeight();
+        int w = ImageViewerGui.getGLComponent().getWidth();
+        int h = ImageViewerGui.getGLComponent().getHeight();
 
         new Thread(() -> {
             window.setFullscreen(!full);

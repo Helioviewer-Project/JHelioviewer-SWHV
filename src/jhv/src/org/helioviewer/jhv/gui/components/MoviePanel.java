@@ -771,7 +771,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         @Override
         protected void scrollDueToClickInTrack(int dir) {
             if (trackListener instanceof TimeTrackListener)
-                slider.setValue(this.valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
+                slider.setValue(valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
         }
 
         @Override

@@ -167,7 +167,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
             Settings settings = Settings.getSingletonInstance();
 
-            Object[][] tableData = new Object[][] { { "Default recording directory", settings.getProperty("default.save.path") },
+            Object[][] tableData = { { "Default recording directory", settings.getProperty("default.save.path") },
                     { "Default download path", settings.getProperty("default.local.path") } };
 
             model = new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {

@@ -27,7 +27,7 @@ class J2KRender implements Runnable {
 
     private static final ThreadLocal<int[]> bufferLocal = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
 
-    private static final int[] firstComponent = new int[] { 0 };
+    private static final int[] firstComponent = { 0 };
 
     /** A reference to the JP2Image this object is owned by. */
     private final JP2Image parentImageRef;

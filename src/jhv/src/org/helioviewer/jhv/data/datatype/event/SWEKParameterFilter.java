@@ -40,12 +40,12 @@ public class SWEKParameterFilter {
      * @param stepSize
      *            the stepsize
      */
-    public SWEKParameterFilter(String filterType, double min, double max, double startValue, Double stepsize, String units, String dbType) {
+    public SWEKParameterFilter(String filterType, double min, double max, double startValue, Double stepSize, String units, String dbType) {
         this.filterType = filterType;
         this.min = min;
         this.max = max;
         this.startValue = startValue;
-        this.stepSize = stepsize;
+        this.stepSize = stepSize;
         this.units = units;
         this.dbType = dbType;
     }

@@ -126,7 +126,7 @@ class J2KReader implements Runnable {
         }
     }
 
-    private void signalRender(final double factor) {
+    private void signalRender(double factor) {
         if (stop)
             return;
 

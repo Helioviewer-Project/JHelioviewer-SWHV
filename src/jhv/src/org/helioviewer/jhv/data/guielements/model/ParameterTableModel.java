@@ -4,12 +4,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 
-/**
- * The model for parameter table panel.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
+// The model for parameter table panel
 @SuppressWarnings("serial")
 public class ParameterTableModel extends AbstractTableModel {
 
@@ -25,7 +20,6 @@ public class ParameterTableModel extends AbstractTableModel {
      *            the parameters
      */
     public ParameterTableModel(JHVEventParameter[] parameters) {
-        super();
         this.parameters = parameters;
     }
 

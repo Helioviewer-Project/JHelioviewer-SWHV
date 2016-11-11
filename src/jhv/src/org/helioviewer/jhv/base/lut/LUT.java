@@ -58,7 +58,7 @@ public class LUT {
      */
     public LUT(String name, int[] lookup8/*, int[] lookup16*/) {
         lutName = name;
-        this.lut8 = lookup8;
+        lut8 = lookup8;
         //this.lut16 = lookup16;
     }
 

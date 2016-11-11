@@ -67,7 +67,7 @@ public class FilterManager {
         return filters.containsKey(eventType) && filters.get(eventType).containsKey(parameter);
     }
 
-    private void fireFilterChanged(final SWEKEventType swekEventType) {
+    private void fireFilterChanged(SWEKEventType swekEventType) {
         for (FilterManagerListener fml : listeners) {
             fml.filtersChanged(swekEventType);
         }

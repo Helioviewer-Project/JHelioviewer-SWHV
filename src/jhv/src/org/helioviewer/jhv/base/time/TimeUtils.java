@@ -24,7 +24,7 @@ public class TimeUtils {
     public static final JHVDate MINIMAL_DATE = JHVDate.parseDateTime("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = JHVDate.parseDateTime("2050-01-01T00:00:00");
 
-    public static Interval makeCompleteDay(final long start, final long end) {
+    public static Interval makeCompleteDay(long start, long end) {
         long endDate = end;
         long now = System.currentTimeMillis();
         if (end > now) {

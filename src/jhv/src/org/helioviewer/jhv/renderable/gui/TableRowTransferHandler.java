@@ -26,7 +26,7 @@ class TableRowTransferHandler extends TransferHandler {
     private BufferedImage image;
 
     public TableRowTransferHandler(JTable table) {
-        this.grid = table;
+        grid = table;
     }
 
     private void createImageOfRow(int rowIndex) {

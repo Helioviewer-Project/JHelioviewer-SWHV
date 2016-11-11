@@ -549,7 +549,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
                         updateDateDisplay();
                         break;
                     case DAYS:
-                        informAllJHVCalendarListeners(new JHVCalendarEvent(this.getParent()));
+                        informAllJHVCalendarListeners(new JHVCalendarEvent(getParent()));
                         break;
                     }
                 }

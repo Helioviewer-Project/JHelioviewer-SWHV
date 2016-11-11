@@ -83,7 +83,7 @@ public class TimestampRollingFileAppender extends FileAppender {
         }
         setFile(directory + formatter.format(timeStamp));
 
-        boolean deleteEmptyFile = (this.getThreshold() == Level.OFF) && !(new File(getFile()).exists());
+        boolean deleteEmptyFile = (getThreshold() == Level.OFF) && !(new File(getFile()).exists());
 
         if (days != 0) {
             File fdir = new File(directory);

@@ -56,7 +56,7 @@ public class GLSLShader {
     }
 
     public final void setTextureUnit(GL2 gl, String texname, int texunit) {
-        int[] params = new int[] { 0 };
+        int[] params = { 0 };
         gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
             Log.error("Error: setTextureUnit needs program to be linked");
@@ -82,7 +82,7 @@ public class GLSLShader {
         gl.glShaderSource(iID, iCount, akProgramText, aiLength, 0);
         gl.glCompileShader(iID);
 
-        int[] params = new int[] { 0 };
+        int[] params = { 0 };
         gl.glGetShaderiv(iID, GL2.GL_COMPILE_STATUS, params, 0);
         if (params[0] != 1) {
             Log.error("vertex compile status: " + params[0]);
@@ -111,7 +111,7 @@ public class GLSLShader {
         gl.glShaderSource(iID, iCount, akProgramText, aiLength, 0);
         gl.glCompileShader(iID);
 
-        int[] params = new int[] { 0 };
+        int[] params = { 0 };
         gl.glGetShaderiv(iID, GL2.GL_COMPILE_STATUS, params, 0);
         if (params[0] != 1) {
             Log.error("fragment compile status: " + params[0]);
@@ -136,7 +136,7 @@ public class GLSLShader {
         gl.glBindAttribLocation(progID, 1, "vertexUV");
         gl.glLinkProgram(progID);
 
-        int[] params = new int[] { 0 };
+        int[] params = { 0 };
         gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
             Log.error("link status: " + params[0]);

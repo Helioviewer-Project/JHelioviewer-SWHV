@@ -163,7 +163,7 @@ public class PfssData {
                     } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
                         counter = addVertex((float) x, (float) z, (float) -y, counter);
                         if (!PfssSettings.fixedColor) {
-                            counter = this.addColor(bright, 1.f, counter);
+                            counter = addColor(bright, 1.f, counter);
                         } else {
                             if (type == 0) {
                                 counter = addColor(PfssData.LOOPCOLOR, counter);

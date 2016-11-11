@@ -43,7 +43,7 @@ public class GLListener implements GLEventListener {
     @Override
     public void dispose(GLAutoDrawable drawable) {
         GLText.dispose();
-        final GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = drawable.getGL().getGL2();
 
         EventQueue.invokeLater(() -> {
             disposeImpl(gl);
@@ -102,7 +102,7 @@ public class GLListener implements GLEventListener {
     }
 
     @Override
-    public void reshape(GLAutoDrawable drawable, final int x, final int y, final int width, final int height) {
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         EventQueue.invokeLater(() -> {
             Displayer.setGLSize(x, y, width, height);
             Displayer.reshapeAll();

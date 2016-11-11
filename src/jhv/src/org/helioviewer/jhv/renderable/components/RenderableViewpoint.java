@@ -19,8 +19,8 @@ public class RenderableViewpoint extends AbstractRenderable {
 
     private static final float lineWidth = 2;
 
-    private static final float[] color1 = new float[] { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f };
-    private static final float[] color2 = new float[] { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f };
+    private static final float[] color1 = { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f };
+    private static final float[] color2 = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f };
 
     private String timeString = null;
 

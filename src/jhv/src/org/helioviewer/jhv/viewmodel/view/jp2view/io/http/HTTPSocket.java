@@ -133,7 +133,7 @@ public class HTTPSocket extends Socket {
             // Parses HTTP headers
             for (;;) {
                 line = LineRead.readAsciiLine(inputStream);
-                if (line.length() == 0)
+                if (line.isEmpty())
                     break;
 
                 parts = line.split(": ", 2);
