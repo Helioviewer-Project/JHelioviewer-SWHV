@@ -13,7 +13,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
 public class LoadURITask extends JHVWorker<View, Void> {
 
     private final ImageLayer imageLayer;
-    protected final URI uri;
+    private final URI uri;
 
     public LoadURITask(ImageLayer _imageLayer, URI _uri) {
         uri = _uri;

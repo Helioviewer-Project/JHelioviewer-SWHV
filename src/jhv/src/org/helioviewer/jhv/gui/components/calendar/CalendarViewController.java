@@ -10,7 +10,7 @@ import java.util.Date;
  * 
  * @author Stephan Pagel
  */
-public interface CalendarViewController {
+interface CalendarViewController {
     /**
      * Adds to the current selected date a defined time span.
      * 

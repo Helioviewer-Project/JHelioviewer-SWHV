@@ -15,7 +15,7 @@ import java.io.IOException;
  * @author Malte Nuhn
  * 
  */
-public final class ClipBoardCopier implements ClipboardOwner {
+public class ClipBoardCopier implements ClipboardOwner {
 
     private final static ClipBoardCopier clipboard = new ClipBoardCopier();
 

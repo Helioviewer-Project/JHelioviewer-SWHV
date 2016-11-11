@@ -825,7 +825,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
 
         // Overrides the track listener to access currentX
-        protected class TimeTrackListener extends TrackListener {
+        private class TimeTrackListener extends TrackListener {
             public int getCurrentX() {
                 return currentMouseX;
             }
