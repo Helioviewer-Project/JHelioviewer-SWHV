@@ -10,7 +10,7 @@ import javax.swing.filechooser.FileFilter;
  * 
  * @author Markus Langenberg
  */
-public abstract class ExtensionFileFilter extends FileFilter {
+abstract class ExtensionFileFilter extends FileFilter {
 
     public static class AllSupportedImageTypesFilter extends ExtensionFileFilter {
 
@@ -25,7 +25,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
 
     }
 
-    public static class FitsFilter extends ExtensionFileFilter {
+    private static class FitsFilter extends ExtensionFileFilter {
 
         public FitsFilter() {
             extensions = new String[] { "fits", "fts" };
@@ -38,7 +38,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
 
     }
 
-    public static class JP2Filter extends ExtensionFileFilter {
+    private static class JP2Filter extends ExtensionFileFilter {
 
         public JP2Filter() {
             extensions = new String[] { "jp2", "jpx" };
@@ -50,7 +50,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
         }
     }
 
-    public static class JPGFilter extends ExtensionFileFilter {
+    private static class JPGFilter extends ExtensionFileFilter {
 
         public JPGFilter() {
             extensions = new String[] { "jpg", "jpeg" };
@@ -63,7 +63,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
 
     }
 
-    public static class PNGFilter extends ExtensionFileFilter {
+    private static class PNGFilter extends ExtensionFileFilter {
 
         public PNGFilter() {
             extensions = new String[] { "png" };
@@ -76,7 +76,7 @@ public abstract class ExtensionFileFilter extends FileFilter {
 
     }
 
-    protected String[] extensions = {};
+    String[] extensions = {};
 
     @Override
     public boolean accept(File f) {

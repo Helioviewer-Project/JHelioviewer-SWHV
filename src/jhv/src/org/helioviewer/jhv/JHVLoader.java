@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 
-public class JHVLoader {
+class JHVLoader {
 
     public static void loadBundledPlugin(String name) throws IOException {
         try (InputStream is = JavaHelioViewer.class.getResourceAsStream("/plugins/" + name)) {

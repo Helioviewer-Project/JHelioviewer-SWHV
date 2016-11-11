@@ -77,7 +77,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *            True if the date of the current date should be displayed at
      *            the bottom; false if not.
      */
-    public JHVCalendar(boolean showToday) {
+    private JHVCalendar(boolean showToday) {
         // load day selection view
         changeDisplayMode(DisplayMode.DAYS);
         // initialize visual components

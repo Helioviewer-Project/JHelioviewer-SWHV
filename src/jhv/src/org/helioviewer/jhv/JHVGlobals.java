@@ -78,11 +78,9 @@ public class JHVGlobals {
             Log.warn("JHVGlobals.determineVersionAndRevision > Set version and revision to null.");
             return;
         }
-        JarFile jarFile = null;
-        if (jarPath.isFile()) {
-            try {
-                jarFile = new JarFile(jarPath);
 
+        if (jarPath.isFile()) {
+            try (JarFile jarFile = new JarFile(jarPath)) {
                 Manifest manifest = jarFile.getManifest();
                 if (manifest == null) {
                     Log.warn("JHVGlobals.determineVersionAndRevision > Manifest not found in jar file: " + jarPath + ". Set version and revision to null.");
@@ -101,14 +99,6 @@ public class JHVGlobals {
                 Log.info("Running " + agent);
             } catch (IOException e) {
                 Log.error("JHVGlobals.determineVersionAndRevision > Error while reading version and revision from manifest in jar file: " + jarPath, e);
-            } finally {
-                if (jarFile != null) {
-                    try {
-                        jarFile.close();
-                    } catch (IOException e) {
-                        Log.error("JHVGlobals.determineVersionAndRevision > Error while closing stream to jar file: " + jarFile.getName(), e);
-                    }
-                }
             }
         } else {
             Log.warn("JHVGlobals.determineVersionAndRevision > Classes are not within a jar file. Set version and revision to null.");
