@@ -28,7 +28,7 @@ public class DataSourcesParser {
     private static String mergeNames(String str1, String str2) {
         if (str1.equals(str2))
             return str1;
-        else if (str1.equals(""))
+        else if (str1.isEmpty())
             return str2;
         return str1 + " " + str2;
     }

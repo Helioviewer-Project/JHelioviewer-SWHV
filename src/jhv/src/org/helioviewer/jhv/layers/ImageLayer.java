@@ -22,6 +22,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.LoadRemoteTask;
 import org.helioviewer.jhv.opengl.GLImage;
+import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -243,7 +244,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler, 
 
             gl.glColorMask(true, true, true, true);
         }
-        shader.unbind(gl);
+        GLSLShader.unbind(gl);
     }
 
     @Override
@@ -259,7 +260,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler, 
         }
     }
 
-    private int generate(GL2 gl) {
+    private static int generate(GL2 gl) {
         int[] tmpId = new int[1];
         gl.glGenBuffers(1, tmpId, 0);
         return tmpId[0];
@@ -269,7 +270,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler, 
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
     }
 
-    private void disableIndexVBO(GL2 gl) {
+    private static void disableIndexVBO(GL2 gl) {
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
@@ -278,7 +279,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler, 
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
     }
 
-    private void disablePositionVBO(GL2 gl) {
+    private static void disablePositionVBO(GL2 gl) {
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
@@ -359,7 +360,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler, 
         }
     }
 
-    private void autoContrast(byte[] ba) {
+    private static void autoContrast(byte[] ba) {
         int len = ba.length;
         int[] histogram = new int[256];
         for (int i = 0; i < len; i++) {

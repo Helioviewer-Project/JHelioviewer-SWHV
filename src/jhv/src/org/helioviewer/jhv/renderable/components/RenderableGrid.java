@@ -135,7 +135,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private void drawGridFlat(GL2 gl, GridScale scale, Viewport vp) {
+    private static void drawGridFlat(GL2 gl, GridScale scale, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
 
@@ -169,7 +169,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private void drawGridTextFlat(GL2 gl, int size, GridScale scale, Viewport vp) {
+    private static void drawGridTextFlat(GL2 gl, int size, GridScale scale, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
         TextRenderer renderer = GLText.getRenderer(size);
@@ -241,7 +241,7 @@ public class RenderableGrid extends AbstractRenderable {
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
 
-    private void drawAxes(GL2 gl) {
+    private static void drawAxes(GL2 gl) {
         gl.glLineWidth(2);
 
         gl.glBegin(GL2.GL_LINES);
@@ -256,7 +256,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glEnd();
     }
 
-    private void drawEarthCircles(GL2 gl, Position.L p) {
+    private static void drawEarthCircles(GL2 gl, Position.L p) {
         gl.glLineWidth(1);
         gl.glColor3f(1, 1, 0);
 
@@ -275,7 +275,7 @@ public class RenderableGrid extends AbstractRenderable {
     private static final float[] R_LABEL_POS = { 2, 8, 24 };
     private static final float STEP_DEGREES = 15;
 
-    private void drawRadialGrid(GL2 gl) {
+    private static void drawRadialGrid(GL2 gl) {
         gl.glPushMatrix();
         {
             gl.glColor3f(1, 1, 1);
@@ -540,7 +540,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glBufferData(GL2.GL_ARRAY_BUFFER, colorBufferSize * Buffers.SIZEOF_FLOAT, colorBuffer, GL2.GL_STATIC_DRAW);
     }
 
-    private int generate(GL2 gl) {
+    private static int generate(GL2 gl) {
         int[] tmpId = new int[1];
         gl.glGenBuffers(1, tmpId, 0);
         return tmpId[0];

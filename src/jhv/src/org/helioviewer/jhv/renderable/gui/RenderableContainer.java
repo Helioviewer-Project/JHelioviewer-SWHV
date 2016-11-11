@@ -10,10 +10,10 @@ import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
+import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 
 import com.jogamp.opengl.GL2;
 
@@ -86,7 +86,7 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void renderMiniview(Camera camera, Viewport miniview, GL2 gl) {
-        ImageViewerGui.getRenderableMiniview().renderBackground(camera, miniview, gl);
+        RenderableMiniview.renderBackground(camera, miniview, gl);
         for (Renderable renderable : renderables) {
             renderable.renderMiniview(camera, miniview, gl);
         }

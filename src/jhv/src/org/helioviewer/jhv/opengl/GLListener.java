@@ -82,7 +82,7 @@ public class GLListener implements GLEventListener {
         ImageViewerGui.getRenderableContainer().init(gl);
     }
 
-    private void disposeImpl(GL2 gl) {
+    private static void disposeImpl(GL2 gl) {
         ImageViewerGui.getRenderableContainer().dispose(gl);
         GLSLSolarShader.dispose(gl);
     }

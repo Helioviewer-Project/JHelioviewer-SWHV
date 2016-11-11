@@ -51,7 +51,7 @@ public class GLSLShader {
         gl.glUseProgram(progID);
     }
 
-    public final void unbind(GL2 gl) {
+    public static void unbind(GL2 gl) {
         gl.glUseProgram(0);
     }
 

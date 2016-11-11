@@ -85,11 +85,11 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
             String pluginName = plugin.getName();
             String pluginAboutLicense = plugin.getAboutLicenseText();
 
-            if (pluginName == null || pluginName.equals("")) {
+            if (pluginName == null || pluginName.isEmpty()) {
                 pluginName = "Unknown Plugin";
             }
 
-            if (pluginAboutLicense == null || pluginAboutLicense.equals("")) {
+            if (pluginAboutLicense == null || pluginAboutLicense.isEmpty()) {
                 pluginAboutLicense = "No License Text Available.";
             }
 
@@ -154,7 +154,7 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
      *
      * @return the formatted version and revision string
      */
-    private String getVersionString() {
+    private static String getVersionString() {
         String versionString = JHVGlobals.getJhvVersion();
         String revisionString = JHVGlobals.getJhvRevision();
 

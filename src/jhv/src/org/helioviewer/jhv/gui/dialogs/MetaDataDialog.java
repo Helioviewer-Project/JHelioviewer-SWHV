@@ -172,7 +172,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }
     }
 
-    private void addDataItem(String key, DefaultListModel<String> model) {
+    private static void addDataItem(String key, DefaultListModel<String> model) {
         model.addElement(key);
     }
 
@@ -312,7 +312,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      *            Node to read
      * @return value of the node
      */
-    private String getElementValue(Node elem) {
+    private static String getElementValue(Node elem) {
         if (elem != null && elem.hasChildNodes()) {
             for (Node child = elem.getFirstChild(); child != null; child = child.getNextSibling()) {
                 if (child.getNodeType() == Node.TEXT_NODE) {
@@ -331,7 +331,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      * @param filename
      *            XML file name
      */
-    private boolean saveXMLDocument(DOMSource source, String filename) {
+    private static boolean saveXMLDocument(DOMSource source, String filename) {
         try (OutputStream os = new BufferedOutputStream(new FileOutputStream(new File(filename)))) {
             StreamResult result = new StreamResult(os);
             TransformerFactory.newInstance().newTransformer().transform(source, result);

@@ -141,7 +141,7 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
     }
 
-    public void setUniform(GL2 gl, int id, float[] val, int count) {
+    public static void setUniform(GL2 gl, int id, float[] val, int count) {
         switch (count) {
         case 1:
             gl.glUniform1fv(id, 1, val, 0);

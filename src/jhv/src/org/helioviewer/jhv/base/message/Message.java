@@ -69,7 +69,7 @@ public class Message {
             return;
 
         String msg = _msg.toString();
-        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (msg == null || msg.equals("") ? "No warning details available." : msg)), "Warning", JOptionPane.WARNING_MESSAGE));
+        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (msg == null || msg.isEmpty() ? "No warning details available." : msg)), "Warning", JOptionPane.WARNING_MESSAGE));
     }
 
     /**
@@ -85,7 +85,7 @@ public class Message {
             return;
 
         String msg = _msg.toString();
-        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, (msg == null || msg.equals("") ? "No warning details available." : msg), _title, JOptionPane.WARNING_MESSAGE));
+        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, (msg == null || msg.isEmpty() ? "No warning details available." : msg), _title, JOptionPane.WARNING_MESSAGE));
     }
 
 }
