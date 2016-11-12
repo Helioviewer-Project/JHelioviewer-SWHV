@@ -1,35 +1,14 @@
-package org.helioviewer.jhv.plugins.swek.view;
+package org.helioviewer.jhv.plugins.swek.config;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 
-/**
- * An Icon bank for the SWEK plugin.
- * 
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
- */
 public class SWEKIconBank {
 
-    private static SWEKIconBank singletonInstance;
-
-    /** the icon bank */
-    private final Map<String, ImageIcon> iconBank = new HashMap<>();
-
-    private SWEKIconBank() {
-        initIconBank();
-    }
-
-    public static SWEKIconBank getSingletonInstance() {
-        if (singletonInstance == null) {
-            singletonInstance = new SWEKIconBank();
-        }
-        return singletonInstance;
-    }
+    private static final HashMap<String, ImageIcon> iconBank = new HashMap<>();
 
     /**
      * Adds a new Icon to the icon bank.
@@ -39,7 +18,7 @@ public class SWEKIconBank {
      * @param icon
      *            the icon corresponding to the event
      */
-    public void addIcon(String eventType, ImageIcon icon) {
+    public static void addIcon(String eventType, ImageIcon icon) {
         iconBank.put(eventType, icon);
     }
 
@@ -51,7 +30,7 @@ public class SWEKIconBank {
      * @return the icon corresponding with the given name or the "other" icon if
      *         the name was not known.
      */
-    public ImageIcon getIcon(String iconName) {
+    public static ImageIcon getIcon(String iconName) {
         ImageIcon tempIcon = iconBank.get(iconName);
         if (tempIcon == null) {
             return iconBank.get("Other");
@@ -60,10 +39,7 @@ public class SWEKIconBank {
         }
     }
 
-    /**
-     * Initializes the icon bank. Adds all the standard icons to the iconbank.
-     */
-    private void initIconBank() {
+    public static void init() {
         iconBank.put("ActiveRegion", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/ar_icon.png")));
         iconBank.put("CoronalDimming", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/cd_icon.png")));
         iconBank.put("CME", new ImageIcon(SWEKPlugin.class.getResource("/images/EventIcons/ce_icon.png")));

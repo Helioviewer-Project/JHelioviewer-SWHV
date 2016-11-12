@@ -187,7 +187,7 @@ public class EventDatabase {
         }
     }
 
-    private static Integer dump_associationint2db(ArrayList<Pair<Integer, Integer>> assocs) {
+    private static int dump_associationint2db(ArrayList<Pair<Integer, Integer>> assocs) {
         Connection connection = ConnectionThread.getConnection();
         if (connection == null) {
             return -1;
@@ -429,7 +429,7 @@ public class EventDatabase {
                     }
                 }
             }
-            EventDatabase.dump_associationint2db(assocs);
+            dump_associationint2db(assocs);
 
             return inserted_ids;
         }

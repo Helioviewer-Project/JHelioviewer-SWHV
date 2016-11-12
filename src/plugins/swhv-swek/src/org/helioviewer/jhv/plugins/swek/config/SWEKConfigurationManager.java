@@ -34,7 +34,6 @@ import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser;
-import org.helioviewer.jhv.plugins.swek.view.SWEKIconBank;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +57,8 @@ public class SWEKConfigurationManager {
 
     public static void loadConfiguration() {
         if (!configLoaded) {
+            SWEKIconBank.init();
+
             Log.debug("search and open the configuration file");
             boolean isConfigParsed;
             if (checkAndOpenUserSetFile()) {
@@ -228,9 +229,9 @@ public class SWEKConfigurationManager {
         try {
             URI eventIconURI = new URI(eventIconValue);
             if (eventIconURI.getScheme().toLowerCase().equals("iconbank")) {
-                return SWEKIconBank.getSingletonInstance().getIcon(eventIconURI.getHost());
+                return SWEKIconBank.getIcon(eventIconURI.getHost());
             } else {
-                return SWEKIconBank.getSingletonInstance().getIcon("Other");
+                return SWEKIconBank.getIcon("Other");
             }
         } catch (URISyntaxException e) {
             Log.info("Could not parse the URI " + eventIconValue + ", null icon returned");
