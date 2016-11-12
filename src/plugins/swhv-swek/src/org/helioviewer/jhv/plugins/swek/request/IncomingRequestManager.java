@@ -18,7 +18,7 @@ public class IncomingRequestManager implements JHVEventCacheRequestHandler {
 
     @Override
     public void handleRequestForInterval(JHVEventType eventType, Interval interval) {
-        SWEKDownloadManager.getSingletonInstance().newRequestForInterval(eventType, interval);
+        SWEKDownloadManager.downloadEventType(eventType, interval);
     }
 
 }

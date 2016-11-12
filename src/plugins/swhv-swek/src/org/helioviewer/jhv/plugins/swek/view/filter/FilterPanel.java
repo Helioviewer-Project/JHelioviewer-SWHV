@@ -29,7 +29,6 @@ public class FilterPanel extends JPanel {
     private final SWEKParameter parameter;
     private final SWEKEventType eventType;
 
-    private final FilterManager filterManager;
     private final FilterDialog filterDialog;
     private final SWEKOperand operand;
 
@@ -39,7 +38,6 @@ public class FilterPanel extends JPanel {
         spinner = _spinner;
         parameter = _parameter;
         eventType = _eventType;
-        filterManager = FilterManager.getSingletonInstance();
 
         setLayout(new BorderLayout());
         setOpaque(false);
@@ -68,11 +66,11 @@ public class FilterPanel extends JPanel {
     }
 
     public void removeFilter() {
-        filterManager.removeFilters(eventType);
+        FilterManager.removeFilters(eventType);
     }
 
     public void fireFilter() {
-        filterManager.fireFilters(eventType);
+        FilterManager.fireFilters(eventType);
     }
 
     public void addFilter() {
@@ -84,7 +82,7 @@ public class FilterPanel extends JPanel {
             else
                 pval = String.valueOf(spinner.getValue());
             SWEKParam param = new SWEKParam(parameter.getParameterName(), pval, operand);
-            filterManager.addFilter(eventType, parameter, param);
+            FilterManager.addFilter(eventType, parameter, param);
         }
     }
 
