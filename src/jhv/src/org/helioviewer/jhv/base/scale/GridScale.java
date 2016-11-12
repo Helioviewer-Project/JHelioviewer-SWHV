@@ -20,37 +20,37 @@ public abstract class GridScale {
 
     public static GridScale current = ortho;
 
-    abstract public double scaleX(double val);
+    public abstract double scaleX(double val);
 
-    abstract public double invScaleX(double val);
+    public abstract double invScaleX(double val);
 
-    abstract public double scaleY(double val);
+    public abstract double scaleY(double val);
 
-    abstract public double invScaleY(double val);
+    public abstract double invScaleY(double val);
 
-    abstract public double getInterpolatedXValue(double v);
+    public abstract double getInterpolatedXValue(double v);
 
-    abstract public double getInterpolatedYValue(double v);
+    public abstract double getInterpolatedYValue(double v);
 
-    abstract public double getXValueInv(double v);
+    public abstract double getXValueInv(double v);
 
-    abstract public double getYValueInv(double v);
+    public abstract double getYValueInv(double v);
 
-    abstract public double getYstart();
+    public abstract double getYstart();
 
-    abstract public double getYstop();
+    public abstract double getYstop();
 
-    abstract public void set(double _xStart, double _xStop, double _yStart, double _yStop);
+    public abstract void set(double _xStart, double _xStop, double _yStart, double _yStop);
 
-    abstract public Vec2 transform(Vec3 pt);
+    public abstract Vec2 transform(Vec3 pt);
 
-    abstract public Vec3 transformInverse(Vec2 pt);
+    public abstract Vec3 transformInverse(Vec2 pt);
 
-    abstract public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridChoiceType gridChoice);
+    public abstract Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridChoiceType gridChoice);
 
-    abstract public Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
+    public abstract Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
-    private static abstract class GridScaleAbstract extends GridScale {
+    private abstract static class GridScaleAbstract extends GridScale {
 
         protected double xStart;
         protected double xStop;

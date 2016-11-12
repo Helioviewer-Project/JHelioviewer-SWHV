@@ -22,7 +22,7 @@ import org.helioviewer.jhv.base.logging.Log;
  */
 public class LUT {
 
-    private final static char angstrom = '\u212B';
+    private static final char angstrom = '\u212B';
 
     private final String lutName;
 

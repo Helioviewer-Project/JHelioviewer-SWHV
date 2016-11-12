@@ -29,7 +29,7 @@ public class PfssNewDataLoader implements Runnable {
 
     private final long start;
     private final long end;
-    private final static SortedMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<>();
+    private static final SortedMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<>();
 
     public PfssNewDataLoader(long _start, long _end) {
         start = _start;

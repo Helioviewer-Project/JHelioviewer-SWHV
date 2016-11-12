@@ -209,9 +209,9 @@ public enum JHVDirectory {
     };
 
     /** A String representation of the path of the directory. */
-    abstract public String getPath();
+    public abstract String getPath();
 
     /** A File representation of the path of the directory. */
-    abstract public File getFile();
+    public abstract File getFile();
 
 }

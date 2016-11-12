@@ -37,7 +37,7 @@ public class RunningDifferencePanel implements ChangeListener {
     private final JPanel diffPanel = new JPanel();
 
     private JCheckBox diffRot;
-    private final static String[] combolist = { "No difference images", "Running difference", "Base difference" };
+    private static final String[] combolist = { "No difference images", "Running difference", "Base difference" };
     private final JButton downloadLayerButton;
     private final JButton showMetaButton;
     private final JPanel topPanel;
