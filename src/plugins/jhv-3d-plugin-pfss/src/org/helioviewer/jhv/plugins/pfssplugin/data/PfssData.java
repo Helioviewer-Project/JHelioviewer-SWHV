@@ -39,9 +39,9 @@ public class PfssData {
     private String dateString;
     private final long time;
 
-    public PfssData(byte[] gzipFitsFile, long time) {
-        this.gzipFitsFile = gzipFitsFile;
-        this.time = time;
+    public PfssData(byte[] _gzipFitsFile, long _time) {
+        gzipFitsFile = _gzipFitsFile;
+        time = _time;
     }
 
     public long getTime() {

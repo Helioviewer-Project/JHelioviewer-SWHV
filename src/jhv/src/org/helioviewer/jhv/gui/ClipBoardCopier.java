@@ -9,21 +9,11 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-/**
- * Simple helper for accessing the user's clipboard.
- * 
- * @author Malte Nuhn
- * 
- */
+// Simple helper for accessing the user's clipboard.
 public class ClipBoardCopier implements ClipboardOwner {
 
     private static final ClipBoardCopier clipboard = new ClipBoardCopier();
 
-    /**
-     * Returns the only instance of this class.
-     * 
-     * @return the only instance of this class.
-     * */
     public static ClipBoardCopier getSingletonInstance() {
         return clipboard;
     }
@@ -31,6 +21,7 @@ public class ClipBoardCopier implements ClipboardOwner {
     private ClipBoardCopier() {
     }
 
+    @Override
     public void lostOwnership(Clipboard aClipboard, Transferable aContents) {
     }
 

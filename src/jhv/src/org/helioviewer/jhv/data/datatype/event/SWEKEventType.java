@@ -17,13 +17,14 @@ public class SWEKEventType {
     private HashMap<String, String> databaseFields;
     private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<>();
 
-    public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, ImageIcon eventIcon) {
-        this.eventName = eventName.intern();
-        this.suppliers = suppliers;
-        this.parameterList = parameterList;
-        this.eventIcon = eventIcon;
+    public SWEKEventType(String _eventName, List<SWEKSupplier> _suppliers, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
+        eventName = _eventName.intern();
+        suppliers = _suppliers;
+        parameterList = _parameterList;
+        eventIcon = _eventIcon;
+
         containsParameterFilter = checkFilters(parameterList);
-        swekEventTypes.put(this.eventName, this);
+        swekEventTypes.put(eventName, this);
     }
 
     public static SWEKEventType getSWEKEventType(String name) {

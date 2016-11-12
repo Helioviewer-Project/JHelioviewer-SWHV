@@ -16,10 +16,10 @@ public class SWEKRelatedEvents {
 
     private final List<SWEKRelatedOn> relatedOnList;
 
-    public SWEKRelatedEvents(SWEKEventType event, SWEKEventType relatedWith, List<SWEKRelatedOn> relatedOnList) {
-        this.event = event;
-        this.relatedWith = relatedWith;
-        this.relatedOnList = relatedOnList;
+    public SWEKRelatedEvents(SWEKEventType _event, SWEKEventType _relatedWith, List<SWEKRelatedOn> _relatedOnList) {
+        event = _event;
+        relatedWith = _relatedWith;
+        relatedOnList = _relatedOnList;
     }
 
     public SWEKEventType getEvent() {

@@ -55,7 +55,7 @@ public class FITSImage implements MetaDataContainer {
 
         if (bitsPerPixel == BasicHDU.BITPIX_BYTE) {
             // get image raw data
-            byte[][] data2D = (byte[][]) ((hdu).getKernel());
+            byte[][] data2D = (byte[][]) (hdu.getKernel());
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
@@ -72,7 +72,7 @@ public class FITSImage implements MetaDataContainer {
             imageData = new SingleChannelByte8ImageData(width, height, ByteBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_SHORT) {
             // get image raw data
-            short[][] data2D = (short[][]) ((hdu).getKernel());
+            short[][] data2D = (short[][]) (hdu.getKernel());
 
             // get width and height of image
             int width = data2D[0].length;
@@ -105,13 +105,13 @@ public class FITSImage implements MetaDataContainer {
 
                 // shift bits of all values
                 for (int i = 0; i < data.length; i++) {
-                    data[i] = (short) (data[i] << shiftBits);
+                    data[i] <<= shiftBits;
                 }
             }
             imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, ShortBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
             // get image raw data
-            int[][] data2D = (int[][]) ((hdu).getKernel());
+            int[][] data2D = (int[][]) (hdu.getKernel());
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
@@ -128,7 +128,7 @@ public class FITSImage implements MetaDataContainer {
             imageData = new ARGBInt32ImageData(false, width, height, IntBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
             // get image raw data
-            float[][] data2D = (float[][]) ((hdu).getKernel());
+            float[][] data2D = (float[][]) (hdu.getKernel());
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;

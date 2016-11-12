@@ -22,52 +22,52 @@ public class BandType {
         return baseURL;
     }
 
-    public void setBaseURL(String baseURL) {
-        this.baseURL = baseURL;
+    public void setBaseURL(String _baseURL) {
+        baseURL = _baseURL;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setLabel(String _label) {
+        label = _label;
     }
 
     public String getUnitLabel() {
         return unitLabel;
     }
 
-    public void setUnitLabel(String unitLabel) {
-        this.unitLabel = unitLabel;
+    public void setUnitLabel(String _unitLabel) {
+        unitLabel = _unitLabel;
     }
 
     public HashMap<String, Double> getWarnLevels() {
         return warnLevels;
     }
 
-    public void setWarnLevels(HashMap<String, Double> warnLevels) {
-        this.warnLevels = warnLevels;
+    public void setWarnLevels(HashMap<String, Double> _warnLevels) {
+        warnLevels = _warnLevels;
     }
 
     public double getMin() {
         return min;
     }
 
-    public void setMin(double min) {
-        this.min = min;
+    public void setMin(double _min) {
+        min = _min;
     }
 
     public double getMax() {
         return max;
     }
 
-    public void setMax(double max) {
-        this.max = max;
+    public void setMax(double _max) {
+        max = _max;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String _name) {
+        name = _name;
     }
 
     public String getName() {

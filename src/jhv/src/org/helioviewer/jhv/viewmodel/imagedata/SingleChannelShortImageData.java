@@ -88,8 +88,7 @@ public class SingleChannelShortImageData extends AbstractImageData {
         DataBufferUShort dataBuffer = new DataBufferUShort((short[]) buffer.array(), width * height);
 
         // create the appropriate bit mask
-        int mask = 0xffffffff;
-        mask = mask >>> (32 - format.getBitDepth());
+        int mask = 0xffffffff >>> (32 - format.getBitDepth());
 
         Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { mask }, new Point(0, 0));
         newImage.setData(raster);
