@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.eveplugin.radio;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -24,9 +25,10 @@ class RadioOptionsPanel extends SmallPanel {
         c.weighty = 1;
         c.fill = GridBagConstraints.NONE;
 
-        JComboBox<String> lutBox = new JComboBox<>(LUT.getStandardList().keySet().toArray(new String[0]));
+        Map<String, LUT> lutMap = LUT.copyMap();
+        JComboBox<String> lutBox = new JComboBox<>(lutMap.keySet().toArray(new String[0]));
         lutBox.setSelectedItem(selected);
-        lutBox.addActionListener(e -> RadioData.setLUT(LUT.getStandardList().get(lutBox.getSelectedItem())));
+        lutBox.addActionListener(e -> RadioData.setLUT(lutMap.get(lutBox.getSelectedItem())));
 
         JButton availabilityButton = new JButton("Available data");
         availabilityButton.addActionListener(e -> {
