@@ -20,9 +20,9 @@ import com.jogamp.opengl.GL2;
 
 public class PfssData {
 
-    private final static Color OPENFIELDCOLOR = Color.RED;
-    private final static Color LOOPCOLOR = Color.WHITE;
-    private final static Color INSIDEFIELDCOLOR = Color.BLUE;
+    private static final Color OPENFIELDCOLOR = Color.RED;
+    private static final Color LOOPCOLOR = Color.WHITE;
+    private static final Color INSIDEFIELDCOLOR = Color.BLUE;
 
     private final byte[] gzipFitsFile;
 

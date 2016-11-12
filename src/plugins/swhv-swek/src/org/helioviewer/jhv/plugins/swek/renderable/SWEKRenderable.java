@@ -350,8 +350,8 @@ public class SWEKRenderable extends AbstractRenderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private final static int MOUSE_OFFSET_X = 25;
-    private final static int MOUSE_OFFSET_Y = 25;
+    private static final int MOUSE_OFFSET_X = 25;
+    private static final int MOUSE_OFFSET_Y = 25;
 
     private static void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<>();
