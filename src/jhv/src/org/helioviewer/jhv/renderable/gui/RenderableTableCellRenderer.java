@@ -18,9 +18,9 @@ class RenderableTableCellRenderer extends DefaultTableCellRenderer {
     public void revalidate() {}
 
     @Override
-    public final void repaint() {}
+    public void repaint() {}
 
     @Override
-    public final void repaint(int x, int y, int width, int height) {}
+    public void repaint(int x, int y, int width, int height) {}
 
 }

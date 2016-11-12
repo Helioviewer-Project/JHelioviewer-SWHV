@@ -19,8 +19,8 @@ public class ParameterTableModel extends AbstractTableModel {
      * @param parameters
      *            the parameters
      */
-    public ParameterTableModel(JHVEventParameter[] parameters) {
-        this.parameters = parameters;
+    public ParameterTableModel(JHVEventParameter[] _parameters) {
+        parameters = _parameters;
     }
 
     @Override

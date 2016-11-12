@@ -24,10 +24,10 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 
+import com.jogamp.newt.event.MouseAdapter;
 import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.newt.event.MouseListener;
 
-public class SWEKPopupController implements MouseListener, TimeListener {
+public class SWEKPopupController extends MouseAdapter implements TimeListener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
@@ -100,25 +100,9 @@ public class SWEKPopupController implements MouseListener, TimeListener {
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
     public void mouseExited(MouseEvent e) {
         mouseOverJHVEvent = null;
         JHVEventCache.highlight(null);
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
     }
 
     private double computeDistSun(JHVEvent evt) {
@@ -222,10 +206,6 @@ public class SWEKPopupController implements MouseListener, TimeListener {
         if (hp != null)
             hp.y = -hp.y;
         return hp;
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseEvent e) {
     }
 
 }

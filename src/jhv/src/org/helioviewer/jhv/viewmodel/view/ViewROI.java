@@ -101,10 +101,10 @@ public class ViewROI {
             } else {
                 double widthxAdd = Math.abs(extraSize * (maxPhysicalX - minPhysicalX));
                 double widthyAdd = Math.abs(extraSize * (maxPhysicalY - minPhysicalY));
-                minPhysicalX = minPhysicalX - widthxAdd;
-                maxPhysicalX = maxPhysicalX + widthxAdd;
-                minPhysicalY = minPhysicalY - widthyAdd;
-                maxPhysicalY = maxPhysicalY + widthyAdd;
+                minPhysicalX -= widthxAdd;
+                maxPhysicalX += widthxAdd;
+                minPhysicalY -= widthyAdd;
+                maxPhysicalY += widthyAdd;
 
                 Region r = m.getPhysicalRegion();
                 if (minPhysicalX < r.llx)

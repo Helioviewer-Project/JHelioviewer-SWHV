@@ -50,7 +50,7 @@ public class JHVDate implements Comparable<JHVDate> {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return string;
     }
 

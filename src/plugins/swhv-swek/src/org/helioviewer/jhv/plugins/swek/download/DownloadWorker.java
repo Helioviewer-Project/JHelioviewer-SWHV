@@ -25,10 +25,10 @@ class DownloadWorker implements Runnable {
     private final List<SWEKParam> params;
     private final Interval requestInterval;
 
-    public DownloadWorker(JHVEventType _jhvType, Interval interval, List<SWEKParam> params) {
-        requestInterval = interval;
+    public DownloadWorker(JHVEventType _jhvType, Interval _interval, List<SWEKParam> _params) {
+        requestInterval = _interval;
         jhvType = _jhvType;
-        this.params = params;
+        params = _params;
     }
 
     public void stopWorker() {

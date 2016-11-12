@@ -14,9 +14,9 @@ public class JHVEventCacheResult {
     private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> availableEvents;
     private final Map<JHVEventType, List<Interval>> missingIntervals;
 
-    public JHVEventCacheResult(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> availableEvents, Map<JHVEventType, List<Interval>> missingIntervals) {
-        this.availableEvents = availableEvents;
-        this.missingIntervals = missingIntervals;
+    public JHVEventCacheResult(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> _availableEvents, Map<JHVEventType, List<Interval>> _missingIntervals) {
+        availableEvents = _availableEvents;
+        missingIntervals = _missingIntervals;
     }
 
     public Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> getAvailableEvents() {
