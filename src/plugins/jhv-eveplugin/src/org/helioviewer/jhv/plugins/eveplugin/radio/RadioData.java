@@ -46,7 +46,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         isVisible = false;
 
         String cm = "Rainbow 2";
-        colorModel = createIndexColorModelFromLUT(LUT.getStandardList().get(cm));
+        colorModel = createIndexColorModelFromLUT(LUT.get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
         yAxis = new YAxis(400, 20, "Mhz", false);
     }

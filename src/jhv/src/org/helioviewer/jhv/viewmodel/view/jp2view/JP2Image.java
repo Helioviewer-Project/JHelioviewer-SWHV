@@ -14,7 +14,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.lut.DefaultTable;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -447,10 +446,7 @@ public class JP2Image {
     private LUT getAssociatedLUT() {
         MetaData metaData = metaDataList[0];
         if (metaData instanceof HelioviewerMetaData) {
-            String colorKey = DefaultTable.getSingletonInstance().getColorTable((HelioviewerMetaData) metaData);
-            if (colorKey != null) {
-                return LUT.getStandardList().get(colorKey);
-            }
+            return LUT.get((HelioviewerMetaData) metaData);
         }
         return null;
     }

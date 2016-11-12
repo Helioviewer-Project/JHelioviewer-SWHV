@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -15,7 +14,6 @@ import javax.swing.JToggleButton;
 import javax.swing.border.Border;
 import javax.swing.border.BevelBorder;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
@@ -37,9 +35,7 @@ public class LUTPanel implements ActionListener, FilterDetails {
     private final JToggleButton enhanceButton;
 
     public LUTPanel() {
-        // duplicate
-        lutMap = new TreeMap<>(JHVGlobals.alphanumComparator);
-        lutMap.putAll(LUT.getStandardList());
+        lutMap = LUT.copyMap(); // duplicate
 
         combobox = new JComboBox<>(lutMap.keySet().toArray(new String[0]));
         combobox.setMaximumSize(combobox.getPreferredSize());

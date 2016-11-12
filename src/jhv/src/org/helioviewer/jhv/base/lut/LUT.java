@@ -3,6 +3,7 @@ package org.helioviewer.jhv.base.lut;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -13,180 +14,35 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
-/**
- * Representing a single color lookup. Each lookup has a name assigned and gives
- * access to lookup the values
- *
- * @author Helge Dietert
- */
 public class LUT {
 
     private static final char angstrom = '\u212B';
 
     private final String lutName;
+    private final int[] lut8;
 
-    /**
-     * Returns the name of the lut
-     *
-     * @return Name
-     */
+    public LUT(String name, int[] lookup8) {
+        lutName = name;
+        lut8 = lookup8;
+    }
+
     public String getName() {
         return lutName;
     }
 
-    /**
-     * LUT for 8 bit
-     */
-    private final int[] lut8;
-
-    /**
-     * LUT for 16 bit
-     */
-    //private final int[] lut16; -- disabled, saves 7MB
-
-    /**
-     * Creates a lookup table with the given table, use e.g. for int[]
-     * org.helioviewer.viewmodel.view.jp2view.JP2View.getBuiltInLUT()
-     *
-     * @param name
-     *            Name of the lookup
-     * @param lookup8
-     *            Array of lookup values for 8 bit lookup
-     * @param lookup16
-     *            Array of lookup values for 16 bit lookup
-     */
-    public LUT(String name, int[] lookup8/*, int[] lookup16*/) {
-        lutName = name;
-        lut8 = lookup8;
-        //this.lut16 = lookup16;
-    }
-
-    /**
-     * Fills the output array with values based on the given input data using
-     * the given lookup table.
-     *
-     * The output data must have the same size as the input data to call this
-     * function.
-     *
-     * @param byteBuf
-     *            Input data
-     * @param intBuf
-     *            Output data
-     * @param invert
-     *            If true, the color table is inverted, false otherwise
-     */
-    /*
-        public void lookup8(byte[] byteBuf, int[] intBuf, boolean invert) {
-            if (invert) {
-                int offset = lut8.length - 1;
-                for (int i = 0; i < byteBuf.length; ++i) {
-                    intBuf[i] = lut8[offset - (byteBuf[i] & 0xff)];
-                }
-            } else {
-                for (int i = 0; i < byteBuf.length; ++i) {
-                    intBuf[i] = lut8[byteBuf[i] & 0xff];
-                }
-            }
-        }
-    */
-
-    /**
-     * Fills the output array with values based on the given input data using
-     * the given lookup table.
-     *
-     * The output data must have the same size as the input data to call this
-     * function.
-     *
-     * @param shortBuf
-     *            Input data
-     * @param intBuf
-     *            Output data
-     * @param invert
-     *            If true, the color table is inverted, false otherwise
-     */
-    /*    public void lookup16(short[] shortBuf, int[] intBuf, boolean invert) {
-            if (invert) {
-                int offset = lut16.length - 1;
-                for (int i = 0; i < shortBuf.length; ++i) {
-                    intBuf[i] = lut16[offset - (shortBuf[i] & 0xFFFF)];
-                }
-            } else {
-                for (int i = 0; i < shortBuf.length; ++i) {
-                    intBuf[i] = lut16[(shortBuf[i] & 0xFFFF)];
-                }
-            }
-        }
-    */
-    /**
-     * Gives back LUT for 8bit
-     *
-     * @return table
-     */
     public int[] getLut8() {
         return lut8;
     }
 
-    /**
-     * Gives back LUT for 16bit
-     *
-     * @return table
-     */
-    /*    public int[] getLut16() {
-            return lut16;
-        }
-    */
-    /**
-     * Reads in a gimp gradient file as a gradient filter
-     *
-     * @param file
-     * @return Created LUT
-     * @throws GradientError
-     *             Error parsing/evaluating the file
-     * @throws IOException
-     *             From opening the file
-     * @throws FileNotFoundException
-     *             From opening the file
-     */
-    private static LUT readGimpGradientFile(File file) throws Exception {
-        FileInputStream fr = null;
-        try {
-            fr = new FileInputStream(file);
-            return readGimpGradientStream(fr);
-        } finally {
-            if (fr != null) {
-                fr.close();
-            }
-        }
-    }
-
-    /**
-     * Reads in a gimp gradient file from a input stream as a gradient filter
-     *
-     * @param is
-     *            Input stream to read from
-     * @return Created LUT
-     * @throws GradientError
-     *             Error parsing/evaluating the file
-     * @throws IOException
-     *             From opening the file
-     */
-    private static LUT readGimpGradientStream(InputStream is) throws Exception {
-        BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-        GimpGradient gg = new GimpGradient(in);
-        int[] lut8 = new int[256];
-        //int[] lut16 = new int[65536];
-        int i;
-        for (i = 0; i < 256; i++) {
-            lut8[i] = gg.getGradientColor(i / 255.0);
-        }
-        /*for (i = 0; i < 65536; i++) {
-            lut16[i] = gg.getGradientColor(i / 65535.0);
-        }*/
-        return new LUT(gg.getName(), lut8/*, lut16*/);
-    }
-
-    private static final Map<String, LUT> standardList = new TreeMap<>(JHVGlobals.alphanumComparator);
+    private static final TreeMap<String, LUT> standardList = new TreeMap<>(JHVGlobals.alphanumComparator);
+    // List of rules to apply
+    private static JSONArray colorRules;
 
     static {
         addStdLut("Gray", "ctable_idl_16bit_00_Black-White_Linear", -16777216, -16711423, -16645630, -16579837, -16514044, -16448251, -16382458, -16316665, -16250872, -16185079, -16119286, -16053493, -15987700, -15921907, -15856114, -15790321, -15724528, -15658735, -15592942, -15527149, -15461356, -15395563, -15329770, -15263977, -15198184, -15132391, -15066598, -15000805, -14935012, -14869219, -14803426, -14737633, -14671840, -14606047, -14540254, -14474461, -14408668, -14342875, -14277082, -14211289, -14145496, -14079703, -14013910, -13948117, -13882324, -13816531, -13750738, -13684945, -13619152, -13553359, -13487566, -13421773, -13355980, -13290187, -13224394, -13158601, -13092808, -13027015, -12961222, -12895429, -12829636, -12763843, -12698050, -12632257, -12566464, -12500671, -12434878, -12369085, -12303292, -12237499, -12171706, -12105913, -12040120, -11974327, -11908534, -11842741, -11776948, -11711155, -11645362, -11579569, -11513776, -11447983, -11382190, -11316397, -11250604, -11184811, -11119018, -11053225, -10987432, -10921639, -10855846, -10790053, -10724260, -10658467, -10592674, -10526881, -10461088, -10395295, -10329502, -10263709, -10197916, -10132123, -10066330, -10000537, -9934744, -9868951, -9803158, -9737365, -9671572, -9605779, -9539986, -9474193, -9408400, -9342607, -9276814, -9211021, -9145228, -9079435, -9013642, -8947849, -8882056, -8816263, -8750470, -8684677, -8618884, -8553091, -8487298, -8421505, -8355712, -8289919, -8224126, -8158333, -8092540, -8026747, -7960954, -7895161, -7829368, -7763575, -7697782, -7631989, -7566196, -7500403, -7434610, -7368817, -7303024, -7237231, -7171438, -7105645, -7039852, -6974059, -6908266, -6842473, -6776680, -6710887, -6645094, -6579301, -6513508, -6447715, -6381922, -6316129, -6250336, -6184543, -6118750, -6052957, -5987164, -5921371, -5855578, -5789785, -5723992, -5658199, -5592406, -5526613, -5460820, -5395027, -5329234, -5263441, -5197648, -5131855, -5066062, -5000269, -4934476, -4868683, -4802890, -4737097, -4671304, -4605511, -4539718, -4473925, -4408132, -4342339, -4276546, -4210753, -4144960, -4079167, -4013374, -3947581, -3881788, -3815995, -3750202, -3684409, -3618616, -3552823, -3487030, -3421237, -3355444, -3289651, -3223858, -3158065, -3092272, -3026479, -2960686, -2894893, -2829100, -2763307, -2697514, -2631721, -2565928, -2500135, -2434342, -2368549, -2302756, -2236963, -2171170, -2105377, -2039584, -1973791, -1907998, -1842205, -1776412, -1710619, -1644826, -1579033, -1513240, -1447447, -1381654, -1315861, -1250068, -1184275, -1118482, -1052689, -986896, -921103, -855310, -789517, -723724, -657931, -592138, -526345, -460552, -394759, -328966, -263173, -197380, -131587, -65794, -1);
@@ -232,59 +88,72 @@ public class LUT {
                     Log.warn("Error loading color table plugin dir", e);
                 }
             }
+
+        // read associations
+        readColors();
     }
 
-    public static Map<String, LUT> getStandardList() {
-        return standardList;
+    private static LUT readGimpGradientFile(File file) throws Exception {
+        try (FileInputStream fr = new FileInputStream(file)) {
+            return readGimpGradientStream(fr);
+        }
     }
 
-    /**
-     * Shortcut to create the old standard gradients. Better way is to use
-     * readGimpGradient properly
-     *
-     * @param name
-     *            Name to identify
-     * @param lookup8
-     *            8 bit lookup values
-     * @param fname
-     *            Filename for 16 bit
-     */
+    private static LUT readGimpGradientStream(InputStream is) throws Exception {
+        BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+        GimpGradient gg = new GimpGradient(in);
+        int[] lut8 = new int[256];
+
+        for (int i = 0; i < 256; i++) {
+            lut8[i] = gg.getGradientColor(i / 255.);
+        }
+        return new LUT(gg.getName(), lut8);
+    }
+
     private static void addStdLut(String name, String fname, int... lookup8) {
-        LUT l = new LUT(name, lookup8/*, internal16Readin(fname)*/);
-        standardList.put(name, l);
+        standardList.put(name, new LUT(name, lookup8));
     }
 
-    /**
-     * Reads in the existing 16bit LUT. In general a gimp gradient file is much
-     * more common and should be used for additions
-     *
-     * @param name
-     * @return 16bit lookup table
-     */
-    /*
-        private static int[] internal16Readin(String name) {
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(FileUtils.getResourceInputStream("/luts/" + name)));
-                String strLine;
+    private static void readColors() {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(FileUtils.getResourceInputStream("/settings/colors.js"), StandardCharsets.UTF_8))) {
+            colorRules = new JSONArray(new JSONTokener(in));
+        } catch (IOException | JSONException e) {
+            Log.warn("Error reading the configuration for the default color tables", e);
+            colorRules = new JSONArray();
+        }
+    }
 
-                int[] intArray = new int[65536];
-                int counter = 0;
-                while ((strLine = br.readLine()) != null) {
-                    String[] array = strLine.split(" ");
-                    for (int i = 0; i < array.length; i++) {
-                        if (array[i].equals(" ") || array[i].equals("")) {
-                        } else {
-                            intArray[counter] = Integer.parseInt(array[i]);
-                            counter++;
-                        }
-                    }
+    public static Map<String, LUT> copyMap() {
+        return new TreeMap<>(standardList);
+    }
+
+    public static LUT get(String name) {
+        return standardList.get(name);
+    }
+
+    public static LUT get(HelioviewerMetaData hvMetaData) {
+        int length = colorRules.length();
+        for (int i = 0; i < length; ++i) {
+            try {
+                JSONObject rule = colorRules.getJSONObject(i);
+                if (rule.has("observatory") && !rule.getString("observatory").equalsIgnoreCase(hvMetaData.getObservatory())) {
+                        continue;
                 }
-                br.close();
-                return intArray;
-            } catch (Exception e) {
-                Log.error("Error open internal color table " + name, e);
-                return null;
+                if (rule.has("instrument") && !rule.getString("instrument").equalsIgnoreCase(hvMetaData.getInstrument())) {
+                        continue;
+                }
+                if (rule.has("detector") && !rule.getString("detector").equalsIgnoreCase(hvMetaData.getDetector())) {
+                        continue;
+                }
+                if (rule.has("measurement") && !rule.getString("measurement").equalsIgnoreCase(hvMetaData.getMeasurement())) {
+                        continue;
+                }
+                return standardList.get(rule.getString("color"));
+            } catch (JSONException e) {
+                Log.warn("Rule " + i + " for the default color table is invalid!", e);
             }
         }
-    */
+        return null;
+    }
+
 }

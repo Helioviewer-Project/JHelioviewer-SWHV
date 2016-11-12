@@ -32,7 +32,7 @@ public class GLImage {
 
     private boolean lutChanged = true;
 
-    private static final LUT gray = LUT.getStandardList().get("Gray");
+    private static final LUT gray = LUT.get("Gray");
 
     private boolean differenceMode = false;
     private boolean baseDifferenceMode = false;
