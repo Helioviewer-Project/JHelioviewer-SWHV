@@ -22,14 +22,6 @@ public class SWEKTreeModel {
         listeners.remove(swekTreeModelListener);
     }
 
-    public static void subTreeCollapsed() {
-        fireTreeExpansionChanged();
-    }
-
-    public static void subTreeExpanded() {
-        fireTreeExpansionChanged();
-    }
-
     public static void setStartLoading(SWEKEventType eventType) {
         for (SWEKTreeModelListener l : listeners) {
             l.startedDownloadingEventType(eventType);
@@ -44,12 +36,6 @@ public class SWEKTreeModel {
 
     public static void resetEventType(SWEKEventType eventType) {
         setStopLoading(eventType);
-    }
-
-    private static void fireTreeExpansionChanged() {
-        for (SWEKTreeModelListener l : listeners) {
-            l.expansionChanged();
-        }
     }
 
 }
