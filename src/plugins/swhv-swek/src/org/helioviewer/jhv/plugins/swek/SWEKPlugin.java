@@ -14,12 +14,11 @@ import org.helioviewer.jhv.threads.JHVWorker;
 
 public class SWEKPlugin implements Plugin {
 
-    private final IncomingRequestManager incomingRequestManager;
-    private final SWEKRenderable renderable;
+    private static final IncomingRequestManager incomingRequestManager = new IncomingRequestManager();
+    private static final SWEKRenderable renderable = new SWEKRenderable();
+    public static final SWEKData swekData = new SWEKData();
 
     public SWEKPlugin() {
-        incomingRequestManager = IncomingRequestManager.getSingletonInstance();
-        renderable = new SWEKRenderable();
     }
 
     @Override
@@ -38,8 +37,8 @@ public class SWEKPlugin implements Plugin {
                 ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), true);
                 ImageViewerGui.getLeftContentPane().revalidate();
 
-                SWEKData.getSingletonInstance().requestEvents(true);
-                Layers.addTimespanListener(SWEKData.getSingletonInstance());
+                SWEKData.requestEvents(true);
+                Layers.addTimespanListener(swekData);
                 ImageViewerGui.getRenderableContainer().addRenderable(renderable);
             }
 
@@ -51,8 +50,7 @@ public class SWEKPlugin implements Plugin {
     @Override
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
-        Layers.removeTimespanListener(SWEKData.getSingletonInstance());
-        SWEKData.reset();
+        Layers.removeTimespanListener(swekData);
 
         ImageViewerGui.getLeftContentPane().remove(SWEKPluginPanel.getSWEKPluginPanelInstance());
         ImageViewerGui.getLeftContentPane().revalidate();

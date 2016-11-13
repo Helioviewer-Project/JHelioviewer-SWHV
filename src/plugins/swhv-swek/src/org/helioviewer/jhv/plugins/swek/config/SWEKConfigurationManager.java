@@ -100,7 +100,7 @@ public class SWEKConfigurationManager {
     }
 
     private static boolean checkAndOpenZippedFile() {
-        URL url = SWEKPlugin.class.getResource("/" + configFileName);
+        URL url = SWEKPlugin.class.getResource('/' + configFileName);
         ReadableByteChannel rbc;
         try {
             rbc = Channels.newChannel(url.openStream());

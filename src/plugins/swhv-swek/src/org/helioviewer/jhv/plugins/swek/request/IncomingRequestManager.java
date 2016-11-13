@@ -7,15 +7,6 @@ import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 
 public class IncomingRequestManager implements JHVEventCacheRequestHandler {
 
-    private static final IncomingRequestManager instance = new IncomingRequestManager();
-
-    private IncomingRequestManager() {
-    }
-
-    public static IncomingRequestManager getSingletonInstance() {
-        return instance;
-    }
-
     @Override
     public void handleRequestForInterval(JHVEventType eventType, Interval interval) {
         SWEKDownloadManager.downloadEventType(eventType, interval);
