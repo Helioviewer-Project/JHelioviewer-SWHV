@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -10,41 +9,27 @@ import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.view.SWEKPluginPanel;
-import org.helioviewer.jhv.threads.JHVWorker;
 
 public class SWEKPlugin implements Plugin {
 
     private static final IncomingRequestManager incomingRequestManager = new IncomingRequestManager();
     private static final SWEKRenderable renderable = new SWEKRenderable();
     public static final SWEKData swekData = new SWEKData();
+    private static SWEKPluginPanel swekPanel;
 
     public SWEKPlugin() {
+        swekPanel = new SWEKPluginPanel(SWEKConfigurationManager.loadConfiguration());
+        JHVEventCache.registerHandler(incomingRequestManager);
     }
 
     @Override
     public void installPlugin() {
-        JHVWorker<Void, Void> loadPlugin = new JHVWorker<Void, Void>() {
+        ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
+        ImageViewerGui.getLeftContentPane().revalidate();
 
-            @Override
-            protected Void backgroundWork() {
-                SWEKConfigurationManager.loadConfiguration();
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                JHVEventCache.registerHandler(incomingRequestManager);
-                ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), true);
-                ImageViewerGui.getLeftContentPane().revalidate();
-
-                SWEKData.requestEvents(true);
-                Layers.addTimespanListener(swekData);
-                ImageViewerGui.getRenderableContainer().addRenderable(renderable);
-            }
-
-        };
-        loadPlugin.setThreadName("SWEK--LoadPlugin");
-        JHVGlobals.getExecutorService().execute(loadPlugin);
+        SWEKData.requestEvents(true);
+        Layers.addTimespanListener(swekData);
+        ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
 
     @Override
@@ -52,7 +37,7 @@ public class SWEKPlugin implements Plugin {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         Layers.removeTimespanListener(swekData);
 
-        ImageViewerGui.getLeftContentPane().remove(SWEKPluginPanel.getSWEKPluginPanelInstance());
+        ImageViewerGui.getLeftContentPane().remove(swekPanel);
         ImageViewerGui.getLeftContentPane().revalidate();
     }
 
