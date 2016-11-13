@@ -15,34 +15,20 @@ import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
+import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 
 public class SWEKData implements TimespanListener, JHVEventHandler {
 
-    private static SWEKData instance;
-    private long beginTime = Layers.getLastUpdatedTimestamp().milli;
-    private long endTime = beginTime;
+    private static long beginTime = Layers.getLastUpdatedTimestamp().milli;
+    private static long endTime = beginTime;
 
-    private SWEKData() {
-    }
-
-    public static SWEKData getSingletonInstance() {
-        if (instance == null) {
-            instance = new SWEKData();
-        }
-        return instance;
-    }
-
-    public static void reset() {
-        instance = null;
-    }
-
-    public void requestEvents(boolean force) {
+    public static void requestEvents(boolean force) {
         long first = Layers.getStartDate().milli;
         long last = Layers.getEndDate().milli;
         if (force || first < beginTime || last > endTime) {
             beginTime = first;
             endTime = last;
-            JHVEventCache.requestForInterval(first, last, this);
+            JHVEventCache.requestForInterval(first, last, SWEKPlugin.swekData);
         }
     }
 
@@ -62,7 +48,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         requestEvents(true);
     }
 
-    public ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
+    public static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
         JHVEventCacheResult result = JHVEventCache.get(beginTime, endTime, beginTime, endTime);
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> data = result.getAvailableEvents();

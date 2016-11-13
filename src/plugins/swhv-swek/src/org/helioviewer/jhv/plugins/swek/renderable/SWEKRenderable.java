@@ -370,7 +370,7 @@ public class SWEKRenderable extends AbstractRenderable {
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            List<JHVRelatedEvents> eventsToDraw = SWEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.getName() == "Coronal Mass Ejection") { // interned
@@ -391,7 +391,7 @@ public class SWEKRenderable extends AbstractRenderable {
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         if (isVisible[vp.idx]) {
-            List<JHVRelatedEvents> eventsToDraw = SWEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.getName() == "Coronal Mass Ejection" && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) { // interned

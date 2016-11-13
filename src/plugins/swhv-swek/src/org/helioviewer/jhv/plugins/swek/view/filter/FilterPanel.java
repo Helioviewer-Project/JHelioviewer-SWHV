@@ -46,7 +46,7 @@ public class FilterPanel extends JPanel {
         JCheckBox enableButton = new JCheckBox();
         enableButton.addActionListener(e -> toggleEnabled());
 
-        label = new JLabel(parameter.getParameterDisplayName() + " " + operand.getStringRepresentation());
+        label = new JLabel(parameter.getParameterDisplayName() + ' ' + operand.getStringRepresentation());
 
         spinner.setEnabled(enabled);
         label.setEnabled(enabled);
