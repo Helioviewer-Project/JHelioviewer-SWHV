@@ -50,12 +50,7 @@ public class SWEKConfigurationManager {
     private static final Map<String, SWEKEventType> eventTypes = new HashMap<>();
     private static final List<SWEKEventType> orderedEventTypes = new ArrayList<>();
 
-    public static List<SWEKEventType> getOrderedEventTypes() {
-        // loadConfiguration();
-        return orderedEventTypes;
-    }
-
-    public static void loadConfiguration() {
+    public static List<SWEKEventType> loadConfiguration() {
         if (!configLoaded) {
             SWEKIconBank.init();
 
@@ -82,6 +77,7 @@ public class SWEKConfigurationManager {
             }
             configLoaded = isConfigParsed;
         }
+        return orderedEventTypes;
     }
 
     private static boolean isManuallyChanged() {
