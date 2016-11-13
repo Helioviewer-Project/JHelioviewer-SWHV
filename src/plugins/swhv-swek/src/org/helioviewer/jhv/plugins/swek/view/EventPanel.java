@@ -52,9 +52,11 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
      */
     public EventPanel(SWEKEventType eventType) {
         this.eventType = eventType;
+
         SWEKTreeModel.addSWEKTreeModelListener(this);
         eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(this.eventType));
         eventPanelModel.addEventPanelModelListener(SWEKDownloadManager.getSingletonInstance());
+
         loadingTimer = new Timer(500, this);
         loadingStep = 0;
 
@@ -63,7 +65,6 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
         eventTypeTree.setShowsRootHandles(true);
         eventTypeTree.setSelectionModel(null);
         eventTypeTree.addMouseListener(this);
-        eventTypeTree.addTreeExpansionListener(eventPanelModel);
         eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
 
         // workaround for Win HiDpi
@@ -139,10 +140,6 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
 
     @Override
     public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void expansionChanged() {
     }
 
     @Override

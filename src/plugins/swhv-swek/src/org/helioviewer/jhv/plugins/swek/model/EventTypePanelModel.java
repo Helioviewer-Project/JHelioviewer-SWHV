@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.swek.model;
 
 import java.util.HashSet;
 
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -15,7 +13,7 @@ import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
  * The model of the event type panel. This model is a TreeModel and is used by
  * the tree on the event type panel.
  */
-public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
+public class EventTypePanelModel implements TreeModel {
 
     /** The event type for this model */
     private final SWEKTreeModelEventType eventType;
@@ -190,30 +188,6 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * javax.swing.event.TreeExpansionListener#treeCollapsed(javax.swing.event
-     * .TreeExpansionEvent)
-     */
-    @Override
-    public void treeCollapsed(TreeExpansionEvent event) {
-        SWEKTreeModel.subTreeCollapsed();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * javax.swing.event.TreeExpansionListener#treeExpanded(javax.swing.event
-     * .TreeExpansionEvent)
-     */
-    @Override
-    public void treeExpanded(TreeExpansionEvent event) {
-        SWEKTreeModel.subTreeExpanded();
     }
 
     /**
