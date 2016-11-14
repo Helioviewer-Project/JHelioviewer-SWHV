@@ -125,7 +125,7 @@ public class PluginManager {
      * @param pluginLocation
      *            Location of the corresponding file of the plug-in.
      */
-    private void addPlugin(Plugin plugin, URI pluginLocation) {
+    public void addPlugin(Plugin plugin, URI pluginLocation) {
         PluginContainer pluginContainer = new PluginContainer(plugin, pluginLocation, pluginSettings.isPluginActivated(pluginLocation));
         plugins.put(plugin, pluginContainer);
         if (pluginContainer.isActive()) {
