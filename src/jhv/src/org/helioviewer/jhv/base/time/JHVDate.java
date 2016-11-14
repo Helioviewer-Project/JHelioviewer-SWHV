@@ -78,7 +78,7 @@ public class JHVDate implements Comparable<JHVDate> {
                 second = 0;
             }
         }
-        return new JHVDate(year, month != 0 ? month - 1 : 0, day, hour, minute, second);
+        return new JHVDate(year, month == 0 ? 0 : month - 1, day, hour, minute, second);
     }
 
 }

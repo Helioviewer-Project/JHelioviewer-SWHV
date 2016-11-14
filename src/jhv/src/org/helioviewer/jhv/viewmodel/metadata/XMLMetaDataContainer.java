@@ -20,7 +20,7 @@ public class XMLMetaDataContainer implements MetaDataContainer {
     public void parseXML(String xml) throws Exception {
         if (xml == null)
             throw new Exception("No XML data present");
-        else if (!xml.contains("</meta>")) {
+        if (!xml.contains("</meta>")) {
             throw new Exception("XML data incomplete");
         }
 

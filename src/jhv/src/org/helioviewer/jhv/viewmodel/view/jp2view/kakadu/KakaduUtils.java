@@ -125,58 +125,58 @@ public class KakaduUtils {
             box_final = new Jp2_input_box();
             Jp2_locator jp2Locator = new Jp2_locator();
 
-            if (!box.Open(src, jp2Locator)) {
+            if (!box.Open(src, jp2Locator))
                 throw new JHV_KduException("Box not open: " + boxNumber);
-            } else {
-                if (boxType == Kdu_global.jp2_association_4cc) {
-                    while (box.Get_box_type() != boxType && box.Exists()) {
-                        box.Close();
-                        if (!box.Open_next()) {
-                            return result;
-                        }
-                    }
 
-                    if (box.Exists()) {
-                        if (!box_final.Open(box)) {
-                            return result;
-                        }
-
-                        int i = 1;
-                        while ((box_final.Get_box_type() != boxType || i < boxNumber) && box_final.Exists()) {
-                            if (box_final.Get_box_type() == boxType)
-                                i++;
-                            box_final.Close();
-                            if (!box_final.Open_next()) {
-                                return result;
-                            }
-                        }
-                        result[1] = box;
-                        box = box_final;
-                        box_final = null;
-                    }
-
-                    if (!box.Exists() || box.Get_box_type() != boxType) {
-                        if (result[1] != null)
-                            result[1].Native_destroy();
-                        result[1] = null;
-                        return result;
-                    }
-                } else {
-                    int i = 1;
-                    while ((box.Get_box_type() != boxType || i < boxNumber) && box.Exists()) {
-                        if (box.Get_box_type() == boxType)
-                            i++;
-                        box.Close();
-                        if (!box.Open_next()) {
-                            return result;
-                        }
-                    }
-
-                    if (!box.Exists() || box.Get_box_type() != boxType) {
+            if (boxType == Kdu_global.jp2_association_4cc) {
+                while (box.Get_box_type() != boxType && box.Exists()) {
+                    box.Close();
+                    if (!box.Open_next()) {
                         return result;
                     }
                 }
+
+                if (box.Exists()) {
+                    if (!box_final.Open(box)) {
+                        return result;
+                    }
+
+                    int i = 1;
+                    while ((box_final.Get_box_type() != boxType || i < boxNumber) && box_final.Exists()) {
+                        if (box_final.Get_box_type() == boxType)
+                            i++;
+                        box_final.Close();
+                        if (!box_final.Open_next()) {
+                            return result;
+                        }
+                    }
+                    result[1] = box;
+                    box = box_final;
+                    box_final = null;
+                }
+
+                if (!box.Exists() || box.Get_box_type() != boxType) {
+                    if (result[1] != null)
+                        result[1].Native_destroy();
+                    result[1] = null;
+                    return result;
+                }
+            } else {
+                int i = 1;
+                while ((box.Get_box_type() != boxType || i < boxNumber) && box.Exists()) {
+                    if (box.Get_box_type() == boxType)
+                        i++;
+                    box.Close();
+                    if (!box.Open_next()) {
+                        return result;
+                    }
+                }
+
+                if (!box.Exists() || box.Get_box_type() != boxType) {
+                    return result;
+                }
             }
+
             result[0] = box;
             return result;
         } catch (KduException ex) {
@@ -209,19 +209,18 @@ public class KakaduUtils {
             box = new Jp2_input_box();
             if (!box.Open(supBox))
                 throw new JHV_KduException("Box not open: " + boxNumber);
-            else {
-                int i = 1;
-                while ((box.Get_box_type() != boxType || i < boxNumber) && box.Exists()) {
-                    if (box.Get_box_type() == boxType)
-                        i++;
-                    box.Close();
-                    box.Open_next();
-                }
 
-                if (!box.Exists() || box.Get_box_type() != boxType) {
-                    box.Native_destroy();
-                    box = null;
-                }
+            int i = 1;
+            while ((box.Get_box_type() != boxType || i < boxNumber) && box.Exists()) {
+                if (box.Get_box_type() == boxType)
+                    i++;
+                box.Close();
+                box.Open_next();
+            }
+
+            if (!box.Exists() || box.Get_box_type() != boxType) {
+                box.Native_destroy();
+                box = null;
             }
         } catch (KduException ex) {
             throw new JHV_KduException("Internal Kakadu Error(findBox2 " + boxNumber + "): " + ex.getMessage(), ex);
@@ -333,18 +332,17 @@ public class KakaduUtils {
         try {
             if (!box.Open(supBox))
                 throw new JHV_KduException("Box not open: " + boxNumber);
-            else {
-                int i = 1;
-                while ((box.Get_box_type() != boxType || i < boxNumber) && box.Exists()) {
-                    if (box.Get_box_type() == boxType)
-                        i++;
-                    box.Close();
-                    box.Open_next();
-                }
 
-                if (!box.Exists() || box.Get_box_type() != boxType) {
-                    return false;
-                }
+            int i = 1;
+            while ((box.Get_box_type() != boxType || i < boxNumber) && box.Exists()) {
+                if (box.Get_box_type() == boxType)
+                    i++;
+                box.Close();
+                box.Open_next();
+            }
+
+            if (!box.Exists() || box.Get_box_type() != boxType) {
+                return false;
             }
         } catch (KduException ex) {
             throw new JHV_KduException("Internal Kakadu Error(myFindBox2 " + boxNumber + "): " + ex.getMessage(), ex);

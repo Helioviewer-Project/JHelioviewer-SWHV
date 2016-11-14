@@ -95,7 +95,7 @@ public class PluginManager {
 
             if (className == null) {
                 String name = file.getName().substring(0, file.getName().length() - 4);
-                className = "org.helioviewer.plugins." + name + "." + name;
+                className = "org.helioviewer.plugins." + name + '.' + name;
                 Log.debug("No Manifest Information Found, Fallback: Main-Class: " + className);
             }
 
@@ -160,7 +160,7 @@ public class PluginManager {
             // when JAR file cannot be deleted note file by using a temporary file
             // in order to delete it when restarting JHV
             try (FileWriter tempFileWriter = new FileWriter(tempFile, true)) {
-                tempFileWriter.write(container.getPluginLocation().getPath() + ";");
+                tempFileWriter.write(container.getPluginLocation().getPath() + ';');
                 tempFileWriter.flush();
             } catch (IOException e) {
                 return false;

@@ -96,7 +96,7 @@ public class JHVUpdate implements Runnable {
             }
 
             EventQueue.invokeLater(() -> {
-                String runningVersion = JHVGlobals.getJhvVersion() + "." + JHVGlobals.getJhvRevision();
+                String runningVersion = JHVGlobals.getJhvVersion() + '.' + JHVGlobals.getJhvRevision();
                 if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
                     Log.info("Found newer version " + version);
 
@@ -110,7 +110,7 @@ public class JHVUpdate implements Runnable {
                 } else {
                     Log.info("Running the newest version of JHelioviewer");
                     if (verbose)
-                        JOptionPane.showMessageDialog(null, "You are running the latest JHelioviewer version (" + runningVersion + ")");
+                        JOptionPane.showMessageDialog(null, "You are running the latest JHelioviewer version (" + runningVersion + ')');
                 }
             });
         } catch (IOException e) {

@@ -135,25 +135,25 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         } else if (detector.equals("C2") || detector.equals("C3")) {
             String measurement1 = m.get("FILTER");
             String measurement2 = m.get("POLAR");
-            measurement = measurement1 + " " + measurement2;
+            measurement = measurement1 + ' ' + measurement2;
             fullName = "LASCO " + detector;
         } else if (instrument.equals("MDI")) {
             measurement = m.get("DPC_OBSR");
             fullName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase(Locale.ENGLISH);
         } else if (detector.equals("COR1") || detector.equals("COR2")) {
             observatory = m.get("OBSRVTRY");
-            fullName = observatory + " " + detector;
+            fullName = observatory + ' ' + detector;
         } else if (detector.equals("EUVI")) {
             observatory = m.get("OBSRVTRY");
-            fullName = observatory + " " + detector + " " + measurement;
+            fullName = observatory + ' ' + detector + ' ' + measurement;
         } else if (instrument.equals("TRACE")) {
             measurement = m.get("WAVE_LEN");
-            fullName = instrument + " " + measurement;
+            fullName = instrument + ' ' + measurement;
         } else if (instrument.equals("XRT")) {
-            measurement = m.get("EC_FW1_") + " " + m.get("EC_FW2_");
-            fullName = instrument + " " + measurement;
+            measurement = m.get("EC_FW1_") + ' ' + m.get("EC_FW2_");
+            fullName = instrument + ' ' + measurement;
         } else {
-            fullName = instrument + " " + measurement;
+            fullName = instrument + ' ' + measurement;
         }
     }
 
@@ -167,7 +167,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if (observedDate == null) {
                 observedDate = m.get("DATE_OBS");
                 if (observedDate != null && instrument.equals("LASCO")) {
-                    observedDate += "T" + m.get("TIME_OBS");
+                    observedDate += 'T' + m.get("TIME_OBS");
                 }
             }
         }

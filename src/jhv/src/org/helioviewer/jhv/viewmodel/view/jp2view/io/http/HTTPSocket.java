@@ -131,7 +131,7 @@ public class HTTPSocket extends Socket {
             // Instantiates new HTTPResponse
             HTTPResponse res = new HTTPResponse(code, parts[2]);
             // Parses HTTP headers
-            for (;;) {
+            while (true) {
                 line = LineRead.readAsciiLine(inputStream);
                 if (line.isEmpty())
                     break;

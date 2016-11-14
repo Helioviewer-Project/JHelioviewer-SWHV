@@ -88,7 +88,7 @@ public class ChunkedInputStream extends InputStream {
             throw new IOException("Attempt to read from closed stream");
         }
 
-        for (;;) {
+        while (true) {
             if (eof)
                 return -1;
 

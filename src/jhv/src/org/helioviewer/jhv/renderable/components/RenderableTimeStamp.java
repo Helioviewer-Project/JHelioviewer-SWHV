@@ -41,7 +41,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
         if (Displayer.multiview) {
             ImageLayer im = Layers.getImageLayerInViewport(vp.idx);
             if (im != null) {
-                text = im.getTimeString() + " " + im.getName();
+                text = im.getTimeString() + ' ' + im.getName();
             }
         }
 
