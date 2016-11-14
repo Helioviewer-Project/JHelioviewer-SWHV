@@ -62,18 +62,12 @@ public class SWEKConfigurationManager {
                 boolean manuallyChanged = isManuallyChanged();
                 if (!manuallyChanged) {
                     // check if the file is manually changed if not we download the latest version anyway
-                    if (checkAndOpenZippedFile()) {
-                        isConfigParsed = parseConfigFile();
-                    } else {
-                        isConfigParsed = false;
-                    }
+                    isConfigParsed = checkAndOpenZippedFile() ? parseConfigFile() : false;
                 } else {
                     isConfigParsed = parseConfigFile();
                 }
-            } else if (checkAndOpenZippedFile()) {
-                isConfigParsed = parseConfigFile();
             } else {
-                isConfigParsed = false;
+                isConfigParsed = checkAndOpenZippedFile() ? parseConfigFile() : false;
             }
             configLoaded = isConfigParsed;
         }

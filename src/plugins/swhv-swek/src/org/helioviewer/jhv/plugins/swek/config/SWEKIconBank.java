@@ -32,11 +32,7 @@ public class SWEKIconBank {
      */
     public static ImageIcon getIcon(String iconName) {
         ImageIcon tempIcon = iconBank.get(iconName);
-        if (tempIcon == null) {
-            return iconBank.get("Other");
-        } else {
-            return tempIcon;
-        }
+        return tempIcon == null ? iconBank.get("Other") : tempIcon;
     }
 
     public static void init() {

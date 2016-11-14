@@ -73,10 +73,7 @@ public class PositionLoad {
 
                 result = JSONUtils.getJSONStream(ds.getInput());
                 if (ds.isResponse400()) {
-                    if (result.has("faultstring"))
-                        report = result.getString("faultstring");
-                    else
-                        report = "Invalid network response";
+                    report = result.has("faultstring") ? result.getString("faultstring") : "Invalid network response";
                 } else {
                     return parseData(result);
                 }
@@ -233,12 +230,7 @@ public class PositionLoad {
                 tstart = position[i].time.milli;
                 tend = position[inext].time.milli;
 
-                double alpha;
-                if (tend == tstart)
-                    alpha = 1.;
-                else
-                    alpha = ((currentCameraTime - tstart) / (double) (tend - tstart)) % 1.;
-
+                double alpha = tend == tstart ? 1. : ((currentCameraTime - tstart) / (double) (tend - tstart)) % 1.;
                 milli = (long) ((1. - alpha) * position[i].time.milli + alpha * position[inext].time.milli);
                 dist = (1. - alpha) * position[i].rad + alpha * position[inext].rad;
                 hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;

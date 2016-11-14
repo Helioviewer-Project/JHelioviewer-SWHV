@@ -473,12 +473,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
         for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
-
-            if (gridChoice == GridChoiceType.CARRINGTON) {
-                txt = formatter1.format(theta + 360);
-            } else {
-                txt = formatter1.format(theta);
-            }
+            txt = gridChoice == GridChoiceType.CARRINGTON ? formatter1.format(theta + 360) : formatter1.format(theta);
             lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
     }

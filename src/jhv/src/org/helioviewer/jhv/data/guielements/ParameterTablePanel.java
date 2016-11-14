@@ -93,13 +93,8 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
         Object value = table.getValueAt(row, col);
         if (value instanceof String) {
             String strValue = (String) value;
-
-            String url;
             Matcher m = Regex.HREF.matcher(strValue);
-            if (m.find()) {
-                url = m.group(1);
-            } else
-                url = strValue;
+            String url = m.find() ? m.group(1) : strValue;
             return Regex.WEB_URL.matcher(url).matches() ? url : null;
         } else {
             return null;
