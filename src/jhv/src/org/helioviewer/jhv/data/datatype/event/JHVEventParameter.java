@@ -88,11 +88,7 @@ public class JHVEventParameter {
         if (Regex.FloatingPoint.matcher(value).matches() &&
                 !Regex.Integer.matcher(value).matches()) {
             String result = numFormatter.format(Double.parseDouble(value));
-            if (result.contains("E0")) {
-                return result.substring(0, result.length() - 2);
-            } else {
-                return result;
-            }
+            return result.contains("E0") ? result.substring(0, result.length() - 2) : result;
         } else {
             if ((Regex.WEB_URL.matcher(value).matches()))
                 return "<a href=\"" + value + "\">Open URL</a>";

@@ -581,12 +581,7 @@ public class EventDatabase {
             if (typedCache == null) {
                 typedCache = new RequestCache();
                 long last_timestamp = getLastEvent(connection, type);
-                long lastEvent;
-                if (last_timestamp != Long.MIN_VALUE) {
-                    lastEvent = Math.min(System.currentTimeMillis(), last_timestamp);
-                } else {
-                    lastEvent = Long.MAX_VALUE;
-                }
+                long lastEvent = last_timestamp == Long.MIN_VALUE ? Long.MAX_VALUE : Math.min(System.currentTimeMillis(), last_timestamp);
                 long invalidationDate = lastEvent - ONEWEEK * 2;
                 downloadedCache.put(type, typedCache);
 

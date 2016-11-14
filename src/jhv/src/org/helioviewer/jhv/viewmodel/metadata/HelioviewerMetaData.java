@@ -114,11 +114,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             int wvI = m.tryGetInt("WAVELNTH");
             if (wvI == 0) {
                 double wvD = m.tryGetDouble("WAVELNTH");
-                if (wvD == 0) {
-                    measurement = " ";
-                } else {
-                    measurement = String.valueOf(wvD);
-                }
+                measurement = wvD == 0 ? " " : String.valueOf(wvD);
             } else {
                 measurement = String.valueOf(wvI);
             }
@@ -172,10 +168,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             }
         }
 
-        if (observedDate != null)
-            return JHVDate.parseDateTime(observedDate);
-        else
-            return TimeUtils.EPOCH;
+        return observedDate == null ? TimeUtils.EPOCH : JHVDate.parseDateTime(observedDate);
     }
 
     private void retrievePosition(MetaDataContainer m, JHVDate dateObs) {

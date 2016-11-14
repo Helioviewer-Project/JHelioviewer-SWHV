@@ -80,10 +80,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
     int getSourceId() {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        if (item != null) // valid
-            return item.sourceId;
-        else
-            return -1;
+        return item == null ? -1 : item.sourceId;
     }
 
     public long getStartTime() {
