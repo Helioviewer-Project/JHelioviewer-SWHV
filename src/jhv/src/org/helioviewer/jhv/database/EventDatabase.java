@@ -97,7 +97,7 @@ public class EventDatabase {
         return pstat;
     }
 
-    private static int getEventTypeId(Connection connection, JHVEventType eventType) {
+    private synchronized static int getEventTypeId(Connection connection, JHVEventType eventType) {
         int typeId = _getEventTypeId(connection, eventType);
         if (typeId == -1) {
             insertEventTypeIfNotExist(connection, eventType);
@@ -187,11 +187,7 @@ public class EventDatabase {
         }
     }
 
-    private static int dump_associationint2db(ArrayList<Pair<Integer, Integer>> assocs) {
-        Connection connection = ConnectionThread.getConnection();
-        if (connection == null) {
-            return -1;
-        }
+    private static int dump_associationint2db(Connection connection, ArrayList<Pair<Integer, Integer>> assocs) {
         int len = assocs.size();
         int i = 0;
         int errorcode = 0;
@@ -213,7 +209,7 @@ public class EventDatabase {
                     }
                     pstatement.executeUpdate();
                 } catch (SQLException e) {
-                    Log.error("Failed to insert event type " + e.getMessage());
+                    Log.error("Failed to insert association " + e.getMessage());
                     errorcode = -1;
                 }
             } else if (id0 != id1) {
@@ -288,13 +284,8 @@ public class EventDatabase {
         }
     }
 
-    private static int getEventId(String uid) {
+    private static int getEventId(Connection connection, String uid) {
         int generatedKey = -1;
-        Connection connection = ConnectionThread.getConnection();
-        if (connection == null) {
-            return generatedKey;
-        }
-
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_ID_FROM_UID);
             pstatement.setString(1, uid);
@@ -352,7 +343,7 @@ public class EventDatabase {
                     Event2Db event2db = event2db_list.get(i);
                     int generatedKey = -1;
                     if (typeId != -1) {
-                        generatedKey = getEventId(event2db.uid);
+                        generatedKey = getEventId(connection, event2db.uid);
 
                         if (generatedKey == -1) {
                             {
@@ -429,7 +420,7 @@ public class EventDatabase {
                     }
                 }
             }
-            dump_associationint2db(assocs);
+            dump_associationint2db(connection, assocs);
 
             return inserted_ids;
         }
