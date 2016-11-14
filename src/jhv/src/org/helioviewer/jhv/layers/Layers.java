@@ -34,10 +34,7 @@ public class Layers {
             }
         }
 
-        if (min == null)
-            return lastTimestamp;
-        else
-            return min;
+        return min == null ? lastTimestamp : min;
     }
 
     public static JHVDate getEndDate() {
@@ -49,10 +46,7 @@ public class Layers {
             }
         }
 
-        if (max == null)
-            return lastTimestamp;
-        else
-            return max;
+        return max == null ? lastTimestamp : max;
     }
 
     public static int getNumLayers() {

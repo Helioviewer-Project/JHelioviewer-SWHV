@@ -55,13 +55,7 @@ public class HEKParser implements SWEKParser {
         Iterator<SWEKParameter> paramIterator = plist.iterator();
         HashSet<String> insertedKeys = new HashSet<>();
         while (paramIterator.hasNext() || keys.hasNext()) {
-            Object key;
-            if (paramIterator.hasNext()) {
-                key = paramIterator.next().getParameterName();
-            }
-            else
-                key = keys.next();
-
+            Object key = paramIterator.hasNext() ? paramIterator.next().getParameterName() : keys.next();
             if (key instanceof String) {
                 String originalKeyString = (String) key;
                 String keyString = originalKeyString.toLowerCase(Locale.ENGLISH).intern();
@@ -272,22 +266,10 @@ public class HEKParser implements SWEKParser {
 
     private static void handleHGSCoordinates(JHVEvent currentEvent, List<Vec3> hgsBoundedBox, List<Vec3> hgsBoundCC, Vec3 hgsCentralPoint, Double hgsX, Double hgsY) {
         if (hgsBoundedBox != null || hgsCentralPoint != null || (hgsX != null && hgsY != null) || hgsBoundCC != null) {
-            List<Vec3> localHGSBoundedBox;
-            List<Vec3> localHGSBoundCC;
+            List<Vec3> localHGSBoundedBox = hgsBoundedBox == null ? new ArrayList<>() : hgsBoundedBox;
+            List<Vec3> localHGSBoundCC = hgsBoundCC == null ? new ArrayList<>() : hgsBoundCC;
+
             Vec3 localHGSCentralPoint = null;
-
-            if (hgsBoundedBox != null) {
-                localHGSBoundedBox = hgsBoundedBox;
-            } else {
-                localHGSBoundedBox = new ArrayList<>();
-            }
-
-            if (hgsBoundCC != null) {
-                localHGSBoundCC = hgsBoundCC;
-            } else {
-                localHGSBoundCC = new ArrayList<>();
-            }
-
             if (hgsCentralPoint != null) {
                 localHGSCentralPoint = hgsCentralPoint;
             } else {
