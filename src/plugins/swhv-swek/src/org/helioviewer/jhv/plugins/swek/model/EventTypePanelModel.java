@@ -124,11 +124,7 @@ public class EventTypePanelModel implements TreeModel {
      */
     @Override
     public Object getChild(Object parent, int index) {
-        if (parent instanceof SWEKTreeModelEventType) {
-            return ((SWEKTreeModelEventType) parent).getSwekTreeSuppliers().get(index);
-        } else {
-            return null;
-        }
+        return parent instanceof SWEKTreeModelEventType ? ((SWEKTreeModelEventType) parent).getSwekTreeSuppliers().get(index) : null;
     }
 
     /*
@@ -138,11 +134,7 @@ public class EventTypePanelModel implements TreeModel {
      */
     @Override
     public int getChildCount(Object parent) {
-        if (parent instanceof SWEKTreeModelEventType) {
-            return ((SWEKTreeModelEventType) parent).getSwekEventType().getSuppliers().size();
-        } else {
-            return 0;
-        }
+        return parent instanceof SWEKTreeModelEventType ? ((SWEKTreeModelEventType) parent).getSwekEventType().getSuppliers().size() : 0;
     }
 
     /*

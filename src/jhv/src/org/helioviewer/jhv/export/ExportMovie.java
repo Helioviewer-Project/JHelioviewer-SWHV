@@ -91,24 +91,11 @@ public class ExportMovie implements FrameListener {
             scrh = EVEImage.getHeight();
         }
 
-        int canvasWidth, canvasHeight, exportHeight;
-
         mode = _mode;
-        if (mode == RecordMode.SHOT)
-            canvasWidth = _w;
-        else
-            canvasWidth = (_w / MACROBLOCK) * MACROBLOCK; // video formats
-
+        int canvasWidth = mode == RecordMode.SHOT ? _w : (_w / MACROBLOCK) * MACROBLOCK;
         int sh = (int) (scrh / (double) scrw * canvasWidth + .5);
-        if (isInternal)
-            canvasHeight = _h - sh;
-        else
-            canvasHeight = _h;
-
-        if (mode == RecordMode.SHOT)
-            exportHeight = canvasHeight + sh;
-        else
-            exportHeight = ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK; // video formats
+        int canvasHeight = isInternal ? _h - sh : _h;
+        int exportHeight = mode == RecordMode.SHOT ? canvasHeight + sh : ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK;
 
         canvasHeight = exportHeight - sh;
 
@@ -174,12 +161,7 @@ public class ExportMovie implements FrameListener {
         public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
-
-            if (_eveImage == null)
-                eveImage = null;
-            else
-                eveImage = ImageUtils.deepCopy(_eveImage);
-
+            eveImage = _eveImage == null ? null : ImageUtils.deepCopy(_eveImage);
             movieLinePosition = _movieLinePosition;
         }
 

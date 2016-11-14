@@ -75,12 +75,8 @@ public class FilterPanel extends JPanel {
 
     public void addFilter() {
         if (enabled) {
-            String pval;
-            Object sval = spinner.getValue();
-            if (sval instanceof String)
-                pval = String.valueOf(GOESLevel.getFloatValue(String.valueOf(spinner.getValue())));
-            else
-                pval = String.valueOf(spinner.getValue());
+            Object oval = spinner.getValue();
+            String pval = oval instanceof String ? String.valueOf(GOESLevel.getFloatValue((String) oval)) : String.valueOf(oval);
             SWEKParam param = new SWEKParam(parameter.getParameterName(), pval, operand);
             FilterManager.addFilter(eventType, parameter, param);
         }

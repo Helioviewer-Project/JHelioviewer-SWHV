@@ -331,13 +331,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, LineDataSelectorElement el, int leftSide, boolean highlight) {
-        int axis_x_offset;
-        g.setColor(Color.WHITE);
-        if (leftSide == -1) {
-            axis_x_offset = graphArea.x;
-        } else {
-            axis_x_offset = graphArea.x + graphArea.width + (leftSide) * DrawConstants.RIGHT_AXIS_WIDTH;
-        }
+        int axis_x_offset = graphArea.x;
+        if (leftSide != -1)
+            axis_x_offset += graphArea.width + leftSide * DrawConstants.RIGHT_AXIS_WIDTH;
 
         g.setColor(el.getDataColor());
         YAxis yAxis = el.getYAxis();
