@@ -109,52 +109,32 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
         gc.fill = GridBagConstraints.BOTH;
         gc.weightx = 1;
         gc.anchor = GridBagConstraints.NORTH;
-        if (standardParameters.isExpanded()) {
-            gc.weighty = 1;
-        } else {
-            gc.weighty = 0;
-        }
+        gc.weighty = standardParameters.isExpanded() ? 1 : 0;
         allTablePanel.add(standardParameters, gc);
 
         gc.gridy = 1;
-        if (allParameters.isExpanded()) {
-            gc.weighty = 1;
-        } else {
-            gc.weighty = 0;
-        }
+        gc.weighty = allParameters.isExpanded() ? 1 : 0;
         allTablePanel.add(allParameters, gc);
 
         int gridYPosition = 2;
 
         if (precedingEventsPanel != null) {
             gc.gridy = gridYPosition;
-            if (precedingEventsPanel.isExpanded()) {
-                gc.weighty = 1;
-            } else {
-                gc.weighty = 0;
-            }
+            gc.weighty = precedingEventsPanel.isExpanded() ? 1 : 0;
             allTablePanel.add(precedingEventsPanel, gc);
             gridYPosition++;
         }
 
         if (followingEventsPanel != null) {
             gc.gridy = gridYPosition;
-            if (followingEventsPanel.isExpanded()) {
-                gc.weighty = 1;
-            } else {
-                gc.weighty = 0;
-            }
+            gc.weighty = followingEventsPanel.isExpanded() ? 1 : 0;
             allTablePanel.add(followingEventsPanel, gc);
             gridYPosition++;
         }
 
         if (otherRelatedEventsPanel != null) {
             gc.gridy = gridYPosition;
-            if (otherRelatedEventsPanel.isExpanded()) {
-                gc.weighty = 1;
-            } else {
-                gc.weighty = 0;
-            }
+            gc.weighty = otherRelatedEventsPanel.isExpanded() ? 1 : 0;
             allTablePanel.add(otherRelatedEventsPanel, gc);
             gridYPosition++;
         }
