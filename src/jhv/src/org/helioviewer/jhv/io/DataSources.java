@@ -81,10 +81,7 @@ public class DataSources {
 
     public static String getServerSetting(String server, String setting) {
         Map<String, String> settings = serverSettings.get(server);
-        if (settings != null)
-            return settings.get(setting);
-        else
-            return null;
+        return settings == null ? null : settings.get(setting);
     }
 
     public static void saveServerSettings(String server) {

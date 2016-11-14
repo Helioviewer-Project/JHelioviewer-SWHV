@@ -48,13 +48,7 @@ public class GLImage {
             tex.copyImageData2D(gl, imageData);
         }
 
-        ImageData prevFrame;
-        if (!baseDifferenceMode) {
-            prevFrame = prevImageData;
-        } else {
-            prevFrame = baseImageData;
-        }
-
+        ImageData prevFrame = baseDifferenceMode ? baseImageData : prevImageData;
         if (differenceMode && prevFrame != null) {
             diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
             diffTex.copyImageData2D(gl, prevFrame);
@@ -132,16 +126,9 @@ public class GLImage {
     }
 
     private void applyLUT(GL2 gl) {
-        LUT currlut;
-
-        if (differenceMode || baseDifferenceMode) {
-            currlut = gray;
-        } else {
-            currlut = lut;
-        }
-
         lutTex.bind(gl, GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE1);
 
+        LUT currlut = differenceMode || baseDifferenceMode ? gray : lut;
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
 

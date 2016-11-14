@@ -26,11 +26,7 @@ public class FilterManager {
     }
 
     public static void addFilter(SWEKEventType swekEventType, SWEKParameter parameter, SWEKParam filter) {
-        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType;
-        if (filters.containsKey(swekEventType))
-            filteredParameterPerEventType = filters.get(swekEventType);
-        else
-            filteredParameterPerEventType = new HashMap<>();
+        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = filters.containsKey(swekEventType) ? filters.get(swekEventType) : new HashMap<>();
         filters.put(swekEventType, filteredParameterPerEventType);
         if (!filteredParameterPerEventType.containsKey(parameter)) {
             filteredParameterPerEventType.put(parameter, new ArrayList<>());

@@ -79,12 +79,7 @@ public class APIRequestManager {
             throw new IOException("Invalid URI");
         }
 
-        URI downloadURI;
-        if (req != null)
-            downloadURI = req.fileRequest;
-        else
-            downloadURI = uri;
-
+        URI downloadURI = req == null ? uri : req.fileRequest;
         try {
             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
             if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
@@ -92,12 +87,7 @@ public class APIRequestManager {
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                  return new SimpleImageView(uri);
             } else {
-                JP2Image jp2Image;
-                if (loc.contains("callisto"))
-                    jp2Image = new JP2ImageCallisto(uri, downloadURI);
-                else
-                    jp2Image = new JP2Image(uri, downloadURI);
-
+                JP2Image jp2Image = loc.contains("callisto") ? new JP2ImageCallisto(uri, downloadURI) : new JP2Image(uri, downloadURI);
                 JP2View view = EventDispatchQueue.invokeAndWait(new AllocateJP2View(jp2Image));
                 view.setAPIRequest(req);
                 return view;
@@ -120,13 +110,8 @@ public class APIRequestManager {
 
         @Override
         public JP2View call() {
-            JP2View view;
             JP2Image jp2Image = refJP2Image.get();
-            if (jp2Image instanceof JP2ImageCallisto) {
-                view = new JP2ViewCallisto();
-            } else {
-                view = new JP2View();
-            }
+            JP2View view = jp2Image instanceof JP2ImageCallisto ? new JP2ViewCallisto() : new JP2View();
             view.setJP2Image(jp2Image);
 
             return view;

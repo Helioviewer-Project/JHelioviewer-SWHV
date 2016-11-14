@@ -93,11 +93,7 @@ class GimpGradientSegment {
         double pos = (x - leftStop) / (rightStop - leftStop);
 
         // Assume linear (most common, and needed by most others).
-        double f;
-        if (pos <= mid)
-            f = 0.5 * (pos / mid);
-        else
-            f = 0.5 * (pos - mid) / (1.0 - mid) + 0.5;
+        double f = pos <= mid ? 0.5 * (pos / mid) : 0.5 * (pos - mid) / (1.0 - mid) + 0.5;
 
         // Find the correct interpolation factor.
         if (blendingType == 1) { // Curved
