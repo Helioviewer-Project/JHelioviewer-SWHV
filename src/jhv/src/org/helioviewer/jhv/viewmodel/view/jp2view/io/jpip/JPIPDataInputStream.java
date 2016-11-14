@@ -108,7 +108,7 @@ class JPIPDataInputStream {
             m = (vbasFstByte & 0x7F) >> 5;
             if (m == 0)
                 throw new ProtocolException("Invalid Bin-ID value format");
-            else if (m >= 2) {
+            if (m >= 2) {
                 classId = readVBAS();
                 if (m > 2)
                     codestream = readVBAS();

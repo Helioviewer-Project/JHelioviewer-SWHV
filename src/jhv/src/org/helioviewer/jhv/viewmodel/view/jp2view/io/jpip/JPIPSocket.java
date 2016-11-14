@@ -83,13 +83,13 @@ public class JPIPSocket extends HTTPSocket {
             String[] parts = cnew.split(",");
             for (String part : parts)
                 for (String cnewParam : cnewParams)
-                    if (part.startsWith(cnewParam + "="))
+                    if (part.startsWith(cnewParam + '='))
                         map.put(cnewParam, part.substring(cnewParam.length() + 1));
         }
         if (map == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
 
-        jpipPath = "/" + map.get("path");
+        jpipPath = '/' + map.get("path");
 
         jpipChannelID = map.get("cid");
         if (jpipChannelID == null)
@@ -140,7 +140,7 @@ public class JPIPSocket extends HTTPSocket {
         if (!req.headerExists(HTTPHeaderKey.CACHE_CONTROL.toString()))
             req.setHeader(HTTPHeaderKey.CACHE_CONTROL.toString(), "no-cache");
         if (!req.headerExists(HTTPHeaderKey.HOST.toString()))
-            req.setHeader(HTTPHeaderKey.HOST.toString(), (getHost() + ":" + getPort()));
+            req.setHeader(HTTPHeaderKey.HOST.toString(), (getHost() + ':' + getPort()));
         // Adds a necessary JPIP request field
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
@@ -190,7 +190,7 @@ public class JPIPSocket extends HTTPSocket {
         JPIPResponse res = new JPIPResponse(httpRes);
 
         if (res.getCode() != 200)
-            throw new IOException("Invalid status code returned (" + res.getCode() + ")");
+            throw new IOException("Invalid status code returned (" + res.getCode() + ')');
         if (!"chunked".equals(res.getHeader("Transfer-Encoding")))
             throw new IOException("Only chunked responses are supported");
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))

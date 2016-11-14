@@ -92,7 +92,7 @@ public class CommandLineProcessor {
      * @return the values associated to the option.
      * */
     public static List<String> getOptionValues(String param) {
-        param = "-" + param;
+        param = '-' + param;
         LinkedList<String> values = new LinkedList<>();
         if (arguments != null) {
             for (int i = 0; i < arguments.length; i++) {

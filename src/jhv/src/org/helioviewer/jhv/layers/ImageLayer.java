@@ -132,7 +132,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler, 
                     if (!Layers.isCor(Layers.getLayer(i).getName()))
                         count++;
                 }
-                opacity = (float) (1. / (count != 0 ? count : 1 /* satisfy coverity */));
+                opacity = (float) (1. / (count == 0 ? 1 : count /* satisfy coverity */));
             }
             optionsPanel.setOpacity(opacity);
         }
@@ -392,7 +392,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler, 
     }
 
     private static byte clipByte(int val) {
-        return val > 255 ? (byte) 255 : (byte) (val & 0xFF);
+        return (byte) (val > 255 ? 255 : val & 0xFF);
     }
 
     public ImageData getImageData() {

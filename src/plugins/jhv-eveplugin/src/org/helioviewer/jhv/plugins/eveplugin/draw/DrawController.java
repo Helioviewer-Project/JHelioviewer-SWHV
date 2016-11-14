@@ -244,14 +244,13 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public static int getMovieLinePosition() {
-        int movieLinePosition;
         if (latestMovieTime == Long.MIN_VALUE) {
             return -1;
-        } else {
-            movieLinePosition = selectedAxis.value2pixel(graphArea.x, graphArea.width, latestMovieTime);
-            if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
-                return -1;
-            }
+        }
+
+        int movieLinePosition = selectedAxis.value2pixel(graphArea.x, graphArea.width, latestMovieTime);
+        if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
+            return -1;
         }
         return movieLinePosition;
     }

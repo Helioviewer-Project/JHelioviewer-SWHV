@@ -196,7 +196,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             int w = Math.max(x1 - x0, 1);
             int h = spacePerLine;
             if (w < 5) {
-                x0 = x0 - (5 / w);
+                x0 -= 5 / w;
                 w = 5;
             }
 
@@ -209,10 +209,10 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             int sz = Math.min(w, 8);
             boolean hl = eventWasHightlighted && highlight;
             if (hl) {
-                x0 = x0 - 10;
-                y = y - 1;
-                w = w + 20;
-                h = h + 2;
+                x0 -= 10;
+                y -= 1;
+                w += 20;
+                h += 2;
                 sz = 12;
                 spacePerLine = h;
             }

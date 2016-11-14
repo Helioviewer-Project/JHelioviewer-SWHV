@@ -59,7 +59,7 @@ public class PfssNewDataLoader implements Runnable {
             if (urls == null || urls.isEmpty()) {
                 urls = new ArrayList<>();
                 String m = (startMonth) < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
-                String url = PfssSettings.baseURL + startYear + "/" + m + "/list.txt";
+                String url = PfssSettings.baseURL + startYear + '/' + m + "/list.txt";
 
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(new URL(url)).getInput(), StandardCharsets.UTF_8))) {
                     String inputLine;

@@ -28,9 +28,9 @@ public class DataSourcesParser {
     private static String mergeNames(String str1, String str2) {
         if (str1.equals(str2))
             return str1;
-        else if (str1.isEmpty())
+        if (str1.isEmpty())
             return str2;
-        return str1 + " " + str2;
+        return str1 + ' ' + str2;
     }
 
     private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) throws ParseException {
@@ -46,7 +46,7 @@ public class DataSourcesParser {
             if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
                 long start = TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime();
                 long end = TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime();
-                String description = json.getString("description") + " [" + TimeUtils.dateFormat.format(start) + " : " + TimeUtils.dateFormat.format(end) + "]";
+                String description = json.getString("description") + " [" + TimeUtils.dateFormat.format(start) + " : " + TimeUtils.dateFormat.format(end) + ']';
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
                                                                                  description, json.getInt("sourceId"), start, end,
                                                                                  json.optBoolean("default", false));

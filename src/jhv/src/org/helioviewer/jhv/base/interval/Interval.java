@@ -38,7 +38,8 @@ public class Interval implements Comparable<Interval> {
     public long squeeze(long value) {
         if (containsPointInclusive(value)) {
             return value;
-        } else if (value <= start) {
+        }
+        if (value <= start) {
             return start;
         }
         return end;

@@ -16,7 +16,7 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 public class ZoomOutAction extends AbstractAction {
 
     public ZoomOutAction(boolean small, boolean useIcon) {
-        super("Zoom Out", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_OUT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_OUT)) : null);
+        super("Zoom Out", useIcon ? IconBank.getIcon(small ? JHVIcon.ZOOM_OUT_SMALL : JHVIcon.ZOOM_OUT) : null);
         putValue(SHORT_DESCRIPTION, "Zoom out");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());

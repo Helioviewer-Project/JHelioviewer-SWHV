@@ -20,7 +20,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
 public class ZoomOneToOneAction extends AbstractAction {
 
     public ZoomOneToOneAction(boolean small, boolean useIcon) {
-        super("Actual Size", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_1TO1_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_1TO1)) : null);
+        super("Actual Size", useIcon ? IconBank.getIcon(small ? JHVIcon.ZOOM_1TO1_SMALL : JHVIcon.ZOOM_1TO1) : null);
         putValue(SHORT_DESCRIPTION, "Zoom to native resolution");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
