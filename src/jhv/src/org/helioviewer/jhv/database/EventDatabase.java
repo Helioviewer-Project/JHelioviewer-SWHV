@@ -97,7 +97,7 @@ public class EventDatabase {
         return pstat;
     }
 
-    private synchronized static int getEventTypeId(Connection connection, JHVEventType eventType) {
+    private static int getEventTypeId(Connection connection, JHVEventType eventType) {
         int typeId = _getEventTypeId(connection, eventType);
         if (typeId == -1) {
             insertEventTypeIfNotExist(connection, eventType);
@@ -414,7 +414,7 @@ public class EventDatabase {
                     Log.error("failed to dump to database");
                     assocs.add(new Pair<>(1, 1));
                 } else {
-                    ArrayList<JHVEvent> rels = getOtherRelations(id, type, true, false);
+                    ArrayList<JHVEvent> rels = getOtherRelations(id, type, true, false, true);
                     for (JHVEvent rel : rels) {
                         assocs.add(new Pair<>(id, rel.getUniqueID()));
                     }
@@ -444,7 +444,7 @@ public class EventDatabase {
     }
 
     //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
-    public static ArrayList<JHVEvent> getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype, boolean full) {
+    public static ArrayList<JHVEvent> getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype, boolean full, boolean is_dbthread) {
         SWEKEventType evt = jhvEventType.getEventType();
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
         ArrayList<JsonEvent> jsonEvents = new ArrayList<>();
@@ -459,7 +459,10 @@ public class EventDatabase {
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
                         JHVEventType othert = JHVEventType.getJHVEventType(reType, supplier);
                         if (similartype == (othert == jhvEventType))
-                            jsonEvents.addAll(rel2prog(id, jhvEventType, othert, f, w));
+                            if (is_dbthread)
+                                jsonEvents.addAll(rel2prog(id, jhvEventType, othert, f, w));
+                            else
+                                jsonEvents.addAll(relations2Program(id, jhvEventType, othert, f, w));
                     }
                 }
             }
@@ -473,7 +476,10 @@ public class EventDatabase {
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
                         JHVEventType fromt = JHVEventType.getJHVEventType(reType, supplier);
                         if (similartype == (fromt == jhvEventType))
-                            jsonEvents.addAll(rel2prog(id, fromt, jhvEventType, f, w));
+                            if (is_dbthread)
+                                jsonEvents.addAll(rel2prog(id, fromt, jhvEventType, f, w));
+                            else
+                                jsonEvents.addAll(relations2Program(id, fromt, jhvEventType, f, w));
                     }
                 }
             }
