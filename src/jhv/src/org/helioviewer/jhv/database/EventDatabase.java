@@ -849,18 +849,6 @@ public class EventDatabase {
         }
     }
 
-    public static ArrayList<JsonEvent> event2Program(int event_id) {
-        FutureTask<JsonEvent> ft = new FutureTask<>(new Event2Program(event_id));
-        executor.execute(ft);
-        ArrayList<JsonEvent> arr = new ArrayList<>();
-        try {
-            arr.add(ft.get());
-        } catch (InterruptedException | ExecutionException e) {
-            Log.error(e.getMessage());
-        }
-        return arr;
-    }
-
     private static JsonEvent event2prog(int event_id) {
         Connection connection = ConnectionThread.getConnection();
         if (connection == null) {
@@ -887,7 +875,7 @@ public class EventDatabase {
             return null;
         }
     }
-
+/*
     private static class Event2Program implements Callable<JsonEvent> {
         private final int event_id;
 
@@ -900,5 +888,18 @@ public class EventDatabase {
             return event2prog(event_id);
         }
     }
+
+    public static ArrayList<JsonEvent> event2Program(int event_id) {
+        FutureTask<JsonEvent> ft = new FutureTask<>(new Event2Program(event_id));
+        executor.execute(ft);
+        ArrayList<JsonEvent> arr = new ArrayList<>();
+        try {
+            arr.add(ft.get());
+        } catch (InterruptedException | ExecutionException e) {
+            Log.error(e.getMessage());
+        }
+        return arr;
+    }
+*/
 
 }

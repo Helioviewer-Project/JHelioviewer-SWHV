@@ -1,6 +1,5 @@
-*************************
-*  JHelioviewer README  *
-*************************
+JHelioviewer
+============
 
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/9940/badge.svg)](https://scan.coverity.com/projects/9940)
 
@@ -45,38 +44,19 @@ https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues
 We will try to solve your problem as fast as possible. The more details you can
 provide the easier it is for us. For example your system specifications
 (hardware and software with version numbers) as well as a detailed description
-what you did (so we can reproduce the problem are very helpful. If possible,
+what you did (so we can reproduce the problem) are very helpful. If possible,
 please also be ready to provide the log files from the session where the problem
 occured. The log files can be found in the Logs/ directory of your JHelioviewer
 home folder. You can find the correct log file by searching for the correct
 start date. The files have the form:
 jhv.'year'-'month'-'day'T'hours'-'minutes'-'seconds'.log
 
+User Manual
+-----------
 
-Documentation
--------------
+A detailed user manual for JHelioviewer can be found at
 
-The main documentation for JHelioviewer is provided as a wiki:
-
-http://wiki.helioviewer.org/wiki/JHelioviewer
-
-It is part of the Helioviewer project:
-
-http://wiki.helioviewer.org/wiki/Main_Page
-
-
-Frequently Asked Questions
---------------------------
-
-See https://answers.launchpad.net/jhelioviewer/+faqs
-
-
-User Handbook
--------------
-
-A detailed MediaWiki based handbook on the usage of JHelioviewer can be found on
-
-http://wiki.helioviewer.org/wiki/JHelioviewer_Handbook
+http://swhv.oma.be/user_manual/
 
 
 Development Information
@@ -89,3 +69,7 @@ For more detailed help or further information on the design concept, coding
 guidelines and other development information please visit:
 
 http://wiki.helioviewer.org/wiki/JHelioviewer_Development_Information
+
+It is part of the Helioviewer project:
+
+http://wiki.helioviewer.org/wiki/Main_Page
