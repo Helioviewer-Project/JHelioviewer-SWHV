@@ -87,15 +87,14 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler, 
         IntBuffer indexBuffer = IcoSphere.IcoSphere.b;
 
         positionBufferID = generate(gl);
-        int positionBufferSize = positionBuffer.capacity();
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
+        gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
 
         indexBufferID = generate(gl);
         indexBufferSize = indexBuffer.capacity();
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-        gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
+        gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferSize * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
