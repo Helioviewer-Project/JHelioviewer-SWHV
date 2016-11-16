@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.dialogs.observation;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -105,8 +106,12 @@ public class ObservationDialog extends JDialog implements ActionListener {
             contentPane.add(buttonPane);
         }
 
-        setMinimumSize(getPreferredSize());
         pack();
+        Dimension dim = getPreferredSize();
+        if (dim != null) // satisfy coverity
+            setMinimumSize(dim);
+        pack();
+
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         getRootPane().setDefaultButton(btnImages);
         setVisible(true);

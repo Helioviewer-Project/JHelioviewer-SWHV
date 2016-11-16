@@ -88,8 +88,11 @@ public class OSXAdapter implements InvocationHandler {
             Class<?> applicationListenerClass = Class.forName("com.apple.eawt.ApplicationListener");
             Method addListenerMethod = applicationClass.getDeclaredMethod("addApplicationListener", applicationListenerClass);
             // Create a proxy object around this handler that can be reflectively added as an Apple ApplicationListener
-            Object osxAdapterProxy = Proxy.newProxyInstance(OSXAdapter.class.getClassLoader(), new Class[] { applicationListenerClass }, adapter);
-            addListenerMethod.invoke(macOSXApplication, osxAdapterProxy);
+            ClassLoader classLoader = OSXAdapter.class.getClassLoader();
+            if (classLoader != null) { // impossible
+                Object osxAdapterProxy = Proxy.newProxyInstance(classLoader, new Class[] { applicationListenerClass }, adapter);
+                addListenerMethod.invoke(macOSXApplication, osxAdapterProxy);
+            }
         } catch (ClassNotFoundException cnfe) {
             System.err.println("This version of Mac OS X does not support the Apple EAWT.  ApplicationEvent handling has been disabled (" + cnfe + ")");
         } catch (Exception ex) { // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
