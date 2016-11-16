@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -96,7 +97,8 @@ class PluginsListEntry extends AbstractPluginsListEntry implements MouseListener
     }
 
     private String getTitleText() {
-        return "<html><font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">" +
+        Font font = new JPanel().getFont();
+        return "<html><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" +
                 "<b>" + plugin.getName() + "</b></font></html>";
     }
 
