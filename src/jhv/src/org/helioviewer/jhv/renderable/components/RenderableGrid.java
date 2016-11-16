@@ -520,19 +520,15 @@ public class RenderableGrid extends AbstractRenderable {
                 colorBuffer.put(color2);
             }
         }
-
         positionBuffer.flip();
         colorBuffer.flip();
-        int positionBufferSize = positionBuffer.capacity();
-        int colorBufferSize = colorBuffer.capacity();
 
         positionBufferID = generate(gl);
         colorBufferID = generate(gl);
-
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
+        gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER, colorBufferSize * Buffers.SIZEOF_FLOAT, colorBuffer, GL2.GL_STATIC_DRAW);
+        gl.glBufferData(GL2.GL_ARRAY_BUFFER, colorBuffer.capacity() * Buffers.SIZEOF_FLOAT, colorBuffer, GL2.GL_STATIC_DRAW);
     }
 
     private static int generate(GL2 gl) {
