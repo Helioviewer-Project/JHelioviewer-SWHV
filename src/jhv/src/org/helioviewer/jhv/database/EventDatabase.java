@@ -494,8 +494,8 @@ public class EventDatabase {
             jsonEvents.clear();
         }
 
-        if (full) {
-            JsonEvent ev = event2prog(id);
+        JsonEvent ev;
+        if (full && (ev = event2prog(id)) != null) {
             jsonEvents.add(ev);
             nEvents.add(parseJSON(ev, full));
         }
