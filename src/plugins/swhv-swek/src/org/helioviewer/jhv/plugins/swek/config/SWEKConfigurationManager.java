@@ -1,14 +1,12 @@
 package org.helioviewer.jhv.plugins.swek.config;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,6 +17,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -90,15 +89,10 @@ public class SWEKConfigurationManager {
     }
 
     private static boolean checkAndOpenZippedFile() {
-        URL url = SWEKPlugin.class.getResource('/' + configFileName);
-        ReadableByteChannel rbc;
-        try {
-            rbc = Channels.newChannel(url.openStream());
-            String saveFile = JHVDirectory.SETTINGS.getPath() + configFileName;
-            try (FileOutputStream fos = new FileOutputStream(saveFile)) {
-                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            }
-            configFileURL = (new File(saveFile)).toURI().toURL();
+        try (InputStream is = SWEKPlugin.class.getResourceAsStream('/' + configFileName)) {
+            File f = new File(JHVDirectory.SETTINGS.getPath() + configFileName);
+            FileUtils.save(is, f);
+            configFileURL = f.toURI().toURL();
             return true;
         } catch (IOException e) {
             Log.debug("Something went wrong extracting the configuration file from the jar bundle or saving it: " + e);
