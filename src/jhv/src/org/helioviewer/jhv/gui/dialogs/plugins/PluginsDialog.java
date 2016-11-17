@@ -185,7 +185,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         PluginContainer[] plugins = PluginManager.getSingletonInstance().getAllPlugins();
         int filterIndex = filterComboBox.getSelectedIndex();
 
-        PluginsListEntry entry = (PluginsListEntry) pluginList.getSelectedEntry();
+        PluginsListEntry entry = pluginList.getSelectedEntry();
         String selectedPlugin = entry == null ? null : entry.getPluginContainer().getName();
 
         pluginList.removeAllEntries();

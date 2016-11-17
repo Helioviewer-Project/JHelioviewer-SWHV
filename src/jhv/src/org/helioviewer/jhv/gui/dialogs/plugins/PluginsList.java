@@ -17,7 +17,7 @@ class PluginsList extends JScrollPane {
     private static final Color selectionForegroundColor = new JList<JPanel>().getSelectionForeground();
 
     private final LinkedList<PluginsListEntryChangeListener> listeners = new LinkedList<>();
-    private final HashMap<String, AbstractPluginsListEntry> entryMap = new HashMap<>();
+    private final HashMap<String, PluginsListEntry> entryMap = new HashMap<>();
 
     private final JPanel contentPane = new JPanel();
 
@@ -62,7 +62,7 @@ class PluginsList extends JScrollPane {
     /**
      * Adds a new item to the list.
      * */
-    public void addEntry(String name, AbstractPluginsListEntry entry) {
+    public void addEntry(String name, PluginsListEntry entry) {
         if (name == null || entry == null) {
             return;
         }
@@ -115,14 +115,14 @@ class PluginsList extends JScrollPane {
         }
 
         // deselect all
-        for (AbstractPluginsListEntry entry : entryMap.values()) {
+        for (PluginsListEntry entry : entryMap.values()) {
             entry.setForeground(Color.BLACK);
             entry.setBackground(Color.WHITE);
         }
 
         // select given one
         selectedEntryName = newSelectedEntryName;
-        AbstractPluginsListEntry selected = entryMap.get(newSelectedEntryName);
+        PluginsListEntry selected = entryMap.get(newSelectedEntryName);
         if (selected != null) {
             selected.setForeground(selectionForegroundColor);
             selected.setBackground(selectionBackgroundColor);
@@ -134,7 +134,7 @@ class PluginsList extends JScrollPane {
     /**
      * Returns the selected entry.
      * */
-    public AbstractPluginsListEntry getSelectedEntry() {
+    public PluginsListEntry getSelectedEntry() {
         return entryMap.get(selectedEntryName);
     }
 
