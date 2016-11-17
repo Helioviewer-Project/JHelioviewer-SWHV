@@ -29,9 +29,8 @@ public class TextDialog extends JDialog implements ActionListener, ShowableDialo
         setResizable(false);
 
         StringBuilder text = new StringBuilder();
-        String linebreak = System.getProperty("line.separator");
-
         try (Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream(), StandardCharsets.UTF_8)))) {
+            String linebreak = System.getProperty("line.separator");
             while (scanner.hasNext()) {
                 text.append(scanner.nextLine()).append(linebreak);
             }
