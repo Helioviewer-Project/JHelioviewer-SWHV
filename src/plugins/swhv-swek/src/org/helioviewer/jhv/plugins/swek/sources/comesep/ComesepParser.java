@@ -24,36 +24,29 @@ public class ComesepParser implements SWEKParser {
     }
 
     private static void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
-        Iterator<?> keys = result.keys();
+        Iterator<String> keys = result.keys();
         while (keys.hasNext()) {
             parseParameter(result, keys.next(), currentEvent);
         }
     }
 
-    private static void parseParameter(JSONObject result, Object key, JHVEvent currentEvent) throws JSONException {
-        if (key instanceof String) {
-            String keyString = ((String) key).intern();
-            String value;
-            if (!result.isNull(keyString)) {
-                value = result.optString(keyString);
-            } else {
-                return;
-            }
+    private static void parseParameter(JSONObject result, String key, JHVEvent currentEvent) throws JSONException {
+        if (result.isNull(key))
+            return;
 
-            String lowerkey = keyString.toLowerCase(Locale.ENGLISH);
-            if (!(lowerkey.equals("atearliest") || lowerkey.equals("atlatest") ||
-                  lowerkey.equals("begin_time_value") || lowerkey.equals("end_time_value") ||
-                  lowerkey.startsWith("liftoff"))) {
-                value = value.trim();
-                if (!value.isEmpty()) {
-                    if (lowerkey.equals("atstrongest")) {
-                        try {
-                            value = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);
-                        } catch (Exception ignore) {
-                        }
+        String lowerkey = key.toLowerCase(Locale.ENGLISH);
+        if (!(lowerkey.equals("atearliest") || lowerkey.equals("atlatest") ||
+              lowerkey.equals("begin_time_value") || lowerkey.equals("end_time_value") ||
+              lowerkey.startsWith("liftoff"))) {
+            String value = result.optString(key).trim();
+            if (!value.isEmpty()) {
+                if (lowerkey.equals("atstrongest")) {
+                    try {
+                        value = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);
+                    } catch (Exception ignore) {
                     }
-                    currentEvent.addParameter(lowerkey, value, true);
                 }
+                currentEvent.addParameter(lowerkey, value, true);
             }
         }
     }
