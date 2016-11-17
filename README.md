@@ -10,15 +10,17 @@ About
 
 JHelioviewer is a visualization tool for solar physics data based on the JPEG
 2000 image compression standard. JPEG 2000 offers many useful new features and
-has the potential to revolutionize the way high- resolution image data are
+has the potential to revolutionize the way high-resolution image data are
 disseminated and analyzed. Using JPEG 2000, we can serve data to a client in
-highly compressed, quality progressive, and region-of-interest based form. These
+highly compressed, progressive in quality, and region-of-interest based form. These
 features make it possible to minimize the data transmitted while maximizing the
 use of the data that is transmitted. This is especially relevant for solar
 physics since NASA's Solar Dynamics Observatory (http://sdo.gsfc.nasa.gov/) is
 providing more than a terabyte of image data per day. Providing efficient access
 to such large data volumes at both high spatial and high time resolution is of
 paramount importance to support scientific discovery.
+
+References:
 
 - JHelioviewer paper by Mueller et al., Computing Science and Engineering, 2009:
   http://jhelioviewer.org/pub/Mueller+al_CiSE2009.pdf
@@ -38,11 +40,12 @@ JHelioviewer is based on two separate projects:
 Report a Problem or Idea
 ------------------------
 
-If you have a problem or have ideas for improvements please report them on:
+If you have a problem or have ideas for improvements please report them at:
+
 https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues
 
 We will try to solve your problem as fast as possible. The more details you can
-provide the easier it is for us. For example your system specifications
+provide, the easier it is for us. For example your system specifications
 (hardware and software with version numbers) as well as a detailed description
 what you did (so we can reproduce the problem) are very helpful. If possible,
 please also be ready to provide the log files from the session where the problem
@@ -54,7 +57,7 @@ jhv.'year'-'month'-'day'T'hours'-'minutes'-'seconds'.log
 User Manual
 -----------
 
-A detailed user manual for JHelioviewer can be found at
+A detailed user manual for JHelioviewer can be found at:
 
 http://swhv.oma.be/user_manual/
 
@@ -70,6 +73,6 @@ guidelines and other development information please visit:
 
 http://wiki.helioviewer.org/wiki/JHelioviewer_Development_Information
 
-It is part of the Helioviewer project:
+It is part of the Helioviewer project wiki:
 
 http://wiki.helioviewer.org/wiki/Main_Page

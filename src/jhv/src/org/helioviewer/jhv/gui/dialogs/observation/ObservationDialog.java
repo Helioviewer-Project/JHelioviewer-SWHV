@@ -108,9 +108,10 @@ public class ObservationDialog extends JDialog implements ActionListener {
 
         pack();
         Dimension dim = getPreferredSize();
-        if (dim != null) // satisfy coverity
+        if (dim != null) { // satisfy coverity
             setMinimumSize(dim);
-        pack();
+            pack();
+        }
 
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         getRootPane().setDefaultButton(btnImages);
