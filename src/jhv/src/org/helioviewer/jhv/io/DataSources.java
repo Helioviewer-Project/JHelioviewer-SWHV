@@ -118,10 +118,8 @@ public class DataSources {
             JSONObject rawSchema = new JSONObject(new JSONTokener(is));
             Schema schema = SchemaLoader.load(rawSchema);
 
-            DataSourcesTask loadTask;
-            HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
-            for (String serverName : datasourceNode.keySet()) {
-                loadTask = new DataSourcesTask(serverName, schema);
+            for (String serverName : serverSettings.keySet()) {
+                DataSourcesTask loadTask = new DataSourcesTask(serverName, schema);
                 JHVGlobals.getExecutorService().execute(loadTask);
             }
         } catch (IOException e) {

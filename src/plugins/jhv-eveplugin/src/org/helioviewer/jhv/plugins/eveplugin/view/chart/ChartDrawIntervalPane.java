@@ -198,11 +198,11 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         int day = -1;
 
         GregorianCalendar tickGreg = new GregorianCalendar();
-        String tickText;
         for (int i = 0; i < maxTicks; ++i) {
             Date tickValue = new Date(availableInterval.start + (long) (i * ratioTime));
             tickGreg.setTime(tickValue);
             int currentday = tickGreg.get(GregorianCalendar.DAY_OF_MONTH);
+            String tickText;
             if (day != currentday) {
                 tickText = DrawConstants.FULL_DATE_TIME_FORMAT_NO_SEC.format(tickValue);
                 day = currentday;

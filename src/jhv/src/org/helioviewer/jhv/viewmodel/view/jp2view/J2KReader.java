@@ -320,8 +320,8 @@ class J2KReader implements Runnable {
                         }
                     }
 
-                    int completed = 0;
-                    for (; completed < num_layers; completed++) {
+                    int completed;
+                    for (completed = 0; completed < num_layers; completed++) {
                         if (cacheStatusRef.getImageStatus(completed) != CacheStatus.COMPLETE)
                             break;
                     }

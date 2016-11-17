@@ -90,7 +90,6 @@ public class RadioData extends AbstractLineDataSelectorElement {
             return;
         latest_cache_start = start - start % TimeUtils.DAY_IN_MILLIS - 2 * TimeUtils.DAY_IN_MILLIS;
         latest_cache_end = latest_cache_start + DAYS_IN_CACHE * TimeUtils.DAY_IN_MILLIS;
-        ArrayList<Long> toDownloadStartDates = new ArrayList<>();
         ArrayList<Long> incomingStartDates = new ArrayList<>(DAYS_IN_CACHE);
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             incomingStartDates.add(latest_cache_start + i * TimeUtils.DAY_IN_MILLIS);
@@ -107,6 +106,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
             }
         }
 
+        ArrayList<Long> toDownloadStartDates = new ArrayList<>();
         for (long incomingStart : incomingStartDates) {
             if (!cache.containsKey(incomingStart)) {
                 toDownloadStartDates.add(incomingStart);

@@ -32,6 +32,8 @@ public class GOESLevel {
                         return 1e-5 * val;
                     case 'X':
                         return 1e-4 * val;
+                    default:
+                        break;
                 }
             } catch (Exception ignore) {
             }

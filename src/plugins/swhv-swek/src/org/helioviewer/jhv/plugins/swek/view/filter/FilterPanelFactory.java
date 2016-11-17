@@ -82,6 +82,8 @@ public class FilterPanelFactory {
                     case "flarefilter":
                         panels.add(new FilterPanel(eventType, parameter, generateFlareSpinner(filterDialog), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
                         break;
+                    default:
+                        break;
                 }
             }
         }

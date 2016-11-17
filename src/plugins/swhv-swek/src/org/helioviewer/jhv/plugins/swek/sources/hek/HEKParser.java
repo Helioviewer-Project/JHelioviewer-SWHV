@@ -140,6 +140,8 @@ public class HEKParser implements SWEKParser {
                         type = "Reference Link";
                         ok = true;
                         break;
+                    default:
+                        break;
                 }
             } else if (lowerKey.equals("ref_url")) {
                 url = value;

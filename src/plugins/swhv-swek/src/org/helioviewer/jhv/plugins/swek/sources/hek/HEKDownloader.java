@@ -82,6 +82,8 @@ public class HEKDownloader extends SWEKDownloader {
                             case JHVDatabaseParam.DBDOUBLETYPE:
                                 paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBDOUBLETYPE, result.getDouble(lfieldName), fieldName));
                                 break;
+                            default:
+                                break;
                         }
                     }
                 }
