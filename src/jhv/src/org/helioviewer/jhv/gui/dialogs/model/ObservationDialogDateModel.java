@@ -4,71 +4,59 @@ import java.util.HashSet;
 
 public class ObservationDialogDateModel {
 
-    private final HashSet<ObservationDialogDateModelListener> listeners = new HashSet<>();
+    private static final HashSet<ObservationDialogDateModelListener> listeners = new HashSet<>();
 
-    private static ObservationDialogDateModel instance;
+    private static long startTime;
+    private static long endTime;
 
-    private long startTime;
-    private long endTime;
+    private static boolean startByUser;
+    private static boolean endByUser;
 
-    private boolean startByUser;
-    private boolean endByUser;
-
-    private ObservationDialogDateModel() {
-    }
-
-    public static ObservationDialogDateModel getInstance() {
-        if (instance == null) {
-            instance = new ObservationDialogDateModel();
-        }
-        return instance;
-    }
-
-    public void addListener(ObservationDialogDateModelListener listener) {
+    public static void addListener(ObservationDialogDateModelListener listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(ObservationDialogDateModelListener listener) {
+    public static void removeListener(ObservationDialogDateModelListener listener) {
         listeners.remove(listener);
     }
 
-    private void fireStartTimeChanged() {
+    private static void fireStartTimeChanged() {
         for (ObservationDialogDateModelListener l : listeners) {
             l.startTimeChanged(startTime);
         }
     }
 
-    private void fireEndTimeChanged() {
+    private static void fireEndTimeChanged() {
         for (ObservationDialogDateModelListener l : listeners) {
             l.endTimeChanged(endTime);
         }
     }
 
-    public void setStartTime(long startTime, boolean byUser) {
+    public static void setStartTime(long _startTime, boolean byUser) {
         if (!startByUser) {
             startByUser = byUser;
         }
         if (!startByUser || byUser) {
-            this.startTime = startTime;
+            startTime = _startTime;
             fireStartTimeChanged();
         }
     }
 
-    public void setEndTime(long endTime, boolean byUser) {
+    public static void setEndTime(long _endTime, boolean byUser) {
         if (!endByUser) {
             endByUser = byUser;
         }
         if (!endByUser || byUser) {
-            this.endTime = endTime;
+            endTime = _endTime;
             fireEndTimeChanged();
         }
     }
 
-    public boolean isEndTimeSetByUser() {
+    public static boolean isEndTimeSetByUser() {
         return endByUser;
     }
 
-    public boolean isStartTimeSetByUser() {
+    public static boolean isStartTimeSetByUser() {
         return startByUser;
     }
 

@@ -133,7 +133,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     @Override
     public boolean loadButtonPressed(Object layer) {
-        ObservationDialogDateModel.getInstance().setStartTime(getTime(), true);
+        ObservationDialogDateModel.setStartTime(getTime(), true);
         updateBandController();
         updateDrawController();
         return true;
