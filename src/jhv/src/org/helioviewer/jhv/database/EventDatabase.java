@@ -495,7 +495,7 @@ public class EventDatabase {
         }
 
         JsonEvent ev;
-        if (full && (ev = event2prog(id)) != null) {
+        if (!is_dbthread && (ev = event2prog(id)) != null) {
             jsonEvents.add(ev);
             nEvents.add(parseJSON(ev, full));
         }
