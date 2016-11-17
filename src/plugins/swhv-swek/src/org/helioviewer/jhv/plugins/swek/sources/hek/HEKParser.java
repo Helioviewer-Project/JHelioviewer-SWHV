@@ -49,55 +49,51 @@ public class HEKParser implements SWEKParser {
         boolean waveCM = false;
         String waveValue = null;
 
-        //First iterate over parameters in the config file.
-        Iterator<?> keys = result.keys();
+        // First iterate over parameters in the config file
         List<SWEKParameter> plist = currentEvent.getJHVEventType().getEventType().getParameterList();
         Iterator<SWEKParameter> paramIterator = plist.iterator();
         HashSet<String> insertedKeys = new HashSet<>();
+
+        Iterator<String> keys = result.keys();
         while (paramIterator.hasNext() || keys.hasNext()) {
-            Object key = paramIterator.hasNext() ? paramIterator.next().getParameterName() : keys.next();
-            if (key instanceof String) {
-                String originalKeyString = (String) key;
-                String keyString = originalKeyString.toLowerCase(Locale.ENGLISH).intern();
-                if (insertedKeys.contains(keyString))
+            String key = paramIterator.hasNext() ? paramIterator.next().getParameterName() : keys.next();
+            String keyString = key.toLowerCase(Locale.ENGLISH);
+            if (insertedKeys.contains(keyString))
+                continue;
+            insertedKeys.add(keyString);
+            if (!result.has(keyString))
+                continue;
+
+            if (keyString.equals("refs")) {
+                parseRefs(currentEvent, result.getJSONArray(key));
+            } else {
+                if (result.isNull(keyString))
                     continue;
-                insertedKeys.add(keyString);
-                if (!result.has(keyString))
-                    continue;
-                if (keyString.equals("refs")) {
-                    parseRefs(currentEvent, result.getJSONArray(originalKeyString));
+
+                String value = result.optString(keyString);
+                if (keyString.equals("hgs_bbox")) {
+                    hgsBoundedBox = parsePolygon(value);
+                } else if (keyString.equals("hgs_boundcc")) {
+                    hgsBoundCC = parsePolygon(value);
+                } else if (keyString.equals("hgs_coord")) {
+                    hgsCentralPoint = parsePoint(value);
+                } else if (keyString.equals("hgs_x")) {
+                    hgsX = Double.valueOf(value);
+                } else if (keyString.equals("hgs_y")) {
+                    hgsY = Double.valueOf(value);
+                } else if (keyString.equals("rasterscan") || keyString.equals("bound_chaincode") ||
+                        keyString.startsWith("hgc_") || keyString.startsWith("hgs_") || keyString.startsWith("hpc_") || keyString.startsWith("hrc_")) {
+                    // nothing, delete
                 } else {
-                    String value;
-                    if (!result.isNull(keyString)) {
-                        value = result.optString(keyString);
-                    } else {
-                        continue;
-                    }
+                    value = value.trim();
+                    if (!value.isEmpty()) {
+                        if (keyString.equals("obs_wavelunit") && value.equals("cm"))
+                            waveCM = true;
 
-                    if (keyString.equals("hgs_bbox")) {
-                        hgsBoundedBox = parsePolygon(value);
-                    } else if (keyString.equals("hgs_boundcc")) {
-                        hgsBoundCC = parsePolygon(value);
-                    } else if (keyString.equals("hgs_coord")) {
-                        hgsCentralPoint = parsePoint(value);
-                    } else if (keyString.equals("hgs_x")) {
-                        hgsX = Double.valueOf(value);
-                    } else if (keyString.equals("hgs_y")) {
-                        hgsY = Double.valueOf(value);
-                    } else if (keyString.equals("rasterscan") || keyString.equals("bound_chaincode") ||
-                            keyString.startsWith("hgc_") || keyString.startsWith("hgs_") || keyString.startsWith("hpc_") || keyString.startsWith("hrc_")) {
-                        // nothing, delete
-                    } else {
-                        value = value.trim();
-                        if (!value.isEmpty()) {
-                            if (keyString.equals("obs_wavelunit") && value.equals("cm"))
-                                waveCM = true;
-
-                            if (keyString.equals("obs_meanwavel"))
-                                waveValue = value;
-                            else
-                                currentEvent.addParameter(keyString, value, full);
-                        }
+                        if (keyString.equals("obs_meanwavel"))
+                            waveValue = value;
+                        else
+                            currentEvent.addParameter(keyString, value, full);
                     }
                 }
             }

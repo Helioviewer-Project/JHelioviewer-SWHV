@@ -97,11 +97,11 @@ public class PositionLoad {
 
             for (int j = 0; j < resLength; j++) {
                 JSONObject posObject = resArray.getJSONObject(j);
-                Iterator<?> iterKeys = posObject.keys();
+                Iterator<String> iterKeys = posObject.keys();
                 if (!iterKeys.hasNext())
                     throw new JSONException("unexpected format");
 
-                String dateString = (String) iterKeys.next();
+                String dateString = iterKeys.next();
                 JSONArray posArray = posObject.getJSONArray(dateString);
 
                 double rad, lon, lat, jlon;
