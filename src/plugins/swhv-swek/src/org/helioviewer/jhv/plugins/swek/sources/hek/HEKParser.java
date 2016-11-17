@@ -57,43 +57,41 @@ public class HEKParser implements SWEKParser {
         Iterator<String> keys = result.keys();
         while (paramIterator.hasNext() || keys.hasNext()) {
             String key = paramIterator.hasNext() ? paramIterator.next().getParameterName() : keys.next();
-            String keyString = key.toLowerCase(Locale.ENGLISH);
-            if (insertedKeys.contains(keyString))
+            String lowKey = key.toLowerCase(Locale.ENGLISH);
+            if (insertedKeys.contains(lowKey))
                 continue;
-            insertedKeys.add(keyString);
-            if (!result.has(keyString))
+            insertedKeys.add(lowKey);
+
+            if (result.isNull(lowKey))
                 continue;
 
-            if (keyString.equals("refs")) {
+            if (lowKey.equals("refs")) {
                 parseRefs(currentEvent, result.getJSONArray(key));
             } else {
-                if (result.isNull(keyString))
-                    continue;
-
-                String value = result.optString(keyString);
-                if (keyString.equals("hgs_bbox")) {
+                String value = result.optString(lowKey);
+                if (lowKey.equals("hgs_bbox")) {
                     hgsBoundedBox = parsePolygon(value);
-                } else if (keyString.equals("hgs_boundcc")) {
+                } else if (lowKey.equals("hgs_boundcc")) {
                     hgsBoundCC = parsePolygon(value);
-                } else if (keyString.equals("hgs_coord")) {
+                } else if (lowKey.equals("hgs_coord")) {
                     hgsCentralPoint = parsePoint(value);
-                } else if (keyString.equals("hgs_x")) {
+                } else if (lowKey.equals("hgs_x")) {
                     hgsX = Double.valueOf(value);
-                } else if (keyString.equals("hgs_y")) {
+                } else if (lowKey.equals("hgs_y")) {
                     hgsY = Double.valueOf(value);
-                } else if (keyString.equals("rasterscan") || keyString.equals("bound_chaincode") ||
-                        keyString.startsWith("hgc_") || keyString.startsWith("hgs_") || keyString.startsWith("hpc_") || keyString.startsWith("hrc_")) {
+                } else if (lowKey.equals("rasterscan") || lowKey.equals("bound_chaincode") ||
+                        lowKey.startsWith("hgc_") || lowKey.startsWith("hgs_") || lowKey.startsWith("hpc_") || lowKey.startsWith("hrc_")) {
                     // nothing, delete
                 } else {
                     value = value.trim();
                     if (!value.isEmpty()) {
-                        if (keyString.equals("obs_wavelunit") && value.equals("cm"))
+                        if (lowKey.equals("obs_wavelunit") && value.equals("cm"))
                             waveCM = true;
 
-                        if (keyString.equals("obs_meanwavel"))
+                        if (lowKey.equals("obs_meanwavel"))
                             waveValue = value;
                         else
-                            currentEvent.addParameter(keyString, value, full);
+                            currentEvent.addParameter(lowKey, value, full);
                     }
                 }
             }

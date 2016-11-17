@@ -26,27 +26,24 @@ public class ComesepParser implements SWEKParser {
     private static void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
         Iterator<String> keys = result.keys();
         while (keys.hasNext()) {
-            parseParameter(result, keys.next(), currentEvent);
-        }
-    }
+            String key = keys.next();
+            if (result.isNull(key))
+                return;
 
-    private static void parseParameter(JSONObject result, String key, JHVEvent currentEvent) throws JSONException {
-        if (result.isNull(key))
-            return;
-
-        String lowerKey = key.toLowerCase(Locale.ENGLISH);
-        if (!(lowerKey.equals("atearliest") || lowerKey.equals("atlatest") ||
-              lowerKey.equals("begin_time_value") || lowerKey.equals("end_time_value") ||
-              lowerKey.startsWith("liftoff"))) {
-            String value = result.optString(key).trim();
-            if (!value.isEmpty()) {
-                if (lowerKey.equals("atstrongest")) {
-                    try {
-                        value = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);
-                    } catch (Exception ignore) {
+            String lowKey = key.toLowerCase(Locale.ENGLISH);
+            if (!(lowKey.equals("atearliest") || lowKey.equals("atlatest") ||
+                  lowKey.equals("begin_time_value") || lowKey.equals("end_time_value") ||
+                  lowKey.startsWith("liftoff"))) {
+                String value = result.optString(key).trim();
+                if (!value.isEmpty()) {
+                    if (lowKey.equals("atstrongest")) {
+                        try {
+                            value = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);
+                        } catch (Exception ignore) {
+                        }
                     }
+                    currentEvent.addParameter(lowKey, value, true);
                 }
-                currentEvent.addParameter(lowerKey, value, true);
             }
         }
     }
