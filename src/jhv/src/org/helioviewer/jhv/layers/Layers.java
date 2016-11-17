@@ -350,13 +350,12 @@ public class Layers {
     }
 
     public static double getLargestPhysicalHeight() {
-        double newSize, size = 0;
+        double size = 0;
 
         for (View v : layers) {
             if (v.getImageLayer().isVisible()) {
                 MetaData m = v.getImageLayer().getMetaData();
-
-                newSize = m.getPhysicalRegion().height;
+                double newSize = m.getPhysicalRegion().height;
                 if (newSize > size) {
                     size = newSize;
                 }

@@ -235,8 +235,6 @@ public class KakaduUtils {
      * @throws JHV_KduException
      */
     public static String getXml(Jp2_family_src src, int boxNumber) throws JHV_KduException {
-        String xml = null;
-
         Jp2_input_box assocBox = null, assoc2Box = null;
         Jp2_input_box findBoxResult[] = KakaduUtils.findBox(src, Kdu_global.jp2_xml_4cc, boxNumber);
         Jp2_input_box xmlBox = findBoxResult[0];
@@ -254,6 +252,7 @@ public class KakaduUtils {
             }
         }
 
+        String xml = null;
         if (xmlBox != null) {
             try {
                 // Grab the xml data if available
@@ -353,11 +352,9 @@ public class KakaduUtils {
     public static void cacheMetaData(Jp2_family_src src, MetaData[] metaDataList) throws Exception {
         XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
 
-        Jp2_input_box findBoxResult[], assocBox;
         Jp2_input_box xmlBox = new Jp2_input_box();
-
-        findBoxResult = findBox(src, Kdu_global.jp2_association_4cc, 1);
-        assocBox = findBoxResult[0];
+        Jp2_input_box[] findBoxResult = findBox(src, Kdu_global.jp2_association_4cc, 1);
+        Jp2_input_box assocBox = findBoxResult[0];
         if (assocBox != null) {
             for (int i = 0; i < metaDataList.length; i++) {
                 try {

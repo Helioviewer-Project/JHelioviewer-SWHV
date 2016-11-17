@@ -83,11 +83,9 @@ public class PfssData {
     }
 
     private void calculatePositions() {
-        int counter = 0;
         lastQuality = PfssSettings.qualityReduction;
         lastFixedColor = PfssSettings.fixedColor;
 
-        int type = 0;
         ByteArrayInputStream is = new ByteArrayInputStream(gzipFitsFile);
         try {
             Fits fits = new Fits(is, true);
@@ -109,13 +107,13 @@ public class PfssData {
                 throw new Exception("DATE-OBS not found");
             dateString = date.substring(11, 30);
 
-            Position.L p = Sun.getEarth(new JHVDate(TimeUtils.utcDateFormat.parse(dateString).getTime()));
-            double phi = p.lon;
-
-            double sphi = Math.sin(phi), cphi = Math.cos(phi);
-
             createBuffer(fieldlinex.length);
 
+            Position.L p = Sun.getEarth(new JHVDate(TimeUtils.utcDateFormat.parse(dateString).getTime()));
+            double sphi = Math.sin(p.lon), cphi = Math.cos(p.lon);
+
+            int counter = 0;
+            int type = 0;
             for (int i = 0; i < fieldlinex.length; i++) {
                 if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {
                     int rx = fieldlinex[i] + 32768;

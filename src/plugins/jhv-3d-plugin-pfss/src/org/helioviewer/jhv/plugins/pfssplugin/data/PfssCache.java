@@ -25,13 +25,12 @@ public class PfssCache {
     private void bubbleSort() {
         boolean swapped = true;
         int j = 0;
-        PfssData tmp;
         while (swapped) {
             swapped = false;
             j++;
             for (int i = 0; i < numberOfElementsInCache - j; i++) {
                 if (data[i].getTime() > data[i + 1].getTime()) {
-                    tmp = data[i];
+                    PfssData tmp = data[i];
                     data[i] = data[i + 1];
                     data[i + 1] = tmp;
                     swapped = true;

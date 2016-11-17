@@ -148,9 +148,8 @@ class J2KReader implements Runnable {
         long replyTextTime = socket.getReplyTextTime();
         long replyDataTime = socket.getReplyDataTime();
 
-        long tdat = replyDataTime - replyTextTime;
-
         if ((receivedBytes - jpipRequestLen) < (jpipRequestLen >> 1) && receivedBytes > (jpipRequestLen >> 1)) {
+            long tdat = replyDataTime - replyTextTime;
             if (tdat > 10000)
                 adjust = -1;
             else if (lastResponseTime > 0) {
@@ -242,7 +241,6 @@ class J2KReader implements Runnable {
                     }
 
                     // build query based on strategy
-                    int complete_steps = 0;
                     int current_step;
                     JPIPQuery[] stepQuerys;
 
@@ -259,12 +257,13 @@ class J2KReader implements Runnable {
                             current_step = currParams.compositionLayer / JPIPConstants.MAX_REQ_LAYERS;
                     }
 
-                    boolean stopReading = false;
                     lastResponseTime = -1;
 
                     //int idx = 0;
                     JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
                     // send queries until everything is complete or caching is interrupted
+                    int complete_steps = 0;
+                    boolean stopReading = false;
                     while (!stopReading && complete_steps < stepQuerys.length) {
                         if (current_step >= stepQuerys.length)
                             current_step = 0;
