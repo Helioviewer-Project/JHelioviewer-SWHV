@@ -127,12 +127,9 @@ public class RenderableContainerPanel extends JPanel {
         jsp.getViewport().setBackground(Color.WHITE);
 
         JButton addLayerButton = new JButton("New Layer", IconBank.getIcon(JHVIcon.ADD));
-        addLayerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                NewLayerAction layerAction = new NewLayerAction(true, false);
-                layerAction.actionPerformed(new ActionEvent(this, 0, ""));
-            }
+        addLayerButton.addActionListener(e -> {
+            NewLayerAction layerAction = new NewLayerAction(true, false);
+            layerAction.actionPerformed(new ActionEvent(addLayerButton, 0, ""));
         });
         addLayerButton.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
         addLayerButton.setHorizontalTextPosition(SwingConstants.TRAILING);

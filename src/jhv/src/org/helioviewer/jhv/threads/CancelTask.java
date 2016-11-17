@@ -5,20 +5,23 @@ import java.util.concurrent.FutureTask;
 
 public class CancelTask extends FutureTask<Boolean> {
 
-    public CancelTask(FutureTask<?> cancelTask) {
-        super(new Callable<Boolean>() {
-           private FutureTask<?> _cancelTask;
+    public CancelTask(FutureTask<?> task) {
+        super(new TaskCancel(task));
+    }
 
-           public Callable<Boolean> init(FutureTask<?> _cancelTask) {
-               this._cancelTask = _cancelTask;
-               return this;
-           }
+    private static class TaskCancel implements Callable<Boolean> {
 
-           @Override
-           public Boolean call() {
-               return _cancelTask.cancel(true);
-           }
-       }.init(cancelTask));
+        private final FutureTask<?> task;
+
+        public TaskCancel(FutureTask<?> _task) {
+            task = _task;
+        }
+
+        @Override
+        public Boolean call() {
+            return task.cancel(true);
+        }
+
     }
 
 }
