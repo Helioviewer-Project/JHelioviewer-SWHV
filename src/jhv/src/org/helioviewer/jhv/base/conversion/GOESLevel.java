@@ -17,10 +17,9 @@ public class GOESLevel {
 
     public static double getFloatValue(String s) {
         if (s.length() >= 2) {
-            char v = s.charAt(0);
-
             try {
                 double val = Double.parseDouble(s.substring(1));
+                char v = s.charAt(0);
                 switch (v) {
                     case 'A':
                         return 1e-8 * val;

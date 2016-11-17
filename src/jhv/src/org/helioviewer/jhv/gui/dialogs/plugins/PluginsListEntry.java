@@ -32,7 +32,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * @author Stephan Pagel
  * */
 @SuppressWarnings("serial")
-class PluginsListEntry extends AbstractPluginsListEntry implements MouseListener {
+class PluginsListEntry extends JPanel implements MouseListener {
 
     private final PluginContainer plugin;
     private final PluginsList list;
