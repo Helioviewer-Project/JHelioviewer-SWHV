@@ -164,11 +164,11 @@ public class Quat {
         if (cosAngle > 1)
             cosAngle = 1;
 
-        double theta0 = Math.acos(cosAngle);
-        double theta = theta0 * t;
         Quat v2 = r.copy().subtract(this.copy().scale(cosAngle));
         v2.normalize();
 
+        double theta0 = Math.acos(cosAngle);
+        double theta = theta0 * t;
         Quat q = this.copy().scale(Math.cos(theta)).add(v2.scale(Math.sin(theta)));
         q.normalize();
         return q;

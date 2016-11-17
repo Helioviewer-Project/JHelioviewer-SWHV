@@ -58,7 +58,6 @@ public class PositionLoad {
 
         @Override
         protected Position.L[] backgroundWork() {
-            JSONObject result;
             try {
                 long deltat = 60, span = (end - start) / 1000;
                 long max = 100000;
@@ -71,7 +70,7 @@ public class PositionLoad {
                                             "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
                 DownloadStream ds = new DownloadStream(url, true);
 
-                result = JSONUtils.getJSONStream(ds.getInput());
+                JSONObject result = JSONUtils.getJSONStream(ds.getInput());
                 if (ds.isResponse400()) {
                     report = result.has("faultstring") ? result.getString("faultstring") : "Invalid network response";
                 } else {

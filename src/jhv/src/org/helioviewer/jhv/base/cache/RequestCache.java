@@ -51,17 +51,14 @@ public class RequestCache {
             newCache.add(new Interval(Long.MIN_VALUE, Long.MAX_VALUE));
             return newCache;
         }
-        int i = 0;
-        Interval interval;
-        long currend;
 
-        interval = toInvert.get(0);
+        Interval interval = toInvert.get(0);
         if (Long.MIN_VALUE != interval.start) {
             newCache.add(new Interval(Long.MIN_VALUE, interval.start));
         }
-        currend = interval.end;
-        i++;
 
+        long currend = interval.end;
+        int i = 1;
         while (i < len) {
             interval = toInvert.get(i);
             newCache.add(new Interval(currend, interval.start));

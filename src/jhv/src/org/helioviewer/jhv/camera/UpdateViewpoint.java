@@ -54,7 +54,6 @@ public interface UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             if (positionLoad.isLoaded()) {
-                long currentCameraTime;
                 long tLayerStart = 0, tLayerEnd = 0;
                 // Active layer times
                 View view = Layers.getActiveView();
@@ -67,6 +66,7 @@ public interface UpdateViewpoint {
                 long tPositionStart = positionLoad.getStartTime();
                 long tPositionEnd = positionLoad.getEndTime();
 
+                long currentCameraTime;
                 if (tLayerEnd != tLayerStart) {
                     currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (time.milli - tLayerStart) / (double) (tLayerEnd - tLayerStart));
                 } else {

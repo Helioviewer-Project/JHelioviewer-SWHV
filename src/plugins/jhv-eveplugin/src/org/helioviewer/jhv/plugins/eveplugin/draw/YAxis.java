@@ -86,9 +86,9 @@ public class YAxis {
         double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
 
         double newScaledMin = (1 + delta) * scaledMin - delta * scaled;
-        double newScaledMax = (1 + delta) * scaledMax - delta * scaled;
-
         newScaledMin = Math.max(scaledMinBound, newScaledMin);
+
+        double newScaledMax = (1 + delta) * scaledMax - delta * scaled;
         newScaledMax = Math.min(scaledMaxBound, newScaledMax);
 
         start = invScale(newScaledMin);
