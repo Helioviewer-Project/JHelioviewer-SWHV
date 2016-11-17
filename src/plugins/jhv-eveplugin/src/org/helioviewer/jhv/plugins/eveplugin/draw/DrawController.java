@@ -134,11 +134,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public static void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
-        double zoomTimeFactor = 10;
         boolean inGraphArea = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
         boolean inXAxisOrAboveGraph = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height));
 
         if (inGraphArea || inXAxisOrAboveGraph) {
+            double zoomTimeFactor = 10;
             if ((!alt && !shift) || inXAxisOrAboveGraph) {
                 zoomX(p.x, zoomTimeFactor * scrollDistance);
             } else if (shift) {

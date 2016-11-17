@@ -59,8 +59,8 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     @Override
     public int getImageCachedPartiallyUntil() {
-        int i = Math.max(0, imagePartialUntil);
-        for (; i <= maxFrameNumber; i++) {
+        int i;
+        for (i = Math.max(0, imagePartialUntil); i <= maxFrameNumber; i++) {
             if (imageStatus[i] != CacheStatus.PARTIAL && imageStatus[i] != CacheStatus.COMPLETE) {
                 break;
             }

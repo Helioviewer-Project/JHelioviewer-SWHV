@@ -67,20 +67,17 @@ public class DayViewController implements CalendarViewController {
     public Object[][] getGridData() {
         // compute number of days in selected month
         Calendar cal = (Calendar) calendar.clone();
-        int numberOfDaysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-        // put all days at correct position in grid data
-        Object[][] data = new Object[6][7];
-
-        boolean win = System.getProperty("jhv.os").equals("windows");
         cal.set(Calendar.DAY_OF_MONTH, 1);
 
         // the calendar returns sometimes index 0 and sometimes index 1 for
         // first week of a month under windows, so an offset is needed
         int offset = 1;
-        if (win)
+        if (System.getProperty("jhv.os").equals("windows"))
             offset = cal.get(Calendar.WEEK_OF_MONTH);
 
+        // put all days at correct position in grid data
+        int numberOfDaysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        Object[][] data = new Object[6][7];
         for (int i = 1; i <= numberOfDaysInMonth; i++) {
             cal.set(Calendar.DAY_OF_MONTH, i);
             data[cal.get(Calendar.WEEK_OF_MONTH) - offset][cal.get(Calendar.DAY_OF_WEEK) - 1] = i;
