@@ -33,10 +33,10 @@ public class JHVEventParameter {
      * @param parameterValue
      *            the parameter value
      */
-    public JHVEventParameter(String parameterName, String parameterDisplayName, String parameterValue) {
-        this.parameterName = parameterName.intern();
-        this.parameterDisplayName = parameterDisplayName.intern();
-        this.parameterValue = parameterValue.intern();
+    public JHVEventParameter(String _parameterName, String _parameterDisplayName, String _parameterValue) {
+        parameterName = _parameterName.intern();
+        parameterDisplayName = _parameterDisplayName.intern();
+        parameterValue = _parameterValue.intern();
     }
 
     /**
