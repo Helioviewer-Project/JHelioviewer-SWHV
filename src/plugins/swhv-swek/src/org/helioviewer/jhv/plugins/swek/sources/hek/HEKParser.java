@@ -122,35 +122,33 @@ public class HEKParser implements SWEKParser {
     }
 
     private static void parseRef(JHVEvent currentEvent, JSONObject ref) throws JSONException {
-        Iterator<?> keys = ref.keys();
         String url = "", type = "";
         boolean ok = false;
-        while (keys.hasNext()) {
-            Object key = keys.next();
-            if (key instanceof String) {
-                String keyString = (String) key;
-                String lkeyString = keyString.toLowerCase(Locale.ENGLISH);
 
-                String value = ref.getString(keyString);
-                if (lkeyString.equals("ref_type")) {
-                    String lvalue = value.toLowerCase(Locale.ENGLISH);
-                    switch (lvalue) {
-                        case "movie":
-                            type = "Reference Movie";
-                            ok = true;
-                            break;
-                        case "image":
-                            type = "Reference Image";
-                            ok = true;
-                            break;
-                        case "html":
-                            type = "Reference Link";
-                            ok = true;
-                            break;
-                    }
-                } else if (lkeyString.equals("ref_url")) {
-                    url = value;
+        Iterator<String> keys = ref.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            String value = ref.getString(key);
+
+            String lowerKey = key.toLowerCase(Locale.ENGLISH);
+            if (lowerKey.equals("ref_type")) {
+                String lvalue = value.toLowerCase(Locale.ENGLISH);
+                switch (lvalue) {
+                    case "movie":
+                        type = "Reference Movie";
+                        ok = true;
+                        break;
+                    case "image":
+                        type = "Reference Image";
+                        ok = true;
+                        break;
+                    case "html":
+                        type = "Reference Link";
+                        ok = true;
+                        break;
                 }
+            } else if (lowerKey.equals("ref_url")) {
+                url = value;
             }
         }
         if (ok) {

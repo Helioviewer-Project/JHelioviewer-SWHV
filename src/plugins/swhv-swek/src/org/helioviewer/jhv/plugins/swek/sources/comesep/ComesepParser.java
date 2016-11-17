@@ -34,19 +34,19 @@ public class ComesepParser implements SWEKParser {
         if (result.isNull(key))
             return;
 
-        String lowerkey = key.toLowerCase(Locale.ENGLISH);
-        if (!(lowerkey.equals("atearliest") || lowerkey.equals("atlatest") ||
-              lowerkey.equals("begin_time_value") || lowerkey.equals("end_time_value") ||
-              lowerkey.startsWith("liftoff"))) {
+        String lowerKey = key.toLowerCase(Locale.ENGLISH);
+        if (!(lowerKey.equals("atearliest") || lowerKey.equals("atlatest") ||
+              lowerKey.equals("begin_time_value") || lowerKey.equals("end_time_value") ||
+              lowerKey.startsWith("liftoff"))) {
             String value = result.optString(key).trim();
             if (!value.isEmpty()) {
-                if (lowerkey.equals("atstrongest")) {
+                if (lowerKey.equals("atstrongest")) {
                     try {
                         value = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);
                     } catch (Exception ignore) {
                     }
                 }
-                currentEvent.addParameter(lowerkey, value, true);
+                currentEvent.addParameter(lowerKey, value, true);
             }
         }
     }
