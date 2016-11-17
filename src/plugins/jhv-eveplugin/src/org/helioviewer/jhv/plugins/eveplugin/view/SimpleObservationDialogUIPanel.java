@@ -22,7 +22,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     private final JHVCalendarDatePicker calendarStartDate;
 
     SimpleObservationDialogUIPanel() {
-        ObservationDialogDateModel.getInstance().addListener(this);
+        ObservationDialogDateModel.addListener(this);
 
         JLabel labelStartDate = new JLabel("Start date");
         calendarStartDate = new JHVCalendarDatePicker();
@@ -62,14 +62,14 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     @Override
     public void actionPerformed(JHVCalendarEvent e) {
         if (e.getSource() == calendarStartDate) {
-            ObservationDialogDateModel.getInstance().setStartTime(calendarStartDate.getTime(), true);
+            ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true);
         }
     }
 
     @Override
     public void timespanChanged(long start, long end) {
         calendarStartDate.setTime(start);
-        ObservationDialogDateModel.getInstance().setStartTime(start, false);
+        ObservationDialogDateModel.setStartTime(start, false);
     }
 
     @Override

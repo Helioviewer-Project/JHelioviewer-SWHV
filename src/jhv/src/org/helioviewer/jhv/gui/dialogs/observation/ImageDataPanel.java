@@ -122,8 +122,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
             return false;
         }
 
-        ObservationDialogDateModel.getInstance().setStartTime(getStartTime(), true);
-        ObservationDialogDateModel.getInstance().setEndTime(getEndTime(), true);
+        ObservationDialogDateModel.setStartTime(getStartTime(), true);
+        ObservationDialogDateModel.setEndTime(getEndTime(), true);
 
         // check if start date is before end date -> if not show message
         if (!timeSelectionPanel.isStartTimeBeforeEndTime()) {
@@ -154,7 +154,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         private boolean setFromOutside = false;
 
         public TimeSelectionPanel() {
-            ObservationDialogDateModel.getInstance().addListener(this);
+            ObservationDialogDateModel.addListener(this);
 
             setLayout(new GridLayout(2, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
@@ -217,7 +217,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             calendarEndDate.setTime(endTime);
             textEndTime.setText(TimeUtils.timeDateFormat.format(endTime));
             if (!setFromOutside) {
-                ObservationDialogDateModel.getInstance().setEndTime(endTime, byUser);
+                ObservationDialogDateModel.setEndTime(endTime, byUser);
             } else {
                 setFromOutside = false;
             }
@@ -227,7 +227,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             calendarStartDate.setTime(startTime);
             textStartTime.setText(TimeUtils.timeDateFormat.format(startTime));
             if (!setFromOutside) {
-                ObservationDialogDateModel.getInstance().setStartTime(startTime, byUser);
+                ObservationDialogDateModel.setStartTime(startTime, byUser);
             } else {
                 setFromOutside = false;
             }
