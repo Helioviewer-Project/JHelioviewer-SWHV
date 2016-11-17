@@ -495,7 +495,7 @@ public class EventDatabase {
         }
 
         JsonEvent ev;
-        if (!is_dbthread && (ev = event2prog(id)) != null) {
+        if (!is_dbthread && (ev = event2Program(id)) != null) {
             jsonEvents.add(ev);
             nEvents.add(parseJSON(ev, full));
         }
@@ -874,6 +874,31 @@ public class EventDatabase {
             Log.error("Could not fetch associations " + e.getMessage());
             return null;
         }
+    }
+
+    private static class Event2Program implements Callable<JsonEvent> {
+        private final int event_id;
+
+        public Event2Program(int _event_id) {
+            event_id = _event_id;
+        }
+
+        @Override
+        public JsonEvent call() {
+            return event2prog(event_id);
+        }
+    }
+
+    public static JsonEvent event2Program(int event_id) {
+        FutureTask<JsonEvent> ft = new FutureTask<>(new Event2Program(event_id));
+        executor.execute(ft);
+        JsonEvent evt = null;
+        try {
+            evt = ft.get();
+        } catch (InterruptedException | ExecutionException e) {
+            Log.error(e.getMessage());
+        }
+        return evt;
     }
 
 }
