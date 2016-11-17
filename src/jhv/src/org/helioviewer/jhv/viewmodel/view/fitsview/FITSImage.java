@@ -223,9 +223,8 @@ public class FITSImage implements MetaDataContainer {
         String sep = System.getProperty("line.separator");
         StringBuilder builder = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + sep + "<meta>" + sep + "<fits>" + sep);
 
-        HeaderCard headerCard;
         for (Cursor iter = header.iterator(); iter.hasNext();) {
-            headerCard = (HeaderCard) iter.next();
+            HeaderCard headerCard = (HeaderCard) iter.next();
             if (headerCard.getValue() != null) {
                 builder.append("<").append(headerCard.getKey()).append(">").append(headerCard.getValue()).append("</").append(headerCard.getKey()).append(">").append(sep);
             }

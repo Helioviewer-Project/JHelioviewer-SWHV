@@ -46,10 +46,10 @@ class JPIPDataInputStream {
      * @throws java.io.IOException
      */
     private long readVBAS() throws IOException {
-        int c;
-        long value = 0;
 
         vbasLength = 0;
+        long value = 0;
+        int c;
         do {
             if (vbasLength >= 9)
                 throw new ProtocolException("VBAS length not supported");
@@ -83,7 +83,6 @@ class JPIPDataInputStream {
      *         <code>false</code> if the end of stream was reached.
      */
     public JPIPDataSegment readSegment() throws IOException {
-        int m;
         long id;
         if ((id = readVBAS()) < 0)
             return null;
@@ -105,7 +104,7 @@ class JPIPDataInputStream {
 
             seg.isFinal = (vbasFstByte & 0x10) != 0;
 
-            m = (vbasFstByte & 0x7F) >> 5;
+            int m = (vbasFstByte & 0x7F) >> 5;
             if (m == 0)
                 throw new ProtocolException("Invalid Bin-ID value format");
             if (m >= 2) {

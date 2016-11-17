@@ -44,8 +44,7 @@ public class JPIPDataSegment {
     // Returns a string representation of the JPIP data segment
     @Override
     public String toString() {
-        String res;
-        res = getClass().getName() + " [";
+        String res = getClass().getName() + " [";
         if (isEOR)
             res += "EOR id=" + binID + " len=" + length;
         else {
@@ -54,7 +53,7 @@ public class JPIPDataSegment {
             if (isFinal)
                 res += " final";
         }
-        return res + "]";
+        return res + ']';
     }
 
 }

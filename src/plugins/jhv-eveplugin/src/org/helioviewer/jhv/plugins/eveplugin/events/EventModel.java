@@ -190,7 +190,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         }
 
         public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight, boolean drawHighlighted) {
-            JHVRelatedEvents highlightedEvent = null;
             int spacePerLine = 3;
             int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
             int w = Math.max(x1 - x0, 1);
@@ -202,12 +201,8 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
             boolean containsMouse = containsPoint(mousePosition, x0 - 1, y - 1, w + 2, h + 2);
             boolean eventWasHightlighted = containsMouse || (mousePosition == null && event.isHighlighted());
-            if (mousePosition != null && containsMouse) {
-                highlightedEvent = event;
-            }
-
-            int sz = Math.min(w, 8);
             boolean hl = eventWasHightlighted && highlight;
+            int sz = Math.min(w, 8);
             if (hl) {
                 x0 -= 10;
                 y -= 1;
@@ -226,7 +221,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                 drawText(graphArea, g, event, x0, y, w, h, mousePosition);
             }
 
-            return highlightedEvent;
+            return mousePosition != null && containsMouse ? highlightedEvent = event : null;
         }
 
         private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int x, int y, int w, int h, Point mousePosition) {

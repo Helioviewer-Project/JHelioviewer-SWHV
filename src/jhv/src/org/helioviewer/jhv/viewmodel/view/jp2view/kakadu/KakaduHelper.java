@@ -33,11 +33,10 @@ public class KakaduHelper {
             throw new KduException(">> cannot determine dimensions for stream " + frame);
         }
 
-        Rectangle rect;
         int maxDWT = stream.Get_min_dwt_levels();
         ResolutionSet res = new ResolutionSet(maxDWT + 1);
 
-        rect = KakaduUtils.kdu_dimsToRect(dims);
+        Rectangle rect = KakaduUtils.kdu_dimsToRect(dims);
         res.addResolutionLevel(0, rect.width, rect.height, 1, 1);
 
         int width0 = rect.width, height0 = rect.height;

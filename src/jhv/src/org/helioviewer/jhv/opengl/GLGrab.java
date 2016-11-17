@@ -44,8 +44,6 @@ public class GLGrab {
         if (fbo == null)
             init(gl);
 
-        BufferedImage screenshot;
-
         int _x = Displayer.fullViewport.x;
         int _y = Displayer.fullViewport.yGL;
         int _w = Displayer.fullViewport.width;
@@ -53,29 +51,29 @@ public class GLGrab {
 
         Displayer.setGLSize(0, 0, fbo.getWidth(), fbo.getHeight());
         Displayer.reshapeAll();
-        {
-            fbo.bind(gl);
-            if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
-                GLListener.renderScene(camera, gl);
-            } else {
-                GLListener.renderSceneScale(camera, gl);
-            }
-            GLListener.renderFloatScene(camera, gl);
-            fbo.unbind(gl);
 
-            fbo.use(gl, fboTex);
-
-            screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            byte[] array = ((DataBufferByte) screenshot.getRaster().getDataBuffer()).getData();
-            ByteBuffer fb = ByteBuffer.wrap(array);
-
-            gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
-            gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
-            gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, fb);
-            gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
-
-            fbo.unuse(gl);
+        fbo.bind(gl);
+        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+            GLListener.renderScene(camera, gl);
+        } else {
+            GLListener.renderSceneScale(camera, gl);
         }
+        GLListener.renderFloatScene(camera, gl);
+        fbo.unbind(gl);
+
+        fbo.use(gl, fboTex);
+
+        BufferedImage screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        byte[] array = ((DataBufferByte) screenshot.getRaster().getDataBuffer()).getData();
+        ByteBuffer fb = ByteBuffer.wrap(array);
+
+        gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
+        gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
+        gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, fb);
+        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
+
+        fbo.unuse(gl);
+
         Displayer.setGLSize(_x, _y, _w, _h);
         Displayer.reshapeAll();
 
