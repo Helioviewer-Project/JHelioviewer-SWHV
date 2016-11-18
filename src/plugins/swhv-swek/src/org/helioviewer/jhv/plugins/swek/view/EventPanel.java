@@ -18,15 +18,13 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
-import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
+import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 
-/**
- * Panel display one event type.
- */
+// Panel to display one event type
 @SuppressWarnings("serial")
 public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelListener, ActionListener {
 
@@ -47,15 +45,12 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
 
     private int loadingStep;
 
-    /**
-     * Creates a event panel for a certain eventType.
-     */
-    public EventPanel(SWEKEventType eventType) {
-        this.eventType = eventType;
+    public EventPanel(SWEKEventType _eventType) {
+        eventType = _eventType;
 
         SWEKTreeModel.addSWEKTreeModelListener(this);
-        eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(this.eventType));
-        eventPanelModel.addEventPanelModelListener(SWEKDownloadManager.getSingletonInstance());
+        eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(eventType));
+        eventPanelModel.addEventPanelModelListener(SWEKPlugin.swekDM);
 
         loadingTimer = new Timer(500, this);
         loadingStep = 0;

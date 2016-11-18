@@ -10,9 +10,9 @@ public class JHVEventType {
     /** The event provider */
     private final SWEKSupplier supplier;
 
-    private JHVEventType(SWEKEventType eventType, SWEKSupplier supplier) {
-        this.eventType = eventType;
-        this.supplier = supplier;
+    private JHVEventType(SWEKEventType _eventType, SWEKSupplier _supplier) {
+        eventType = _eventType;
+        supplier = _supplier;
     }
 
     private static final ArrayList<JHVEventType> evtList = new ArrayList<>();
