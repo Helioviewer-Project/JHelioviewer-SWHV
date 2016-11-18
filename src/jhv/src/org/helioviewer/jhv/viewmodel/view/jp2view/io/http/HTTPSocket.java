@@ -51,12 +51,12 @@ public class HTTPSocket extends Socket {
         lastUsedPort = port <= 0 ? PORT : port;
         lastUsedHost = uri.getHost();
 
-        super.setReceiveBufferSize(Math.max(262144 * 8, 2 * getReceiveBufferSize()));
-        super.setTrafficClass(0x10);
-        super.setSoTimeout(TO_READ);
-        super.setKeepAlive(true);
-        super.setTcpNoDelay(true);
-        super.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TO_CONNECT);
+        setReceiveBufferSize(Math.max(262144 * 8, 2 * getReceiveBufferSize()));
+        setTrafficClass(0x10);
+        setSoTimeout(TO_READ);
+        setKeepAlive(true);
+        setTcpNoDelay(true);
+        connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TO_CONNECT);
 
         inputStream = new BufferedInputStream(getInputStream(), 65536);
 

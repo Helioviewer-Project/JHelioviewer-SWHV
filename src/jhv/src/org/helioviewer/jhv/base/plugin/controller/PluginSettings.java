@@ -243,10 +243,7 @@ public class PluginSettings {
         }
 
         Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath());
-        if (pluginNode != null)
-            return isActivated(pluginNode, NODES_PLUGINACTIVATED);
-
-        return true;
+        return pluginNode == null || isActivated(pluginNode, NODES_PLUGINACTIVATED);
     }
 
     /**
