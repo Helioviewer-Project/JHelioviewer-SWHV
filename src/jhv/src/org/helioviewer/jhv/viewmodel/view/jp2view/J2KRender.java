@@ -139,24 +139,11 @@ class J2KRender implements Runnable {
 
     private void setImageData(ImageData newImageData) {
         MetaData metaData = params.jp2Image.metaDataList[params.compositionLayer];
-
         newImageData.setMetaData(metaData);
         newImageData.setViewpoint(params.viewpoint);
         newImageData.setRegion(metaData.roiToRegion(params.subImage, params.resolution.factorX, params.resolution.factorY));
 
-        EventQueue.invokeLater(new Runnable() {
-            private ImageData theImageData;
-
-            @Override
-            public void run() {
-                parentViewRef.setImageData(theImageData);
-            }
-
-            public Runnable init(ImageData imagedata) {
-                theImageData = imagedata;
-                return this;
-            }
-        }.init(newImageData));
+        EventQueue.invokeLater(() -> parentViewRef.setImageData(newImageData));
     }
 
     @Override

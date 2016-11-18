@@ -88,57 +88,46 @@ public class JavaHelioViewer {
 
         FileUtils.deleteDir(JHVDirectory.PLUGINSCACHE.getFile());
         JHVDirectory.PLUGINSCACHE.getFile().mkdirs();
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                UIGlobals.setUIFont(UIGlobals.UIFont);
+        EventQueue.invokeLater(() -> {
+            UIGlobals.setUIFont(UIGlobals.UIFont);
 
-                Log.info("Start main window");
-                ExitHooks.attach();
-                ImageViewerGui.prepareGui();
+            Log.info("Start main window");
+            ExitHooks.attach();
+            ImageViewerGui.prepareGui();
 
-                DataSources.loadSources();
+            DataSources.loadSources();
 
-                Log.info("Load plugin settings");
-                PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
+            Log.info("Load plugin settings");
+            PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
 
-                try {
-                    if (theArgs.length != 0 && theArgs[0].equals("--exclude-plugins")) {
-                        Log.info("Do not load plugins");
-                    } else {
-                        Log.info("Load bundled plugins");
-                        JHVLoader.loadBundledPlugin("EVEPlugin.jar");
-                        JHVLoader.loadBundledPlugin("SWEKPlugin.jar");
-                        JHVLoader.loadBundledPlugin("PfssPlugin.jar");
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+            try {
+                if (args.length != 0 && args[0].equals("--exclude-plugins")) {
+                    Log.info("Do not load plugins");
+                } else {
+                    Log.info("Load bundled plugins");
+                    JHVLoader.loadBundledPlugin("EVEPlugin.jar");
+                    JHVLoader.loadBundledPlugin("SWEKPlugin.jar");
+                    JHVLoader.loadBundledPlugin("PfssPlugin.jar");
                 }
-
-                // after loading plugins fix the minimum width of left pane
-                JComponent leftScrollPane = ImageViewerGui.getLeftScrollPane();
-                leftScrollPane.setMinimumSize(new Dimension(leftScrollPane.getPreferredSize().width + ImageViewerGui.SIDE_PANEL_WIDTH_EXTRA, -1));
-                ImageViewerGui.getMainFrame().pack();
-
-                LoadStartup.loadCommandLine();
-
-                try {
-                    JHVUpdate update = new JHVUpdate(false);
-                    update.check();
-                } catch (Exception e) {
-                    // Should never happen
-                    Log.error("Error retrieving internal update URL", e);
-                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
 
-            private String[] theArgs;
+            // after loading plugins fix the minimum width of left pane
+            JComponent leftScrollPane = ImageViewerGui.getLeftScrollPane();
+            leftScrollPane.setMinimumSize(new Dimension(leftScrollPane.getPreferredSize().width + ImageViewerGui.SIDE_PANEL_WIDTH_EXTRA, -1));
+            ImageViewerGui.getMainFrame().pack();
 
-            public Runnable init(String[] _args) {
-                theArgs = _args;
-                return this;
+            LoadStartup.loadCommandLine();
+
+            try {
+                JHVUpdate update = new JHVUpdate(false);
+                update.check();
+            } catch (Exception e) {
+                // Should never happen
+                Log.error("Error retrieving internal update URL", e);
             }
-
-        }.init(args));
+        });
     }
 
 }
