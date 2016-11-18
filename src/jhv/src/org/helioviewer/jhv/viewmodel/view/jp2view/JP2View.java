@@ -122,14 +122,11 @@ public class JP2View extends AbstractView {
     @Override
     protected void finalize() throws Throwable {
         if (!isAbolished) {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    abolish();
-                    try {
-                        super.finalize();
-                    } catch (Throwable ignore) {}
-                }
+            EventQueue.invokeLater(() -> {
+                abolish();
+                try {
+                    super.finalize();
+                } catch (Throwable ignore) {}
             });
         } else {
             super.finalize();
