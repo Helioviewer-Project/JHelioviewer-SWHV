@@ -221,7 +221,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
                 drawText(graphArea, g, event, x0, y, w, h, mousePosition);
             }
 
-            return mousePosition != null && containsMouse ? highlightedEvent = event : null;
+            return containsMouse ? highlightedEvent = event : null;
         }
 
         private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int x, int y, int w, int h, Point mousePosition) {
