@@ -13,7 +13,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventCacheRequestHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.SWEKOperand;

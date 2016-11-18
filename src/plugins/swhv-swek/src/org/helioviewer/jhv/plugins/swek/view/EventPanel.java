@@ -5,8 +5,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -26,16 +26,10 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 
 // Panel to display one event type
 @SuppressWarnings("serial")
-public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelListener, ActionListener {
+public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionListener {
 
     /** The event type for which the event panel is created */
     private final SWEKEventType eventType;
-
-    /** Tree containing the event type and its sources. */
-    private final JTree eventTypeTree;
-
-    /** The model for this panel */
-    private final EventTypePanelModel eventPanelModel;
 
     /** The label holding the loading text */
     private final JLabel loadingLabel;
@@ -47,20 +41,28 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
 
     public EventPanel(SWEKEventType _eventType) {
         eventType = _eventType;
-
+        setLayout(new BorderLayout());
         SWEKTreeModel.addSWEKTreeModelListener(this);
-        eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(eventType));
-        eventPanelModel.addEventPanelModelListener(SWEKPlugin.swekDM);
 
         loadingTimer = new Timer(500, this);
         loadingStep = 0;
 
-        setLayout(new BorderLayout());
-        eventTypeTree = new JTree(eventPanelModel);
+        EventTypePanelModel eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(eventType));
+        eventPanelModel.addEventPanelModelListener(SWEKPlugin.downloadManager);
+
+        JTree eventTypeTree = new JTree(eventPanelModel);
         eventTypeTree.setShowsRootHandles(true);
         eventTypeTree.setSelectionModel(null);
-        eventTypeTree.addMouseListener(this);
         eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
+        eventTypeTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int clickedOnRow = eventTypeTree.getRowForLocation(e.getX(), e.getY());
+                eventPanelModel.rowClicked(clickedOnRow);
+                // eventTypeTree.revalidate();
+                eventTypeTree.repaint();
+            }
+        });
 
         // workaround for Win HiDpi
         if (System.getProperty("jhv.os").equals("windows")) {
@@ -78,63 +80,21 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
         if (eventType.containsFilter()) {
             JButton filterButton = new JButton("Filter");
             filterButton.addActionListener(e -> filterDialog.setVisible(true));
-            filterButton.addMouseListener(new MouseListener() {
-
+            filterButton.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseReleased(MouseEvent arg0) {
-                }
-
-                @Override
-                public void mousePressed(MouseEvent arg0) {
-                    Point pressedLocation = arg0.getLocationOnScreen();
+                public void mousePressed(MouseEvent e) {
+                    Point pressedLocation = e.getLocationOnScreen();
                     Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
                     filterDialog.setLocation(windowLocation);
                 }
-
-                @Override
-                public void mouseExited(MouseEvent arg0) {
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent arg0) {
-                }
-
-                @Override
-                public void mouseClicked(MouseEvent arg0) {
-                }
             });
-
             filterPanel.add(filterButton);
-
         }
+
         loadingLabel = new JLabel();
         filterPanel.add(loadingLabel);
         filterPanel.setSmall();
         add(filterPanel, BorderLayout.LINE_END);
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        int clickedOnRow = eventTypeTree.getRowForLocation(e.getX(), e.getY());
-        eventPanelModel.rowClicked(clickedOnRow);
-        eventTypeTree.revalidate();
-        eventTypeTree.repaint();
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
     }
 
     @Override
