@@ -87,31 +87,22 @@ public class JP2View extends AbstractView {
     }
 
     private static class AbolishThread extends Thread {
+
         private JP2View view;
 
-        public void init(JP2View view) {
-            this.view = view;
+        public void init(JP2View _view) {
+            view = _view;
         }
 
         @Override
         public void run() {
             J2KRender.threadEnv.destroy();
-
-            EventQueue.invokeLater(new Runnable() {
-                private JP2View view;
-
-                @Override
-                public void run() {
-                    view._jp2Image.abolish();
-                    view._jp2Image = null;
-                }
-
-                public Runnable init(JP2View view) {
-                    this.view = view;
-                    return this;
-                }
-            }.init(view));
+            EventQueue.invokeLater(() -> {
+                view._jp2Image.abolish();
+                view._jp2Image = null;
+            });
         }
+
     }
 
     private volatile boolean isAbolished = false;
