@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.data.container.JHVEventCacheRequestHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.SWEKOperand;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -27,7 +28,7 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.threads.JHVThread;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class SWEKDownloadManager implements EventTypePanelModelListener, FilterManagerListener {
+public class SWEKDownloadManager implements EventTypePanelModelListener, FilterManagerListener, JHVEventCacheRequestHandler {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
@@ -37,18 +38,6 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
                                                                                     new ThreadPoolExecutor.DiscardPolicy());
     private static final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap = new HashMap<>();
     private static final ArrayList<JHVEventType> activeEventTypes = new ArrayList<>();
-    private static SWEKDownloadManager instance;
-
-    private SWEKDownloadManager() {
-        FilterManager.addFilterManagerListener(this);
-    }
-
-    public static SWEKDownloadManager getSingletonInstance() {
-        if (instance == null) {
-            instance = new SWEKDownloadManager();
-        }
-        return instance;
-    }
 
     private static void stopDownloadingEventType(SWEKEventType eventType, boolean keepActive) {
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
@@ -144,16 +133,6 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         return params;
     }
 
-    public static void downloadEventType(JHVEventType eventType, Interval interval) {
-        SWEKEventType swekEventType = eventType.getEventType();
-        SWEKSupplier supplier = eventType.getSupplier();
-        if (swekEventType != null && supplier != null) {
-            startDownloadEventType(eventType, interval);
-        } else {
-            Log.debug("SWEKType: " + swekEventType + " SWEKSupplier: " + supplier);
-        }
-    }
-
     private static void downloadSelectedSuppliers(SWEKEventType swekEventType) {
         for (JHVEventType jhvType : activeEventTypes) {
             if (jhvType.getEventType() == swekEventType)
@@ -166,6 +145,11 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         for (Interval interval : allIntervals) {
             startDownloadEventType(jhvType, interval);
         }
+    }
+
+    @Override
+    public void handleRequestForInterval(JHVEventType jhvType, Interval interval) {
+        startDownloadEventType(jhvType, interval);
     }
 
     private static void startDownloadEventType(JHVEventType jhvType, Interval interval) {
