@@ -9,8 +9,8 @@ public class NEWTMouseAdapter implements MouseListener {
 
     private final MouseListener l;
 
-    public NEWTMouseAdapter(MouseListener l) {
-        this.l = l;
+    public NEWTMouseAdapter(MouseListener _l) {
+        l = _l;
     }
 
     @Override

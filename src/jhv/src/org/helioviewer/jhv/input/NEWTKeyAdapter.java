@@ -9,8 +9,8 @@ public class NEWTKeyAdapter implements KeyListener {
 
     private final KeyListener l;
 
-    public NEWTKeyAdapter(KeyListener l) {
-        this.l = l;
+    public NEWTKeyAdapter(KeyListener _l) {
+        l = _l;
     }
 
     @Override
