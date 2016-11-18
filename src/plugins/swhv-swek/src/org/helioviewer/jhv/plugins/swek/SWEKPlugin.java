@@ -15,12 +15,12 @@ public class SWEKPlugin implements Plugin {
     private static final SWEKRenderable renderable = new SWEKRenderable();
     private static SWEKPluginPanel swekPanel;
 
-    public static final SWEKDownloadManager swekDM = new SWEKDownloadManager();
+    public static final SWEKDownloadManager downloadManager = new SWEKDownloadManager();
     public static final SWEKData swekData = new SWEKData();
 
     public SWEKPlugin() {
         swekPanel = new SWEKPluginPanel(SWEKConfigurationManager.loadConfiguration());
-        JHVEventCache.registerHandler(swekDM);
+        JHVEventCache.registerHandler(downloadManager);
     }
 
     @Override
