@@ -79,8 +79,7 @@ public class JavaHelioViewer {
         Log.debug("Instantiate Kakadu engine");
         try {
             JHVLoader.copyKDULibs();
-            KakaduMessageSystem engine = new KakaduMessageSystem();
-            engine.startKduMessageSystem();
+            KakaduMessageSystem.startKduMessageSystem();
         } catch (Exception e) {
             Message.err("Failed to setup Kakadu", e.getMessage(), true);
             return;

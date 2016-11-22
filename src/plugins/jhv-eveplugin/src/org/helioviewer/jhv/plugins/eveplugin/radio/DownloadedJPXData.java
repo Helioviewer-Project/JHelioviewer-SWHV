@@ -53,7 +53,6 @@ class DownloadedJPXData implements ImageDataHandler {
         view.setDataHandler(this);
 
         JP2ImageCallisto image = view.getJP2Image();
-
         ResolutionSet resolutionSet = image.getResolutionSet(0);
         jp2Width = resolutionSet.getResolutionLevel(0).width;
         jp2Height = resolutionSet.getResolutionLevel(0).height;
@@ -117,11 +116,10 @@ class DownloadedJPXData implements ImageDataHandler {
 
     void requestData() {
         if (view != null) {
-            JP2ImageCallisto image = view.getJP2Image();
             TimeAxis xAxis = DrawController.selectedAxis;
             Rectangle roi = getROI(xAxis, EVEPlugin.rd.getYAxis());
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
-                image.setRegion(roi);
+                view.getJP2Image().setRegion(roi);
                 view.render(null, null, last_resolution);
             }
         }

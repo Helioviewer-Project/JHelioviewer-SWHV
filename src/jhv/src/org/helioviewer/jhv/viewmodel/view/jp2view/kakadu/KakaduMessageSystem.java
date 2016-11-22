@@ -31,7 +31,7 @@ public class KakaduMessageSystem {
      * 
      * @throws JHV_KduException
      */
-    public void startKduMessageSystem() throws Exception {
+    public static void startKduMessageSystem() throws Exception {
         try {
             warnings = new JHV_Kdu_message(false);
             errors = new JHV_Kdu_message(true);
