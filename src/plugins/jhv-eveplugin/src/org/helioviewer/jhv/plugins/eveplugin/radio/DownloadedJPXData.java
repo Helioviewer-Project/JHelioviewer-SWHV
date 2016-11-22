@@ -13,6 +13,7 @@ import java.awt.image.Raster;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
@@ -42,9 +43,9 @@ class DownloadedJPXData implements ImageDataHandler {
     private Region region;
     private boolean downloadJPXFailed = false;
 
-    public DownloadedJPXData(long _startDate, long _endDate) {
+    public DownloadedJPXData(long _startDate) {
         startDate = _startDate;
-        endDate = _endDate;
+        endDate = startDate + TimeUtils.DAY_IN_MILLIS;
     }
 
     public void init(JP2ViewCallisto _view) {
@@ -65,15 +66,15 @@ class DownloadedJPXData implements ImageDataHandler {
 
             long start = JHVDate.parseDateTime(hvMetaData.get("DATE-OBS")).milli;
             long end = JHVDate.parseDateTime(hvMetaData.get("DATE-END")).milli;
-            if (startDate != start || endDate != end)
-                Log.warn("Something is wrong with the JPX dates " + start + " " + end + " " + startDate + " " + endDate);
-
             hvMetaData.destroyXML();
+
+            if (startDate == start && endDate == end) {
+                requestData();
+                return;
+            }
         } catch (Exception e) {
             Log.error("Some of the metadata could not be read, aborting...");
-            return;
         }
-        requestData();
     }
 
     void remove() {
