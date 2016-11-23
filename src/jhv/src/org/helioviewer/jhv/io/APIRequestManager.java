@@ -21,24 +21,20 @@ import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
 
 public class APIRequestManager {
 
-    public static View requestAndOpenRemoteFile(APIRequest req, boolean errorMessage) throws IOException {
+    public static View requestAndOpenRemoteFile(APIRequest req) throws IOException {
         try {
             APIResponse response = new APIResponse(new DownloadStream(req.jpipRequest).getInput());
             // Could we handle the answer from the server
             if (!response.hasData()) {
                 Log.error("Could not understand server answer from " + req.jpipRequest);
-                if (errorMessage) {
-                    Message.err("Invalid Server reply", "The server data could not be parsed.", false);
-                }
+                Message.err("Invalid Server reply", "The server data could not be parsed.", false);
                 return null;
             }
             // Just some error from the server
             String error = response.getString("error");
             if (error != null) {
                 Log.error("Data query returned error: " + error);
-                if (errorMessage) {
-                    Message.err("Error getting the data", Message.formatMessageString(error), false);
-                }
+                Message.err("Error getting the data", Message.formatMessageString(error), false);
                 return null;
             }
 
@@ -46,7 +42,7 @@ public class APIRequestManager {
             if (response.getURI() != null) {
                 // The server wants to load us the data
                 String message = response.getString("message");
-                if (message != null && errorMessage) {
+                if (message != null) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
                 return loadView(response.getURI(), req);
@@ -56,14 +52,10 @@ public class APIRequestManager {
                 if (message != null) {
                     Log.error("No data to load returned from " + req.jpipRequest);
                     Log.error("Server message: " + message);
-                    if (errorMessage) {
-                        Message.err("Server could not return data", Message.formatMessageString(message), false);
-                    }
+                    Message.err("Server could not return data", Message.formatMessageString(message), false);
                 } else {
                     Log.error("Did not find URI in response to " + req.jpipRequest);
-                    if (errorMessage) {
-                        Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
-                    }
+                    Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
                 }
             }
         } catch (SocketTimeoutException e) {
