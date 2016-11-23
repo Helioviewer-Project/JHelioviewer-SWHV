@@ -15,8 +15,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -42,7 +41,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 @SuppressWarnings("serial")
 public class JHVCalendarDatePicker extends JPanel implements FocusListener, ActionListener, KeyListener, JHVCalendarListener {
 
-    private final List<JHVCalendarListener> listeners = new LinkedList<>();
+    private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
     private final Calendar calendar = new GregorianCalendar();
 
     private JHVCalendar jhvCalendar = null;
@@ -108,7 +107,8 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      * @param e
      *            event
      */
-    private void informAllJHVCalendarListeners(JHVCalendarEvent e) {
+    private void informAllJHVCalendarListeners() {
+        JHVCalendarEvent e = new JHVCalendarEvent(this);
         for (JHVCalendarListener l : listeners) {
             l.actionPerformed(e);
         }
@@ -132,7 +132,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         // has textfield lost the focus
         if (arg0.getComponent() == textField) {
             setDateFromTextField();
-            informAllJHVCalendarListeners(new JHVCalendarEvent(this));
+            informAllJHVCalendarListeners();
         }
     }
 
@@ -154,7 +154,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             setDateFromTextField();
-            informAllJHVCalendarListeners(new JHVCalendarEvent(this));
+            informAllJHVCalendarListeners();
         }
     }
 
@@ -180,7 +180,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      */
     private void showCalPopup() {
         // set up the popup content
-        jhvCalendar = new JHVCalendar();
+        jhvCalendar = new JHVCalendar(true);
         jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());
         jhvCalendar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         jhvCalendar.addJHVCalendarListener(this);
@@ -253,7 +253,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
             jhvCalendar = null;
         }
         // inform all listeners of this class that a new date was choosen by the user
-        informAllJHVCalendarListeners(new JHVCalendarEvent(this));
+        informAllJHVCalendarListeners();
     }
 
     public void setTime(long time) {

@@ -14,8 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -50,7 +49,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * @author Stephan Pagel
  */
 @SuppressWarnings("serial")
-public class JHVCalendar extends JPanel implements ComponentListener {
+class JHVCalendar extends JPanel implements ComponentListener {
 
     private enum DisplayMode {
         DAYS, MONTHS, YEARS
@@ -59,15 +58,11 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private DisplayMode displayMode;
     private CalendarViewController calendarViewController = null;
-    private final List<JHVCalendarListener> listeners = new LinkedList<>();
+    private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
 
     private final NavigationPanel navigationPanel = new NavigationPanel();
     private final SelectionPanel selectionPanel = new SelectionPanel();
     private final BottomPanel bottomPanel = new BottomPanel();
-
-    public JHVCalendar() {
-        this(true);
-    }
 
     /**
      * Constructor where to choose if the current date should be displayed at
@@ -77,7 +72,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *            True if the date of the current date should be displayed at
      *            the bottom; false if not.
      */
-    private JHVCalendar(boolean showToday) {
+    JHVCalendar(boolean showToday) {
         // load day selection view
         changeDisplayMode(DisplayMode.DAYS);
         // initialize visual components
@@ -207,7 +202,8 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      * @param e
      *            event
      */
-    private void informAllJHVCalendarListeners(JHVCalendarEvent e) {
+    private void informAllJHVCalendarListeners() {
+        JHVCalendarEvent e = new JHVCalendarEvent(this);
         for (JHVCalendarListener l : listeners) {
             l.actionPerformed(e);
         }
@@ -404,13 +400,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
         private JPanel contentPane;
 
         public SelectionPanel() {
-            initVisualComponents();
-        }
-
-        /**
-         * Initialize the visual parts of the component.
-         */
-        private void initVisualComponents() {
             setLayout(new GridLayout(1, 1));
             // create table
             table = new JTable();
@@ -549,7 +538,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
                         updateDateDisplay();
                         break;
                     case DAYS:
-                        informAllJHVCalendarListeners(new JHVCalendarEvent(getParent()));
+                        informAllJHVCalendarListeners();
                         break;
                     }
                 }
