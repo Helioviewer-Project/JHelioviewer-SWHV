@@ -103,11 +103,10 @@ public class PositionLoad {
                 String dateString = iterKeys.next();
                 JSONArray posArray = posObject.getJSONArray(dateString);
 
-                double rad, lon, lat, jlon;
-                rad = posArray.getDouble(0) * (1000. / Sun.RadiusMeter);
-                jlon = posArray.getDouble(1);
-                lon = jlon + (jlon > 0 ? -Math.PI : Math.PI);
-                lat = -posArray.getDouble(2);
+                double rad = posArray.getDouble(0) * (1000. / Sun.RadiusMeter);
+                double jlon = posArray.getDouble(1);
+                double lon = jlon + (jlon > 0 ? -Math.PI : Math.PI);
+                double lat = -posArray.getDouble(2);
 
                 JHVDate time = new JHVDate(TimeUtils.utcFullDateFormat.parse(dateString).getTime());
                 Position.L p = Sun.getEarth(time);

@@ -31,7 +31,7 @@ public class ObservationDialog extends JDialog implements ActionListener {
     private final JButton btnClose = new JButton("Cancel");
     private final JButton availabilityButton = new JButton("Available data");
 
-    private final ImageDataPanel imageObservationPanel;
+    private final ImageDataPanel imageObservationPanel = new ImageDataPanel();
 
     private static ObservationDialog instance;
 
@@ -55,21 +55,18 @@ public class ObservationDialog extends JDialog implements ActionListener {
         contentPane.setBorder(BorderFactory.createEmptyBorder(3, 9, 1, 9));
         contentPane.setFocusable(true);
 
-        availabilityButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (observationPanel instanceof ImageDataPanel) {
-                    String url = Settings.getSingletonInstance().getProperty("availability.images.url");
-                    int sourceId = imageObservationPanel.getSourceId();
-                    if (sourceId != -1)
-                        url += "#IID" + sourceId;
+        availabilityButton.addActionListener(e -> {
+            if (observationPanel instanceof ImageDataPanel) {
+                String url = Settings.getSingletonInstance().getProperty("availability.images.url");
+                int sourceId = imageObservationPanel.getSourceId();
+                if (sourceId != -1)
+                    url += "#IID" + sourceId;
 
-                    JHVGlobals.openURL(url);
-                } else {
-                    String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
-                    JHVGlobals.openURL(url);
-                }
-             }
+                JHVGlobals.openURL(url);
+            } else {
+                String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
+                JHVGlobals.openURL(url);
+            }
         });
 
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT, 3, 3));
@@ -81,8 +78,6 @@ public class ObservationDialog extends JDialog implements ActionListener {
         btnClose.addActionListener(this);
 
         getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        imageObservationPanel = new ImageDataPanel();
     }
 
     // Shows up the dialog and initializes the UI with the given panel.
