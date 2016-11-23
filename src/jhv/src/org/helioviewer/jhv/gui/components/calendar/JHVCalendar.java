@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.components.calendar;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -10,8 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -75,18 +74,6 @@ class JHVCalendar extends JPanel implements ComponentListener {
     JHVCalendar(boolean showToday) {
         // load day selection view
         changeDisplayMode(DisplayMode.DAYS);
-        // initialize visual components
-        initVisualComponents(showToday);
-    }
-
-    /**
-     * Initialize the visual parts of the component.
-     *
-     * @param showToday
-     *            True if the date of the current date should be displayed at
-     *            the bottom; false if not.
-     */
-    private void initVisualComponents(boolean showToday) {
         // set basic layout
         setLayout(new BorderLayout());
         // add listener
@@ -394,7 +381,7 @@ class JHVCalendar extends JPanel implements ComponentListener {
      *
      * @author Stephan Pagel
      */
-    private class SelectionPanel extends JPanel implements MouseListener {
+    private class SelectionPanel extends JPanel {
 
         private JTable table;
         private JPanel contentPane;
@@ -413,8 +400,31 @@ class JHVCalendar extends JPanel implements ComponentListener {
             table.getTableHeader().setReorderingAllowed(false);
             table.getTableHeader().setResizingAllowed(false);
 
-            // add listener
-            table.addMouseListener(this);
+            table.addMouseListener(new MouseAdapter() {
+                // when a cell which contains valid data was clicked, the view controller and view mode will be changed.
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON1 && isValidCellSelected(e.getPoint())) {
+                        calendarViewController.setDateOfCellValue(table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()));
+
+                        switch (displayMode) {
+                        case YEARS:
+                            changeDisplayMode(DisplayMode.MONTHS);
+                            updateDateDisplay();
+                            break;
+                        case MONTHS:
+                            changeDisplayMode(DisplayMode.DAYS);
+                            updateDateDisplay();
+                            break;
+                        case DAYS:
+                            informAllJHVCalendarListeners();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+            });
 
             // place table on form
             JPanel headerPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
@@ -450,7 +460,7 @@ class JHVCalendar extends JPanel implements ComponentListener {
             if (data == null || columnNames == null)
                 return;
             // change model of table
-            table.setModel(new SelectionTableModel(data, columnNames));
+            table.setModel(new DefaultTableModel(data, columnNames));
             // set header visible or not
             table.getTableHeader().setVisible(showHeader);
             // add a cell renderer to all cells which shows cell content
@@ -516,76 +526,6 @@ class JHVCalendar extends JPanel implements ComponentListener {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         * <p>
-         * When a cell in the table was clicked which contains a valid data, the
-         * view controller and view mode will be changed.
-         */
-        @Override
-        public void mouseClicked(MouseEvent arg0) {
-            if (arg0.getButton() == MouseEvent.BUTTON1) {
-                if (isValidCellSelected(arg0.getPoint())) {
-                    calendarViewController.setDateOfCellValue(table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()));
-
-                    switch (displayMode) {
-                    case YEARS:
-                        changeDisplayMode(DisplayMode.MONTHS);
-                        updateDateDisplay();
-                        break;
-                    case MONTHS:
-                        changeDisplayMode(DisplayMode.DAYS);
-                        updateDateDisplay();
-                        break;
-                    case DAYS:
-                        informAllJHVCalendarListeners();
-                        break;
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent arg0) {
-        }
-
-        @Override
-        public void mouseExited(MouseEvent arg0) {
-        }
-
-        @Override
-        public void mousePressed(MouseEvent arg0) {
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent arg0) {
-        }
-
-    }
-
-    /**
-     * Table model for the used JTable. This model did not allow to edit cells
-     * of the table.
-     *
-     * @author Stephan Pagel
-     */
-    private static class SelectionTableModel extends DefaultTableModel {
-
-        public SelectionTableModel(Object[][] data, String[] columnNames) {
-            super(data, columnNames);
-        }
-
-        /**
-         * {@inheritDoc}
-         * <p>
-         * Returns always false, so all cells cannot be edited.
-         */
-
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-
     }
 
     /**
@@ -601,16 +541,6 @@ class JHVCalendar extends JPanel implements ComponentListener {
             setHorizontalAlignment(CENTER);
         }
 
-        /**
-         * Overrides this method so it will be set up correctly with super class
-         * but returns its own instance.
-         */
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            return this;
-        }
-
     }
 
     /**
@@ -619,27 +549,20 @@ class JHVCalendar extends JPanel implements ComponentListener {
      *
      * @author Stephan Pagel
      */
-    private class BottomPanel extends JPanel implements ActionListener {
+    private class BottomPanel extends JPanel {
 
         public BottomPanel() {
             // set basic layout
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
             // set up button
             JButton dateButton = new JButton("Today is " + dateFormat.format(new Date()));
-            dateButton.addActionListener(this);
+            // set the calendar component to the current date
+            dateButton.addActionListener(e -> {
+                changeDisplayMode(DisplayMode.DAYS);
+                setDate(new Date());
+            });
             // add label to component
             add(dateButton);
-        }
-
-        /**
-         * {@inheritDoc}
-         * <p>
-         * Sets the calendar component to the current date.
-         */
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            changeDisplayMode(DisplayMode.DAYS);
-            setDate(new Date());
         }
 
     }
