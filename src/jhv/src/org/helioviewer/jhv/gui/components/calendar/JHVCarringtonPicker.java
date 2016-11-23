@@ -11,8 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -29,7 +28,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 @SuppressWarnings("serial")
 public class JHVCarringtonPicker extends JPanel implements FocusListener, ActionListener, JHVCalendarListener {
 
-    private final List<JHVCalendarListener> listeners = new LinkedList<>();
+    private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
 
     private final JButton crPopupButton;
     private Popup crPopup = null;
@@ -69,7 +68,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
             carringtonPanel = null;
         }
         // inform all listeners of this class that a new date was choosen by the user
-        informAllJHVCalendarListeners(new JHVCalendarEvent(this));
+        informAllJHVCalendarListeners();
     }
 
     /**
@@ -97,9 +96,9 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         }
     }
 
-    public void setTime(long time) {
-        if (time > TimeUtils.MINIMAL_DATE.milli && time < TimeUtils.MAXIMAL_DATE.milli) {
-            this.time = time;
+    public void setTime(long _time) {
+        if (_time > TimeUtils.MINIMAL_DATE.milli && _time < TimeUtils.MAXIMAL_DATE.milli) {
+            time = _time;
         }
     }
 
@@ -107,7 +106,8 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         return time;
     }
 
-    private void informAllJHVCalendarListeners(JHVCalendarEvent e) {
+    private void informAllJHVCalendarListeners() {
+        JHVCalendarEvent e = new JHVCalendarEvent(this);
         for (JHVCalendarListener l : listeners) {
             l.actionPerformed(e);
         }
@@ -188,7 +188,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     private class JHVCarrington extends JPanel implements ActionListener {
 
-        private final List<JHVCalendarListener> listeners = new LinkedList<>();
+        private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
         private final JComboBox<Integer> crCombo;
 
         public JHVCarrington() {

@@ -15,8 +15,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
@@ -34,7 +32,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
-public class ObservationDialogUIPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, JHVCalendarListener, TimespanListener, ObservationDialogDateModelListener {
+public class ObservationDialogUIPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener {
 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
@@ -44,7 +42,8 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         comboBoxGroup.addActionListener(e -> updateGroupValues());
-        calendarStartDate.addJHVCalendarListener(this);
+
+        calendarStartDate.addJHVCalendarListener(e -> ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true));
         calendarStartDate.setToolTipText("UTC date for observation start");
 
         JPanel startDatePane = new JPanel(new BorderLayout());
@@ -175,15 +174,6 @@ public class ObservationDialogUIPanel extends ObservationDialogPanel implements 
 
     @Override
     public void lineDataVisibility(LineDataSelectorElement element, boolean flag) {
-    }
-
-    // JHV Calendar Listener
-
-    @Override
-    public void actionPerformed(JHVCalendarEvent e) {
-        if (e.getSource() == calendarStartDate) {
-            ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true);
-        }
     }
 
     @Override
