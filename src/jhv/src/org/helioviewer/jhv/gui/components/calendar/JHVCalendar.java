@@ -53,12 +53,12 @@ class JHVCalendar extends JPanel {
     }
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private DisplayMode displayMode;
-    private CalendarViewController calendarViewController = null;
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
-
     private final NavigationPanel navigationPanel = new NavigationPanel();
     private final SelectionPanel selectionPanel = new SelectionPanel();
+
+    private DisplayMode displayMode;
+    private CalendarViewController calendarViewController = null;
 
     /**
      * Constructor where to choose if the current date should be displayed at
@@ -160,27 +160,12 @@ class JHVCalendar extends JPanel {
         return calendarViewController.getDate();
     }
 
-    /**
-     * Adds a listener which will be informed when a date has been selected.
-     *
-     * @param l
-     *            listener which has to be informed.
-     */
     public void addJHVCalendarListener(JHVCalendarListener l) {
-        if (l != null)
-            listeners.add(l);
+        listeners.add(l);
     }
 
-    /**
-     * Removes a listener which should not be informed anymore when a date has
-     * been selected.
-     *
-     * @param l
-     *            listener which should not be informed anymore.
-     */
     public void removeJHVCalendarListener(JHVCalendarListener l) {
-        if (l != null)
-            listeners.remove(l);
+        listeners.remove(l);
     }
 
     /**

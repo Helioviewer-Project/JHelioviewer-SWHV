@@ -71,29 +71,12 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         informAllJHVCalendarListeners();
     }
 
-    /**
-     * Adds a listener which will be informed when a date has been selected.
-     *
-     * @param l
-     *            listener which has to be informed.
-     */
     public void addJHVCalendarListener(JHVCalendarListener l) {
-        if (l != null) {
-            listeners.add(l);
-        }
+        listeners.add(l);
     }
 
-    /**
-     * Removes a listener which should not be informed anymore when a date has
-     * been selected.
-     *
-     * @param l
-     *            listener which should not be informed anymore.
-     */
     public void removeJHVCalendarListener(JHVCalendarListener l) {
-        if (l != null) {
-            listeners.remove(l);
-        }
+        listeners.remove(l);
     }
 
     public void setTime(long _time) {
@@ -186,64 +169,36 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
         }
     }
 
-    private class JHVCarrington extends JPanel implements ActionListener {
+    private class JHVCarrington extends JPanel {
 
         private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
-        private final JComboBox<Integer> crCombo;
+        private final JComboBox<Integer> crCombo = new JComboBox<>(createCRList());
 
         public JHVCarrington() {
             setLayout(new BorderLayout());
 
-            crCombo = new JComboBox<>(createCRList());
             double cr = Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL;
             crCombo.setSelectedIndex((int) Math.round(cr));
-
-            crCombo.addActionListener(this);
+            crCombo.addActionListener(e -> {
+                time = Carrington.CR_start[crCombo.getSelectedIndex()];
+                informAllJHVCalendarListeners();
+            });
             add(crCombo);
         }
 
-        /**
-         * Adds a listener which will be informed when a date has been selected.
-         *
-         * @param l
-         *            listener which has to be informed.
-         */
         public void addJHVCalendarListener(JHVCalendarListener l) {
-            if (l != null) {
-                listeners.add(l);
-            }
+            listeners.add(l);
         }
 
-        /**
-         * Removes a listener which should not be informed anymore when a date
-         * has been selected.
-         *
-         * @param l
-         *            listener which should not be informed anymore.
-         */
         public void removeJHVCalendarListener(JHVCalendarListener l) {
-            if (l != null) {
-                listeners.remove(l);
-            }
+            listeners.remove(l);
         }
 
-        /**
-         * Informs all listener of this class by passing the corresponding
-         * event.
-         *
-         * @param e
-         *            event
-         */
-        private void informAllJHVCalendarListeners(JHVCalendarEvent e) {
+        private void informAllJHVCalendarListeners() {
+            JHVCalendarEvent e = new JHVCalendarEvent(this);
             for (JHVCalendarListener l : listeners) {
                 l.actionPerformed(e);
             }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            time = Carrington.CR_start[crCombo.getSelectedIndex()];
-            informAllJHVCalendarListeners(new JHVCalendarEvent(this));
         }
 
         private Integer[] createCRList() {

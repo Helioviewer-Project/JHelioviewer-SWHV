@@ -44,7 +44,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
     private final Calendar calendar = new GregorianCalendar();
 
-    private JHVCalendar jhvCalendar = null;
+    private final JHVCalendar jhvCalendar = new JHVCalendar(true);
     private final JTextField textField = new JTextField();
 
     private static final Icon icon = IconBank.getIcon(JHVIcon.DATE);
@@ -74,31 +74,19 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         // place sub components
         add(calPopupButton, BorderLayout.EAST);
         add(textField, BorderLayout.CENTER);
+
+        jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());
+        jhvCalendar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        jhvCalendar.addJHVCalendarListener(this);
+        addFocusListenerToAllChildren(jhvCalendar);
     }
 
-    /**
-     * Adds a listener which will be informed when a date has been selected.
-     *
-     * @param l
-     *            listener which has to be informed.
-     */
     public void addJHVCalendarListener(JHVCalendarListener l) {
-        if (l != null) {
-            listeners.add(l);
-        }
+        listeners.add(l);
     }
 
-    /**
-     * Removes a listener which should not be informed anymore when a date has
-     * been selected.
-     *
-     * @param l
-     *            listener which should not be informed anymore.
-     */
     public void removeJHVCalendarListener(JHVCalendarListener l) {
-        if (l != null) {
-            listeners.remove(l);
-        }
+        listeners.remove(l);
     }
 
     /**
@@ -180,12 +168,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      */
     private void showCalPopup() {
         // set up the popup content
-        jhvCalendar = new JHVCalendar(true);
-        jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());
-        jhvCalendar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        jhvCalendar.addJHVCalendarListener(this);
         jhvCalendar.setDate(calendar.getTime());
-        addFocusListenerToAllChildren(jhvCalendar);
 
         // get position for popup
         int x = textField.getLocationOnScreen().x;
@@ -250,7 +233,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
             hideCalPopup();
             // set selected date
             setTime(jhvCalendar.getDate().getTime());
-            jhvCalendar = null;
         }
         // inform all listeners of this class that a new date was choosen by the user
         informAllJHVCalendarListeners();
