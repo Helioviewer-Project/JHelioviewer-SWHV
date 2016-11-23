@@ -67,10 +67,8 @@ class DownloadedJPXData implements ImageDataHandler {
             long end = JHVDate.parseDateTime(hvMetaData.get("DATE-END")).milli;
             hvMetaData.destroyXML();
 
-            if (startDate == start && endDate == end) {
+            // if (startDate == start && endDate == end) - TBD
                 requestData();
-                return;
-            }
         } catch (Exception e) {
             Log.error("Some of the metadata could not be read, aborting...");
         }
