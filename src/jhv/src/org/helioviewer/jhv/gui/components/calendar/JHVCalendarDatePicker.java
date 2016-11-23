@@ -196,7 +196,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         calPopup = factory.getPopup(calPopupButton, jhvCalendar, x, y);
         calPopup.show();
 
-        jhvCalendar.componentResized(null);
+        jhvCalendar.resizeSelectionPanel();
 
         // correct position of popup when it does not fit into screen area
         x = x + jhvCalendar.getSize().width > Toolkit.getDefaultToolkit().getScreenSize().width ? Toolkit.getDefaultToolkit().getScreenSize().width - jhvCalendar.getSize().width : x;

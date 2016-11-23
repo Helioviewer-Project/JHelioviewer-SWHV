@@ -7,8 +7,6 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
@@ -48,7 +46,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * @author Stephan Pagel
  */
 @SuppressWarnings("serial")
-class JHVCalendar extends JPanel implements ComponentListener {
+class JHVCalendar extends JPanel {
 
     private enum DisplayMode {
         DAYS, MONTHS, YEARS
@@ -72,14 +70,11 @@ class JHVCalendar extends JPanel implements ComponentListener {
      *            the bottom; false if not.
      */
     JHVCalendar(boolean showToday) {
-        // load day selection view
-        changeDisplayMode(DisplayMode.DAYS);
         // set basic layout
         setLayout(new BorderLayout());
-        // add listener
-        addComponentListener(this);
-
         setMinimumSize(new Dimension(250, 200));
+        // load day selection view
+        changeDisplayMode(DisplayMode.DAYS);
 
         // add sub components
         add(navigationPanel, BorderLayout.NORTH);
@@ -90,6 +85,12 @@ class JHVCalendar extends JPanel implements ComponentListener {
 
         // show data in visual components
         updateDateDisplay();
+    }
+
+    void resizeSelectionPanel() {
+        selectionPanel.resizeTableSpace();
+        selectionPanel.resizeTableRowHeight();
+        selectionPanel.resizeTableColumnWidth();
     }
 
     /**
@@ -197,39 +198,6 @@ class JHVCalendar extends JPanel implements ComponentListener {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void componentHidden(ComponentEvent arg0) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void componentMoved(ComponentEvent arg0) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void componentResized(ComponentEvent arg0) {
-        if (selectionPanel != null) {
-            selectionPanel.resizeTableSpace();
-            selectionPanel.resizeTableRowHeight();
-            selectionPanel.resizeTableColumnWidth();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void componentShown(ComponentEvent arg0) {
-    }
-
-    /**
      * Panel which acts as a container for the navigation buttons on the top of
      * the calendar component.
      *
@@ -244,15 +212,6 @@ class JHVCalendar extends JPanel implements ComponentListener {
         private final JButton selectButton = new JButton();
 
         public NavigationPanel() {
-            initVisualComponents();
-            addActionListeners();
-        }
-
-        /**
-         * Initialize the visual parts of the component.
-         */
-        private void initVisualComponents() {
-            // set basic layout
             setLayout(new BorderLayout());
 
             quickForwardButton.setPreferredSize(new Dimension(24, quickForwardButton.getPreferredSize().height));
@@ -261,7 +220,6 @@ class JHVCalendar extends JPanel implements ComponentListener {
             forwardButton.setPreferredSize(new Dimension(24, forwardButton.getPreferredSize().height));
             backButton.setPreferredSize(new Dimension(24, backButton.getPreferredSize().height));
 
-            // add navigation buttons
             JPanel forwardButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
             forwardButtonPanel.add(forwardButton);
             forwardButtonPanel.add(quickForwardButton);
@@ -276,6 +234,8 @@ class JHVCalendar extends JPanel implements ComponentListener {
             add(forwardButtonPanel, BorderLayout.EAST);
             add(selectionButtonPanel, BorderLayout.CENTER);
             add(backButtonPanel, BorderLayout.WEST);
+
+            addActionListeners();
         }
 
         /**
@@ -463,10 +423,8 @@ class JHVCalendar extends JPanel implements ComponentListener {
             table.setModel(new DefaultTableModel(data, columnNames));
             // set header visible or not
             table.getTableHeader().setVisible(showHeader);
-            // add a cell renderer to all cells which shows cell content
-            // centered
+            // add a cell renderer to all cells which shows cell content centered
             TableCellRenderer cellRenderer = new CenterTableCellRenderer();
-
             for (int i = 0; i < table.getColumnCount(); i++) {
                 table.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
             }
