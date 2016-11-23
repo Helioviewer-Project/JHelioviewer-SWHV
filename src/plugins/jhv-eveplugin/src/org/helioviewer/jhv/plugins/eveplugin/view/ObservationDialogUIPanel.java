@@ -3,17 +3,25 @@ package org.helioviewer.jhv.plugins.eveplugin.view;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
+import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
+import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
+import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
@@ -26,36 +34,48 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
-public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements LineDataSelectorModelListener {
+public class ObservationDialogUIPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, JHVCalendarListener, TimespanListener, ObservationDialogDateModelListener {
 
+    private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
     private final JComboBox<BandType> comboBoxData = new JComboBox<>();
 
     public ObservationDialogUIPanel() {
-        JLabel labelGroup = new JLabel("Group", JLabel.RIGHT);
-        JLabel labelData = new JLabel("Dataset", JLabel.RIGHT);
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         comboBoxGroup.addActionListener(e -> updateGroupValues());
+        calendarStartDate.addJHVCalendarListener(this);
+        calendarStartDate.setToolTipText("UTC date for observation start");
+
+        JPanel startDatePane = new JPanel(new BorderLayout());
+        startDatePane.add(new JLabel("Start date"), BorderLayout.PAGE_START);
+        startDatePane.add(calendarStartDate, BorderLayout.CENTER);
+
+        JPanel timePane = new JPanel(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
+        timePane.add(startDatePane);
+        add(timePane);
 
         JPanel dataPane = new JPanel(new GridBagLayout());
-
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
-        dataPane.add(labelGroup, c);
+        dataPane.add(new JLabel("Group", JLabel.RIGHT), c);
         c.gridx = 1;
         c.gridy = 0;
         dataPane.add(comboBoxGroup, c);
         c.gridx = 0;
         c.gridy = 1;
-        dataPane.add(labelData, c);
+        dataPane.add(new JLabel("Dataset", JLabel.RIGHT), c);
         c.gridx = 1;
         c.gridy = 1;
         dataPane.add(comboBoxData, c);
         add(dataPane, BorderLayout.CENTER);
+
+        Layers.addTimespanListener(this);
+        ObservationDialogDateModel.addListener(this);
     }
 
     public void setupDatasets() {
@@ -97,7 +117,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     private void updateDrawController() {
-        Interval interval = defineInterval(getTime());
+        Interval interval = defineInterval(calendarStartDate.getTime());
         DrawController.setSelectedInterval(interval.start, interval.end);
     }
 
@@ -133,7 +153,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     @Override
     public boolean loadButtonPressed(Object layer) {
-        ObservationDialogDateModel.setStartTime(getTime(), true);
+        ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true);
         updateBandController();
         updateDrawController();
         return true;
@@ -155,6 +175,30 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     @Override
     public void lineDataVisibility(LineDataSelectorElement element, boolean flag) {
+    }
+
+    // JHV Calendar Listener
+
+    @Override
+    public void actionPerformed(JHVCalendarEvent e) {
+        if (e.getSource() == calendarStartDate) {
+            ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true);
+        }
+    }
+
+    @Override
+    public void timespanChanged(long start, long end) {
+        calendarStartDate.setTime(start);
+        ObservationDialogDateModel.setStartTime(start, false);
+    }
+
+    @Override
+    public void startTimeChanged(long startTime) {
+        calendarStartDate.setTime(startTime);
+    }
+
+    @Override
+    public void endTimeChanged(long endTime) {
     }
 
 }
