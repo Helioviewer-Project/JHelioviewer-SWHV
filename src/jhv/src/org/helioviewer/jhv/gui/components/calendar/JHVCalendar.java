@@ -59,7 +59,6 @@ class JHVCalendar extends JPanel {
 
     private final NavigationPanel navigationPanel = new NavigationPanel();
     private final SelectionPanel selectionPanel = new SelectionPanel();
-    private final BottomPanel bottomPanel = new BottomPanel();
 
     /**
      * Constructor where to choose if the current date should be displayed at
@@ -81,7 +80,7 @@ class JHVCalendar extends JPanel {
         add(selectionPanel, BorderLayout.CENTER);
 
         if (showToday)
-            add(bottomPanel, BorderLayout.SOUTH);
+            add(new BottomPanel(), BorderLayout.SOUTH);
 
         // show data in visual components
         updateDateDisplay();
@@ -343,8 +342,8 @@ class JHVCalendar extends JPanel {
      */
     private class SelectionPanel extends JPanel {
 
-        private JTable table;
-        private JPanel contentPane;
+        private final JTable table;
+        private final JPanel contentPane;
 
         public SelectionPanel() {
             setLayout(new GridLayout(1, 1));
