@@ -131,13 +131,12 @@ public class CameraHelper {
     }
 
     public static void zoomToFit(Camera camera) {
-        double newFOV = Camera.INITFOV;
         double size = 1;
-
         if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
             size = Layers.getLargestPhysicalHeight();
         }
 
+        double newFOV = Camera.INITFOV;
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
         camera.setCameraFOV(newFOV);

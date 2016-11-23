@@ -365,15 +365,14 @@ public class Layers {
     }
 
     public static double getLargestPhysicalSize() {
-        double newSize, size = 0;
+        double size = 0;
 
         for (View v : layers) {
             if (v.getImageLayer().isVisible()) {
                 MetaData m = v.getImageLayer().getMetaData();
                 double h = m.getPhysicalRegion().height;
                 double w = m.getPhysicalRegion().width;
-
-                newSize = Math.sqrt(h * h + w * w);
+                double newSize = Math.sqrt(h * h + w * w);
                 if (newSize > size) {
                     size = newSize;
                 }

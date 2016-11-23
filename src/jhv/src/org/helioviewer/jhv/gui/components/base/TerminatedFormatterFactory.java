@@ -32,7 +32,7 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
             public Object stringToValue(String string) {
                 Double value = 0.;
 
-                if (string != null && string.length() != 0) {
+                if (string != null && !string.isEmpty()) {
                     int t = string.indexOf(terminator);
                     if (t > 0) {
                         try {

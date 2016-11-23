@@ -31,7 +31,7 @@ public class GLText {
             Font font = UIGlobals.UIFontRoboto.deriveFont((float) (idx * STEP + MIN));
             renderer[idx] = new TextRenderer(font, true, true, null, true);
             renderer[idx].setUseVertexArrays(true);
-            // textRenderer.setSmoothing(false);
+            // renderer[idx].setSmoothing(false);
             renderer[idx].setColor(Color.WHITE);
         }
         return renderer[idx];

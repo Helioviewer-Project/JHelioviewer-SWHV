@@ -109,7 +109,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
                 splitPane.setBottomComponent(collapsiblePane);
                 splitPane.setDividerSize(DIVIDER_SIZE);
-            } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {
+            } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().isEmpty()) && !pluginList.isEmpty()) {
                 JTabbedPane tabbedPane = new JTabbedPane();
 
                 for (MainContentPanelPlugin plugin : pluginList) {
