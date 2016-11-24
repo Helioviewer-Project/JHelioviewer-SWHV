@@ -49,13 +49,6 @@ public class TimelineDialog extends JDialog {
         contentPane.add(observationPanel);
         contentPane.add(buttonPane);
 
-        pack();
-        Dimension dim = getPreferredSize();
-        if (dim != null) { // satisfy coverity
-            setMinimumSize(dim);
-            pack();
-        }
-
         getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
@@ -64,12 +57,19 @@ public class TimelineDialog extends JDialog {
     }
 
     public void showDialog() {
+        pack();
+        Dimension dim = getPreferredSize();
+        if (dim != null) { // satisfy coverity
+            setMinimumSize(dim);
+            pack();
+        }
+
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         getRootPane().setDefaultButton(btnImages);
         setVisible(true);
     }
 
-    public void loadButtonPressed() {
+    private void loadButtonPressed() {
         if (observationPanel.loadButtonPressed(null))
             dispose();
     }

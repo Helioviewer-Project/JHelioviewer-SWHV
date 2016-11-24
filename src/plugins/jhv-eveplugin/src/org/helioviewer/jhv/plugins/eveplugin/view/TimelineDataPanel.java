@@ -159,10 +159,6 @@ public class TimelineDataPanel extends ObservationDialogPanel implements LineDat
     }
 
     @Override
-    public void setupLayer(Object layer) {
-    }
-
-    @Override
     public void lineDataAdded(LineDataSelectorElement element) {
         updateGroupValues();
     }
