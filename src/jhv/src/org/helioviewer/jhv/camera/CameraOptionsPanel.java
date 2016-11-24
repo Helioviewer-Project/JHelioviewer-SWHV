@@ -201,7 +201,7 @@ public class CameraOptionsPanel extends SmallPanel implements PositionLoadFire {
     }
 
     @Override
-    public void firePositionLoaded(String state) {
+    public void fireLoaded(String state) {
         expertOptionPanel.fireLoaded(state);
         Displayer.getCamera().refresh();
     }

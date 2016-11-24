@@ -7,7 +7,7 @@ import kdu_jni.Kdu_message;
  * This class allows to print Kakadu error messages, throwing Java exceptions if
  * it is necessary.
  */
-public class JHV_Kdu_message extends Kdu_message {
+class JHV_Kdu_message extends Kdu_message {
 
     private final boolean raiseException;
 

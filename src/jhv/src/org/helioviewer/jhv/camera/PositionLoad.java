@@ -50,10 +50,10 @@ public class PositionLoad {
         private final long end;
         private final String observer;
 
-        public LoadPositionWorker(long start, long end, String observer) {
-            this.start = start;
-            this.end = end;
-            this.observer = observer;
+        public LoadPositionWorker(long _start, long _end, String _observer) {
+            start = _start;
+            end = _end;
+            observer = _observer;
         }
 
         @Override
@@ -137,7 +137,7 @@ public class PositionLoad {
                     }
                 }
                 if (report != null) {
-                    fireLoaded(report);
+                    receiver.fireLoaded(report);
                     report = null;
                 }
             }
@@ -148,7 +148,7 @@ public class PositionLoad {
         if (worker != null) {
             worker.cancel(false);
         }
-        fireLoaded("Loading...");
+        receiver.fireLoaded("Loading...");
 
         worker = new LoadPositionWorker(beginTime, endTime, observer);
         worker.setThreadName("MAIN--PositionLoad");
@@ -158,7 +158,7 @@ public class PositionLoad {
     private void setLoaded(boolean _isLoaded) {
         isLoaded = _isLoaded;
         if (isLoaded) {
-            fireLoaded(LOADEDSTATE);
+            receiver.fireLoaded(LOADEDSTATE);
         }
     }
 
@@ -172,22 +172,18 @@ public class PositionLoad {
         requestData();
     }
 
-    public void setBeginTime(long beginTime, boolean applyChanges) {
-        this.beginTime = beginTime;
+    public void setBeginTime(long _beginTime, boolean applyChanges) {
+        beginTime = _beginTime;
         if (applyChanges) {
             applyChanges();
         }
     }
 
-    public void setEndTime(long endTime, boolean applyChanges) {
-        this.endTime = endTime;
+    public void setEndTime(long _endTime, boolean applyChanges) {
+        endTime = _endTime;
         if (applyChanges) {
             applyChanges();
         }
-    }
-
-    public void fireLoaded(String state) {
-        receiver.firePositionLoaded(state);
     }
 
     public long getStartTime() {
