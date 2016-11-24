@@ -32,13 +32,13 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
-public class ObservationDialogUIPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener {
+public class TimelineDataPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener {
 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
     private final JComboBox<BandType> comboBoxData = new JComboBox<>();
 
-    public ObservationDialogUIPanel() {
+    public TimelineDataPanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         comboBoxGroup.addActionListener(e -> updateGroupValues());

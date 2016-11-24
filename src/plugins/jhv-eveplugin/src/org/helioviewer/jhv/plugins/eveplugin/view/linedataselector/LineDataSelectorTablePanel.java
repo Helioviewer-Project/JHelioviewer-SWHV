@@ -24,7 +24,6 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
@@ -101,7 +100,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         jsp.getViewport().setBackground(Color.WHITE);
 
         JButton addLayerButton = new JButton("New Layer", IconBank.getIcon(JHVIcon.ADD));
-        addLayerButton.addActionListener(e -> ObservationDialog.getInstance().showDialog(true, null, EVEPlugin.op));
+        addLayerButton.addActionListener(e -> EVEPlugin.td.showDialog());
         addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         addLayerButton.setHorizontalTextPosition(SwingConstants.TRAILING);
         addLayerButton.setBorderPainted(false);
