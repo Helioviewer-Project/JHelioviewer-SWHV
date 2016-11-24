@@ -48,12 +48,12 @@ public class PositionLoad {
         private String report = null;
         private final long start;
         private final long end;
-        private final String observer;
+        private final String obs;
 
-        public LoadPositionWorker(long _start, long _end, String _observer) {
+        public LoadPositionWorker(long _start, long _end, String _obs) {
             start = _start;
             end = _end;
-            observer = _observer;
+            obs = _obs;
         }
 
         @Override
@@ -67,7 +67,7 @@ public class PositionLoad {
 
                 URL url = new URL(baseURL + "abcorr=LT%2BS&utc=" + TimeUtils.utcFullDateFormat.format(start) + 
                                             "&utc_end=" + TimeUtils.utcFullDateFormat.format(end) + "&deltat=" + deltat +
-                                            "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
+                                            "&observer=" + obs + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
                 DownloadStream ds = new DownloadStream(url, true);
 
                 JSONObject result = JSONUtils.getJSONStream(ds.getInput());
@@ -144,17 +144,6 @@ public class PositionLoad {
         }
     }
 
-    private void requestData() {
-        if (worker != null) {
-            worker.cancel(false);
-        }
-        receiver.fireLoaded("Loading...");
-
-        worker = new LoadPositionWorker(beginTime, endTime, observer);
-        worker.setThreadName("MAIN--PositionLoad");
-        JHVGlobals.getExecutorService().execute(worker);
-    }
-
     private void setLoaded(boolean _isLoaded) {
         isLoaded = _isLoaded;
         if (isLoaded) {
@@ -169,7 +158,15 @@ public class PositionLoad {
     private void applyChanges() {
         setLoaded(false);
         position = null;
-        requestData();
+
+        if (worker != null) {
+            worker.cancel(false);
+        }
+        receiver.fireLoaded("Loading...");
+
+        worker = new LoadPositionWorker(beginTime, endTime, observer);
+        worker.setThreadName("MAIN--PositionLoad");
+        JHVGlobals.getExecutorService().execute(worker);
     }
 
     public void setBeginTime(long _beginTime, boolean applyChanges) {
