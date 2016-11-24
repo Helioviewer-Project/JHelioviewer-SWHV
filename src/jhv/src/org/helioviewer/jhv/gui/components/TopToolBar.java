@@ -362,7 +362,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     /**
      * Shows the popup if the correct mouse button was pressed.
      *
-     * @param e
+     * @param me
      *            MouseEvent that triggered the event
      */
     private void maybeShowPopup(MouseEvent me) {

@@ -37,8 +37,8 @@ public class NewLayerAction extends AbstractAction {
             JHVDate start = view.getFirstTime();
             JHVDate end = view.getLastTime();
 
-            long obsStartDate = ObservationDialog.getInstance().getObservationImagePane().getStartTime();
-            long obsEndDate = ObservationDialog.getInstance().getObservationImagePane().getEndTime();
+            long obsStartDate = ObservationDialog.getInstance().getObservationPanel().getStartTime();
+            long obsEndDate = ObservationDialog.getInstance().getObservationPanel().getEndTime();
             // only updates if it's really necessary with a tolerance of an hour
             int tolerance = 60 * 60 * 1000;
             if (Math.abs(start.milli - obsStartDate) > tolerance || Math.abs(end.milli - obsEndDate) > tolerance) {
@@ -50,7 +50,7 @@ public class NewLayerAction extends AbstractAction {
                 }
             }
         }
-        ObservationDialog.getInstance().showDialog(true, ImageLayer.createImageLayer(), ObservationDialog.getInstance().getObservationImagePane());
+        ObservationDialog.getInstance().showDialog(true, ImageLayer.createImageLayer());
     }
 
 }

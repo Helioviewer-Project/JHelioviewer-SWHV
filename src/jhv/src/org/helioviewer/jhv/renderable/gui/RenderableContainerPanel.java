@@ -231,7 +231,7 @@ public class RenderableContainerPanel extends JPanel {
                 Renderable renderable = (Renderable) grid.getValueAt(row, col);
 
                 if ((col == TITLE_COL || col == TIME_COL) && renderable instanceof ImageLayer && e.getClickCount() == 2) {
-                    ObservationDialog.getInstance().showDialog(false, renderable, ObservationDialog.getInstance().getObservationImagePane());
+                    ObservationDialog.getInstance().showDialog(false, renderable);
                     return;
                 }
 

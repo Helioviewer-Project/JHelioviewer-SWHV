@@ -25,7 +25,6 @@ public class TimelineDialog extends JDialog {
     public TimelineDialog() {
         super(ImageViewerGui.getMainFrame(), true);
 
-        // set dialog settings
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
         contentPane.setBorder(BorderFactory.createEmptyBorder(3, 9, 1, 9));

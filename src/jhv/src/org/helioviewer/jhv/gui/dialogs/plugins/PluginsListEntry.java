@@ -25,7 +25,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
 /**
- * Visual {@link List} entry for each plug-in. Provides functions to
+ * Visual list entry for each plug-in. Provides functions to
  * enable/disable a plug-in and to display additional information about the
  * plug-in.
  * 

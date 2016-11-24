@@ -42,7 +42,7 @@ public class SDOCutOutAction extends AbstractAction {
         url.append("&stopTime=").append(endTime);
 
         url.append("&wavelengths=").append(Layers.getSDOCutoutString());
-        url.append("&cadence=").append(ObservationDialog.getInstance().getObservationImagePane().getCadence()).append("&cadenceUnits=s");
+        url.append("&cadence=").append(ObservationDialog.getInstance().getObservationPanel().getCadence()).append("&cadenceUnits=s");
 
         View v = Layers.getActiveView();
         if (v != null) {

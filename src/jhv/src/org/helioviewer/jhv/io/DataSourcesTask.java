@@ -57,7 +57,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ObservationDialog.getInstance().getObservationImagePane().setupSources(parser);
+        ObservationDialog.getInstance().getObservationPanel().setupSources(parser);
     }
 
 }
