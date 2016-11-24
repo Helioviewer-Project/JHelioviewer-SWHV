@@ -28,7 +28,7 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
     }
 
     public DrawControllerOptionsPanel() {
-        setLayout(new BorderLayout(0, 0));
+        setLayout(new BorderLayout());
 
         ZoomComboboxItem[] items = {
             new ZoomComboboxItem(ZOOM.CUSTOM, 0),

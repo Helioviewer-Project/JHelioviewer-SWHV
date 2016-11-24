@@ -14,7 +14,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.events.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
-import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
+import org.helioviewer.jhv.plugins.eveplugin.view.TimelineDialog;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
@@ -33,7 +33,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private static final DrawController dc = new DrawController();
     public static final RadioData rd = new RadioData();
     public static final EventModel em = new EventModel();
-    public static final ObservationDialogUIPanel op = new ObservationDialogUIPanel();
+    public static final TimelineDialog td = new TimelineDialog();
 
     private static final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
 
@@ -52,7 +52,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         JHVRelatedEvents.addHighlightListener(dc);
 
         LineDataSelectorModel.addLineDataSelectorModelListener(dc);
-        LineDataSelectorModel.addLineDataSelectorModelListener(op);
+        LineDataSelectorModel.addLineDataSelectorModelListener(td.getObservationPanel());
         LineDataSelectorModel.addLineData(rd);
         LineDataSelectorModel.addLineData(em);
 
@@ -68,7 +68,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
             @Override
             protected void done() {
-                op.setupDatasets();
+                td.getObservationPanel().setupDatasets();
             }
 
         };
