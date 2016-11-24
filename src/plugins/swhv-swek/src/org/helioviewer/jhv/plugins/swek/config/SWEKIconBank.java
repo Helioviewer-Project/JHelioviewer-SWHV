@@ -6,7 +6,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 
-public class SWEKIconBank {
+class SWEKIconBank {
 
     private static final HashMap<String, ImageIcon> iconBank = new HashMap<>();
 
