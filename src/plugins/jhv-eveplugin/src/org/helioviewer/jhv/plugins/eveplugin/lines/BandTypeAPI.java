@@ -13,13 +13,12 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BandTypeAPI {
-
-    private static final String baseURL = "http://swhv.oma.be/datasets/index.php";
 
     private static final HashMap<String, BandGroup> groups = new HashMap<>();
     private static final ArrayList<BandGroup> orderedGroups = new ArrayList<>();
@@ -42,9 +41,10 @@ public class BandTypeAPI {
     private static String readJSON() {
         URL url = null;
         try {
-            url = new URL(baseURL);
+            url = new URL(EVESettings.baseURL);
         } catch (MalformedURLException e) {
             Log.error("Malformed URL", e);
+            return null;
         }
 
         File dstFile = new File(JHVDirectory.PLUGINS.getPath() + "/EVEPlugin/datasets.json");

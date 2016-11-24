@@ -13,8 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
 
 @SuppressWarnings("serial")
 public class TimelineDialog extends JDialog {
@@ -32,10 +32,7 @@ public class TimelineDialog extends JDialog {
         setContentPane(contentPane);
 
         JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> {
-            String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
-            JHVGlobals.openURL(url);
-        });
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(EVESettings.availabilityURL));
 
         btnImages.addActionListener(e -> loadButtonPressed());
         JButton btnClose = new JButton("Cancel");
