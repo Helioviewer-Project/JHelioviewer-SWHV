@@ -2,8 +2,6 @@ package org.helioviewer.jhv.gui.dialogs.plugins;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
@@ -22,19 +20,15 @@ import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
-/**
- * Dialog that is used to display information about a plug-in.
- *
- * @author Stephan Pagel
- */
+// Dialog that is used to display information about a plug-in.
 @SuppressWarnings("serial")
-class PluginAboutDialog extends JDialog implements ActionListener, HyperlinkListener {
+class PluginAboutDialog extends JDialog implements HyperlinkListener {
 
     private final Plugin plugin;
 
-    private PluginAboutDialog(Plugin plugin) {
+    private PluginAboutDialog(Plugin _plugin) {
         super(ImageViewerGui.getMainFrame(), "About...", true);
-        this.plugin = plugin;
+        plugin = _plugin;
 
         // dialog
         JPanel contentPane = new JPanel(new BorderLayout());
@@ -57,17 +51,12 @@ class PluginAboutDialog extends JDialog implements ActionListener, HyperlinkList
 
         // footer
         JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(this);
+        closeButton.addActionListener(e -> dispose());
         bottomPane.add(closeButton);
 
-        getRootPane().registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
         getRootPane().setFocusable(true);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        dispose();
     }
 
     /**

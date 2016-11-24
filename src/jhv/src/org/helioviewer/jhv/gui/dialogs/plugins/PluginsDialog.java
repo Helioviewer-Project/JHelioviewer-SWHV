@@ -6,11 +6,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -31,7 +29,6 @@ import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
-import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
@@ -43,7 +40,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  * @author Stephan Pagel
  * */
 @SuppressWarnings("serial")
-public class PluginsDialog extends JDialog implements ShowableDialog, ActionListener, WindowListener, PluginsListEntryChangeListener {
+public class PluginsDialog extends JDialog implements ShowableDialog, PluginsListEntryChangeListener {
 
     private boolean changesMade = false;
 
@@ -51,8 +48,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     private static final Dimension DIALOG_SIZE_PREFERRED = new Dimension(400, 500);
 
     private final JComboBox<String> filterComboBox = new JComboBox<>(new String[]{"All", "Enabled", "Disabled"});
-    private final JButton addButton = new JButton("Add plug-in", IconBank.getIcon(JHVIcon.ADD));
-    private final JButton downloadButton = new JButton("Download");
 
     private final JLabel emptyLabel = new JLabel("No plug-ins available", JLabel.CENTER);
     private final PluginsList pluginList = new PluginsList();
@@ -70,19 +65,23 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
         JPanel contentPane = new JPanel();
         setContentPane(contentPane);
-        addWindowListener(this);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeDialog();
+            }
+        });
 
         // header
         JLabel headerLabel = new JLabel("You can enable or disable JHelioviewer plug-ins.");
         headerLabel.setBorder(BorderFactory.createEmptyBorder(3, 3, 6, 3));
 
         // center - installed plug-ins
-        JPanel installedFilterPane = new JPanel();
-        installedFilterPane.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel installedFilterPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
         installedFilterPane.add(new JLabel("Filter"));
         installedFilterPane.add(filterComboBox);
 
-        filterComboBox.addActionListener(this);
+        filterComboBox.addActionListener(e -> updatePluginList());
 
         pluginList.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         JScrollPane emptyScrollPane = new JScrollPane(emptyLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -99,34 +98,32 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
         pluginList.addListEntryChangeListener(this);
 
-        JPanel installedButtonPane = new JPanel();
-        installedButtonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        JPanel installedButtonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        // JButton addButton = new JButton("Add plug-in", IconBank.getIcon(JHVIcon.ADD));
+        // addButton.setToolTipText("Add a new plug-in to JHelioviewer");
+        // addButton.addActionListener(e -> importPlugin());
+        // JButton downloadButton = new JButton("Download");
+        // downloadButton.addActionListener(e -> downloadPlugins());
         // installedButtonPane.add(addButton);
         // installedButtonPane(downloadButton); //TODO SP: add
 
-        addButton.setToolTipText("Add a new plug-in to JHelioviewer");
-        addButton.addActionListener(this);
-        downloadButton.addActionListener(this);
-
-        JPanel installedPane = new JPanel();
-        installedPane.setLayout(new BorderLayout());
+        JPanel installedPane = new JPanel(new BorderLayout());
         installedPane.setBorder(BorderFactory.createTitledBorder(" Installed Plug-ins "));
         installedPane.add(installedFilterPane, BorderLayout.PAGE_START);
         installedPane.add(listContainerPane, BorderLayout.CENTER);
         installedPane.add(installedButtonPane, BorderLayout.PAGE_END);
 
         // center
-        JPanel centerPane = new JPanel();
-        centerPane.setLayout(new BorderLayout());
+        JPanel centerPane = new JPanel(new BorderLayout());
         centerPane.add(installedPane, BorderLayout.CENTER);
 
         // footer
-        JPanel footer = new JPanel();
-        footer.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         footer.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
         footer.add(closeButton);
 
-        closeButton.addActionListener(this);
+        closeButton.addActionListener(e -> closeDialog());
 
         // content pane
         contentPane.setLayout(new BorderLayout());
@@ -265,79 +262,8 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-
         getRootPane().setDefaultButton(closeButton);
         setVisible(true);
-    }
-
-    // Action Listener
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource().equals(closeButton)) {
-            closeDialog();
-        } else if (e.getSource().equals(addButton)) {
-            importPlugin();
-        } else if (e.getSource().equals(downloadButton)) {
-            downloadPlugins();
-        } else if (e.getSource().equals(filterComboBox)) {
-            updatePluginList();
-        }
-    }
-
-    // Window Listener
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void windowActivated(WindowEvent e) {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void windowClosed(WindowEvent e) {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void windowClosing(WindowEvent e) {
-        closeDialog();
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void windowDeactivated(WindowEvent e) {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void windowDeiconified(WindowEvent e) {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void windowIconified(WindowEvent e) {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void windowOpened(WindowEvent e) {
     }
 
     // List Entry Change Listener

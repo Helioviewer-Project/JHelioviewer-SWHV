@@ -3,8 +3,6 @@ package org.helioviewer.jhv.gui.dialogs.observation;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -136,7 +134,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
     }
 
     // Time Selection Panel
-
     private static class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
 
         private final TimeTextField textStartTime;
@@ -275,8 +272,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
     }
 
     // Cadence Panel
-
-    private static class CadencePanel extends JPanel implements ActionListener {
+    private static class CadencePanel extends JPanel {
 
         private static final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
 
@@ -290,7 +286,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             spinnerCadence.setModel(new SpinnerNumberModel(30, 1, 1000000, 1));
 
             comboUnit.setSelectedItem("min");
-            comboUnit.addActionListener(this);
+            comboUnit.addActionListener(e -> spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4));
 
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -300,13 +296,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
             JLabel labelTimeStep = new JLabel("Time step", JLabel.RIGHT);
             add(labelTimeStep);
             add(panel);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == comboUnit) {
-                spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4);
-            }
         }
 
         // Returns the number of seconds of the selected cadence

@@ -3,8 +3,6 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
@@ -22,7 +20,7 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
  * the main image area plug-ins are able to display their GUI components.
  * */
 @SuppressWarnings("serial")
-public class MainContentPanel extends JPanel implements ActionListener {
+public class MainContentPanel extends JPanel {
 
     private static final int DIVIDER_SIZE = 3;
 
@@ -35,7 +33,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
     public MainContentPanel(Component mainComponent) {
         pluginContainer = new JPanel(new BorderLayout());
         collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
-        collapsiblePane.toggleButton.addActionListener(this);
+        collapsiblePane.toggleButton.addActionListener(e -> updateLayout());
 
         // nest in a container to avoid crash of GL drawables inside JSplitPane
         JPanel container = new JPanel(new BorderLayout());
@@ -129,11 +127,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
         }
         revalidate();
         repaint();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        updateLayout();
     }
 
 }

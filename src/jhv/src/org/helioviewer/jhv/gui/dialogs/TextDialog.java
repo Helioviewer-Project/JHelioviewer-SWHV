@@ -2,8 +2,6 @@ package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,7 +20,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 @SuppressWarnings("serial")
-public class TextDialog extends JDialog implements ActionListener, ShowableDialog {
+public class TextDialog extends JDialog implements ShowableDialog {
 
     public TextDialog(String title, URL textFile) {
         super(ImageViewerGui.getMainFrame(), title, true);
@@ -54,17 +52,12 @@ public class TextDialog extends JDialog implements ActionListener, ShowableDialo
         add(scrollPane, BorderLayout.NORTH);
 
         JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(this);
+        closeButton.addActionListener(e -> dispose());
         add(closeButton, BorderLayout.EAST);
 
-        getRootPane().registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
         getRootPane().setFocusable(true);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        dispose();
     }
 
     @Override
