@@ -99,9 +99,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
         layer.load(new APIRequest(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence()));
     }
 
-    // Methods derived from Observation Dialog Panel
-
-    @Override
     public void setupLayer(Object layer) {
         if (layer instanceof ImageLayer) {
             APIRequest req = ((ImageLayer) layer).getAPIRequest();
