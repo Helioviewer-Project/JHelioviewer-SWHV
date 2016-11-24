@@ -26,25 +26,12 @@ import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 @SuppressWarnings("serial")
 class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionListener {
 
-    private final JTable table;
-
     public ParameterTablePanel(JHVEventParameter[] parameters) {
         setLayout(new BorderLayout());
 
         ParameterTableModel parameterModel = new ParameterTableModel(parameters);
-        table = new JTable(parameterModel) {
-            @Override
-            public void columnMarginChanged(ChangeEvent e) {
-                updateRowHeights();
-            }
-
-            // don't delete
-            // @Override
-            // public void tableChanged(TableModelEvent e) {
-            //     updateRowHeights();
-            // }
-        };
-
+        JTable table = new WrappedTable();
+        table.setModel(parameterModel);
         table.setAutoCreateRowSorter(true);
         table.getColumnModel().getColumn(0).setResizable(false);
         table.getColumnModel().getColumn(0).setMaxWidth(180);
@@ -64,6 +51,35 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
 
+    private static class WrappedTable extends JTable {
+
+            @Override
+            public void columnMarginChanged(ChangeEvent e) {
+                updateRowHeights();
+            }
+
+            // don't delete
+            // @Override
+            // public void tableChanged(TableModelEvent e) {
+            //     updateRowHeights();
+            // }
+
+            private void updateRowHeights()  {
+                int rowMargin = getRowMargin();
+                int rowHeight = getRowHeight();
+                int rows = getRowCount();
+                for (int i = 0; i < rows; i++) {
+                    Component comp = prepareRenderer(getCellRenderer(i, 1), i, 1);
+
+                    int height;
+                    Dimension dim = comp.getPreferredSize();
+                    if (dim != null /* satisfy coverity */ && (height = dim.height + rowMargin) > rowHeight)
+                        setRowHeight(i, height);
+                }
+            }
+
+    }
+
     private static class WrappedTextRenderer extends DefaultTableCellRenderer {
 
         @Override
@@ -73,20 +89,6 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
             return label;
         }
 
-    }
-
-    private void updateRowHeights()  {
-        int rowMargin = table.getRowMargin();
-        int rowHeight = table.getRowHeight();
-        int rows = table.getRowCount();
-        for (int i = 0; i < rows; i++) {
-            Component comp = table.prepareRenderer(table.getCellRenderer(i, 1), i, 1);
-
-            int height;
-            Dimension dim = comp.getPreferredSize();
-            if (dim != null /* satisfy coverity */ && (height = dim.height + rowMargin) > rowHeight)
-                table.setRowHeight(i, height);
-        }
     }
 
     private static String extractURL(JTable table, int col, int row) {

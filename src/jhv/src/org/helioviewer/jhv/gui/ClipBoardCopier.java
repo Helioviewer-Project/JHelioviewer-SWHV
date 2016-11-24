@@ -12,10 +12,10 @@ import java.io.IOException;
 // Simple helper for accessing the user's clipboard.
 public class ClipBoardCopier implements ClipboardOwner {
 
-    private static final ClipBoardCopier clipboard = new ClipBoardCopier();
+    private static final ClipBoardCopier instance = new ClipBoardCopier();
 
     public static ClipBoardCopier getSingletonInstance() {
-        return clipboard;
+        return instance;
     }
 
     private ClipBoardCopier() {
@@ -33,8 +33,7 @@ public class ClipBoardCopier implements ClipboardOwner {
      */
     public void setString(String data) {
         StringSelection stringSelection = new StringSelection(data);
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(stringSelection, this);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, this);
     }
 
     /**
@@ -43,9 +42,8 @@ public class ClipBoardCopier implements ClipboardOwner {
      * @return clipboard content
      */
     public static String getString() {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        Transferable contents = clipboard.getContents(null);
-        boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+        Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        boolean hasTransferableText = contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
         if (hasTransferableText) {
             try {
                 return (String) contents.getTransferData(DataFlavor.stringFlavor);
