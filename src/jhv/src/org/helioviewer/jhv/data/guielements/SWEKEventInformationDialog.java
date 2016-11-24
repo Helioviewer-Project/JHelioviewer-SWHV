@@ -143,8 +143,8 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     private DataCollapsiblePanel createRelatedEventsCollapsiblePane(String relation, JHVRelatedEvents rEvents, ArrayList<JHVEvent> relations) {
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
-        for (JHVEvent event : relations) {
-            allPrecedingEvents.add(createEventPanel(rEvents, event));
+        for (JHVEvent ev : relations) {
+            allPrecedingEvents.add(createEventPanel(rEvents, ev));
         }
         return new DataCollapsiblePanel(relation, new JScrollPane(allPrecedingEvents), false, model);
     }
@@ -152,10 +152,10 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     private DataCollapsiblePanel createOtherRelatedEventsCollapsiblePane(String relation, ArrayList<JHVRelatedEvents> rEvents) {
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
-        for (JHVRelatedEvents rEvent : rEvents) {
-            ArrayList<JHVEvent> evs = rEvent.getEvents();
+        for (JHVRelatedEvents rev : rEvents) {
+            ArrayList<JHVEvent> evs = rev.getEvents();
             if (!evs.isEmpty()) {
-                allPrecedingEvents.add(createEventPanel(rEvent, evs.get(0)));
+                allPrecedingEvents.add(createEventPanel(rev, evs.get(0)));
             }
         }
         return new DataCollapsiblePanel(relation, new JScrollPane(allPrecedingEvents), false, model);
