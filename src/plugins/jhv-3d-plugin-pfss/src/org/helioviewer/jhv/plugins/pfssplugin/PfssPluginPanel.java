@@ -11,7 +11,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
@@ -31,7 +30,6 @@ class PfssPluginPanel extends SmallPanel {
         WheelSupport.installMouseWheelSupport(levelSpinner);
 
         GridBagConstraints c0 = new GridBagConstraints();
-
         c0.weightx = 1.;
         c0.weighty = 1.;
         c0.gridy = 0;
@@ -55,11 +53,8 @@ class PfssPluginPanel extends SmallPanel {
         add(fixedColors, c0);
 
         JButton availabilityButton = new JButton("Available data");
-        availabilityButton.setToolTipText("Click here to check the availability of PFSS data");
-        availabilityButton.addActionListener(e -> {
-            String url = Settings.getSingletonInstance().getProperty("availability.pfss.url");
-            JHVGlobals.openURL(url);
-        });
+        availabilityButton.setToolTipText("Click here to check the PFSS data availability");
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(PfssSettings.availabilityURL));
 
         c0.anchor = GridBagConstraints.EAST;
         c0.gridx = 3;
