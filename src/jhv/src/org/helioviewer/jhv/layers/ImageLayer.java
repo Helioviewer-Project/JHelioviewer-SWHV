@@ -35,7 +35,7 @@ import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class ImageLayer extends AbstractRenderable implements ImageDataHandler, Layer {
+public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private int positionBufferID;
     private int indexBufferID;
@@ -63,7 +63,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler, 
         }
     }
 
-    @Override
     public void unload() {
         if (view == null) // not changing view
             ImageViewerGui.getRenderableContainer().removeRenderable(this);
