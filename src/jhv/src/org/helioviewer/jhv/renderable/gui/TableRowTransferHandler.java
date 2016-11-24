@@ -30,10 +30,10 @@ class TableRowTransferHandler extends TransferHandler {
     }
 
     private void createImageOfRow(int rowIndex) {
-        int x = grid.getX();
-        int y = grid.getRowHeight() * rowIndex;
         int w = grid.getWidth();
         int h = grid.getRowHeight();
+        int x = grid.getX();
+        int y = h * rowIndex;
         image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2 = image.createGraphics();

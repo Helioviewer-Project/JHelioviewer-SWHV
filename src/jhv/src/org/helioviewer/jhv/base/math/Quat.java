@@ -79,11 +79,11 @@ public class Quat {
         double y2 = q.u.y;
         double z2 = q.u.z;
 
-        double a = a1 * a2 - x1 * x2 - y1 * y2 - z1 * z2;
+        double an = a1 * a2 - x1 * x2 - y1 * y2 - z1 * z2;
         double x = a1 * x2 + x1 * a2 + y1 * z2 - z1 * y2;
         double y = a1 * y2 - x1 * z2 + y1 * a2 + z1 * x2;
         double z = a1 * z2 + x1 * y2 - y1 * x2 + z1 * a2;
-        return new Quat(a, x, y, z);
+        return new Quat(an, x, y, z);
     }
 
     public Mat4 toMatrix() {

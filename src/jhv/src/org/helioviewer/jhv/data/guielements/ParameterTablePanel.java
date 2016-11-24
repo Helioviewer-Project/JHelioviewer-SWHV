@@ -65,8 +65,6 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
             // }
 
             private void updateRowHeights()  {
-                int rowMargin = getRowMargin();
-                int rowHeight = getRowHeight();
                 int rows = getRowCount();
                 for (int i = 0; i < rows; i++) {
                     Component comp = prepareRenderer(getCellRenderer(i, 1), i, 1);

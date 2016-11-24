@@ -133,14 +133,14 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     private void updateWarnLevels(Rectangle graphArea) {
-        LinkedList<Integer> warnLevels = new LinkedList<>();
-        LinkedList<String> warnLabels = new LinkedList<>();
+        LinkedList<Integer> _warnLevels = new LinkedList<>();
+        LinkedList<String> _warnLabels = new LinkedList<>();
         HashMap<String, Double> unconvertedWarnLevels = bandType.getWarnLevels();
         for (Map.Entry<String, Double> pairs : unconvertedWarnLevels.entrySet()) {
-            warnLevels.add(yAxis.value2pixel(graphArea.y, graphArea.height, pairs.getValue()));
-            warnLabels.add(pairs.getKey());
+            _warnLevels.add(yAxis.value2pixel(graphArea.y, graphArea.height, pairs.getValue()));
+            _warnLabels.add(pairs.getKey());
         }
-        setWarn(warnLevels, warnLabels);
+        setWarn(_warnLevels, _warnLabels);
     }
 
     private void updateGraphsData() {

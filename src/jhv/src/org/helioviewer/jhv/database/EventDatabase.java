@@ -697,10 +697,10 @@ public class EventDatabase {
                     try (ResultSet rs = pstatement.executeQuery()) {
                         while (rs.next()) {
                             int id = rs.getInt(1);
-                            long start = rs.getLong(2);
-                            long end = rs.getLong(3);
+                            long _start = rs.getLong(2);
+                            long _end = rs.getLong(3);
                             byte[] json = rs.getBytes(4);
-                            eventList.add(new JsonEvent(json, type, id, start, end));
+                            eventList.add(new JsonEvent(json, type, id, _start, _end));
                         }
                     }
                 } catch (SQLException e) {
