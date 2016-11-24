@@ -2,8 +2,6 @@ package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
@@ -19,7 +17,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 @SuppressWarnings("serial")
-public class ExportReadyDialog extends JDialog implements ActionListener, ShowableDialog {
+public class ExportReadyDialog extends JDialog implements ShowableDialog {
 
     private final JTextPane messagePane = new JTextPane();
 
@@ -39,11 +37,11 @@ public class ExportReadyDialog extends JDialog implements ActionListener, Showab
 
         JPanel closeButtonContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(this);
+        closeButton.addActionListener(e -> dispose());
         closeButtonContainer.add(closeButton);
         add(closeButtonContainer, BorderLayout.SOUTH);
 
-        getRootPane().registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
         getRootPane().setFocusable(true);
     }
@@ -61,11 +59,6 @@ public class ExportReadyDialog extends JDialog implements ActionListener, Showab
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent a) {
-        dispose();
     }
 
 }

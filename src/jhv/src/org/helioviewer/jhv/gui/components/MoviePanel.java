@@ -58,7 +58,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener {
+public class MoviePanel extends JPanel implements ChangeListener, MouseListener, MouseWheelListener {
 
     // different animation speeds
     private enum SpeedUnit {
@@ -271,7 +271,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         advancedButton = new JButton("Options", IconBank.getIcon(JHVIcon.SHOW_MORE));
         advancedButton.setToolTipText("Options to control playback and recording");
-        advancedButton.addActionListener(this);
+        advancedButton.addActionListener(e -> setAdvanced(!isAdvanced));
         advancedButton.setHorizontalTextPosition(SwingConstants.LEADING);
         advancedButton.setBorderPainted(false);
         advancedButton.setFocusPainted(false);
@@ -314,7 +314,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         speedUnitComboBox = new JComboBox<>(new SpeedUnit[]{SpeedUnit.FRAMESPERSECOND /*, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND */});
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
-        speedUnitComboBox.addActionListener(this);
+        speedUnitComboBox.addActionListener(e -> updateMovieSpeed());
         speedPanel.add(speedUnitComboBox);
 
         mainPanel.add(speedPanel);
@@ -325,7 +325,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         animationModeComboBox = new JComboBox<>(new AnimationMode[]{AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING});
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
-        animationModeComboBox.addActionListener(this);
+        animationModeComboBox.addActionListener(e -> Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem()));
         modePanel.add(animationModeComboBox);
 
         mainPanel.add(modePanel);
@@ -474,20 +474,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             Layers.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
         } else {
             Layers.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object source = e.getSource();
-        if (source.equals(advancedButton)) {
-            setAdvanced(!isAdvanced);
-            // Change animation speed or unit
-        } else if (source.equals(speedSpinner) || source.equals(speedUnitComboBox)) {
-            updateMovieSpeed();
-            // Change animation mode
-        } else if (source.equals(animationModeComboBox)) {
-            Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
 

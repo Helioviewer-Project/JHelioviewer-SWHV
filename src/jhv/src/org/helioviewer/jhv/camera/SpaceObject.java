@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.swing.JSeparator;
 
-public class SpaceObject {
+class SpaceObject {
 
     private final String urlName;
     private final String labelName;
