@@ -58,7 +58,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     private Popup calPopup = null;
 
     public JHVCalendarDatePicker() {
-        setLayout(new BorderLayout(0, 0));
+        setLayout(new BorderLayout());
 
         // set up text field
         textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));

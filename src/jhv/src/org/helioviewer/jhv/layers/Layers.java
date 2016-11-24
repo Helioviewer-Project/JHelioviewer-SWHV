@@ -94,7 +94,7 @@ public class Layers {
             } else {
                 startTime = activeView.getFirstTime().milli;
                 endTime = activeView.getLastTime().milli;
-                cadence = ObservationDialog.getInstance().getObservationImagePane().getCadence();
+                cadence = ObservationDialog.getInstance().getObservationPanel().getCadence();
             }
 
             for (View v : layers) {

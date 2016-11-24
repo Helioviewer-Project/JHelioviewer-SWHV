@@ -23,15 +23,12 @@ import org.helioviewer.jhv.layers.Layer;
 @SuppressWarnings("serial")
 public class ObservationDialog extends JDialog implements ActionListener {
 
-    private ObservationDialogPanel observationPanel;
-
-    private final JPanel contentPane = new JPanel();
-    private final JPanel buttonPane = new JPanel();
     private final JButton btnImages = new JButton();
     private final JButton btnClose = new JButton("Cancel");
     private final JButton availabilityButton = new JButton("Available data");
 
-    private final ImageDataPanel imageObservationPanel = new ImageDataPanel();
+    private final ImageDataPanel observationPanel = new ImageDataPanel();
+    private Object layer;
 
     private static ObservationDialog instance;
 
@@ -42,34 +39,29 @@ public class ObservationDialog extends JDialog implements ActionListener {
         return instance;
     }
 
-    public ImageDataPanel getObservationImagePane() {
-        return imageObservationPanel;
+    public ImageDataPanel getObservationPanel() {
+        return observationPanel;
     }
 
     private ObservationDialog(JFrame mainFrame) {
         super(mainFrame, true);
 
-        // set dialog settings
+        JPanel contentPane = new JPanel();
         setContentPane(contentPane);
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
         contentPane.setBorder(BorderFactory.createEmptyBorder(3, 9, 1, 9));
         contentPane.setFocusable(true);
 
         availabilityButton.addActionListener(e -> {
-            if (observationPanel instanceof ImageDataPanel) {
-                String url = Settings.getSingletonInstance().getProperty("availability.images.url");
-                int sourceId = imageObservationPanel.getSourceId();
-                if (sourceId != -1)
-                    url += "#IID" + sourceId;
+            String url = Settings.getSingletonInstance().getProperty("availability.images.url");
+            int sourceId = observationPanel.getSourceId();
+            if (sourceId != -1)
+                url += "#IID" + sourceId;
 
-                JHVGlobals.openURL(url);
-            } else {
-                String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
-                JHVGlobals.openURL(url);
-            }
+            JHVGlobals.openURL(url);
         });
 
-        buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT, 3, 3));
+        JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 3));
         buttonPane.add(availabilityButton);
         buttonPane.add(btnClose);
         buttonPane.add(btnImages);
@@ -77,29 +69,8 @@ public class ObservationDialog extends JDialog implements ActionListener {
         btnImages.addActionListener(this);
         btnClose.addActionListener(this);
 
-        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-    }
-
-    // Shows up the dialog and initializes the UI with the given panel.
-    public void showDialog(boolean newLayer, Object layer, ObservationDialogPanel observationPanel) {
-        if (newLayer) {
-            setTitle("New Layer");
-            btnImages.setText("Add");
-        } else {
-            setTitle("Change Layer");
-            btnImages.setText("Change");
-        }
-        observationPanel.setupLayer(layer);
-
-        this.layer = layer;
-
-        if (this.observationPanel != observationPanel) {
-            this.observationPanel = observationPanel;
-
-            contentPane.removeAll();
-            contentPane.add(observationPanel);
-            contentPane.add(buttonPane);
-        }
+        contentPane.add(observationPanel);
+        contentPane.add(buttonPane);
 
         pack();
         Dimension dim = getPreferredSize();
@@ -108,12 +79,26 @@ public class ObservationDialog extends JDialog implements ActionListener {
             pack();
         }
 
+        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+    }
+
+    // Shows up the dialog and initializes the UI with the given panel.
+    public void showDialog(boolean newLayer, Object _layer) {
+        layer = _layer;
+        observationPanel.setupLayer(layer);
+
+        if (newLayer) {
+            setTitle("New Layer");
+            btnImages.setText("Add");
+        } else {
+            setTitle("Change Layer");
+            btnImages.setText("Change");
+        }
+
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         getRootPane().setDefaultButton(btnImages);
         setVisible(true);
     }
-
-    private Object layer; // tbd if timelines get change layer
 
     public void loadButtonPressed() {
         if (observationPanel.loadButtonPressed(layer))

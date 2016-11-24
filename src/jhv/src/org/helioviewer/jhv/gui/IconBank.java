@@ -104,7 +104,7 @@ public class IconBank {
     /**
      * Returns the ImageIcon associated with the given enum
      *
-     * @param _icon
+     * @param icon
      *            enum which represents the image
      * @return the image icon of the given enum
      * */
