@@ -16,7 +16,7 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.ImageLayer;
 
 @SuppressWarnings("serial")
 public class ObservationDialog extends JDialog {
@@ -25,7 +25,7 @@ public class ObservationDialog extends JDialog {
     private final JButton availabilityButton = new JButton("Available data");
 
     private final ImageDataPanel observationPanel = new ImageDataPanel();
-    private Object layer;
+    private ImageLayer layer;
 
     private static ObservationDialog instance;
 
@@ -75,7 +75,7 @@ public class ObservationDialog extends JDialog {
     }
 
     // Shows up the dialog and initializes the UI with the given panel.
-    public void showDialog(boolean newLayer, Object _layer) {
+    public void showDialog(boolean newLayer, ImageLayer _layer) {
         layer = _layer;
         observationPanel.setupLayer(layer);
 
@@ -109,8 +109,7 @@ public class ObservationDialog extends JDialog {
     }
 
     private void cancel() {
-        if (layer instanceof Layer)
-            ((Layer) layer).unload();
+        layer.unload();
         dispose();
     }
 

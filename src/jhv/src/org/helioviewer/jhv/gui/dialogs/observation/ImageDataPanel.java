@@ -99,15 +99,13 @@ public class ImageDataPanel extends ObservationDialogPanel {
         layer.load(new APIRequest(item.server, item.sourceId, getStartTime(), getEndTime(), getCadence()));
     }
 
-    public void setupLayer(Object layer) {
-        if (layer instanceof ImageLayer) {
-            APIRequest req = ((ImageLayer) layer).getAPIRequest();
-            if (req != null) {
-                sourcesTree.setSelectedItem(req.server, req.sourceId);
-                timeSelectionPanel.setStartTime(req.startTime, false);
-                timeSelectionPanel.setEndTime(req.endTime, false);
-                cadencePanel.setCadence(req.cadence);
-            }
+    public void setupLayer(ImageLayer layer) {
+        APIRequest req = layer.getAPIRequest();
+        if (req != null) {
+            sourcesTree.setSelectedItem(req.server, req.sourceId);
+            timeSelectionPanel.setStartTime(req.startTime, false);
+            timeSelectionPanel.setEndTime(req.endTime, false);
+            cadencePanel.setCadence(req.cadence);
         }
     }
 
