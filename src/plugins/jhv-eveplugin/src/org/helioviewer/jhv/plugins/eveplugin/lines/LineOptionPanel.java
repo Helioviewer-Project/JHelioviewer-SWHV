@@ -9,9 +9,9 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
 
 @SuppressWarnings("serial")
 class LineOptionPanel extends SmallPanel {
@@ -41,12 +41,9 @@ class LineOptionPanel extends SmallPanel {
         c.gridx = 1;
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
+
         JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> {
-            String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
-            url += "#" + band.getBandType().getName();
-            JHVGlobals.openURL(url);
-        });
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(EVESettings.availabilityURL + "#" + band.getBandType().getName()));
         add(availabilityButton, c);
 
         setSmall();
