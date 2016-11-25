@@ -44,9 +44,6 @@ public class JHVUpdate implements Runnable {
     /**
      * Verbose whether a dialog box should be popped up.
      * Otherwise a message box is shown in case of an update error.
-     *
-     * @throws MalformedURLException
-     *             Error while parsing the internal update URL
      */
     public JHVUpdate(boolean _verbose) {
         verbose = _verbose;

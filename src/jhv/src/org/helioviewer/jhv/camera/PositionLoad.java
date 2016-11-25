@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.ParseException;
@@ -76,8 +75,6 @@ public class PositionLoad {
                 } else {
                     return parseData(result);
                 }
-            } catch (MalformedURLException e) {
-                Log.error("Malformed URL", e);
             } catch (UnknownHostException e) {
                 Log.debug("Unknown host, network down?", e);
             } catch (IOException e) {

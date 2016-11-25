@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.helioviewer.jhv.base.DownloadStream;
@@ -35,15 +34,8 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
 
     @Override
     protected Pair<float[], long[]> backgroundWork() {
-        URL url;
         try {
-            url = buildRequestURL(interval, band.getBandType());
-        } catch (MalformedURLException e) {
-            Log.error("Error creating EVE URL: ", e);
-            return null;
-        }
-
-        try {
+            URL url = new URL(buildRequest(interval, band.getBandType()));
             JSONObject json = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
 
             double multiplier = 1.0;
@@ -86,10 +78,9 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
         DownloadController.downloadFinished(band, interval);
     }
 
-    private static URL buildRequestURL(Interval interval, BandType type) throws MalformedURLException {
+    private static String buildRequest(Interval interval, BandType type) {
         String urlf = type.getBaseURL() + "start_date=%s&end_date=%s&timeline=%s&data_format=json";
-        String url = String.format(urlf, TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
-        return new URL(url);
+        return String.format(urlf, TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
     }
 
 }

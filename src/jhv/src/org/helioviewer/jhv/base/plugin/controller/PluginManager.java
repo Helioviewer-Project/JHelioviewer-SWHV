@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -74,13 +73,6 @@ public class PluginManager {
      *         otherwise.
      */
     public boolean loadPlugin(URI pluginLocation) {
-        URL[] urls = new URL[1];
-        try {
-            urls[0] = pluginLocation.toURL();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
         Log.info("PluginManager is trying to load the plugin located at " + pluginLocation);
 
         File file = new File(pluginLocation);
@@ -99,10 +91,12 @@ public class PluginManager {
                 Log.debug("No Manifest Information Found, Fallback: Main-Class: " + className);
             }
 
+            URL[] urls = new URL[1];
+            urls[0] = pluginLocation.toURL();
+
             URLClassLoader classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
             Object obj = classLoader.loadClass(className).getConstructor().newInstance();
             Log.info("PluginManager: Load plugin class: " + className);
-
             if (obj instanceof Plugin) {
                 addPlugin((Plugin) obj, pluginLocation);
                 return true;
