@@ -31,12 +31,7 @@ class RadioOptionsPanel extends SmallPanel {
         lutBox.addActionListener(e -> RadioData.setLUT(lutMap.get(lutBox.getSelectedItem())));
 
         JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> {
-            String url = Settings.getSingletonInstance().getProperty("availability.images.url");
-            url += "#IID" + RadioData.CallistoID;
-
-            JHVGlobals.openURL(url);
-        });
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(Settings.getSingletonInstance().getProperty("availability.images.url") + "#IID" + RadioData.CallistoID));
 
         add(lutBox, c);
         c.anchor = GridBagConstraints.EAST;

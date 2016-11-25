@@ -10,8 +10,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 /**
  * Interface should be implemented by a class that handles received events by
  * the JHVEventContainer.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie)
  */
 public interface JHVEventHandler {
 
