@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.everit.json.schema.Schema;
 import org.helioviewer.jhv.base.DownloadStream;
@@ -28,7 +27,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
     protected Void backgroundWork() throws Exception {
         while (true) {
             try {
-                JSONObject json = JSONUtils.getJSONStream(new DownloadStream(new URL(url)).getInput());
+                JSONObject json = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
                 schema.validate(json);
                 parser.parse(json);
                 return null;

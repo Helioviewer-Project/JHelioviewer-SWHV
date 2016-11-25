@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,9 +21,11 @@ public class BandTypeAPI {
 
     public static void getDatasets() {
         try {
-            JSONObject jsonmain = JSONUtils.getJSONStream(new DownloadStream(new URL(EVESettings.baseURL)).getInput());
+            JSONObject jsonmain = JSONUtils.getJSONStream(new DownloadStream(EVESettings.baseURL).getInput());
             updateBandGroups(jsonmain.getJSONArray("groups"));
             updateBandTypes(jsonmain.getJSONArray("objects"));
+        } catch (UnknownHostException e) {
+            Log.debug("Unknown host, network down?", e);
         } catch (IOException e) {
             Log.error("Error downloading the bandtypes", e);
         } catch (JSONException e) {
