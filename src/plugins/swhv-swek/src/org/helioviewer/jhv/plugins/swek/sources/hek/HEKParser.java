@@ -166,16 +166,15 @@ public class HEKParser implements SWEKParser {
             String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
             String coordinates = coordinatesString.substring(coordinatesString.indexOf('(') + 1, coordinatesString.lastIndexOf(')'));
 
-            Scanner s = new Scanner(coordinates);
-            s.useDelimiter(",");
-            while (s.hasNext()) {
-                String coordinateString = s.next();
-                Vec3 tempPoint = parseCoordinates(coordinateString);
-                if (tempPoint != null) {
-                    polygonPoints.add(tempPoint);
+            try (Scanner s = new Scanner(coordinates)) {
+                s.useDelimiter(",");
+                while (s.hasNext()) {
+                    Vec3 tempPoint = parseCoordinates(s.next());
+                    if (tempPoint != null) {
+                        polygonPoints.add(tempPoint);
+                    }
                 }
             }
-            s.close();
         }
         return polygonPoints;
     }
@@ -189,8 +188,7 @@ public class HEKParser implements SWEKParser {
      */
     private static Vec3 parsePoint(String value) {
         if (value.toLowerCase(Locale.ENGLISH).contains("point")) {
-            String coordinates = value.substring(value.indexOf('(') + 1, value.indexOf(')'));
-            return parseCoordinates(coordinates);
+            return parseCoordinates(value.substring(value.indexOf('(') + 1, value.indexOf(')')));
         }
         return null;
     }
@@ -203,20 +201,19 @@ public class HEKParser implements SWEKParser {
      *            the string to parse
      * @return the GL3DVec3 or null of it could not be parsed
      */
-    private static Vec3 parseCoordinates(String coordinateString) {
+    private static Vec3 parseCoordinates(String value) {
         double[] coordinate = {0, 0, 0};
         boolean notnull = false;
 
-        Scanner coordinatesScanner = new Scanner(coordinateString);
-        coordinatesScanner.useDelimiter(" ");
-
-        for (int i = 0; i < 3; i++) {
-            if (coordinatesScanner.hasNext()) {
-                coordinate[i] = Double.parseDouble(coordinatesScanner.next());
-                notnull = true;
+        try (Scanner s = new Scanner(value)) {
+            s.useDelimiter(" ");
+            for (int i = 0; i < 3; i++) {
+                if (s.hasNext()) {
+                    coordinate[i] = Double.parseDouble(s.next());
+                    notnull = true;
+                }
             }
         }
-        coordinatesScanner.close();
 
         if (notnull) {
             return new Vec3(coordinate[0], coordinate[1], coordinate[2]);
