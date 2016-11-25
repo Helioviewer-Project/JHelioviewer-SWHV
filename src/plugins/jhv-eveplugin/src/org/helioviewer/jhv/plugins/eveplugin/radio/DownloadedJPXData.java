@@ -63,8 +63,8 @@ class DownloadedJPXData implements ImageDataHandler {
             endFreq = hvMetaData.tryGetDouble("STARTFRQ");
             startFreq = hvMetaData.tryGetDouble("END-FREQ");
 
-            long start = JHVDate.parseDateTime(hvMetaData.get("DATE-OBS")).milli;
-            long end = JHVDate.parseDateTime(hvMetaData.get("DATE-END")).milli;
+            // long start = JHVDate.parseDateTime(hvMetaData.get("DATE-OBS")).milli;
+            // long end = JHVDate.parseDateTime(hvMetaData.get("DATE-END")).milli;
             hvMetaData.destroyXML();
 
             // if (startDate == start && endDate == end) - TBD
