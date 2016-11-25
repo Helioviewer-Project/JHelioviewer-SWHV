@@ -1,13 +1,17 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStream;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.FixedSizedInputStream;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.TransferInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
@@ -191,34 +195,60 @@ public class JPIPSocket extends HTTPSocket {
 
         if (res.getCode() != 200)
             throw new IOException("Invalid status code returned (" + res.getCode() + ')');
-        if (!"chunked".equals(res.getHeader("Transfer-Encoding")))
-            throw new IOException("Only chunked responses are supported");
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 
         replyTextTm = System.currentTimeMillis();
 
-        ChunkedInputStream input = new ChunkedInputStream(inputStream);
-        JPIPDataInputStream jpip;
-        if ("gzip".equals(res.getHeader("Content-Encoding")))
-            jpip = new JPIPDataInputStream(new GZIPInputStream(input));
-        else
-            jpip = new JPIPDataInputStream(input);
+        TransferInputStream transferInput;
+        String transferEncoding = res.getHeader("Transfer-Encoding") == null ? "" : res.getHeader("Transfer-Encoding");
+        switch (transferEncoding.toLowerCase()) {
+            case "":
+            case "identity":
+                String contentLength = res.getHeader("Content-Length");
+                try {
+                    transferInput = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
+                } catch (Exception e) {
+                    throw new IOException("Invalid Content-Length header: " + contentLength);
+                }
+                break;
+            case "chunked":
+                transferInput = new ChunkedInputStream(inputStream);
+                break;
+            default:
+                throw new IOException("Unsupported transfer encoding: " + transferEncoding);
+        }
 
+        InputStream input = transferInput;
+        String contentEncoding = res.getHeader("Content-Encoding") == null ? "" : res.getHeader("Content-Encoding");
+        switch (contentEncoding.toLowerCase()) {
+            case "":
+            case "identity":
+                break;
+            case "gzip":
+                input = new GZIPInputStream(input);
+                break;
+            case "deflate":
+                input = new InflaterInputStream(input);
+                break;
+            default:
+                throw new IOException("Unknown content encoding: " + contentEncoding);
+        }
+
+        JPIPDataInputStream jpip = new JPIPDataInputStream(input);
         try {
             JPIPDataSegment seg;
             while ((seg = jpip.readSegment()) != null)
                 res.addJpipDataSegment(seg);
         } finally {
-            // make sure the stream is exhausted
-            input.close();
+            input.close(); // make sure the stream is exhausted
         }
 
         if ("close".equals(res.getHeader("Connection"))) {
             super.close();
         }
         replyDataTm = System.currentTimeMillis();
-        receivedData = input.getTotalLength();
+        receivedData = transferInput.getTotalLength();
 
         // System.out.format("Bandwidth: %.2f KB/seg.\n", (double)(receivedData
         // * 1.0) / (double)(replyDataTm - tini));

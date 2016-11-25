@@ -77,10 +77,12 @@ public class DownloadStream {
 
     private static InputStream getEncodedStream(String encoding, InputStream httpStream) throws IOException {
         if (encoding != null) {
-            if (encoding.equalsIgnoreCase("gzip"))
-                return new GZIPInputStream(httpStream);
-            else if (encoding.equalsIgnoreCase("deflate"))
-                return new InflaterInputStream(httpStream);
+            switch (encoding.toLowerCase()) {
+                case "gzip":
+                    return new GZIPInputStream(httpStream);
+                case "deflate":
+                    return new InflaterInputStream(httpStream);
+            }
         }
         return httpStream;
     }

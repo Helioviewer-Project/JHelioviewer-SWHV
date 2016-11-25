@@ -19,7 +19,7 @@ import java.net.ProtocolException;
  * The class <code>ChunkedInputStream</code> allows to decode HTTP chunked
  * responses with a simple format. Does not support internal chunk headers.
  */
-public class ChunkedInputStream extends InputStream {
+public class ChunkedInputStream extends TransferInputStream {
 
     private int totalLength = 0;
 
