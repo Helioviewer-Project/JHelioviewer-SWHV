@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.everit.json.schema.Schema;
@@ -16,16 +15,12 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
 
     private final DataSourcesParser parser;
     private final Schema schema;
-    private URL url;
+    private final String url;
 
-    public DataSourcesTask(String server, Schema schema) {
+    public DataSourcesTask(String server, Schema _schema) {
         parser = new DataSourcesParser(server);
-        this.schema = schema;
-        try {
-            url = new URL(DataSources.getServerSetting(server, "API.dataSources.path"));
-        } catch (MalformedURLException e) {
-            Log.error("Invalid data sources URL", e);
-        }
+        schema = _schema;
+        url = DataSources.getServerSetting(server, "API.dataSources.path");
         setThreadName("MAIN--DataSources");
     }
 
@@ -33,7 +28,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
     protected Void backgroundWork() throws Exception {
         while (true) {
             try {
-                JSONObject json = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
+                JSONObject json = JSONUtils.getJSONStream(new DownloadStream(new URL(url)).getInput());
                 schema.validate(json);
                 parser.parse(json);
                 return null;

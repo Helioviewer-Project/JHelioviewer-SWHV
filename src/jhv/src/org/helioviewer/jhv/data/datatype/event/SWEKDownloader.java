@@ -2,7 +2,6 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +29,8 @@ public abstract class SWEKDownloader {
             boolean overmax = true;
 
             while (overmax && success) {
-                String urlString = createURL(eventType.getEventType(), start, end, params, page);
-                InputStream stream = new DownloadStream(new URL(urlString)).getInput();
+                String url = createURL(eventType.getEventType(), start, end, params, page);
+                InputStream stream = new DownloadStream(new URL(url)).getInput();
                 if (stream == null) {
                     Log.error("Download input stream was null. Probably HEK is down.");
                     return false;
@@ -45,8 +44,6 @@ public abstract class SWEKDownloader {
             return success;
         } catch (JSONException e) {
             Log.error("JSON parse error: " + e);
-        } catch (MalformedURLException e) {
-            Log.error("Could not create URL from given string error: " + e);
         } catch (IOException e) {
             Log.error("Could not create input stream for given URL error: " + e);
         }
