@@ -5,7 +5,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.net.URL;
 
 import javax.swing.JOptionPane;
 
@@ -79,18 +78,14 @@ public class JHVUpdate implements Runnable {
             }
         }
 
-        try {
-            Log.trace("Start checking for updates");
-            URL updateURL = new URL(JHVGlobals.downloadURL + "VERSION");
-
-            String version;
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(updateURL).getInput(), StandardCharsets.UTF_8))) {
-                version = in.readLine();
-                if (version == null || version.isEmpty()) {
-                    throw new IOException("JHVUpdate: Empty version string");
-                }
-                // String message = in.readLine(); - extra
+        Log.trace("Start checking for updates");
+        String version;
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(JHVGlobals.downloadURL + "VERSION").getInput(), StandardCharsets.UTF_8))) {
+            version = in.readLine();
+            if (version == null || version.isEmpty()) {
+                throw new IOException("JHVUpdate: Empty version string");
             }
+           // String message = in.readLine(); - extra
 
             EventQueue.invokeLater(() -> {
                 String runningVersion = JHVGlobals.getJhvVersion() + '.' + JHVGlobals.getJhvRevision();

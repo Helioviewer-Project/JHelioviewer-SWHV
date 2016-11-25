@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.DownloadStream;
@@ -42,7 +41,7 @@ class PfssDataLoader implements Runnable {
             remote = PfssSettings.baseURL + url;
         }
 
-        try (InputStream in = new BufferedInputStream(new DownloadStream(new URL(remote)).getInput(), BUFSIZ)) {
+        try (InputStream in = new BufferedInputStream(new DownloadStream(remote).getInput(), BUFSIZ)) {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             int nRead;
             byte[] data = new byte[BUFSIZ];

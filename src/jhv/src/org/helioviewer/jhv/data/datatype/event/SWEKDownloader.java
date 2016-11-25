@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.data.datatype.event;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,20 +21,13 @@ public abstract class SWEKDownloader {
                 return true;
             }
         }
+
+        int page = 0;
+        boolean success = true;
+        boolean overmax = true;
         try {
-            int page = 0;
-            boolean success = true;
-            boolean overmax = true;
-
             while (overmax && success) {
-                String url = createURL(eventType.getEventType(), start, end, params, page);
-                InputStream stream = new DownloadStream(new URL(url)).getInput();
-                if (stream == null) {
-                    Log.error("Download input stream was null. Probably HEK is down.");
-                    return false;
-                }
-
-                JSONObject eventJSON = JSONUtils.getJSONStream(stream);
+                JSONObject eventJSON = JSONUtils.getJSONStream(new DownloadStream(createURL(eventType.getEventType(), start, end, params, page)).getInput());
                 overmax = eventJSON.has("overmax") && eventJSON.getBoolean("overmax");
                 success = parseEvents(eventJSON, eventType) && parseAssociations(eventJSON);
                 page++;

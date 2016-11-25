@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
@@ -19,9 +18,9 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
     private final Interval interval;
     private final Band band;
 
-    public DownloadThread(Band band, Interval interval) {
-        this.interval = interval;
-        this.band = band;
+    public DownloadThread(Band _band, Interval _interval) {
+        interval = _interval;
+        band = _band;
     }
 
     public Interval getInterval() {
@@ -35,8 +34,7 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
     @Override
     protected Pair<float[], long[]> backgroundWork() {
         try {
-            URL url = new URL(buildRequest(interval, band.getBandType()));
-            JSONObject json = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
+            JSONObject json = JSONUtils.getJSONStream(new DownloadStream(buildRequest(interval, band.getBandType())).getInput());
 
             double multiplier = 1.0;
             if (json.has("multiplier")) {

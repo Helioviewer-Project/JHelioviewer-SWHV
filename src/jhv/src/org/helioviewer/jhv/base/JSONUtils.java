@@ -18,8 +18,8 @@ public class JSONUtils {
     private static final int BUFSIZ = 65536;
 
     public static JSONObject getJSONStream(InputStream in) {
-        try {
-            return new JSONObject(new JSONTokener(new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8), BUFSIZ)));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8), BUFSIZ)) {
+            return new JSONObject(new JSONTokener(reader));
         } catch (Exception e) {
             Log.error("Invalid JSON response " + e);
             return new JSONObject();

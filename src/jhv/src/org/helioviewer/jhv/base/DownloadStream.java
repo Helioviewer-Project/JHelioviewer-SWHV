@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -67,8 +68,16 @@ public class DownloadStream {
         this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), ignore400);
     }
 
+    public DownloadStream(String url, boolean ignore400) throws MalformedURLException {
+        this(new URL(url), ignore400);
+    }
+
     public DownloadStream(URL url) {
         this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), false);
+    }
+
+    public DownloadStream(String url) throws MalformedURLException {
+        this(new URL(url));
     }
 
     public boolean isResponse400() {

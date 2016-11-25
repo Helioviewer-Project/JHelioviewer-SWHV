@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Iterator;
@@ -25,8 +24,6 @@ public class PositionLoad {
     private static final String LOADEDSTATE = "Loaded";
     private static final String FAILEDSTATE = "Failed";
 
-    private static final String baseURL = "http://swhv.oma.be/position?";
-    private static final String target = "SUN";
     private String observer = "Earth";
 
     private long beginTime = TimeUtils.EPOCH.milli;
@@ -44,7 +41,11 @@ public class PositionLoad {
 
     private class LoadPositionWorker extends JHVWorker<Position.L[], Void> {
 
+        private static final String baseURL = "http://swhv.oma.be/position?";
+        private static final String target = "SUN";
+
         private String report = null;
+
         private final long start;
         private final long end;
         private final String obs;
@@ -55,20 +56,22 @@ public class PositionLoad {
             obs = _obs;
         }
 
+        private String buildURL(long deltat) {
+            return baseURL + "abcorr=LT%2BS&utc=" + TimeUtils.utcFullDateFormat.format(start) +
+                   "&utc_end=" + TimeUtils.utcFullDateFormat.format(end) + "&deltat=" + deltat +
+                   "&observer=" + obs + "&target=" + target + "&ref=HEEQ&kind=latitudinal";
+        }
+
         @Override
         protected Position.L[] backgroundWork() {
+            long deltat = 60, span = (end - start) / 1000;
+            long max = 100000;
+
+            if (span / deltat > max)
+                deltat = span / max;
+
             try {
-                long deltat = 60, span = (end - start) / 1000;
-                long max = 100000;
-
-                if (span / deltat > max)
-                    deltat = span / max;
-
-                URL url = new URL(baseURL + "abcorr=LT%2BS&utc=" + TimeUtils.utcFullDateFormat.format(start) + 
-                                            "&utc_end=" + TimeUtils.utcFullDateFormat.format(end) + "&deltat=" + deltat +
-                                            "&observer=" + obs + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
-                DownloadStream ds = new DownloadStream(url, true);
-
+                DownloadStream ds = new DownloadStream(buildURL(deltat), true);
                 JSONObject result = JSONUtils.getJSONStream(ds.getInput());
                 if (ds.isResponse400()) {
                     report = result.has("faultstring") ? result.getString("faultstring") : "Invalid network response";
