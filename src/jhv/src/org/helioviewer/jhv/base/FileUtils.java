@@ -126,11 +126,10 @@ public class FileUtils {
     }
 
     public static String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is, StandardCharsets.UTF_8.name());
-        s.useDelimiter("\\A");
-        String next = s.hasNext() ? s.next() : "";
-        s.close();
-        return next;
+        try (Scanner s = new Scanner(is, StandardCharsets.UTF_8.name())) {
+            s.useDelimiter("\\A");
+            return s.hasNext() ? s.next() : "";
+        }
     }
 
     /**
