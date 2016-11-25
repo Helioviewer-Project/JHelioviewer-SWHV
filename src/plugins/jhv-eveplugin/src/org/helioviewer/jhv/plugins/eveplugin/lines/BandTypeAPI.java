@@ -1,17 +1,13 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.DownloadStream;
-import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
 import org.json.JSONArray;
@@ -24,45 +20,15 @@ public class BandTypeAPI {
     private static final ArrayList<BandGroup> orderedGroups = new ArrayList<>();
 
     public static void getDatasets() {
-        String jsonString = readJSON();
-        if (jsonString != null) {
-            try {
-                JSONObject jsonmain = new JSONObject(jsonString);
-                JSONArray jsonGroupArray = (JSONArray) jsonmain.get("groups");
-                updateBandGroups(jsonGroupArray);
-                JSONArray jsonObjectArray = (JSONArray) jsonmain.get("objects");
-                updateBandTypes(jsonObjectArray);
-            } catch (JSONException e) {
-                Log.error("JSON parsing error", e);
-            }
-        }
-    }
-
-    private static String readJSON() {
-        URL url = null;
         try {
-            url = new URL(EVESettings.baseURL);
-        } catch (MalformedURLException e) {
-            Log.error("Malformed URL", e);
-            return null;
-        }
-
-        File dstFile = new File(JHVDirectory.PLUGINS.getPath() + "/EVEPlugin/datasets.json");
-        try {
-            FileUtils.save(new DownloadStream(url).getInput(), dstFile);
-        } catch (UnknownHostException e) {
-            Log.debug("Unknown host, network down?", e);
+            JSONObject jsonmain = JSONUtils.getJSONStream(new DownloadStream(new URL(EVESettings.baseURL)).getInput());
+            updateBandGroups(jsonmain.getJSONArray("groups"));
+            updateBandTypes(jsonmain.getJSONArray("objects"));
         } catch (IOException e) {
-            Log.debug("Error downloading the bandtypes", e);
+            Log.error("Error downloading the bandtypes", e);
+        } catch (JSONException e) {
+            Log.error("JSON parsing error", e);
         }
-
-        try {
-            return FileUtils.read(dstFile);
-        } catch (IOException e) {
-            Log.debug("Error reading the bandtypes", e);
-        }
-
-        return null;
     }
 
     private static void updateBandTypes(JSONArray jsonObjectArray) {
@@ -70,13 +36,13 @@ public class BandTypeAPI {
         try {
             for (int i = 0; i < jsonObjectArray.length(); i++) {
                 bandtypes[i] = new BandType();
-                JSONObject job = (JSONObject) jsonObjectArray.get(i);
 
+                JSONObject job = jsonObjectArray.getJSONObject(i);
                 if (job.has("label")) {
-                    bandtypes[i].setLabel((String) job.get("label"));
+                    bandtypes[i].setLabel(job.getString("label"));
                 }
                 if (job.has("name")) {
-                    bandtypes[i].setName((String) job.get("name"));
+                    bandtypes[i].setName(job.getString("name"));
                 }
                 if (job.has("range")) {
                     JSONArray rangeArray = job.getJSONArray("range");
@@ -86,10 +52,10 @@ public class BandTypeAPI {
                     bandtypes[i].setMax(v1);
                 }
                 if (job.has("unitLabel")) {
-                    bandtypes[i].setUnitLabel((String) job.get("unitLabel"));
+                    bandtypes[i].setUnitLabel(job.getString("unitLabel"));
                 }
                 if (job.has("baseUrl")) {
-                    bandtypes[i].setBaseURL((String) job.get("baseUrl"));
+                    bandtypes[i].setBaseURL(job.getString("baseUrl"));
                 }
                 if (job.has("scale")) {
                     bandtypes[i].setScale(job.getString("scale"));
@@ -97,8 +63,8 @@ public class BandTypeAPI {
                 if (job.has("warnLevels")) {
                     JSONArray warnLevels = job.getJSONArray("warnLevels");
                     for (int j = 0; j < warnLevels.length(); j++) {
-                        JSONObject helpobj = (JSONObject) warnLevels.get(j);
-                        bandtypes[i].warnLevels.put((String) helpobj.get("warnLabel"), helpobj.getDouble("warnValue"));
+                        JSONObject helpobj = warnLevels.getJSONObject(j);
+                        bandtypes[i].warnLevels.put(helpobj.getString("warnLabel"), helpobj.getDouble("warnValue"));
                     }
                 }
                 if (job.has("group")) {
