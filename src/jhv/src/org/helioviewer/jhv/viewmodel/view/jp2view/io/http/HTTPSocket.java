@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.ProtocolException;
+import java.net.Proxy;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +27,30 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.LineRead;
  */
 public class HTTPSocket extends Socket {
 
+    private static Proxy detectProxy(String host, String port, Proxy.Type type) {
+        String proxyHost = System.getProperty(host);
+        if (proxyHost != null) {
+            try {
+                int proxyPort = Integer.parseInt(System.getProperty(port));
+                return new Proxy(type, new InetSocketAddress(proxyHost, proxyPort));
+            } catch (Exception ignore) {
+            }
+        }
+        return null;
+    }
+
+    static {
+        Proxy _proxy = detectProxy("http.proxyHost", "http.proxyPort", Proxy.Type.HTTP);
+        if (_proxy == null)
+            _proxy = detectProxy("socksProxyHost", "socksProxyPort", Proxy.Type.SOCKS);
+        if (_proxy == null)
+            _proxy = Proxy.NO_PROXY;
+
+        proxy = _proxy;
+    }
+
+    private static final Proxy proxy;
+
     /** The last used port */
     private int lastUsedPort = 0;
 
@@ -39,6 +64,10 @@ public class HTTPSocket extends Socket {
     private static final int TO_READ = 30000;
 
     protected InputStream inputStream;
+
+    protected HTTPSocket() {
+        super(proxy);
+    }
 
     /**
      * Connects to the specified host via the supplied URI.
