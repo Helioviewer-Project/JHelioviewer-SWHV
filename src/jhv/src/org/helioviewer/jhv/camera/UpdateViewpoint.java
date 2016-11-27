@@ -35,11 +35,7 @@ public interface UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             View view = Layers.getActiveView();
-            if (view == null) {
-                return Sun.getEarthQuat(time);
-            } else {
-                return view.getMetaData(time).getViewpoint();
-            }
+            return view == null ? Sun.getEarthQuat(time) : view.getMetaData(time).getViewpoint();
         }
     }
 

@@ -30,7 +30,7 @@ public class Vec2 {
     }
 
     public Vec2() {
-        this(Vec2.ZERO);
+        this(ZERO);
     }
 
     public Vec2(double[] coordinates) {
@@ -127,7 +127,7 @@ public class Vec2 {
     }
 
     public double dot(Vec2 vec) {
-        return Vec2.dot(this, vec);
+        return dot(this, vec);
     }
 
     public static double dot(Vec2 u, Vec2 v) {

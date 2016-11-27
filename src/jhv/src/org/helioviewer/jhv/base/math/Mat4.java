@@ -41,7 +41,7 @@ public class Mat4 {
     }
 
     public final void setIdentity() {
-        this.set(Mat4.identity());
+        this.set(identity());
     }
 
     public static Mat4 identity() {
@@ -293,7 +293,7 @@ public class Mat4 {
     }
 
     public final Mat4 rotate(double angle, double axisx, double axisy, double axisz) {
-        return this.multiply(Mat4.rotation(angle, axisx, axisy, axisz));
+        return this.multiply(rotation(angle, axisx, axisy, axisz));
     }
 
     public final Mat4 invert() {
@@ -331,17 +331,17 @@ public class Mat4 {
     }
 
     public static Mat4 rotation(Quat q) {
-        return Mat4.rotation(q.getAngle(), q.getRotationAxis());
+        return rotation(q.getAngle(), q.getRotationAxis());
     }
 
     public static Mat4 rotation(double angle, Vec3 axis) {
-        return Mat4.rotation(angle, axis.x, axis.y, axis.z);
+        return rotation(angle, axis.x, axis.y, axis.z);
     }
 
     public static Mat4 rotation(double angle, double axisx, double axisy, double axisz) {
         // Quaterniond quat = new Quaterniond(degAng, axisx, axisy, axisz);
         // return buildRotationMatrix(quat);
-        Mat4 r = Mat4.identity();
+        Mat4 r = identity();
         double ca = Math.cos(angle);
         double sa = Math.sin(angle);
 

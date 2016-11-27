@@ -39,7 +39,7 @@ public class Vec3 {
     }
 
     public Vec3() {
-        this(Vec3.ZERO);
+        this(ZERO);
     }
 
     public Vec3(double[] coordinates) {
@@ -165,7 +165,7 @@ public class Vec3 {
     }
 
     public final double dot(Vec3 vec) {
-        return Vec3.dot(this, vec);
+        return dot(this, vec);
     }
 
     public static double dot(Vec3 u, Vec3 v) {
@@ -173,7 +173,7 @@ public class Vec3 {
     }
 
     public final Vec3 cross(Vec3 vec) {
-        return Vec3.cross(this, vec);
+        return cross(this, vec);
     }
 
     public static Vec3 cross(Vec3 u, Vec3 v) {
