@@ -29,37 +29,37 @@ public class Log {
 
     public static void log(Level logLevel, Object message, Throwable error) {
         if (logLevel.equals(Level.TRACE)) {
-            Log.trace(message, error);
+            trace(message, error);
         } else if (logLevel.equals(Level.DEBUG)) {
-            Log.debug(message, error);
+            debug(message, error);
         } else if (logLevel.equals(Level.INFO)) {
-            Log.info(message, error);
+            info(message, error);
         } else if (logLevel.equals(Level.WARN)) {
-            Log.warn(message, error);
+            warn(message, error);
         } else if (logLevel.equals(Level.ERROR)) {
-            Log.error(message, error);
+            error(message, error);
         } else if (logLevel.equals(Level.FATAL)) {
-            Log.fatal(message, error);
+            fatal(message, error);
         } else {
-            Log.error("Log.log(" + logLevel + ", " + message + ", " + error + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
+            error("Log.log(" + logLevel + ", " + message + ", " + error + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
         }
     }
 
     public static void log(Level logLevel, Object message) {
         if (logLevel.equals(Level.TRACE)) {
-            Log.trace(message);
+            trace(message);
         } else if (logLevel.equals(Level.DEBUG)) {
-            Log.debug(message);
+            debug(message);
         } else if (logLevel.equals(Level.INFO)) {
-            Log.info(message);
+            info(message);
         } else if (logLevel.equals(Level.WARN)) {
-            Log.warn(message);
+            warn(message);
         } else if (logLevel.equals(Level.ERROR)) {
-            Log.error(message);
+            error(message);
         } else if (logLevel.equals(Level.FATAL)) {
-            Log.fatal(message);
+            fatal(message);
         } else {
-            Log.error("Log.log(" + logLevel + ", " + message + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
+            error("Log.log(" + logLevel + ", " + message + ") > Invalid log level.", new IllegalArgumentException("Unknown log level"));
         }
     }
 

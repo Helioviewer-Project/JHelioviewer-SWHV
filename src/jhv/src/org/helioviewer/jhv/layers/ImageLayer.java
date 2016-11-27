@@ -398,10 +398,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     public MetaData getMetaData() {
-        if (imageData == null) // not yet decoded
-            return view.getMetaData(new JHVDate(0));
-        else
-            return imageData.getMetaData();
+        return imageData == null ? view.getMetaData(new JHVDate(0)) : imageData.getMetaData();
     }
 
     @Override

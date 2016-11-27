@@ -255,8 +255,8 @@ public class RenderableContainerPanel extends JPanel {
 
         grid.addMouseMotionListener(new MouseAdapter() {
             @Override
-            public void mouseMoved(MouseEvent arg0) {
-                int row = grid.rowAtPoint(arg0.getPoint());
+            public void mouseMoved(MouseEvent e) {
+                int row = grid.rowAtPoint(e.getPoint());
                 if (grid.getValueAt(row, 0) instanceof ImageLayer) {
                     grid.setCursor(UIGlobals.openHandCursor);
                 } else {

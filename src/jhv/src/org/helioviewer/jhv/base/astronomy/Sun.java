@@ -79,7 +79,7 @@ public class Sun {
 
         // convert distance to solar radii
         // change L0 Carrington longitude sign to increase towards West, like Stonyhurst
-        return new Position.L(time, dist * Sun.MeanEarthDistance, -he_lon, he_lat);
+        return new Position.L(time, dist * MeanEarthDistance, -he_lon, he_lat);
     }
 
     private static double sunRot(double mjd) {

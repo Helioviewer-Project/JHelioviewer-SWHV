@@ -149,13 +149,13 @@ public class PfssData {
 
                             if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
                                 type = 0;
-                                counter = addColor(PfssData.LOOPCOLOR, counter);
+                                counter = addColor(LOOPCOLOR, counter);
                             } else if (bright < 0) {
                                 type = 1;
-                                counter = addColor(PfssData.INSIDEFIELDCOLOR, counter);
+                                counter = addColor(INSIDEFIELDCOLOR, counter);
                             } else {
                                 type = 2;
-                                counter = addColor(PfssData.OPENFIELDCOLOR, counter);
+                                counter = addColor(OPENFIELDCOLOR, counter);
                             }
                         }
                     } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
@@ -164,15 +164,14 @@ public class PfssData {
                             counter = addColor(bright, 1.f, counter);
                         } else {
                             if (type == 0) {
-                                counter = addColor(PfssData.LOOPCOLOR, counter);
+                                counter = addColor(LOOPCOLOR, counter);
                             } else if (type == 1) {
-                                counter = addColor(PfssData.INSIDEFIELDCOLOR, counter);
+                                counter = addColor(INSIDEFIELDCOLOR, counter);
                             } else {
-                                counter = addColor(PfssData.OPENFIELDCOLOR, counter);
+                                counter = addColor(OPENFIELDCOLOR, counter);
                             }
                         }
                         counter = addVertex((float) x, (float) z, (float) -y, counter);
-
                         counter = addColor(bright, 0, counter);
                     } else {
                         counter = addVertex((float) x, (float) z, (float) -y, counter);
@@ -180,11 +179,11 @@ public class PfssData {
                             counter = addColor(bright, 1, counter);
                         } else {
                             if (type == 0) {
-                                counter = addColor(PfssData.LOOPCOLOR, counter);
+                                counter = addColor(LOOPCOLOR, counter);
                             } else if (type == 1) {
-                                counter = addColor(PfssData.INSIDEFIELDCOLOR, counter);
+                                counter = addColor(INSIDEFIELDCOLOR, counter);
                             } else {
-                                counter = addColor(PfssData.OPENFIELDCOLOR, counter);
+                                counter = addColor(OPENFIELDCOLOR, counter);
                             }
                         }
                     }
@@ -251,8 +250,8 @@ public class PfssData {
         return init;
     }
 
-    public void setInit(boolean init) {
-        this.init = init;
+    public void setInit(boolean _init) {
+        init = _init;
     }
 
     public String getDateString() {

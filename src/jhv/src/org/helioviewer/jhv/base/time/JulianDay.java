@@ -7,11 +7,11 @@ public class JulianDay {
     public static final double UNIX_EPOCH_MJD = (2440587.5 - DJM0);
 
     public static double milli2mjd(long milli) {
-        return JulianDay.UNIX_EPOCH_MJD + milli / (double) TimeUtils.DAY_IN_MILLIS;
+        return UNIX_EPOCH_MJD + milli / (double) TimeUtils.DAY_IN_MILLIS;
     }
 
     public static double mjd2jcy(double mjd, double epoch) {
-        return (JulianDay.DJM0 - epoch + mjd) / 36525.;
+        return (DJM0 - epoch + mjd) / 36525.;
     }
 
     /* Earliest year allowed (4800BC) */

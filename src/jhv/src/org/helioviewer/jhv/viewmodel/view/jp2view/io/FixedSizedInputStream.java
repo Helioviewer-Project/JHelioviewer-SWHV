@@ -6,8 +6,6 @@ import java.io.InputStream;
 /**
  * Input stream with a fixed size. After reading the expected number of bytes
  * this input stream will behave as if the end of the stream has been reached.
- * 
- * @author Andre Dau
  */
 public class FixedSizedInputStream extends TransferInputStream {
 

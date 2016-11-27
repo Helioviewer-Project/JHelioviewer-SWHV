@@ -236,18 +236,18 @@ public class KakaduUtils {
      */
     public static String getXml(Jp2_family_src src, int boxNumber) throws JHV_KduException {
         Jp2_input_box assocBox = null, assoc2Box = null;
-        Jp2_input_box findBoxResult[] = KakaduUtils.findBox(src, Kdu_global.jp2_xml_4cc, boxNumber);
+        Jp2_input_box findBoxResult[] = findBox(src, Kdu_global.jp2_xml_4cc, boxNumber);
         Jp2_input_box xmlBox = findBoxResult[0];
 
         if (xmlBox == null) {
-            findBoxResult = KakaduUtils.findBox(src, Kdu_global.jp2_association_4cc, boxNumber);
+            findBoxResult = findBox(src, Kdu_global.jp2_association_4cc, boxNumber);
             assocBox = findBoxResult[0];
             if (assocBox != null) {
-                xmlBox = KakaduUtils.findBox2(assocBox, Kdu_global.jp2_xml_4cc, 1);
+                xmlBox = findBox2(assocBox, Kdu_global.jp2_xml_4cc, 1);
                 if (xmlBox == null) {
-                    assoc2Box = KakaduUtils.findBox2(assocBox, Kdu_global.jp2_association_4cc, boxNumber);
+                    assoc2Box = findBox2(assocBox, Kdu_global.jp2_association_4cc, boxNumber);
                     if (assoc2Box != null)
-                        xmlBox = KakaduUtils.findBox2(assoc2Box, Kdu_global.jp2_xml_4cc, 1);
+                        xmlBox = findBox2(assoc2Box, Kdu_global.jp2_xml_4cc, 1);
                 }
             }
         }
@@ -372,7 +372,7 @@ public class KakaduUtils {
                 }
             }
         } else { // JP2
-            findBoxResult = KakaduUtils.findBox(src, Kdu_global.jp2_xml_4cc, 1);
+            findBoxResult = findBox(src, Kdu_global.jp2_xml_4cc, 1);
             xmlBox = findBoxResult[0];
             if (xmlBox != null) {
                 hvMetaData.parseXML(xmlBox2xml(xmlBox));

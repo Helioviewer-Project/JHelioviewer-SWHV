@@ -45,8 +45,8 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
             setBorder(LineDataSelectorTablePanel.commonBorder);
         }
 
-        public void setLineColor(Color c) {
-            this.c = c;
+        public void setLineColor(Color _c) {
+            c = _c;
         }
 
         @Override

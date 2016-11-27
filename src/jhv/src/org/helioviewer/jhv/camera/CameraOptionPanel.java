@@ -11,6 +11,4 @@ class CameraOptionPanel extends SmallPanel {
 
     void syncWithLayer() {}
 
-    CameraOptionPanel() {}
-
 }

@@ -21,9 +21,9 @@ class PfssDataLoader implements Runnable {
     private final String url;
     private final long time;
 
-    public PfssDataLoader(String url, long time) {
-        this.url = url;
-        this.time = time;
+    public PfssDataLoader(String _url, long _time) {
+        url = _url;
+        time = _time;
     }
 
     @Override

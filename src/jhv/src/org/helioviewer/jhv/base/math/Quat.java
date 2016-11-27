@@ -205,7 +205,7 @@ public class Quat {
         Vec3 rotationAxis = Vec3.cross(startPoint, endPoint);
         double rotationAngle = Math.atan2(rotationAxis.length(), Vec3.dot(startPoint, endPoint));
 
-        return Quat.createRotation(rotationAngle, rotationAxis);
+        return createRotation(rotationAngle, rotationAxis);
     }
 
     public Vec3 rotateVector(Vec3 vec) {

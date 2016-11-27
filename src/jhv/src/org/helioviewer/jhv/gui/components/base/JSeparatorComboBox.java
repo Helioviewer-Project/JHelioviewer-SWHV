@@ -28,50 +28,35 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
     //  Track when the separator has been selected
     private boolean separatorSelected = false;
 
-    /**
-     * Standard constructor. See JComboBox API for details
-     */
     public JSeparatorComboBox() {
         super();
-        init();
+        _init();
     }
 
-    /**
-     * Standard constructor. See JComboBox API for details
-     */
     public JSeparatorComboBox(ComboBoxModel model) {
         super(model);
-        init();
+        _init();
     }
 
-    /**
-     * Standard constructor. See JComboBox API for details
-     */
     public JSeparatorComboBox(Object[] items) {
         super(items);
-        init();
+        _init();
     }
 
-    /**
-     * Standard constructor. See JComboBox API for details
-     */
     public JSeparatorComboBox(Vector<?> items) {
         super(items);
-        init();
+        _init();
     }
 
-    private void init() {
+    private void _init() {
         setRenderer(new SeparatorRenderer());
         addKeyListener(this);
     }
 
-    /**
-     * Prevent selection of the separator by keyboard or mouse
-     */
+    // Prevent selection of the separator by keyboard or mouse
     @Override
     public void setSelectedIndex(int index) {
         Object value = getItemAt(index);
-
         //  Attempting to select a separator
         if (value instanceof JSeparator) {
             //  If no keys have been pressed then we must be using the mouse.
@@ -92,24 +77,17 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
         super.setSelectedIndex(index);
     }
 
-    /**
-     * Prevent closing of the popup when attempting to select the separator with
-     * the mouse.
-     */
+    // Prevent closing of the popup when attempting to select the separator with the mouse
     @Override
     public void setPopupVisible(boolean visible) {
-        //  Keep the popup open when the separator was clicked on
+        // Keep the popup open when the separator was clicked on
         if (separatorSelected) {
             separatorSelected = false;
             return;
         }
-
         super.setPopupVisible(visible);
     }
 
-    //
-    //  Implement the KeyListener interface
-    //
     @Override
     public void keyPressed(KeyEvent e) {
         released = false;
@@ -124,18 +102,13 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
     public void keyTyped(KeyEvent e) {
     }
 
-    /**
-     * Class to render the JSeparator compenent
-     */
+    // Class to render the JSeparator compenent
     private static class SeparatorRenderer extends BasicComboBoxRenderer {
-
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
             if (value instanceof JSeparator)
                 return (JSeparator) value;
-
             return this;
         }
     }
