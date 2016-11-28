@@ -50,12 +50,19 @@ public class JHVGlobals {
         return executorService;
     }
 
+    private static int readTimeout = -1;
+    private static int connectTimeout = -1;
+
     public static int getStdReadTimeout() {
-        return Integer.parseInt(Settings.getSingletonInstance().getProperty("connection.read.timeout"));
+        if (readTimeout == -1)
+            readTimeout = Integer.parseInt(Settings.getSingletonInstance().getProperty("connection.read.timeout"));
+        return readTimeout;
     }
 
     public static int getStdConnectTimeout() {
-        return Integer.parseInt(Settings.getSingletonInstance().getProperty("connection.connect.timeout"));
+        if (connectTimeout == -1)
+            connectTimeout = Integer.parseInt(Settings.getSingletonInstance().getProperty("connection.connect.timeout"));
+        return connectTimeout;
     }
 
     // This function must be called prior to the first call to getJhvVersion and getJhvRevision

@@ -18,34 +18,27 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.logging.Log;
 
 public class DownloadStream {
-    /**
-     * Input stream to read the data from
-     */
+
+    // Input stream to read the data from
     private InputStream in = null;
-    /**
-     * Output to send as a post request
-     */
+
+    // Output to send as a post request
     private String output = null;
-    /**
-     * Suggested name to save (if wanted)
-     */
+
+    // Suggested name to save (if wanted)
     private String outputName = null;
 
     private String contentDisposition = null;
     private int contentLength = -1;
     private boolean response400 = false;
 
-    /**
-     * Read timeout in ms
-     */
+    // Read timeout in ms
     private final int readTimeout;
-    /**
-     * Connect timeout in ms
-     */
+
+    // Connect timeout in ms
     private final int connectTimeout;
-    /**
-     * Used url to connect
-     */
+
+    // URL to connect
     private final URL url;
     private final boolean ignore400;
 
@@ -57,11 +50,11 @@ public class DownloadStream {
         }
     }
 
-    private DownloadStream(URL url, int connectTimeout, int readTimeout, boolean ignore400) {
-        this.url = url;
-        this.readTimeout = readTimeout;
-        this.connectTimeout = connectTimeout;
-        this.ignore400 = ignore400;
+    private DownloadStream(URL _url, int _connectTimeout, int _readTimeout, boolean _ignore400) {
+        url = _url;
+        readTimeout = _readTimeout;
+        connectTimeout = _connectTimeout;
+        ignore400 = _ignore400;
     }
 
     public DownloadStream(URL url, boolean ignore400) {
@@ -125,6 +118,7 @@ public class DownloadStream {
                     out.write(output);
                 }
             }
+
             try {
                 httpC.connect();
             } catch (IOException e) {
@@ -213,8 +207,8 @@ public class DownloadStream {
      * @param output
      *            Send output to the server, null if nothing (GET in HTTP)
      */
-    public void setOutput(String output) {
-        this.output = output;
+    public void setOutput(String _output) {
+        output = _output;
     }
 
 }
