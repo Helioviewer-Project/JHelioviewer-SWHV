@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.ProxySettings;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.logging.LogSettings;
 import org.helioviewer.jhv.base.message.Message;
@@ -89,6 +90,8 @@ public class JavaHelioViewer {
         JHVDirectory.PLUGINSCACHE.getFile().mkdirs();
         EventQueue.invokeLater(() -> {
             UIGlobals.setUIFont(UIGlobals.UIFont);
+
+            ProxySettings.init();
 
             Log.info("Start main window");
             ExitHooks.attach();
