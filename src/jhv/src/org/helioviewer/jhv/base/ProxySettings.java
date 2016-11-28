@@ -5,6 +5,8 @@ import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
 
+import org.helioviewer.jhv.Settings;
+
 public class ProxySettings {
 
     public static final Proxy proxy;
@@ -29,10 +31,15 @@ public class ProxySettings {
                         String[] vars = proxy.type().equals(Proxy.Type.HTTP) ? httpVars : socksVars;
                         String host = System.getProperty(vars[0]);
                         String port = System.getProperty(vars[1]);
-                        String user = System.getProperty(vars[2], "");
-                        String pass = System.getProperty(vars[3], "");
+                        String user = System.getProperty(vars[2]);
+                        String pass = System.getProperty(vars[3]);
 
-                        if (getRequestingHost().equalsIgnoreCase(host) && String.valueOf(getRequestingPort()).equals(port)) {
+                        if (user == null || pass == null) {
+                            user = Settings.getSingletonInstance().getProperty("default.proxyUser");
+                            pass = Settings.getSingletonInstance().getProperty("default.proxyPassword");
+                        }
+
+                        if (user != null && pass != null && getRequestingHost().equalsIgnoreCase(host) && String.valueOf(getRequestingPort()).equals(port)) {
                             return new PasswordAuthentication(user, pass.toCharArray());
                         }
                     }

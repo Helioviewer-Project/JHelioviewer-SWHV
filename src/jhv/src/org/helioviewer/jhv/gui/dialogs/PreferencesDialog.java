@@ -167,13 +167,17 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
             Settings settings = Settings.getSingletonInstance();
 
-            Object[][] tableData = { { "Default recording directory", settings.getProperty("default.save.path") },
-                    { "Default download path", settings.getProperty("default.local.path") } };
+            Object[][] tableData = {
+                { "Default recording directory", settings.getProperty("default.save.path") },
+                { "Default download path", settings.getProperty("default.local.path") },
+                { "Proxy user", settings.getProperty("default.proxyUser") },
+                { "Proxy password", settings.getProperty("default.proxyPassword") },
+            };
 
             model = new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return column == 1 && (row == 2 || row == 3);
                 }
             };
 
@@ -213,12 +217,16 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             Settings settings = Settings.getSingletonInstance();
             model.setValueAt(settings.getProperty("default.save.path"), 0, 1);
             model.setValueAt(settings.getProperty("default.local.path"), 1, 1);
+            model.setValueAt(settings.getProperty("default.proxyUser"), 2, 1);
+            model.setValueAt(settings.getProperty("default.proxyPassword"), 3, 1);
         }
 
         public void saveSettings() {
             Settings settings = Settings.getSingletonInstance();
             settings.setProperty("default.save.path", model.getValueAt(0, 1).toString());
             settings.setProperty("default.local.path", model.getValueAt(1, 1).toString());
+            settings.setProperty("default.proxyUser", model.getValueAt(2, 1).toString());
+            settings.setProperty("default.proxyPassword", model.getValueAt(3, 1).toString());
         }
 
     }
