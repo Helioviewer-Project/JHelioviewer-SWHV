@@ -37,6 +37,13 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     private static final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
 
+    public EVEPlugin() {
+        LineDataSelectorModel.addLineDataSelectorModelListener(dc);
+        LineDataSelectorModel.addLineDataSelectorModelListener(td.getObservationPanel());
+        LineDataSelectorModel.addLineData(rd);
+        LineDataSelectorModel.addLineData(em);
+    }
+
     @Override
     public void installPlugin() {
         pluginPanes.add(plotOne);
@@ -50,11 +57,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         Layers.addTimeListener(dc);
         Layers.addTimespanListener(dc);
         JHVRelatedEvents.addHighlightListener(dc);
-
-        LineDataSelectorModel.addLineDataSelectorModelListener(dc);
-        LineDataSelectorModel.addLineDataSelectorModelListener(td.getObservationPanel());
-        LineDataSelectorModel.addLineData(rd);
-        LineDataSelectorModel.addLineData(em);
 
         // em.fetchData(DrawController.selectedAxis);
 
@@ -80,6 +82,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     @Override
     public void uninstallPlugin() {
         JHVRelatedEvents.removeHighlightListener(dc);
+        Layers.removeTimespanListener(dc);
         Layers.removeTimeListener(dc);
         Layers.removeLayersListener(dc);
 
