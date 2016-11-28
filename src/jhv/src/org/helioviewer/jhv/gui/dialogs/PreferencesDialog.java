@@ -144,7 +144,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      */
     private JPanel createDefaultSaveDirPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder(" Locations "));
+        panel.setBorder(BorderFactory.createTitledBorder(" Settings "));
 
         defaultsPanel = new DefaultsSelectionPanel();
         defaultsPanel.loadSettings();
@@ -170,7 +170,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             Object[][] tableData = {
                 { "Default recording directory", settings.getProperty("default.save.path") },
                 { "Default download path", settings.getProperty("default.local.path") },
-                { "Proxy user", settings.getProperty("default.proxyUser") },
+                { "Proxy username", settings.getProperty("default.proxyUsername") },
                 { "Proxy password", settings.getProperty("default.proxyPassword") },
             };
 
@@ -217,7 +217,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             Settings settings = Settings.getSingletonInstance();
             model.setValueAt(settings.getProperty("default.save.path"), 0, 1);
             model.setValueAt(settings.getProperty("default.local.path"), 1, 1);
-            model.setValueAt(settings.getProperty("default.proxyUser"), 2, 1);
+            model.setValueAt(settings.getProperty("default.proxyUsername"), 2, 1);
             model.setValueAt(settings.getProperty("default.proxyPassword"), 3, 1);
         }
 
@@ -225,8 +225,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             Settings settings = Settings.getSingletonInstance();
             settings.setProperty("default.save.path", model.getValueAt(0, 1).toString());
             settings.setProperty("default.local.path", model.getValueAt(1, 1).toString());
-            settings.setProperty("default.proxyUser", model.getValueAt(2, 1).toString());
-            settings.setProperty("default.proxyPassword", model.getValueAt(3, 1).toString());
+            if (model.getValueAt(2, 1) != null) settings.setProperty("default.proxyUsername", model.getValueAt(2, 1).toString());
+            if (model.getValueAt(3, 1) != null) settings.setProperty("default.proxyPassword", model.getValueAt(3, 1).toString());
         }
 
     }
