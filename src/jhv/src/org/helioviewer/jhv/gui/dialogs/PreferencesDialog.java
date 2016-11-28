@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -9,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -17,11 +19,14 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
@@ -148,7 +153,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         defaultsPanel = new DefaultsSelectionPanel();
         defaultsPanel.loadSettings();
-        defaultsPanel.setPreferredSize(new Dimension(450, 100));
+        defaultsPanel.setPreferredSize(new Dimension(450, 150));
         defaultsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         panel.add(defaultsPanel, BorderLayout.CENTER);
@@ -181,7 +186,31 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 }
             };
 
-            table = new JTable(model);
+            JPasswordField passField = new JPasswordField();
+            DefaultCellEditor passEditor = new DefaultCellEditor(passField);
+
+            table = new JTable(model) {
+                @Override
+                public TableCellEditor getCellEditor(int row, int column) {
+                    if (row == 3 && column == 1) {
+                        if (getValueAt(3, 1) instanceof String)
+                            passField.setText((String) getValueAt(3, 1));
+                        return passEditor;
+                    } else
+                        return super.getCellEditor(row, column);
+                }
+            };
+            table.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer () {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    if (row == 3 && column == 1) {
+                        if (value instanceof String)
+                            passField.setText((String) value);
+                        return passField;
+                    }
+                    return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                }
+            });
 
             table.setRowHeight(20);
             JScrollPane scrollPane = new JScrollPane(table);
