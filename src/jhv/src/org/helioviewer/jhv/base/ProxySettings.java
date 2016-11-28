@@ -35,7 +35,7 @@ public class ProxySettings {
                         String pass = System.getProperty(vars[3]);
 
                         if (user == null || pass == null) {
-                            user = Settings.getSingletonInstance().getProperty("default.proxyUser");
+                            user = Settings.getSingletonInstance().getProperty("default.proxyUsername");
                             pass = Settings.getSingletonInstance().getProperty("default.proxyPassword");
                         }
 
