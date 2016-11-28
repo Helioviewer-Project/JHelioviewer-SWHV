@@ -39,7 +39,7 @@ public class ProxySettings {
                             pass = Settings.getSingletonInstance().getProperty("default.proxyPassword");
                         }
 
-                        if (user != null && pass != null && getRequestingHost().equalsIgnoreCase(host) && String.valueOf(getRequestingPort()).equals(port)) {
+                        if (user != null && pass != null && getRequestingHost().equalsIgnoreCase(host) && Integer.toString(getRequestingPort()).equals(port)) {
                             return new PasswordAuthentication(user, pass.toCharArray());
                         }
                     }
@@ -54,7 +54,7 @@ public class ProxySettings {
         if (proxyHost != null) {
             try {
                 int proxyPort = Integer.parseInt(System.getProperty(port));
-                return new Proxy(type, new InetSocketAddress(proxyHost, proxyPort));
+                return new Proxy(type, InetSocketAddress.createUnresolved(proxyHost, proxyPort));
             } catch (Exception ignore) {
             }
         }
