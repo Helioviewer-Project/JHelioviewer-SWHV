@@ -27,9 +27,10 @@ public class ProxySettings {
             Authenticator.setDefault(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    if (getRequestorType() == RequestorType.PROXY) {
-                        String[] vars = proxy.type().equals(Proxy.Type.HTTP) ? httpVars : socksVars;
-                        String host = System.getProperty(vars[0]);
+                    String[] vars = proxy.type().equals(Proxy.Type.HTTP) ? httpVars : socksVars;
+                    String host = System.getProperty(vars[0]);
+                    if (getRequestingHost().equalsIgnoreCase(host)) {
+                    // if (getRequestorType() == RequestorType.PROXY) {
                         String port = System.getProperty(vars[1]);
                         String user = System.getProperty(vars[2]);
                         String pass = System.getProperty(vars[3]);
@@ -39,7 +40,7 @@ public class ProxySettings {
                             pass = Settings.getSingletonInstance().getProperty("default.proxyPassword");
                         }
 
-                        if (user != null && pass != null && getRequestingHost().equalsIgnoreCase(host) && Integer.toString(getRequestingPort()).equals(port)) {
+                        if (user != null && pass != null && Integer.toString(getRequestingPort()).equals(port)) {
                             return new PasswordAuthentication(user, pass.toCharArray());
                         }
                     }
