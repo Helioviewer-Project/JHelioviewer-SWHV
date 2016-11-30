@@ -68,9 +68,4 @@ public class HTTPRequest extends HTTPMessage {
         return method;
     }
 
-    /** This is a request message so this method always returns true. */
-    public boolean isRequest() {
-        return true;
-    }
-
 }
