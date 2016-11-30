@@ -42,7 +42,7 @@ public class HTTPSocket extends Socket {
     /**
      * Connects to the specified host via the supplied URI.
      *
-     * @param _uri
+     * @param uri
      * @throws IOException
      */
     protected Object connect(URI uri) throws IOException {
@@ -77,17 +77,7 @@ public class HTTPSocket extends Socket {
             throw new ProtocolException("Invalid HTTP message: " + line);
         }
 
-        if (parts[0].startsWith("HTTP/")) {
-            // Parses HTTP version
-            double ver;
-            try {
-                ver = Double.parseDouble(parts[0].substring(5));
-            } catch (NumberFormatException ex) {
-                throw new ProtocolException("Invalid HTTP version format");
-            }
-            if (ver < 1 || ver > HTTPConstants.version)
-                throw new ProtocolException("HTTP version not supported");
-
+        if (parts[0].startsWith("HTTP/1.1")) {
             // Parses status code
             int code;
             try {
@@ -113,17 +103,15 @@ public class HTTPSocket extends Socket {
             }
             return res;
         } else {
-            throw new ProtocolException("Requests received not yet supported");
+            throw new ProtocolException("Requests received not supported");
         }
     }
 
-    /** Returns the lastUsedPort */
     @Override
     public int getPort() {
         return lastUsedPort;
     }
 
-    /** Returns the lastUsedHost */
     protected String getHost() {
         return lastUsedHost;
     }

@@ -94,9 +94,9 @@ public class JP2Image {
      * called by the constructor. Either the constructor throws an exception or
      * the image was opened successfully.
      *
-     * @param newUri
+     * @param _uri
      *            URI representing the location of the image
-     * @param downloadURI
+     * @param _downloadURI
      *            In case the file should be downloaded to the local filesystem,
      *            use this URI as the source.
      * @throws IOException

@@ -22,10 +22,7 @@ public interface ImageCacheStatus {
 
     /**
      * Sets the image cache status of one composition layer.
-     * 
-     * If necessary, fires a
-     * {@link org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason}.
-     * 
+     *
      * @param compositionLayer
      *            Layer, whose status has changed
      * @param newStatus

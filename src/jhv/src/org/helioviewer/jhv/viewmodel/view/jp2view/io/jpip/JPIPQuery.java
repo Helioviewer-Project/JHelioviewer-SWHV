@@ -11,7 +11,6 @@ import java.util.HashMap;
  */
 public class JPIPQuery {
 
-    /** HashMap holding the jpip-request-fields */
     private final HashMap<String, String> fields = new HashMap<>();
 
     public JPIPQuery() {
@@ -39,36 +38,10 @@ public class JPIPQuery {
         fields.putIfAbsent("len", Integer.toString(JPIPConstants.MIN_REQUEST_LEN));
     }
 
-    /**
-     * Sets the specified field to the specified value.
-     * 
-     * @param _key
-     * @param _value
-     */
     public void setField(String key, String value) {
         fields.put(key, value);
     }
 
-    /**
-     * Removes a specified pair (key, value).
-     * 
-     * @param key
-     */
-    public void removeField(String key) {
-        fields.remove(key);
-    }
-
-    /**
-     * Gets the value of the specified field. Returns null if it does not exist.
-     * 
-     * @param key
-     * @return Value corresponding to given key
-     */
-    public String getValue(String key) {
-        return fields.get(key);
-    }
-
-    /** Returns a String representing this query. */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
