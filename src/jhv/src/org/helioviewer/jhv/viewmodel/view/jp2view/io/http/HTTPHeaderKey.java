@@ -14,6 +14,7 @@ public enum HTTPHeaderKey {
     HOST("Host"),
     USER_AGENT("User-Agent"),
     ACCEPT_ENCODING("Accept-Encoding"),
+    CONTENT_ENCODING("Content-Encoding"),
     CONTENT_LENGTH("Content-Length"),
     CONTENT_TYPE("Content-Type");
 

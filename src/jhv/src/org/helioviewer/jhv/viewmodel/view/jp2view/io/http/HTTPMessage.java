@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
  * The class <code>HTTPMessage</code> defines the basic body of a HTTP message.
  * 
  * @author Juan Pablo Garcia Ortiz
@@ -40,6 +39,10 @@ public abstract class HTTPMessage {
         return headers.get(key);
     }
 
+    public final String getHeader(HTTPHeaderKey key) {
+        return headers.get(key.toString());
+    }
+
     /**
      * Sets a new value for a specific HTTP message header. If the header does
      * not exists, it will be added to the header list of the message.
@@ -53,13 +56,8 @@ public abstract class HTTPMessage {
         headers.put(key, val);
     }
 
-    /**
-     * Same as setHeader except for a map of headers.
-     * 
-     * @param map
-     */
-    public final void setHeaders(Map<String, String> map) {
-        headers.putAll(map);
+    public final void addHeader(HTTPHeaderKey key, String val) {
+        headers.putIfAbsent(key.toString(), val);
     }
 
     /**
@@ -68,30 +66,6 @@ public abstract class HTTPMessage {
      */
     public final Set<String> getHeaders() {
         return headers.keySet();
-    }
-
-    /**
-     * Tests to see if a header exists.
-     * 
-     * @param _key
-     * @return True, if the header exists, false otherwise
-     */
-    public final boolean headerExists(String key) {
-        return headers.containsKey(key);
-    }
-
-    /**
-     * Removes the specified message header.
-     * 
-     * @param key
-     */
-    public final void removeHeader(String key) {
-        headers.remove(key);
-    }
-
-    /** Removes all the message headers. */
-    public final void clearHeaders() {
-        headers.clear();
     }
 
 }
