@@ -98,9 +98,8 @@ public class HTTPSocket extends Socket {
                 throw new ProtocolException("Invalid HTTP status code format");
             }
 
-            // Instantiates new HTTPResponse
-            HTTPMessage res = new HTTPMessage();
             // Parses HTTP headers
+            HTTPMessage res = new HTTPMessage();
             while (true) {
                 line = LineRead.readAsciiLine(inputStream);
                 if (line.isEmpty())
@@ -114,7 +113,7 @@ public class HTTPSocket extends Socket {
             }
             return res;
         } else {
-            throw new ProtocolException("Requests receiving not yet supported");
+            throw new ProtocolException("Requests received not yet supported");
         }
     }
 

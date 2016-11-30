@@ -259,7 +259,7 @@ class J2KReader implements Runnable {
                     lastResponseTime = -1;
 
                     //int idx = 0;
-                    JPIPRequest req = new JPIPRequest(JPIPRequest.Method.GET);
+                    JPIPRequest req = new JPIPRequest();
                     // send queries until everything is complete or caching is interrupted
                     int complete_steps = 0;
                     boolean stopReading = false;
