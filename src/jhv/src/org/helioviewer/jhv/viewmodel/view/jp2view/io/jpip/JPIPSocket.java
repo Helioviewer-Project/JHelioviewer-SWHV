@@ -13,7 +13,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.FixedSizedInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.TransferInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPConstants;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPMessage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPSocket;
 
@@ -122,11 +121,11 @@ public class JPIPSocket extends HTTPSocket {
     // Sends a JPIPRequest
     public void send(JPIPRequest req) throws IOException {
         // Adds some default headers if they were not already added
-        req.addHeader(HTTPHeaderKey.USER_AGENT, JHVGlobals.getUserAgent());
-        req.addHeader(HTTPHeaderKey.CONNECTION, "Keep-Alive");
-        req.addHeader(HTTPHeaderKey.ACCEPT_ENCODING, "gzip");
-        req.addHeader(HTTPHeaderKey.CACHE_CONTROL, "no-cache");
-        req.addHeader(HTTPHeaderKey.HOST, getHost() + ':' + getPort());
+        req.addHeader("User-Agent", JHVGlobals.getUserAgent());
+        req.addHeader("Connection", "Keep-Alive");
+        req.addHeader("Accept-Encoding", "gzip");
+        req.addHeader("Cache-Control", "no-cache");
+        req.addHeader("Host", getHost() + ':' + getPort());
 
         // Adds a necessary JPIP request field
         String queryStr = req.getQuery();
@@ -146,19 +145,19 @@ public class JPIPSocket extends HTTPSocket {
     public JPIPResponse receive() throws IOException {
         // long tini = System.currentTimeMillis();
         HTTPMessage res = recv();
-        if (!"image/jpp-stream".equals(res.getHeader(HTTPHeaderKey.CONTENT_TYPE)))
+        if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 
         replyTextTm = System.currentTimeMillis();
 
         String head;
         TransferInputStream transferInput;
-        head = res.getHeader(HTTPHeaderKey.TRANSFER_ENCODING);
+        head = res.getHeader("Transfer-Encoding");
         String transferEncoding = head == null ? "" : head.toLowerCase();
         switch (transferEncoding) {
             case "":
             case "identity":
-                String contentLength = res.getHeader(HTTPHeaderKey.CONTENT_LENGTH);
+                String contentLength = res.getHeader("Content-Length");
                 try {
                     transferInput = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
                 } catch (Exception e) {
@@ -173,7 +172,7 @@ public class JPIPSocket extends HTTPSocket {
         }
 
         InputStream input = transferInput;
-        head = res.getHeader(HTTPHeaderKey.CONTENT_ENCODING);
+        head = res.getHeader("Content-Encoding");
         String contentEncoding = head == null ? "" : head.toLowerCase();
         switch (contentEncoding) {
             case "":
@@ -199,7 +198,7 @@ public class JPIPSocket extends HTTPSocket {
             input.close(); // make sure the stream is exhausted
         }
 
-        if ("close".equals(res.getHeader(HTTPHeaderKey.CONNECTION))) {
+        if ("close".equals(res.getHeader("Connection"))) {
             super.close();
         }
         replyDataTm = System.currentTimeMillis();

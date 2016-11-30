@@ -25,10 +25,6 @@ public class HTTPMessage {
         return headers.get(key);
     }
 
-    public final String getHeader(HTTPHeaderKey key) {
-        return headers.get(key.toString());
-    }
-
     /**
      * Sets a new value for a specific HTTP message header. If the header does
      * not exists, it will be added to the header list of the message.
@@ -42,12 +38,8 @@ public class HTTPMessage {
         headers.put(key, val);
     }
 
-    public final void setHeader(HTTPHeaderKey key, String val) {
-        headers.put(key.toString(), val);
-    }
-
-    public final void addHeader(HTTPHeaderKey key, String val) {
-        headers.putIfAbsent(key.toString(), val);
+    public final void addHeader(String key, String val) {
+        headers.putIfAbsent(key, val);
     }
 
     public final String toString() {
