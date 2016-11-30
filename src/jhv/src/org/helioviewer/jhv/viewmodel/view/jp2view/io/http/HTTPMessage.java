@@ -3,11 +3,6 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * The class <code>HTTPMessage</code> defines the basic body of a HTTP message.
- * 
- * @author Juan Pablo Garcia Ortiz
- */
 public class HTTPMessage {
 
     private final HashMap<String, String> headers = new HashMap<>();
@@ -18,10 +13,6 @@ public class HTTPMessage {
 
     public final void setHeader(String key, String val) {
         headers.put(key, val);
-    }
-
-    public final void addHeader(String key, String val) {
-        headers.putIfAbsent(key, val);
     }
 
     public final String toString() {
