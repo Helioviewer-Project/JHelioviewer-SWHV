@@ -119,12 +119,12 @@ public class JPIPSocket extends HTTPSocket {
 
     // Sends a JPIPRequest
     public void send(JPIPRequest req) throws IOException {
-        // Add some default headers if they were not already added
-        req.addHeader("User-Agent", JHVGlobals.getUserAgent());
-        req.addHeader("Connection", "Keep-Alive");
-        req.addHeader("Accept-Encoding", "gzip");
-        req.addHeader("Cache-Control", "no-cache");
-        req.addHeader("Host", getHost() + ':' + getPort());
+        // Add some default headers
+        req.setHeader("User-Agent", JHVGlobals.getUserAgent());
+        req.setHeader("Connection", "Keep-Alive");
+        req.setHeader("Accept-Encoding", "gzip");
+        req.setHeader("Cache-Control", "no-cache");
+        req.setHeader("Host", getHost() + ':' + getPort());
 
         // Add a necessary JPIP request field
         String queryStr = req.getQuery();
