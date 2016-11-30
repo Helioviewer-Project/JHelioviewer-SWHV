@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
 
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPMessage;
 
 /**
  * A glorified HTTP request object.
@@ -8,19 +8,19 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
  * @author caplins
  * @author Juan Pablo
  */
-public class JPIPRequest extends HTTPRequest {
+public class JPIPRequest extends HTTPMessage {
+
+    public enum Method {
+        GET, POST
+    }
+
+    private final Method method;
 
     /** The query in string form. */
     private String query = null;
 
-    /**
-     * Default constructor.
-     * 
-     * @param _method
-     * @throws ProtocolException
-     */
     public JPIPRequest(Method _method) {
-        super(_method);
+        method = _method;
     }
 
     /**
@@ -30,17 +30,12 @@ public class JPIPRequest extends HTTPRequest {
      * @param _query
      */
     public JPIPRequest(Method _method, Object _query) {
-        super(_method);
+        this(_method);
         query = _query.toString();
     }
 
-    /** Method does nothing. */
-    public void setURI(String _uri) {
-    }
-
-    /** Method does nothing... returns null. */
-    public String getURI() {
-        return null;
+    public Method getMethod() {
+        return method;
     }
 
     /**

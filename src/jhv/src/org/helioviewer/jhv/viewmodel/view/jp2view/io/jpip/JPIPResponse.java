@@ -2,8 +2,6 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
 
 import java.util.LinkedList;
 
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPResponse;
-
 /**
  * A response to a JPIPRequest. Encapsulates both the HTTPResponse headers and
  * the JPIPDataSegments.
@@ -11,7 +9,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPResponse;
  * @author caplins
  *
  */
-public class JPIPResponse extends HTTPResponse {
+public class JPIPResponse {
 
     /** The status... could be EOR_WINDOW_DONE or EOR_IMAGE_DONE */
     private long status = -1;
@@ -20,17 +18,14 @@ public class JPIPResponse extends HTTPResponse {
     private final LinkedList<JPIPDataSegment> jpipDataList = new LinkedList<>();
     private long size = 0;
 
-    /**
-     * Used to form responses.
-     *
-     * @param res
-     * @throws IOException
-     */
-    public JPIPResponse(HTTPResponse res) {
-        super(res.getCode(), res.getReason());
+    private final String cnew;
 
-        for (String key : res.getHeaders())
-            setHeader(key, res.getHeader(key));
+    public JPIPResponse(String _cnew) {
+        cnew = _cnew;
+    }
+
+    public String getCNew() {
+        return cnew;
     }
 
     /**

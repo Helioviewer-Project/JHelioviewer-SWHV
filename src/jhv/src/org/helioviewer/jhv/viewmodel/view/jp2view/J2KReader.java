@@ -10,7 +10,6 @@ import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPRequest;
@@ -260,7 +259,7 @@ class J2KReader implements Runnable {
                     lastResponseTime = -1;
 
                     //int idx = 0;
-                    JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
+                    JPIPRequest req = new JPIPRequest(JPIPRequest.Method.GET);
                     // send queries until everything is complete or caching is interrupted
                     int complete_steps = 0;
                     boolean stopReading = false;
