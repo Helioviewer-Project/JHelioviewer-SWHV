@@ -75,7 +75,7 @@ public class JPIPResponse extends HTTPResponse {
      * @return True, if the response is complete
      */
     public boolean isResponseComplete() {
-        return (status == JPIPConstants.EOR_WINDOW_DONE || status == JPIPConstants.EOR_IMAGE_DONE);
+        return status == JPIPConstants.EOR_WINDOW_DONE || status == JPIPConstants.EOR_IMAGE_DONE;
     }
 
 }

@@ -36,8 +36,7 @@ public class JPIPQuery {
             isKey = !isKey;
         }
 
-        if (fields.get("len") == null)
-            fields.put("len", Integer.toString(JPIPConstants.MIN_REQUEST_LEN));
+        fields.putIfAbsent("len", Integer.toString(JPIPConstants.MIN_REQUEST_LEN));
     }
 
     /**

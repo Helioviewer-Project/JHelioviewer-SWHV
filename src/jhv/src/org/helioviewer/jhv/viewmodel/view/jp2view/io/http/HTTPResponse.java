@@ -11,38 +11,25 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
  */
 public class HTTPResponse extends HTTPMessage {
 
-    /** The status code */
+    // The status code
     private final int code;
 
-    /** The reason phrase */
+    // The reason phrase
     private final String reason;
 
-    /**
-     * Constructs a new HTTP response, with its status code and reason phrase.
-     * 
-     * @param code
-     *            Status code.
-     * @param reason
-     *            Reason phrase.
-     */
-    public HTTPResponse(int code, String reason) {
-        this.code = code;
-        this.reason = reason;
+    public HTTPResponse(int _code, String _reason) {
+        code = _code;
+        reason = _reason;
     }
 
-    /**
-     * Returns the status code.
-     */
     public int getCode() {
         return code;
     }
 
-    /** Returns the reason phrase. */
     public String getReason() {
         return reason;
     }
 
-    /** This is a response message so this method always returns false. */
     public boolean isRequest() {
         return false;
     }

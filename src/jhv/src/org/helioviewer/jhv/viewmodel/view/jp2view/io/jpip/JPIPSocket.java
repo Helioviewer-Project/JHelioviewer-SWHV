@@ -80,18 +80,16 @@ public class JPIPSocket extends HTTPSocket {
         if (res == null)
             throw new IOException("The server did not send a response after connection");
 
-        HashMap<String, String> map = null;
         String cnew = res.getHeader("JPIP-cnew");
-        if (cnew != null) {
-            map = new HashMap<>();
-            String[] parts = cnew.split(",");
-            for (String part : parts)
-                for (String cnewParam : cnewParams)
-                    if (part.startsWith(cnewParam + '='))
-                        map.put(cnewParam, part.substring(cnewParam.length() + 1));
-        }
-        if (map == null)
+        if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
+
+        HashMap<String, String> map = new HashMap<>();
+        String[] parts = cnew.split(",");
+        for (String part : parts)
+            for (String cnewParam : cnewParams)
+                if (part.startsWith(cnewParam + '='))
+                    map.put(cnewParam, part.substring(cnewParam.length() + 1));
 
         jpipPath = '/' + map.get("path");
 
@@ -105,7 +103,7 @@ public class JPIPSocket extends HTTPSocket {
         return res;
     }
 
-    /** Closes the JPIPSocket */
+    // Closes the JPIPSocket
     @Override
     public void close() throws IOException {
         if (isClosed())
@@ -127,36 +125,25 @@ public class JPIPSocket extends HTTPSocket {
         }
     }
 
-    /**
-     * Sends a JPIPRequest
-     *
-     * @param _req
-     * @throws IOException
-     */
+    // Sends a JPIPRequest
     public void send(JPIPRequest req) throws IOException {
         String queryStr = req.getQuery();
 
-        // Adds some default headers if they were not already added.
-        if (!req.headerExists(HTTPHeaderKey.USER_AGENT.toString()))
-            req.setHeader(HTTPHeaderKey.USER_AGENT.toString(), JHVGlobals.getUserAgent());
-        if (!req.headerExists(HTTPHeaderKey.ACCEPT_ENCODING.toString()))
-            req.setHeader(HTTPHeaderKey.ACCEPT_ENCODING.toString(), "gzip");
-        if (!req.headerExists(HTTPHeaderKey.CACHE_CONTROL.toString()))
-            req.setHeader(HTTPHeaderKey.CACHE_CONTROL.toString(), "no-cache");
-        if (!req.headerExists(HTTPHeaderKey.HOST.toString()))
-            req.setHeader(HTTPHeaderKey.HOST.toString(), (getHost() + ':' + getPort()));
+        // Adds some default headers if they were not already added
+        req.addHeader(HTTPHeaderKey.USER_AGENT, JHVGlobals.getUserAgent());
+        req.addHeader(HTTPHeaderKey.ACCEPT_ENCODING, "gzip");
+        req.addHeader(HTTPHeaderKey.CACHE_CONTROL, "no-cache");
+        req.addHeader(HTTPHeaderKey.HOST, getHost() + ':' + getPort());
+
         // Adds a necessary JPIP request field
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
         if (req.getMethod() == Method.GET) {
-            if (!req.headerExists(HTTPHeaderKey.CONNECTION.toString()))
-                req.setHeader(HTTPHeaderKey.CONNECTION.toString(), "Keep-Alive");
+            req.addHeader(HTTPHeaderKey.CONNECTION, "Keep-Alive");
         } else if (req.getMethod() == Method.POST) {
-            if (!req.headerExists(HTTPHeaderKey.CONTENT_TYPE.toString()))
-                req.setHeader(HTTPHeaderKey.CONTENT_TYPE.toString(), "application/x-www-form-urlencoded");
-            if (!req.headerExists(HTTPHeaderKey.CONTENT_LENGTH.toString()))
-                req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(queryStr.getBytes(StandardCharsets.UTF_8).length));
+            req.addHeader(HTTPHeaderKey.CONTENT_TYPE, "application/x-www-form-urlencoded");
+            req.addHeader(HTTPHeaderKey.CONTENT_LENGTH, Integer.toString(queryStr.getBytes(StandardCharsets.UTF_8).length));
         }
 
         StringBuilder str = new StringBuilder();
@@ -185,7 +172,7 @@ public class JPIPSocket extends HTTPSocket {
         getOutputStream().write(str.toString().getBytes(StandardCharsets.UTF_8));
     }
 
-    /** Receives a JPIPResponse returning null if EOS reached */
+    // Receives a JPIPResponse returning null if EOS reached
     @Override
     public JPIPResponse receive() throws IOException {
         // long tini = System.currentTimeMillis();
@@ -195,17 +182,17 @@ public class JPIPSocket extends HTTPSocket {
 
         if (res.getCode() != 200)
             throw new IOException("Invalid status code returned (" + res.getCode() + ')');
-        if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
+        if (!"image/jpp-stream".equals(res.getHeader(HTTPHeaderKey.CONTENT_TYPE)))
             throw new IOException("Expected image/jpp-stream content");
 
         replyTextTm = System.currentTimeMillis();
 
         TransferInputStream transferInput;
-        String transferEncoding = res.getHeader("Transfer-Encoding") == null ? "" : res.getHeader("Transfer-Encoding");
+        String transferEncoding = res.getHeader(HTTPHeaderKey.TRANSFER_ENCODING) == null ? "" : res.getHeader(HTTPHeaderKey.TRANSFER_ENCODING);
         switch (transferEncoding.toLowerCase()) {
             case "":
             case "identity":
-                String contentLength = res.getHeader("Content-Length");
+                String contentLength = res.getHeader(HTTPHeaderKey.CONTENT_LENGTH);
                 try {
                     transferInput = new FixedSizedInputStream(inputStream, Integer.parseInt(contentLength));
                 } catch (Exception e) {
@@ -220,7 +207,7 @@ public class JPIPSocket extends HTTPSocket {
         }
 
         InputStream input = transferInput;
-        String contentEncoding = res.getHeader("Content-Encoding") == null ? "" : res.getHeader("Content-Encoding");
+        String contentEncoding = res.getHeader(HTTPHeaderKey.CONTENT_ENCODING) == null ? "" : res.getHeader(HTTPHeaderKey.CONTENT_ENCODING);
         switch (contentEncoding.toLowerCase()) {
             case "":
             case "identity":
@@ -244,7 +231,7 @@ public class JPIPSocket extends HTTPSocket {
             input.close(); // make sure the stream is exhausted
         }
 
-        if ("close".equals(res.getHeader("Connection"))) {
+        if ("close".equals(res.getHeader(HTTPHeaderKey.CONNECTION))) {
             super.close();
         }
         replyDataTm = System.currentTimeMillis();
