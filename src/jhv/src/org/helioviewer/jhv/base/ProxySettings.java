@@ -32,21 +32,22 @@ public class ProxySettings {
                     String[] vars = proxy.type().equals(Proxy.Type.HTTP) ? httpVars : socksVars;
                     String host = System.getProperty(vars[0]);
                     if (getRequestingHost().equalsIgnoreCase(host)) {
-                    // if (getRequestorType() == RequestorType.PROXY) {
+                    // if (getRequestorType() == RequestorType.PROXY)
                         String port = System.getProperty(vars[1]);
                         String user = System.getProperty(vars[2]);
                         String pass = System.getProperty(vars[3]);
 
-                        if (user == null || pass == null) {
-                            user = Settings.getSingletonInstance().getProperty("default.proxyUsername");
-                            pass = Settings.getSingletonInstance().getProperty("default.proxyPassword");
-                        }
-
-                        if (user != null && pass != null && Integer.toString(getRequestingPort()).equals(port)) {
-                            try {
-                                return new PasswordAuthentication(user, new String(Base64.getDecoder().decode(pass), StandardCharsets.UTF_8).toCharArray());
-                            } catch (Exception ignore) {
+                        try {
+                            if (user == null || pass == null) {
+                                user = Settings.getSingletonInstance().getProperty("default.proxyUsername");
+                                pass = Settings.getSingletonInstance().getProperty("default.proxyPassword");
+                                if (pass != null)
+                                    pass = new String(Base64.getDecoder().decode(pass), StandardCharsets.UTF_8);
                             }
+
+                            if (user != null && pass != null && Integer.toString(getRequestingPort()).equals(port))
+                                return new PasswordAuthentication(user, pass.toCharArray());
+                        } catch (Exception ignore) {
                         }
                     }
                     return null;

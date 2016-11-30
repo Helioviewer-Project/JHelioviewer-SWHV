@@ -255,8 +255,10 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 settings.setProperty("default.local.path", (String) model.getValueAt(1, 1));
             if (model.getValueAt(2, 1) instanceof String)
                 settings.setProperty("default.proxyUsername", (String) model.getValueAt(2, 1));
-            if (model.getValueAt(3, 1) instanceof String)
-                settings.setProperty("default.proxyPassword", Base64.getEncoder().encodeToString(((String) model.getValueAt(3, 1)).getBytes(StandardCharsets.UTF_8)));
+            if (model.getValueAt(3, 1) instanceof String) {
+                String s = Base64.getEncoder().withoutPadding().encodeToString(((String) model.getValueAt(3, 1)).getBytes(StandardCharsets.UTF_8));
+                settings.setProperty("default.proxyPassword", s);
+            }
         }
 
     }
