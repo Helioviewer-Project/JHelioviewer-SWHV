@@ -7,13 +7,8 @@ import java.util.Set;
  * The class <code>HTTPMessage</code> defines the basic body of a HTTP message.
  * 
  * @author Juan Pablo Garcia Ortiz
- * @see HTTPRequest
- * @see HTTPResponse
- * @see HTTPSocket
- * @version 0.1
- * 
  */
-public abstract class HTTPMessage {
+public class HTTPMessage {
 
     /** A hash table with the headers of the message */
     private final HashMap<String, String> headers = new HashMap<>();

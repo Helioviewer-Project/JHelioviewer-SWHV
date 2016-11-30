@@ -7,23 +7,17 @@ import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 
 import org.helioviewer.jhv.base.ProxySettings;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.LineRead;
 
 /**
- *
  * The class <code>HTTPSocket</code> is a simple implementation for read/write
  * HTTP messages. In this version are only supported to send requests and to
  * receive responses.
  *
  * @author Juan Pablo Garcia Ortiz
- * @see java.net.Socket
- * @see HTTPResponse
- * @see HTTPRequest
  * @version 0.1
- *
  */
 public class HTTPSocket extends Socket {
 
@@ -69,37 +63,6 @@ public class HTTPSocket extends Socket {
     }
 
     /**
-     * Sends a HTTP message. Only HTTP requests supported
-     *
-     * @param _msg
-     *            A <code>HTTPMessage</code> object with the message.
-     * @throws java.io.IOException
-     */
-    protected void send(HTTPRequest req) throws IOException {
-        StringBuilder str = new StringBuilder();
-        // Adds the URI line
-        str.append(req.getMethod()).append(' ').append(req.getURI()).append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
-
-        String msgBody = req.getMessageBody();
-        // Sets the content length header if it's a POST
-        if (req.getMethod() == HTTPRequest.Method.POST)
-            req.setHeader(HTTPHeaderKey.CONTENT_LENGTH, Integer.toString(msgBody.getBytes(StandardCharsets.UTF_8).length));
-
-        // Adds the headers
-        for (String key : req.getHeaders()) {
-            str.append(key).append(": ").append(req.getHeader(key)).append(HTTPConstants.CRLF);
-        }
-        str.append(HTTPConstants.CRLF);
-
-        // Adds the message body if it's a POST
-        if (req.getMethod() == HTTPRequest.Method.POST)
-            str.append(msgBody);
-
-        // Writes the result to the output stream
-        getOutputStream().write(str.toString().getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
      * Receives a HTTP message from the socket. Currently it is only supported
      * to receive HTTP responses.
      *
@@ -107,7 +70,7 @@ public class HTTPSocket extends Socket {
      *         <code>null</code> if the end of stream was reached.
      * @throws java.io.IOException
      */
-    protected HTTPResponse receive() throws IOException {
+    protected HTTPMessage recv() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);
         String parts[] = line.split(" ", 3);
         if (parts.length != 3) {
@@ -129,12 +92,14 @@ public class HTTPSocket extends Socket {
             int code;
             try {
                 code = Integer.parseInt(parts[1]);
+                if (code != 200)
+                    throw new IOException("Invalid status code returned (" + code + "): " + parts[2]);
             } catch (NumberFormatException ex) {
                 throw new ProtocolException("Invalid HTTP status code format");
             }
 
             // Instantiates new HTTPResponse
-            HTTPResponse res = new HTTPResponse(code, parts[2]);
+            HTTPMessage res = new HTTPMessage();
             // Parses HTTP headers
             while (true) {
                 line = LineRead.readAsciiLine(inputStream);

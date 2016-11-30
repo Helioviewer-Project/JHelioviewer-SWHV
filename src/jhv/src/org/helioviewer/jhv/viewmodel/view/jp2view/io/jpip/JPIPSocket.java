@@ -14,9 +14,8 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.FixedSizedInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.TransferInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPMessage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPSocket;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest.Method;
 
 /**
  * Assumes a persistent HTTP connection.
@@ -68,7 +67,7 @@ public class JPIPSocket extends HTTPSocket {
                                         JPIPRequestField.TID.toString(), "0",
                                         JPIPRequestField.LEN.toString(), "512"); // deliberately small
 
-        JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
+        JPIPRequest req = new JPIPRequest(JPIPRequest.Method.GET);
         req.setQuery(query.toString());
 
         JPIPResponse res = null;
@@ -79,7 +78,7 @@ public class JPIPSocket extends HTTPSocket {
         if (res == null)
             throw new IOException("The server did not send a response after connection");
 
-        String cnew = res.getHeader("JPIP-cnew");
+        String cnew = res.getCNew();
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
 
@@ -112,8 +111,7 @@ public class JPIPSocket extends HTTPSocket {
             if (jpipChannelID != null) {
                 JPIPQuery query = new JPIPQuery(JPIPRequestField.CCLOSE.toString(), jpipChannelID,
                                                 JPIPRequestField.LEN.toString(), "0");
-
-                JPIPRequest req = new JPIPRequest(HTTPRequest.Method.GET);
+                JPIPRequest req = new JPIPRequest(JPIPRequest.Method.GET);
                 req.setQuery(query.toString());
                 send(req);
             }
@@ -138,9 +136,9 @@ public class JPIPSocket extends HTTPSocket {
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
-        if (req.getMethod() == Method.GET) {
+        if (req.getMethod() == JPIPRequest.Method.GET) {
             req.addHeader(HTTPHeaderKey.CONNECTION, "Keep-Alive");
-        } else if (req.getMethod() == Method.POST) {
+        } else if (req.getMethod() == JPIPRequest.Method.POST) {
             req.addHeader(HTTPHeaderKey.CONTENT_TYPE, "application/x-www-form-urlencoded");
             req.addHeader(HTTPHeaderKey.CONTENT_LENGTH, Integer.toString(queryStr.getBytes(StandardCharsets.UTF_8).length));
         }
@@ -149,7 +147,7 @@ public class JPIPSocket extends HTTPSocket {
 
         // Adds the URI line
         str.append(req.getMethod()).append(' ').append(jpipPath);
-        if (req.getMethod() == Method.GET) {
+        if (req.getMethod() == JPIPRequest.Method.GET) {
             str.append('?').append(queryStr);
         }
         str.append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
@@ -161,7 +159,7 @@ public class JPIPSocket extends HTTPSocket {
         str.append(HTTPConstants.CRLF);
 
         // Adds the message body if necessary
-        if (req.getMethod() == HTTPRequest.Method.POST)
+        if (req.getMethod() == JPIPRequest.Method.POST)
             str.append(queryStr);
 
         // if (!isConnected())
@@ -172,12 +170,9 @@ public class JPIPSocket extends HTTPSocket {
     }
 
     // Receives a JPIPResponse returning null if EOS reached
-    @Override
     public JPIPResponse receive() throws IOException {
         // long tini = System.currentTimeMillis();
-        JPIPResponse res = new JPIPResponse(super.receive());
-        if (res.getCode() != 200)
-            throw new IOException("Invalid status code returned (" + res.getCode() + ')');
+        HTTPMessage res = recv();
         if (!"image/jpp-stream".equals(res.getHeader(HTTPHeaderKey.CONTENT_TYPE)))
             throw new IOException("Expected image/jpp-stream content");
 
@@ -218,11 +213,12 @@ public class JPIPSocket extends HTTPSocket {
                 throw new IOException("Unknown content encoding: " + contentEncoding);
         }
 
+        JPIPResponse jpipRes = new JPIPResponse(res.getHeader("JPIP-cnew"));
         JPIPDataInputStream jpip = new JPIPDataInputStream(input);
         try {
             JPIPDataSegment seg;
             while ((seg = jpip.readSegment()) != null)
-                res.addJpipDataSegment(seg);
+                jpipRes.addJpipDataSegment(seg);
         } finally {
             input.close(); // make sure the stream is exhausted
         }
@@ -236,7 +232,7 @@ public class JPIPSocket extends HTTPSocket {
         // System.out.format("Bandwidth: %.2f KB/seg.\n", (double)(receivedData
         // * 1.0) / (double)(replyDataTm - tini));
 
-        return res;
+        return jpipRes;
     }
 
     /**
