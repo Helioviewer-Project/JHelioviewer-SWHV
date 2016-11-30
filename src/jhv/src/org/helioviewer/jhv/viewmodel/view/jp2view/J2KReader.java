@@ -276,7 +276,7 @@ class J2KReader implements Runnable {
                         // update requested package size
                         stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), Integer.toString(jpipRequestLen));
 
-                        req.setQuery(stepQuerys[current_step]);
+                        req.setQuery(stepQuerys[current_step].toString());
                         // Log.debug(stepQuerys[current_step].toString());
                         socket.send(req);
 
