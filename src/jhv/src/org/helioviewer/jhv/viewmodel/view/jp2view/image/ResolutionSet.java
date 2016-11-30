@@ -18,7 +18,7 @@ public class ResolutionSet {
      * Constructor. Takes the number of resolution levels in the associated
      * image.
      *
-     * @param _numResolutions
+     * @param numResolutions
      */
     public ResolutionSet(int numResolutions) {
         resolutions = new ResolutionLevel[numResolutions];
@@ -33,7 +33,7 @@ public class ResolutionSet {
      * use a rectangle object instead of a Dimension object (even though I don't
      * think I ever explicitly use the origin).
      *
-     * @param _discardLayer
+     * @param discardLayer
      * @param _dims
      */
     public void addResolutionLevel(int discardLayer, int width, int height, double scaleX, double scaleY) {

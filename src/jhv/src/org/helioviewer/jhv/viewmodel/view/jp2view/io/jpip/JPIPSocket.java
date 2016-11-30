@@ -12,7 +12,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.FixedSizedInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.TransferInputStream;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPMessage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPSocket;
 
@@ -51,7 +50,7 @@ public class JPIPSocket extends HTTPSocket {
      * distinguish it from the super classes connect method (I want to return
      * something and the super class has a return type of void).
      *
-     * @param _uri
+     * @param uri
      * @return The first response of the server when connecting.
      * @throws IOException
      */
@@ -120,25 +119,22 @@ public class JPIPSocket extends HTTPSocket {
 
     // Sends a JPIPRequest
     public void send(JPIPRequest req) throws IOException {
-        // Adds some default headers if they were not already added
+        // Add some default headers if they were not already added
         req.addHeader("User-Agent", JHVGlobals.getUserAgent());
         req.addHeader("Connection", "Keep-Alive");
         req.addHeader("Accept-Encoding", "gzip");
         req.addHeader("Cache-Control", "no-cache");
         req.addHeader("Host", getHost() + ':' + getPort());
 
-        // Adds a necessary JPIP request field
+        // Add a necessary JPIP request field
         String queryStr = req.getQuery();
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
-        StringBuilder str = new StringBuilder("GET ");
-        // Adds the URI
-        str.append(jpipPath).append('?').append(queryStr).append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
-        // Adds the headers
-        str.append(req).append(HTTPConstants.CRLF);
+        // Build request to send
+        String res = "GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n";
         // Writes the result to the output stream
-        getOutputStream().write(str.toString().getBytes(StandardCharsets.UTF_8));
+        getOutputStream().write(res.getBytes(StandardCharsets.UTF_8));
     }
 
     // Receives a JPIPResponse returning null if EOS reached

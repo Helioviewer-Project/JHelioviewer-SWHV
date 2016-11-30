@@ -24,7 +24,7 @@ public class BooleanSignal {
     /**
      * Default constructor. Assigns the initial value of the isSignaled flag.
      * 
-     * @param _intitialVal
+     * @param _initialVal
      */
     public BooleanSignal(boolean _initialVal) {
         isSignaled = _initialVal;

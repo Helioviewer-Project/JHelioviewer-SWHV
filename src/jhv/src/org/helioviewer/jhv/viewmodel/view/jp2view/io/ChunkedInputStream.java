@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ProtocolException;
 
-/**
+/*
  * Transparently coalesces chunks of a HTTP stream that uses
  * Transfer-Encoding chunked.
  *

@@ -37,7 +37,7 @@ public class KakaduUtils {
     /**
      * Converts a Kdu_dims object to its Java equivalent (Rectangle).
      *
-     * @param _dims
+     * @param dims
      *            Kdu_dims to convert
      * @return Rectangle equivalent to the given Kdu_dims
      */
@@ -50,7 +50,7 @@ public class KakaduUtils {
     /**
      * Converts a SubImage object to a Kdu_dims object
      *
-     * @param _roi
+     * @param roi
      *            SubImage to convert
      * @return Kdu_dims equivalent to the given SubImage
      */
@@ -72,8 +72,8 @@ public class KakaduUtils {
      * application, it includes the main header as well as the metadata.
      * JPIPSocket object should already be connected.
      *
-     * @param _socket
-     * @param _cache
+     * @param socket
+     * @param cache
      * @throws IOException
      * @throws JHV_KduException
      */
@@ -111,9 +111,9 @@ public class KakaduUtils {
      * were found. The superbox is returned so it can be closed properly after
      * the matching box has been closed.
      *
-     * @param _familySrc
-     * @param _boxType
-     * @param _boxNumber
+     * @param src
+     * @param boxType
+     * @param boxNumber
      * @return Box found and its superbox if one was opened
      * @throws JHV_KduException
      */
@@ -197,9 +197,9 @@ public class KakaduUtils {
      * Jp2_family_src like the previous method. And in this case the search
      * process is quite simpler.
      *
-     * @param _supBox
-     * @param _boxType
-     * @param _boxNumber
+     * @param supBox
+     * @param boxType
+     * @param boxNumber
      * @return Box found
      * @throws JHV_KduException
      */
