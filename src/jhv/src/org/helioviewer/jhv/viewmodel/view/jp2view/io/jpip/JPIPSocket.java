@@ -62,7 +62,7 @@ public class JPIPSocket extends HTTPSocket {
 
         jpipPath = uri.getPath();
 
-        JPIPRequest req = new JPIPRequest(JPIPRequest.Method.GET);
+        JPIPRequest req = new JPIPRequest();
         JPIPQuery query = new JPIPQuery(JPIPRequestField.CNEW.toString(), "http",
                                         JPIPRequestField.TYPE.toString(), "jpp-stream",
                                         JPIPRequestField.TID.toString(), "0",
@@ -108,14 +108,12 @@ public class JPIPSocket extends HTTPSocket {
 
         try {
             if (jpipChannelID != null) {
-                JPIPRequest req = new JPIPRequest(JPIPRequest.Method.GET);
+                JPIPRequest req = new JPIPRequest();
                 JPIPQuery query = new JPIPQuery(JPIPRequestField.CCLOSE.toString(), jpipChannelID,
                                                 JPIPRequestField.LEN.toString(), "0");
                 req.setQuery(query.toString());
                 send(req);
             }
-        } catch (IOException e) {
-            // e.printStackTrace();
         } finally {
             super.close();
         }
@@ -123,48 +121,23 @@ public class JPIPSocket extends HTTPSocket {
 
     // Sends a JPIPRequest
     public void send(JPIPRequest req) throws IOException {
-        String queryStr = req.getQuery();
-
         // Adds some default headers if they were not already added
         req.addHeader(HTTPHeaderKey.USER_AGENT, JHVGlobals.getUserAgent());
+        req.addHeader(HTTPHeaderKey.CONNECTION, "Keep-Alive");
         req.addHeader(HTTPHeaderKey.ACCEPT_ENCODING, "gzip");
         req.addHeader(HTTPHeaderKey.CACHE_CONTROL, "no-cache");
         req.addHeader(HTTPHeaderKey.HOST, getHost() + ':' + getPort());
 
         // Adds a necessary JPIP request field
+        String queryStr = req.getQuery();
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
-        JPIPRequest.Method method = req.getMethod();
-        if (method == JPIPRequest.Method.GET) {
-            req.addHeader(HTTPHeaderKey.CONNECTION, "Keep-Alive");
-        } else if (method == JPIPRequest.Method.POST) {
-            req.addHeader(HTTPHeaderKey.CONTENT_TYPE, "application/x-www-form-urlencoded");
-            req.addHeader(HTTPHeaderKey.CONTENT_LENGTH, Integer.toString(queryStr.getBytes(StandardCharsets.UTF_8).length));
-        }
-
-        StringBuilder str = new StringBuilder();
-
-        // Adds the URI line
-        str.append(method).append(' ').append(jpipPath);
-        if (method == JPIPRequest.Method.GET) {
-            str.append('?').append(queryStr);
-        }
-        str.append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
-
+        StringBuilder str = new StringBuilder("GET ");
+        // Adds the URI
+        str.append(jpipPath).append('?').append(queryStr).append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
         // Adds the headers
-        for (String key : req.getHeaders()) {
-            str.append(key).append(": ").append(req.getHeader(key)).append(HTTPConstants.CRLF);
-        }
-        str.append(HTTPConstants.CRLF);
-
-        // Adds the message body if necessary
-        if (method == JPIPRequest.Method.POST)
-            str.append(queryStr);
-
-        // if (!isConnected())
-        //    reconnect();
-
+        str.append(req).append(HTTPConstants.CRLF);
         // Writes the result to the output stream
         getOutputStream().write(str.toString().getBytes(StandardCharsets.UTF_8));
     }

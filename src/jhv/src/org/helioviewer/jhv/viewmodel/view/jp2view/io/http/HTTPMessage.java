@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 
 import java.util.HashMap;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * The class <code>HTTPMessage</code> defines the basic body of a HTTP message.
@@ -50,12 +50,12 @@ public class HTTPMessage {
         headers.putIfAbsent(key.toString(), val);
     }
 
-    /**
-     * Returns a <code>Set<String></code> with all the headers keys. This set
-     * backs the headers, so don't change anything.
-     */
-    public final Set<String> getHeaders() {
-        return headers.keySet();
+    public final String toString() {
+        StringBuilder str = new StringBuilder();
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            str.append(entry.getKey()).append(": ").append(entry.getValue()).append(HTTPConstants.CRLF);
+        }
+        return str.toString();
     }
 
 }
