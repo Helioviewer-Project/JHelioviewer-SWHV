@@ -79,9 +79,8 @@ public class JHVUpdate implements Runnable {
         }
 
         Log.trace("Start checking for updates");
-        String version;
         try (BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(JHVGlobals.downloadURL + "VERSION").getInput(), StandardCharsets.UTF_8))) {
-            version = in.readLine();
+            String version = in.readLine();
             if (version == null || version.isEmpty()) {
                 throw new IOException("JHVUpdate: Empty version string");
             }

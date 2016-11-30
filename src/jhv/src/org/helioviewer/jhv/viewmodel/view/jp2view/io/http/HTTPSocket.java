@@ -79,9 +79,8 @@ public class HTTPSocket extends Socket {
 
         if (parts[0].startsWith("HTTP/1.1")) {
             // Parses status code
-            int code;
             try {
-                code = Integer.parseInt(parts[1]);
+                int code = Integer.parseInt(parts[1]);
                 if (code != 200)
                     throw new IOException("Invalid status code returned (" + code + "): " + parts[2]);
             } catch (NumberFormatException ex) {

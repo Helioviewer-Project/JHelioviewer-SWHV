@@ -146,9 +146,8 @@ public class JPIPSocket extends HTTPSocket {
 
         replyTextTm = System.currentTimeMillis();
 
-        String head;
         TransferInputStream transferInput;
-        head = res.getHeader("Transfer-Encoding");
+        String head = res.getHeader("Transfer-Encoding");
         String transferEncoding = head == null ? "" : head.toLowerCase();
         switch (transferEncoding) {
             case "":

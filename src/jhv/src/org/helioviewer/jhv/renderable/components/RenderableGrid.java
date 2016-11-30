@@ -461,19 +461,17 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void makeLonLabels() {
-        String txt;
-        double size = Sun.Radius * 1.05;
-
         lonLabels.clear();
 
+        double size = Sun.Radius * 1.05;
         for (double theta = 0; theta <= 180.; theta += lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
-            txt = formatter1.format(theta);
+            String txt = formatter1.format(theta);
             lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
         for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
-            txt = gridChoice == GridChoiceType.CARRINGTON ? formatter1.format(theta + 360) : formatter1.format(theta);
+            String txt = gridChoice == GridChoiceType.CARRINGTON ? formatter1.format(theta + 360) : formatter1.format(theta);
             lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
     }
