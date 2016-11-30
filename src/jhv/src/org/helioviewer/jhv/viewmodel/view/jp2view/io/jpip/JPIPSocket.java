@@ -135,9 +135,10 @@ public class JPIPSocket extends HTTPSocket {
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
-        if (req.getMethod() == JPIPRequest.Method.GET) {
+        JPIPRequest.Method method = req.getMethod();
+        if (method == JPIPRequest.Method.GET) {
             req.addHeader(HTTPHeaderKey.CONNECTION, "Keep-Alive");
-        } else if (req.getMethod() == JPIPRequest.Method.POST) {
+        } else if (method == JPIPRequest.Method.POST) {
             req.addHeader(HTTPHeaderKey.CONTENT_TYPE, "application/x-www-form-urlencoded");
             req.addHeader(HTTPHeaderKey.CONTENT_LENGTH, Integer.toString(queryStr.getBytes(StandardCharsets.UTF_8).length));
         }
@@ -145,8 +146,8 @@ public class JPIPSocket extends HTTPSocket {
         StringBuilder str = new StringBuilder();
 
         // Adds the URI line
-        str.append(req.getMethod()).append(' ').append(jpipPath);
-        if (req.getMethod() == JPIPRequest.Method.GET) {
+        str.append(method).append(' ').append(jpipPath);
+        if (method == JPIPRequest.Method.GET) {
             str.append('?').append(queryStr);
         }
         str.append(' ').append(HTTPConstants.versionText).append(HTTPConstants.CRLF);
@@ -158,7 +159,7 @@ public class JPIPSocket extends HTTPSocket {
         str.append(HTTPConstants.CRLF);
 
         // Adds the message body if necessary
-        if (req.getMethod() == JPIPRequest.Method.POST)
+        if (method == JPIPRequest.Method.POST)
             str.append(queryStr);
 
         // if (!isConnected())
@@ -177,9 +178,11 @@ public class JPIPSocket extends HTTPSocket {
 
         replyTextTm = System.currentTimeMillis();
 
+        String head;
         TransferInputStream transferInput;
-        String transferEncoding = res.getHeader(HTTPHeaderKey.TRANSFER_ENCODING) == null ? "" : res.getHeader(HTTPHeaderKey.TRANSFER_ENCODING);
-        switch (transferEncoding.toLowerCase()) {
+        head = res.getHeader(HTTPHeaderKey.TRANSFER_ENCODING);
+        String transferEncoding = head == null ? "" : head.toLowerCase();
+        switch (transferEncoding) {
             case "":
             case "identity":
                 String contentLength = res.getHeader(HTTPHeaderKey.CONTENT_LENGTH);
@@ -197,8 +200,9 @@ public class JPIPSocket extends HTTPSocket {
         }
 
         InputStream input = transferInput;
-        String contentEncoding = res.getHeader(HTTPHeaderKey.CONTENT_ENCODING) == null ? "" : res.getHeader(HTTPHeaderKey.CONTENT_ENCODING);
-        switch (contentEncoding.toLowerCase()) {
+        head = res.getHeader(HTTPHeaderKey.CONTENT_ENCODING);
+        String contentEncoding = head == null ? "" : head.toLowerCase();
+        switch (contentEncoding) {
             case "":
             case "identity":
                 break;
