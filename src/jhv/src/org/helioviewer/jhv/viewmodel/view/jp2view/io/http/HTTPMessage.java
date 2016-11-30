@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,14 +17,6 @@ public abstract class HTTPMessage {
 
     /** A hash table with the headers of the message */
     private final HashMap<String, String> headers = new HashMap<>();
-
-    /** Returns <code>true</code> if the message is a request. */
-    public abstract boolean isRequest();
-
-    /** Returns <code>true</code> if the message is a response. */
-    public final boolean isResponse() {
-        return !isRequest();
-    }
 
     /**
      * Returns the value of a message header.
@@ -54,6 +45,10 @@ public abstract class HTTPMessage {
      */
     public final void setHeader(String key, String val) {
         headers.put(key, val);
+    }
+
+    public final void setHeader(HTTPHeaderKey key, String val) {
+        headers.put(key.toString(), val);
     }
 
     public final void addHeader(HTTPHeaderKey key, String val) {

@@ -83,7 +83,7 @@ public class HTTPSocket extends Socket {
         String msgBody = req.getMessageBody();
         // Sets the content length header if it's a POST
         if (req.getMethod() == HTTPRequest.Method.POST)
-            req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), Integer.toString(msgBody.getBytes(StandardCharsets.UTF_8).length));
+            req.setHeader(HTTPHeaderKey.CONTENT_LENGTH, Integer.toString(msgBody.getBytes(StandardCharsets.UTF_8).length));
 
         // Adds the headers
         for (String key : req.getHeaders()) {
@@ -107,7 +107,7 @@ public class HTTPSocket extends Socket {
      *         <code>null</code> if the end of stream was reached.
      * @throws java.io.IOException
      */
-    protected HTTPMessage receive() throws IOException {
+    protected HTTPResponse receive() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);
         String parts[] = line.split(" ", 3);
         if (parts.length != 3) {

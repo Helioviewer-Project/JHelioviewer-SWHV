@@ -15,7 +15,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.TransferInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPRequest.Method;
 
@@ -176,10 +175,7 @@ public class JPIPSocket extends HTTPSocket {
     @Override
     public JPIPResponse receive() throws IOException {
         // long tini = System.currentTimeMillis();
-
-        HTTPResponse httpRes = (HTTPResponse) super.receive();
-        JPIPResponse res = new JPIPResponse(httpRes);
-
+        JPIPResponse res = new JPIPResponse(super.receive());
         if (res.getCode() != 200)
             throw new IOException("Invalid status code returned (" + res.getCode() + ')');
         if (!"image/jpp-stream".equals(res.getHeader(HTTPHeaderKey.CONTENT_TYPE)))

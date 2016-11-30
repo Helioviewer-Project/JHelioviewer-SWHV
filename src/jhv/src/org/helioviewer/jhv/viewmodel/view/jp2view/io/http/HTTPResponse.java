@@ -30,8 +30,4 @@ public class HTTPResponse extends HTTPMessage {
         return reason;
     }
 
-    public boolean isRequest() {
-        return false;
-    }
-
 }
