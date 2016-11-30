@@ -4,6 +4,8 @@ import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import org.helioviewer.jhv.Settings;
 
@@ -41,7 +43,10 @@ public class ProxySettings {
                         }
 
                         if (user != null && pass != null && Integer.toString(getRequestingPort()).equals(port)) {
-                            return new PasswordAuthentication(user, pass.toCharArray());
+                            try {
+                                return new PasswordAuthentication(user, new String(Base64.getDecoder().decode(pass), StandardCharsets.UTF_8).toCharArray());
+                            } catch (Exception ignore) {
+                            }
                         }
                     }
                     return null;

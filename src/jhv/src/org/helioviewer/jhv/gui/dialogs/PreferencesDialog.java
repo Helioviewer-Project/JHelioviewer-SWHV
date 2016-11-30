@@ -8,6 +8,8 @@ import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -35,9 +37,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
 
-/**
- * Dialog that allows the user to change default preferences and settings.
- */
+// Dialog that allows the user to change default preferences and settings
 @SuppressWarnings("serial")
 public class PreferencesDialog extends JDialog implements ShowableDialog {
 
@@ -152,7 +152,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         panel.setBorder(BorderFactory.createTitledBorder(" Settings "));
 
         defaultsPanel = new DefaultsSelectionPanel();
-        defaultsPanel.loadSettings();
         defaultsPanel.setPreferredSize(new Dimension(450, 150));
         defaultsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -171,12 +170,18 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             // setPreferredSize(new Dimension(150, 180));
 
             Settings settings = Settings.getSingletonInstance();
+            String pass = settings.getProperty("default.proxyPassword");
+            try {
+                pass = new String(Base64.getDecoder().decode(pass), StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                pass = null;
+            }
 
             Object[][] tableData = {
                 { "Default recording directory", settings.getProperty("default.save.path") },
                 { "Default download path", settings.getProperty("default.local.path") },
                 { "Proxy username", settings.getProperty("default.proxyUsername") },
-                { "Proxy password", settings.getProperty("default.proxyPassword") },
+                { "Proxy password", pass },
             };
 
             model = new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
@@ -242,20 +247,16 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             add(scrollPane, BorderLayout.CENTER);
         }
 
-        public void loadSettings() {
-            Settings settings = Settings.getSingletonInstance();
-            model.setValueAt(settings.getProperty("default.save.path"), 0, 1);
-            model.setValueAt(settings.getProperty("default.local.path"), 1, 1);
-            model.setValueAt(settings.getProperty("default.proxyUsername"), 2, 1);
-            model.setValueAt(settings.getProperty("default.proxyPassword"), 3, 1);
-        }
-
         public void saveSettings() {
             Settings settings = Settings.getSingletonInstance();
-            settings.setProperty("default.save.path", model.getValueAt(0, 1).toString());
-            settings.setProperty("default.local.path", model.getValueAt(1, 1).toString());
-            if (model.getValueAt(2, 1) != null) settings.setProperty("default.proxyUsername", model.getValueAt(2, 1).toString());
-            if (model.getValueAt(3, 1) != null) settings.setProperty("default.proxyPassword", model.getValueAt(3, 1).toString());
+            if (model.getValueAt(0, 1) instanceof String)
+                settings.setProperty("default.save.path", (String) model.getValueAt(0, 1));
+            if (model.getValueAt(1, 1) instanceof String)
+                settings.setProperty("default.local.path", (String) model.getValueAt(1, 1));
+            if (model.getValueAt(2, 1) instanceof String)
+                settings.setProperty("default.proxyUsername", (String) model.getValueAt(2, 1));
+            if (model.getValueAt(3, 1) instanceof String)
+                settings.setProperty("default.proxyPassword", Base64.getEncoder().encodeToString(((String) model.getValueAt(3, 1)).getBytes(StandardCharsets.UTF_8)));
         }
 
     }
