@@ -10,10 +10,9 @@ import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 
-// Manages the filters for the different event types.
+// Manages the filters for the different event types
 public class FilterManager {
 
-    private static FilterManager instance;
     private static final Map<SWEKEventType, Map<SWEKParameter, List<SWEKParam>>> filters = new HashMap<>();
     private static final HashSet<FilterManagerListener> listeners = new HashSet<>();
 

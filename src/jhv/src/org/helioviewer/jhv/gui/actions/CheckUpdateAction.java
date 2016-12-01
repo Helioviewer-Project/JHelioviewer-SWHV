@@ -7,9 +7,7 @@ import javax.swing.AbstractAction;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.JHVUpdate;
 
-/**
- * Action that checks for updates
- */
+// Action that checks for updates
 @SuppressWarnings("serial")
 public class CheckUpdateAction extends AbstractAction {
 
@@ -18,13 +16,13 @@ public class CheckUpdateAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Check for newer releases");
     }
 
-    public void actionPerformed(ActionEvent arg0) {
+    public void actionPerformed(ActionEvent e) {
         try {
             JHVUpdate update = new JHVUpdate(true);
             update.check();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // Should not happen
-            Log.error("Error while parsing update URL " + e.getLocalizedMessage(), e);
+            Log.error("Error while parsing update URL " + ex.getLocalizedMessage(), ex);
         }
     }
 

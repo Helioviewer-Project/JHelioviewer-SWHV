@@ -116,7 +116,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     }
 
     @Override
-    public void actionPerformed(ActionEvent arg0) {
+    public void actionPerformed(ActionEvent e) {
         switch (loadingStep) {
         case 0:
             loadingLabel.setText("Loading   ");

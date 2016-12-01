@@ -25,7 +25,7 @@ public class ZoomInAction extends AbstractAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent arg0) {
+    public void actionPerformed(ActionEvent e) {
         Displayer.getCamera().zoom(-1 * Displayer.CAMERA_ZOOM_MULTIPLIER_BUTTON);
         Displayer.render(1);
     }

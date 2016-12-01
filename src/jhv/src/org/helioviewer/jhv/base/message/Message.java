@@ -25,11 +25,11 @@ public class Message {
             if (lineLength + word.length() < 70) {
                 lineLength += word.length() + 1;
             } else {
-                sb.append("\n");
+                sb.append('\n');
                 lineLength = word.length() + 1;
             }
             sb.append(word);
-            sb.append(" ");
+            sb.append(' ');
         }
         return sb.toString();
     }
