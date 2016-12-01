@@ -167,8 +167,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
                 }
             }
         }
-
-        return observedDate == null ? TimeUtils.EPOCH : JHVDate.parseDateTime(observedDate);
+        return observedDate == null ? TimeUtils.EPOCH : new JHVDate(observedDate);
     }
 
     private void retrievePosition(MetaDataContainer m, JHVDate dateObs) {

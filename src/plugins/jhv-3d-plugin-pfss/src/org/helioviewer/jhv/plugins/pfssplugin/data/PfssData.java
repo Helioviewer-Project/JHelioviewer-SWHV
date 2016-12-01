@@ -98,7 +98,6 @@ public class PfssData {
             short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
 
             Header header = bhdu.getHeader();
-
             String date = header.findKey("DATE-OBS");
             if (date == null)
                 throw new Exception("DATE-OBS not found");
