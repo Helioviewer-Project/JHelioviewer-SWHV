@@ -30,8 +30,8 @@ public class EventTypePanelModel implements TreeModel {
      * @param eventType
      *            The event type for which to create the tree model
      */
-    public EventTypePanelModel(SWEKTreeModelEventType eventType) {
-        this.eventType = eventType;
+    public EventTypePanelModel(SWEKTreeModelEventType _eventType) {
+        eventType = _eventType;
     }
 
     /*

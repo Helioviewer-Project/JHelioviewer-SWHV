@@ -15,7 +15,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
-import org.helioviewer.jhv.plugins.swek.model.AbstractSWEKTreeModelElement;
+import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelElement;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelSupplier;
 
@@ -68,13 +68,13 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         SmallPanel panel = new SmallPanel(new BorderLayout());
         panel.setOpaque(false);
 
-        ImageIcon icon = ((AbstractSWEKTreeModelElement) whatToDisplay).getIcon();
+        ImageIcon icon = ((SWEKTreeModelElement) whatToDisplay).getIcon();
         if (icon != null) {
             panel.add(new TreeLabel(icon), BorderLayout.LINE_START);
         }
 
         JCheckBox checkBox = new JCheckBox(name);
-        checkBox.setSelected(((AbstractSWEKTreeModelElement) whatToDisplay).isCheckboxSelected());
+        checkBox.setSelected(((SWEKTreeModelElement) whatToDisplay).isCheckboxSelected());
         checkBox.setBackground(Color.WHITE);
         panel.add(checkBox, BorderLayout.CENTER);
 

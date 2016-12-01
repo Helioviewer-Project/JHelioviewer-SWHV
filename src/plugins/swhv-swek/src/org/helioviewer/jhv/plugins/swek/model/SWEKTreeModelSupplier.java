@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.swek.model;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 
-public class SWEKTreeModelSupplier extends AbstractSWEKTreeModelElement {
+public class SWEKTreeModelSupplier extends SWEKTreeModelElement {
 
     /** The SWEK supplier for this SWEK tree supplier */
     private final SWEKSupplier swekSupplier;
@@ -13,9 +13,9 @@ public class SWEKTreeModelSupplier extends AbstractSWEKTreeModelElement {
      * @param swekSupplier
      *            The SWEK supplier for this SWEK tree supplier
      */
-    public SWEKTreeModelSupplier(SWEKSupplier swekSupplier) {
+    public SWEKTreeModelSupplier(SWEKSupplier _swekSupplier) {
         super(false);
-        this.swekSupplier = swekSupplier;
+        swekSupplier = _swekSupplier;
     }
 
     /**

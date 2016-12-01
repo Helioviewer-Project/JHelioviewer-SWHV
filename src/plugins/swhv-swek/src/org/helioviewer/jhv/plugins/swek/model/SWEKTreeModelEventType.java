@@ -6,13 +6,9 @@ import java.util.List;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 
-/**
- * The SWEK tree model representation of the SWEK event type.
- * 
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
- */
-public class SWEKTreeModelEventType extends AbstractSWEKTreeModelElement {
+// The SWEK tree model representation of the SWEK event type
+public class SWEKTreeModelEventType extends SWEKTreeModelElement {
+
     /** The swekEventType for this treemodel event type */
     private final SWEKEventType swekEventType;
 
@@ -26,9 +22,9 @@ public class SWEKTreeModelEventType extends AbstractSWEKTreeModelElement {
      *            The event type for which the SWEK tree model event type is
      *            created
      */
-    public SWEKTreeModelEventType(SWEKEventType swekEventType) {
-        super(false, swekEventType.getEventIcon());
-        this.swekEventType = swekEventType;
+    public SWEKTreeModelEventType(SWEKEventType _swekEventType) {
+        super(false, _swekEventType.getEventIcon());
+        swekEventType = _swekEventType;
         fillSWEKTreeSuppliers();
     }
 
