@@ -9,18 +9,12 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
-import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
@@ -41,11 +35,10 @@ class PluginsListEntry extends JPanel implements MouseListener {
 
     private final JLabel preferencesLabel = new JLabel();
     private final JLabel enableLabel = new JLabel();
-    private final JLabel removeLabel = new JLabel();
 
-    public PluginsListEntry(PluginContainer plugin, PluginsList list) {
-        this.plugin = plugin;
-        this.list = list;
+    public PluginsListEntry(PluginContainer _plugin, PluginsList _list) {
+        plugin = _plugin;
+        list = _list;
 
         // title
         JEditorPane titlePane = new JEditorPane("text/html", getTitleText());
@@ -65,13 +58,9 @@ class PluginsListEntry extends JPanel implements MouseListener {
         buttonPane.setOpaque(false);
         // buttonPane.add(preferencesLabel);
         buttonPane.add(enableLabel);
-        // buttonPane.add(removeLabel);
 
         preferencesLabel.setIcon(IconBank.getIcon(JHVIcon.ADD));
         preferencesLabel.setToolTipText("Shows up the preference dialog of the plug-in.");
-
-        removeLabel.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-        removeLabel.setToolTipText("Removes the plug-in from JHelioviewer and your file system.");
 
         updateEnableLabel();
 
@@ -93,7 +82,6 @@ class PluginsListEntry extends JPanel implements MouseListener {
         buttonPane.addMouseListener(this);
         preferencesLabel.addMouseListener(this);
         enableLabel.addMouseListener(this);
-        removeLabel.addMouseListener(this);
     }
 
     private String getTitleText() {
@@ -155,21 +143,7 @@ class PluginsListEntry extends JPanel implements MouseListener {
         list.fireItemChanged();
     }
 
-    /**
-     * Remove the plug-in and deletes the plug-in file of selected entry.
-     */
-    private void deletePlugin() {
-        if (JOptionPane.showConfirmDialog(this, "Are you sure to delete the selected plug-in permanently from your system?", "Confirmation", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            if (!PluginManager.getSingletonInstance().deletePlugin(plugin, new File(JHVDirectory.PLUGINS.getPath() + JHVGlobals.TEMP_FILENAME_DELETE_PLUGIN_FILES))) {
-                Message.err("An error occured while deleting the plugin file!", "Please check manually!", false);
-            }
-            list.removeEntry(plugin.getName());
-            list.fireItemChanged();
-        }
-    }
-
-    // Mouse Listener
-
+    @Override
     public void mouseClicked(MouseEvent e) {
         list.selectItem(plugin.getName());
 
@@ -179,20 +153,22 @@ class PluginsListEntry extends JPanel implements MouseListener {
             showPreferencesDialog();
         } else if (e.getSource().equals(enableLabel)) {
             setPluginActive(!plugin.isActive());
-        } else if (e.getSource().equals(removeLabel)) {
-            deletePlugin();
         }
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 
@@ -204,10 +180,12 @@ class PluginsListEntry extends JPanel implements MouseListener {
             setForeground(Color.BLUE);
 
             addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseEntered(MouseEvent e) {
                     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 }
 
+                @Override
                 public void mouseExited(MouseEvent e) {
                     setCursor(Cursor.getDefaultCursor());
                 }

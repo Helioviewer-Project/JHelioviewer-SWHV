@@ -31,16 +31,11 @@ public class JHVGlobals {
 
     public static final String programName = "ESA JHelioviewer";
     public static final String downloadURL = "http://swhv.oma.be/download/";
-
-    public static final String TEMP_FILENAME_DELETE_PLUGIN_FILES = "delete-plugins.tmp";
-
-    public static final AlphanumComparator alphanumComparator = new AlphanumComparator();
-
     private static String version = "";
     private static String revision = "";
     private static String agent = "JHV/SWHV-";
 
-    private JHVGlobals() {}
+    public static final AlphanumComparator alphanumComparator = new AlphanumComparator();
 
     public static final int hiDpiCutoff = 1024;
 

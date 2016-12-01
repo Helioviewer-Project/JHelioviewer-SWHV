@@ -29,7 +29,7 @@ public class ProxySettings {
             Authenticator.setDefault(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    String[] vars = proxy.type().equals(Proxy.Type.HTTP) ? httpVars : socksVars;
+                    String[] vars = proxy.type() == Proxy.Type.HTTP ? httpVars : socksVars;
                     String host = System.getProperty(vars[0]);
                     if (getRequestingHost().equalsIgnoreCase(host)) {
                     // if (getRequestorType() == RequestorType.PROXY)
