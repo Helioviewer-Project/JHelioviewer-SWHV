@@ -283,7 +283,7 @@ public class Layers {
 
         ImageViewerGui.getRenderableViewpoint().fireTimeUpdated(camera.getViewpoint().time); // !
         for (TimeListener listener : timeListeners) {
-            listener.timeChanged(lastTimestamp);
+            listener.timeChanged(lastTimestamp.milli);
         }
 
         int activeFrame = activeView.getCurrentFrameNumber();
@@ -316,9 +316,8 @@ public class Layers {
         layerListeners.remove(listener);
     }
 
-    public static JHVDate addTimeListener(TimeListener listener) {
+    public static void addTimeListener(TimeListener listener) {
         timeListeners.add(listener);
-        return lastTimestamp;
     }
 
     public static void removeTimeListener(TimeListener listener) {

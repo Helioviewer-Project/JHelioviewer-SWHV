@@ -233,11 +233,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void timeChanged(JHVDate date) {
-        timeChanged(date.milli);
-    }
-
-    private static void timeChanged(long milli) {
+    public void timeChanged(long milli) {
         latestMovieTime = milli;
         centraliseSelected(latestMovieTime);
         fireRedrawRequestMovieFrameChanged();
