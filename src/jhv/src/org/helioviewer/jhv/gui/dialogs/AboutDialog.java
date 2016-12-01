@@ -76,8 +76,10 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
         text.append("<p>This software uses <a href=\"https://jogamp.org\">JogAmp</a>, the Java high performance libraries for 3D Graphics, Multimedia and Processing,<br>").append('\u00A9').append(" JogAmp Community and others<br>");
         text.append("<p>This software uses <a href=\"https://commons.apache.org\">Apache Commons</a>,<br>").append('\u00A9').append(" 2001-2015, The Apache Software Foundation<br>");
         text.append("<p>This software uses <a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> from the Apache Logging Services Project, licensed under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License version 2.0</a>,<br>" + '\u00A9' + " 2010, The Apache Software Foundation<br>");
+        text.append("<p>This software uses the <a href=\"https://github.com/stleary/JSON-java\">JSON in Java</a> Library, licensed under a custom <a href=\"http://www.json.org/license.html\">License</a>.");
         text.append("<p>This software uses the <a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial SQLite JDBC Driver</a>, licensed under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License version 2.0</a>.<br>");
         text.append("<p>This software uses <a href=\"http://jcodec.org\">JCodec</a>, licensed under the FreeBSD License.<br>");
+        text.append("<p>This software uses the <a href=\"http://nom-tam-fits.github.io/nom-tam-fits/\">FITS in Java</a> public domain library.");
         text.append("<p>This software uses the <a href=\"http://www.davekoelle.com/alphanum.html\">Alphanum Algorithm</a>, licensed under the LGPLv2.1.<br> Its source code can be downloaded <a href=\"http://jhelioviewer.org/libjhv/external/AlphanumComparator.java\">here</a>.<br>");
 
         for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {

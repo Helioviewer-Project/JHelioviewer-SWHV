@@ -4,7 +4,6 @@ import java.time.ZoneOffset;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.helioviewer.jhv.base.interval.Interval;
 
 public class TimeUtils {
 
@@ -25,18 +24,5 @@ public class TimeUtils {
     public static final JHVDate EPOCH = new JHVDate("2000-01-01T00:00:00");
     public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = new JHVDate("2050-01-01T00:00:00");
-
-    public static Interval makeCompleteDay(long start, long end) {
-        long endDate = end;
-        long now = System.currentTimeMillis();
-        if (end > now) {
-            endDate = now;
-        }
-
-        long new_start = start - start % DAY_IN_MILLIS;
-        long new_end = endDate - endDate % DAY_IN_MILLIS + DAY_IN_MILLIS;
-
-        return new Interval(new_start, new_end);
-    }
 
 }

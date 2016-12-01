@@ -55,7 +55,7 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public String getAboutLicenseText() {
-        return "<p>The plugin uses the <a href=\"http://nom-tam-fits.github.io/nom-tam-fits/\">FITS in Java</a> public domain library.";
+        return "Mozilla Public License Version 2.0";
     }
 
     @Override
