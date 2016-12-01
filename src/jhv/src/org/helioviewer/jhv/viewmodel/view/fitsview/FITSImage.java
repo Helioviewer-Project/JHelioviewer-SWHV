@@ -28,25 +28,20 @@ public class FITSImage implements MetaDataContainer {
 
     private static final float MDI_THRESHOLD = 2000f;
 
-    private final Header header;
+    private Header header;
     private BufferedImage image = null;
 
-    /**
-     * Default constructor.
-     *
-     * @param url
-     *            Specifies the location of the FITS file.
-     * @throws Exception
-     *             when an error occurred during reading the fits file.
-     * */
     public FITSImage(String url) throws Exception {
-        // access the FITS file
-        Fits fits = new Fits(url);
-        // get basic information from file
-        BasicHDU<?> hdu = fits.readHDU();
-        if (hdu == null)
-            throw new Exception("Could not read FITS: " + url);
+        try (Fits f = new Fits(url)) {
+            // get basic information from file
+            BasicHDU<?> hdu = f.readHDU();
+            if (hdu == null)
+                throw new Exception("Could not read FITS: " + url);
+            readHDU(hdu);
+        }
+    }
 
+    private void readHDU(BasicHDU<?> hdu) throws Exception {
         header = hdu.getHeader();
         ImageData imageData = null;
 
