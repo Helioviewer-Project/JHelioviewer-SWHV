@@ -11,7 +11,6 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
@@ -43,14 +42,14 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
     static int mouseOverY;
     long currentTime;
 
-    public SWEKPopupController(Component component) {
-        this.component = component;
+    public SWEKPopupController(Component _component) {
+        component = _component;
         camera = Displayer.getCamera();
     }
 
     @Override
-    public void timeChanged(JHVDate date) {
-        currentTime = date.milli;
+    public void timeChanged(long milli) {
+        currentTime = milli;
     }
 
     private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {
