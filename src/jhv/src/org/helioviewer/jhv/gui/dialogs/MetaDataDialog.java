@@ -172,7 +172,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }
     }
 
-    private static void addDataItem(String key, DefaultListModel<String> model) {
+    private void addDataItem(String key, DefaultListModel<String> model) {
         model.addElement(key);
     }
 

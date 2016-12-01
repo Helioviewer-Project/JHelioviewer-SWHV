@@ -94,10 +94,10 @@ class PluginAboutDialog extends JDialog implements HyperlinkListener {
 
     public static void showDialog(Plugin plugin) {
         PluginAboutDialog dialog = new PluginAboutDialog(plugin);
-        dialog.showDialog();
+        dialog._show();
     }
 
-    private void showDialog() {
+    private void _show() {
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
