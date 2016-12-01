@@ -95,7 +95,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public String getName() {
-        return "EVEPlugin " + "$Rev$";
+        return "Timeline Plugin";
     }
 
     @Override
