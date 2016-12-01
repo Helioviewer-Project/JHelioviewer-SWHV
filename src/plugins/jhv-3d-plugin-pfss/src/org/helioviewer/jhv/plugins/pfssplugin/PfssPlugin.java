@@ -50,7 +50,7 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public String getName() {
-        return "PFSS Plugin " + "$Rev$";
+        return "PFSS Plugin";
     }
 
     @Override
