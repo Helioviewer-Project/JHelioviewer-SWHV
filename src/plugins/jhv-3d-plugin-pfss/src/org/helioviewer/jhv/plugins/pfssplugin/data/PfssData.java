@@ -86,8 +86,7 @@ public class PfssData {
         lastQuality = PfssSettings.qualityReduction;
         lastFixedColor = PfssSettings.fixedColor;
 
-        try (ByteArrayInputStream is = new ByteArrayInputStream(gzipFitsFile)) {
-            Fits fits = new Fits(is);
+        try (Fits fits = new Fits(new ByteArrayInputStream(gzipFitsFile))) {
             BasicHDU<?> hdus[] = fits.read();
             if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))
                 throw new Exception("Could not read FITS");
