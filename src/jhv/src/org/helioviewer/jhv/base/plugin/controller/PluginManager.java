@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.base.plugin.controller;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -125,42 +124,6 @@ public class PluginManager {
         if (pluginContainer.isActive()) {
             plugin.installPlugin();
         }
-    }
-
-    /**
-     * Removes a container with a plug-in from the list of all plug-ins.
-     *
-     * @param container
-     *            Plug-in container to remove from the list.
-     */
-    private void removePluginContainer(PluginContainer container) {
-        plugins.remove(container.getPlugin());
-        pluginSettings.removePluginFromXML(container);
-    }
-
-    public boolean deletePlugin(PluginContainer container, File tempFile) {
-        // deactivate plug-in if it is still active
-        if (container.isActive()) {
-            container.setActive(false);
-            container.changeSettings();
-        }
-
-        // remove plug-in
-        removePluginContainer(container);
-
-        // delete corresponding JAR file
-        File file = new File(container.getPluginLocation());
-        if (!file.delete()) {
-            // when JAR file cannot be deleted note file by using a temporary file
-            // in order to delete it when restarting JHV
-            try (FileWriter tempFileWriter = new FileWriter(tempFile, true)) {
-                tempFileWriter.write(container.getPluginLocation().getPath() + ';');
-                tempFileWriter.flush();
-            } catch (IOException e) {
-                return false;
-            }
-        }
-        return true;
     }
 
 }
