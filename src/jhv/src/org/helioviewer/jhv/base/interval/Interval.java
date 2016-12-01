@@ -23,7 +23,7 @@ public class Interval implements Comparable<Interval> {
     }
 
     public boolean overlaps(Interval otherInterval) {
-        return !(start > otherInterval.end || end < otherInterval.start);
+        return start <= otherInterval.end && end >= otherInterval.start;
     }
 
     public boolean overlapsInclusive(Interval other) {
@@ -45,14 +45,18 @@ public class Interval implements Comparable<Interval> {
         return end;
     }
 
-    @Override
-    public String toString() {
-        return "[" + start + "," + end + ")";
-    }
 
-    @Override
-    public int compareTo(Interval o) {
-        return start < o.start ? -1 : (start > o.start ? 1 : 0);
+    public static Interval makeCompleteDay(long start, long end) {
+        long endDate = end;
+        long now = System.currentTimeMillis();
+        if (end > now) {
+            endDate = now;
+        }
+
+        long new_start = start - start % TimeUtils.DAY_IN_MILLIS;
+        long new_end = endDate - endDate % TimeUtils.DAY_IN_MILLIS + TimeUtils.DAY_IN_MILLIS;
+
+        return new Interval(new_start, new_end);
     }
 
     public static ArrayList<Interval> splitInterval(Interval interval, int days) {
@@ -86,6 +90,16 @@ public class Interval implements Comparable<Interval> {
     public int hashCode() {
         int result = (int) (start ^ (start >>> 32));
         return 31 * result + (int) (end ^ (end >>> 32));
+    }
+
+    @Override
+    public String toString() {
+        return "[" + start + "," + end + ")";
+    }
+
+    @Override
+    public int compareTo(Interval o) {
+        return start < o.start ? -1 : (start > o.start ? 1 : 0);
     }
 
 }

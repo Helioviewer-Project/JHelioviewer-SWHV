@@ -165,7 +165,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if ((selectedAxis.start <= availableAxis.start || selectedAxis.end >= availableAxis.end)) {
             availableStart = Math.min(selectedAxis.start, availableStart);
             availableEnd = Math.max(selectedAxis.end, availableEnd);
-            Interval availableInterval = TimeUtils.makeCompleteDay(availableStart, availableEnd);
+            Interval availableInterval = Interval.makeCompleteDay(availableStart, availableEnd);
             availableAxis.start = availableInterval.start;
             availableAxis.end = availableInterval.end;
         }
