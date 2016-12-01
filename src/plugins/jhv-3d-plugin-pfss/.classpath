@@ -4,6 +4,7 @@
     <classpathentry kind="src" path="resources"/>
     <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
     <classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
+    <classpathentry kind="lib" path="../lib/annotations-3.0.1u2.jar"/>
     <classpathentry kind="lib" path="../lib/commons-lang3-3.5.jar"/>
     <classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
     <classpathentry kind="lib" path="../lib/jogl-all.jar"/>
