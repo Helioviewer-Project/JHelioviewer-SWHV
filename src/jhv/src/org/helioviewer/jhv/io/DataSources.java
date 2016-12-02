@@ -25,8 +25,6 @@ public class DataSources {
                     put("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php?action=getJPX&");
-                    put("default.remote.path", "jpip://swhv.oma.be:8090");
-                    put("default.httpRemote.path", "http://swhv.oma.be/hv/jp2/");
                     put("default.label", "Royal Observatory of Belgium");
                 }
             });
@@ -35,8 +33,6 @@ public class DataSources {
                     put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
-                    put("default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080");
-                    put("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
                     put("default.label", "Institut d'Astrophysique Spatiale");
                 }
             });
@@ -45,8 +41,6 @@ public class DataSources {
                     put("API.dataSources.path", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "https://api.helioviewer.org/v2/getJP2Image/?");
                     put("API.jp2series.path", "https://api.helioviewer.org/v2/getJPX/?");
-                    put("default.remote.path", "jpip://helioviewer.org:8090");
-                    put("default.httpRemote.path", "https://helioviewer.org/jp2/");
                     put("default.label", "Goddard Space Flight Center");
                 }
             });
@@ -56,8 +50,6 @@ public class DataSources {
                     put("API.dataSources.path", "http://localhost:8080/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://localhost:8080/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://localhost:8080/helioviewer/api/index.php?action=getJPX&");
-                    put("default.remote.path", "jpip://localhost:8090");
-                    put("default.httpRemote.path", "http://localhost:8080/helioviewer/jp2/");
                     put("default.label", "Localhost");
                 }
             });

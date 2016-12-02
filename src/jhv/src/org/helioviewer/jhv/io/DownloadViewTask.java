@@ -65,14 +65,10 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
     @Override
     protected Void backgroundWork() {
-        File dstFile = new File(JHVDirectory.REMOTEFILES.getPath() + uri.getPath().substring(Math.max(0, uri.getPath().lastIndexOf('/')))).getAbsoluteFile();
-
         URI srcURI;
         if (downloadURI.getScheme().equalsIgnoreCase("jpip")) {
-            // String httpPath = Settings.getSingletonInstance().getProperty("default.httpRemote.path"); - not good if server changed
             try {
                 srcURI = new URI(downloadURI.toString().replaceFirst("jpip://", "http://").replaceFirst(":" + downloadURI.getPort(), "/jp2"));
-                // srcURI = new URI(httpPath + downloadURI.getPath().substring(Math.max(0, downloadURI.getPath().lastIndexOf('/'))));
             } catch (URISyntaxException e) {
                 e.printStackTrace();
                 return null;
@@ -80,6 +76,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         } else
             srcURI = downloadURI;
 
+        File dstFile = new File(JHVDirectory.REMOTEFILES.getPath() + uri.getPath().substring(Math.max(0, uri.getPath().lastIndexOf('/')))).getAbsoluteFile();
         if (srcURI.equals(dstFile.toURI())) // avoid self-destruction
             return null;
 
