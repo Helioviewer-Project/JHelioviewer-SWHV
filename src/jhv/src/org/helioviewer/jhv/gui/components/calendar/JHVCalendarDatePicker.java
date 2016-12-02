@@ -103,22 +103,22 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     }
 
     @Override
-    public void focusGained(FocusEvent arg0) {
+    public void focusGained(FocusEvent e) {
     }
 
     @Override
-    public void focusLost(FocusEvent arg0) {
+    public void focusLost(FocusEvent e) {
         // has popup button or a subcomponent of jhvCalendar lost the focus?
-        if (arg0.getComponent() == calPopupButton || (jhvCalendar != null && jhvCalendar.isAncestorOf(arg0.getComponent()))) {
+        if (e.getComponent() == calPopupButton || (jhvCalendar != null && jhvCalendar.isAncestorOf(e.getComponent()))) {
             // if the receiver of the focus is not a subcomponent of the
             // jhvCalendar than hide the popup
-            if (jhvCalendar != null && !jhvCalendar.isAncestorOf(arg0.getOppositeComponent())) {
+            if (jhvCalendar != null && !jhvCalendar.isAncestorOf(e.getOppositeComponent())) {
                 hideCalPopup();
             }
         }
 
         // has textfield lost the focus
-        if (arg0.getComponent() == textField) {
+        if (e.getComponent() == textField) {
             setDateFromTextField();
             informAllJHVCalendarListeners();
         }

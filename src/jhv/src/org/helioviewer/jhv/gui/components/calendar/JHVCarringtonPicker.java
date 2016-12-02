@@ -97,16 +97,16 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
     }
 
     @Override
-    public void focusGained(FocusEvent arg0) {
+    public void focusGained(FocusEvent e) {
     }
 
     @Override
-    public void focusLost(FocusEvent arg0) {
+    public void focusLost(FocusEvent e) {
         // has popup button or a subcomponent of jhvCalendar lost the focus?
-        if (arg0.getComponent() == crPopupButton || (carringtonPanel != null && carringtonPanel.isAncestorOf(arg0.getComponent()))) {
+        if (e.getComponent() == crPopupButton || (carringtonPanel != null && carringtonPanel.isAncestorOf(e.getComponent()))) {
             // if the receiver of the focus is not a subcomponent of the
             // jhvCalendar than hide the popup
-            if (carringtonPanel != null && !carringtonPanel.isAncestorOf(arg0.getOppositeComponent())) {
+            if (carringtonPanel != null && !carringtonPanel.isAncestorOf(e.getOppositeComponent())) {
                 hideCRPopup();
             }
         }

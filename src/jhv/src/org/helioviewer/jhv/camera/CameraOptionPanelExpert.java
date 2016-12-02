@@ -5,8 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 
 import javax.swing.Box;
@@ -113,8 +113,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
         synchronizeWithCurrentButton.addActionListener(e -> syncWithLayerCurrentTime());
 
-        buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(0, 3));
+        buttonPanel = new JPanel(new GridLayout(0, 3));
 
         synchronizeWithLayersButton.getMaximumSize().width = 15;
         buttonPanel.add(synchronizeWithLayersButton);
@@ -159,13 +158,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private void addBeginDatePanel(GridBagConstraints c) {
         beginDatePicker = new JHVCalendarDatePicker();
-        beginDatePicker.getTextField().addFocusListener(new FocusListener() {
+        beginDatePicker.getTextField().addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(FocusEvent arg0) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent arg0) {
+            public void focusLost(FocusEvent e) {
                 setBeginTime(true);
             }
         });
@@ -177,9 +172,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         beginDateLabel.setPreferredSize(new Dimension(40, 0));
 
         addBeginDatePanel.add(beginDateLabel);
-
-        JPanel beginDatetimePanel = new JPanel();
-        beginDatetimePanel.setLayout(new GridLayout(0, 2));
 
         beginDatePicker.addJHVCalendarListener(e -> setBeginTime(true));
         beginTimePicker.addActionListener(e -> setBeginTime(true));
@@ -258,13 +250,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private void addEndDatePanel(GridBagConstraints c) {
         endDatePicker = new JHVCalendarDatePicker();
-        endDatePicker.getTextField().addFocusListener(new FocusListener() {
+        endDatePicker.getTextField().addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(FocusEvent arg0) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent arg0) {
+            public void focusLost(FocusEvent e) {
                 setEndTime(true);
             }
         });
@@ -275,9 +263,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         JLabel endDateLabel = new JLabel("End", JLabel.RIGHT);
         endDateLabel.setPreferredSize(new Dimension(40, 0));
         addEndDatePanel.add(endDateLabel);
-
-        JPanel endDatetimePanel = new JPanel();
-        endDatetimePanel.setLayout(new GridLayout(0, 2));
 
         endDatePicker.addJHVCalendarListener(e -> setEndTime(true));
         endTimePicker.addActionListener(e -> setEndTime(true));

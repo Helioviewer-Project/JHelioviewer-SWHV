@@ -89,6 +89,7 @@ public class JavaHelioViewer {
 
         FileUtils.deleteDir(JHVDirectory.PLUGINSCACHE.getFile());
         JHVDirectory.PLUGINSCACHE.getFile().mkdirs();
+
         EventQueue.invokeLater(() -> {
             UIGlobals.setUIFont(UIGlobals.UIFont);
 
@@ -98,11 +99,7 @@ public class JavaHelioViewer {
             ExitHooks.attach();
             JFrame frame = ImageViewerGui.prepareGui();
 
-            DataSources.loadSources();
-
-            Log.info("Load plugin settings");
             PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
-
             try {
                 if (args.length != 0 && args[0].equals("--exclude-plugins")) {
                     Log.info("Do not load plugins");
@@ -124,6 +121,7 @@ public class JavaHelioViewer {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
 
+            DataSources.loadSources();
             LoadStartup.loadCommandLine();
 
             try {
@@ -131,7 +129,7 @@ public class JavaHelioViewer {
                 update.check();
             } catch (Exception e) {
                 // Should never happen
-                Log.error("Error retrieving internal update URL", e);
+                Log.error("Error retrieving update URL", e);
             }
         });
     }
