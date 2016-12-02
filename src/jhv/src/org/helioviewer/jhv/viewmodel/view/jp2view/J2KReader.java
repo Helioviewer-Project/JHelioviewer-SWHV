@@ -68,8 +68,10 @@ class J2KReader implements Runnable {
         if ((socket = parentImageRef.getSocket()) == null)
             reconnect();
 
-        myThread = null;
         stop = false;
+        myThread = new Thread(this, "Reader " + parentImageRef.getName());
+        myThread.setDaemon(true);
+        myThread.start();
     }
 
     private void reconnect() throws IOException {
@@ -81,15 +83,6 @@ class J2KReader implements Runnable {
         } catch (JHV_KduException e) {
             e.printStackTrace();
         }
-    }
-
-    void start() {
-        if (myThread != null)
-            stop();
-        myThread = new Thread(this, "Reader " + parentImageRef.getName());
-        myThread.setDaemon(true);
-        stop = false;
-        myThread.start();
     }
 
     private void stop() {
@@ -106,6 +99,7 @@ class J2KReader implements Runnable {
                 e.printStackTrace();
             } finally {
                 myThread = null;
+                socket = null;
             }
         }
     }
@@ -113,15 +107,7 @@ class J2KReader implements Runnable {
     // Release the resources associated with this object
     void abolish() {
         stop = true;
-        stop();
-        try {
-            if (socket != null) {
-                socket.close();
-                socket = null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new Thread(() -> stop()).start();
     }
 
     private void signalRender(double factor) {

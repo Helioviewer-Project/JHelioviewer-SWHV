@@ -236,7 +236,6 @@ public class JP2Image {
         if (cacheReader != null) // remote
             try {
                 reader = new J2KReader(view, this);
-                reader.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
