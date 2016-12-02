@@ -101,9 +101,8 @@ public class CameraOptionsPanel extends SmallPanel implements PositionLoadFire {
             }
 
             @Override
-            public void actionPerformed(ActionEvent arg0) {
-                TextDialog td = new TextDialog("Viewpoint options information", explanation);
-                td.showDialog();
+            public void actionPerformed(ActionEvent e) {
+                new TextDialog("Viewpoint options information", explanation).showDialog();
             }
         });
         infoButton.setBorder(null);

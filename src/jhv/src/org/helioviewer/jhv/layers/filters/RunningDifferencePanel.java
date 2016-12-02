@@ -52,7 +52,7 @@ public class RunningDifferencePanel implements ChangeListener {
             }
 
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 DownloadViewTask downloadTask = new DownloadViewTask(((ImageLayerOptions) getComponent().getParent()).getView());
                 JHVGlobals.getExecutorService().execute(downloadTask);
             }
@@ -70,7 +70,7 @@ public class RunningDifferencePanel implements ChangeListener {
             }
 
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 MetaDataDialog dialog = new MetaDataDialog(((ImageLayerOptions) getComponent().getParent()).getView());
                 dialog.showDialog();
             }
