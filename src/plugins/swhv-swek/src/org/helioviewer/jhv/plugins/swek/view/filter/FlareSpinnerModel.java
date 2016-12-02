@@ -37,22 +37,20 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         if (curval.length() >= 2) {
             char v = curval.charAt(0);
             double pv = Double.parseDouble(curval.substring(1));
-            if (v == 'A') {
-                return compose_next(pv, "A", "B1.0");
-            } else if (v == 'B') {
-                return compose_next(pv, "B", "C1.0");
-            } else if (v == 'C') {
-                return compose_next(pv, "C", "M1.0");
-            } else if (v == 'M') {
-                return compose_next(pv, "M", "X1.0");
-            } else if (v == 'X') {
-                if (pv <= 20.0) {
-                    pv += 0.1;
-                    return String.format("X%.1f", pv);
-                } else {
-                    return null;
-                }
-
+            switch (v) {
+                case 'A':
+                    return compose_next(pv, "A", "B1.0");
+                case 'B':
+                    return compose_next(pv, "B", "C1.0");
+                case 'C':
+                    return compose_next(pv, "C", "M1.0");
+                case 'M':
+                    return compose_next(pv, "M", "X1.0");
+                case 'X':
+                    if (pv <= 19.9) {
+                        pv += 0.1;
+                        return String.format("X%.1f", pv);
+                    }
             }
         }
         return null;
@@ -72,16 +70,17 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         if (curval.length() >= 2) {
             char v = curval.charAt(0);
             double pv = Double.parseDouble(curval.substring(1));
-            if (v == 'X') {
-                return compose_prev(pv, "X", "M9.9");
-            } else if (v == 'M') {
-                return compose_prev(pv, "M", "C9.9");
-            } else if (v == 'C') {
-                return compose_prev(pv, "C", "B9.9");
-            } else if (v == 'B') {
-                return compose_prev(pv, "B", "A9.9");
-            } else if (v == 'A') {
-                return compose_prev(pv, "A", null);
+            switch (v) {
+                case 'X':
+                    return compose_prev(pv, "X", "M9.9");
+                case 'M':
+                    return compose_prev(pv, "M", "C9.9");
+                case 'C':
+                    return compose_prev(pv, "C", "B9.9");
+                case 'B':
+                    return compose_prev(pv, "B", "A9.9");
+                case 'A':
+                    return compose_prev(pv, "A", null);
             }
         }
         return null;

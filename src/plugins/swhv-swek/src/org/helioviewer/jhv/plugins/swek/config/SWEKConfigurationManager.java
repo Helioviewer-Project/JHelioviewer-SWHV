@@ -80,10 +80,8 @@ public class SWEKConfigurationManager {
             return parseManuallyChanged(configJSON);
         } catch (JSONException e) {
             Log.error("Could not parse JSON: " + e.getMessage());
-            e.printStackTrace();
         } catch (IOException e) {
             Log.error("Could not load the file: " + e.getMessage());
-            e.printStackTrace();
         }
         return false;
     }
