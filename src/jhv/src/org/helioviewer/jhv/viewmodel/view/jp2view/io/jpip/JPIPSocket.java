@@ -106,6 +106,8 @@ public class JPIPSocket extends HTTPSocket {
                 req.setQuery(JPIPQuery.create(0, "cclose", jpipChannelID));
                 send(req);
             }
+        } catch (IOException ignore) {
+            // no problem, server may have closed the socket
         } finally {
             super.close();
         }
