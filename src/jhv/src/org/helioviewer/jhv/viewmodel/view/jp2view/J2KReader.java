@@ -13,7 +13,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPRequest;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPRequestField;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
@@ -179,10 +178,10 @@ class J2KReader implements Runnable {
     }
 
     private static JPIPQuery createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
-        return new JPIPQuery(JPIPRequestField.CONTEXT.toString(), "jpxl<" + iniLayer + '-' + endLayer + '>',
-                             JPIPRequestField.FSIZ.toString(), Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height) + ',' + "closest",
-                             JPIPRequestField.ROFF.toString(), Integer.toString(currParams.subImage.x) + ',' + Integer.toString(currParams.subImage.y),
-                             JPIPRequestField.RSIZ.toString(), Integer.toString(currParams.subImage.width) + ',' + Integer.toString(currParams.subImage.height));
+        return new JPIPQuery("context", "jpxl<" + iniLayer + '-' + endLayer + '>',
+                             "fsiz", Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height) + ',' + "closest",
+                             "roff", Integer.toString(currParams.subImage.x) + ',' + Integer.toString(currParams.subImage.y),
+                             "rsiz", Integer.toString(currParams.subImage.width) + ',' + Integer.toString(currParams.subImage.height));
     }
 
     private static JPIPQuery[] createSingleQuery(JP2ImageParameter currParams) {
@@ -271,7 +270,7 @@ class J2KReader implements Runnable {
                         }
 
                         // update requested package size
-                        stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), Integer.toString(jpipRequestLen));
+                        stepQuerys[current_step].setField("len", Integer.toString(jpipRequestLen));
                         req.setQuery(stepQuerys[current_step].toString());
                         // Log.debug(stepQuerys[current_step].toString());
                         socket.send(req);

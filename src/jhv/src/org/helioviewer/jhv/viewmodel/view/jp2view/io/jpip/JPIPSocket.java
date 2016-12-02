@@ -61,10 +61,7 @@ public class JPIPSocket extends HTTPSocket {
         jpipPath = uri.getPath();
 
         JPIPRequest req = new JPIPRequest();
-        JPIPQuery query = new JPIPQuery(JPIPRequestField.CNEW.toString(), "http",
-                                        JPIPRequestField.TYPE.toString(), "jpp-stream",
-                                        JPIPRequestField.TID.toString(), "0",
-                                        JPIPRequestField.LEN.toString(), "512"); // deliberately small
+        JPIPQuery query = new JPIPQuery("cnew", "http", "type", "jpp-stream", "tid", "0", "len", "512"); // deliberately small
         req.setQuery(query.toString());
 
         JPIPResponse res = null;
@@ -107,8 +104,7 @@ public class JPIPSocket extends HTTPSocket {
         try {
             if (jpipChannelID != null) {
                 JPIPRequest req = new JPIPRequest();
-                JPIPQuery query = new JPIPQuery(JPIPRequestField.CCLOSE.toString(), jpipChannelID,
-                                                JPIPRequestField.LEN.toString(), "0");
+                JPIPQuery query = new JPIPQuery("cclose", jpipChannelID, "len", "0");
                 req.setQuery(query.toString());
                 send(req);
             }
