@@ -13,10 +13,6 @@ public class JPIPQuery {
 
     private final HashMap<String, String> fields = new HashMap<>();
 
-    public JPIPQuery() {
-        fields.put("len", Integer.toString(JPIPConstants.MIN_REQUEST_LEN));
-    }
-
     /**
      * This constructor allows to initialize the query by means of a string list
      * of pairs: key1, value1, key2, value2, ...

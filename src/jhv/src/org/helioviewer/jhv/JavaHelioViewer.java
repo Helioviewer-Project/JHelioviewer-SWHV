@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.ProxySettings;
@@ -95,7 +96,7 @@ public class JavaHelioViewer {
 
             Log.info("Start main window");
             ExitHooks.attach();
-            ImageViewerGui.prepareGui();
+            JFrame frame = ImageViewerGui.prepareGui();
 
             DataSources.loadSources();
 
@@ -118,7 +119,10 @@ public class JavaHelioViewer {
             // after loading plugins fix the minimum width of left pane
             JComponent leftScrollPane = ImageViewerGui.getLeftScrollPane();
             leftScrollPane.setMinimumSize(new Dimension(leftScrollPane.getPreferredSize().width + ImageViewerGui.SIDE_PANEL_WIDTH_EXTRA, -1));
-            ImageViewerGui.getMainFrame().pack();
+
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
 
             LoadStartup.loadCommandLine();
 

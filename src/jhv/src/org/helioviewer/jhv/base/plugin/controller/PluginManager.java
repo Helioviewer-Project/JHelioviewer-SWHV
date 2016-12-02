@@ -81,7 +81,6 @@ public class PluginManager {
             String className = null;
             if (manifest != null) {
                 className = manifest.getMainAttributes().getValue("Main-Class");
-                Log.debug("Found Manifest: Main-Class: " + className);
             }
 
             if (className == null) {

@@ -78,7 +78,7 @@ public class ImageViewerGui {
     private static InteractionAnnotate annotateInteraction;
     private static Interaction currentInteraction;
 
-    public static void prepareGui() {
+    public static JFrame prepareGui() {
         mainFrame = createMainFrame();
         mainFrame.setJMenuBar(new MenuBar());
 
@@ -145,18 +145,15 @@ public class ImageViewerGui {
         mainFrame.add(midSplitPane, BorderLayout.CENTER);
         mainFrame.add(statusPanel, BorderLayout.PAGE_END);
 
-        mainFrame.pack();
-        mainFrame.setLocationRelativeTo(null);
-        mainFrame.setVisible(true);
+        return mainFrame;
     }
 
     private static JFrame createMainFrame() {
         JFrame frame = new JFrame(JHVGlobals.programName);
-
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent arg0) {
+            public void windowClosing(WindowEvent e) {
                 ExitProgramAction exitAction = new ExitProgramAction();
                 exitAction.actionPerformed(new ActionEvent(this, 0, ""));
             }

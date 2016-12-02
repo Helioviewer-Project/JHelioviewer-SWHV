@@ -72,9 +72,7 @@ public class FileUtils {
      * @throws IOException
      */
     public static void save(InputStream in, File dst) throws IOException {
-        Log.debug("Saving stream to " + dst.getAbsolutePath());
         dst.getParentFile().mkdirs();
-
         // Transfer bytes from in to out
         try (OutputStream out = new FileOutputStream(dst)) {
             byte[] buf = new byte[BUFSIZ];

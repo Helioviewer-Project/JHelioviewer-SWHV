@@ -10,7 +10,7 @@ public class PlotPanel extends JPanel {
 
     public PlotPanel() {
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(0, 150));
+        setPreferredSize(new Dimension(0, 50));
 
         add(new ChartDrawGraphPane(), BorderLayout.CENTER);
         add(new ChartDrawIntervalPane(), BorderLayout.PAGE_END);
