@@ -79,7 +79,7 @@ public class KakaduUtils {
      */
     public static void downloadInitialData(JPIPSocket socket, JHV_Kdu_cache cache, ImageCacheStatus status) throws IOException, JHV_KduException {
         JPIPRequest req = new JPIPRequest();
-        req.setQuery(new JPIPQuery("stream", "0", "metareq", "[*]!!", "len", Integer.toString(JPIPConstants.META_REQUEST_LEN)).toString());
+        req.setQuery(JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!"));
 
         try {
             JPIPResponse res;
@@ -89,7 +89,7 @@ public class KakaduUtils {
             } while (!cache.addJPIPResponseData(res, status));
 
             if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
-                req.setQuery(new JPIPQuery("stream", "0").toString());
+                req.setQuery(JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0"));
                 do {
                     socket.send(req);
                     res = socket.receive();

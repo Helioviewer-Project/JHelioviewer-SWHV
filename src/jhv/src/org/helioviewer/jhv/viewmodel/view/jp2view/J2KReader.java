@@ -177,23 +177,23 @@ class J2KReader implements Runnable {
         lastResponseTime = replyDataTime;
     }
 
-    private static JPIPQuery createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
-        return new JPIPQuery("context", "jpxl<" + iniLayer + '-' + endLayer + '>',
-                             "fsiz", Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height) + ",closest",
-                             "roff", Integer.toString(currParams.subImage.x) + ',' + Integer.toString(currParams.subImage.y),
-                             "rsiz", Integer.toString(currParams.subImage.width) + ',' + Integer.toString(currParams.subImage.height));
+    private static String createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
+        return JPIPQuery.create("context", "jpxl<" + iniLayer + '-' + endLayer + '>',
+                                "fsiz", Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height) + ",closest",
+                                "roff", Integer.toString(currParams.subImage.x) + ',' + Integer.toString(currParams.subImage.y),
+                                "rsiz", Integer.toString(currParams.subImage.width) + ',' + Integer.toString(currParams.subImage.height));
     }
 
-    private static JPIPQuery[] createSingleQuery(JP2ImageParameter currParams) {
-        return new JPIPQuery[] { createQuery(currParams, currParams.compositionLayer, currParams.compositionLayer) };
+    private static String[] createSingleQuery(JP2ImageParameter currParams) {
+        return new String[] { createQuery(currParams, currParams.compositionLayer, currParams.compositionLayer) };
     }
 
-    private JPIPQuery[] createMultiQuery(JP2ImageParameter currParams) {
+    private String[] createMultiQuery(JP2ImageParameter currParams) {
         int num_steps = num_layers / JPIPConstants.MAX_REQ_LAYERS;
         if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
             num_steps++;
 
-        JPIPQuery[] stepQuerys = new JPIPQuery[num_steps];
+        String[] stepQuerys = new String[num_steps];
 
         int lpf = 0, lpi = 0, max_layers = num_layers - 1;
         for (int i = 0; i < num_steps; i++) {
@@ -237,8 +237,7 @@ class J2KReader implements Runnable {
 
                     // build query based on strategy
                     int current_step;
-                    JPIPQuery[] stepQuerys;
-
+                    String[] stepQuerys;
                     if (singleFrame) {
                         stepQuerys = createSingleQuery(currParams);
                         current_step = 0;
@@ -270,9 +269,7 @@ class J2KReader implements Runnable {
                         }
 
                         // update requested package size
-                        stepQuerys[current_step].setField("len", Integer.toString(jpipRequestLen));
-                        req.setQuery(stepQuerys[current_step].toString());
-                        // Log.debug(stepQuerys[current_step].toString());
+                        req.setQuery(stepQuerys[current_step] + "len=" + jpipRequestLen);
                         socket.send(req);
 
                         // receive data
