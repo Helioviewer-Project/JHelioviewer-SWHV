@@ -46,12 +46,9 @@ public class ParameterTableModel extends AbstractTableModel {
             } else if (columnIndex == 1) {
                 String result = parameters[rowIndex].getDisplayParameterValue();
                 return result.length() > STRING_CUTOFF ? result.substring(0, STRING_CUTOFF) + "..." : result;
-            } else {
-                return "";
             }
-        } else {
-            return "";
         }
+        return "";
     }
 
     @Override
@@ -60,9 +57,8 @@ public class ParameterTableModel extends AbstractTableModel {
             return "Parameter Name";
         } else if (column == 1) {
             return "Value";
-        } else {
-            return super.getColumnName(column);
         }
+        return super.getColumnName(column);
     }
 
 }

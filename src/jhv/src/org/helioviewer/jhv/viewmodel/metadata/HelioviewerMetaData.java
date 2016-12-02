@@ -257,23 +257,21 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             return 1;
         }
 
-        if (wv != 0) {
-            if (wv < 304)
-                return Sun.RadiusFactor_171;
-            else if (wv < 1600)
-                return Sun.RadiusFactor_304;
-            else if (wv < 1700)
-                return Sun.RadiusFactor_1600;
-            else if (wv < 4500)
-                return Sun.RadiusFactor_1700;
-            else if (wv < 6173)
-                return 1;
-            else if (wv < 6562)
-                return Sun.RadiusFactor_6173;
-            else
-                return Sun.RadiusFactor_6562;
-        }
-        return 1;
+        if (wv == 0)
+            return 1;
+        if (wv < 304)
+            return Sun.RadiusFactor_171;
+        if (wv < 1600)
+            return Sun.RadiusFactor_304;
+        if (wv < 1700)
+            return Sun.RadiusFactor_1600;
+        if (wv < 4500)
+            return Sun.RadiusFactor_1700;
+        if (wv < 6173)
+            return 1;
+        if (wv < 6562)
+            return Sun.RadiusFactor_6173;
+        return Sun.RadiusFactor_6562;
     }
 
     @Override

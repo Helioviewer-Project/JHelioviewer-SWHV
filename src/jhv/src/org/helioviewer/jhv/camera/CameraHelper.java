@@ -93,13 +93,14 @@ public class CameraHelper {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
-        if (radius2 <= Sun.Radius2) {
-            Vec3 hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
-            if (correctDrag)
-                hitPoint = camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
-            return rotation.rotateInverseVector(hitPoint);
-        }
-        return null;
+
+        if (radius2 > Sun.Radius2)
+            return null;
+
+        Vec3 hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
+        if (correctDrag)
+            hitPoint = camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
+        return rotation.rotateInverseVector(hitPoint);
     }
 
     public static Vec3 getVectorFromPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
@@ -118,7 +119,6 @@ public class CameraHelper {
         Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
         if (correctDrag)
             hitPoint = currentDragRotation.rotateInverseVector(hitPoint);
-
         return rotation.rotateInverseVector(hitPoint);
     }
 
