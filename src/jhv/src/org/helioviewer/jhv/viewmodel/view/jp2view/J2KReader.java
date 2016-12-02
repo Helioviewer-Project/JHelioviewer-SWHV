@@ -179,7 +179,7 @@ class J2KReader implements Runnable {
 
     private static JPIPQuery createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
         return new JPIPQuery("context", "jpxl<" + iniLayer + '-' + endLayer + '>',
-                             "fsiz", Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height) + ',' + "closest",
+                             "fsiz", Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height) + ",closest",
                              "roff", Integer.toString(currParams.subImage.x) + ',' + Integer.toString(currParams.subImage.y),
                              "rsiz", Integer.toString(currParams.subImage.width) + ',' + Integer.toString(currParams.subImage.height));
     }
