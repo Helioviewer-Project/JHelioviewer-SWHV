@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.swing.BorderFactory;
@@ -65,31 +64,20 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
     @Override
     protected Void backgroundWork() {
-        URI srcURI;
-        if (downloadURI.getScheme().equalsIgnoreCase("jpip")) {
-            try {
-                srcURI = new URI(downloadURI.toString().replaceFirst("jpip://", "http://").replaceFirst(":" + downloadURI.getPort(), "/jp2"));
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                return null;
-            }
-        } else
-            srcURI = downloadURI;
-
         File dstFile = new File(JHVDirectory.REMOTEFILES.getPath() + uri.getPath().substring(Math.max(0, uri.getPath().lastIndexOf('/')))).getAbsoluteFile();
-        if (srcURI.equals(dstFile.toURI())) // avoid self-destruction
+        if (downloadURI.equals(dstFile.toURI())) // avoid self-destruction
             return null;
 
-        URL srcURL;
+        URL downloadURL;
         try {
-            srcURL = srcURI.toURL();
+            downloadURL = downloadURI.toURL();
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
         }
 
         boolean failed = false;
-        DownloadStream ds = new DownloadStream(srcURL);
+        DownloadStream ds = new DownloadStream(downloadURL);
         try (InputStream in = new BufferedInputStream(ds.getInput(), BUFSIZ)) {
             int contentLength = ds.getContentLength();
             if (contentLength > 0) {

@@ -118,6 +118,7 @@ public class JP2Image {
             ImageCacheStatusInitial initialCacheStatus = new ImageCacheStatusInitial();
             String scheme = uri.getScheme().toLowerCase();
             switch (scheme) {
+                case "http":
                 case "jpip":
                     cacheReader = new JHV_Kdu_cache();
                     cacheRender = new Kdu_cache();
