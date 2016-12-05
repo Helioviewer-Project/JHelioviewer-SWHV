@@ -175,16 +175,14 @@ public class JP2Image {
     private void initRemote(JHV_Kdu_cache cache) throws JHV_KduException {
         // Create the JPIP-socket necessary for communications
         socket = new JPIPSocket();
-
         try {
             // Connect to the JPIP server and add the first response to cache
-            JPIPResponse res = socket.connect(uri);
+            JPIPResponse res = socket.newChannel(uri);
             cache.addJPIPResponseData(res);
 
             // Download the necessary initial data
             boolean initialDataLoaded = false;
             int numTries = 0;
-
             do {
                 try {
                     KakaduUtils.downloadInitialData(socket, cache);
@@ -194,7 +192,7 @@ public class JP2Image {
                     numTries++;
                     socket.close();
                     socket = new JPIPSocket();
-                    socket.connect(uri);
+                    socket.newChannel(uri);
                 }
             } while (!initialDataLoaded && numTries < 5);
         } catch (SocketTimeoutException e) {
