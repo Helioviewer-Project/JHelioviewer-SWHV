@@ -34,8 +34,8 @@ class JPIPDataInputStream {
     private final InputStream in;
 
     /** Constructs a object based on the indicated <code>InputStream</code>. */
-    public JPIPDataInputStream(InputStream in) {
-        this.in = in;
+    public JPIPDataInputStream(InputStream _in) {
+        in = _in;
     }
 
     /**
@@ -46,7 +46,6 @@ class JPIPDataInputStream {
      * @throws java.io.IOException
      */
     private long readVBAS() throws IOException {
-
         vbasLength = 0;
         long value = 0;
         int c;
@@ -66,7 +65,6 @@ class JPIPDataInputStream {
             if (vbasLength == 0)
                 vbasFstByte = c;
             vbasLength++;
-
         } while ((c & 0x80) != 0);
 
         return value;
@@ -88,7 +86,6 @@ class JPIPDataInputStream {
             return null;
 
         JPIPDataSegment seg = new JPIPDataSegment();
-
         seg.binID = id;
 
         if (vbasFstByte == 0) {
@@ -101,7 +98,6 @@ class JPIPDataInputStream {
         } else {
             seg.isEOR = false;
             seg.binID &= ~(0x70L << ((vbasLength - 1) * 7));
-
             seg.isFinal = (vbasFstByte & 0x10) != 0;
 
             int m = (vbasFstByte & 0x7F) >> 5;
