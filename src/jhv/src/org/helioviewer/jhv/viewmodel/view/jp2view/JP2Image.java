@@ -121,10 +121,11 @@ public class JP2Image {
                 case "http":
                 case "jpip":
                     cacheReader = new JHV_Kdu_cache();
+                    cacheReader.setImageCacheStatus(initialCacheStatus);
                     cacheRender = new Kdu_cache();
                     cacheRender.Attach_to(cacheReader);
                     // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
-                    initRemote(cacheReader, initialCacheStatus);
+                    initRemote(cacheReader);
                     break;
                 case "file":
                     // nothing
@@ -154,6 +155,7 @@ public class JP2Image {
             if (cacheReader != null) { // remote
                 imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader.getCompositor(), getMaximumFrameNumber());
                 imageCacheStatus.setImageStatus(0, initialCacheStatus.getImageStatus(0));
+                cacheReader.setImageCacheStatus(imageCacheStatus);
             } else {
                 imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader.getCompositor(), getMaximumFrameNumber());
             }
@@ -170,14 +172,14 @@ public class JP2Image {
      * @throws JHV_KduException
      * @throws IOException
      */
-    private void initRemote(JHV_Kdu_cache cache, ImageCacheStatus status) throws JHV_KduException {
+    private void initRemote(JHV_Kdu_cache cache) throws JHV_KduException {
         // Create the JPIP-socket necessary for communications
         socket = new JPIPSocket();
 
         try {
             // Connect to the JPIP server and add the first response to cache
             JPIPResponse res = (JPIPResponse) socket.connect(uri);
-            cache.addJPIPResponseData(res, status);
+            cache.addJPIPResponseData(res);
 
             // Download the necessary initial data
             boolean initialDataLoaded = false;
@@ -185,7 +187,7 @@ public class JP2Image {
 
             do {
                 try {
-                    KakaduUtils.downloadInitialData(socket, cache, status);
+                    KakaduUtils.downloadInitialData(socket, cache);
                     initialDataLoaded = true;
                 } catch (IOException e) {
                     e.printStackTrace();

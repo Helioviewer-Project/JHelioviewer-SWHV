@@ -79,7 +79,7 @@ class J2KReader implements Runnable {
             // System.out.println(">>> reconnect");
             socket = new JPIPSocket();
             JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
-            cacheRef.addJPIPResponseData(res, cacheStatusRef);
+            cacheRef.addJPIPResponseData(res);
         } catch (JHV_KduException e) {
             e.printStackTrace();
         }
@@ -261,7 +261,7 @@ class J2KReader implements Runnable {
                         flowControl();
 
                         // add response to cache - react if query complete
-                        if (cacheRef.addJPIPResponseData(res, cacheStatusRef)) {
+                        if (cacheRef.addJPIPResponseData(res)) {
                             // mark query as complete
                             complete_steps++;
                             stepQuerys[current_step] = null;
