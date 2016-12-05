@@ -55,7 +55,8 @@ public class ParameterTableModel extends AbstractTableModel {
     public String getColumnName(int column) {
         if (column == 0) {
             return "Parameter Name";
-        } else if (column == 1) {
+        }
+        if (column == 1) {
             return "Value";
         }
         return super.getColumnName(column);

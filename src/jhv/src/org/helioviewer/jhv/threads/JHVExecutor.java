@@ -66,12 +66,12 @@ import sun.awt.AppContext;
         return executorService;
     }
 
-    private static void shutdownOnDisposal(final ExecutorService es) {
-        final Runnable shutdownHook =
+    private static void shutdownOnDisposal(ExecutorService es) {
+        Runnable shutdownHook =
             new Runnable() {
                 final WeakReference<ExecutorService> executorServiceRef = new WeakReference<>(es);
                 public void run() {
-                    final ExecutorService executorService = executorServiceRef.get();
+                    ExecutorService executorService = executorServiceRef.get();
                     if (executorService != null) {
                         AccessController.doPrivileged(
                                 (PrivilegedAction<Void>) () -> {

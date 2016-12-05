@@ -25,9 +25,9 @@ public class DataSourcesTree extends JTree {
         public final String name;
         public final String description;
 
-        public Item(String name, String description) {
-            this.name = name;
-            this.description = description;
+        public Item(String _name, String _description) {
+            name = _name;
+            description = _description;
         }
 
         @Override
@@ -45,13 +45,13 @@ public class DataSourcesTree extends JTree {
         public final long end;
         public final boolean defaultItem;
 
-        public SourceItem(String server, String name, String description, int sourceId, long start, long end, boolean defaultItem) {
-            super(name, description);
-            this.server = server;
-            this.sourceId = sourceId;
-            this.start = start;
-            this.end = end;
-            this.defaultItem = defaultItem;
+        public SourceItem(String _server, String _name, String _description, int _sourceId, long _start, long _end, boolean _defaultItem) {
+            super(_name, _description);
+            server = _server;
+            sourceId = _sourceId;
+            start = _start;
+            end = _end;
+            defaultItem = _defaultItem;
         }
 
     }

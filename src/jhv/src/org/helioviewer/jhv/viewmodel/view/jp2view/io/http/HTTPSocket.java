@@ -66,7 +66,7 @@ public class HTTPSocket extends Socket {
      *
      * @return A new <code>HTTPMessage</code> object with the message read or
      *         <code>null</code> if the end of stream was reached.
-     * @throws java.io.IOException
+     * @throws IOException
      */
     protected HTTPMessage recv() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);

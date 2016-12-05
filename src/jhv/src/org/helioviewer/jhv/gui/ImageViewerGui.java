@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -171,12 +172,12 @@ public class ImageViewerGui {
         return frame;
     }
 
-    private static void enableFullScreen(java.awt.Window window) {
+    private static void enableFullScreen(Window window) {
         if (System.getProperty("jhv.os").equals("mac")) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             try {
                 Class<?> fullScreenUtilities = Class.forName("com.apple.eawt.FullScreenUtilities");
-                Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", java.awt.Window.class, boolean.class);
+                Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", Window.class, boolean.class);
                 setWindowCanFullScreen.invoke(fullScreenUtilities, window, true);
             } catch (Exception e) {
                 Log.error("Fullscreen utilities not available");
