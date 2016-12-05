@@ -180,11 +180,8 @@ public class JPIPSocket extends HTTPSocket {
         }
 
         JPIPResponse jpipRes = new JPIPResponse(res.getHeader("JPIP-cnew"));
-        JPIPDataInputStream jpip = new JPIPDataInputStream();
         try {
-            JPIPDataSegment seg;
-            while ((seg = jpip.readSegment(input)) != null)
-                jpipRes.addJpipDataSegment(seg);
+            jpipRes.readSegments(input);
         } finally {
             input.close(); // make sure the stream is exhausted
         }
