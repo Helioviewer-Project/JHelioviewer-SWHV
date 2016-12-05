@@ -78,7 +78,7 @@ class J2KReader implements Runnable {
         try {
             // System.out.println(">>> reconnect");
             socket = new JPIPSocket();
-            JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
+            JPIPResponse res = socket.connect(parentImageRef.getURI());
             cacheRef.addJPIPResponseData(res);
         } catch (JHV_KduException e) {
             e.printStackTrace();

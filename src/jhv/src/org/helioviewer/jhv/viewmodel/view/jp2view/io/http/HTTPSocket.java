@@ -45,7 +45,7 @@ public class HTTPSocket extends Socket {
      * @param uri
      * @throws IOException
      */
-    protected Object connect(URI uri) throws IOException {
+    protected void _connect(URI uri) throws IOException {
         int port = uri.getPort();
         lastUsedPort = port <= 0 ? PORT : port;
         lastUsedHost = uri.getHost();
@@ -58,8 +58,6 @@ public class HTTPSocket extends Socket {
         connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TO_CONNECT);
 
         inputStream = new BufferedInputStream(getInputStream(), 65536);
-
-        return null;
     }
 
     /**
