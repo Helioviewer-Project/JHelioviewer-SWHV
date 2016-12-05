@@ -3,8 +3,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
 import java.util.LinkedList;
 
 /**
- * A response to a JPIPRequest. Encapsulates both the HTTPResponse headers and
- * the JPIPDataSegments.
+ * A response to a JPIPRequest, encapsulates the JPIPDataSegments
  *
  * @author caplins
  *
@@ -47,12 +46,12 @@ public class JPIPResponse {
      * @return The removed data segment, null if the list was empty
      */
     public JPIPDataSegment removeJpipDataSegment() {
-        if (!jpipDataList.isEmpty()) {
-            JPIPDataSegment jpr = jpipDataList.remove();
-            size -= jpr.length;
-            return jpr;
-        }
-        return null;
+        if (jpipDataList.isEmpty())
+            return null;
+
+        JPIPDataSegment jpr = jpipDataList.remove();
+        size -= jpr.length;
+        return jpr;
     }
 
     /**

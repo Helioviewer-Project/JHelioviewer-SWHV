@@ -24,7 +24,7 @@ class J2KReader implements Runnable {
     private static final boolean verbose = false;
 
     /** The thread that this object runs on. */
-    private volatile Thread myThread;
+    private final Thread myThread;
 
     /** A boolean flag used for stopping the thread. */
     private volatile boolean stop;
@@ -86,20 +86,13 @@ class J2KReader implements Runnable {
     }
 
     private void stop() {
-        if (myThread != null && myThread.isAlive()) {
+        while (myThread.isAlive()) {
             try {
-                do {
-                    if (socket != null) { // try to unblock i/o
-                        socket.close();
-                    }
-                    myThread.interrupt();
-                    myThread.join(100);
-                } while (myThread.isAlive());
-            } catch (Exception e) {
+                socket.close(); // try to unblock i/o
+                myThread.interrupt();
+                myThread.join(100);
+            } catch (Exception e) { // avoid exit from loop
                 e.printStackTrace();
-            } finally {
-                myThread = null;
-                socket = null;
             }
         }
     }
@@ -113,7 +106,6 @@ class J2KReader implements Runnable {
     private void signalRender(double factor) {
         if (stop)
             return;
-
         EventQueue.invokeLater(() -> parentViewRef.signalRenderFromReader(parentImageRef, factor));
     }
 
@@ -154,7 +146,6 @@ class J2KReader implements Runnable {
         }
 
         jpipRequestLen += (jpipRequestLen >> 2) * adjust;
-
         if (jpipRequestLen > JPIPConstants.MAX_REQUEST_LEN)
             jpipRequestLen = JPIPConstants.MAX_REQUEST_LEN;
         if (jpipRequestLen < JPIPConstants.MIN_REQUEST_LEN)

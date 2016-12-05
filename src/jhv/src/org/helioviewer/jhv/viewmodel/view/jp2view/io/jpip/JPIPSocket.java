@@ -96,7 +96,7 @@ public class JPIPSocket extends HTTPSocket {
 
     // Closes the JPIPSocket
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         if (isClosed())
             return;
 
