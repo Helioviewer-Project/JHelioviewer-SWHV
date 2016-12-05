@@ -2,7 +2,6 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.net.URI;
 
 import kdu_jni.KduException;
@@ -34,6 +33,10 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemot
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
@@ -172,29 +175,24 @@ public class JP2Image {
      * @throws IOException
      */
     private void initRemote(JHV_Kdu_cache cache) throws JHV_KduException {
-        // Create the JPIP-socket necessary for communications
-        socket = new JPIPSocket();
         try {
-            // Connect to the JPIP server and add the first response to cache
-            socket.newChannel(uri, cache);
-            // Download the necessary initial data
-            boolean initialDataLoaded = false;
-            int numTries = 0;
+            // Connect to the JPIP server and add the necessary initial data (the main header as well as the metadata) to cache
+            socket = new JPIPSocket(uri, cache);
+
+            JPIPResponse res;
+            String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
             do {
-                try {
-                    KakaduUtils.downloadInitialData(socket, cache);
-                    initialDataLoaded = true;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    numTries++;
-                    socket.close();
-                    socket = new JPIPSocket();
-                    socket.newChannel(uri, cache);
-                }
-            } while (!initialDataLoaded && numTries < 5);
-        } catch (SocketTimeoutException e) {
-            initCloseSocket();
-            throw new JHV_KduException("Timeout while communicating with the server: " + e.getMessage(), e);
+                socket.send(req);
+                res = socket.receive(cache);
+            } while (!res.isResponseComplete());
+
+            if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
+                req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
+                do {
+                    socket.send(req);
+                    res = socket.receive(cache);
+                } while (!res.isResponseComplete() && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
+            }
         } catch (IOException e) {
             initCloseSocket();
             throw new JHV_KduException("Error in the server communication: " + e.getMessage(), e);

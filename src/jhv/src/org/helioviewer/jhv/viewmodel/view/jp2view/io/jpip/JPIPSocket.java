@@ -48,10 +48,9 @@ public class JPIPSocket extends HTTPSocket {
     /**
      * Open new JPIP channel
      *
-     * @return The first response of the server when connecting.
      * @throws IOException
      */
-    public JPIPResponse newChannel(URI uri, JPIPCache cache) throws IOException {
+    public JPIPSocket(URI uri, JPIPCache cache) throws IOException {
         connect(uri);
 
         jpipPath = uri.getPath();
@@ -77,8 +76,6 @@ public class JPIPSocket extends HTTPSocket {
 
         if (!"http".equals(map.get("transport")))
             throw new IOException("The client only supports HTTP transport");
-
-        return res;
     }
 
     // Closes the JPIPSocket
@@ -100,20 +97,19 @@ public class JPIPSocket extends HTTPSocket {
 
     // Sends a JPIP request
     public void send(String queryStr) throws IOException {
-        HTTPMessage req = new HTTPMessage();
-        // Add some default headers
-        req.setHeader("User-Agent", JHVGlobals.getUserAgent());
-        req.setHeader("Connection", "Keep-Alive");
-        req.setHeader("Accept-Encoding", "gzip");
-        req.setHeader("Cache-Control", "no-cache");
-        req.setHeader("Host", getHost() + ':' + getPort());
-
         // Add a necessary JPIP request field
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
         // Build request to send
+        HTTPMessage req = new HTTPMessage();
+        req.setHeader("User-Agent", JHVGlobals.getUserAgent());
+        req.setHeader("Connection", "Keep-Alive");
+        req.setHeader("Accept-Encoding", "gzip");
+        req.setHeader("Cache-Control", "no-cache");
+        req.setHeader("Host", getHost() + ':' + getPort());
         String res = "GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n";
+
         // Writes the result to the output stream
         getOutputStream().write(res.getBytes(StandardCharsets.UTF_8));
     }
@@ -183,23 +179,17 @@ public class JPIPSocket extends HTTPSocket {
         return jpipRes;
     }
 
-    /**
-     * Returns the time when received the last reply text
-     */
+    // Returns the time when received the headers of last response
     public long getReplyTextTime() {
         return replyTextTm;
     }
 
-    /**
-     * Returns the time when received the last reply data
-     */
+    // Returns the time when received the data of last response
     public long getReplyDataTime() {
         return replyDataTm;
     }
 
-    /**
-     * Returns the amount of data (bytes) of the last response.
-     */
+    // Returns the amount of data (bytes) of the last response
     public int getReceivedData() {
         return receivedData;
     }
