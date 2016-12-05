@@ -100,7 +100,7 @@ class J2KReader implements Runnable {
     // Release the resources associated with this object
     void abolish() {
         stop = true;
-        new Thread(() -> stop()).start();
+        new Thread(this::stop).start();
     }
 
     private void signalRender(double factor) {
