@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.kakadu;
 
 import java.awt.Rectangle;
-import java.io.EOFException;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import kdu_jni.Jp2_input_box;
@@ -17,11 +15,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 
 /**
  * A collection of useful static methods.
@@ -63,41 +56,6 @@ public class KakaduUtils {
         siz.Set_y(roi.height);
 
         return dims;
-    }
-
-    /**
-     * Downloads all the necessary initial data of an image. In the case of this
-     * application, it includes the main header as well as the metadata.
-     * JPIPSocket object should already be connected.
-     *
-     * @param socket
-     * @param cache
-     * @throws IOException
-     * @throws JHV_KduException
-     */
-    public static void downloadInitialData(JPIPSocket socket, JHV_Kdu_cache cache) throws IOException, JHV_KduException {
-        String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
-        try {
-            JPIPResponse res;
-            do {
-                socket.send(req);
-                res = socket.receive(cache);
-            } while (!res.isResponseComplete());
-
-            if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
-                req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
-                do {
-                    socket.send(req);
-                    res = socket.receive(cache);
-                } while (!res.isResponseComplete() && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
-            }
-        } catch (EOFException e) {
-            e.printStackTrace();
-        }
-
-        if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
-            throw new IOException("Unable to read all data, data bin is not complete");
-        }
     }
 
     /**

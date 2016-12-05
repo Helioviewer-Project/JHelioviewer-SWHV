@@ -74,14 +74,17 @@ class J2KReader implements Runnable {
 
     private void reconnect() throws IOException {
         // System.out.println(">>> reconnect");
-        socket = new JPIPSocket();
-        socket.newChannel(parentImageRef.getURI(), cacheRef);
+        socket = new JPIPSocket(parentImageRef.getURI(), cacheRef);
     }
 
     private void stop() {
+        if (myThread == null) // paranoia
+            return;
+
         while (myThread.isAlive()) {
             try {
-                socket.close(); // try to unblock i/o
+                if (socket != null)
+                    socket.close(); // try to unblock i/o
                 myThread.interrupt();
                 myThread.join(100);
             } catch (Exception e) { // avoid exit from loop
