@@ -54,23 +54,16 @@ public class JPIPSocket extends HTTPSocket {
      * @return The first response of the server when connecting.
      * @throws IOException
      */
-    @Override
-    public Object connect(URI uri) throws IOException {
-        super.connect(uri);
+    public JPIPResponse connect(URI uri) throws IOException {
+        _connect(uri);
 
         jpipPath = uri.getPath();
 
         JPIPRequest req = new JPIPRequest();
         req.setQuery(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0")); // deliberately short
+        send(req);
 
-        JPIPResponse res = null;
-        while (res == null && isConnected()) {
-            send(req);
-            res = receive();
-        }
-        if (res == null)
-            throw new IOException("The server did not send a response after connection");
-
+        JPIPResponse res = receive();
         String cnew = res.getCNew();
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");

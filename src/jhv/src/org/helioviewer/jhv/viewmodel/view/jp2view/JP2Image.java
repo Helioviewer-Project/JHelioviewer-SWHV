@@ -178,7 +178,7 @@ public class JP2Image {
 
         try {
             // Connect to the JPIP server and add the first response to cache
-            JPIPResponse res = (JPIPResponse) socket.connect(uri);
+            JPIPResponse res = socket.connect(uri);
             cache.addJPIPResponseData(res);
 
             // Download the necessary initial data
