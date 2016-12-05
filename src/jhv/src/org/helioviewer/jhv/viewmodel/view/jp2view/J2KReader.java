@@ -12,7 +12,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPRequest;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
@@ -230,8 +229,6 @@ class J2KReader implements Runnable {
 
                     lastResponseTime = -1;
 
-                    //int idx = 0;
-                    JPIPRequest req = new JPIPRequest();
                     // send queries until everything is complete or caching is interrupted
                     int complete_steps = 0;
                     boolean stopReading = false;
@@ -246,8 +243,7 @@ class J2KReader implements Runnable {
                         }
 
                         // update requested package size
-                        req.setQuery(stepQuerys[current_step] + "len=" + jpipRequestLen);
-                        socket.send(req);
+                        socket.send(stepQuerys[current_step] + "len=" + jpipRequestLen);
 
                         // receive and add data to cache
                         JPIPResponse res = socket.receive();
