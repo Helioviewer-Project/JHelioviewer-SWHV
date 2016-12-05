@@ -20,7 +20,6 @@ import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPRequest;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 
@@ -77,9 +76,7 @@ public class KakaduUtils {
      * @throws JHV_KduException
      */
     public static void downloadInitialData(JPIPSocket socket, JHV_Kdu_cache cache) throws IOException, JHV_KduException {
-        JPIPRequest req = new JPIPRequest();
-        req.setQuery(JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!"));
-
+        String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
         try {
             JPIPResponse res;
             do {
@@ -89,7 +86,7 @@ public class KakaduUtils {
             } while (!res.isResponseComplete());
 
             if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
-                req.setQuery(JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0"));
+                req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
                 do {
                     socket.send(req);
                     res = socket.receive();

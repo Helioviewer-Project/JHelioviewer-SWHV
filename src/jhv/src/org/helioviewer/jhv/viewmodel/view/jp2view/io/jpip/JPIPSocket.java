@@ -57,11 +57,9 @@ public class JPIPSocket extends HTTPSocket {
 
         jpipPath = uri.getPath();
 
-        JPIPRequest req = new JPIPRequest();
-        req.setQuery(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0")); // deliberately short
-        send(req);
-
+        send(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0")); // deliberately short
         JPIPResponse res = receive();
+
         String cnew = res.getCNew();
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
@@ -92,9 +90,7 @@ public class JPIPSocket extends HTTPSocket {
 
         try {
             if (jpipChannelID != null) {
-                JPIPRequest req = new JPIPRequest();
-                req.setQuery(JPIPQuery.create(0, "cclose", jpipChannelID));
-                send(req);
+                send(JPIPQuery.create(0, "cclose", jpipChannelID));
             }
         } catch (IOException ignore) {
             // no problem, server may have closed the socket
@@ -103,8 +99,9 @@ public class JPIPSocket extends HTTPSocket {
         }
     }
 
-    // Sends a JPIPRequest
-    public void send(JPIPRequest req) throws IOException {
+    // Sends a JPIP request
+    public void send(String queryStr) throws IOException {
+        HTTPMessage req = new HTTPMessage();
         // Add some default headers
         req.setHeader("User-Agent", JHVGlobals.getUserAgent());
         req.setHeader("Connection", "Keep-Alive");
@@ -113,7 +110,6 @@ public class JPIPSocket extends HTTPSocket {
         req.setHeader("Host", getHost() + ':' + getPort());
 
         // Add a necessary JPIP request field
-        String queryStr = req.getQuery();
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
 
