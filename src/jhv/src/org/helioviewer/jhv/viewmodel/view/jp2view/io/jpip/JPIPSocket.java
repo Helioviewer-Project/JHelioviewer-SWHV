@@ -48,17 +48,16 @@ public class JPIPSocket extends HTTPSocket {
     /**
      * Open new JPIP channel
      *
-     * @param uri
      * @return The first response of the server when connecting.
      * @throws IOException
      */
-    public JPIPResponse newChannel(URI uri) throws IOException {
+    public JPIPResponse newChannel(URI uri, JPIPCache cache) throws IOException {
         connect(uri);
 
         jpipPath = uri.getPath();
 
         send(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0")); // deliberately short
-        JPIPResponse res = receive();
+        JPIPResponse res = receive(cache);
 
         String cnew = res.getCNew();
         if (cnew == null)
@@ -120,7 +119,7 @@ public class JPIPSocket extends HTTPSocket {
     }
 
     // Receives a JPIPResponse returning null if EOS reached
-    public JPIPResponse receive() throws IOException {
+    public JPIPResponse receive(JPIPCache cache) throws IOException {
         // long tini = System.currentTimeMillis();
         HTTPMessage res = recv();
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
@@ -167,7 +166,7 @@ public class JPIPSocket extends HTTPSocket {
 
         JPIPResponse jpipRes = new JPIPResponse(res.getHeader("JPIP-cnew"));
         try {
-            jpipRes.readSegments(input);
+            jpipRes.readSegments(input, cache);
         } finally {
             input.close(); // make sure the stream is exhausted
         }

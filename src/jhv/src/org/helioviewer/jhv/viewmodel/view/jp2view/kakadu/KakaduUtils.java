@@ -81,16 +81,14 @@ public class KakaduUtils {
             JPIPResponse res;
             do {
                 socket.send(req);
-                res = socket.receive();
-                cache.addJPIPResponseData(res);
+                res = socket.receive(cache);
             } while (!res.isResponseComplete());
 
             if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
                 req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
                 do {
                     socket.send(req);
-                    res = socket.receive();
-                    cache.addJPIPResponseData(res);
+                    res = socket.receive(cache);
                 } while (!res.isResponseComplete() && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
             }
         } catch (EOFException e) {

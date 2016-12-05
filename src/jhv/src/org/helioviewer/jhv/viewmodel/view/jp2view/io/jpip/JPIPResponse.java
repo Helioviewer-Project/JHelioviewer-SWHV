@@ -4,7 +4,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ProtocolException;
-import java.util.LinkedList;
 
 /**
  * A response to a JPIPRequest, encapsulates the JPIPDataSegments
@@ -18,9 +17,6 @@ public class JPIPResponse {
     /** The status: could be EOR_WINDOW_DONE or EOR_IMAGE_DONE */
     private long status = -1;
 
-    /** A list of the data segments. */
-    private final LinkedList<JPIPDataSegment> jpipDataList = new LinkedList<>();
-
     private final String cnew;
 
     public JPIPResponse(String _cnew) {
@@ -29,29 +25,6 @@ public class JPIPResponse {
 
     public String getCNew() {
         return cnew;
-    }
-
-    /**
-     * Adds the data segment to this object.
-     *
-     * @param data
-     */
-    private void addJpipDataSegment(JPIPDataSegment data) {
-        if (data.isEOR) {
-            status = data.binID;
-        }
-        jpipDataList.add(data);
-    }
-
-    /**
-     * Removes a data segment from this object.
-     *
-     * @return The removed data segment, null if the list was empty
-     */
-    public JPIPDataSegment removeJpipDataSegment() {
-        if (jpipDataList.isEmpty())
-            return null;
-        return jpipDataList.remove();
     }
 
     /**
@@ -175,10 +148,14 @@ public class JPIPResponse {
         return seg;
     }
 
-    public void readSegments(InputStream in) throws IOException {
+    public void readSegments(InputStream in, JPIPCache cache) throws IOException {
         JPIPDataSegment seg;
-        while ((seg = readSegment(in)) != null)
-            addJpipDataSegment(seg);
+        while ((seg = readSegment(in)) != null) {
+            if (seg.isEOR)
+                status = seg.binID;
+            else
+                cache.addJPIPDataSegment(seg);
+        }
     }
 
 }

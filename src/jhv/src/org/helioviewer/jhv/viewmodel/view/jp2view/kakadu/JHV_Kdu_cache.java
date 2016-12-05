@@ -1,19 +1,21 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.kakadu;
 
+import java.io.IOException;
+
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPCache;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDataSegment;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 
 /**
  * @author caplins
  * @author Juan Pablo
  */
-public class JHV_Kdu_cache extends Kdu_cache {
+public class JHV_Kdu_cache extends Kdu_cache implements JPIPCache {
 
     private ImageCacheStatus status;
 
@@ -41,28 +43,17 @@ public class JHV_Kdu_cache extends Kdu_cache {
     }
 
     /**
-     * Adds a JPIPResponse to the cache object using the addDataSegment methods.
-     * 
-     * @param res
-     * @throws Exception
-     */
-    public void addJPIPResponseData(JPIPResponse res) throws JHV_KduException {
-        JPIPDataSegment data;
-        while ((data = res.removeJpipDataSegment()) != null && !data.isEOR)
-            addDataSegment(data);
-    }
-
-    /**
-     * Adds a JPIPDataSegment to the cache object. Updates the newData variable.
+     * Adds a JPIPDataSegment to the cache object
      * 
      * @param data
      * @throws JHV_KduException
      */
-    private void addDataSegment(JPIPDataSegment data) throws JHV_KduException {
+    @Override
+    public void addJPIPDataSegment(JPIPDataSegment data) throws IOException {
         try {
             Add_to_databin(data.classID.kakaduClassID, data.codestreamID, data.binID, data.data, data.offset, data.length, data.isFinal, true, false);
-        } catch (KduException ex) {
-            throw new JHV_KduException("Internal Kakadu error: " + ex.getMessage());
+        } catch (KduException e) {
+            throw new IOException("Internal Kakadu error: " + e.getMessage());
         }
 
         int compositionLayer = (int) data.codestreamID;

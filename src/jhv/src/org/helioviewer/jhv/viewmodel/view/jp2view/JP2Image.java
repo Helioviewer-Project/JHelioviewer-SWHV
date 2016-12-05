@@ -34,7 +34,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemot
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
@@ -177,9 +176,7 @@ public class JP2Image {
         socket = new JPIPSocket();
         try {
             // Connect to the JPIP server and add the first response to cache
-            JPIPResponse res = socket.newChannel(uri);
-            cache.addJPIPResponseData(res);
-
+            socket.newChannel(uri, cache);
             // Download the necessary initial data
             boolean initialDataLoaded = false;
             int numTries = 0;
@@ -192,7 +189,7 @@ public class JP2Image {
                     numTries++;
                     socket.close();
                     socket = new JPIPSocket();
-                    socket.newChannel(uri);
+                    socket.newChannel(uri, cache);
                 }
             } while (!initialDataLoaded && numTries < 5);
         } catch (SocketTimeoutException e) {
