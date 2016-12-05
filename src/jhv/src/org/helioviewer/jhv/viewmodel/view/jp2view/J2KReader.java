@@ -14,7 +14,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
-import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 class J2KReader implements Runnable {
@@ -74,14 +73,9 @@ class J2KReader implements Runnable {
     }
 
     private void reconnect() throws IOException {
-        try {
-            // System.out.println(">>> reconnect");
-            socket = new JPIPSocket();
-            JPIPResponse res = socket.newChannel(parentImageRef.getURI());
-            cacheRef.addJPIPResponseData(res);
-        } catch (JHV_KduException e) {
-            e.printStackTrace();
-        }
+        // System.out.println(">>> reconnect");
+        socket = new JPIPSocket();
+        socket.newChannel(parentImageRef.getURI(), cacheRef);
     }
 
     private void stop() {
@@ -244,14 +238,10 @@ class J2KReader implements Runnable {
 
                         // update requested package size
                         socket.send(stepQuerys[current_step] + "len=" + jpipRequestLen);
-
                         // receive and add data to cache
-                        JPIPResponse res = socket.receive();
-                        cacheRef.addJPIPResponseData(res);
-
+                        JPIPResponse res = socket.receive(cacheRef);
                         // update optimal package size
                         flowControl();
-
                         // react if query complete
                         if (res.isResponseComplete()) {
                             // mark query as complete
@@ -301,8 +291,6 @@ class J2KReader implements Runnable {
                     }
                     // Send signal to try again
                     readerSignal.signal(currParams);
-                } catch (JHV_KduException e) {
-                    e.printStackTrace();
                 }
             }
         }
