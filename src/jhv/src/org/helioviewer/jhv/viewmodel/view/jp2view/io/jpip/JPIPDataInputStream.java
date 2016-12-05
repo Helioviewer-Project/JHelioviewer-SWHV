@@ -30,14 +30,6 @@ class JPIPDataInputStream {
     /** The first byte of the last VBAS read. */
     private int vbasFstByte = 0;
 
-    /** The <code>InputStream</code> base. */
-    private final InputStream in;
-
-    /** Constructs a object based on the indicated <code>InputStream</code>. */
-    public JPIPDataInputStream(InputStream _in) {
-        in = _in;
-    }
-
     /**
      * Reads an VBAS integer from the stream. The length in bytes of the VBAS is
      * stored in the <code>vbasLength</code>variable, and the first byte of the
@@ -45,7 +37,7 @@ class JPIPDataInputStream {
      * 
      * @throws java.io.IOException
      */
-    private long readVBAS() throws IOException {
+    private long readVBAS(InputStream in) throws IOException {
         vbasLength = 0;
         long value = 0;
         int c;
@@ -80,9 +72,9 @@ class JPIPDataInputStream {
      * @return Returns <code>true</code> if a new data segment was read, or
      *         <code>false</code> if the end of stream was reached.
      */
-    public JPIPDataSegment readSegment() throws IOException {
+    public JPIPDataSegment readSegment(InputStream in) throws IOException {
         long id;
-        if ((id = readVBAS()) < 0)
+        if ((id = readVBAS(in)) < 0)
             return null;
 
         JPIPDataSegment seg = new JPIPDataSegment();
@@ -94,7 +86,7 @@ class JPIPDataInputStream {
             if ((seg.binID = in.read()) < 0)
                 throw new EOFException("EOF reached before completing EOR message");
 
-            seg.length = (int) readVBAS();
+            seg.length = (int) readVBAS(in);
         } else {
             seg.isEOR = false;
             seg.binID &= ~(0x70L << ((vbasLength - 1) * 7));
@@ -104,31 +96,29 @@ class JPIPDataInputStream {
             if (m == 0)
                 throw new ProtocolException("Invalid Bin-ID value format");
             if (m >= 2) {
-                classId = readVBAS();
+                classId = readVBAS(in);
                 if (m > 2)
-                    codestream = readVBAS();
+                    codestream = readVBAS(in);
             }
             seg.codestreamID = codestream;
 
             for (JPIPDatabinClass idEnum : JPIPDatabinClass.values())
-                if (classId == idEnum.standardClassID)
+                if (classId == idEnum.standardClassID) {
                     seg.classID = idEnum;
+                    break;
+                }
             if (seg.classID == null)
                 throw new ProtocolException("Invalid databin classID");
 
-            seg.offset = (int) readVBAS();
-            seg.length = (int) readVBAS();
+            seg.offset = (int) readVBAS(in);
+            seg.length = (int) readVBAS(in);
 
             if (classId == JPIPConstants.EXTENDED_PRECINCT_DATA_BIN_CLASS || classId == JPIPConstants.EXTENDED_TILE_DATA_BIN_CLASS)
-                seg.aux = readVBAS();
+                seg.aux = readVBAS(in);
         }
 
         if (seg.length > 0) {
-            // Assign new array if it was null
-            if (seg.data == null)
-                seg.data = new byte[seg.length];
-            // Assign larger array if needed.
-            seg.data = seg.data.length < seg.length ? new byte[seg.length] : seg.data;
+            seg.data = new byte[seg.length];
 
             int offset = 0;
             int len = seg.length;
