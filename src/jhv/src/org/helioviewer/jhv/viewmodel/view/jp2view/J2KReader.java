@@ -249,19 +249,15 @@ class J2KReader implements Runnable {
                         req.setQuery(stepQuerys[current_step] + "len=" + jpipRequestLen);
                         socket.send(req);
 
-                        // receive data
-                        //long start = System.currentTimeMillis();
+                        // receive and add data to cache
                         JPIPResponse res = socket.receive();
-                        //double delta = System.currentTimeMillis() - start;
-                        //delta = delta > 0 ? delta : 1;
-                        //System.out.println(">> " + String.format("%.3fM", res.getResponseSize() / delta * 1000. / (1024.*1024.)) + " " + jpipRequestLen);
-                        //System.out.println(">>> request " + (idx++) + " " + jpipRequestLen + " " + res.getResponseSize());
+                        cacheRef.addJPIPResponseData(res);
 
                         // update optimal package size
                         flowControl();
 
-                        // add response to cache - react if query complete
-                        if (cacheRef.addJPIPResponseData(res)) {
+                        // react if query complete
+                        if (res.isResponseComplete()) {
                             // mark query as complete
                             complete_steps++;
                             stepQuerys[current_step] = null;

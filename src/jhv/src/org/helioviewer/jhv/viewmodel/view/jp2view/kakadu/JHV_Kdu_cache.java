@@ -44,14 +44,12 @@ public class JHV_Kdu_cache extends Kdu_cache {
      * Adds a JPIPResponse to the cache object using the addDataSegment methods.
      * 
      * @param res
-     * @return True, the response is complete
      * @throws Exception
      */
-    public boolean addJPIPResponseData(JPIPResponse res) throws JHV_KduException {
+    public void addJPIPResponseData(JPIPResponse res) throws JHV_KduException {
         JPIPDataSegment data;
         while ((data = res.removeJpipDataSegment()) != null && !data.isEOR)
             addDataSegment(data);
-        return res.isResponseComplete();
     }
 
     /**
