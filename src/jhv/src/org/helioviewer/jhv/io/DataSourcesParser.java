@@ -16,8 +16,8 @@ public class DataSourcesParser {
 
     private final String server;
 
-    DataSourcesParser(String server) {
-        this.server = server;
+    DataSourcesParser(String _server) {
+        server = _server;
         rootNode = new DefaultMutableTreeNode(server);
     }
 

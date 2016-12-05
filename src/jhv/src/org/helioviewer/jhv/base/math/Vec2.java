@@ -234,11 +234,11 @@ public class Vec2 {
         return new Vec2(Math.min(max.x, Math.max(min.x, v.x)), Math.min(max.x, Math.max(min.x, v.y)));
     }
 
-    public static Vec2 componentMin(final Vec2 v1, final Vec2 v2) {
+    public static Vec2 componentMin(Vec2 v1, Vec2 v2) {
         return new Vec2(Math.min(v1.x, v2.x), Math.min(v1.y, v2.y));
     }
 
-    public static Vec2 componentMax(final Vec2 v1, final Vec2 v2) {
+    public static Vec2 componentMax(Vec2 v1, Vec2 v2) {
         return new Vec2(Math.max(v1.x, v2.x), Math.max(v1.y, v2.y));
     }
 

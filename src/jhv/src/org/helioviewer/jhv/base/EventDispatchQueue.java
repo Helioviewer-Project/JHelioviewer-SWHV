@@ -9,8 +9,8 @@ public class EventDispatchQueue {
 
     // http://kotek.net/blog/swingutilities.invokeandwait_with_return_value
     public static <E> E invokeAndWait(Callable<E> r) throws InterruptedException, InvocationTargetException {
-        final AtomicReference<E> ret = new AtomicReference<>();
-        final AtomicReference<Exception> except = new AtomicReference<>();
+        AtomicReference<E> ret = new AtomicReference<>();
+        AtomicReference<Exception> except = new AtomicReference<>();
 
         EventQueue.invokeAndWait(() -> {
             try {

@@ -25,7 +25,7 @@ public class JPIPSocket extends HTTPSocket {
     /**
      * The jpip channel ID for the connection (persistent)
      */
-    private String jpipChannelID;
+    private final String jpipChannelID;
 
     /**
      * The path supplied on the uri line of the HTTP message. Generally for the

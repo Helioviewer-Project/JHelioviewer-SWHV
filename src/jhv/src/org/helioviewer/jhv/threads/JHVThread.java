@@ -20,8 +20,8 @@ public class JHVThread {
 
         protected final String name;
 
-        public NamedThreadFactory(String name) {
-            this.name = name;
+        public NamedThreadFactory(String _name) {
+            name = _name;
         }
 
         @Override
@@ -124,8 +124,8 @@ public class JHVThread {
 
     public static class NamedDbThreadFactory extends NamedThreadFactory {
 
-        public NamedDbThreadFactory(String name) {
-            super(name);
+        public NamedDbThreadFactory(String _name) {
+            super(_name);
         }
 
         @Override

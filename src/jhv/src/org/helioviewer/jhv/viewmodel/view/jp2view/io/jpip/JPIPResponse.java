@@ -53,7 +53,7 @@ public class JPIPResponse {
      * stored in the <code>vbasLength</code>variable, and the first byte of the
      * VBAS is stored in the <code>vbasFstByte</code> variable.
      * 
-     * @throws java.io.IOException
+     * @throws IOException
      */
     private long readVBAS(InputStream in) throws IOException {
         vbasLength = 0;

@@ -27,8 +27,8 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public void setAPIRequest(APIRequest apiRequest) {
-        this.apiRequest = apiRequest;
+    public void setAPIRequest(APIRequest _apiRequest) {
+        apiRequest = _apiRequest;
     }
 
     @Override

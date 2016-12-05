@@ -67,7 +67,7 @@ public class ChunkedInputStream extends TransferInputStream {
      * no more chunks to decode.
      * 
      * @return The next byte read, or -1 is there is no more data.
-     * @throws java.io.IOException
+     * @throws IOException
      */
     @Override
     public int read() throws IOException {

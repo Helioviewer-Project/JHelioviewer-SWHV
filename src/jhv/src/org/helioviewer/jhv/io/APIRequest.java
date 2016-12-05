@@ -21,12 +21,12 @@ public class APIRequest {
     public final URL jpipRequest;
     public final URI fileRequest;
 
-    public APIRequest(String server, int sourceId, long startTime, long endTime, int cadence) {
-        this.server = server;
-        this.sourceId = sourceId;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.cadence = cadence;
+    public APIRequest(String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
+        server = _server;
+        sourceId = _sourceId;
+        startTime = _startTime;
+        endTime = _endTime;
+        cadence = _cadence;
 
         String jpipReq, fileReq;
         if (startTime == endTime) {
