@@ -15,7 +15,6 @@ public class JPIPResponse {
 
     /** A list of the data segments. */
     private final LinkedList<JPIPDataSegment> jpipDataList = new LinkedList<>();
-    private long size = 0;
 
     private final String cnew;
 
@@ -37,7 +36,6 @@ public class JPIPResponse {
             status = data.binID;
         }
         jpipDataList.add(data);
-        size += data.length;
     }
 
     /**
@@ -48,19 +46,7 @@ public class JPIPResponse {
     public JPIPDataSegment removeJpipDataSegment() {
         if (jpipDataList.isEmpty())
             return null;
-
-        JPIPDataSegment jpr = jpipDataList.remove();
-        size -= jpr.length;
-        return jpr;
-    }
-
-    /**
-     * Determines the response size.
-     *
-     * @return Response size
-     */
-    public long getResponseSize() {
-        return size;
+        return jpipDataList.remove();
     }
 
     /**
