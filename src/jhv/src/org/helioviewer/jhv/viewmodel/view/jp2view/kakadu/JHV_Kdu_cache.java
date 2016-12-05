@@ -15,6 +15,12 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
  */
 public class JHV_Kdu_cache extends Kdu_cache {
 
+    private ImageCacheStatus status;
+
+    public void setImageCacheStatus(ImageCacheStatus imageCacheStatus) {
+        status = imageCacheStatus;
+    }
+
     /**
      * Returns whether or not the databin is complete.
      * 
@@ -41,10 +47,10 @@ public class JHV_Kdu_cache extends Kdu_cache {
      * @return True, the response is complete
      * @throws Exception
      */
-    public boolean addJPIPResponseData(JPIPResponse res, ImageCacheStatus status) throws JHV_KduException {
+    public boolean addJPIPResponseData(JPIPResponse res) throws JHV_KduException {
         JPIPDataSegment data;
         while ((data = res.removeJpipDataSegment()) != null && !data.isEOR)
-            addDataSegment(data, status);
+            addDataSegment(data);
         return res.isResponseComplete();
     }
 
@@ -54,7 +60,7 @@ public class JHV_Kdu_cache extends Kdu_cache {
      * @param data
      * @throws JHV_KduException
      */
-    private void addDataSegment(JPIPDataSegment data, ImageCacheStatus status) throws JHV_KduException {
+    private void addDataSegment(JPIPDataSegment data) throws JHV_KduException {
         try {
             Add_to_databin(data.classID.kakaduClassID, data.codestreamID, data.binID, data.data, data.offset, data.length, data.isFinal, true, false);
         } catch (KduException ex) {

@@ -13,7 +13,6 @@ import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -77,7 +76,7 @@ public class KakaduUtils {
      * @throws IOException
      * @throws JHV_KduException
      */
-    public static void downloadInitialData(JPIPSocket socket, JHV_Kdu_cache cache, ImageCacheStatus status) throws IOException, JHV_KduException {
+    public static void downloadInitialData(JPIPSocket socket, JHV_Kdu_cache cache) throws IOException, JHV_KduException {
         JPIPRequest req = new JPIPRequest();
         req.setQuery(JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!"));
 
@@ -86,14 +85,14 @@ public class KakaduUtils {
             do {
                 socket.send(req);
                 res = socket.receive();
-            } while (!cache.addJPIPResponseData(res, status));
+            } while (!cache.addJPIPResponseData(res));
 
             if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
                 req.setQuery(JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0"));
                 do {
                     socket.send(req);
                     res = socket.receive();
-                } while (!cache.addJPIPResponseData(res, status) && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
+                } while (!cache.addJPIPResponseData(res) && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
             }
         } catch (EOFException e) {
             e.printStackTrace();
