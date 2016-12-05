@@ -46,16 +46,14 @@ public class JPIPSocket extends HTTPSocket {
     private static final String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
 
     /**
-     * Connects to the specified URI. The second parameter only serves to
-     * distinguish it from the super classes connect method (I want to return
-     * something and the super class has a return type of void).
+     * Open new JPIP channel
      *
      * @param uri
      * @return The first response of the server when connecting.
      * @throws IOException
      */
-    public JPIPResponse connect(URI uri) throws IOException {
-        _connect(uri);
+    public JPIPResponse newChannel(URI uri) throws IOException {
+        connect(uri);
 
         jpipPath = uri.getPath();
 
@@ -76,7 +74,6 @@ public class JPIPSocket extends HTTPSocket {
                     map.put(cnewParam, part.substring(cnewParam.length() + 1));
 
         jpipPath = '/' + map.get("path");
-
         jpipChannelID = map.get("cid");
         if (jpipChannelID == null)
             throw new IOException("The channel id was not sent by the server");

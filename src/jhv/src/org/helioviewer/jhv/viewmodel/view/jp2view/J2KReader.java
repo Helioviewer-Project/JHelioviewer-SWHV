@@ -78,7 +78,7 @@ class J2KReader implements Runnable {
         try {
             // System.out.println(">>> reconnect");
             socket = new JPIPSocket();
-            JPIPResponse res = socket.connect(parentImageRef.getURI());
+            JPIPResponse res = socket.newChannel(parentImageRef.getURI());
             cacheRef.addJPIPResponseData(res);
         } catch (JHV_KduException e) {
             e.printStackTrace();
@@ -289,8 +289,6 @@ class J2KReader implements Runnable {
                             break;
                     }
                     complete = completed == num_layers;
-                    //if (complete)
-                    //   System.out.println(">> COMPLETE");
 
                     // if incomplete && not interrupted && single frame -> signal again to go on reading
                     if (!complete && !stopReading && singleFrame) {
