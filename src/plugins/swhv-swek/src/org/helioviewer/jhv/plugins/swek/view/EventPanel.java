@@ -98,8 +98,8 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     }
 
     @Override
-    public void startedDownloadingEventType(SWEKEventType eventType) {
-        if (eventType.equals(this.eventType) && !loadingTimer.isRunning()) {
+    public void startedDownloadingEventType(SWEKEventType _eventType) {
+        if (eventType.equals(_eventType) && !loadingTimer.isRunning()) {
             loadingLabel.setText("Loading   ");
             loadingStep = 0;
             loadingTimer.start();
@@ -107,8 +107,8 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     }
 
     @Override
-    public void stoppedDownloadingEventType(SWEKEventType eventType) {
-        if (eventType.equals(this.eventType) && loadingTimer.isRunning()) {
+    public void stoppedDownloadingEventType(SWEKEventType _eventType) {
+        if (eventType.equals(_eventType) && loadingTimer.isRunning()) {
             loadingTimer.stop();
             loadingLabel.setText("          ");
             loadingStep = 0;

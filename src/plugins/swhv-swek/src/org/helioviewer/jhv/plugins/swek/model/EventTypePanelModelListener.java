@@ -26,6 +26,6 @@ public interface EventTypePanelModelListener {
      * @param supplier
      *            the supplier providing the event
      */
-    void newEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSupplier supplier);
+    void newEventTypeAndSourceInactive(SWEKEventType eventType, SWEKSupplier supplier);
 
 }

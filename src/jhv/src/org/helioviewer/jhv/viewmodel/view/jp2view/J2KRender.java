@@ -161,7 +161,7 @@ class J2KRender implements Runnable {
         }
     }
 
-    private static final ThreadLocal<Kdu_thread_env> threadEnv = ThreadLocal.withInitial(() -> createThreadEnv());
+    private static final ThreadLocal<Kdu_thread_env> threadEnv = ThreadLocal.withInitial(J2KRender::createThreadEnv);
 
     private static Kdu_thread_env createThreadEnv() {
         try {

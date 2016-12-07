@@ -411,8 +411,8 @@ public class JP2Image {
                 cacheReader.Close();
                 cacheReader.Native_destroy();
             }
-        } catch (KduException ex) {
-            ex.printStackTrace();
+        } catch (KduException e) {
+            e.printStackTrace();
         } finally {
             cacheRender = null;
             cacheReader = null;

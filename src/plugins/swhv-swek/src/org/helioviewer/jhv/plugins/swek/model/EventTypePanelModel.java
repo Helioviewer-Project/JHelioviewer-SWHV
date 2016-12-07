@@ -94,7 +94,7 @@ public class EventTypePanelModel implements TreeModel {
             if (eventType.isCheckboxSelected()) {
                 fireNewEventTypeActive(eventType.getSwekEventType());
             } else {
-                fireNewEventTypeInActive(eventType.getSwekEventType());
+                fireNewEventTypeInactive(eventType.getSwekEventType());
             }
         } else if (row > 0 && row <= eventType.getSwekTreeSuppliers().size()) {
             SWEKTreeModelSupplier supplier = eventType.getSwekTreeSuppliers().get(row - 1);
@@ -112,7 +112,7 @@ public class EventTypePanelModel implements TreeModel {
             if (supplier.isCheckboxSelected()) {
                 fireNewEventTypeAndSourceActive(eventType.getSwekEventType(), supplier.getSwekSupplier());
             } else {
-                fireNewEventTypeAndSourceInActive(eventType.getSwekEventType(), supplier.getSwekSupplier());
+                fireNewEventTypeAndSourceInactive(eventType.getSwekEventType(), supplier.getSwekSupplier());
             }
         }
     }
@@ -190,9 +190,9 @@ public class EventTypePanelModel implements TreeModel {
      * @param swekSupplier
      *            the supplier that became active
      */
-    private void fireNewEventTypeAndSourceActive(SWEKEventType eventType, SWEKSupplier swekSupplier) {
+    private void fireNewEventTypeAndSourceActive(SWEKEventType swekEventType, SWEKSupplier swekSupplier) {
         for (EventTypePanelModelListener l : panelModelListeners) {
-            l.newEventTypeAndSourceActive(eventType, swekSupplier);
+            l.newEventTypeAndSourceActive(swekEventType, swekSupplier);
         }
     }
 
@@ -205,9 +205,9 @@ public class EventTypePanelModel implements TreeModel {
      * @param swekSource
      *            the source that became inactive
      */
-    private void fireNewEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSupplier supplier) {
+    private void fireNewEventTypeAndSourceInactive(SWEKEventType swekEventType, SWEKSupplier supplier) {
         for (EventTypePanelModelListener l : panelModelListeners) {
-            l.newEventTypeAndSourceInActive(eventType, supplier);
+            l.newEventTypeAndSourceInactive(swekEventType, supplier);
         }
     }
 
@@ -229,9 +229,9 @@ public class EventTypePanelModel implements TreeModel {
      * @param swekEventType
      *            the event type that became inactive
      */
-    private void fireNewEventTypeInActive(SWEKEventType swekEventType) {
+    private void fireNewEventTypeInactive(SWEKEventType swekEventType) {
         for (SWEKSupplier supplier : swekEventType.getSuppliers()) {
-            fireNewEventTypeAndSourceInActive(swekEventType, supplier);
+            fireNewEventTypeAndSourceInactive(swekEventType, supplier);
         }
     }
 
