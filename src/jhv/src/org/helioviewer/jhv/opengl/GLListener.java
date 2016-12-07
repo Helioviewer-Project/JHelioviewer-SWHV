@@ -23,8 +23,8 @@ public class GLListener implements GLEventListener {
 
     private final ScalableSurface surface;
 
-    public GLListener(ScalableSurface surface) {
-        this.surface = surface;
+    public GLListener(ScalableSurface _surface) {
+        surface = _surface;
     }
 
     @Override

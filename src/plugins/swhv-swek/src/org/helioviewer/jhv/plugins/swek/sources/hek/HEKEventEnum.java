@@ -21,17 +21,17 @@ public enum HEKEventEnum {
      * Private constructor of the HEKEvent enumeration.
      * 
      * 
-     * @param hekEventName
+     * @param _hekEventName
      *            The hek name of the hek event
-     * @param swekEventName
+     * @param _swekEventName
      *            The swek name of the event
-     * @param eventAbbreviation
+     * @param _eventAbbreviation
      *            The hek abbreviation of the hek event
      */
-    HEKEventEnum(String hekEventName, String swekEventName, String eventAbbreviation) {
-        this.eventAbbreviation = eventAbbreviation;
-        this.swekEventName = swekEventName;
-        this.hekEventName = hekEventName;
+    HEKEventEnum(String _hekEventName, String _swekEventName, String _eventAbbreviation) {
+        eventAbbreviation = _eventAbbreviation;
+        swekEventName = _swekEventName;
+        hekEventName = _hekEventName;
     }
 
     /**
@@ -60,4 +60,5 @@ public enum HEKEventEnum {
     public String getHEKEventName() {
         return hekEventName;
     }
+
 }

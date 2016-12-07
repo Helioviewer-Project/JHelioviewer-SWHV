@@ -7,12 +7,13 @@ import java.nio.charset.StandardCharsets;
 import org.helioviewer.jhv.base.logging.Log;
 
 public enum SWEKOperand {
+
     EQUALS("="), NOT_EQUAL("!="), BIGGER(">"), SMALLER("<"), BIGGER_OR_EQUAL(">="), SMALLER_OR_EQUAL("<="), LIKE("like");
 
     private final String representation;
 
-    SWEKOperand(String representation) {
-        this.representation = representation;
+    SWEKOperand(String _representation) {
+        representation = _representation;
     }
 
     /**
@@ -37,4 +38,5 @@ public enum SWEKOperand {
             return representation;
         }
     }
+
 }

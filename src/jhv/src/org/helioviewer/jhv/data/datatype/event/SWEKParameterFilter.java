@@ -1,11 +1,6 @@
 package org.helioviewer.jhv.data.datatype.event;
 
-/**
- * Describes a SWEK parameter filter
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
+// Describes a SWEK parameter filter
 public class SWEKParameterFilter {
 
     /** The type of filter */
@@ -40,14 +35,14 @@ public class SWEKParameterFilter {
      * @param stepSize
      *            the stepsize
      */
-    public SWEKParameterFilter(String filterType, double min, double max, double startValue, Double stepSize, String units, String dbType) {
-        this.filterType = filterType;
-        this.min = min;
-        this.max = max;
-        this.startValue = startValue;
-        this.stepSize = stepSize;
-        this.units = units;
-        this.dbType = dbType;
+    public SWEKParameterFilter(String _filterType, double _min, double _max, double _startValue, Double _stepSize, String _units, String _dbType) {
+        filterType = _filterType;
+        min = _min;
+        max = _max;
+        startValue = _startValue;
+        stepSize = _stepSize;
+        units = _units;
+        dbType = _dbType;
     }
 
     public String getDbType() {

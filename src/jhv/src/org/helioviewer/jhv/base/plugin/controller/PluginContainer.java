@@ -8,8 +8,6 @@ import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 /**
  * The basic class which manages the interface between JHV and the contained
  * plugin. It manages the current status of the corresponding plug-in.
- * 
- * @author Stephan Pagel
  */
 public class PluginContainer implements Container {
 
@@ -17,41 +15,25 @@ public class PluginContainer implements Container {
     private final URI pluginLocation;
     private boolean pluginActive;
 
-    /**
-     * Default constructor.
-     * 
-     * @param plugin
-     *            Plug-in to control.
-     * @param pluginLocation
-     *            Location of the associated file of the plug-in.
-     * @param active
-     *            Status if plug-in is already activated (installed) or not.
-     */
-    public PluginContainer(Plugin plugin, URI pluginLocation, boolean active) {
-        this.plugin = plugin;
-        this.pluginLocation = pluginLocation;
-        this.pluginActive = active;
+    public PluginContainer(Plugin _plugin, URI _pluginLocation, boolean _pluginActive) {
+        plugin = _plugin;
+        pluginLocation = _pluginLocation;
+        pluginActive = _pluginActive;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName() {
-        return this.plugin.getName();
+        return plugin.getName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDescription() {
-        return this.plugin.getDescription();
+        return plugin.getDescription();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isActive() {
-        return this.pluginActive;
+        return pluginActive;
     }
 
     /**
@@ -61,47 +43,34 @@ public class PluginContainer implements Container {
      * will do nothing. Otherwise it installs the plug-in if the new status is
      * true or uninstalls the plug-in if the new status is false.
      */
+    @Override
     public void setActive(boolean active) {
-        if (this.pluginActive == active)
+        if (pluginActive == active)
             return;
 
-        this.pluginActive = active;
+        pluginActive = active;
         if (active)
             plugin.installPlugin();
         else
             plugin.uninstallPlugin();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void changeSettings() {
         PluginSettings.getSingletonInstance().pluginSettingsToXML(this);
     }
 
-    /**
-     * Returns the plug-in which is controlled by this container.
-     * 
-     * @return the plug-in which is controlled by this container.
-     */
     public Plugin getPlugin() {
-        return this.plugin;
+        return plugin;
     }
 
-    /**
-     * Returns the location of the file where the controlled plug-in is from.
-     * 
-     * @return the location of the file where the controlled plug-in is from.
-     */
     public URI getPluginLocation() {
-        return this.pluginLocation;
+        return pluginLocation;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String toString() {
-        return this.plugin.getName();
+        return plugin.getName();
     }
 
 }
