@@ -20,11 +20,7 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 
-/**
- * Implementation of View for JPG2000 images.
- * This class represents the gateway to the heart of the helioviewer project. It
- * is responsible for reading and decoding JPG2000 images.
- */
+// This class is responsible for reading and decoding of JPEG2000 images
 public class JP2View extends AbstractView {
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
@@ -86,25 +82,6 @@ public class JP2View extends AbstractView {
         return _jp2Image.getDownloadURI();
     }
 
-    private static class AbolishThread extends Thread {
-
-        private JP2View view;
-
-        public void init(JP2View _view) {
-            view = _view;
-        }
-
-        @Override
-        public void run() {
-            J2KRender.threadEnv.destroy();
-            EventQueue.invokeLater(() -> {
-                view._jp2Image.abolish();
-                view._jp2Image = null;
-            });
-        }
-
-    }
-
     private volatile boolean isAbolished = false;
 
     @Override
@@ -112,9 +89,8 @@ public class JP2View extends AbstractView {
         isAbolished = true;
         stopRender = true;
 
-        AbolishThread thread = new AbolishThread();
-        thread.init(this);
-        executor.execute(thread);
+        _jp2Image.abolish();
+        _jp2Image = null;
         executor.shutdown();
     }
 

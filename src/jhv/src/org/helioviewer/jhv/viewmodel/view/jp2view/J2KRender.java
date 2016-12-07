@@ -161,40 +161,21 @@ class J2KRender implements Runnable {
         }
     }
 
-    static final ThreadEnvLocal threadEnv = new ThreadEnvLocal();
+    private static final ThreadLocal<Kdu_thread_env> threadEnv = ThreadLocal.withInitial(() -> createThreadEnv());
 
-    static class ThreadEnvLocal extends ThreadLocal<Kdu_thread_env> {
-        @Override
-        protected Kdu_thread_env initialValue() {
-            try {
-                return createThreadEnv();
-            } catch (KduException e) {
-                e.printStackTrace();
-            }
-            return null;
+    private static Kdu_thread_env createThreadEnv() {
+        try {
+            Kdu_thread_env theThreadEnv = new Kdu_thread_env();
+            // System.out.println(">>>> Kdu_thread_env create " + theThreadEnv);
+            theThreadEnv.Create();
+            int numThreads = Kdu_global.Kdu_get_num_processors();
+            for (int i = 1; i < numThreads; i++)
+                theThreadEnv.Add_thread();
+            return theThreadEnv;
+        } catch (KduException e) {
+            e.printStackTrace();
         }
-
-        public void destroy() {
-            destroyThreadEnv(get());
-            set(null);
-        }
-    }
-
-    private static Kdu_thread_env createThreadEnv() throws KduException {
-        Kdu_thread_env threadEnv = new Kdu_thread_env();
-        // System.out.println(">>>> threadEnv create " + threadEnv);
-        threadEnv.Create();
-        int numThreads = Kdu_global.Kdu_get_num_processors();
-        for (int i = 1; i < numThreads; i++)
-            threadEnv.Add_thread();
-        return threadEnv;
-    }
-
-    private static void destroyThreadEnv(Kdu_thread_env threadEnv) {
-        if (threadEnv != null) {
-            // System.out.println(">>>> threadEnv destroy " + threadEnv);
-            threadEnv.Native_destroy();
-        }
+        return null;
     }
 
 }
