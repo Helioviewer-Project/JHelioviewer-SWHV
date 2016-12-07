@@ -65,8 +65,8 @@ public class JHVEvent {
         return positionInformation;
     }
 
-    public void addPositionInformation(JHVPositionInformation positionInformation) {
-        this.positionInformation = positionInformation;
+    public void addPositionInformation(JHVPositionInformation _positionInformation) {
+        positionInformation = _positionInformation;
     }
 
     public Integer getUniqueID() {

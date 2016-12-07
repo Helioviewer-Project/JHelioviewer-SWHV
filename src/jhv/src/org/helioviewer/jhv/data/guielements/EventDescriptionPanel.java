@@ -23,8 +23,8 @@ class EventDescriptionPanel extends JPanel implements MouseListener {
 
     private final JHVRelatedEvents revent;
 
-    public EventDescriptionPanel(JHVRelatedEvents revent, JHVEvent event) {
-        this.revent = revent;
+    public EventDescriptionPanel(JHVRelatedEvents _revent, JHVEvent event) {
+        revent = _revent;
 
         JLabel labelIcon = new JLabel(revent.getIcon());
 

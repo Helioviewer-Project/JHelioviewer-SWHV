@@ -15,14 +15,16 @@ package org.helioviewer.jhv.viewmodel.imageformat;
  * 
  */
 public class ARGB32ImageFormat implements RGBImageFormat, AlphaChannelImageFormat {
+
     private boolean isSingleChannel;
 
-    public void setSingleChannel(boolean isSingleChannel) {
-        this.isSingleChannel = isSingleChannel;
+    public void setSingleChannel(boolean _isSingleChannel) {
+        isSingleChannel = _isSingleChannel;
     }
 
     @Override
     public boolean isSingleChannel() {
         return isSingleChannel;
     }
+
 }

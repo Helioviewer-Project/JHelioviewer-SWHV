@@ -103,10 +103,10 @@ public class OSXAdapter implements InvocationHandler {
 
     // Each OSXAdapter has the name of the EAWT method it intends to listen for (handleAbout, for example),
     // the Object that will ultimately perform the task, and the Method to be called on that Object
-    protected OSXAdapter(String proxySignature, Object target, Method handler) {
-        this.proxySignature = proxySignature;
-        this.targetObject = target;
-        this.targetMethod = handler;
+    protected OSXAdapter(String _proxySignature, Object _targetObject, Method _targetMethod) {
+        proxySignature = _proxySignature;
+        targetObject = _targetObject;
+        targetMethod = _targetMethod;
     }
 
     // Override this method to perform any operations on the event

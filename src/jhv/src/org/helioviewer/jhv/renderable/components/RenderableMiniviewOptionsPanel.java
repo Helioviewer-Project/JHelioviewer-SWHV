@@ -22,8 +22,8 @@ class RenderableMiniviewOptionsPanel extends SmallPanel {
     private final RenderableMiniview miniview;
     private JSpinner xSpinner;
 
-    public RenderableMiniviewOptionsPanel(RenderableMiniview miniview) {
-        this.miniview = miniview;
+    public RenderableMiniviewOptionsPanel(RenderableMiniview _miniview) {
+        miniview = _miniview;
 
         createXSpinner();
 

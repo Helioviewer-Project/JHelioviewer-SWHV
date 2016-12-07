@@ -16,8 +16,8 @@ public class ImageLayerOptions extends SmallPanel {
     private final OpacityPanel opacityPanel;
     private final LUTPanel lutPanel;
 
-    public ImageLayerOptions(ImageLayer imageLayer) {
-        this.imageLayer = imageLayer;
+    public ImageLayerOptions(ImageLayer _imageLayer) {
+        imageLayer = _imageLayer;
 
         RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
         opacityPanel = new OpacityPanel();
