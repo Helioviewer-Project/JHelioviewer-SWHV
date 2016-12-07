@@ -80,7 +80,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     @Override
-    public void newEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSupplier supplier) {
+    public void newEventTypeAndSourceInactive(SWEKEventType eventType, SWEKSupplier supplier) {
         removeEventTypeFromActiveEventTypeMap(JHVEventType.getJHVEventType(eventType, supplier));
         stopDownloadingEventType(eventType, supplier, false);
     }

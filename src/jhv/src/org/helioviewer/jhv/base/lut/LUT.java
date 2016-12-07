@@ -78,7 +78,6 @@ public class LUT {
         // User addons
         File addOnDir = JHVDirectory.COLOR_PLUGINS.getFile();
         File[] fileList = addOnDir.listFiles(new GGRFilter());
-
         if (fileList != null)
             for (File f : fileList) {
                 try {

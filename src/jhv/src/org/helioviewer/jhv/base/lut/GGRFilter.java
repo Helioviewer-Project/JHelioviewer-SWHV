@@ -10,12 +10,11 @@ import javax.swing.filechooser.FileFilter;
  * @author Helge Dietert
  * 
  */
-public class GGRFilter extends FileFilter implements java.io.FileFilter {
-    private final String[] extensions = { "ggr" };
+class GGRFilter extends FileFilter implements java.io.FileFilter {
 
-    /**
-     * {@inheritDoc}
-     */
+    private static final String[] extensions = { "ggr" };
+
+    @Override
     public boolean accept(File f) {
         if (f.isDirectory())
             return true;
@@ -29,9 +28,7 @@ public class GGRFilter extends FileFilter implements java.io.FileFilter {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDescription() {
         return "GIMP gradient files (\".ggr\")";
     }

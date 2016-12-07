@@ -402,8 +402,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void handleData(ImageData imageData) {
-        setImageData(imageData);
+    public void handleData(ImageData newImageData) {
+        setImageData(newImageData);
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
         Displayer.display();
     }
