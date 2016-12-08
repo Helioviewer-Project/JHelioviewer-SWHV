@@ -78,23 +78,6 @@ public class JPIPSocket extends HTTPSocket {
             throw new IOException("The client only supports HTTP transport");
     }
 
-    // Closes the JPIPSocket
-    @Override
-    public synchronized void close() throws IOException {
-        if (isClosed())
-            return;
-
-        try {
-            if (jpipChannelID != null) {
-                send(JPIPQuery.create(0, "cclose", jpipChannelID));
-            }
-        } catch (IOException ignore) {
-            // no problem, server may have closed the socket
-        } finally {
-            super.close();
-        }
-    }
-
     // Sends a JPIP request
     public void send(String queryStr) throws IOException {
         // Add a necessary JPIP request field
