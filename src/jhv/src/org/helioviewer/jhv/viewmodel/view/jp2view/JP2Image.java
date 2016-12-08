@@ -386,11 +386,16 @@ public class JP2Image {
     void abolish() {
         isAbolished = true;
 
-        if (reader != null) {
-            reader.abolish();
-            reader = null;
-        }
+        new Thread(() -> {
+            if (reader != null) {
+                reader.abolish();
+                reader = null;
+            }
+            EventQueue.invokeLater(() -> kduDestroy());
+        }).start();
+    }
 
+    private void kduDestroy() {
         try {
             destroyEngine();
 
