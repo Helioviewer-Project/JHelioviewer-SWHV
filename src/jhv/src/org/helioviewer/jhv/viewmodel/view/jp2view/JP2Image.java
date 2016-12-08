@@ -284,9 +284,7 @@ public class JP2Image {
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, factor);
 
-        boolean viewChanged = oldImageViewParams == null ||
-                              !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
-                                imageViewParams.resolution.equals(oldImageViewParams.resolution));
+        boolean viewChanged = oldImageViewParams == null || imageViewParams.resolution.compareTo(oldImageViewParams.resolution) > 0;
         if (viewChanged) {
             imageViewParams.downgrade = true;
             imageCacheStatus.downgradeImageStatus(0, frameCount - 1);
