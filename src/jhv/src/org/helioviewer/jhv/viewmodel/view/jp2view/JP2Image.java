@@ -288,11 +288,8 @@ public class JP2Image {
         if (viewChanged) {
             imageViewParams.downgrade = true;
             imageCacheStatus.downgradeImageStatus(0, frameCount - 1);
-        }
-
-        // ping reader
-        if (imageCacheStatus.getImageStatus(frame) != CacheStatus.COMPLETE) // do not disturb caching
             signalReader(imageViewParams);
+        }
 
         oldImageViewParams = imageViewParams;
 
