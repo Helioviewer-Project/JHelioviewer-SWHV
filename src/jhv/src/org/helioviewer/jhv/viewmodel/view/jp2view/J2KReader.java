@@ -18,25 +18,25 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 class J2KReader implements Runnable {
 
-    /** Whether IOExceptions should be shown on System.err or not */
+    // Whether IOExceptions should be shown on System.err or not
     private static final boolean verbose = false;
 
-    /** The thread that this object runs on. */
+    // The thread that this object runs on
     private final Thread myThread;
 
-    /** A boolean flag used for stopping the thread. */
+    // A boolean flag used for stopping the thread
     private volatile boolean stop;
 
-    /** A reference to the JP2Image this object is owned by. */
+    // A reference to the JP2Image this object is owned by
     private final JP2Image parentImageRef;
 
-    /** A reference to the JP2ImageView this object is owned by. */
+    // A reference to the JP2View this object is owned by
     private final JP2View parentViewRef;
 
-    /** The JPIPSocket used to connect to the server. */
+    /// The JPIPSocket used to connect to the server
     private JPIPSocket socket;
 
-    /** The a reference to the cache object used by the run method. */
+    // The a reference to the cache object used by the run method
     private final JHV_Kdu_cache cacheRef;
 
     /**
@@ -150,15 +150,13 @@ class J2KReader implements Runnable {
         lastResponseTime = replyDataTime;
     }
 
-    private static String createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
-        return JPIPQuery.create("context", "jpxl<" + iniLayer + '-' + endLayer + '>',
-                                "fsiz", Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height) + ",closest",
-                                "roff", Integer.toString(currParams.subImage.x) + ',' + Integer.toString(currParams.subImage.y),
-                                "rsiz", Integer.toString(currParams.subImage.width) + ',' + Integer.toString(currParams.subImage.height));
+    private static String createQuery(String fSiz, int iniLayer, int endLayer) {
+        return JPIPQuery.create("context", "jpxl<" + iniLayer + '-' + endLayer + '>', "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
     }
 
     private static String[] createSingleQuery(JP2ImageParameter currParams) {
-        return new String[] { createQuery(currParams, currParams.compositionLayer, currParams.compositionLayer) };
+        String fSiz = Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height);
+        return new String[] { createQuery(fSiz, currParams.compositionLayer, currParams.compositionLayer) };
     }
 
     private String[] createMultiQuery(JP2ImageParameter currParams) {
@@ -167,6 +165,7 @@ class J2KReader implements Runnable {
             num_steps++;
 
         String[] stepQuerys = new String[num_steps];
+        String fSiz = Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height);
 
         int lpf = 0, lpi = 0, max_layers = num_layers - 1;
         for (int i = 0; i < num_steps; i++) {
@@ -174,7 +173,7 @@ class J2KReader implements Runnable {
             if (lpf > max_layers)
                 lpf = max_layers;
 
-            stepQuerys[i] = createQuery(currParams, lpi, lpf);
+            stepQuerys[i] = createQuery(fSiz, lpi, lpf);
 
             lpi = lpf + 1;
             if (lpi > max_layers)
