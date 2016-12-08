@@ -77,7 +77,10 @@ class J2KReader implements Runnable {
         socket = new JPIPSocket(parentImageRef.getURI(), cacheRef);
     }
 
-    private void stop() {
+    // runs in abolish thread
+    void abolish() {
+        stop = true;
+
         if (myThread == null) // paranoia
             return;
 
@@ -91,12 +94,6 @@ class J2KReader implements Runnable {
                 e.printStackTrace();
             }
         }
-    }
-
-    // Release the resources associated with this object
-    void abolish() {
-        stop = true;
-        stop();
     }
 
     private void signalRender(double factor) {
