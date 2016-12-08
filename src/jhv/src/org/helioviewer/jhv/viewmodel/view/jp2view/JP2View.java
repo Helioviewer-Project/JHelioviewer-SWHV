@@ -89,9 +89,17 @@ public class JP2View extends AbstractView {
         isAbolished = true;
         stopRender = true;
 
-        _jp2Image.abolish();
-        _jp2Image = null;
         executor.shutdown();
+        new Thread(() -> {
+            try {
+                while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
+            } catch (Exception ignore) {
+            }
+            EventQueue.invokeLater(() -> {
+                _jp2Image.abolish();
+                _jp2Image = null;
+            });
+        }).start();
     }
 
     // if instance was built before cancelling
