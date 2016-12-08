@@ -71,11 +71,8 @@ public class ResolutionSet {
      * that while this class is public, its constructor is private. The
      * ResolutionSet object can be considered to be the ResolutionLevel
      * 'factory'.
-     *
-     * @author caplins
-     *
      */
-    public static class ResolutionLevel {
+    public static class ResolutionLevel implements Comparable<ResolutionLevel> {
 
         public final int discardLayers;
 
@@ -87,7 +84,7 @@ public class ResolutionSet {
         public final double factorX;
         public final double factorY;
 
-        /** Private constructor */
+        // Private constructor
         private ResolutionLevel(int _discardLayers, int _width, int _height, double _factorX, double _factorY) {
             discardLayers = _discardLayers;
             scaleLevel = 1f / (1 << discardLayers);
@@ -121,6 +118,13 @@ public class ResolutionSet {
         @Override
         public String toString() {
             return "[[Discard=" + discardLayers + "][ScaleLevel=" + scaleLevel + "][ScaleFactor=" + factorX + "," + factorY + "][ZoomDims=" + width + "," + height + "]]";
+        }
+
+        @Override
+        public int compareTo(ResolutionLevel r) {
+            assert width == r.width && height == r.height && factorX == r.factorX && factorY == r.factorY : "not comparable";
+            int diff = discardLayers - r.discardLayers;
+            return diff > 0 ? -1 : (diff < 0 ? +1 : 0);
         }
 
     }
