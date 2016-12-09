@@ -47,9 +47,6 @@ class J2KRender implements Runnable {
     }
 
     private void renderLayer(Kdu_region_compositor compositor) throws KduException {
-        if (cacheStatus != CacheStatus.COMPLETE && cacheStatus != CacheStatus.PARTIAL)
-            return;
-
         int numLayer = params.compositionLayer;
         int numComponents = params.components;
 
@@ -148,11 +145,14 @@ class J2KRender implements Runnable {
     @Override
     public void run() {
         try {
-            renderLayer(parentImageRef.getCompositor(threadEnv.get()));
+            if (cacheStatus != CacheStatus.COMPLETE && cacheStatus != CacheStatus.PARTIAL)
+                return;
+
+            renderLayer(parentImageRef.getRenderEngine(threadEnv.get()).getCompositor());
         } catch (Exception e) {
             // reboot the compositor
             try {
-                parentImageRef.destroyEngine();
+                parentImageRef.destroyRenderEngine();
             } catch (KduException ex) {
                 ex.printStackTrace();
             }

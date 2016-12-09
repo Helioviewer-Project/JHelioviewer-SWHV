@@ -60,7 +60,7 @@ class J2KReader implements Runnable {
         parentImageRef = _jp2ImageRef;
 
         num_layers = parentImageRef.getMaximumFrameNumber() + 1;
-        cacheRef = parentImageRef.getCacheRef();
+        cacheRef = parentImageRef.getReaderCache();
         cacheStatusRef = parentImageRef.getImageCacheStatus();
 
         if ((socket = parentImageRef.getSocket()) == null)
