@@ -13,15 +13,11 @@ public class ResolutionSet {
      * num of discardLayers
      */
     private final ResolutionLevel[] resolutions;
+    public final int components;
 
-    /**
-     * Constructor. Takes the number of resolution levels in the associated
-     * image.
-     *
-     * @param numResolutions
-     */
-    public ResolutionSet(int numResolutions) {
-        resolutions = new ResolutionLevel[numResolutions];
+    public ResolutionSet(int _resolutions, int _components) {
+        resolutions = new ResolutionLevel[_resolutions];
+        components = _components;
     }
 
     /**

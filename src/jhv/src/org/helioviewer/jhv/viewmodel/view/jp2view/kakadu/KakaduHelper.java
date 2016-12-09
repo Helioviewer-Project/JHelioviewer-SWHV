@@ -27,6 +27,20 @@ public class KakaduHelper {
             throw new KduException(">> stream does not exist " + frame);
         }
 
+        // Since it gets tricky here I am just grabbing a bunch of values
+        // and taking the max of them. It is acceptable to think that an
+        // image is color when its not monochromatic, but not the other way
+        // around... so this is just playing it safe.
+        Kdu_channel_mapping cmap = new Kdu_channel_mapping();
+        cmap.Configure(stream);
+
+        int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
+        // numComponents = maxComponents == 1 ? 1 : 3;
+        // With new file formats we may have 2 components
+
+        cmap.Clear();
+        cmap.Native_destroy();
+
         compositor.Set_scale(false, false, false, 1f);
         Kdu_dims dims = new Kdu_dims();
         if (!compositor.Get_total_composition_dims(dims)) {
@@ -34,7 +48,7 @@ public class KakaduHelper {
         }
 
         int maxDWT = stream.Get_min_dwt_levels();
-        ResolutionSet res = new ResolutionSet(maxDWT + 1);
+        ResolutionSet res = new ResolutionSet(maxDWT + 1, maxComponents);
 
         Rectangle rect = KakaduUtils.kdu_dimsToRect(dims);
         res.addResolutionLevel(0, rect.width, rect.height, 1, 1);
@@ -53,35 +67,6 @@ public class KakaduHelper {
         compositor.Remove_ilayer(ilayer, false);
 
         return res;
-    }
-
-    public static int getNumComponents(Kdu_region_compositor compositor, int frame) throws KduException {
-        // I create references here so the GC doesn't try to collect the Kdu_dims obj
-        Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims(); // avoid gc
-        Kdu_ilayer_ref ilayer = compositor.Add_ilayer(frame, ref1, ref2);
-
-        Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true, frame));
-        if (!stream.Exists()) {
-            throw new KduException(">> stream does not exist " + frame);
-        }
-
-        // Since it gets tricky here I am just grabbing a bunch of values
-        // and taking the max of them. It is acceptable to think that an
-        // image is color when its not monochromatic, but not the other way
-        // around... so this is just playing it safe.
-        Kdu_channel_mapping cmap = new Kdu_channel_mapping();
-        cmap.Configure(stream);
-
-        int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
-        // numComponents = maxComponents == 1 ? 1 : 3;
-        // With new file formats we may have 2 components
-
-        cmap.Clear();
-        cmap.Native_destroy();
-
-        compositor.Remove_ilayer(ilayer, false);
-
-        return maxComponents;
     }
 
     public static int[] getLUT(Jpx_source jpxSrc) throws KduException {

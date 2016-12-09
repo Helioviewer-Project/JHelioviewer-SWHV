@@ -73,13 +73,6 @@ public class JP2Image {
 
     private JPIPSocket socket;
 
-    /**
-     * The number of output components (should be the number of 8 bits
-     * channels). Currently only value of 1 and 3 are supported (corresponding
-     * to grayscale and RGB images).
-     */
-    private final int numComponents;
-
     private final JP2ImageCacheStatus imageCacheStatus;
 
     private J2KReader reader;
@@ -142,8 +135,6 @@ public class JP2Image {
             frameCount = tempVar[0];
 
             builtinLUT = KakaduHelper.getLUT(kduReader.getJpxSource());
-
-            numComponents = KakaduHelper.getNumComponents(kduReader.getCompositor(), 0);
 
             metaDataList = new MetaData[frameCount];
             KakaduUtils.cacheMetaData(kduReader.getFamilySrc(), metaDataList);
@@ -280,7 +271,7 @@ public class JP2Image {
         }
         factor = Math.min(factor, adj);
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, factor);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).components, factor);
 
         boolean viewChanged = oldImageViewParams == null || imageViewParams.resolution.compareTo(oldImageViewParams.resolution) > 0;
         if (viewChanged) {
@@ -340,11 +331,6 @@ public class JP2Image {
         JPIPSocket output = socket;
         socket = null;
         return output;
-    }
-
-    // Returns the number of output components
-    int getNumComponents() {
-        return numComponents;
     }
 
     public int getMaximumFrameNumber() {

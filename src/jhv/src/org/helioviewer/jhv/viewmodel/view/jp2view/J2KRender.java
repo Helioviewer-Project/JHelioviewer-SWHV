@@ -51,14 +51,14 @@ class J2KRender implements Runnable {
             return;
 
         int numLayer = params.compositionLayer;
+        int numComponents = params.components;
 
         // compositor.Refresh();
         // compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
         Kdu_ilayer_ref ilayer;
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
-        int numComponents = parentImageRef.getNumComponents();
-        // parentImageRef.deactivateColorLookupTable(numLayer);
+
         if (numComponents < 3) {
             // alpha tbd
             ilayer = compositor.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
