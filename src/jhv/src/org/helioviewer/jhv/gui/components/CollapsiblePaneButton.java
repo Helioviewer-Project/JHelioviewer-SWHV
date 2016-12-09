@@ -58,15 +58,15 @@ class CollapsiblePaneButton extends JToggleButton {
         Point p0 = new Point(0, 0);
         Point ph = new Point(0, h);
 
-        if (!isSelected()) {
-            g2.setPaint(new GradientPaint(p0, dark, ph, color));
-            g2.fillRect(0, 0, w, h / 2);
-            g2.setPaint(new GradientPaint(p0, color, ph, dark));
-            g2.fillRect(0, h / 2, w, h / 2);
-        } else {
+        if (isSelected()) {
             g2.setPaint(new GradientPaint(p0, dark, ph, bright));
             g2.fillRect(0, 0, w, h / 2);
             g2.setPaint(new GradientPaint(p0, bright, ph, dark));
+            g2.fillRect(0, h / 2, w, h / 2);
+        } else {
+            g2.setPaint(new GradientPaint(p0, dark, ph, color));
+            g2.fillRect(0, 0, w, h / 2);
+            g2.setPaint(new GradientPaint(p0, color, ph, dark));
             g2.fillRect(0, h / 2, w, h / 2);
         }
         g2.dispose();

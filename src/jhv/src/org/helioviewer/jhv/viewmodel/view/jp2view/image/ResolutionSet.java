@@ -11,7 +11,7 @@ public class ResolutionSet {
     // The indices represent the number of discardLayers
     private final ResolutionLevel[] resolutions;
     private final boolean[] complete;
-    public final int numLevels;
+    private final int numLevels;
     public final int numComps;
 
     public ResolutionSet(int _numLevels, int _numComps) {

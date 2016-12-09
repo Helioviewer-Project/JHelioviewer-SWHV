@@ -58,12 +58,11 @@ public class SWEKConfigurationManager {
             if (checkAndOpenUserSetFile()) {
                 isConfigParsed = parseConfigFile();
             } else if (checkAndOpenHomeDirectoryFile()) {
-                boolean manuallyChanged = isManuallyChanged();
-                if (!manuallyChanged) {
+                if (isManuallyChanged()) {
+                    isConfigParsed = parseConfigFile();
+                } else {
                     // check if the file is manually changed if not we download the latest version anyway
                     isConfigParsed = checkAndOpenZippedFile() && parseConfigFile();
-                } else {
-                    isConfigParsed = parseConfigFile();
                 }
             } else {
                 isConfigParsed = checkAndOpenZippedFile() && parseConfigFile();

@@ -18,7 +18,7 @@ public class JHVThread {
     // this creates daemon threads
     public static class NamedThreadFactory implements ThreadFactory {
 
-        protected final String name;
+        final String name;
 
         public NamedThreadFactory(String _name) {
             name = _name;

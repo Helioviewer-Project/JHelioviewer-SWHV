@@ -7,7 +7,7 @@ import org.apache.commons.lang3.time.FastDateFormat;
 
 public class TimeUtils {
 
-    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     public static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
 
     public static final long DAY_IN_MILLIS = 86400000;

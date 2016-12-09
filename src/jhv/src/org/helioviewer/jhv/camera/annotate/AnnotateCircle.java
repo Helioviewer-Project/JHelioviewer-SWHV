@@ -46,11 +46,11 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.y = center.y + cosr * u.y + sinr * v.y;
             vx.z = center.z + cosr * u.z + sinr * v.z;
 
-            if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
+            if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+                gl.glVertex3f((float) vx.x, (float) vx.y, (float) vx.z);
+            } else {
                 vx.y = -vx.y;
                 previous = GLHelper.drawVertex(camera, vp, gl, vx, previous);
-            } else {
-                gl.glVertex3f((float) vx.x, (float) vx.y, (float) vx.z);
             }
         }
         gl.glEnd();

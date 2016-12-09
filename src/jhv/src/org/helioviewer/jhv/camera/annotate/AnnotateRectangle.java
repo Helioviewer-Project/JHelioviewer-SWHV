@@ -55,12 +55,13 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
+
             Vec3 pc = toCart(y, z);
-            if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
+            if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+                gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
+            } else {
                 pc.y = -pc.y;
                 previous = GLHelper.drawVertex(camera, vp, gl, pc, previous);
-            } else {
-                gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
         }
     }
