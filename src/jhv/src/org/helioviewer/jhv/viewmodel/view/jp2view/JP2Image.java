@@ -269,7 +269,7 @@ public class JP2Image {
         }
         factor = Math.min(factor, adj);
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).components, factor);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
 
         boolean viewChanged = oldImageViewParams == null || imageViewParams.resolution.compareTo(oldImageViewParams.resolution) > 0;
         if (viewChanged) {

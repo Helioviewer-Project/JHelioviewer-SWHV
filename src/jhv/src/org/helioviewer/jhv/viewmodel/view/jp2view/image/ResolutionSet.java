@@ -9,15 +9,17 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.image;
 public class ResolutionSet {
 
     /**
-     * An array containing the available resolutions. The index's represent the
+     * An array containing the available resolutions. The indices represent the
      * num of discardLayers
      */
     private final ResolutionLevel[] resolutions;
-    public final int components;
+    public final int numLevels;
+    public final int numComps;
 
-    public ResolutionSet(int _resolutions, int _components) {
-        resolutions = new ResolutionLevel[_resolutions];
-        components = _components;
+    public ResolutionSet(int _numLevels, int _numComps) {
+        numLevels = _numLevels;
+        numComps = _numComps;
+        resolutions = new ResolutionLevel[numLevels];
     }
 
     /**
@@ -42,7 +44,7 @@ public class ResolutionSet {
 
     public ResolutionLevel getPreviousResolutionLevel(int w, int h) {
         int idx = 0;
-        for (int i = 0; i < resolutions.length; i++) {
+        for (int i = 0; i < numLevels; i++) {
             idx = i;
             if (resolutions[i].width <= w && resolutions[i].height <= h)
                 break;
@@ -51,15 +53,11 @@ public class ResolutionSet {
     }
 
     public ResolutionLevel getNextResolutionLevel(int w, int h) {
-        for (int i = 1; i < resolutions.length; ++i) {
+        for (int i = 1; i < numLevels; ++i) {
             if (resolutions[i].width < w || resolutions[i].height < h)
                 return resolutions[i - 1];
         }
-        return resolutions[resolutions.length - 1];
-    }
-
-    public int getMaxResolutionLevels() {
-        return resolutions.length - 1;
+        return resolutions[numLevels - 1];
     }
 
     /**
