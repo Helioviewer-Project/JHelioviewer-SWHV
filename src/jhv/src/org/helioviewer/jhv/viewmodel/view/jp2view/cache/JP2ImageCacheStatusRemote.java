@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 
+import java.awt.EventQueue;
+
 import kdu_jni.KduException;
 import kdu_jni.Kdu_region_compositor;
 
@@ -36,8 +38,8 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
                 e.printStackTrace();
             }
         }
-        imageStatus[compositionLayer] = newStatus;
 
+        imageStatus[compositionLayer] = newStatus;
         if (newStatus == CacheStatus.COMPLETE)
             resolutionSet[compositionLayer].setComplete(level);
     }
@@ -83,18 +85,17 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     }
 
     @Override
-    public int countCompleted() {
-        int count = 0;
+    public boolean currentComplete() {
         for (int i = 0; i <= maxFrameNumber; i++) {
-            if (imageStatus[i] == CacheStatus.COMPLETE)
-                count++;
+            if (imageStatus[i] != CacheStatus.COMPLETE)
+                return false;
         }
-        return count;
+        return true;
     }
 
     @Override
-    public boolean getComplete(int level) {
-        if (isComplete == true)
+    public boolean levelComplete(int level) {
+        if (fullyComplete == true)
             return true;
 
         for (int i = 0; i <= maxFrameNumber; i++) {
@@ -102,10 +103,10 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
                 return false;
         }
         if (level == 0)
-            isComplete = true;
+            fullyComplete = true;
         return true;
     }
 
-    private boolean isComplete;
+    private boolean fullyComplete;
 
 }
