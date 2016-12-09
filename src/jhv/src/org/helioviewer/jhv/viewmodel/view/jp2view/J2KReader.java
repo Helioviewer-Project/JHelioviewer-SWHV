@@ -269,8 +269,7 @@ class J2KReader implements Runnable {
                         }
                     }
 
-                    complete = cacheStatusRef.countCompleted() == num_layers;
-
+                    complete = cacheStatusRef.currentComplete();
                     // if incomplete && not interrupted && single frame -> signal again to go on reading
                     if (!complete && !stopReading && singleFrame) {
                         readerSignal.signal(currParams);

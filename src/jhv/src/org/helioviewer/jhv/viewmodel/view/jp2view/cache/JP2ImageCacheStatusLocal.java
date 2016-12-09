@@ -27,12 +27,12 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
     }
 
     @Override
-    public int countCompleted() {
-        return maxFrameNumber;
+    public boolean currentComplete() {
+        return true;
     }
 
     @Override
-    public boolean getComplete(int level) {
+    public boolean levelComplete(int level) {
         return true;
     }
 
