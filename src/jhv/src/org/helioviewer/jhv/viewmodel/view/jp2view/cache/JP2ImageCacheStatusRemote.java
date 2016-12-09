@@ -13,7 +13,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     private final ResolutionSet[] resolutionSet;
     private final Kdu_region_compositor compositor;
 
-    // r/w image load, r/w J2KReader, r J2KRender, r MoviePanel/EDT
+    // r/w image load, r/w J2KReader, r MoviePanel/EDT
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
 
