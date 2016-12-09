@@ -34,11 +34,10 @@ public class SubImage {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof SubImage) {
-            SubImage s = (SubImage) o;
-            return x == s.x && y == s.y && width == s.width && height == s.height;
-        }
-        return false;
+        if (!(o instanceof SubImage))
+            return false;
+        SubImage s = (SubImage) o;
+        return x == s.x && y == s.y && width == s.width && height == s.height;
     }
 
     @Override

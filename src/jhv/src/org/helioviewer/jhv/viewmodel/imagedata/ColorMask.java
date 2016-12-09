@@ -94,9 +94,8 @@ public class ColorMask {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ColorMask)) {
+        if (!(o instanceof ColorMask))
             return false;
-        }
         ColorMask m = (ColorMask) o;
         return m.red == red && m.green == green && m.blue == blue;
     }

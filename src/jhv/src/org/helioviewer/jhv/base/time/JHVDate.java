@@ -27,11 +27,10 @@ public class JHVDate implements Comparable<JHVDate> {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof JHVDate) {
-            JHVDate d = (JHVDate) o;
-            return milli == d.milli;
-        }
-        return false;
+        if (!(o instanceof JHVDate))
+            return false;
+        JHVDate d = (JHVDate) o;
+        return milli == d.milli;
     }
 
     @Override
