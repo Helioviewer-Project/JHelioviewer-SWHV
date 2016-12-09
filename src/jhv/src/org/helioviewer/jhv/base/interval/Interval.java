@@ -79,11 +79,10 @@ public class Interval implements Comparable<Interval> {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Interval) {
-            Interval s = (Interval) o;
-            return start == s.start && end == s.end;
-        }
-        return false;
+        if (!(o instanceof Interval))
+            return false;
+        Interval s = (Interval) o;
+        return start == s.start && end == s.end;
     }
 
     @Override

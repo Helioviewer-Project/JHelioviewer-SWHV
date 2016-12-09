@@ -61,11 +61,10 @@ public class APIRequest {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof APIRequest) {
-            APIRequest r = (APIRequest) o;
-            return sourceId == r.sourceId && startTime == r.startTime && endTime == r.endTime && cadence == r.cadence && server.equals(r.server);
-        }
-        return false;
+        if (!(o instanceof APIRequest))
+            return false;
+        APIRequest r = (APIRequest) o;
+        return sourceId == r.sourceId && startTime == r.startTime && endTime == r.endTime && cadence == r.cadence && server.equals(r.server);
     }
 
     @Override

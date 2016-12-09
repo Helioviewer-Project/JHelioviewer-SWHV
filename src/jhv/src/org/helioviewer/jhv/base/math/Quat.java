@@ -251,11 +251,10 @@ public class Quat {
 
     @Override
     public final boolean equals(Object o) {
-        if (o instanceof Quat) {
-            Quat q = (Quat) o;
-            return a == q.a && u.equals(q.u);
-        }
-        return false;
+        if (!(o instanceof Quat))
+            return false;
+        Quat q = (Quat) o;
+        return a == q.a && u.equals(q.u);
     }
 
     @Override
