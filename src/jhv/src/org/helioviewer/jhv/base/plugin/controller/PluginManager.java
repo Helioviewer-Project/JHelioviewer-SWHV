@@ -68,10 +68,8 @@ public class PluginManager {
      *
      * @param pluginLocation
      *            Specifies the location of the file which contains the plug-in.
-     * @return true if the plug-in could be loaded successfully; false
-     *         otherwise.
      */
-    public boolean loadPlugin(URI pluginLocation) {
+    public void loadPlugin(URI pluginLocation) {
         Log.info("PluginManager is trying to load the plugin located at " + pluginLocation);
 
         File file = new File(pluginLocation);
@@ -97,14 +95,13 @@ public class PluginManager {
             Log.info("PluginManager: Load plugin class: " + className);
             if (obj instanceof Plugin) {
                 addPlugin((Plugin) obj, pluginLocation);
-                return true;
+                return;
             } else {
                 Log.debug("Load failed, was trying to load something that is not a plugin: " + className);
             }
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | IOException e) {
             Log.error("PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         }
-        return false;
     }
 
     /**

@@ -93,11 +93,11 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     @Override
     public boolean levelComplete(int level) {
-        if (fullyComplete == true)
+        if (fullyComplete)
             return true;
 
         for (int i = 0; i <= maxFrameNumber; i++) {
-            if (resolutionSet[i] == null || resolutionSet[i].getComplete(level) == false)
+            if (resolutionSet[i] == null || !resolutionSet[i].getComplete(level))
                 return false;
         }
         if (level == 0)
