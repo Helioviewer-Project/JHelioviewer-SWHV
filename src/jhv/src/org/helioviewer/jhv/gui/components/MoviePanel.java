@@ -534,12 +534,12 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     // only for Layers
     public static void setPlayState(boolean play) {
         if (!someoneIsDragging) {
-            if (!play) {
-                playButton.setIcon(playIcon);
-                playButton.setToolTipText("Play movie");
-            } else {
+            if (play) {
                 playButton.setIcon(pauseIcon);
                 playButton.setToolTipText("Pause movie");
+            } else {
+                playButton.setIcon(playIcon);
+                playButton.setToolTipText("Play movie");
             }
         }
     }

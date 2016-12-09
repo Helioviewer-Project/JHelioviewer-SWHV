@@ -165,10 +165,10 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     }
 
     private void resetData() {
-        if (!metaDataOK) {
-            exportFitsButton.setEnabled(false);
-        } else {
+        if (metaDataOK) {
             exportFitsButton.setEnabled(true);
+        } else {
+            exportFitsButton.setEnabled(false);
         }
     }
 
