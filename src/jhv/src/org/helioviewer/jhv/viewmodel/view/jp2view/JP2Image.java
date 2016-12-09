@@ -42,32 +42,18 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
-/**
- * This class can open JPEG2000 images. Modified to improve the JPIP
- * communication.
- *
- * @author caplins
- * @author Benjamin Wamsler
- * @author Juan Pablo
- */
 public class JP2Image {
 
-    /** An array of the file extensions this class currently supports */
     private static final String[] SUPPORTED_EXTENSIONS = { ".jp2", ".jpx" };
 
-    /** This is the URI that uniquely identifies the image. */
     private final URI uri;
-
-    /** This is the URI from whch the whole file can be downloaded via http */
     private final URI downloadURI;
 
-    /** This is the object in which all transmitted data is stored */
     private JHV_Kdu_cache cacheReader;
     private Kdu_cache cacheRender;
 
     private KakaduEngine kduReader;
 
-    /** The number of composition layers for the image. */
     private final int frameCount;
     private final int[] builtinLUT;
 
@@ -126,7 +112,7 @@ public class JP2Image {
                     throw new JHV_KduException(scheme + " scheme not supported!");
             }
 
-            kduReader = new KakaduEngine(cacheReader, uri, null);
+            kduReader = new KakaduEngine(cacheReader, uri);
 
             // Retrieve the number of composition layers
             int[] tempVar = new int[1];
@@ -199,15 +185,16 @@ public class JP2Image {
 
     private KakaduEngine kduRender;
 
-    Kdu_region_compositor getCompositor(Kdu_thread_env threadEnv) throws KduException, IOException {
+    KakaduEngine getRenderEngine(Kdu_thread_env threadEnv) throws KduException, IOException {
         if (kduRender == null) {
             Thread.currentThread().setName("Render " + getName());
-            kduRender = new KakaduEngine(cacheRender, uri, threadEnv);
+            kduRender = new KakaduEngine(cacheRender, uri);
+            kduRender.getCompositor().Set_thread_env(threadEnv, null);
         }
-        return kduRender.getCompositor();
+        return kduRender;
     }
 
-    void destroyEngine() throws KduException {
+    void destroyRenderEngine() throws KduException {
         if (kduRender != null) {
             kduRender.destroy();
             kduRender = null;
@@ -380,7 +367,7 @@ public class JP2Image {
 
     private void kduDestroy() {
         try {
-            destroyEngine();
+            destroyRenderEngine();
 
             if (kduReader != null) {
                 kduReader.destroy();
@@ -402,8 +389,7 @@ public class JP2Image {
         }
     }
 
-    // Returns the cache reference
-    JHV_Kdu_cache getCacheRef() {
+    JHV_Kdu_cache getReaderCache() {
         return cacheReader;
     }
 
@@ -430,7 +416,7 @@ public class JP2Image {
     public String getXML(int boxNumber) {
         String xml = null;
         try {
-            KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri, null);
+            KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri);
             xml = KakaduUtils.getXml(kduTmp.getFamilySrc(), boxNumber);
             kduTmp.destroy();
         } catch (Exception e) {

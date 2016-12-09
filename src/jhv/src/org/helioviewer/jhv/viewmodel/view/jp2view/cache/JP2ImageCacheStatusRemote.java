@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 
-import java.awt.EventQueue;
-
 import kdu_jni.KduException;
 import kdu_jni.Kdu_region_compositor;
 

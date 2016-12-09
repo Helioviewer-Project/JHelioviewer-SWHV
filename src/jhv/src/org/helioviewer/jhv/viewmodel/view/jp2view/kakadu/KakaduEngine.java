@@ -10,7 +10,6 @@ import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_region_compositor;
-import kdu_jni.Kdu_thread_env;
 
 public class KakaduEngine {
 
@@ -18,7 +17,7 @@ public class KakaduEngine {
     private final Jpx_source jpxSrc;
     private final Kdu_region_compositor compositor;
 
-    public KakaduEngine(Kdu_cache cache, URI uri, Kdu_thread_env threadEnv) throws KduException, IOException {
+    public KakaduEngine(Kdu_cache cache, URI uri) throws KduException, IOException {
         familySrc = new Jp2_family_src();
         if (cache == null) { // local
             File file = new File(uri);
@@ -29,7 +28,7 @@ public class KakaduEngine {
 
         jpxSrc = new Jpx_source();
         jpxSrc.Open(familySrc, false);
-        compositor = createCompositor(jpxSrc, threadEnv);
+        compositor = createCompositor(jpxSrc);
     }
 
     public Jp2_family_src getFamilySrc() {
@@ -58,12 +57,11 @@ public class KakaduEngine {
         }
     }
 
-    private static Kdu_region_compositor createCompositor(Jpx_source jpx, Kdu_thread_env threadEnv) throws KduException {
+    private static Kdu_region_compositor createCompositor(Jpx_source jpx) throws KduException {
         Kdu_region_compositor compositor = new Kdu_region_compositor();
         // System.out.println(">>>> compositor create " + compositor + " " + Thread.currentThread().getName());
         compositor.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
         compositor.Set_surface_initialization_mode(false);
-        compositor.Set_thread_env(threadEnv, null);
         return compositor;
     }
 
