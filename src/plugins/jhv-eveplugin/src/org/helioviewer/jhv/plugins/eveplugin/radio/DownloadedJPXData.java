@@ -53,9 +53,9 @@ class DownloadedJPXData implements ImageDataHandler {
         view.setDataHandler(this);
 
         JP2ImageCallisto image = view.getJP2Image();
-        ResolutionSet resolutionSet = image.getResolutionSet(0);
-        jp2Width = resolutionSet.getResolutionLevel(0).width;
-        jp2Height = resolutionSet.getResolutionLevel(0).height;
+        ResolutionSet.ResolutionLevel resLevel = image.getResolutionSet(0).getResolutionLevel(0);
+        jp2Width = resLevel.width;
+        jp2Height = resLevel.height;
 
         XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
         try {

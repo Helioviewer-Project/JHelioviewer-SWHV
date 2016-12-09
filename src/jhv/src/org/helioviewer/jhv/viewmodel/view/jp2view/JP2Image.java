@@ -18,8 +18,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatusInitial;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
@@ -424,7 +422,7 @@ public class JP2Image {
         return cacheReader;
     }
 
-    ImageCacheStatus getImageCacheStatus() {
+    JP2ImageCacheStatus getImageCacheStatus() {
         return imageCacheStatus;
     }
 

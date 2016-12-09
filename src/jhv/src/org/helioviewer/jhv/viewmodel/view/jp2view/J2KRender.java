@@ -13,7 +13,6 @@ import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
@@ -26,32 +25,32 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 class J2KRender implements Runnable {
 
     private static final ThreadLocal<int[]> bufferLocal = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
+    private static final ThreadLocal<Kdu_thread_env> threadEnv = ThreadLocal.withInitial(J2KRender::createThreadEnv);
 
     private static final int[] firstComponent = { 0 };
 
-    /** A reference to the JP2Image this object is owned by. */
+    // A reference to the JP2Image this object is owned by
     private final JP2Image parentImageRef;
 
-    private final ImageCacheStatus cacheStatusRef;
+    private final CacheStatus cacheStatus;
 
-    /** A reference to the JP2View this object is owned by. */
+    // A reference to the JP2View this object is owned by
     private final JP2View parentViewRef;
 
     private final JP2ImageParameter params;
 
-    J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams) {
+    J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams, CacheStatus _cacheStatus) {
         parentViewRef = _parentViewRef;
         params = _currParams;
         parentImageRef = params.jp2Image;
-        cacheStatusRef = parentImageRef.getImageCacheStatus();
+        cacheStatus = _cacheStatus;
     }
 
     private void renderLayer(Kdu_region_compositor compositor) throws KduException {
-        int numLayer = params.compositionLayer;
-
-        CacheStatus status = cacheStatusRef.getImageStatus(numLayer);
-        if (status != CacheStatus.COMPLETE && status != CacheStatus.PARTIAL)
+        if (cacheStatus != CacheStatus.COMPLETE && cacheStatus != CacheStatus.PARTIAL)
             return;
+
+        int numLayer = params.compositionLayer;
 
         // compositor.Refresh();
         // compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
@@ -126,7 +125,7 @@ class J2KRender implements Runnable {
         }
 
         compositorBuf.Native_destroy();
-        compositor.Remove_ilayer(ilayer, status != CacheStatus.COMPLETE);
+        compositor.Remove_ilayer(ilayer, cacheStatus != CacheStatus.COMPLETE);
 
         ImageData imdata;
         if (numComponents < 3) {
@@ -161,16 +160,14 @@ class J2KRender implements Runnable {
         }
     }
 
-    private static final ThreadLocal<Kdu_thread_env> threadEnv = ThreadLocal.withInitial(J2KRender::createThreadEnv);
-
     private static Kdu_thread_env createThreadEnv() {
         try {
             Kdu_thread_env theThreadEnv = new Kdu_thread_env();
-            // System.out.println(">>>> Kdu_thread_env create " + theThreadEnv);
             theThreadEnv.Create();
             int numThreads = Kdu_global.Kdu_get_num_processors();
             for (int i = 1; i < numThreads; i++)
                 theThreadEnv.Add_thread();
+            // System.out.println(">>>> Kdu_thread_env create " + theThreadEnv);
             return theThreadEnv;
         } catch (KduException e) {
             e.printStackTrace();

@@ -287,7 +287,7 @@ public class JP2View extends AbstractView {
         }
 
         JP2ImageParameter imageViewParams = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, factor);
-        queueSubmitTask(new J2KRender(this, imageViewParams));
+        queueSubmitTask(new J2KRender(this, imageViewParams, getImageCacheStatus(targetFrame)));
     }
 
     @Override
