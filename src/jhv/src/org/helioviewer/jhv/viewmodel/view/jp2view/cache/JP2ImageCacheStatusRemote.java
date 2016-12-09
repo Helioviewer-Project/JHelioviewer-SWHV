@@ -28,7 +28,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     // not threadsafe
     @Override
-    public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
+    public void setImageStatus(int compositionLayer, int level, CacheStatus newStatus) {
         if (resolutionSet[compositionLayer] == null && newStatus == CacheStatus.PARTIAL) {
             try {
                 resolutionSet[compositionLayer] = KakaduHelper.getResolutionSet(compositor, compositionLayer);
@@ -37,6 +37,9 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
             }
         }
         imageStatus[compositionLayer] = newStatus;
+
+        if (newStatus == CacheStatus.COMPLETE)
+            resolutionSet[compositionLayer].setComplete(level);
     }
 
     // not threadsafe
@@ -78,5 +81,31 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
         }
         return resolutionSet[compositionLayer];
     }
+
+    @Override
+    public int countCompleted() {
+        int count = 0;
+        for (int i = 0; i <= maxFrameNumber; i++) {
+            if (imageStatus[i] == CacheStatus.COMPLETE)
+                count++;
+        }
+        return count;
+    }
+
+    @Override
+    public boolean getComplete(int level) {
+        if (isComplete == true)
+            return true;
+
+        for (int i = 0; i <= maxFrameNumber; i++) {
+            if (resolutionSet[i] == null || resolutionSet[i].getComplete(level) == false)
+                return false;
+        }
+        if (level == 0)
+            isComplete = true;
+        return true;
+    }
+
+    private boolean isComplete;
 
 }

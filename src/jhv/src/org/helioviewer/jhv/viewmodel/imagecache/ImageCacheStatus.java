@@ -28,7 +28,7 @@ public interface ImageCacheStatus {
      * @param newStatus
      *            New image data cache status
      */
-    void setImageStatus(int compositionLayer, CacheStatus newStatus);
+    void setImageStatus(int compositionLayer, int level, CacheStatus newStatus);
 
     /**
      * Downgrades the status from complete to partial, if necessary.

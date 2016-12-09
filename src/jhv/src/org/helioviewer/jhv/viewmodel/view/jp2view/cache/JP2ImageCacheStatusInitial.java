@@ -14,7 +14,7 @@ public class JP2ImageCacheStatusInitial implements JP2ImageCacheStatus {
     }
 
     @Override
-    public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
+    public void setImageStatus(int compositionLayer, int level, CacheStatus newStatus) {
         if (compositionLayer != 0)
             throw new IllegalArgumentException();
         imageStatus = newStatus;
@@ -32,6 +32,16 @@ public class JP2ImageCacheStatusInitial implements JP2ImageCacheStatus {
     @Override
     public ResolutionSet getResolutionSet(int compositionLayer) {
         return null;
+    }
+
+    @Override
+    public int countCompleted() {
+        return 0;
+    }
+
+    @Override
+    public boolean getComplete(int level) {
+        return false;
     }
 
 }

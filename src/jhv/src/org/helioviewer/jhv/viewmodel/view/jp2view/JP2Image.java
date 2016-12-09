@@ -144,7 +144,7 @@ public class JP2Image {
 
             if (cacheReader != null) { // remote
                 imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader.getCompositor(), getMaximumFrameNumber());
-                imageCacheStatus.setImageStatus(0, initialCacheStatus.getImageStatus(0));
+                imageCacheStatus.setImageStatus(0, -1, initialCacheStatus.getImageStatus(0));
             } else {
                 imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader.getCompositor(), getMaximumFrameNumber());
             }
@@ -228,8 +228,6 @@ public class JP2Image {
             reader.signalReader(params);
     }
 
-    private JP2ImageParameter oldImageViewParams;
-
     // Recalculates the image parameters used within the jp2-package
     JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
         MetaData m = metaDataList[frame];
@@ -271,14 +269,12 @@ public class JP2Image {
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
 
-        boolean viewChanged = oldImageViewParams == null || imageViewParams.resolution.compareTo(oldImageViewParams.resolution) > 0;
-        if (viewChanged) {
+        boolean complete = imageCacheStatus.getComplete(res.discardLayers);
+        if (!complete) {
             imageViewParams.downgrade = true;
             imageCacheStatus.downgradeImageStatus(0, frameCount - 1);
             signalReader(imageViewParams);
         }
-
-        oldImageViewParams = imageViewParams;
 
         return imageViewParams;
     }

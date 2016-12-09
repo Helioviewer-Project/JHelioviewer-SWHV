@@ -247,13 +247,14 @@ class J2KReader implements Runnable {
                             complete_steps++;
                             stepQuerys[current_step] = null;
 
+                            int layers = currParams.resolution.discardLayers;
                             // tell the cache status
                             if (singleFrame) {
-                                cacheStatusRef.setImageStatus(currParams.compositionLayer, CacheStatus.COMPLETE);
+                                cacheStatusRef.setImageStatus(currParams.compositionLayer, layers, CacheStatus.COMPLETE);
                                 signalRender(currParams.factor);
                             } else {
                                 for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++)
-                                    cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);
+                                    cacheStatusRef.setImageStatus(j, layers, CacheStatus.COMPLETE);
                             }
                         }
                         MoviePanel.cacheStatusChanged();
@@ -268,12 +269,7 @@ class J2KReader implements Runnable {
                         }
                     }
 
-                    int completed;
-                    for (completed = 0; completed < num_layers; completed++) {
-                        if (cacheStatusRef.getImageStatus(completed) != CacheStatus.COMPLETE)
-                            break;
-                    }
-                    complete = completed == num_layers;
+                    complete = cacheStatusRef.countCompleted() == num_layers;
 
                     // if incomplete && not interrupted && single frame -> signal again to go on reading
                     if (!complete && !stopReading && singleFrame) {
