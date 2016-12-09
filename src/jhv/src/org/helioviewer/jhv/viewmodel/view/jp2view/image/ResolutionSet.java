@@ -98,11 +98,11 @@ public class ResolutionSet {
          */
         @Override
         public boolean equals(Object o) {
-            if (o instanceof ResolutionLevel) {
-                ResolutionLevel r = (ResolutionLevel) o;
-                return discardLayers == r.discardLayers && width == r.width && height == r.height && factorX == r.factorX && factorY == r.factorY;
-            }
-            return false;
+            if (!(o instanceof ResolutionLevel))
+                return false;
+
+            ResolutionLevel r = (ResolutionLevel) o;
+            return discardLayers == r.discardLayers && width == r.width && height == r.height && factorX == r.factorX && factorY == r.factorY;
         }
 
         @Override
