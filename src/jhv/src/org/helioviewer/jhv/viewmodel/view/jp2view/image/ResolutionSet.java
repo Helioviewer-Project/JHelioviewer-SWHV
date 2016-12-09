@@ -8,11 +8,9 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.image;
  */
 public class ResolutionSet {
 
-    /**
-     * An array containing the available resolutions. The indices represent the
-     * num of discardLayers
-     */
+    // The indices represent the number of discardLayers
     private final ResolutionLevel[] resolutions;
+    private final boolean[] complete;
     public final int numLevels;
     public final int numComps;
 
@@ -20,6 +18,20 @@ public class ResolutionSet {
         numLevels = _numLevels;
         numComps = _numComps;
         resolutions = new ResolutionLevel[numLevels];
+        complete = new boolean[numLevels];
+    }
+
+    public void setComplete(int idx) {
+        if (idx >= 0 || idx < numLevels) {
+            for (int i = idx; i < numLevels; i++)
+                complete[i] = true;
+        }
+    }
+
+    public boolean getComplete(int idx) {
+        if (idx >= 0 || idx < numLevels)
+            return complete[idx];
+        return false;
     }
 
     /**
@@ -38,8 +50,8 @@ public class ResolutionSet {
         resolutions[discardLayer] = new ResolutionLevel(discardLayer, width, height, scaleX, scaleY);
     }
 
-    public ResolutionLevel getResolutionLevel(int index) {
-        return resolutions[index];
+    public ResolutionLevel getResolutionLevel(int idx) {
+        return resolutions[idx];
     }
 
     public ResolutionLevel getPreviousResolutionLevel(int w, int h) {
@@ -66,10 +78,9 @@ public class ResolutionSet {
      * ResolutionSet object can be considered to be the ResolutionLevel
      * 'factory'.
      */
-    public static class ResolutionLevel implements Comparable<ResolutionLevel> {
+    public static class ResolutionLevel {
 
         public final int discardLayers;
-
         public final float scaleLevel;
 
         public final int width;
@@ -111,13 +122,6 @@ public class ResolutionSet {
         @Override
         public String toString() {
             return "[[Discard=" + discardLayers + "][ScaleLevel=" + scaleLevel + "][ScaleFactor=" + factorX + "," + factorY + "][ZoomDims=" + width + "," + height + "]]";
-        }
-
-        @Override
-        public int compareTo(ResolutionLevel r) {
-            assert width == r.width && height == r.height && factorX == r.factorX && factorY == r.factorY : "not comparable";
-            int diff = discardLayers - r.discardLayers;
-            return diff > 0 ? -1 : (diff < 0 ? +1 : 0);
         }
 
     }

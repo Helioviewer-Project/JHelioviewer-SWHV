@@ -17,12 +17,23 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
         resolutionSet = new ResolutionSet[_maxFrameNumber + 1];
         for (int i = 0; i <= _maxFrameNumber; ++i) {
             resolutionSet[i] = KakaduHelper.getResolutionSet(compositor, i);
+            resolutionSet[i].setComplete(0);
         }
     }
 
     @Override
     public ResolutionSet getResolutionSet(int compositionLayer) {
         return resolutionSet[compositionLayer];
+    }
+
+    @Override
+    public int countCompleted() {
+        return maxFrameNumber;
+    }
+
+    @Override
+    public boolean getComplete(int level) {
+        return true;
     }
 
 }
