@@ -18,7 +18,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatusInitial;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -26,6 +25,7 @@ import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.viewmodel.view.ViewROI;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusInitial;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemote;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
@@ -108,17 +108,16 @@ public class JP2Image {
             throw new JHV_KduException("File extension not supported");
 
         try {
-            ImageCacheStatusInitial initialCacheStatus = new ImageCacheStatusInitial();
+            JP2ImageCacheStatusInitial initialCacheStatus = new JP2ImageCacheStatusInitial();
             String scheme = uri.getScheme().toLowerCase();
             switch (scheme) {
                 case "http":
                 case "jpip":
                     cacheReader = new JHV_Kdu_cache();
-                    cacheReader.setImageCacheStatus(initialCacheStatus);
                     cacheRender = new Kdu_cache();
                     cacheRender.Attach_to(cacheReader);
                     // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
-                    initRemote(cacheReader);
+                    initRemote(cacheReader, initialCacheStatus);
                     break;
                 case "file":
                     // nothing
@@ -146,7 +145,6 @@ public class JP2Image {
             if (cacheReader != null) { // remote
                 imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader.getCompositor(), getMaximumFrameNumber());
                 imageCacheStatus.setImageStatus(0, initialCacheStatus.getImageStatus(0));
-                cacheReader.setImageCacheStatus(imageCacheStatus);
             } else {
                 imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader.getCompositor(), getMaximumFrameNumber());
             }
@@ -163,23 +161,23 @@ public class JP2Image {
      * @throws JHV_KduException
      * @throws IOException
      */
-    private void initRemote(JHV_Kdu_cache cache) throws JHV_KduException {
+    private void initRemote(JHV_Kdu_cache cache, JP2ImageCacheStatus status) throws JHV_KduException {
         try {
             // Connect to the JPIP server and add the necessary initial data (the main header as well as the metadata) to cache
-            socket = new JPIPSocket(uri, cache);
+            socket = new JPIPSocket(uri, cache, status);
 
             JPIPResponse res;
             String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
             do {
                 socket.send(req);
-                res = socket.receive(cache);
+                res = socket.receive(cache, status);
             } while (!res.isResponseComplete());
 
             if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
                 req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
                 do {
                     socket.send(req);
-                    res = socket.receive(cache);
+                    res = socket.receive(cache, status);
                 } while (!res.isResponseComplete() && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
             }
         } catch (IOException e) {

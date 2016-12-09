@@ -1,6 +1,8 @@
-package org.helioviewer.jhv.viewmodel.imagecache;
+package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 
-public class ImageCacheStatusInitial implements ImageCacheStatus {
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
+
+public class JP2ImageCacheStatusInitial implements JP2ImageCacheStatus {
 
     private CacheStatus imageStatus;
 
@@ -25,6 +27,11 @@ public class ImageCacheStatusInitial implements ImageCacheStatus {
     @Override
     public int getImageCachedPartiallyUntil() {
         return -1;
+    }
+
+    @Override
+    public ResolutionSet getResolutionSet(int compositionLayer) {
+        return null;
     }
 
 }

@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
@@ -49,7 +49,7 @@ class J2KReader implements Runnable {
     /** The current length in bytes to use for requests */
     private int jpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
 
-    private final ImageCacheStatus cacheStatusRef;
+    private final JP2ImageCacheStatus cacheStatusRef;
 
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
@@ -74,7 +74,7 @@ class J2KReader implements Runnable {
 
     private void reconnect() throws IOException {
         // System.out.println(">>> reconnect");
-        socket = new JPIPSocket(parentImageRef.getURI(), cacheRef);
+        socket = new JPIPSocket(parentImageRef.getURI(), cacheRef, cacheStatusRef);
     }
 
     // runs in abolish thread
@@ -238,7 +238,7 @@ class J2KReader implements Runnable {
                         // update requested package size
                         socket.send(stepQuerys[current_step] + "len=" + jpipRequestLen);
                         // receive and add data to cache
-                        JPIPResponse res = socket.receive(cacheRef);
+                        JPIPResponse res = socket.receive(cacheRef, cacheStatusRef);
                         // update optimal package size
                         flowControl();
                         // react if query complete

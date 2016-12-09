@@ -5,9 +5,9 @@ import java.io.IOException;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
-import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPCache;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JPIPCache;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDataSegment;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
 
@@ -17,21 +17,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
  */
 public class JHV_Kdu_cache extends Kdu_cache implements JPIPCache {
 
-    private ImageCacheStatus status;
-
-    public void setImageCacheStatus(ImageCacheStatus imageCacheStatus) {
-        status = imageCacheStatus;
-    }
-
-    /**
-     * Returns whether or not the databin is complete.
-     * 
-     * @param binClass
-     * @param streamID
-     * @param binID
-     * @return True, if the databin is complete, false otherwise
-     * @throws JHV_KduException
-     */
     public boolean isDataBinCompleted(JPIPDatabinClass binClass, int streamID, int binID) throws JHV_KduException {
         boolean complete[] = new boolean[1];
         try {
@@ -42,14 +27,8 @@ public class JHV_Kdu_cache extends Kdu_cache implements JPIPCache {
         return complete[0];
     }
 
-    /**
-     * Adds a JPIPDataSegment to the cache object
-     * 
-     * @param data
-     * @throws JHV_KduException
-     */
     @Override
-    public void addJPIPDataSegment(JPIPDataSegment data) throws IOException {
+    public void addJPIPDataSegment(JPIPDataSegment data, JP2ImageCacheStatus status) throws IOException {
         try {
             Add_to_databin(data.classID.kakaduClassID, data.codestreamID, data.binID, data.data, data.offset, data.length, data.isFinal, true, false);
         } catch (KduException e) {
