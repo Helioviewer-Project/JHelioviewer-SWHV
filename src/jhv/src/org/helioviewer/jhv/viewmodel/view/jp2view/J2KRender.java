@@ -145,9 +145,6 @@ class J2KRender implements Runnable {
     @Override
     public void run() {
         try {
-            if (cacheStatus != CacheStatus.COMPLETE && cacheStatus != CacheStatus.PARTIAL)
-                return;
-
             renderLayer(parentImageRef.getRenderEngine(threadEnv.get()).getCompositor());
         } catch (Exception e) {
             // reboot the compositor

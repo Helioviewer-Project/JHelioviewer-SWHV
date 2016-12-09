@@ -45,14 +45,6 @@ public class JP2View extends AbstractView {
     private MetaData[] metaDataArray;
     private int maximumFrame;
 
-    /**
-     * Sets the JPG2000 image used by this class.
-     *
-     * This functions sets up the whole infrastructure needed for using the
-     * image.
-     *
-     * @param newJP2Image
-     */
     public void setJP2Image(JP2Image newJP2Image) {
         _jp2Image = newJP2Image;
 
@@ -118,8 +110,6 @@ public class JP2View extends AbstractView {
     }
 
     /**
-     * Sets the new image data for the given region.
-     *
      * This function is used as a callback function which is called by
      * {@link J2KRender} when it has finished decoding an image.
      */
@@ -204,11 +194,8 @@ public class JP2View extends AbstractView {
         int frame = getFrameNumber(time);
         if (frame != targetFrame) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
-            if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
-                // _jp2Image.signalReader(calculateParameter(_jp2Image, v,
-                // frame, false)); // wake up reader
+            if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE)
                 return;
-            }
             targetFrame = frame;
         }
     }
@@ -282,12 +269,16 @@ public class JP2View extends AbstractView {
 
     private void signalRender(JP2Image jp2Image, double factor) {
         // from reader on EDT, might come after abolish
-        if (stopRender || jp2Image == null) {
+        if (stopRender || jp2Image == null)
             return;
-        }
 
+        // order is important, this will signal reader
         JP2ImageParameter imageViewParams = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, factor);
-        queueSubmitTask(new J2KRender(this, imageViewParams, getImageCacheStatus(targetFrame)));
+        CacheStatus status = jp2Image.getImageCacheStatus().getImageStatus(targetFrame);
+        if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) // avoid empty image at startup
+            return;
+
+        queueSubmitTask(new J2KRender(this, imageViewParams, status));
     }
 
     @Override
