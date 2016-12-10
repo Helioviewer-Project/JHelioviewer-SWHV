@@ -2,12 +2,7 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.util.List;
 
-/**
- * Defines a relationship between events.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
+// Defines a relationship between events.
 public class SWEKRelatedEvents {
 
     private final SWEKEventType event;

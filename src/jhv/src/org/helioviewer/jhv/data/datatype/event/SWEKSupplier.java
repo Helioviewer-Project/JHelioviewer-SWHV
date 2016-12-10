@@ -2,12 +2,7 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.util.HashMap;
 
-/**
- * Defines an event type supplier.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
+// Defines an event type supplier.
 public class SWEKSupplier {
 
     /** Name of the supplier */
@@ -31,12 +26,13 @@ public class SWEKSupplier {
      * @param source
      *            The source on which the supplier supplies its events
      */
-    public SWEKSupplier(String supplierName, String supplierDisplayName, SWEKSource source, String db) {
+    public SWEKSupplier(String _supplierName, String _supplierDisplayName, SWEKSource _source, String _db) {
+        supplierName = _supplierName;
+        supplierDisplayName = _supplierDisplayName;
+        source = _source;
+        db = _db;
+
         String key = supplierName + source.getSourceName() + db;
-        this.supplierName = supplierName;
-        this.supplierDisplayName = supplierDisplayName;
-        this.source = source;
-        this.db = db;
         suppliers.put(key, this);
     }
 
@@ -44,20 +40,10 @@ public class SWEKSupplier {
         return suppliers.get(supplierNameKey);
     }
 
-    /**
-     * Gets the supplier name.
-     *
-     * @return the supplierName
-     */
     public String getSupplierName() {
         return supplierName;
     }
 
-    /**
-     * Gets the display name of the supplier
-     *
-     * @return the display name of the supplier.
-     */
     public String getSupplierDisplayName() {
         return supplierDisplayName;
     }
@@ -66,11 +52,6 @@ public class SWEKSupplier {
         return db;
     }
 
-    /**
-     * Gets the source on which the supplier supplies its events.
-     *
-     * @return the source
-     */
     public SWEKSource getSource() {
         return source;
     }
