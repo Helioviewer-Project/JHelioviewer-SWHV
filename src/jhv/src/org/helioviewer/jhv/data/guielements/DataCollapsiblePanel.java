@@ -13,10 +13,10 @@ public class DataCollapsiblePanel extends CollapsiblePane {
 
     private final DataCollapsiblePanelModel model;
 
-    public DataCollapsiblePanel(String title, Component component, boolean startExpanded, DataCollapsiblePanelModel model) {
+    public DataCollapsiblePanel(String title, Component component, boolean startExpanded, DataCollapsiblePanelModel _model) {
         super(title, component, startExpanded);
-        this.model = model;
         isExpanded = startExpanded;
+        model = _model;
     }
 
     @Override

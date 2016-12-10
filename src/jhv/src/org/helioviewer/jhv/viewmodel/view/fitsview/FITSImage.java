@@ -130,7 +130,7 @@ public class FITSImage implements MetaDataContainer {
                 for (int h = 0; h < height; h++) {
                     for (int w = 0; w < width; w++) {
                         float value = data2D[h][w] + MDI_THRESHOLD;
-                        value = value < 0.0f ? 0.0f : value > doubleThreshold ? doubleThreshold : value;
+                        value = value < 0.0f ? 0.0f : (value > doubleThreshold ? doubleThreshold : value);
                         data[counter] = (short) ((value * 65535) / doubleThreshold);
                         counter++;
                     }

@@ -95,7 +95,6 @@ public class PluginManager {
             Log.info("PluginManager: Load plugin class: " + className);
             if (obj instanceof Plugin) {
                 addPlugin((Plugin) obj, pluginLocation);
-                return;
             } else {
                 Log.debug("Load failed, was trying to load something that is not a plugin: " + className);
             }

@@ -361,7 +361,7 @@ public class JP2Image {
                 reader.abolish();
                 reader = null;
             }
-            EventQueue.invokeLater(() -> kduDestroy());
+            EventQueue.invokeLater(this::kduDestroy);
         }).start();
     }
 
