@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
+import javax.swing.JOptionPane;
+
 import org.helioviewer.jhv.base.logging.Log;
 
 import com.jogamp.nativewindow.ScalableSurface;
@@ -28,7 +30,12 @@ public class GLInfo {
             if (!gl.isExtensionAvailable("GL_VERSION_2_1")) {
                 String err = "OpenGL 2.1 not supported. JHelioviewer is not able to run.";
                 Log.error("GLInfo > " + err);
-                throw new GLException(err);
+
+                Object[] options = { "OK", "Crash" };
+                if (1 == JOptionPane.showOptionDialog(null, err, "Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]))
+                    throw new GLException(err);
+                else
+                    System.exit(-1);
             }
 
             int[] out = { 0 };

@@ -28,9 +28,8 @@ public class FixedSizedInputStream extends TransferInputStream {
         if (remainingBytes > 0) {
             --remainingBytes;
             return in.read();
-        } else {
-            return -1;
         }
+        return -1;
     }
 
     @Override
@@ -39,9 +38,8 @@ public class FixedSizedInputStream extends TransferInputStream {
             int bytesRead = in.read(b, off, remainingBytes < len ? remainingBytes : len);
             remainingBytes -= bytesRead;
             return bytesRead;
-        } else {
-            return -1;
         }
+        return -1;
     }
 
     @Override
@@ -50,9 +48,8 @@ public class FixedSizedInputStream extends TransferInputStream {
             int bytesRead = in.read(b, 0, remainingBytes < b.length ? remainingBytes : b.length);
             remainingBytes -= bytesRead;
             return bytesRead;
-        } else {
-            return -1;
         }
+        return -1;
     }
 
 }
