@@ -1,15 +1,12 @@
 package org.helioviewer.jhv.base.time;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 public class JHVDate implements Comparable<JHVDate> {
 
     private final String string;
     public final long milli;
 
     public JHVDate(String date) {
-        this(LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(TimeUtils.ZERO).toEpochMilli());
+        this(TimeUtils.parse(date));
     }
 
     public JHVDate(long _milli) {
