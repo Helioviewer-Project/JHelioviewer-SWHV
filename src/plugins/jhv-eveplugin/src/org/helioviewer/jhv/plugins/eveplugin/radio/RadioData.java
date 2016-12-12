@@ -45,7 +45,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     public RadioData() {
         isVisible = false;
 
-        String cm = "Rainbow 2";
+        String cm = "Blue/Red";
         colorModel = createIndexColorModelFromLUT(LUT.get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
         yAxis = new YAxis(400, 20, "Mhz", false);
@@ -57,7 +57,17 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
-        return new IndexColorModel(8, lut2.getLut8().length, lut2.getLut8(), 0, false, -1, DataBuffer.TYPE_BYTE);
+        int[] source = lut2.getLut8();
+        int len = source.length;
+
+        int[] inv = new int[len];
+        int offset = len - 1;
+        for (int i = 0; i < len / 2; i++) {
+            inv[i] = source[offset - i];
+            inv[offset - i] = source[i];
+        }
+
+        return new IndexColorModel(8, len, inv, 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 
     static void setLUT(LUT lut) {
