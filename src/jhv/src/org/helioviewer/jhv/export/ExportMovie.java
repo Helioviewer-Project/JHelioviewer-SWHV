@@ -33,7 +33,13 @@ public class ExportMovie implements FrameListener {
 
     private static final int NUM_FRAMES = 512;
     private final ArrayBlockingQueue<Runnable> frameQueue = new ArrayBlockingQueue<>(2 * NUM_FRAMES);
-    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, frameQueue, new JHVThread.NamedThreadFactory("Export Movie"), new ThreadPoolExecutor.DiscardPolicy());
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, frameQueue, new JHVThread.NamedThreadFactory("Export Movie"), new ThreadPoolExecutor.DiscardPolicy()) {
+        @Override
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            JHVThread.afterExecute(r, t);
+        }
+    };
 
     public static BufferedImage EVEImage = null;
     public static int EVEMovieLinePosition = -1;

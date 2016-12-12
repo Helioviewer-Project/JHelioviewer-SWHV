@@ -34,7 +34,13 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private static final ExecutorService downloadEventPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
                                                                                     new PriorityBlockingQueue<>(2048, new ComparePriority()),
                                                                                     new JHVThread.NamedThreadFactory("SWEK Download"),
-                                                                                    new ThreadPoolExecutor.DiscardPolicy());
+                                                                                    new ThreadPoolExecutor.DiscardPolicy()) {
+        @Override
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            JHVThread.afterExecute(r, t);
+        }
+    };
     private static final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap = new HashMap<>();
     private static final ArrayList<JHVEventType> activeEventTypes = new ArrayList<>();
 
@@ -94,7 +100,6 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
 
     private static void removeFromDownloaderMap(DownloadWorker worker) {
         ArrayList<DownloadWorker> dwMapList = dwMap.get(worker.getEventType());
-
         if (dwMapList != null)
             dwMapList.remove(worker);
 
