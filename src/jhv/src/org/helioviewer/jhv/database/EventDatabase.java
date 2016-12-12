@@ -233,9 +233,9 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            return -1;
+            e.getCause().printStackTrace();
         }
+        return -1;
     }
 
     private static class DumpAssociation2Db implements Callable<Integer> {
@@ -315,9 +315,9 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            return get_id_init_list(event2db_list.size());
+            e.getCause().printStackTrace();
         }
+        return get_id_init_list(event2db_list.size());
     }
 
     private static class DumpEvent2Db implements Callable<int[]> {
@@ -558,8 +558,9 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            return new ArrayList<>();
+            e.getCause().printStackTrace();
         }
+        return new ArrayList<>();
     }
 
     private static class Db2DateRange implements Callable<ArrayList<Interval>> {
@@ -635,9 +636,9 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            Log.error(e.getMessage());
-            return new ArrayList<>();
+            e.getCause().getStackTrace();
         }
+        return new ArrayList<>();
     }
 
     public static class JsonEvent {
@@ -718,8 +719,9 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            return new ArrayList<>();
+            e.getCause().printStackTrace();
         }
+        return new ArrayList<>();
     }
 
     private static class Associations2Program implements Callable<ArrayList<JHVAssociation>> {
@@ -769,8 +771,9 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            return new ArrayList<>();
+            e.getCause().printStackTrace();
         }
+        return new ArrayList<>();
     }
 
     private static ArrayList<JsonEvent> rel2prog(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
@@ -896,7 +899,7 @@ public class EventDatabase {
         try {
             evt = ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            Log.error(e.getMessage());
+            e.getCause().printStackTrace();
         }
         return evt;
     }

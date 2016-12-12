@@ -288,7 +288,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
                 ArrayList<JP2ViewCallisto> jpList = get();
                 initJPX(jpList, datesToDownload);
             } catch (InterruptedException | ExecutionException e) {
-                Log.error("RadioData error: " + e.getMessage());
+                Log.error("RadioData error: " + e.getCause().getMessage());
             }
         }
 
