@@ -42,7 +42,7 @@ public class ExportMovie implements FrameListener {
         if (exporter != null) {
             Runnable runnable = new CloseWriter(exporter, keep);
             if (keep) {
-                executor.submit(runnable);
+                executor.execute(runnable);
             } else {
                 executor.shutdownNow();
                 runnable.run();
@@ -72,7 +72,7 @@ public class ExportMovie implements FrameListener {
         BufferedImage screenshot = grabber.renderFrame(camera, gl);
         try {
             if (mode == RecordMode.SHOT || frameQueue.size() <= NUM_FRAMES)
-                executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
+                executor.execute(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
