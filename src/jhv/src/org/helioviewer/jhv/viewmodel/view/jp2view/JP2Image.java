@@ -6,7 +6,6 @@ import java.net.URI;
 
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
-import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.JHVGlobals;

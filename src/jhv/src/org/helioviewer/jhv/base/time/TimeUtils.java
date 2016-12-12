@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.base.time;
 
 import java.time.ZoneOffset;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -8,7 +10,7 @@ import org.apache.commons.lang3.time.FastDateFormat;
 public class TimeUtils {
 
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-    public static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
+    private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
 
     public static final long DAY_IN_MILLIS = 86400000;
     public static final long MINUTE_IN_MILLIS = 60000;
@@ -24,5 +26,9 @@ public class TimeUtils {
     public static final JHVDate EPOCH = new JHVDate("2000-01-01T00:00:00");
     public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = new JHVDate("2050-01-01T00:00:00");
+
+    public static long parse(String date) {
+        return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(TimeUtils.ZERO).toEpochMilli();
+    }
 
 }

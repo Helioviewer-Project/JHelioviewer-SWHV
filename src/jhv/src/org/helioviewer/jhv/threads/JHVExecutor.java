@@ -62,29 +62,33 @@ import sun.awt.AppContext;
     }
 */
 
+    public static void afterExecute(Runnable r, Throwable t) {
+        if (t == null && r instanceof Future<?>) {
+            try {
+                Future<?> future = (Future<?>) r;
+                if (future.isDone()) {
+                    future.get();
+                }
+            } catch (CancellationException e) {
+                t = e;
+            } catch (ExecutionException e) {
+                t = e.getCause();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // ??? ignore/reset
+            }
+        }
+        if (t != null) {
+            t.printStackTrace();
+        }
+    }
+
     public static ExecutorService getJHVWorkersExecutorService(String name, int MAX_WORKER_THREADS) {
         ExecutorService executorService = new ThreadPoolExecutor(MAX_WORKER_THREADS / 2, MAX_WORKER_THREADS,
                 10L, TimeUnit.MINUTES, new LinkedBlockingQueue<>(), new JHVThread.NamedThreadFactory("JHVWorker-" + name)) {
             @Override
             protected void afterExecute(Runnable r, Throwable t) {
                 super.afterExecute(r, t);
-                if (t == null && r instanceof Future<?>) {
-                    try {
-                        Future<?> future = (Future<?>) r;
-                        if (future.isDone()) {
-                            future.get();
-                        }
-                    } catch (CancellationException e) {
-                        t = e;
-                    } catch (ExecutionException e) {
-                        t = e.getCause();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt(); // ??? ignore/reset
-                    }
-                }
-                if (t != null) {
-                    t.printStackTrace();
-                }
+                JHVExecutor.afterExecute(r, t);
             }
         };
         shutdownOnDisposal(executorService);
