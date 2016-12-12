@@ -7,6 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
 import org.helioviewer.jhv.JHVDirectory;
@@ -14,6 +17,26 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.database.EventDatabase;
 
 public class JHVThread {
+
+    public static void afterExecute(Runnable r, Throwable t) {
+        if (t == null && r instanceof Future<?>) {
+            try {
+                Future<?> future = (Future<?>) r;
+                if (future.isDone()) {
+                    future.get();
+                }
+            } catch (CancellationException e) {
+                t = e;
+            } catch (ExecutionException e) {
+                t = e.getCause();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // ??? ignore/reset
+            }
+        }
+        if (t != null) {
+            t.printStackTrace();
+        }
+    }
 
     // this creates daemon threads
     public static class NamedThreadFactory implements ThreadFactory {

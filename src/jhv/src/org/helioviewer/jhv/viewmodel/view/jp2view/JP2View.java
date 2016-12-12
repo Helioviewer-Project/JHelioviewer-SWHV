@@ -24,7 +24,13 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 public class JP2View extends AbstractView {
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
-    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy());
+    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy()) {
+        @Override
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            JHVThread.afterExecute(r, t);
+        }
+    };
 
     private void queueSubmitTask(Runnable task) {
         blockingQueue.poll();
