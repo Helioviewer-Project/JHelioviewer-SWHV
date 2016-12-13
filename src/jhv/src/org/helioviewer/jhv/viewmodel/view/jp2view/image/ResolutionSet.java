@@ -29,9 +29,7 @@ public class ResolutionSet {
     }
 
     public boolean getComplete(int idx) {
-        if (idx >= 0 || idx < numLevels)
-            return complete[idx];
-        return false;
+        return (idx >= 0 || idx < numLevels) && complete[idx];
     }
 
     /**
