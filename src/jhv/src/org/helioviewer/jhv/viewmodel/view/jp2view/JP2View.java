@@ -46,8 +46,6 @@ public class JP2View extends AbstractView {
     private long frameCountStart;
     private float frameRate;
 
-    private boolean stopRender = false;
-
     private MetaData[] metaDataArray;
     private int maximumFrame;
 
@@ -84,8 +82,9 @@ public class JP2View extends AbstractView {
 
     @Override
     public void abolish() {
+        if (isAbolished)
+            return;
         isAbolished = true;
-        stopRender = true;
 
         executor.shutdown();
         new Thread(() -> {
@@ -103,14 +102,9 @@ public class JP2View extends AbstractView {
     // if instance was built before cancelling
     @Override
     protected void finalize() throws Throwable {
-        if (!isAbolished) {
-            EventQueue.invokeLater(() -> {
-                abolish();
-                try {
-                    super.finalize();
-                } catch (Throwable ignore) {}
-            });
-        } else {
+        try {
+            abolish();
+        } finally {
             super.finalize();
         }
     }
@@ -275,7 +269,7 @@ public class JP2View extends AbstractView {
 
     private void signalRender(JP2Image jp2Image, double factor) {
         // from reader on EDT, might come after abolish
-        if (stopRender || jp2Image == null)
+        if (isAbolished /*|| jp2Image == null*/)
             return;
 
         // order is important, this will signal reader
