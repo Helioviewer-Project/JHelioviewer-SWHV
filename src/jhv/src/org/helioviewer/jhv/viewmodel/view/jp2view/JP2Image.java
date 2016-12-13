@@ -327,29 +327,25 @@ public class JP2Image {
         return imageCacheStatus.getResolutionSet(frame);
     }
 
-    private volatile boolean isAbolished = false;
-
     // if instance was built before cancelling
     @Override
     protected void finalize() throws Throwable {
-        if (!isAbolished) {
-            EventQueue.invokeLater(() -> {
-                abolish();
-                try {
-                    super.finalize();
-                } catch (Throwable ignore) {}
-            });
-        } else {
+        try {
+            abolish();
+        } finally {
             super.finalize();
         }
     }
 
+    private volatile boolean isAbolished = false;
     /**
      * Closes the image out. Destroys all objects and performs cleanup
      * operations. I use the 'abolish' name to distinguish it from what the
      * Kakadu library uses.
      */
     void abolish() {
+        if (isAbolished)
+            return;
         isAbolished = true;
 
         new Thread(() -> {
