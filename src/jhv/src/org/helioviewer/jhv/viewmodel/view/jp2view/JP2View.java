@@ -278,7 +278,7 @@ public class JP2View extends AbstractView {
         if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) // avoid empty image at startup
             return;
 
-        queueSubmitTask(new J2KRender(this, imageViewParams, status));
+        queueSubmitTask(new J2KRender(this, imageViewParams, status != CacheStatus.COMPLETE));
     }
 
     @Override

@@ -13,7 +13,6 @@ import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -34,26 +33,23 @@ class J2KRender implements Runnable {
     // A reference to the JP2Image this object is owned by
     private final JP2Image parentImageRef;
 
-    private final CacheStatus cacheStatus;
-
     // A reference to the JP2View this object is owned by
     private final JP2View parentViewRef;
 
     private final JP2ImageParameter params;
 
-    J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams, CacheStatus _cacheStatus) {
+    private final boolean discard;
+
+    J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams, boolean _discard) {
         parentViewRef = _parentViewRef;
         params = _currParams;
         parentImageRef = params.jp2Image;
-        cacheStatus = _cacheStatus;
+        discard = _discard;
     }
 
     private void renderLayer(Kdu_region_compositor compositor) throws KduException {
         int numLayer = params.compositionLayer;
         int numComponents = params.components;
-
-        // compositor.Refresh();
-        // compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
         Kdu_ilayer_ref ilayer;
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
@@ -124,7 +120,7 @@ class J2KRender implements Runnable {
         }
 
         compositorBuf.Native_destroy();
-        compositor.Remove_ilayer(ilayer, cacheStatus != CacheStatus.COMPLETE);
+        compositor.Remove_ilayer(ilayer, discard);
 
         ImageData imdata;
         if (numComponents < 3) {

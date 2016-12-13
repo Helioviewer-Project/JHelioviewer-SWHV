@@ -30,21 +30,17 @@ public class JavaHelioViewer {
             System.out.println(CommandLineProcessor.getUsageMessage());
             return;
         }
+
         // Uncaught runtime errors are displayed in a dialog box in addition
         JHVUncaughtExceptionHandler.setupHandlerForThread();
-
         // Save command line arguments
         CommandLineProcessor.setArguments(args);
-
         // Save current default system timezone in user.timezone
         System.setProperty("user.timezone", TimeZone.getDefault().getID());
-
         // Per default all times should be given in GMT
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-
         // Save current default locale to user.locale
         System.setProperty("user.locale", Locale.getDefault().toString());
-
         // Per default, the us locale should be used
         Locale.setDefault(Locale.US);
 
@@ -60,25 +56,17 @@ public class JavaHelioViewer {
 
         // This attempts to create the necessary directories for the application
         JHVGlobals.createDirs();
-
         // Save the log settings. Must be done AFTER the directories are created
         logSettings.update();
-
         // Read the version and revision from the JAR metafile
         JHVGlobals.determineVersionAndRevision();
-
-        Log.info("Initializing JHelioviewer");
         // Load settings from file but do not apply them yet
         // The settings must not be applied before the kakadu engine has been initialized
         Settings.getSingletonInstance().load(false);
-
         // Set the platform system properties
         SystemProperties.setPlatform();
-        Log.info("OS: " + System.getProperty("jhv.os") + " - arch: " + System.getProperty("jhv.arch") + " - java arch: " + System.getProperty("jhv.java.arch"));
-
         System.setProperty("newt.window.icons", "null,null");
 
-        Log.debug("Instantiate Kakadu engine");
         try {
             JHVLoader.copyKDULibs();
             KakaduMessageSystem.startKduMessageSystem();
