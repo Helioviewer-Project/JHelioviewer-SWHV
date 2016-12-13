@@ -101,8 +101,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             @Override
             public void componentResized(ComponentEvent e) {
                 // force cache invalidation by temporarily setting fixed height
-                ((JList) e.getComponent()).setFixedCellHeight(10);
-                ((JList) e.getComponent()).setFixedCellHeight(-1);
+                ((JList<?>) e.getComponent()).setFixedCellHeight(10);
+                ((JList<?>) e.getComponent()).setFixedCellHeight(-1);
             }
         };
         jhBox.addComponentListener(cl);
