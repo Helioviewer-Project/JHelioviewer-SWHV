@@ -20,12 +20,14 @@ import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduConstants;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 class J2KRender implements Runnable {
 
     private static final ThreadLocal<int[]> bufferLocal = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
-    private static final ThreadLocal<Kdu_thread_env> threadEnv = ThreadLocal.withInitial(J2KRender::createThreadEnv);
+    private static final ThreadLocal<Kdu_thread_env> threadLocal = ThreadLocal.withInitial(J2KRender::createThreadEnv);
+    private static final ThreadLocal<KakaduEngine> engineLocal = new ThreadLocal<KakaduEngine>();
 
     private static final int[] firstComponent = { 0 };
 
@@ -145,10 +147,15 @@ class J2KRender implements Runnable {
     @Override
     public void run() {
         try {
-            renderLayer(parentImageRef.getRenderEngine(threadEnv.get()).getCompositor());
+            KakaduEngine kduEngine = engineLocal.get();
+            if (kduEngine == null) {
+                kduEngine = parentImageRef.getRenderEngine(threadLocal.get());
+                engineLocal.set(kduEngine);
+            }
+            renderLayer(kduEngine.getCompositor());
         } catch (Exception e) {
             // reboot the compositor
-            parentImageRef.destroyRenderEngine();
+            engineLocal.set(null);
             e.printStackTrace();
         }
     }

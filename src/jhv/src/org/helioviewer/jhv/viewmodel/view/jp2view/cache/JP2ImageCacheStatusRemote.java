@@ -38,7 +38,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
         }
 
         imageStatus[compositionLayer] = newStatus;
-        if (newStatus == CacheStatus.COMPLETE)
+        if (newStatus == CacheStatus.COMPLETE && resolutionSet[compositionLayer] != null)
             resolutionSet[compositionLayer].setComplete(level);
     }
 
