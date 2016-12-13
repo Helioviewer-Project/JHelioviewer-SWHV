@@ -193,11 +193,8 @@ public class JP2Image {
         return kduRender;
     }
 
-    void destroyRenderEngine() throws KduException {
-        if (kduRender != null) {
-            kduRender.destroy();
-            kduRender = null;
-        }
+    void destroyRenderEngine() {
+        kduRender = null;
     }
 
     void startReader(JP2View view) {
@@ -366,12 +363,9 @@ public class JP2Image {
 
     private void kduDestroy() {
         try {
-            destroyRenderEngine();
+            kduRender = null;
+            kduReader = null;
 
-            if (kduReader != null) {
-                kduReader.destroy();
-                kduReader = null;
-            }
             if (cacheRender != null) {
                 cacheRender.Close();
                 cacheRender.Native_destroy();
@@ -417,7 +411,6 @@ public class JP2Image {
         try {
             KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri);
             xml = KakaduUtils.getXml(kduTmp.getFamilySrc(), boxNumber);
-            kduTmp.destroy();
         } catch (Exception e) {
             e.printStackTrace();
         }

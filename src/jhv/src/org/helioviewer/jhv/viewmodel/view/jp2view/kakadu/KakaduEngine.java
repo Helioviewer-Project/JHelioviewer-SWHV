@@ -43,17 +43,21 @@ public class KakaduEngine {
         return compositor;
     }
 
-    public void destroy() throws KduException {
-        destroyCompositor(compositor);
-        if (jpxSrc != null) {
-            if (jpxSrc.Exists())
-                jpxSrc.Close();
-            jpxSrc.Native_destroy();
-        }
-        if (familySrc != null) {
-            if (familySrc.Exists())
-                familySrc.Close();
-            familySrc.Native_destroy();
+    public void finalize() throws Throwable {
+        try {
+            destroyCompositor(compositor);
+            if (jpxSrc != null) {
+                if (jpxSrc.Exists())
+                    jpxSrc.Close();
+                jpxSrc.Native_destroy();
+            }
+            if (familySrc != null) {
+                if (familySrc.Exists())
+                    familySrc.Close();
+                familySrc.Native_destroy();
+            }
+        } finally {
+            super.finalize();
         }
     }
 
