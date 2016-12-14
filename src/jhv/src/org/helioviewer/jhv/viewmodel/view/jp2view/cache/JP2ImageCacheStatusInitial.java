@@ -30,12 +30,17 @@ public class JP2ImageCacheStatusInitial implements JP2ImageCacheStatus {
     }
 
     @Override
-    public ResolutionSet getResolutionSet(int compositionLayer) {
+    public ResolutionSet getResolutionSet(int frame) {
         return null;
     }
 
     @Override
     public boolean levelComplete(int level) {
+        return false;
+    }
+
+    @Override
+    public boolean imageComplete(int frame, int level) {
         return false;
     }
 

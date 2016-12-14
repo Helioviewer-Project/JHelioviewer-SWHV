@@ -74,12 +74,12 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     }
 
     @Override
-    public ResolutionSet getResolutionSet(int compositionLayer) {
-        if (resolutionSet[compositionLayer] == null) {
-            Log.error("resolutionSet[" + compositionLayer + "] null"); // never happened?
+    public ResolutionSet getResolutionSet(int frame) {
+        if (resolutionSet[frame] == null) {
+            Log.error("resolutionSet[" + frame + "] null"); // never happened?
             return resolutionSet[0];
         }
-        return resolutionSet[compositionLayer];
+        return resolutionSet[frame];
     }
 
     @Override
@@ -97,5 +97,10 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     }
 
     private boolean fullyComplete;
+
+    @Override
+    public boolean imageComplete(int frame, int level) {
+        return resolutionSet[frame].getComplete(level);
+    }
 
 }

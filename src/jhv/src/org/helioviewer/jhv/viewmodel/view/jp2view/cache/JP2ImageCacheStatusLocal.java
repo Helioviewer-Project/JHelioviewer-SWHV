@@ -31,12 +31,17 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
     }
 
     @Override
-    public ResolutionSet getResolutionSet(int compositionLayer) {
-        return resolutionSet[compositionLayer];
+    public ResolutionSet getResolutionSet(int frame) {
+        return resolutionSet[frame];
     }
 
     @Override
     public boolean levelComplete(int level) {
+        return true;
+    }
+
+    @Override
+    public boolean imageComplete(int frame, int level) {
         return true;
     }
 

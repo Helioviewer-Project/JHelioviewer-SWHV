@@ -11,8 +11,10 @@ public interface JP2ImageCacheStatus extends ImageCacheStatus {
     // Returns the highest frame until which the status is at least PARTIAL
     int getImageCachedPartiallyUntil();
 
-    ResolutionSet getResolutionSet(int compositionLayer);
+    ResolutionSet getResolutionSet(int frame);
 
     boolean levelComplete(int level);
+
+    boolean imageComplete(int frame, int level);
 
 }
