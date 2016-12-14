@@ -17,7 +17,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.LoadRemoteTask;
@@ -74,8 +73,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private ImageLayer() {
         optionsPanel = new ImageLayerOptions(this);
-        ComponentUtils.setEnabled(optionsPanel, false);
-        setVisible(true);
     }
 
     @Override
@@ -114,6 +111,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         view = _view;
         worker = null; // drop reference
 
+        setVisible(true); // enable optionsPanel
+
         view.setImageLayer(this);
         view.setDataHandler(this);
         Layers.addLayer(view);
@@ -135,11 +134,9 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             optionsPanel.setOpacity(opacity);
         }
         optionsPanel.setLUT(view.getDefaultLUT());
-        ComponentUtils.setEnabled(optionsPanel, true);
     }
 
     private void unsetView() {
-        ComponentUtils.setEnabled(optionsPanel, false);
         if (view != null) {
             Layers.removeLayer(view);
             view.setDataHandler(null);
