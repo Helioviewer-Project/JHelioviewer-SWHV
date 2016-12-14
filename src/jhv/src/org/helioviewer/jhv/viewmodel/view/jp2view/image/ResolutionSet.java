@@ -53,7 +53,7 @@ public class ResolutionSet {
         return resolutions[numLevels - 1];
     }
 
-    public static class ResolutionLevel {
+    public static class ResolutionLevel implements Comparable<ResolutionLevel> {
 
         public final int level;
         public final float scaleLevel;
@@ -91,6 +91,13 @@ public class ResolutionSet {
         @Override
         public String toString() {
             return "[[Discard=" + level + "][ScaleFactor=" + factorX + "," + factorY + "][ZoomDims=" + width + "," + height + "]]";
+        }
+
+        @Override
+        public int compareTo(ResolutionLevel r) {
+            assert width == r.width && height == r.height && factorX == r.factorX && factorY == r.factorY : "not comparable";
+            int diff = level - r.level;
+            return diff > 0 ? -1 : (diff < 0 ? +1 : 0);
         }
 
     }
