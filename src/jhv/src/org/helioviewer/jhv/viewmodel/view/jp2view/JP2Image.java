@@ -77,8 +77,6 @@ public class JP2Image {
      * @param _downloadURI
      *            In case the file should be downloaded to the local filesystem,
      *            use this URI as the source.
-     * @throws IOException
-     * @throws JHV_KduException
      */
     public JP2Image(URI _uri, URI _downloadURI) throws Exception {
         uri = _uri;
@@ -139,13 +137,6 @@ public class JP2Image {
         }
     }
 
-    /**
-     * Initializes the Jp2_family_src for a remote file. (JPIP comms
-     * happen here).
-     *
-     * @throws JHV_KduException
-     * @throws IOException
-     */
     private void initRemote(JHV_Kdu_cache cache, JP2ImageCacheStatus status) throws JHV_KduException {
         try {
             // Connect to the JPIP server and add the necessary initial data (the main header as well as the metadata) to cache
@@ -247,7 +238,7 @@ public class JP2Image {
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
 
         boolean viewChanged = oldImageViewParams == null || imageViewParams.resolution.compareTo(oldImageViewParams.resolution) > 0;
-        boolean complete = imageCacheStatus.levelComplete(res.discardLayers);
+        boolean complete = imageCacheStatus.levelComplete(res.level);
         if (!complete && viewChanged) {
             imageViewParams.downgrade = true;
             imageCacheStatus.downgradeImageStatus(0, frameCount - 1);
@@ -259,23 +250,10 @@ public class JP2Image {
         return imageViewParams;
     }
 
-    /**
-     * Returns the URI representing the location of the image.
-     *
-     * @return URI representing the location of the image.
-     */
     URI getURI() {
         return uri;
     }
 
-    /**
-     * Returns the download uri the image.
-     *
-     * This is the uri from which the whole file can be downloaded and stored
-     * locally
-     *
-     * @return download uri
-     */
     public URI getDownloadURI() {
         return downloadURI;
     }
