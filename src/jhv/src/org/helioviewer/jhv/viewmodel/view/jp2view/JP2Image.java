@@ -292,7 +292,7 @@ public class JP2Image {
         return imageCacheStatus.getResolutionSet(frame).getResolutionLevel(level);
     }
 
-    public int getNumComponents(int frame) {
+    protected int getNumComponents(int frame) {
         return imageCacheStatus.getResolutionSet(frame).numComps;
     }
 
