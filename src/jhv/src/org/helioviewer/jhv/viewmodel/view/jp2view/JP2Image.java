@@ -28,7 +28,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusIniti
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemote;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
@@ -289,12 +288,12 @@ public class JP2Image {
         return frameCount - 1;
     }
 
-    /**
-     * Gets the ResolutionSet object that contains the Resolution level
-     * information.
-     */
-    public ResolutionSet getResolutionSet(int frame) {
-        return imageCacheStatus.getResolutionSet(frame);
+    public ResolutionLevel getResolutionLevel(int frame, int level) {
+        return imageCacheStatus.getResolutionSet(frame).getResolutionLevel(level);
+    }
+
+    public int getNumComponents(int frame) {
+        return imageCacheStatus.getResolutionSet(frame).numComps;
     }
 
     // if instance was built before cancelling

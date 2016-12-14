@@ -26,7 +26,7 @@ class J2KRender implements Runnable {
 
     private static final ThreadLocal<int[]> bufferLocal = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
     private static final ThreadLocal<Kdu_thread_env> threadLocal = ThreadLocal.withInitial(J2KRender::createThreadEnv);
-    private static final ThreadLocal<KakaduEngine> engineLocal = new ThreadLocal<KakaduEngine>();
+    private static final ThreadLocal<KakaduEngine> engineLocal = new ThreadLocal<>();
 
     private static final int[] firstComponent = { 0 };
 
