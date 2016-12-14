@@ -194,6 +194,8 @@ public class JP2Image {
             reader.signalReader(params);
     }
 
+    private JP2ImageParameter oldImageViewParams;
+
     // Recalculates the image parameters used within the jp2-package
     JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
         MetaData m = metaDataList[frame];
@@ -235,12 +237,16 @@ public class JP2Image {
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
 
+        boolean viewChanged = oldImageViewParams == null || imageViewParams.resolution.compareTo(oldImageViewParams.resolution) > 0;
         boolean complete = imageCacheStatus.levelComplete(res.level);
-        if (!complete) {
+        if (!complete && viewChanged) {
             imageViewParams.downgrade = true;
             imageCacheStatus.downgradeImageStatus(0, frameCount - 1);
             signalReader(imageViewParams);
         }
+
+        oldImageViewParams = imageViewParams;
+
         return imageViewParams;
     }
 
