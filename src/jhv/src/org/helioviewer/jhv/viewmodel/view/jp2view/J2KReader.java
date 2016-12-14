@@ -275,6 +275,15 @@ class J2KReader implements Runnable {
                     if (!complete && !stopReading && singleFrame) {
                         readerSignal.signal(currParams);
                     }
+
+                    // suicide
+                    if (cacheStatusRef.levelComplete(0)) {
+                        try {
+                            socket.close();
+                        } catch (IOException ignore) {
+                        }
+                        return;
+                    }
                  } catch (IOException e) {
                     if (verbose) {
                         e.printStackTrace();
