@@ -7,8 +7,6 @@ public interface JP2ImageCacheStatus extends ImageCacheStatus {
 
     ResolutionSet getResolutionSet(int compositionLayer);
 
-    boolean currentComplete();
-
     boolean levelComplete(int level);
 
 }

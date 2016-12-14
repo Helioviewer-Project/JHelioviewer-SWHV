@@ -197,10 +197,13 @@ class J2KReader implements Runnable {
                     if (socket.isClosed())
                         reconnect();
 
+                    int frame = currParams.compositionLayer;
+                    int level = currParams.resolution.level;
+
                     // choose cache strategy
                     boolean singleFrame = false;
                     if (num_layers <= 1 /* one frame */ ||
-                       (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(currParams.compositionLayer) != CacheStatus.COMPLETE)) {
+                       (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(frame) != CacheStatus.COMPLETE)) {
                         singleFrame = true;
                     }
 
@@ -217,7 +220,7 @@ class J2KReader implements Runnable {
                         if (partial < num_layers - 1)
                             current_step = partial / JPIPConstants.MAX_REQ_LAYERS;
                         else
-                            current_step = currParams.compositionLayer / JPIPConstants.MAX_REQ_LAYERS;
+                            current_step = frame / JPIPConstants.MAX_REQ_LAYERS;
                     }
 
                     lastResponseTime = -1;
@@ -247,10 +250,9 @@ class J2KReader implements Runnable {
                             complete_steps++;
                             stepQuerys[current_step] = null;
 
-                            int level = currParams.resolution.level;
                             // tell the cache status
                             if (singleFrame) {
-                                cacheStatusRef.setImageStatus(currParams.compositionLayer, level, CacheStatus.COMPLETE);
+                                cacheStatusRef.setImageStatus(frame, level, CacheStatus.COMPLETE);
                                 signalRender(currParams.factor);
                             } else {
                                 for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++)
@@ -269,7 +271,7 @@ class J2KReader implements Runnable {
                         }
                     }
 
-                    complete = cacheStatusRef.currentComplete();
+                    complete = cacheStatusRef.levelComplete(level);
                     // if incomplete && not interrupted && single frame -> signal again to go on reading
                     if (!complete && !stopReading && singleFrame) {
                         readerSignal.signal(currParams);
