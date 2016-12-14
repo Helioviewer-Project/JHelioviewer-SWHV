@@ -202,8 +202,7 @@ class J2KReader implements Runnable {
 
                     // choose cache strategy
                     boolean singleFrame = false;
-                    if (num_layers <= 1 /* one frame */ ||
-                       (!Layers.isMoviePlaying() /*! */ && !cacheStatusRef.imageComplete(frame, level))) {
+                    if (num_layers <= 1 /* one frame */ || (!Layers.isMoviePlaying() /*! */ && !cacheStatusRef.imageComplete(frame, level))) {
                         singleFrame = true;
                     }
 

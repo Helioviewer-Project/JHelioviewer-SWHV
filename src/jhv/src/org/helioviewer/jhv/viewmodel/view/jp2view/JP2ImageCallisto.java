@@ -24,14 +24,14 @@ public class JP2ImageCallisto extends JP2Image {
 
     @Override
     protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
-        return calculateParameter(0, factor);
+        return calculateParameter(frame, factor);
     }
 
     private JP2ImageParameter calculateParameter(int frame, double factor) {
-        ResolutionLevel res = getResolutionSet(frame).getResolutionLevel(0);
+        ResolutionLevel res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, null, subImage, res, frame, getResolutionSet(frame).numComps, factor);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, null, subImage, res, frame, getNumComponents(frame), factor);
         signalReader(imageViewParams);
 
         return imageViewParams;
