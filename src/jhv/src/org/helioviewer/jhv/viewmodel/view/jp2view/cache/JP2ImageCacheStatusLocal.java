@@ -22,6 +22,15 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
     }
 
     @Override
+    public void downgradeImageStatus(int startFrame, int endFrame) {
+    }
+
+    @Override
+    public int getImageCachedPartiallyUntil() {
+        return maxFrameNumber;
+    }
+
+    @Override
     public ResolutionSet getResolutionSet(int compositionLayer) {
         return resolutionSet[compositionLayer];
     }
