@@ -10,9 +10,6 @@ package org.helioviewer.jhv.viewmodel.imagecache;
  * partial image information, which means the image can be shown, but not yet in
  * full quality, and a complete image information, which means the image can be
  * shown in full quality.
- * 
- * @author Markus Langenberg
- * 
  */
 public interface ImageCacheStatus {
 
@@ -31,14 +28,6 @@ public interface ImageCacheStatus {
     void setImageStatus(int compositionLayer, int level, CacheStatus newStatus);
 
     /**
-     * Downgrades the status from complete to partial, if necessary.
-     * 
-     * This function may be called during zooming or panning, when entering
-     * areas that have not been loaded so far.
-     */
-    void downgradeImageStatus(int startFrame, int endFrame);
-
-    /**
      * Returns the image cache status of the given layer.
      * 
      * @param compositionLayer
@@ -46,12 +35,5 @@ public interface ImageCacheStatus {
      * @return Image cache status
      */
     CacheStatus getImageStatus(int compositionLayer);
-
-    /**
-     * Returns the highest frame until which the status is at least PARTIAL.
-     * 
-     * @return highest frame until which the status is at least PARTIAL.
-     */
-    int getImageCachedPartiallyUntil();
 
 }
