@@ -27,11 +27,6 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
     }
 
     @Override
-    public boolean currentComplete() {
-        return true;
-    }
-
-    @Override
     public boolean levelComplete(int level) {
         return true;
     }

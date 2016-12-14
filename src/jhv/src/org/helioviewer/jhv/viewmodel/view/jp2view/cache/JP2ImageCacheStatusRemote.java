@@ -83,15 +83,6 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     }
 
     @Override
-    public boolean currentComplete() {
-        for (int i = 0; i <= maxFrameNumber; i++) {
-            if (imageStatus[i] != CacheStatus.COMPLETE)
-                return false;
-        }
-        return true;
-    }
-
-    @Override
     public boolean levelComplete(int level) {
         if (fullyComplete)
             return true;

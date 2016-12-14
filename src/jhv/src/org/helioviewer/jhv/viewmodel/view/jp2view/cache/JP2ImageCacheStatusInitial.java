@@ -35,11 +35,6 @@ public class JP2ImageCacheStatusInitial implements JP2ImageCacheStatus {
     }
 
     @Override
-    public boolean currentComplete() {
-        return false;
-    }
-
-    @Override
     public boolean levelComplete(int level) {
         return false;
     }
