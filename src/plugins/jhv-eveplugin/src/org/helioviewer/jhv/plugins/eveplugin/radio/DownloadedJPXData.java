@@ -69,6 +69,7 @@ class DownloadedJPXData implements ImageDataHandler {
 
         downloadJPXFailed = true;
         startDate = start;
+        endDate = start + TimeUtils.DAY_IN_MILLIS;
     }
 
     long getStartDate() {
