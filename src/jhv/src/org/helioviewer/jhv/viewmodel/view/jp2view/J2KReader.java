@@ -181,8 +181,6 @@ class J2KReader implements Runnable {
 
     @Override
     public void run() {
-        boolean complete = false;
-
         while (!stop) {
             JP2ImageParameter currParams;
             // wait for signal
@@ -192,113 +190,109 @@ class J2KReader implements Runnable {
                 continue;
             }
 
-            if (!complete || currParams.downgrade) {
-                try {
-                    if (socket.isClosed())
-                        reconnect();
+            try {
+                if (socket.isClosed())
+                    reconnect();
 
-                    int frame = currParams.compositionLayer;
-                    int level = currParams.resolution.level;
+                int frame = currParams.compositionLayer;
+                int level = currParams.resolution.level;
 
-                    // choose cache strategy
-                    boolean singleFrame = false;
-                    if (num_layers <= 1 /* one frame */ || (!Layers.isMoviePlaying() /*! */ && !cacheStatusRef.imageComplete(frame, level))) {
-                        singleFrame = true;
-                    }
+                // choose cache strategy
+                boolean singleFrame = false;
+                if (num_layers <= 1 /* one frame */ || (!Layers.isMoviePlaying() /*! */ && !cacheStatusRef.imageComplete(frame, level))) {
+                    singleFrame = true;
+                }
 
-                    // build query based on strategy
-                    int current_step;
-                    String[] stepQuerys;
-                    if (singleFrame) {
-                        stepQuerys = createSingleQuery(currParams);
+                // build query based on strategy
+                int current_step;
+                String[] stepQuerys;
+                if (singleFrame) {
+                    stepQuerys = createSingleQuery(currParams);
+                    current_step = 0;
+                } else {
+                    stepQuerys = createMultiQuery(currParams);
+
+                    int partial = cacheStatusRef.getImageCachedPartiallyUntil();
+                    if (partial < num_layers - 1)
+                        current_step = partial / JPIPConstants.MAX_REQ_LAYERS;
+                    else
+                        current_step = frame / JPIPConstants.MAX_REQ_LAYERS;
+                }
+
+                lastResponseTime = -1;
+
+                // send queries until everything is complete or caching is interrupted
+                int complete_steps = 0;
+                boolean stopReading = false;
+                while (!stopReading && complete_steps < stepQuerys.length) {
+                    if (current_step >= stepQuerys.length)
                         current_step = 0;
-                    } else {
-                        stepQuerys = createMultiQuery(currParams);
 
-                        int partial = cacheStatusRef.getImageCachedPartiallyUntil();
-                        if (partial < num_layers - 1)
-                            current_step = partial / JPIPConstants.MAX_REQ_LAYERS;
-                        else
-                            current_step = frame / JPIPConstants.MAX_REQ_LAYERS;
+                    // if query is already complete, go to next step
+                    if (stepQuerys[current_step] == null) {
+                        current_step++;
+                        continue;
                     }
 
-                    lastResponseTime = -1;
+                    // update requested package size
+                    socket.send(stepQuerys[current_step] + "len=" + jpipRequestLen);
+                    // receive and add data to cache
+                    JPIPResponse res = socket.receive(cacheRef, cacheStatusRef);
+                    // update optimal package size
+                    flowControl();
+                    // react if query complete
+                    if (res.isResponseComplete()) {
+                        // mark query as complete
+                        complete_steps++;
+                        stepQuerys[current_step] = null;
 
-                    // send queries until everything is complete or caching is interrupted
-                    int complete_steps = 0;
-                    boolean stopReading = false;
-                    while (!stopReading && complete_steps < stepQuerys.length) {
-                        if (current_step >= stepQuerys.length)
-                            current_step = 0;
-
-                        // if query is already complete, go to next step
-                        if (stepQuerys[current_step] == null) {
-                            current_step++;
-                            continue;
-                        }
-
-                        // update requested package size
-                        socket.send(stepQuerys[current_step] + "len=" + jpipRequestLen);
-                        // receive and add data to cache
-                        JPIPResponse res = socket.receive(cacheRef, cacheStatusRef);
-                        // update optimal package size
-                        flowControl();
-                        // react if query complete
-                        if (res.isResponseComplete()) {
-                            // mark query as complete
-                            complete_steps++;
-                            stepQuerys[current_step] = null;
-
-                            // tell the cache status
-                            if (singleFrame) {
-                                cacheStatusRef.setVisibleStatus(frame, CacheStatus.COMPLETE);
-                                cacheStatusRef.setImageComplete(frame, level);
-                                signalRender(currParams.factor);
-                            } else {
-                                for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
-                                    cacheStatusRef.setVisibleStatus(j, CacheStatus.COMPLETE);
-                                    cacheStatusRef.setImageComplete(j, level);
-                                }
+                        // tell the cache status
+                        if (singleFrame) {
+                            cacheStatusRef.setVisibleStatus(frame, CacheStatus.COMPLETE);
+                            cacheStatusRef.setImageComplete(frame, level);
+                            signalRender(currParams.factor);
+                        } else {
+                            for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
+                                cacheStatusRef.setVisibleStatus(j, CacheStatus.COMPLETE);
+                                cacheStatusRef.setImageComplete(j, level);
                             }
                         }
-                        MoviePanel.cacheStatusChanged();
-
-                        // select next query based on strategy
-                        if (!singleFrame)
-                            current_step++;
-
-                        // check whether caching has to be interrupted
-                        if (readerSignal.isSignaled() || Thread.interrupted()) {
-                            stopReading = true;
-                        }
                     }
+                    MoviePanel.cacheStatusChanged();
 
-                    complete = cacheStatusRef.levelComplete(level);
-                    // if incomplete && not interrupted && single frame -> signal again to go on reading
-                    if (!complete && !stopReading && singleFrame) {
-                        readerSignal.signal(currParams);
-                    }
+                    // select next query based on strategy
+                    if (!singleFrame)
+                        current_step++;
 
-                    // suicide
-                    if (cacheStatusRef.levelComplete(0)) {
-                        try {
-                            socket.close();
-                        } catch (IOException ignore) {
-                        }
-                        return;
+                    // check whether caching has to be interrupted
+                    if (readerSignal.isSignaled() || Thread.interrupted()) {
+                        stopReading = true;
                     }
-                 } catch (IOException e) {
-                    if (verbose) {
-                        e.printStackTrace();
-                    }
+                }
+                // suicide if fully done
+                if (cacheStatusRef.levelComplete(0)) {
                     try {
                         socket.close();
-                    } catch (IOException ioe) {
-                        Log.error("J2KReader.run() > Error closing socket", ioe);
+                    } catch (IOException ignore) {
                     }
-                    // Send signal to try again
+                    return;
+                }
+
+                // if incomplete && not interrupted && single frame -> signal again to go on reading
+                if (!cacheStatusRef.levelComplete(level) && !stopReading && singleFrame) {
                     readerSignal.signal(currParams);
                 }
+             } catch (IOException e) {
+                if (verbose) {
+                    e.printStackTrace();
+                }
+                try {
+                    socket.close();
+                } catch (IOException ioe) {
+                    Log.error("J2KReader.run() > Error closing socket", ioe);
+                }
+                // Send signal to try again
+                readerSignal.signal(currParams);
             }
         }
     }
