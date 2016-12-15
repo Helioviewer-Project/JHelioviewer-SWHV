@@ -43,7 +43,8 @@ public class KakaduEngine {
         return compositor;
     }
 
-    public void finalize() throws Throwable {
+    @Override
+    protected void finalize() throws Throwable {
         try {
             destroyCompositor(compositor);
             if (jpxSrc != null) {

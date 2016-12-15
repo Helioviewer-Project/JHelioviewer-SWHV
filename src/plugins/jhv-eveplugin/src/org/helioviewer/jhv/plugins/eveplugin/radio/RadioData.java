@@ -110,8 +110,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
             Entry<Long, DownloadedJPXData> entry = it.next();
             Long key = entry.getKey();
             if (!incomingStartDates.contains(key)) {
-                DownloadedJPXData jpxData = entry.getValue();
-                jpxData.remove();
+                entry.getValue().remove();
                 it.remove();
             }
         }
@@ -270,14 +269,12 @@ public class RadioData extends AbstractLineDataSelectorElement {
         protected ArrayList<JP2ViewCallisto> backgroundWork() {
             ArrayList<JP2ViewCallisto> jpList = new ArrayList<>();
             for (long date : datesToDownload) {
-                JP2ViewCallisto v = null;
                 try {
                     APIRequest req = new APIRequest("ROB", CallistoID, date, date, APIRequest.CADENCE_ANY);
-                    v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(req);
+                    jpList.add((JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(req));
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file: " + e.getMessage());
                 }
-                jpList.add(v);
             }
             return jpList;
         }
