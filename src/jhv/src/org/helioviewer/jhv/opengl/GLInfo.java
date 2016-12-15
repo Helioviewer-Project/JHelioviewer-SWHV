@@ -12,6 +12,7 @@ import com.jogamp.opengl.glu.GLU;
 public class GLInfo {
 
     public static final int GLSAMPLES = 4;
+    private static final String[] crashOptions = { "OK", "Crash" };
 
     public static int[] pixelScale = { 1, 1 };
     public static float[] pixelScaleFloat = { 1, 1 };
@@ -31,8 +32,7 @@ public class GLInfo {
                 String err = "OpenGL 2.1 not supported. JHelioviewer is not able to run.";
                 Log.error("GLInfo > " + err);
 
-                Object[] options = { "OK", "Crash" };
-                if (1 == JOptionPane.showOptionDialog(null, err, "Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]))
+                if (1 == JOptionPane.showOptionDialog(null, err, "Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, crashOptions, crashOptions[0]))
                     throw new GLException(err);
                 else
                     System.exit(-1);
