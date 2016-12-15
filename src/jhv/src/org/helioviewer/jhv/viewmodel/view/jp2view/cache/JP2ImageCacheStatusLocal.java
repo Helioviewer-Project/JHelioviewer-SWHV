@@ -11,11 +11,11 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
 
     private final ResolutionSet[] resolutionSet;
 
-    public JP2ImageCacheStatusLocal(Kdu_region_compositor compositor, int _maxFrameNumber) throws KduException {
-        super(_maxFrameNumber);
+    public JP2ImageCacheStatusLocal(Kdu_region_compositor compositor, int _maxFrame) throws KduException {
+        super(_maxFrame);
 
-        resolutionSet = new ResolutionSet[_maxFrameNumber + 1];
-        for (int i = 0; i <= _maxFrameNumber; ++i) {
+        resolutionSet = new ResolutionSet[maxFrame + 1];
+        for (int i = 0; i <= maxFrame; ++i) {
             resolutionSet[i] = KakaduHelper.getResolutionSet(compositor, i);
             resolutionSet[i].setComplete(0);
         }
@@ -27,7 +27,7 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
 
     @Override
     public int getImageCachedPartiallyUntil() {
-        return maxFrameNumber;
+        return maxFrame;
     }
 
     @Override
@@ -43,6 +43,10 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
     @Override
     public boolean imageComplete(int frame, int level) {
         return true;
+    }
+
+    @Override
+    public void setImageComplete(int frame, int level) {
     }
 
 }

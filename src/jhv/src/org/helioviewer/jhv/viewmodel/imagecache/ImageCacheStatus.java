@@ -17,23 +17,8 @@ public interface ImageCacheStatus {
         HEADER, PARTIAL, COMPLETE
     }
 
-    /**
-     * Sets the image cache status of one composition layer.
-     *
-     * @param compositionLayer
-     *            Layer, whose status has changed
-     * @param newStatus
-     *            New image data cache status
-     */
-    void setImageStatus(int compositionLayer, int level, CacheStatus newStatus);
+    void setVisibleStatus(int frame, CacheStatus newStatus);
 
-    /**
-     * Returns the image cache status of the given layer.
-     * 
-     * @param compositionLayer
-     *            Layer to get the image cache status for
-     * @return Image cache status
-     */
-    CacheStatus getImageStatus(int compositionLayer);
+    CacheStatus getVisibleStatus(int frame);
 
 }

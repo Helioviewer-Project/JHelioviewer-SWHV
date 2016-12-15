@@ -251,11 +251,14 @@ class J2KReader implements Runnable {
 
                             // tell the cache status
                             if (singleFrame) {
-                                cacheStatusRef.setImageStatus(frame, level, CacheStatus.COMPLETE);
+                                cacheStatusRef.setVisibleStatus(frame, CacheStatus.COMPLETE);
+                                cacheStatusRef.setImageComplete(frame, level);
                                 signalRender(currParams.factor);
                             } else {
-                                for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++)
-                                    cacheStatusRef.setImageStatus(j, level, CacheStatus.COMPLETE);
+                                for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
+                                    cacheStatusRef.setVisibleStatus(j, CacheStatus.COMPLETE);
+                                    cacheStatusRef.setImageComplete(j, level);
+                                }
                             }
                         }
                         MoviePanel.cacheStatusChanged();

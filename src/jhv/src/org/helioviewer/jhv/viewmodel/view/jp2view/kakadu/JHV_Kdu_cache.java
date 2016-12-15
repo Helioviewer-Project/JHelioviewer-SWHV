@@ -11,10 +11,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JPIPCache;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDataSegment;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
 
-/**
- * @author caplins
- * @author Juan Pablo
- */
 public class JHV_Kdu_cache extends Kdu_cache implements JPIPCache {
 
     public boolean isDataBinCompleted(JPIPDatabinClass binClass, int streamID, int binID) throws JHV_KduException {
@@ -37,10 +33,10 @@ public class JHV_Kdu_cache extends Kdu_cache implements JPIPCache {
 
         int compositionLayer = (int) data.codestreamID;
         if (compositionLayer >= 0) {
-            if (data.classID.kakaduClassID == KakaduConstants.KDU_PRECINCT_DATABIN && status.getImageStatus(compositionLayer) == CacheStatus.HEADER)
-                status.setImageStatus(compositionLayer, -1, CacheStatus.PARTIAL);
+            if (data.classID.kakaduClassID == KakaduConstants.KDU_PRECINCT_DATABIN && status.getVisibleStatus(compositionLayer) == CacheStatus.HEADER)
+                status.setVisibleStatus(compositionLayer, CacheStatus.PARTIAL);
             else if (data.isFinal && data.classID.kakaduClassID == KakaduConstants.KDU_MAIN_HEADER_DATABIN)
-                status.setImageStatus(compositionLayer, -1, CacheStatus.HEADER);
+                status.setVisibleStatus(compositionLayer, CacheStatus.HEADER);
         }
     }
 

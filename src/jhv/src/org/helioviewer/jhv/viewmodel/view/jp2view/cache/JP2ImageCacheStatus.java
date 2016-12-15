@@ -17,4 +17,6 @@ public interface JP2ImageCacheStatus extends ImageCacheStatus {
 
     boolean imageComplete(int frame, int level);
 
+    void setImageComplete(int frame, int level);
+
 }

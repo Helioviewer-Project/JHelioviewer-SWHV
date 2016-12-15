@@ -127,7 +127,7 @@ public class JP2View extends AbstractView {
 
     @Override
     public CacheStatus getImageCacheStatus(int frame) {
-        return _jp2Image.getImageCacheStatus().getImageStatus(frame);
+        return _jp2Image.getImageCacheStatus().getVisibleStatus(frame);
     }
 
     @Override
@@ -193,7 +193,7 @@ public class JP2View extends AbstractView {
     public void setFrame(JHVDate time) {
         int frame = getFrameNumber(time);
         if (frame != targetFrame) {
-            CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
+            CacheStatus status = _jp2Image.getImageCacheStatus().getVisibleStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE)
                 return;
             targetFrame = frame;
@@ -274,7 +274,7 @@ public class JP2View extends AbstractView {
 
         // order is important, this will signal reader
         JP2ImageParameter imageViewParams = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, factor);
-        CacheStatus status = jp2Image.getImageCacheStatus().getImageStatus(targetFrame);
+        CacheStatus status = jp2Image.getImageCacheStatus().getVisibleStatus(targetFrame);
         if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) // avoid empty image at startup
             return;
 
