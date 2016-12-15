@@ -126,7 +126,7 @@ public class JP2Image {
 
             if (cacheReader != null) { // remote
                 imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader.getCompositor(), getMaximumFrameNumber());
-                imageCacheStatus.setImageStatus(0, -1, initialCacheStatus.getImageStatus(0));
+                imageCacheStatus.setVisibleStatus(0, initialCacheStatus.getVisibleStatus(0));
             } else {
                 imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader.getCompositor(), getMaximumFrameNumber());
             }
@@ -188,7 +188,7 @@ public class JP2Image {
             }
     }
 
-    void signalReader(JP2ImageParameter params) {
+    protected void signalReader(JP2ImageParameter params) {
         if (reader != null)
             reader.signalReader(params);
     }

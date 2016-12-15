@@ -2,19 +2,19 @@ package org.helioviewer.jhv.viewmodel.imagecache;
 
 public class ImageCacheStatusLocal implements ImageCacheStatus {
 
-    protected final int maxFrameNumber;
+    protected final int maxFrame;
 
-    public ImageCacheStatusLocal(int _maxFrameNumber) {
-        maxFrameNumber = _maxFrameNumber;
+    public ImageCacheStatusLocal(int _maxFrame) {
+        maxFrame = _maxFrame;
     }
 
     @Override
-    public CacheStatus getImageStatus(int compositionLayer) {
+    public void setVisibleStatus(int frame, CacheStatus newStatus) {
+    }
+
+    @Override
+    public CacheStatus getVisibleStatus(int frame) {
         return CacheStatus.COMPLETE;
-    }
-
-    @Override
-    public void setImageStatus(int compositionLayer, int level, CacheStatus newStatus) {
     }
 
 }

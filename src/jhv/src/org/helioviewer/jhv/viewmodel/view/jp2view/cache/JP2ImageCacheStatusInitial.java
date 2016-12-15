@@ -7,17 +7,17 @@ public class JP2ImageCacheStatusInitial implements JP2ImageCacheStatus {
     private CacheStatus imageStatus;
 
     @Override
-    public CacheStatus getImageStatus(int compositionLayer) {
-        if (compositionLayer != 0)
+    public void setVisibleStatus(int frame, CacheStatus newStatus) {
+        if (frame != 0)
             throw new IllegalArgumentException();
-        return imageStatus;
+        imageStatus = newStatus;
     }
 
     @Override
-    public void setImageStatus(int compositionLayer, int level, CacheStatus newStatus) {
-        if (compositionLayer != 0)
+    public CacheStatus getVisibleStatus(int frame) {
+        if (frame != 0)
             throw new IllegalArgumentException();
-        imageStatus = newStatus;
+        return imageStatus;
     }
 
     @Override
@@ -42,6 +42,10 @@ public class JP2ImageCacheStatusInitial implements JP2ImageCacheStatus {
     @Override
     public boolean imageComplete(int frame, int level) {
         return false;
+    }
+
+    @Override
+    public void setImageComplete(int frame, int level) {
     }
 
 }

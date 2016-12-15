@@ -9,7 +9,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 
 public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
-    private final int maxFrameNumber;
+    private final int maxFrame;
     private final ResolutionSet[] resolutionSet;
     private final Kdu_region_compositor compositor;
 
@@ -17,50 +17,48 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
 
-    public JP2ImageCacheStatusRemote(Kdu_region_compositor _compositor, int _maxFrameNumber) throws KduException {
-        maxFrameNumber = _maxFrameNumber;
-        imageStatus = new CacheStatus[maxFrameNumber + 1];
+    public JP2ImageCacheStatusRemote(Kdu_region_compositor _compositor, int _maxFrame) throws KduException {
+        maxFrame = _maxFrame;
+        imageStatus = new CacheStatus[maxFrame + 1];
 
         compositor = _compositor;
-        resolutionSet = new ResolutionSet[maxFrameNumber + 1];
+        resolutionSet = new ResolutionSet[maxFrame + 1];
         resolutionSet[0] = KakaduHelper.getResolutionSet(compositor, 0);
     }
 
     // not threadsafe
     @Override
-    public void setImageStatus(int compositionLayer, int level, CacheStatus newStatus) {
-        if (resolutionSet[compositionLayer] == null && newStatus == CacheStatus.PARTIAL) {
+    public void setVisibleStatus(int frame, CacheStatus newStatus) {
+        if (resolutionSet[frame] == null && newStatus == CacheStatus.PARTIAL) {
             try {
-                resolutionSet[compositionLayer] = KakaduHelper.getResolutionSet(compositor, compositionLayer);
+                resolutionSet[frame] = KakaduHelper.getResolutionSet(compositor, frame);
             } catch (KduException e) {
                 e.printStackTrace();
             }
         }
 
-        imageStatus[compositionLayer] = newStatus;
-        if (newStatus == CacheStatus.COMPLETE && resolutionSet[compositionLayer] != null)
-            resolutionSet[compositionLayer].setComplete(level);
+        imageStatus[frame] = newStatus;
+    }
+
+    // not threadsafe
+    @Override
+    public CacheStatus getVisibleStatus(int frame) {
+        return imageStatus[frame];
     }
 
     // not threadsafe
     @Override
     public void downgradeVisibleStatus(int level) {
-        for (int i = 0; i <= maxFrameNumber; i++) {
+        for (int i = 0; i <= maxFrame; i++) {
             if (imageStatus[i] == CacheStatus.COMPLETE && ((resolutionSet[i] == null || !resolutionSet[i].getComplete(level)))) //!
                 imageStatus[i] = CacheStatus.PARTIAL;
         }
     }
 
-    // not threadsafe
-    @Override
-    public CacheStatus getImageStatus(int compositionLayer) {
-        return imageStatus[compositionLayer];
-    }
-
     @Override
     public int getImageCachedPartiallyUntil() {
         int i;
-        for (i = Math.max(0, imagePartialUntil); i <= maxFrameNumber; i++) {
+        for (i = Math.max(0, imagePartialUntil); i <= maxFrame; i++) {
             if (imageStatus[i] != CacheStatus.PARTIAL && imageStatus[i] != CacheStatus.COMPLETE) {
                 break;
             }
@@ -84,7 +82,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
         if (fullyComplete)
             return true;
 
-        for (int i = 0; i <= maxFrameNumber; i++) {
+        for (int i = 0; i <= maxFrame; i++) {
             if (resolutionSet[i] == null || !resolutionSet[i].getComplete(level))
                 return false;
         }
@@ -98,6 +96,11 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     @Override
     public boolean imageComplete(int frame, int level) {
         return resolutionSet[frame].getComplete(level);
+    }
+
+    @Override
+    public void setImageComplete(int frame, int level) {
+        resolutionSet[frame].setComplete(level);
     }
 
 }
