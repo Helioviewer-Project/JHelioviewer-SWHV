@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.helioviewer.jhv.base.logging.Log;
@@ -72,7 +72,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
     static void setLUT(LUT lut) {
         colorModel = createIndexColorModelFromLUT(lut);
-        for (Entry<Long, DownloadedJPXData> entry : cache.entrySet()) {
+        for (Map.Entry<Long, DownloadedJPXData> entry : cache.entrySet()) {
             DownloadedJPXData jpxData = entry.getValue();
             jpxData.changeColormap(colorModel);
         }
@@ -100,14 +100,15 @@ public class RadioData extends AbstractLineDataSelectorElement {
             return;
         latest_cache_start = start - start % TimeUtils.DAY_IN_MILLIS - 2 * TimeUtils.DAY_IN_MILLIS;
         latest_cache_end = latest_cache_start + DAYS_IN_CACHE * TimeUtils.DAY_IN_MILLIS;
+
         ArrayList<Long> incomingStartDates = new ArrayList<>(DAYS_IN_CACHE);
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             incomingStartDates.add(latest_cache_start + i * TimeUtils.DAY_IN_MILLIS);
         }
 
-        Iterator<Entry<Long, DownloadedJPXData>> it = cache.entrySet().iterator();
+        Iterator<Map.Entry<Long, DownloadedJPXData>> it = cache.entrySet().iterator();
         while (it.hasNext()) {
-            Entry<Long, DownloadedJPXData> entry = it.next();
+            Map.Entry<Long, DownloadedJPXData> entry = it.next();
             Long key = entry.getKey();
             if (!incomingStartDates.contains(key)) {
                 entry.getValue().remove();
@@ -119,7 +120,6 @@ public class RadioData extends AbstractLineDataSelectorElement {
         for (long incomingStart : incomingStartDates) {
             if (!cache.containsKey(incomingStart)) {
                 toDownloadStartDates.add(incomingStart);
-                cache.put(incomingStart, new DownloadedJPXData(incomingStart));
             }
         }
 
@@ -131,22 +131,49 @@ public class RadioData extends AbstractLineDataSelectorElement {
         }
     }
 
-    private static void initJPX(ArrayList<JP2ViewCallisto> jpList, ArrayList<Long> datesToDownload) {
-        for (int i = 0; i < jpList.size(); i++) {
-            JP2ViewCallisto v = jpList.get(i);
-            long date = datesToDownload.get(i);
-            DownloadedJPXData jpxData = cache.get(date);
-            if (v != null) {
-                if (jpxData != null) {
-                    jpxData.init(v);
-                } else {
-                    v.abolish();
+    private static class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
+
+        private final ArrayList<Long> datesToDownload;
+
+        public RadioJPXDownload(ArrayList<Long> toDownload) {
+            datesToDownload = toDownload;
+        }
+
+        @Override
+        protected ArrayList<JP2ViewCallisto> backgroundWork() {
+            ArrayList<JP2ViewCallisto> jpList = new ArrayList<>();
+            for (long date : datesToDownload) {
+                JP2ViewCallisto v = null;
+                try {
+                    APIRequest req = new APIRequest("ROB", CallistoID, date, date, APIRequest.CADENCE_ANY);
+                    v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(req);
+                } catch (IOException e) {
+                    Log.error("An error occured while opening the remote file: " + e.getMessage());
                 }
-            } else {
-                if (jpxData != null)
-                    jpxData.downloadJPXFailed();
+                jpList.add(v);
+            }
+            return jpList;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                ArrayList<JP2ViewCallisto> jpList = get();
+
+                for (int i = 0; i < datesToDownload.size(); i++) {
+                    JP2ViewCallisto v = jpList.get(i);
+                    if (v != null) {
+                        long incomingStart = datesToDownload.get(i);
+                        DownloadedJPXData jp2Data = DownloadedJPXData.createJPXData(v, incomingStart);
+                        if (jp2Data != null)
+                            cache.put(incomingStart, jp2Data);
+                    }
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                Log.error("RadioData error: " + e.getCause().getMessage());
             }
         }
+
     }
 
     private static void requestForData() {
@@ -255,40 +282,6 @@ public class RadioData extends AbstractLineDataSelectorElement {
             g.drawString(text1, x1, y1);
             g.drawString(text2, x2, y2);
         }
-    }
-
-    private static class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
-
-        private final ArrayList<Long> datesToDownload;
-
-        public RadioJPXDownload(ArrayList<Long> toDownload) {
-            datesToDownload = toDownload;
-        }
-
-        @Override
-        protected ArrayList<JP2ViewCallisto> backgroundWork() {
-            ArrayList<JP2ViewCallisto> jpList = new ArrayList<>();
-            for (long date : datesToDownload) {
-                try {
-                    APIRequest req = new APIRequest("ROB", CallistoID, date, date, APIRequest.CADENCE_ANY);
-                    jpList.add((JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(req));
-                } catch (IOException e) {
-                    Log.error("An error occured while opening the remote file: " + e.getMessage());
-                }
-            }
-            return jpList;
-        }
-
-        @Override
-        protected void done() {
-            try {
-                ArrayList<JP2ViewCallisto> jpList = get();
-                initJPX(jpList, datesToDownload);
-            } catch (InterruptedException | ExecutionException e) {
-                Log.error("RadioData error: " + e.getCause().getMessage());
-            }
-        }
-
     }
 
     @Override
