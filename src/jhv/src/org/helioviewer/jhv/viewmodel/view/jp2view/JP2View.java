@@ -273,12 +273,12 @@ public class JP2View extends AbstractView {
             return;
 
         // order is important, this will signal reader
-        JP2ImageParameter imageViewParams = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, factor);
+        JP2ImageParameter params = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, factor);
         CacheStatus status = jp2Image.getImageCacheStatus().getVisibleStatus(targetFrame);
         if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) // avoid empty image at startup
             return;
 
-        queueSubmitTask(new J2KRender(this, imageViewParams, !jp2Image.getImageCacheStatus().imageComplete(targetFrame, imageViewParams.resolution.level)));
+        queueSubmitTask(new J2KRender(this, params, !jp2Image.getImageCacheStatus().imageComplete(targetFrame, params.resolution.level)));
     }
 
     @Override
