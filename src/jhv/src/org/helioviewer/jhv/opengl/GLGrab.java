@@ -24,7 +24,7 @@ public class GLGrab {
         h = _h;
     }
 
-    public void init(GL2 gl) {
+    private void init(GL2 gl) {
         fbo = new FBObject();
         fbo.init(gl, w, h, 0);
         fboTex = fbo.attachTexture2D(gl, 0, true, GL2.GL_LINEAR, GL2.GL_LINEAR, GL2.GL_CLAMP_TO_EDGE, GL2.GL_CLAMP_TO_EDGE);

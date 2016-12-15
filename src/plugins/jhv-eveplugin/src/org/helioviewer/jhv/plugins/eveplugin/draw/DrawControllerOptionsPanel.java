@@ -84,9 +84,9 @@ class DrawControllerOptionsPanel extends SmallPanel implements ActionListener {
         private final ZOOM zoom;
         private final long number;
 
-        public ZoomComboboxItem(ZOOM zoom, long number) {
-            this.zoom = zoom;
-            this.number = number;
+        public ZoomComboboxItem(ZOOM _zoom, long _number) {
+            zoom = _zoom;
+            number = _number;
         }
 
         @Override
