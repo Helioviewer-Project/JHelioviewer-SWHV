@@ -10,7 +10,7 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class APIResponse {
+class APIResponse {
 
     private JSONObject data;
     private URI uri;

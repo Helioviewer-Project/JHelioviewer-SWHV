@@ -34,12 +34,12 @@ public class TimestampRollingFileAppender extends FileAppender {
         formatter.setTimeZone(TimeZone.getTimeZone(System.getProperty("user.timezone")));
     }
 
-    public void setTimeStamp(String timeStampString) {
-        this.timeStampString = timeStampString;
+    public void setTimeStamp(String _timeStampString) {
+        timeStampString = _timeStampString;
     }
 
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
+    public void setPattern(String _pattern) {
+        pattern = _pattern;
     }
 
     public void setDirectory(String directory) {

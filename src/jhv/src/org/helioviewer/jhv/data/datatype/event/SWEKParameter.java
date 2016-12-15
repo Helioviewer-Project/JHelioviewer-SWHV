@@ -7,11 +7,11 @@ public class SWEKParameter {
     private final SWEKParameterFilter parameterFilter;
     private final boolean defaultVisible;
 
-    public SWEKParameter(String parameterName, String parameterDisplayName, SWEKParameterFilter parameterFilter, boolean defaultVisible) {
-        this.parameterName = parameterName;
-        this.parameterDisplayName = parameterDisplayName;
-        this.parameterFilter = parameterFilter;
-        this.defaultVisible = defaultVisible;
+    public SWEKParameter(String _parameterName, String _parameterDisplayName, SWEKParameterFilter _parameterFilter, boolean _defaultVisible) {
+        parameterName = _parameterName;
+        parameterDisplayName = _parameterDisplayName;
+        parameterFilter = _parameterFilter;
+        defaultVisible = _defaultVisible;
     }
 
     public String getParameterName() {
