@@ -77,12 +77,13 @@ class DownloadedJPXData implements ImageDataHandler {
         return startDate;
     }
 
-    void remove() {
+    void removeData() {
         if (view != null) {
             view.setDataHandler(null);
             view.abolish();
             view = null;
         }
+        bufferedImage = null;
     }
 
     @Override

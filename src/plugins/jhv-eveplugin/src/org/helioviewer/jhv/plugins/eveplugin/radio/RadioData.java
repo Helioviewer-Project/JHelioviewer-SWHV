@@ -71,9 +71,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
     static void setLUT(LUT lut) {
         colorModel = createIndexColorModelFromLUT(lut);
-        for (Map.Entry<Long, DownloadedJPXData> entry : cache.entrySet()) {
-            DownloadedJPXData jpxData = entry.getValue();
-            jpxData.changeColormap(colorModel);
+        for (DownloadedJPXData jp2Data : cache.values()) {
+            jp2Data.changeColormap(colorModel);
         }
         DrawController.fireRedrawRequest();
     }
@@ -83,8 +82,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     private void clearCache() {
-        for (DownloadedJPXData jpxData : cache.values()) {
-            jpxData.remove();
+        for (DownloadedJPXData jp2Data : cache.values()) {
+            jp2Data.removeData();
         }
         cache.clear();
         latest_cache_start = -1;
@@ -110,7 +109,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
             Map.Entry<Long, DownloadedJPXData> entry = it.next();
             Long key = entry.getKey();
             if (!incomingStartDates.contains(key)) {
-                entry.getValue().remove();
+                entry.getValue().removeData();
                 it.remove();
             }
         }
