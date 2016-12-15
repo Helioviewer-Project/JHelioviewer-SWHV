@@ -44,11 +44,8 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     // not threadsafe
     @Override
-    public void downgradeImageStatus(int startFrame, int endFrame, int level) {
-        startFrame = startFrame < 0 ? 0 : startFrame;
-        endFrame = endFrame > maxFrameNumber ? maxFrameNumber : endFrame;
-
-        for (int i = startFrame; i <= endFrame; i++) {
+    public void downgradeVisibleStatus(int level) {
+        for (int i = 0; i <= maxFrameNumber; i++) {
             if (imageStatus[i] == CacheStatus.COMPLETE && ((resolutionSet[i] == null || !resolutionSet[i].getComplete(level)))) //!
                 imageStatus[i] = CacheStatus.PARTIAL;
         }

@@ -237,7 +237,7 @@ public class JP2Image {
         boolean complete = imageCacheStatus.levelComplete(res.level);
         if (!complete) {
             imageViewParams.downgrade = true;
-            imageCacheStatus.downgradeImageStatus(0, frameCount - 1, res.level);
+            imageCacheStatus.downgradeVisibleStatus(res.level);
             signalReader(imageViewParams);
         }
         return imageViewParams;

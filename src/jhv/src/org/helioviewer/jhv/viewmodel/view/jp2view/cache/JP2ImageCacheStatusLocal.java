@@ -22,7 +22,7 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
     }
 
     @Override
-    public void downgradeImageStatus(int startFrame, int endFrame, int level) {
+    public void downgradeVisibleStatus(int level) {
     }
 
     @Override
