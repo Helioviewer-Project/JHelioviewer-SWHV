@@ -232,13 +232,13 @@ public class JP2Image {
         }
         factor = Math.min(factor, adj);
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
+        JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
         boolean complete = imageCacheStatus.levelComplete(res.level);
         if (!complete) {
             imageCacheStatus.downgradeVisibleStatus(res.level);
-            signalReader(imageViewParams);
+            signalReader(params);
         }
-        return imageViewParams;
+        return params;
     }
 
     URI getURI() {

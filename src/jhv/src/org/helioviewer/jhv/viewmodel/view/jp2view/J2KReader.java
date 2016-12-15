@@ -63,7 +63,6 @@ class J2KReader implements Runnable {
         if ((socket = parentImageRef.getSocket()) == null)
             reconnect();
 
-        stop = false;
         myThread = new Thread(this, "Reader " + parentImageRef.getName());
         myThread.setDaemon(true);
         myThread.start();
@@ -94,9 +93,8 @@ class J2KReader implements Runnable {
     }
 
     private void signalRender(double factor) {
-        if (stop)
-            return;
-        EventQueue.invokeLater(() -> parentViewRef.signalRenderFromReader(parentImageRef, factor));
+        if (!stop)
+            EventQueue.invokeLater(() -> parentViewRef.signalRenderFromReader(parentImageRef, factor));
     }
 
     void signalReader(JP2ImageParameter params) {
@@ -179,10 +177,10 @@ class J2KReader implements Runnable {
     @Override
     public void run() {
         while (!stop) {
-            JP2ImageParameter currParams;
+            JP2ImageParameter params;
             // wait for signal
             try {
-                currParams = readerSignal.waitForSignal();
+                params = readerSignal.waitForSignal();
             } catch (InterruptedException e) {
                 continue;
             }
@@ -191,8 +189,8 @@ class J2KReader implements Runnable {
                 if (socket.isClosed())
                     reconnect();
 
-                int frame = currParams.compositionLayer;
-                int level = currParams.resolution.level;
+                int frame = params.compositionLayer;
+                int level = params.resolution.level;
 
                 // choose cache strategy
                 boolean singleFrame = false;
@@ -204,10 +202,10 @@ class J2KReader implements Runnable {
                 int current_step;
                 String[] stepQuerys;
                 if (singleFrame) {
-                    stepQuerys = createSingleQuery(currParams);
+                    stepQuerys = createSingleQuery(params);
                     current_step = 0;
                 } else {
-                    stepQuerys = createMultiQuery(currParams);
+                    stepQuerys = createMultiQuery(params);
 
                     int partial = cacheStatusRef.getImageCachedPartiallyUntil();
                     if (partial < num_layers - 1)
@@ -247,7 +245,7 @@ class J2KReader implements Runnable {
                         if (singleFrame) {
                             cacheStatusRef.setVisibleStatus(frame, CacheStatus.COMPLETE);
                             cacheStatusRef.setImageComplete(frame, level);
-                            signalRender(currParams.factor);
+                            signalRender(params.factor);
                         } else {
                             for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
                                 cacheStatusRef.setVisibleStatus(j, CacheStatus.COMPLETE);
@@ -277,7 +275,7 @@ class J2KReader implements Runnable {
 
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && !stopReading && !cacheStatusRef.levelComplete(level)) {
-                    readerSignal.signal(currParams);
+                    readerSignal.signal(params);
                 }
              } catch (IOException e) {
                 try {
@@ -286,7 +284,7 @@ class J2KReader implements Runnable {
                     Log.error("J2KReader.run() > Error closing socket", ioe);
                 }
                 // Send signal to try again
-                readerSignal.signal(currParams);
+                readerSignal.signal(params);
             }
         }
     }

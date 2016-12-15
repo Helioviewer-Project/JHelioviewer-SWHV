@@ -36,7 +36,6 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
                 e.printStackTrace();
             }
         }
-
         imageStatus[frame] = newStatus;
     }
 
@@ -50,7 +49,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     @Override
     public void downgradeVisibleStatus(int level) {
         for (int i = 0; i <= maxFrame; i++) {
-            if (imageStatus[i] == CacheStatus.COMPLETE && ((resolutionSet[i] == null || !resolutionSet[i].getComplete(level)))) //!
+            if (imageStatus[i] == CacheStatus.COMPLETE && (resolutionSet[i] == null || !resolutionSet[i].getComplete(level))) //!
                 imageStatus[i] = CacheStatus.PARTIAL;
         }
     }
@@ -64,7 +63,6 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
             }
         }
         imagePartialUntil = i - 1;
-
         return imagePartialUntil;
     }
 
