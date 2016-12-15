@@ -18,9 +18,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 class J2KReader implements Runnable {
 
-    // Whether IOExceptions should be shown on System.err or not
-    private static final boolean verbose = false;
-
     // The thread that this object runs on
     private final Thread myThread;
 
@@ -278,14 +275,11 @@ class J2KReader implements Runnable {
                     return;
                 }
 
-                // if incomplete && not interrupted && single frame -> signal again to go on reading
-                if (!cacheStatusRef.levelComplete(level) && !stopReading && singleFrame) {
+                // if single frame & not interrupted & incomplete -> signal again to go on reading
+                if (singleFrame && !stopReading && !cacheStatusRef.levelComplete(level)) {
                     readerSignal.signal(currParams);
                 }
              } catch (IOException e) {
-                if (verbose) {
-                    e.printStackTrace();
-                }
                 try {
                     socket.close();
                 } catch (IOException ioe) {
