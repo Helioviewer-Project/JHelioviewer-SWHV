@@ -67,6 +67,7 @@ class DownloadedJPXData implements ImageDataHandler {
             Log.error("Some of the metadata could not be read: " + _view.getURI());
         }
 
+        _view.abolish();
         downloadJPXFailed = true;
         startDate = start;
         endDate = start + TimeUtils.DAY_IN_MILLIS;
