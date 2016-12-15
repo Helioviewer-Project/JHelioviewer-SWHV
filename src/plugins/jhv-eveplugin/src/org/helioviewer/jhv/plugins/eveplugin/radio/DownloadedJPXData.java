@@ -31,7 +31,7 @@ class DownloadedJPXData implements ImageDataHandler {
 
     private JP2ViewCallisto view;
 
-    private final long startDate;
+    final long startDate;
     private final long endDate;
     private final double startFreq;
     private final double endFreq;
@@ -43,21 +43,7 @@ class DownloadedJPXData implements ImageDataHandler {
     private boolean downloadJPXFailed = false;
     private boolean hasData = false;
 
-    static DownloadedJPXData createJPXData(JP2ViewCallisto view, long start) {
-        try {
-            DownloadedJPXData jpxData = new DownloadedJPXData(view);
-            if (jpxData.startDate == start && jpxData.endDate == start + TimeUtils.DAY_IN_MILLIS) {
-                view.setDataHandler(jpxData);
-                jpxData.requestData();
-                return jpxData;
-            }
-        } catch (Exception e) {
-            Log.error("Some of the metadata could not be read, aborting...");
-        }
-        return null;
-    }
-
-    private DownloadedJPXData(JP2ViewCallisto _view) throws Exception {
+    public DownloadedJPXData(JP2ViewCallisto _view, long start) throws Exception {
         view = _view;
 
         JP2ImageCallisto image = view.getJP2Image();
@@ -73,6 +59,11 @@ class DownloadedJPXData implements ImageDataHandler {
         startDate = TimeUtils.parse(hvMetaData.get("DATE-OBS"));
         endDate = TimeUtils.parse(hvMetaData.get("DATE-END"));
         hvMetaData.destroyXML();
+
+        if (startDate == start && endDate == start + TimeUtils.DAY_IN_MILLIS) {
+            view.setDataHandler(this);
+        } else
+            throw new Exception("Start or end date not matching");
     }
 
     void remove() {

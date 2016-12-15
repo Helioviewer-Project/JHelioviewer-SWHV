@@ -125,13 +125,13 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
         if (!toDownloadStartDates.isEmpty()) {
             LineDataSelectorModel.downloadStarted(this);
-            JHVWorker<ArrayList<JP2ViewCallisto>, Void> imageDownloadWorker = new RadioJPXDownload(toDownloadStartDates);
+            JHVWorker<ArrayList<DownloadedJPXData>, Void> imageDownloadWorker = new RadioJPXDownload(toDownloadStartDates);
             imageDownloadWorker.setThreadName("EVE--RadioDownloader");
             EVEPlugin.executorService.execute(imageDownloadWorker);
         }
     }
 
-    private static class RadioJPXDownload extends JHVWorker<ArrayList<JP2ViewCallisto>, Void> {
+    private static class RadioJPXDownload extends JHVWorker<ArrayList<DownloadedJPXData>, Void> {
 
         private final ArrayList<Long> datesToDownload;
 
@@ -140,17 +140,16 @@ public class RadioData extends AbstractLineDataSelectorElement {
         }
 
         @Override
-        protected ArrayList<JP2ViewCallisto> backgroundWork() {
-            ArrayList<JP2ViewCallisto> jpList = new ArrayList<>();
+        protected ArrayList<DownloadedJPXData> backgroundWork() {
+            ArrayList<DownloadedJPXData> jpList = new ArrayList<>();
             for (long date : datesToDownload) {
-                JP2ViewCallisto v = null;
                 try {
                     APIRequest req = new APIRequest("ROB", CallistoID, date, date, APIRequest.CADENCE_ANY);
-                    v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(req);
-                } catch (IOException e) {
+                    JP2ViewCallisto v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(req);
+                    jpList.add(new DownloadedJPXData(v, date));
+                } catch (Exception e) {
                     Log.error("An error occured while opening the remote file: " + e.getMessage());
                 }
-                jpList.add(v);
             }
             return jpList;
         }
@@ -158,16 +157,10 @@ public class RadioData extends AbstractLineDataSelectorElement {
         @Override
         protected void done() {
             try {
-                ArrayList<JP2ViewCallisto> jpList = get();
-
-                for (int i = 0; i < datesToDownload.size(); i++) {
-                    JP2ViewCallisto v = jpList.get(i);
-                    if (v != null) {
-                        long incomingStart = datesToDownload.get(i);
-                        DownloadedJPXData jp2Data = DownloadedJPXData.createJPXData(v, incomingStart);
-                        if (jp2Data != null)
-                            cache.put(incomingStart, jp2Data);
-                    }
+                ArrayList<DownloadedJPXData> jpList = get();
+                for (DownloadedJPXData jp2Data : jpList) {
+                    jp2Data.requestData();
+                    cache.put(jp2Data.startDate, jp2Data);
                 }
             } catch (InterruptedException | ExecutionException e) {
                 Log.error("RadioData error: " + e.getCause().getMessage());
