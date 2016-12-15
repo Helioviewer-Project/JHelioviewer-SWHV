@@ -130,18 +130,21 @@ public class RadioData extends AbstractLineDataSelectorElement {
         }
     }
 
+    private static int isDownloading;
+
     private static class RadioJPXDownload extends JHVWorker<ArrayList<DownloadedJPXData>, Void> {
 
-        private final ArrayList<Long> datesToDownload;
+        private final ArrayList<Long> toDownload;
 
-        public RadioJPXDownload(ArrayList<Long> toDownload) {
-            datesToDownload = toDownload;
+        public RadioJPXDownload(ArrayList<Long> _toDownload) {
+            isDownloading++;
+            toDownload = _toDownload;
         }
 
         @Override
         protected ArrayList<DownloadedJPXData> backgroundWork() {
             ArrayList<DownloadedJPXData> jpList = new ArrayList<>();
-            for (long date : datesToDownload) {
+            for (long date : toDownload) {
                 try {
                     APIRequest req = new APIRequest("ROB", CallistoID, date, date, APIRequest.CADENCE_ANY);
                     View v = APIRequestManager.requestAndOpenRemoteFile(req);
@@ -157,6 +160,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         @Override
         protected void done() {
             try {
+                isDownloading--;
                 ArrayList<DownloadedJPXData> jpList = get();
                 for (DownloadedJPXData jp2Data : jpList) {
                     jp2Data.requestData();
@@ -217,7 +221,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
                 return true;
             }
         }
-        return false;
+        return isDownloading != 0;
     }
 
     @Override

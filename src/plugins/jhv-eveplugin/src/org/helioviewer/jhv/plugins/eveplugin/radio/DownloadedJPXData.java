@@ -133,19 +133,17 @@ class DownloadedJPXData implements ImageDataHandler {
         double pct = Math.min(width / (double) jp2Width, 1);
 
         double visibleImagePercentage = pct * height / jp2Height;
-        if (visibleImagePercentage <= 0.03125) {
+        if (visibleImagePercentage <= 0.03125)
             return 1;
-        } else if (visibleImagePercentage <= 0.0625) {
+        if (visibleImagePercentage <= 0.0625)
             return 0.5;
-        } else if (visibleImagePercentage <= 0.125) {
+        if (visibleImagePercentage <= 0.125)
             return 0.25;
-        } else if (visibleImagePercentage <= 0.25) {
+        if (visibleImagePercentage <= 0.25)
             return 0.125;
-        } else if (visibleImagePercentage <= 0.5) {
+        if (visibleImagePercentage <= 0.5)
             return 0.0625;
-        } else {
-            return 0.03125;
-        }
+        return 0.03125;
     }
 
     private boolean first = true;
