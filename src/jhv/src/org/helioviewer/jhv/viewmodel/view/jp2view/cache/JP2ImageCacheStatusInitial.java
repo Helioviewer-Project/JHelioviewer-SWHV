@@ -21,7 +21,7 @@ public class JP2ImageCacheStatusInitial implements JP2ImageCacheStatus {
     }
 
     @Override
-    public void downgradeImageStatus(int startFrame, int endFrame) {
+    public void downgradeImageStatus(int startFrame, int endFrame, int level) {
     }
 
     @Override
