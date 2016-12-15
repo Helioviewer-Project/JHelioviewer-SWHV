@@ -12,7 +12,6 @@ import java.awt.image.Raster;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
-//import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
@@ -31,39 +30,49 @@ class DownloadedJPXData implements ImageDataHandler {
 
     private JP2ViewCallisto view;
 
-    final long startDate;
-    private final long endDate;
-    private final double startFreq;
-    private final double endFreq;
-    private final int jp2Width;
-    private final int jp2Height;
+    private long startDate;
+    private long endDate;
+    private double startFreq;
+    private double endFreq;
+    private int jp2Width;
+    private int jp2Height;
 
     private BufferedImage bufferedImage;
     private Region region;
     private boolean downloadJPXFailed = false;
     private boolean hasData = false;
 
-    public DownloadedJPXData(JP2ViewCallisto _view, long start) throws Exception {
-        view = _view;
+    public DownloadedJPXData(JP2ViewCallisto _view, long start) {
+        try {
+            JP2ImageCallisto image = _view.getJP2Image();
+            ResolutionSet.ResolutionLevel resLevel = image.getResolutionLevel(0, 0);
+            jp2Width = resLevel.width;
+            jp2Height = resLevel.height;
 
-        JP2ImageCallisto image = view.getJP2Image();
-        ResolutionSet.ResolutionLevel resLevel = image.getResolutionLevel(0, 0);
-        jp2Width = resLevel.width;
-        jp2Height = resLevel.height;
+            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
 
-        XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
+            hvMetaData.parseXML(image.getXML(0));
+            endFreq = hvMetaData.tryGetDouble("STARTFRQ");
+            startFreq = hvMetaData.tryGetDouble("END-FREQ");
+            startDate = TimeUtils.parse(hvMetaData.get("DATE-OBS"));
+            endDate = TimeUtils.parse(hvMetaData.get("DATE-END"));
+            hvMetaData.destroyXML();
 
-        hvMetaData.parseXML(image.getXML(0));
-        endFreq = hvMetaData.tryGetDouble("STARTFRQ");
-        startFreq = hvMetaData.tryGetDouble("END-FREQ");
-        startDate = TimeUtils.parse(hvMetaData.get("DATE-OBS"));
-        endDate = TimeUtils.parse(hvMetaData.get("DATE-END"));
-        hvMetaData.destroyXML();
+            if (startDate == start && endDate <= start + TimeUtils.DAY_IN_MILLIS) {
+                view = _view;
+                view.setDataHandler(this);
+                return;
+            }
+        } catch (Exception e) {
+            Log.error("Some of the metadata could not be read: " + _view.getURI());
+        }
 
-        if (startDate == start && endDate == start + TimeUtils.DAY_IN_MILLIS) {
-            view.setDataHandler(this);
-        } else
-            throw new Exception("Start or end date not matching");
+        downloadJPXFailed = true;
+        startDate = start;
+    }
+
+    long getStartDate() {
+        return startDate;
     }
 
     void remove() {
@@ -236,10 +245,6 @@ class DownloadedJPXData implements ImageDataHandler {
         int x = dx0 + dwidth / 2 - tWidth / 2;
         int y = ga.y + ga.height / 2 - tHeight / 2;
         g.drawString(text, x, y);
-    }
-
-    void downloadJPXFailed() {
-        downloadJPXFailed = true;
     }
 
     boolean isDownloading() {

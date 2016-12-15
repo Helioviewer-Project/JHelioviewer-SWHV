@@ -160,8 +160,9 @@ public class RadioData extends AbstractLineDataSelectorElement {
                 ArrayList<DownloadedJPXData> jpList = get();
                 for (DownloadedJPXData jp2Data : jpList) {
                     jp2Data.requestData();
-                    cache.put(jp2Data.startDate, jp2Data);
+                    cache.put(jp2Data.getStartDate(), jp2Data);
                 }
+                DrawController.fireRedrawRequest();
             } catch (InterruptedException | ExecutionException e) {
                 Log.error("RadioData error: " + e.getCause().getMessage());
             }
