@@ -6,7 +6,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 public interface JP2ImageCacheStatus extends ImageCacheStatus {
 
     // Downgrades the status from complete to partial, if necessary
-    void downgradeImageStatus(int startFrame, int endFrame, int level);
+    void downgradeVisibleStatus(int level);
 
     // Returns the highest frame until which the status is at least PARTIAL
     int getImageCachedPartiallyUntil();

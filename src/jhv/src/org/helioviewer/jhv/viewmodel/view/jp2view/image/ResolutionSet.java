@@ -17,14 +17,12 @@ public class ResolutionSet {
     }
 
     public void setComplete(int idx) {
-        if (idx >= 0 || idx < numLevels) {
-            for (int i = idx; i < numLevels; i++)
-                complete[i] = true;
-        }
+        for (int i = idx; i < numLevels; i++)
+            complete[i] = true;
     }
 
     public boolean getComplete(int idx) {
-        return (idx >= 0 || idx < numLevels) && complete[idx];
+        return complete[idx];
     }
 
     public void addResolutionLevel(int discardLayer, int width, int height, double scaleX, double scaleY) {
