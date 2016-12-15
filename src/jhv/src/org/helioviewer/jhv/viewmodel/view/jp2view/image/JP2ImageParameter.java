@@ -15,8 +15,6 @@ public class JP2ImageParameter {
     public final int components;
     public final double factor;
 
-    public boolean downgrade = false;
-
     public JP2ImageParameter(JP2Image _jp2Image, Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer, int _components, double _factor) {
         jp2Image = _jp2Image;
         viewpoint = _p;
@@ -47,7 +45,7 @@ public class JP2ImageParameter {
 
     @Override
     public String toString() {
-        return "ImageViewParams[ " + jp2Image + " " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + compositionLayer + " NumComponents=" + components + "] " + factor + " " + downgrade + "]";
+        return "ImageViewParams[ " + jp2Image + " " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + compositionLayer + " NumComponents=" + components + "] " + factor + "]";
     }
 
 }
