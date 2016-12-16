@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.Locale;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.helioviewer.jhv.base.DownloadStream;
-import org.helioviewer.jhv.base.EventDispatchQueue;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -79,8 +76,8 @@ public class APIRequestManager {
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                  return new SimpleImageView(uri);
             } else {
-                JP2Image jp2Image = loc.contains("callisto") ? new JP2ImageCallisto(uri, downloadURI) : new JP2Image(uri, downloadURI);
-                JP2View view = EventDispatchQueue.invokeAndWait(new AllocateJP2View(jp2Image));
+                JP2Image image = loc.contains("callisto") ? new JP2ImageCallisto(uri, downloadURI) : new JP2Image(uri, downloadURI);
+                View view = image instanceof JP2ImageCallisto ? new JP2ViewCallisto(image) : new JP2View(image);
                 view.setAPIRequest(req);
                 return view;
             }
@@ -91,23 +88,6 @@ public class APIRequestManager {
             throw new IOException(e.getMessage());
         }
         return null;
-    }
-
-    private static class AllocateJP2View implements Callable<JP2View> {
-        private final AtomicReference<JP2Image> refJP2Image = new AtomicReference<>();
-
-        public AllocateJP2View(JP2Image jp2Image) {
-            refJP2Image.set(jp2Image);
-        }
-
-        @Override
-        public JP2View call() {
-            JP2Image jp2Image = refJP2Image.get();
-            JP2View view = jp2Image instanceof JP2ImageCallisto ? new JP2ViewCallisto() : new JP2View();
-            view.setJP2Image(jp2Image);
-
-            return view;
-        }
     }
 
 }
