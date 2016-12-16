@@ -162,10 +162,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
             try {
                 isDownloading--;
                 ArrayList<DownloadedJPXData> jpList = get();
-                for (DownloadedJPXData jp2Data : jpList) {
-                    jp2Data.requestData();
+                for (DownloadedJPXData jp2Data : jpList)
                     cache.put(jp2Data.getStartDate(), jp2Data);
-                }
                 DrawController.fireRedrawRequest();
             } catch (InterruptedException | ExecutionException e) {
                 Log.error("RadioData error: " + e.getCause().getMessage());
@@ -175,9 +173,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     private static void requestForData() {
-        for (DownloadedJPXData jpxData : cache.values()) {
+        for (DownloadedJPXData jpxData : cache.values())
             jpxData.requestData();
-        }
     }
 
     @Override
