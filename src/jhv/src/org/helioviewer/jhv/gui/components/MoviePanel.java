@@ -1,12 +1,8 @@
 package org.helioviewer.jhv.gui.components;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
@@ -29,7 +25,6 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
@@ -38,7 +33,6 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -49,11 +43,9 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
 
@@ -303,7 +295,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         int speedMin = 1, speedMax = 60;
         speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(20), Double.valueOf(1), Double.valueOf(speedMax), Double.valueOf(speedMin)));
         speedSpinner.setToolTipText("Maximum " + speedMax + " fps");
-        speedSpinner.addChangeListener(this);
+        speedSpinner.addChangeListener(e -> updateMovieSpeed());
 
         JFormattedTextField fx = ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField();
         fx.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "", speedMin, speedMax));
@@ -359,18 +351,9 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         group.add(shotButton);
         group.add(freeButton);
 
-        ActionListener recordModeListener = e -> {
-            JRadioButton aButton = (JRadioButton) e.getSource();
-            if (aButton.equals(loopButton))
-                recordButton.setRecordMode(RecordMode.LOOP);
-            else if (aButton.equals(shotButton))
-                recordButton.setRecordMode(RecordMode.SHOT);
-            else if (aButton.equals(freeButton))
-                recordButton.setRecordMode(RecordMode.FREE);
-        };
-        loopButton.addActionListener(recordModeListener);
-        shotButton.addActionListener(recordModeListener);
-        freeButton.addActionListener(recordModeListener);
+        loopButton.addActionListener(e -> recordButton.setRecordMode(RecordMode.LOOP));
+        shotButton.addActionListener(e -> recordButton.setRecordMode(RecordMode.SHOT));
+        freeButton.addActionListener(e -> recordButton.setRecordMode(RecordMode.FREE));
 
         c.gridy = 1;
         c.gridx = 2;
@@ -450,11 +433,23 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     public static void setAdvanced(boolean advanced) {
         isAdvanced = advanced;
-
         advancedButton.setIcon(advanced ? closeIcon : openIcon);
         modePanel.setVisible(advanced);
         speedPanel.setVisible(advanced);
         recordPanel.setVisible(advanced);
+    }
+
+    /**
+     * Updates the speed of the animation. This function is called when changing
+     * the speed of the animation or its unit.
+     */
+    private static void updateMovieSpeed() {
+        int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
+        if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
+            Layers.setDesiredRelativeSpeed(speed);
+        } else {
+            Layers.setDesiredAbsoluteSpeed(speed * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
+        }
     }
 
     public static void setFrameSlider(int frame) {
@@ -465,29 +460,22 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         timeSlider.addChangeListener(instance);
     }
 
-    /**
-     * Updates the speed of the animation. This function is called when changing
-     * the speed of the animation or its unit.
-     */
-    private static void updateMovieSpeed() {
-        if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
-            Layers.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
-        } else {
-            Layers.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
-        }
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        // Jump to different frame
+        int val = timeSlider.getValue();
+        Layers.setFrame(val);
+        frameNumberLabel.setText((val + 1) + "/" + (timeSlider.getMaximum() + 1));
     }
 
     @Override
-    public void stateChanged(ChangeEvent e) {
-        Object source = e.getSource();
-        // Jump to different frame
-        if (source.equals(timeSlider)) {
-            int val = timeSlider.getValue();
-            Layers.setFrame(val);
-            frameNumberLabel.setText((val + 1) + "/" + (timeSlider.getMaximum() + 1));
-            // Change animation speed
-        } else if (source.equals(speedSpinner)) {
-            updateMovieSpeed();
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (isEnabled()) {
+            if (e.getWheelRotation() < 0) {
+                Layers.nextFrame();
+            } else if (e.getWheelRotation() > 0) {
+                Layers.previousFrame();
+            }
         }
     }
 
@@ -509,17 +497,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         wasPlaying = Layers.isMoviePlaying();
         if (wasPlaying) {
             Layers.pauseMovie();
-        }
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        if (isEnabled()) {
-            if (e.getWheelRotation() < 0) {
-                Layers.nextFrame();
-            } else if (e.getWheelRotation() > 0) {
-                Layers.previousFrame();
-            }
         }
     }
 
@@ -601,12 +578,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         return nextFrameAction;
     }
 
-    /**
-     * Action to play or pause the active layer, if it is an image series.
-     *
-     * Static movie actions are supposed be integrated into {@link MenuBar},
-     * also to provide shortcuts. They always refer to the active layer.
-     */
     private static class PlayPauseAction extends AbstractAction {
 
         public PlayPauseAction() {
@@ -624,13 +595,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     }
 
-    /**
-     * Action to step to the previous frame for the active layer, if it is an
-     * image series.
-     *
-     * Static movie actions are supposed be integrated into {@link MenuBar},
-     * also to provide shortcuts. They always refer to the active layer.
-     */
     private static class PreviousFrameAction extends AbstractAction {
 
         public PreviousFrameAction() {
@@ -649,13 +613,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     }
 
-    /**
-     * Action to step to the next frame for the active layer, if it is an image
-     * series.
-     *
-     * Static movie actions are supposed be integrated into {@link MenuBar},
-     * also to provide shortcuts. They always refer to the active layer.
-     */
     private static class NextFrameAction extends AbstractAction {
 
         public NextFrameAction() {
@@ -672,150 +629,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
             Layers.nextFrame();
         }
 
-    }
-
-    /**
-     * Extension of JSlider displaying the caching status on the track.
-     *
-     * This element provides its own look and feel. Therefore, it is independent
-     * from the global look and feel.
-     */
-    private static class TimeSlider extends JSlider implements LazyComponent {
-        /**
-         * Default constructor
-         *
-         * @param orientation
-         *            specified orientation
-         * @param min
-         *            specified minimum
-         * @param max
-         *            specified maximum
-         * @param value
-         *            initial value
-         */
-        public TimeSlider(int orientation, int min, int max, int value) {
-            super(orientation, min, max, value);
-            setUI(new TimeSliderUI(this));
-        }
-
-        // Overrides updateUI, to keep own SliderUI
-        @Override
-        public void updateUI() {
-        }
-
-        @Override
-        public void repaint() {
-            dirty = true;
-        }
-
-        @Override
-        public void repaint(int x, int y, int width, int height) {
-            dirty = true;
-        }
-
-        private boolean dirty = false;
-
-        @Override
-        public void lazyRepaint() {
-            if (dirty) {
-                super.repaint();
-                dirty = false;
-            }
-        }
-
-    }
-
-    /**
-     * Extension of BasicSliderUI overriding some drawing functions.
-     * All functions for size calculations stay the same.
-     */
-    private static class TimeSliderUI extends BasicSliderUI {
-
-        private static final Color notCachedColor = Color.LIGHT_GRAY;
-        private static final Color partialCachedColor = new Color(0x8080FF);
-        private static final Color completeCachedColor = new Color(0x4040FF);
-
-        private static final BasicStroke thickStroke = new BasicStroke(4);
-        private static final BasicStroke thinStroke = new BasicStroke(1);
-
-        /**
-         * Default constructor
-         *
-         * @param component
-         *            the component where this UI delegate is being
-         *            installed
-         */
-        public TimeSliderUI(JSlider component) {
-            super(component);
-        }
-
-        @Override
-        protected TrackListener createTrackListener(JSlider slider) {
-            return new TimeTrackListener();
-        }
-
-        @Override
-        protected void scrollDueToClickInTrack(int dir) {
-            if (trackListener instanceof TimeTrackListener)
-                slider.setValue(valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
-        }
-
-        @Override
-        public void paintThumb(Graphics g) {
-            g.setColor(Color.BLACK);
-            g.drawRect(thumbRect.x, thumbRect.y, thumbRect.width - 1, thumbRect.height - 1);
-
-            int x = thumbRect.x + (thumbRect.width - 1) / 2;
-            g.drawLine(x, thumbRect.y, x, thumbRect.y + thumbRect.height - 1);
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * Draws the different region (no/partial/complete information
-         * loaded) in different colors.
-         */
-        @Override
-        public void paintTrack(Graphics g) {
-            if (!(g instanceof Graphics2D))
-                return;
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setStroke(thickStroke);
-
-            int y = slider.getSize().height / 2;
-            View view = Layers.getActiveView();
-            if (view == null) {
-                g2d.setColor(notCachedColor);
-                g2d.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
-            } else {
-                int len = view.getMaximumFrameNumber();
-                for (int i = 0; i < len; i++) {
-                    int begin = (int) ((float) i / len * trackRect.width);
-                    int end = (int) ((float) (i + 1) / len * trackRect.width);
-
-                    if (end == begin)
-                        end++;
-
-                    CacheStatus cacheStatus = view.getImageCacheStatus(i);
-                    if (cacheStatus == CacheStatus.PARTIAL) {
-                        g2d.setColor(partialCachedColor);
-                    } else if (cacheStatus == CacheStatus.COMPLETE) {
-                        g2d.setColor(completeCachedColor);
-                    } else {
-                        g2d.setColor(notCachedColor);
-                    }
-                    g2d.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
-                }
-            }
-            g2d.setStroke(thinStroke);
-        }
-
-        // Overrides the track listener to access currentX
-        private class TimeTrackListener extends TrackListener {
-            public int getCurrentX() {
-                return currentMouseX;
-            }
-        }
     }
 
 }
