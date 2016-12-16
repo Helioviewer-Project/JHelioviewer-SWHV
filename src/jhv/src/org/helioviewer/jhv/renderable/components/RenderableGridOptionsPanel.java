@@ -43,13 +43,13 @@ class RenderableGridOptionsPanel extends SmallPanel {
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.EAST;
-        JCheckBox axes = new JCheckBox("Solar axes", grid.getShowAxes());
-        axes.setHorizontalTextPosition(SwingConstants.LEFT);
-        axes.addItemListener(e -> {
-            grid.showAxes(e.getStateChange() == ItemEvent.SELECTED);
+        JCheckBox axis = new JCheckBox("Solar axis", grid.getShowAxis());
+        axis.setHorizontalTextPosition(SwingConstants.LEFT);
+        axis.addItemListener(e -> {
+            grid.showAxis(e.getStateChange() == ItemEvent.SELECTED);
             Displayer.display();
         });
-        add(axes, c0);
+        add(axis, c0);
 
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.EAST;

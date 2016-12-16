@@ -62,7 +62,7 @@ class DownloadedJPXData implements ImageDataHandler {
             if (startDate == start && endDate <= start + TimeUtils.DAY_IN_MILLIS) {
                 view = _view;
                 view.setDataHandler(this);
-                EventQueue.invokeLater(() -> requestData());
+                EventQueue.invokeLater(this::requestData);
                 return;
             }
         } catch (Exception e) {
