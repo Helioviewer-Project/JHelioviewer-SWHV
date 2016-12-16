@@ -24,13 +24,8 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 public class JP2View extends AbstractView {
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
-    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy()) {
-        @Override
-        protected void afterExecute(Runnable r, Throwable t) {
-            super.afterExecute(r, t);
-            JHVThread.afterExecute(r, t);
-        }
-    };
+    // no need to intercept exceptions
+    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy());
 
     private void queueSubmitTask(Runnable task) {
         blockingQueue.poll();
@@ -46,8 +41,8 @@ public class JP2View extends AbstractView {
     private long frameCountStart;
     private float frameRate;
 
-    private MetaData[] metaDataArray;
-    private int maximumFrame;
+    private final MetaData[] metaDataArray;
+    private final int maximumFrame;
 
     public JP2View(JP2Image newJP2Image) {
         _jp2Image = newJP2Image;
@@ -269,7 +264,7 @@ public class JP2View extends AbstractView {
 
     private void signalRender(JP2Image jp2Image, double factor) {
         // from reader on EDT, might come after abolish
-        if (isAbolished /*|| jp2Image == null*/)
+        if (isAbolished)
             return;
 
         // order is important, this will signal reader
