@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -61,6 +62,7 @@ class DownloadedJPXData implements ImageDataHandler {
             if (startDate == start && endDate <= start + TimeUtils.DAY_IN_MILLIS) {
                 view = _view;
                 view.setDataHandler(this);
+                EventQueue.invokeLater(() -> requestData());
                 return;
             }
         } catch (Exception e) {
