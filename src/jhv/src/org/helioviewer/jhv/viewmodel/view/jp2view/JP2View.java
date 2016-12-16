@@ -49,7 +49,7 @@ public class JP2View extends AbstractView {
     private MetaData[] metaDataArray;
     private int maximumFrame;
 
-    public void setJP2Image(JP2Image newJP2Image) {
+    public JP2View(JP2Image newJP2Image) {
         _jp2Image = newJP2Image;
 
         metaDataArray = _jp2Image.metaDataList;
