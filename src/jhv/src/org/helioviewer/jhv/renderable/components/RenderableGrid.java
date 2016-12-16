@@ -54,7 +54,7 @@ public class RenderableGrid extends AbstractRenderable {
     private float lonstepDegrees = 15f;
     private float latstepDegrees = 20f;
 
-    private boolean showAxes = true;
+    private boolean showAxis = true;
     private boolean showLabels = true;
     private boolean showRadial = false;
 
@@ -65,7 +65,7 @@ public class RenderableGrid extends AbstractRenderable {
         JSONObject jo = new JSONObject();
         jo.put("lonstepDegrees", lonstepDegrees);
         jo.put("latstepDegrees", latstepDegrees);
-        jo.put("showAxes", showAxes);
+        jo.put("showAxis", showAxis);
         jo.put("showLabels", showLabels);
         jo.put("showRadial", showRadial);
         jo.put("name", name);
@@ -77,8 +77,8 @@ public class RenderableGrid extends AbstractRenderable {
             lonstepDegrees = (float) jo.getDouble("lonstepDegrees");
         if (jo.has("latstepDegrees"))
             latstepDegrees = (float) jo.getDouble("latstepDegrees");
-        if (jo.has("showAxes"))
-            showAxes = jo.getBoolean("showAxes");
+        if (jo.has("showAxis"))
+            showAxis = jo.getBoolean("showAxis");
         if (jo.has("showLabels"))
             showLabels = jo.getBoolean("showLabels");
         if (jo.has("showRadial"))
@@ -199,8 +199,8 @@ public class RenderableGrid extends AbstractRenderable {
         if (!isVisible[vp.idx])
             return;
 
-        if (showAxes)
-            drawAxes(gl);
+        if (showAxis)
+            drawAxis(gl);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
@@ -241,7 +241,7 @@ public class RenderableGrid extends AbstractRenderable {
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
 
-    private static void drawAxes(GL2 gl) {
+    private static void drawAxis(GL2 gl) {
         gl.glLineWidth(2);
 
         gl.glBegin(GL2.GL_LINES);
@@ -572,8 +572,8 @@ public class RenderableGrid extends AbstractRenderable {
         return showLabels;
     }
 
-    public boolean getShowAxes() {
-        return showAxes;
+    public boolean getShowAxis() {
+        return showAxis;
     }
 
     public boolean getShowRadial() {
@@ -584,8 +584,8 @@ public class RenderableGrid extends AbstractRenderable {
         showLabels = show;
     }
 
-    public void showAxes(boolean show) {
-        showAxes = show;
+    public void showAxis(boolean show) {
+        showAxis = show;
     }
 
     public void showRadial(boolean show) {
