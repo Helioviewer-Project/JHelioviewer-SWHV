@@ -218,11 +218,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     }
 
     private MoviePanel() {
-        super(new BorderLayout());
-
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
-        add(mainPanel, BorderLayout.NORTH);
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         // Time line
         timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
@@ -235,8 +231,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         timeSlider.getActionMap().put("RIGHT_ARROW", getNextFrameAction());
         timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LEFT_ARROW");
         timeSlider.getActionMap().put("LEFT_ARROW", getPreviousFrameAction());
-
-        mainPanel.add(timeSlider);
 
         JPanel secondLine = new JPanel(new BorderLayout());
 
@@ -283,8 +277,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         frameNumberLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         secondLine.add(frameNumberLabel, BorderLayout.EAST);
 
-        mainPanel.add(secondLine);
-
         // The speed panel has some distinction from above as it is one of the advanced options
         // It is not included in the main Panel to save space if it is not shown
 
@@ -309,8 +301,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         speedUnitComboBox.addActionListener(e -> updateMovieSpeed());
         speedPanel.add(speedUnitComboBox);
 
-        mainPanel.add(speedPanel);
-
         // Animation mode
         modePanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
@@ -319,8 +309,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
         animationModeComboBox.addActionListener(e -> Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem()));
         modePanel.add(animationModeComboBox);
-
-        mainPanel.add(modePanel);
 
         recordPanel = new SmallPanel(new GridBagLayout());
 
@@ -365,7 +353,11 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         c.gridx = 3;
         recordPanel.add(recordSizeCombo, c);
 
-        mainPanel.add(recordPanel);
+        add(timeSlider);
+        add(secondLine);
+        add(speedPanel);
+        add(modePanel);
+        add(recordPanel);
 
         speedPanel.setSmall();
         modePanel.setSmall();
