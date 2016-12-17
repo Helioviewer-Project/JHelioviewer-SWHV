@@ -18,7 +18,7 @@ import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
 
 public class APIRequestManager {
 
-    public static View requestAndOpenRemoteFile(APIRequest req) throws IOException {
+    public static URI requestRemoteFile(APIRequest req) throws IOException {
         try {
             APIResponse response = new APIResponse(new DownloadStream(req.jpipRequest).getInput());
             // Could we handle the answer from the server
@@ -42,7 +42,7 @@ public class APIRequestManager {
                 if (message != null) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
-                return loadView(response.getURI(), req);
+                return response.getURI();
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");
@@ -63,7 +63,11 @@ public class APIRequestManager {
         return null;
     }
 
-    static View loadView(URI uri, APIRequest req) throws IOException {
+    public static View requestAndOpenRemoteFile(APIRequest req) throws IOException {
+        return loadView(requestRemoteFile(req), req);
+    }
+
+    public static View loadView(URI uri, APIRequest req) throws IOException {
         if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI");
         }
