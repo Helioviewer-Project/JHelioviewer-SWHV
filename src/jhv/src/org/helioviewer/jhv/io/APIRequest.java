@@ -11,6 +11,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 public class APIRequest {
 
     public static final int CADENCE_ANY = -100;
+    public static final int CallistoID = 5000;
 
     public final String server;
     public final int sourceId;

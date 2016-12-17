@@ -11,6 +11,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.io.APIRequest;
 
 @SuppressWarnings("serial")
 class RadioOptionsPanel extends SmallPanel {
@@ -31,7 +32,8 @@ class RadioOptionsPanel extends SmallPanel {
         lutBox.addActionListener(e -> RadioData.setLUT(lutMap.get(lutBox.getSelectedItem())));
 
         JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(Settings.getSingletonInstance().getProperty("availability.images.url") + "#IID" + RadioData.CallistoID));
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(Settings.getSingletonInstance().getProperty("availability.images.url") +
+                                                                     "#IID" + APIRequest.CallistoID));
 
         add(lutBox, c);
         c.anchor = GridBagConstraints.EAST;

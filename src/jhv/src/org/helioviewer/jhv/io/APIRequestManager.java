@@ -80,8 +80,11 @@ public class APIRequestManager {
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                  return new SimpleImageView(uri);
             } else {
-                JP2Image image = loc.contains("callisto") ? new JP2ImageCallisto(uri, downloadURI) : new JP2Image(uri, downloadURI);
-                View view = image instanceof JP2ImageCallisto ? new JP2ViewCallisto(image) : new JP2View(image);
+                View view;
+                if (req == null || req.sourceId != APIRequest.CallistoID)
+                    view = new JP2View(new JP2Image(uri, downloadURI));
+                else
+                    view = new JP2ViewCallisto(new JP2ImageCallisto(uri, downloadURI));
                 view.setAPIRequest(req);
                 return view;
             }
