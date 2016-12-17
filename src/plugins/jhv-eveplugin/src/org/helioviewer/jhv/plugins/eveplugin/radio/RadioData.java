@@ -33,7 +33,6 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
     private static YAxis yAxis;
 
-    public static final int CallistoID = 5000;
     private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<>();
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
@@ -146,7 +145,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
             ArrayList<DownloadedJPXData> jpList = new ArrayList<>();
             for (long date : toDownload) {
                 try {
-                    APIRequest req = new APIRequest("ROB", CallistoID, date, date, APIRequest.CADENCE_ANY);
+                    APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
                     View v = APIRequestManager.requestAndOpenRemoteFile(req);
                     if (v instanceof JP2ViewCallisto)
                         jpList.add(new DownloadedJPXData((JP2ViewCallisto) v, date));
