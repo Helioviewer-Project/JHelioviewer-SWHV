@@ -152,6 +152,7 @@ class J2KRender implements Runnable {
         } catch (Exception e) {
             // reboot the compositor
             engineLocal.set(null);
+            threadLocal.remove();
             e.printStackTrace();
         }
     }
