@@ -45,7 +45,6 @@ public class JP2Image {
     private static final String[] SUPPORTED_EXTENSIONS = { ".jp2", ".jpx" };
 
     private final URI uri;
-    private final URI downloadURI;
 
     private JHV_Kdu_cache cacheReader;
     private Kdu_cache cacheRender;
@@ -73,13 +72,9 @@ public class JP2Image {
      *
      * @param _uri
      *            URI representing the location of the image
-     * @param _downloadURI
-     *            In case the file should be downloaded to the local filesystem,
-     *            use this URI as the source.
      */
-    public JP2Image(URI _uri, URI _downloadURI) throws Exception {
+    public JP2Image(URI _uri) throws Exception {
         uri = _uri;
-        downloadURI = _downloadURI;
 
         String name = uri.getPath().toLowerCase();
         boolean supported = false;
@@ -233,8 +228,7 @@ public class JP2Image {
         factor = Math.min(factor, adj);
 
         JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
-        boolean complete = imageCacheStatus.levelComplete(res.level);
-        if (!complete) {
+        if (!imageCacheStatus.imageComplete(frame, res.level)) {
             imageCacheStatus.downgradeVisibleStatus(res.level);
             signalReader(params);
         }
@@ -243,10 +237,6 @@ public class JP2Image {
 
     URI getURI() {
         return uri;
-    }
-
-    public URI getDownloadURI() {
-        return downloadURI;
     }
 
     String getName() {

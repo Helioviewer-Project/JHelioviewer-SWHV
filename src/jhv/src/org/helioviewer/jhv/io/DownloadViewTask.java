@@ -39,7 +39,13 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
     public DownloadViewTask(View view) {
         uri = view.getURI();
-        downloadURI = view.getDownloadURI();
+
+        APIRequest req = view.getAPIRequest();
+        if (req == null)
+            downloadURI = uri;
+        else
+            downloadURI = req.fileRequest;
+
         layer = view.getImageLayer();
 
         dialog = new JWindow(ImageViewerGui.getMainFrame());

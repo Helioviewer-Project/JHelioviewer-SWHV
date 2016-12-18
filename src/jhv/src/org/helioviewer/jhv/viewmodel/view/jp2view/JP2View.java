@@ -68,11 +68,6 @@ public class JP2View extends AbstractView {
         return _jp2Image.getURI();
     }
 
-    @Override
-    public URI getDownloadURI() {
-        return _jp2Image.getDownloadURI();
-    }
-
     private volatile boolean isAbolished = false;
 
     @Override

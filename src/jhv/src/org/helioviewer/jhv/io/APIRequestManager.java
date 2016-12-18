@@ -72,7 +72,6 @@ public class APIRequestManager {
             throw new IOException("Invalid URI");
         }
 
-        URI downloadURI = req == null ? uri : req.fileRequest;
         try {
             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
             if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
@@ -82,16 +81,16 @@ public class APIRequestManager {
             } else {
                 View view;
                 if (req == null || req.sourceId != APIRequest.CallistoID)
-                    view = new JP2View(new JP2Image(uri, downloadURI));
+                    view = new JP2View(new JP2Image(uri));
                 else
-                    view = new JP2ViewCallisto(new JP2ImageCallisto(uri, downloadURI));
+                    view = new JP2ViewCallisto(new JP2ImageCallisto(uri));
                 view.setAPIRequest(req);
                 return view;
             }
         } catch (InterruptedException ignore) {
             // nothing
         } catch (Exception e) {
-            Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
+            Log.debug("APIRequestManager.loadView(\"" + uri + "\") ", e);
             throw new IOException(e.getMessage());
         }
         return null;

@@ -57,15 +57,6 @@ public interface View {
      * @return Name of the image
      */
     String getName();
-    /**
-     * Returns the download uri the image.
-     *
-     * This is the uri from which the whole file can be downloaded and stored
-     * locally
-     *
-     * @return download uri
-     */
-    URI getDownloadURI();
 
     LUT getDefaultLUT();
 

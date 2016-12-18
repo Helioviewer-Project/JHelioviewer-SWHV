@@ -12,8 +12,8 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.Resolution
 
 public class JP2ImageCallisto extends JP2Image {
 
-    public JP2ImageCallisto(URI _uri, URI _downloadURI) throws Exception {
-        super(_uri, _downloadURI);
+    public JP2ImageCallisto(URI _uri) throws Exception {
+        super(_uri);
     }
 
     public void setRegion(Rectangle r) {
