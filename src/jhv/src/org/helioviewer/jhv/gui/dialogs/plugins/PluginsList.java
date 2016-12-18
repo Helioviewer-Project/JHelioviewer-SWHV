@@ -45,7 +45,7 @@ class PluginsList extends JScrollPane {
     private void updateList() {
         contentPane.removeAll();
 
-        String[] pluginNames = entryMap.keySet().toArray(new String[0]);
+        String[] pluginNames = entryMap.keySet().stream().toArray(String[]::new);
         Arrays.sort(pluginNames);
 
         for (String name : pluginNames) {
@@ -105,7 +105,7 @@ class PluginsList extends JScrollPane {
         String newSelectedEntryName = pluginName;
 
         if (pluginName == null || !entryMap.keySet().contains(pluginName)) {
-            String[] pluginNames = entryMap.keySet().toArray(new String[0]);
+            String[] pluginNames = entryMap.keySet().stream().toArray(String[]::new);
             Arrays.sort(pluginNames);
 
             if (pluginNames.length == 0) {

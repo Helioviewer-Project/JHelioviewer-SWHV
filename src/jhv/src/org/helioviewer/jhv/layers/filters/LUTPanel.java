@@ -37,7 +37,7 @@ public class LUTPanel implements ActionListener, FilterDetails {
     public LUTPanel() {
         lutMap = LUT.copyMap(); // duplicate
 
-        combobox = new JComboBox<>(lutMap.keySet().toArray(new String[0]));
+        combobox = new JComboBox<>(lutMap.keySet().stream().toArray(String[]::new));
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
         combobox.addActionListener(this);

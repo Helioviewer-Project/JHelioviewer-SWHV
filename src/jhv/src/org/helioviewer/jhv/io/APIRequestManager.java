@@ -64,7 +64,8 @@ public class APIRequestManager {
     }
 
     public static View requestAndOpenRemoteFile(APIRequest req) throws IOException {
-        return loadView(requestRemoteFile(req), req);
+        URI uri = requestRemoteFile(req);
+        return uri == null ? null : loadView(uri, req);
     }
 
     public static View loadView(URI uri, APIRequest req) throws IOException {

@@ -60,7 +60,7 @@ public class PluginManager {
      * @return a list with all loaded plug-ins.
      */
     public PluginContainer[] getAllPlugins() {
-        return plugins.values().toArray(new PluginContainer[0]);
+        return plugins.values().stream().toArray(PluginContainer[]::new);
     }
 
     /**
