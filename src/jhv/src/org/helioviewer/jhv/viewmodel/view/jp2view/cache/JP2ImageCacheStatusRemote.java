@@ -1,29 +1,40 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 
 import kdu_jni.KduException;
-import kdu_jni.Kdu_region_compositor;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 
 public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     private final int maxFrame;
     private final ResolutionSet[] resolutionSet;
-    private final Kdu_region_compositor compositor;
+    private KakaduEngine engine;
 
     // r/w image load, r/w J2KReader, r MoviePanel/EDT
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
 
-    public JP2ImageCacheStatusRemote(Kdu_region_compositor _compositor, int _maxFrame) throws KduException {
+    public JP2ImageCacheStatusRemote(KakaduEngine _engine, int _maxFrame) throws KduException {
         maxFrame = _maxFrame;
         imageStatus = new CacheStatus[maxFrame + 1];
 
-        compositor = _compositor;
+        engine = _engine;
         resolutionSet = new ResolutionSet[maxFrame + 1];
-        resolutionSet[0] = KakaduHelper.getResolutionSet(compositor, 0);
+        resolutionSet[0] = KakaduHelper.getResolutionSet(engine.getCompositor(), 0);
+    }
+
+    private void destroyIfFull() {
+        boolean haveNull = false;
+        for (int i = 0; i <= maxFrame; i++)
+            if (resolutionSet[i] == null) {
+                haveNull = true;
+                break;
+            }
+        if (!haveNull)
+            engine = null;
     }
 
     // not threadsafe
@@ -31,7 +42,8 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     public void setVisibleStatus(int frame, CacheStatus newStatus) {
         if (resolutionSet[frame] == null && newStatus == CacheStatus.PARTIAL) {
             try {
-                resolutionSet[frame] = KakaduHelper.getResolutionSet(compositor, frame);
+                resolutionSet[frame] = KakaduHelper.getResolutionSet(engine.getCompositor(), frame);
+                destroyIfFull();
             } catch (KduException e) {
                 e.printStackTrace();
             }

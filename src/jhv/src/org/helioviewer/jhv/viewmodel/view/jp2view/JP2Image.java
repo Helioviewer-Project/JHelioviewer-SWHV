@@ -49,8 +49,6 @@ public class JP2Image {
     private JHV_Kdu_cache cacheReader;
     private Kdu_cache cacheRender;
 
-    private KakaduEngine kduReader;
-
     private final int frameCount;
     private final int[] builtinLUT;
 
@@ -103,8 +101,7 @@ public class JP2Image {
                     throw new JHV_KduException(scheme + " scheme not supported!");
             }
 
-            kduReader = new KakaduEngine(cacheReader, uri);
-
+            KakaduEngine kduReader = new KakaduEngine(cacheReader, uri);
             // Retrieve the number of composition layers
             int[] tempVar = new int[1];
             kduReader.getJpxSource().Count_compositing_layers(tempVar);
@@ -120,10 +117,10 @@ public class JP2Image {
             }
 
             if (cacheReader != null) { // remote
-                imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader.getCompositor(), getMaximumFrameNumber());
+                imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader, frameCount - 1);
                 imageCacheStatus.setVisibleStatus(0, initialCacheStatus.getVisibleStatus(0));
             } else {
-                imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader.getCompositor(), getMaximumFrameNumber());
+                imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader, frameCount - 1);
             }
         } catch (KduException e) {
             e.printStackTrace();
@@ -310,8 +307,6 @@ public class JP2Image {
 
     private void kduDestroy() {
         try {
-            kduReader = null;
-
             if (cacheRender != null) {
                 cacheRender.Close();
                 cacheRender.Native_destroy();
