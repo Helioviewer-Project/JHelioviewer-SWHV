@@ -64,7 +64,7 @@ public class DataSources {
     }
 
     public static String[] getServers() {
-        return serverSettings.keySet().toArray(new String [0]);
+        return serverSettings.keySet().stream().toArray(String[]::new);
     }
 
     public static String getPreferredServer() {
