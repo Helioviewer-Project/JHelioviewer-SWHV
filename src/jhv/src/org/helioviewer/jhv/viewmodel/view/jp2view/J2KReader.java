@@ -146,18 +146,18 @@ class J2KReader implements Runnable {
         return JPIPQuery.create("context", "jpxl<" + iniLayer + '-' + endLayer + '>', "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
     }
 
-    private static String[] createSingleQuery(JP2ImageParameter currParams) {
-        String fSiz = Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height);
-        return new String[] { createQuery(fSiz, currParams.compositionLayer, currParams.compositionLayer) };
+    private static String[] createSingleQuery(JP2ImageParameter params) {
+        String fSiz = Integer.toString(params.resolution.width) + ',' + Integer.toString(params.resolution.height);
+        return new String[] { createQuery(fSiz, params.compositionLayer, params.compositionLayer) };
     }
 
-    private String[] createMultiQuery(JP2ImageParameter currParams) {
+    private String[] createMultiQuery(JP2ImageParameter params) {
         int num_steps = num_layers / JPIPConstants.MAX_REQ_LAYERS;
         if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
             num_steps++;
 
         String[] stepQuerys = new String[num_steps];
-        String fSiz = Integer.toString(currParams.resolution.width) + ',' + Integer.toString(currParams.resolution.height);
+        String fSiz = Integer.toString(params.resolution.width) + ',' + Integer.toString(params.resolution.height);
 
         int lpf = 0, lpi = 0, max_layers = num_layers - 1;
         for (int i = 0; i < num_steps; i++) {

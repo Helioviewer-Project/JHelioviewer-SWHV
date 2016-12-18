@@ -93,12 +93,13 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     @Override
     public boolean imageComplete(int frame, int level) {
-        return resolutionSet[frame].getComplete(level);
+        return resolutionSet[frame] != null && resolutionSet[frame].getComplete(level);
     }
 
     @Override
     public void setImageComplete(int frame, int level) {
-        resolutionSet[frame].setComplete(level);
+        if (resolutionSet[frame] != null)
+            resolutionSet[frame].setComplete(level);
     }
 
 }
