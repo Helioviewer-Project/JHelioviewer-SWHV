@@ -33,19 +33,14 @@ import org.helioviewer.jhv.io.DownloadViewTask;
 public class RunningDifferencePanel implements ChangeListener {
 
     private final JSpinner truncateSpinner;
-    private final JLabel truncateLabel;
     private final JPanel diffPanel = new JPanel();
 
     private JCheckBox diffRot;
     private static final String[] combolist = { "No difference images", "Running difference", "Base difference" };
-    private final JButton downloadLayerButton;
-    private final JButton showMetaButton;
-    private final JPanel topPanel;
     private final JPanel radPanel;
-    private final JComboBox<String> comboBox;
 
     public RunningDifferencePanel() {
-        downloadLayerButton = new JButton(new AbstractAction() {
+        JButton downloadButton = new JButton(new AbstractAction() {
             {
                 putValue(SHORT_DESCRIPTION, "Download selected layer");
                 putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWNLOAD));
@@ -57,13 +52,13 @@ public class RunningDifferencePanel implements ChangeListener {
                 JHVGlobals.getExecutorService().execute(downloadTask);
             }
         });
-        downloadLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        downloadLayerButton.setText(null);
-        downloadLayerButton.setBorderPainted(false);
-        downloadLayerButton.setFocusPainted(false);
-        downloadLayerButton.setContentAreaFilled(false);
+        downloadButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        downloadButton.setText(null);
+        downloadButton.setBorderPainted(false);
+        downloadButton.setFocusPainted(false);
+        downloadButton.setContentAreaFilled(false);
 
-        showMetaButton = new JButton(new AbstractAction() {
+        JButton metaButton = new JButton(new AbstractAction() {
             {
                 putValue(SHORT_DESCRIPTION, "Show metadata of selected layer");
                 putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
@@ -75,15 +70,15 @@ public class RunningDifferencePanel implements ChangeListener {
                 dialog.showDialog();
             }
         });
-        showMetaButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        showMetaButton.setText(null);
-        showMetaButton.setBorderPainted(false);
-        showMetaButton.setFocusPainted(false);
-        showMetaButton.setContentAreaFilled(false);
+        metaButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        metaButton.setText(null);
+        metaButton.setBorderPainted(false);
+        metaButton.setFocusPainted(false);
+        metaButton.setContentAreaFilled(false);
 
         diffPanel.setLayout(new BoxLayout(diffPanel, BoxLayout.PAGE_AXIS));
 
-        truncateLabel = new JLabel("Contrast boost", JLabel.RIGHT);
+        JLabel truncateLabel = new JLabel("Contrast boost", JLabel.RIGHT);
 
         truncateSpinner = new JSpinner();
         truncateSpinner.setModel(new SpinnerNumberModel(Float.valueOf(0.8f), Float.valueOf(0), Float.valueOf(0.99f), Float.valueOf(0.01f)));
@@ -94,29 +89,14 @@ public class RunningDifferencePanel implements ChangeListener {
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
 
-        comboBox = new JComboBox<>(combolist);
-        topPanel = new JPanel(new GridBagLayout());
+        JComboBox<String> comboBox = new JComboBox<>(combolist);
+        JPanel topPanel = new JPanel(new GridBagLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         radPanel = new JPanel(new FlowLayout());
         radPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         radPanel.setVisible(false);
 
-        addRadioButtons();
-    }
-
-    private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
-        if (showExtraPanel) {
-            radPanel.setVisible(true);
-            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setRunDiffNoRot(!diffRot.isSelected());
-        } else {
-            radPanel.setVisible(false);
-        }
-
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(differenceMode);
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceMode(baseDifferenceMode);
-    }
-
-    private void addRadioButtons() {
+        //
         comboBox.setSelectedItem(0);
         diffRot = new JCheckBox("Rotation correction");
         diffRot.setSelected(true);
@@ -134,9 +114,9 @@ public class RunningDifferencePanel implements ChangeListener {
         topPanel.add(comboBox, c);
         c.gridx = 1;
         c.weightx = 0;
-        topPanel.add(downloadLayerButton, c);
+        topPanel.add(metaButton, c);
         c.gridx = 2;
-        topPanel.add(showMetaButton, c);
+        topPanel.add(downloadButton, c);
         diffPanel.add(topPanel);
         c.gridy = 1;
         c.gridx = 0;
@@ -187,6 +167,18 @@ public class RunningDifferencePanel implements ChangeListener {
         c.gridx = 0;
         c.gridwidth = 3;
         topPanel.add(radPanel, c);
+    }
+
+    private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
+        if (showExtraPanel) {
+            radPanel.setVisible(true);
+            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setRunDiffNoRot(!diffRot.isSelected());
+        } else {
+            radPanel.setVisible(false);
+        }
+
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(differenceMode);
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceMode(baseDifferenceMode);
     }
 
     @Override
