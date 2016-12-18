@@ -54,9 +54,4 @@ public class SimpleImageView extends AbstractView {
         return uri;
     }
 
-    @Override
-    public URI getDownloadURI() {
-        return uri;
-    }
-
 }
