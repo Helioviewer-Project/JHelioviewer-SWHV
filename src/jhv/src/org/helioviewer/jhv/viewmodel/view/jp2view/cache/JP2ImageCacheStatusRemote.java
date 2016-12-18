@@ -24,22 +24,22 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
         engine = _engine;
         resolutionSet = new ResolutionSet[maxFrame + 1];
         resolutionSet[0] = KakaduHelper.getResolutionSet(engine.getCompositor(), 0);
+        destroyIfFull();
     }
 
     private void destroyIfFull() {
-        boolean haveNull = false;
-        for (int i = 0; i <= maxFrame; i++)
+        for (int i = 0; i <= maxFrame; i++) {
             if (resolutionSet[i] == null) {
-                haveNull = true;
-                break;
+                return;
             }
-        if (!haveNull)
-            engine = null;
+        }
+        engine = null;
     }
 
     // not threadsafe
     @Override
     public void setVisibleStatus(int frame, CacheStatus newStatus) {
+        imageStatus[frame] = newStatus;
         if (resolutionSet[frame] == null && newStatus == CacheStatus.PARTIAL) {
             try {
                 resolutionSet[frame] = KakaduHelper.getResolutionSet(engine.getCompositor(), frame);
@@ -48,7 +48,6 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
                 e.printStackTrace();
             }
         }
-        imageStatus[frame] = newStatus;
     }
 
     // not threadsafe
@@ -61,8 +60,9 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     @Override
     public void downgradeVisibleStatus(int level) {
         for (int i = 0; i <= maxFrame; i++) {
-            if (imageStatus[i] == CacheStatus.COMPLETE && (resolutionSet[i] == null || !resolutionSet[i].getComplete(level))) //!
+            if (imageStatus[i] == CacheStatus.COMPLETE && (resolutionSet[i] == null || !resolutionSet[i].getComplete(level))) { //!
                 imageStatus[i] = CacheStatus.PARTIAL;
+            }
         }
     }
 
@@ -93,8 +93,9 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
             return true;
 
         for (int i = 0; i <= maxFrame; i++) {
-            if (resolutionSet[i] == null || !resolutionSet[i].getComplete(level))
+            if (resolutionSet[i] == null || !resolutionSet[i].getComplete(level)) {
                 return false;
+            }
         }
         if (level == 0)
             fullyComplete = true;
@@ -110,8 +111,9 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     @Override
     public void setImageComplete(int frame, int level) {
-        if (resolutionSet[frame] != null)
+        if (resolutionSet[frame] != null) {
             resolutionSet[frame].setComplete(level);
+        }
     }
 
 }
