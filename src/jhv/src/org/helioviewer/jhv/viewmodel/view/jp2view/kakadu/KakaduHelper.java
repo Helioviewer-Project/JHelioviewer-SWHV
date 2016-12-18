@@ -19,9 +19,10 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 public class KakaduHelper {
 
     public static ResolutionSet getResolutionSet(Kdu_region_compositor compositor, int frame) throws KduException {
+        compositor.Refresh();
+
         Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims(); // avoid gc
         Kdu_ilayer_ref ilayer = compositor.Add_ilayer(frame, ref1, ref2);
-
         Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true, frame));
         if (!stream.Exists()) {
             throw new KduException(">> stream does not exist " + frame);
@@ -64,7 +65,7 @@ public class KakaduHelper {
             res.addResolutionLevel(i, rect.width, rect.height, width0 / (double) rect.width, height0 / (double) rect.height);
         }
 
-        compositor.Remove_ilayer(ilayer, false);
+        compositor.Remove_ilayer(ilayer, true);
 
         return res;
     }
