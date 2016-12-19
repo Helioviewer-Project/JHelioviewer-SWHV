@@ -218,7 +218,7 @@ public class JP2Image {
         JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
 
         int level = res.level;
-        if (!imageCacheStatus.imageComplete(frame, level) && level < oldLevel) {
+        if (!imageCacheStatus.imageComplete(frame, level) && (!Layers.isMoviePlaying() || level < oldLevel)) {
             imageCacheStatus.downgradeVisibleStatus(level);
             signalReader(params);
         }
