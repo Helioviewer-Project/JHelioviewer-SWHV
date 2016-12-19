@@ -13,9 +13,9 @@ import kdu_jni.Kdu_region_compositor;
 
 public class KakaduEngine {
 
-    private final Jp2_family_src familySrc;
-    private final Jpx_source jpxSrc;
-    private final Kdu_region_compositor compositor;
+    private Jp2_family_src familySrc;
+    private Jpx_source jpxSrc;
+    private Kdu_region_compositor compositor;
 
     public KakaduEngine(Kdu_cache cache, URI uri) throws KduException, IOException {
         familySrc = new Jp2_family_src();
@@ -57,7 +57,12 @@ public class KakaduEngine {
                     familySrc.Close();
                 familySrc.Native_destroy();
             }
+        } catch (KduException e) {
+            e.printStackTrace();
         } finally {
+            compositor = null;
+            jpxSrc = null;
+            familySrc = null;
             super.finalize();
         }
     }
