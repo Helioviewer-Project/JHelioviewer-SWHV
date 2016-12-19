@@ -27,7 +27,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+//import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
@@ -124,7 +124,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         }
 
         if (!toDownloadStartDates.isEmpty()) {
-            LineDataSelectorModel.downloadStarted(this);
+            // LineDataSelectorModel.downloadStarted(this);
             JHVWorker<ArrayList<DownloadedJPXData>, Void> imageDownloadWorker = new RadioJPXDownload(toDownloadStartDates);
             imageDownloadWorker.setThreadName("EVE--RadioDownloader");
             EVEPlugin.executorService.execute(imageDownloadWorker);
