@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import kdu_jni.KduException;
-import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -46,7 +45,6 @@ public class JP2Image {
     private final URI uri;
 
     private JHV_Kdu_cache cacheReader;
-    private Kdu_cache cacheRender;
 
     private final int frameCount;
     private final int[] builtinLUT;
@@ -88,9 +86,6 @@ public class JP2Image {
                 case "http":
                 case "jpip":
                     cacheReader = new JHV_Kdu_cache();
-                    cacheRender = new Kdu_cache();
-                    cacheRender.Attach_to(cacheReader);
-                    // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
                     initRemote(cacheReader, initialCacheStatus);
                     break;
                 case "file":
@@ -166,7 +161,7 @@ public class JP2Image {
 
     KakaduEngine getRenderEngine(Kdu_thread_env threadEnv) throws KduException, IOException {
         Thread.currentThread().setName("Render " + getName());
-        KakaduEngine engine = new KakaduEngine(cacheRender, uri);
+        KakaduEngine engine = new KakaduEngine(cacheReader, uri);
         engine.getCompositor().Set_thread_env(threadEnv, null);
         return engine;
     }
@@ -294,10 +289,6 @@ public class JP2Image {
 
     private void kduDestroy() {
         try {
-            if (cacheRender != null) {
-                cacheRender.Close();
-                cacheRender.Native_destroy();
-            }
             if (cacheReader != null) {
                 cacheReader.Close();
                 cacheReader.Native_destroy();
@@ -305,7 +296,6 @@ public class JP2Image {
         } catch (KduException e) {
             e.printStackTrace();
         } finally {
-            cacheRender = null;
             cacheReader = null;
         }
     }
