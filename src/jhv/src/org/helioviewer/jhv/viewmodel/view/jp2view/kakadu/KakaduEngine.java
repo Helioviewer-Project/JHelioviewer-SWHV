@@ -64,6 +64,8 @@ public class KakaduEngine {
                 slaveCache.Close();
                 slaveCache.Native_destroy();
             }
+        } catch (KduException e) {
+            e.printStackTrace();
         } finally {
             super.finalize();
         }
