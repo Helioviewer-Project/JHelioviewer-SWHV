@@ -41,16 +41,14 @@ public class JP2View extends AbstractView {
     private long frameCountStart;
     private float frameRate;
 
-    private final MetaData[] metaDataArray;
-    private final int maximumFrame;
+    private MetaData[] metaDataArray;
+    private int maximumFrame;
 
-    public JP2View(JP2Image newJP2Image) {
+    public void setJP2Image(JP2Image newJP2Image) {
         _jp2Image = newJP2Image;
 
         metaDataArray = _jp2Image.metaDataList;
         maximumFrame = metaDataArray.length - 1;
-
-        _jp2Image.startReader(this);
         frameCountStart = System.currentTimeMillis();
     }
 

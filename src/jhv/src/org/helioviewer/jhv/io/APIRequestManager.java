@@ -80,11 +80,14 @@ public class APIRequestManager {
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                  return new SimpleImageView(uri);
             } else {
-                View view;
-                if (req == null || req.sourceId != APIRequest.CallistoID)
-                    view = new JP2View(new JP2Image(uri));
-                else
-                    view = new JP2ViewCallisto(new JP2ImageCallisto(uri));
+                JP2View view;
+                if (req == null || req.sourceId != APIRequest.CallistoID) {
+                    view = new JP2View();
+                    view.setJP2Image(new JP2Image(uri, view));
+                } else {
+                    view = new JP2ViewCallisto();
+                    view.setJP2Image(new JP2ImageCallisto(uri, view));
+                }
                 view.setAPIRequest(req);
                 return view;
             }
