@@ -70,7 +70,7 @@ public class JP2Image {
      * @param _uri
      *            URI representing the location of the image
      */
-    public JP2Image(URI _uri) throws Exception {
+    public JP2Image(URI _uri, JP2View _view) throws Exception {
         uri = _uri;
 
         String name = uri.getPath().toLowerCase();
@@ -118,6 +118,7 @@ public class JP2Image {
             if (cacheReader != null) { // remote
                 imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader, frameCount - 1);
                 imageCacheStatus.setVisibleStatus(0, initialCacheStatus.getVisibleStatus(0));
+                reader = new J2KReader(_view, this);
             } else {
                 imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader, frameCount - 1);
             }
@@ -168,15 +169,6 @@ public class JP2Image {
         KakaduEngine engine = new KakaduEngine(cacheRender, uri);
         engine.getCompositor().Set_thread_env(threadEnv, null);
         return engine;
-    }
-
-    void startReader(JP2View view) {
-        if (cacheReader != null) // remote
-            try {
-                reader = new J2KReader(view, this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
     }
 
     protected void signalReader(JP2ImageParameter params) {

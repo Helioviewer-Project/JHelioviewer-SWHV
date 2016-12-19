@@ -22,19 +22,21 @@ class J2KReader implements Runnable {
     private final Thread myThread;
 
     // A boolean flag used for stopping the thread
-    private volatile boolean stop;
+    private volatile boolean isAbolished;
 
     // A reference to the JP2Image this object is owned by
-    private final JP2Image parentImageRef;
+    private JP2Image parentImageRef;
 
     // A reference to the JP2View this object is owned by
-    private final JP2View parentViewRef;
+    private JP2View parentViewRef;
+
+    // The a reference to the cache object used by the run method
+    private JHV_Kdu_cache cacheRef;
+
+    private JP2ImageCacheStatus cacheStatusRef;
 
     /// The JPIPSocket used to connect to the server
     private JPIPSocket socket;
-
-    // The a reference to the cache object used by the run method
-    private final JHV_Kdu_cache cacheRef;
 
     /**
      * The time when the last response was received. It is used for performing
@@ -46,22 +48,18 @@ class J2KReader implements Runnable {
     /** The current length in bytes to use for requests */
     private int jpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
 
-    private final JP2ImageCacheStatus cacheStatusRef;
-
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
     private final int num_layers;
 
-    J2KReader(JP2View _imageViewRef, JP2Image _jp2ImageRef) throws IOException {
+    J2KReader(JP2View _imageViewRef, JP2Image _jp2ImageRef) {
         parentViewRef = _imageViewRef;
         parentImageRef = _jp2ImageRef;
 
         num_layers = parentImageRef.getMaximumFrameNumber() + 1;
         cacheRef = parentImageRef.getReaderCache();
         cacheStatusRef = parentImageRef.getImageCacheStatus();
-
-        if ((socket = parentImageRef.getSocket()) == null)
-            reconnect();
+        socket = parentImageRef.getSocket();
 
         myThread = new Thread(this, "Reader " + parentImageRef.getName());
         myThread.setDaemon(true);
@@ -75,10 +73,14 @@ class J2KReader implements Runnable {
 
     // runs in abolish thread
     void abolish() {
-        stop = true;
-
-        if (myThread == null) // paranoia
+        if (isAbolished)
             return;
+        isAbolished = true;
+
+        parentViewRef = null;
+        parentImageRef = null;
+        cacheRef = null;
+        cacheStatusRef = null;
 
         while (myThread.isAlive()) {
             try {
@@ -93,7 +95,7 @@ class J2KReader implements Runnable {
     }
 
     private void signalRender(double factor) {
-        if (!stop)
+        if (!isAbolished)
             EventQueue.invokeLater(() -> parentViewRef.signalRenderFromReader(parentImageRef, factor));
     }
 
@@ -176,7 +178,7 @@ class J2KReader implements Runnable {
 
     @Override
     public void run() {
-        while (!stop) {
+        while (!isAbolished) {
             JP2ImageParameter params;
             // wait for signal
             try {
