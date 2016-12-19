@@ -16,17 +16,14 @@ public class KakaduEngine {
     private final Jp2_family_src familySrc;
     private final Jpx_source jpxSrc;
     private final Kdu_region_compositor compositor;
-    private final Kdu_cache slaveCache;
 
     public KakaduEngine(Kdu_cache cache, URI uri) throws KduException, IOException {
         familySrc = new Jp2_family_src();
         if (cache == null) { // local
-            slaveCache = null;
-            familySrc.Open(new File(uri).getCanonicalPath(), true);
+            File file = new File(uri);
+            familySrc.Open(file.getCanonicalPath(), true);
         } else {
-            slaveCache = new Kdu_cache();
-            slaveCache.Attach_to(cache);
-            familySrc.Open(slaveCache);
+            familySrc.Open(cache);
         }
 
         jpxSrc = new Jpx_source();
@@ -60,12 +57,6 @@ public class KakaduEngine {
                     familySrc.Close();
                 familySrc.Native_destroy();
             }
-            if (slaveCache != null) {
-                slaveCache.Close();
-                slaveCache.Native_destroy();
-            }
-        } catch (KduException e) {
-            e.printStackTrace();
         } finally {
             super.finalize();
         }
