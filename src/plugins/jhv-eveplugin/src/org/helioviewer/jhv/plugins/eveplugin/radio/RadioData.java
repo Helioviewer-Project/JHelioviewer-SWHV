@@ -8,8 +8,11 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -33,10 +36,9 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
     private static YAxis yAxis;
 
-    private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<>();
-
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
+    private static final HashMap<Long, DownloadedJPXData> cache = new HashMap<>(DAYS_IN_CACHE);
 
     private static RadioOptionsPanel optionsPanel;
     private static IndexColorModel colorModel;
@@ -142,14 +144,24 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
         @Override
         protected ArrayList<DownloadedJPXData> backgroundWork() {
-            ArrayList<DownloadedJPXData> jpList = new ArrayList<>();
+            ArrayList<DownloadedJPXData> jpList = new ArrayList<>(DAYS_IN_CACHE);
+            HashSet<URI> remotes = new HashSet<>(DAYS_IN_CACHE);
             for (long date : toDownload) {
                 try {
                     APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
-                    View v = APIRequestManager.requestAndOpenRemoteFile(req);
-                    if (v instanceof JP2ViewCallisto)
-                        jpList.add(new DownloadedJPXData((JP2ViewCallisto) v, date));
-                } catch (Exception e) {
+                    URI uri = APIRequestManager.requestRemoteFile(req);
+                    if (uri == null)
+                        continue;
+
+                    if (remotes.contains(uri)) // seen before
+                        jpList.add(new DownloadedJPXData(null, req.startTime));
+                    else {
+                        remotes.add(uri);
+                        View v = APIRequestManager.loadView(uri, req);
+                        if (v instanceof JP2ViewCallisto)
+                            jpList.add(new DownloadedJPXData((JP2ViewCallisto) v, req.startTime));
+                    }
+                } catch (IOException e) {
                     Log.error("An error occured while opening the remote file: " + e.getMessage());
                 }
             }

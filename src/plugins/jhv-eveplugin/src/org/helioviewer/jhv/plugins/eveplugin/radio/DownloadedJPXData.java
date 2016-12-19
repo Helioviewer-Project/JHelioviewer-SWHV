@@ -44,32 +44,34 @@ class DownloadedJPXData implements ImageDataHandler {
     private boolean hasData = false;
 
     public DownloadedJPXData(JP2ViewCallisto _view, long start) {
-        try {
-            JP2ImageCallisto image = _view.getJP2Image();
-            ResolutionSet.ResolutionLevel resLevel = image.getResolutionLevel(0, 0);
-            jp2Width = resLevel.width;
-            jp2Height = resLevel.height;
+        if (_view != null) { // null for empty
+            try {
+                JP2ImageCallisto image = _view.getJP2Image();
+                ResolutionSet.ResolutionLevel resLevel = image.getResolutionLevel(0, 0);
+                jp2Width = resLevel.width;
+                jp2Height = resLevel.height;
 
-            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
+                XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
 
-            hvMetaData.parseXML(image.getXML(0));
-            endFreq = hvMetaData.tryGetDouble("STARTFRQ");
-            startFreq = hvMetaData.tryGetDouble("END-FREQ");
-            startDate = TimeUtils.parse(hvMetaData.get("DATE-OBS"));
-            endDate = TimeUtils.parse(hvMetaData.get("DATE-END"));
-            hvMetaData.destroyXML();
+                hvMetaData.parseXML(image.getXML(0));
+                endFreq = hvMetaData.tryGetDouble("STARTFRQ");
+                startFreq = hvMetaData.tryGetDouble("END-FREQ");
+                startDate = TimeUtils.parse(hvMetaData.get("DATE-OBS"));
+                endDate = TimeUtils.parse(hvMetaData.get("DATE-END"));
+                hvMetaData.destroyXML();
 
-            if (startDate == start && endDate <= start + TimeUtils.DAY_IN_MILLIS) {
-                view = _view;
-                view.setDataHandler(this);
-                EventQueue.invokeLater(this::requestData);
-                return;
+                if (startDate == start && endDate <= start + TimeUtils.DAY_IN_MILLIS) {
+                    view = _view;
+                    view.setDataHandler(this);
+                    EventQueue.invokeLater(this::requestData);
+                    return;
+                }
+            } catch (Exception e) {
+                Log.error("Some of the metadata could not be read: " + _view.getURI());
             }
-        } catch (Exception e) {
-            Log.error("Some of the metadata could not be read: " + _view.getURI());
+            _view.abolish();
         }
 
-        _view.abolish();
         downloadJPXFailed = true;
         startDate = start;
         endDate = start + TimeUtils.DAY_IN_MILLIS;
