@@ -25,15 +25,15 @@ class J2KReader implements Runnable {
     private volatile boolean isAbolished;
 
     // A reference to the JP2Image this object is owned by
-    private JP2Image parentImageRef;
+    private final JP2Image parentImageRef;
 
     // A reference to the JP2View this object is owned by
-    private JP2View parentViewRef;
+    private final JP2View parentViewRef;
 
     // The a reference to the cache object used by the run method
-    private JHV_Kdu_cache cacheRef;
+    private final JHV_Kdu_cache cacheRef;
 
-    private JP2ImageCacheStatus cacheStatusRef;
+    private final JP2ImageCacheStatus cacheStatusRef;
 
     /// The JPIPSocket used to connect to the server
     private JPIPSocket socket;
@@ -76,11 +76,6 @@ class J2KReader implements Runnable {
         if (isAbolished)
             return;
         isAbolished = true;
-
-        parentViewRef = null;
-        parentImageRef = null;
-        cacheRef = null;
-        cacheStatusRef = null;
 
         while (myThread.isAlive()) {
             try {
