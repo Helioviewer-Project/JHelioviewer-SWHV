@@ -32,11 +32,11 @@ import org.helioviewer.jhv.io.DownloadViewTask;
 @SuppressWarnings("serial")
 public class RunningDifferencePanel implements ChangeListener {
 
-    private final JSpinner truncateSpinner;
-    private final JPanel diffPanel = new JPanel();
-
-    private JCheckBox diffRot;
     private static final String[] combolist = { "No difference images", "Running difference", "Base difference" };
+
+    private final JPanel diffPanel = new JPanel();
+    private final JSpinner truncateSpinner;
+    private final JCheckBox diffRot;
     private final JPanel radPanel;
 
     public RunningDifferencePanel() {
