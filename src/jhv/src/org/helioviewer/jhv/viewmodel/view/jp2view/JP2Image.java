@@ -216,12 +216,18 @@ public class JP2Image {
         factor = Math.min(factor, adj);
 
         JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
-        if (!imageCacheStatus.imageComplete(frame, res.level)) {
-            imageCacheStatus.downgradeVisibleStatus(res.level);
+
+        int level = res.level;
+        if (!imageCacheStatus.imageComplete(frame, level) && level < oldLevel) {
+            imageCacheStatus.downgradeVisibleStatus(level);
             signalReader(params);
         }
+        oldLevel = level;
+
         return params;
     }
+
+    private int oldLevel = 1000;
 
     URI getURI() {
         return uri;
