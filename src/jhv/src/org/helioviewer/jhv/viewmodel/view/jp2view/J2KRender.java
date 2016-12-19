@@ -24,6 +24,8 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 class J2KRender implements Runnable {
 
+    private static final int MAX_INACTIVE_LAYERS = 200;
+
     private static final ThreadLocal<int[]> bufferLocal = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
     private static final ThreadLocal<Kdu_thread_env> threadLocal = ThreadLocal.withInitial(J2KRender::createThreadEnv);
     private static final ThreadLocal<KakaduEngine> engineLocal = new ThreadLocal<>();
@@ -48,6 +50,11 @@ class J2KRender implements Runnable {
     }
 
     private void renderLayer(Kdu_region_compositor compositor) throws KduException {
+        if (discard)
+            compositor.Refresh();
+        else
+            compositor.Cull_inactive_ilayers(MAX_INACTIVE_LAYERS);
+
         int numLayer = params.compositionLayer;
         int numComponents = params.components;
 
