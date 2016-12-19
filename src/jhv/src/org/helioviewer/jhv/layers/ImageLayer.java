@@ -112,6 +112,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         worker = null; // drop reference
 
         setVisible(true); // enable optionsPanel
+        ImageViewerGui.getRenderableContainerPanel().revalidate();
+        ImageViewerGui.getRenderableContainerPanel().repaint();
 
         view.setImageLayer(this);
         view.setDataHandler(this);
