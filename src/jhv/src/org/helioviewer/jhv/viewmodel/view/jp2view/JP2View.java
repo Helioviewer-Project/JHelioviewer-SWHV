@@ -2,10 +2,6 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
 import java.net.URI;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
@@ -13,19 +9,15 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 
 // This class is responsible for reading and decoding of JPEG2000 images
 public class JP2View extends AbstractView {
 
-    private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
-    // no need to intercept exceptions
-    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy());
+    private final JP2ViewExecutor executor = new JP2ViewExecutor();
 
     protected JP2Image _jp2Image;
 
@@ -47,18 +39,8 @@ public class JP2View extends AbstractView {
         frameCountStart = System.currentTimeMillis();
     }
 
-    @Override
-    public String getName() {
-        return _jp2Image.getName();
-    }
-
     public String getXMLMetaData() {
         return _jp2Image.getXML(trueFrame + 1);
-    }
-
-    @Override
-    public URI getURI() {
-        return _jp2Image.getURI();
     }
 
     private volatile boolean isAbolished = false;
@@ -69,13 +51,8 @@ public class JP2View extends AbstractView {
             return;
         isAbolished = true;
 
-        executor.shutdown();
         new Thread(() -> {
-            try {
-                while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
-            } catch (Exception ignore) {
-            }
-
+            executor.abolish();
             if (_jp2Image != null) {
                 _jp2Image.abolish();
                 _jp2Image = null;
@@ -107,11 +84,6 @@ public class JP2View extends AbstractView {
         if (dataHandler != null) {
             dataHandler.handleData(newImageData);
         }
-    }
-
-    @Override
-    public CacheStatus getImageCacheStatus(int frame) {
-        return _jp2Image.getImageCacheStatus().getVisibleStatus(frame);
     }
 
     @Override
@@ -244,30 +216,37 @@ public class JP2View extends AbstractView {
             viewpoint = camera.getViewpoint();
         }
 
-        signalRender(_jp2Image, factor);
+        signalRender(_jp2Image, targetFrame, factor);
     }
 
-    void signalRenderFromReader(JP2Image jp2Image, double factor) {
-        EventQueue.invokeLater(() -> signalRender(jp2Image, factor));
+    void signalRenderFromReader(JP2Image image, int frame, double factor) {
+        if (isAbolished || frame != targetFrame)
+            return;
+        EventQueue.invokeLater(() -> signalRender(image, frame, factor));
     }
 
-    private void signalRender(JP2Image jp2Image, double factor) {
-        if (isAbolished)
-            return;
+    private void signalRender(JP2Image image, int frame, double factor) {
+        executor.execute(camera, vp, viewpoint, this, image, frame, factor);
+    }
 
-        // order is important, this will signal reader
-        JP2ImageParameter params = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, factor);
-        CacheStatus status = jp2Image.getImageCacheStatus().getVisibleStatus(targetFrame);
-        if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) // avoid empty image at startup
-            return;
+    @Override
+    public String getName() {
+        return _jp2Image.getName();
+    }
 
-        blockingQueue.poll();
-        executor.execute(new J2KRender(this, params, !jp2Image.getImageCacheStatus().imageComplete(targetFrame, params.resolution.level)));
+    @Override
+    public URI getURI() {
+        return _jp2Image.getURI();
     }
 
     @Override
     public LUT getDefaultLUT() {
         return _jp2Image.getDefaultLUT();
+    }
+
+    @Override
+    public CacheStatus getImageCacheStatus(int frame) {
+        return _jp2Image.getImageCacheStatus().getVisibleStatus(frame);
     }
 
 }
