@@ -80,10 +80,12 @@ public class JP2View extends AbstractView {
                 while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
             } catch (Exception ignore) {
             }
-            EventQueue.invokeLater(() -> {
-                _jp2Image.abolish();
-                _jp2Image = null;
-            });
+
+            if (_jp2Image != null)
+                EventQueue.invokeLater(() -> {
+                    _jp2Image.abolish();
+                    _jp2Image = null;
+                });
         }).start();
     }
 

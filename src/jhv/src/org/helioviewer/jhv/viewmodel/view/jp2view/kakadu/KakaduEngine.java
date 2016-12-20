@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-import kdu_jni.Jp2_family_src;
+import kdu_jni.Jp2_threadsafe_family_src;
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
@@ -13,12 +13,12 @@ import kdu_jni.Kdu_region_compositor;
 
 public class KakaduEngine {
 
-    private Jp2_family_src familySrc;
+    private Jp2_threadsafe_family_src familySrc;
     private Jpx_source jpxSrc;
     private Kdu_region_compositor compositor;
 
     public KakaduEngine(Kdu_cache cache, URI uri) throws KduException, IOException {
-        familySrc = new Jp2_family_src();
+        familySrc = new Jp2_threadsafe_family_src();
         if (cache == null) { // local
             File file = new File(uri);
             familySrc.Open(file.getCanonicalPath(), true);
@@ -31,7 +31,7 @@ public class KakaduEngine {
         compositor = createCompositor(jpxSrc);
     }
 
-    public Jp2_family_src getFamilySrc() {
+    public Jp2_threadsafe_family_src getFamilySrc() {
         return familySrc;
     }
 
@@ -47,7 +47,7 @@ public class KakaduEngine {
     protected void finalize() throws Throwable {
         try {
             destroyCompositor(compositor);
-            if (jpxSrc != null) {
+            /* if (jpxSrc != null) {
                 if (jpxSrc.Exists())
                     jpxSrc.Close();
                 jpxSrc.Native_destroy();
@@ -56,7 +56,7 @@ public class KakaduEngine {
                 if (familySrc.Exists())
                     familySrc.Close();
                 familySrc.Native_destroy();
-            }
+            } */
         } catch (KduException e) {
             e.printStackTrace();
         } finally {
