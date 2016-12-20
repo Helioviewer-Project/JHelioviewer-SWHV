@@ -32,9 +32,6 @@ class J2KRender implements Runnable {
 
     private static final int[] firstComponent = { 0 };
 
-    // A reference to the JP2Image this object is owned by
-    private final JP2Image parentImageRef;
-
     // A reference to the JP2View this object is owned by
     private final JP2View parentViewRef;
 
@@ -45,7 +42,6 @@ class J2KRender implements Runnable {
     J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams, boolean _discard) {
         parentViewRef = _parentViewRef;
         params = _currParams;
-        parentImageRef = params.jp2Image;
         discard = _discard;
     }
 
@@ -152,7 +148,7 @@ class J2KRender implements Runnable {
         try {
             KakaduEngine kduEngine = engineLocal.get();
             if (kduEngine == null) {
-                kduEngine = parentImageRef.getRenderEngine(threadLocal.get());
+                kduEngine = params.jp2Image.getRenderEngine(threadLocal.get());
                 engineLocal.set(kduEngine);
             }
             renderLayer(kduEngine.getCompositor());

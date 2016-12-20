@@ -27,12 +27,7 @@ public class JP2View extends AbstractView {
     // no need to intercept exceptions
     private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy());
 
-    private void queueSubmitTask(Runnable task) {
-        blockingQueue.poll();
-        executor.execute(task);
-    }
-
-    JP2Image _jp2Image;
+    protected JP2Image _jp2Image;
 
     private int targetFrame = 0;
     private int trueFrame = -1;
@@ -266,7 +261,8 @@ public class JP2View extends AbstractView {
         if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) // avoid empty image at startup
             return;
 
-        queueSubmitTask(new J2KRender(this, params, !jp2Image.getImageCacheStatus().imageComplete(targetFrame, params.resolution.level)));
+        blockingQueue.poll();
+        executor.execute(new J2KRender(this, params, !jp2Image.getImageCacheStatus().imageComplete(targetFrame, params.resolution.level)));
     }
 
     @Override

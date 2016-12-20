@@ -65,11 +65,6 @@ class J2KReader implements Runnable {
         myThread.start();
     }
 
-    private void reconnect() throws IOException {
-        // System.out.println(">>> reconnect");
-        socket = new JPIPSocket(parentImageRef.getURI(), cacheRef, cacheStatusRef);
-    }
-
     // runs in abolish thread
     void abolish() {
         if (isAbolished)
@@ -177,8 +172,10 @@ class J2KReader implements Runnable {
             }
 
             try {
-                if (socket.isClosed())
-                    reconnect();
+                if (socket.isClosed()) {
+                    // System.out.println(">>> reconnect");
+                    socket = new JPIPSocket(parentImageRef.getURI(), cacheRef, cacheStatusRef);
+                }
 
                 int frame = params.compositionLayer;
                 int level = params.resolution.level;
