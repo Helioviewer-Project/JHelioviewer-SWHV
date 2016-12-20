@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 
 import org.helioviewer.jhv.base.logging.Log;
@@ -87,11 +86,6 @@ class J2KReader implements Runnable {
                 e.printStackTrace();
             }
         }
-    }
-
-    private void signalRender(double factor) {
-        if (!isAbolished)
-            EventQueue.invokeLater(() -> parentViewRef.signalRenderFromReader(parentImageRef, factor));
     }
 
     void signalReader(JP2ImageParameter params) {
@@ -242,7 +236,7 @@ class J2KReader implements Runnable {
                         if (singleFrame) {
                             cacheStatusRef.setVisibleStatus(frame, CacheStatus.COMPLETE);
                             cacheStatusRef.setImageComplete(frame, level);
-                            signalRender(params.factor);
+                            parentViewRef.signalRenderFromReader(parentImageRef, params.factor); // refresh current image
                         } else {
                             for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
                                 cacheStatusRef.setVisibleStatus(j, CacheStatus.COMPLETE);
