@@ -233,7 +233,7 @@ class J2KReader implements Runnable {
                         if (singleFrame) {
                             cacheStatusRef.setVisibleStatus(frame, CacheStatus.COMPLETE);
                             cacheStatusRef.setImageComplete(frame, level);
-                            parentViewRef.signalRenderFromReader(parentImageRef, params.factor); // refresh current image
+                            parentViewRef.signalRenderFromReader(parentImageRef, frame, params.factor); // refresh current image
                         } else {
                             for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
                                 cacheStatusRef.setVisibleStatus(j, CacheStatus.COMPLETE);
