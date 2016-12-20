@@ -11,7 +11,7 @@ import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 class JHVLoader {
 
     public static void loadBundledPlugin(String name) throws IOException {
-        try (InputStream is = JavaHelioViewer.class.getResourceAsStream("/plugins/" + name)) {
+        try (InputStream is = JHVLoader.class.getResourceAsStream("/plugins/" + name)) {
             File f = new File(JHVDirectory.PLUGINS.getPath() + name);
             FileUtils.save(is, f);
             PluginManager.getSingletonInstance().loadPlugin(f.toURI());
@@ -56,7 +56,7 @@ class JHVLoader {
         }
 
         for (String kduLib : kduLibs) {
-            try (InputStream is = JavaHelioViewer.class.getResourceAsStream("/natives/" + pathlib + kduLib)) {
+            try (InputStream is = JHVLoader.class.getResourceAsStream("/natives/" + pathlib + kduLib)) {
                 File f = new File(JHVDirectory.LIBS.getPath() + kduLib);
                 FileUtils.save(is, f);
                 System.load(f.getAbsolutePath());

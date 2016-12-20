@@ -2,7 +2,7 @@ package org.helioviewer.jhv.launcher;
 
 import java.awt.EventQueue;
 
-import org.helioviewer.jhv.JavaHelioViewer;
+import org.helioviewer.jhv.JHelioviewer;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
@@ -22,7 +22,7 @@ public class SWHVLauncher {
         System.out.println("=================================================================\n\n");
 
         String[] args2 = new String[] { "--exclude-plugins" };
-        JavaHelioViewer.main(args2);
+        JHelioviewer.main(args2);
 
         EventQueue.invokeLater(new Runnable() {
             @Override

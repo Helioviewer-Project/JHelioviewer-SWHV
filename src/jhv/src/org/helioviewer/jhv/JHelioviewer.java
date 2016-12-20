@@ -22,7 +22,7 @@ import org.helioviewer.jhv.io.LoadStartup;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
 // Main
-public class JavaHelioViewer {
+public class JHelioviewer {
 
     public static void main(String[] args) {
         // Prints the usage message

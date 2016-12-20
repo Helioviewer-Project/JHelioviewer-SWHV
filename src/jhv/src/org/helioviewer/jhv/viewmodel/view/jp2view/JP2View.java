@@ -81,11 +81,10 @@ public class JP2View extends AbstractView {
             } catch (Exception ignore) {
             }
 
-            if (_jp2Image != null)
-                EventQueue.invokeLater(() -> {
-                    _jp2Image.abolish();
-                    _jp2Image = null;
-                });
+            if (_jp2Image != null) {
+                _jp2Image.abolish();
+                _jp2Image = null;
+            }
         }).start();
     }
 
@@ -254,11 +253,10 @@ public class JP2View extends AbstractView {
     }
 
     void signalRenderFromReader(JP2Image jp2Image, double factor) {
-        signalRender(jp2Image, factor);
+        EventQueue.invokeLater(() -> signalRender(jp2Image, factor));
     }
 
     private void signalRender(JP2Image jp2Image, double factor) {
-        // from reader on EDT, might come after abolish
         if (isAbolished)
             return;
 
