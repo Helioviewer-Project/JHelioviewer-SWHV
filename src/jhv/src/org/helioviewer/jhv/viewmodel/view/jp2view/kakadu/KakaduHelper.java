@@ -1,13 +1,12 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.kakadu;
 
-import java.awt.Rectangle;
-
 import kdu_jni.Jp2_palette;
 import kdu_jni.Jpx_codestream_source;
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_channel_mapping;
 import kdu_jni.Kdu_codestream;
+import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_istream_ref;
@@ -42,27 +41,28 @@ public class KakaduHelper {
         cmap.Clear();
         cmap.Native_destroy();
 
+        int maxDWT = stream.Get_min_dwt_levels();
+        ResolutionSet res = new ResolutionSet(maxDWT + 1, maxComponents);
+
         compositor.Set_scale(false, false, false, 1f);
         Kdu_dims dims = new Kdu_dims();
         if (!compositor.Get_total_composition_dims(dims)) {
             throw new KduException(">> cannot determine dimensions for stream " + frame);
         }
 
-        int maxDWT = stream.Get_min_dwt_levels();
-        ResolutionSet res = new ResolutionSet(maxDWT + 1, maxComponents);
+        Kdu_coords siz = dims.Access_size();
+        int width0 = siz.Get_x(), height0 = siz.Get_y();
+        res.addResolutionLevel(0, width0, height0, 1, 1);
 
-        Rectangle rect = KakaduUtils.kdu_dimsToRect(dims);
-        res.addResolutionLevel(0, rect.width, rect.height, 1, 1);
-
-        int width0 = rect.width, height0 = rect.height;
         for (int i = 1; i <= maxDWT; i++) {
             compositor.Set_scale(false, false, false, 1f / (1 << i));
             dims = new Kdu_dims();
             if (!compositor.Get_total_composition_dims(dims))
                 break;
 
-            rect = KakaduUtils.kdu_dimsToRect(dims);
-            res.addResolutionLevel(i, rect.width, rect.height, width0 / (double) rect.width, height0 / (double) rect.height);
+            siz = dims.Access_size();
+            int width = siz.Get_x(), height = siz.Get_y();
+            res.addResolutionLevel(i, width, height, width0 / (double) width, height0 / (double) height);
         }
 
         compositor.Remove_ilayer(ilayer, true);

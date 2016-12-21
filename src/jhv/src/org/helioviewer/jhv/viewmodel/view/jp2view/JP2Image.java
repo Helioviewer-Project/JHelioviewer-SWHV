@@ -3,6 +3,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 import java.io.IOException;
 import java.net.URI;
 
+import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_thread_env;
@@ -37,7 +38,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
-import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMeta;
 
 public class JP2Image {
 
@@ -101,15 +102,17 @@ public class JP2Image {
             }
 
             KakaduEngine kduReader = new KakaduEngine(cacheReader, uri);
+            Jpx_source jpx = kduReader.getJpxSource();
+
             // Retrieve the number of composition layers
             int[] tempVar = new int[1];
-            kduReader.getJpxSource().Count_compositing_layers(tempVar);
+            jpx.Count_compositing_layers(tempVar);
             frameCount = tempVar[0];
 
-            builtinLUT = KakaduHelper.getLUT(kduReader.getJpxSource());
+            builtinLUT = KakaduHelper.getLUT(jpx);
 
             metaDataList = new MetaData[frameCount];
-            KakaduUtils.cacheMetaData(kduReader.getFamilySrc(), metaDataList);
+            KakaduMeta.cacheMetaData(kduReader.getFamilySrc(), metaDataList);
             for (int i = 0; i < frameCount; i++) {
                 if (metaDataList[i] == null)
                     metaDataList[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
@@ -344,7 +347,7 @@ public class JP2Image {
         String xml = null;
         try {
             KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri);
-            xml = KakaduUtils.getXml(kduTmp.getFamilySrc(), boxNumber);
+            xml = KakaduMeta.getXml(kduTmp.getFamilySrc(), boxNumber);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -16,11 +16,11 @@ import kdu_jni.Kdu_thread_env;
 import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
-import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 class J2KRender implements Runnable {
 
@@ -53,6 +53,7 @@ class J2KRender implements Runnable {
 
         int numLayer = params.compositionLayer;
         int numComponents = params.components;
+        SubImage subImage = params.subImage;
 
         Kdu_ilayer_ref ilayer;
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
@@ -65,7 +66,7 @@ class J2KRender implements Runnable {
         }
 
         compositor.Set_scale(false, false, false, params.resolution.scaleLevel, (float) params.factor);
-        Kdu_dims requestedRegion = KakaduUtils.roiToKdu_dims(params.subImage);
+        Kdu_dims requestedRegion = jhvToKdu_dims(subImage.x, subImage.y, subImage.width, subImage.height);
         compositor.Set_buffer_surface(requestedRegion);
 
         Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(new Kdu_dims());
@@ -125,22 +126,19 @@ class J2KRender implements Runnable {
         compositorBuf.Native_destroy();
         compositor.Remove_ilayer(ilayer, discard);
 
-        ImageData imdata;
+        ImageData data;
         if (numComponents < 3) {
-            imdata = new SingleChannelByte8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
+            data = new SingleChannelByte8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
         } else {
-            imdata = new ARGBInt32ImageData(false, aWidth, aHeight, IntBuffer.wrap(intBuffer));
+            data = new ARGBInt32ImageData(false, aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
-        setImageData(imdata);
-    }
 
-    private void setImageData(ImageData newImageData) {
-        MetaData metaData = params.jp2Image.metaDataList[params.compositionLayer];
-        newImageData.setMetaData(metaData);
-        newImageData.setViewpoint(params.viewpoint);
-        newImageData.setRegion(metaData.roiToRegion(params.subImage, params.resolution.factorX, params.resolution.factorY));
+        MetaData metaData = params.jp2Image.metaDataList[numLayer];
+        data.setMetaData(metaData);
+        data.setViewpoint(params.viewpoint);
+        data.setRegion(metaData.roiToRegion(subImage, params.resolution.factorX, params.resolution.factorY));
 
-        EventQueue.invokeLater(() -> parentViewRef.setImageData(newImageData));
+        EventQueue.invokeLater(() -> parentViewRef.setImageData(data));
     }
 
     @Override
@@ -158,6 +156,18 @@ class J2KRender implements Runnable {
             threadLocal.remove();
             e.printStackTrace();
         }
+    }
+
+    private static Kdu_dims jhvToKdu_dims(int x, int y, int width, int height) throws KduException {
+        Kdu_dims dims = new Kdu_dims();
+        Kdu_coords pos = dims.Access_pos();
+        pos.Set_x(x);
+        pos.Set_y(y);
+        Kdu_coords siz = dims.Access_size();
+        siz.Set_x(width);
+        siz.Set_y(height);
+
+        return dims;
     }
 
     private static Kdu_thread_env createThreadEnv() {
