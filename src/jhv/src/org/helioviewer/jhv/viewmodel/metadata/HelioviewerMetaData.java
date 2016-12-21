@@ -156,8 +156,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private JHVDate retrieveDateTime(MetaDataContainer m) {
         String observedDate;
 
-        // MDI DATE-OBS unusable
-        if (instrument.equals("MDI")) {
+        // DATE-OBS unusable for MDI and early EIT
+        if (instrument.equals("MDI") || instrument.equals("EIT")) {
             observedDate = m.get("DATE_OBS").replace("Z", "");
         } else {
             observedDate = m.get("DATE-OBS");
