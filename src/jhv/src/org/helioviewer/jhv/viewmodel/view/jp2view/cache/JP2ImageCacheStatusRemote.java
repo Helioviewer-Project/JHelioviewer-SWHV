@@ -15,7 +15,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     // r/w image load, r/w J2KReader, r MoviePanel/EDT
     private final CacheStatus[] imageStatus;
-    private int imagePartialUntil = -1;
+    private int imagePartialUntil = 0;
 
     public JP2ImageCacheStatusRemote(KakaduEngine _engine, int _maxFrame) throws KduException {
         maxFrame = _maxFrame;
@@ -69,12 +69,12 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     @Override
     public int getImageCachedPartiallyUntil() {
         int i;
-        for (i = Math.max(0, imagePartialUntil); i <= maxFrame; i++) {
+        for (i = imagePartialUntil; i <= maxFrame; i++) {
             if (imageStatus[i] != CacheStatus.PARTIAL && imageStatus[i] != CacheStatus.COMPLETE) {
                 break;
             }
         }
-        imagePartialUntil = i - 1;
+        imagePartialUntil = Math.max(0, i - 1);
         return imagePartialUntil;
     }
 
