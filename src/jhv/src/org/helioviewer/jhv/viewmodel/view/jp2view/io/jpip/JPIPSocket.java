@@ -17,16 +17,10 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.TransferInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPMessage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPSocket;
 
-/**
- * Assumes a persistent HTTP connection.
- *
- * @author caplins
- *
- */
+// Assumes a persistent HTTP connection.
 public class JPIPSocket extends HTTPSocket {
-    /**
-     * The jpip channel ID for the connection (persistent)
-     */
+
+    // The jpip channel ID for the connection (persistent)
     private final String jpipChannelID;
 
     /**
@@ -36,22 +30,8 @@ public class JPIPSocket extends HTTPSocket {
      */
     private String jpipPath;
 
-    /** Amount of data (bytes) of the last response */
-    private int receivedData = 0;
-
-    /** Time when received the last reply text */
-    private long replyTextTm = 0;
-
-    /** Time when received the last reply data */
-    private long replyDataTm = 0;
-
     private static final String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
 
-    /**
-     * Open new JPIP channel
-     *
-     * @throws IOException
-     */
     public JPIPSocket(URI uri, JPIPCache cache, JP2ImageCacheStatus status) throws IOException {
         connect(uri);
 
@@ -118,12 +98,9 @@ public class JPIPSocket extends HTTPSocket {
 
     // Receives a JPIPResponse returning null if EOS reached
     public JPIPResponse receive(JPIPCache cache, JP2ImageCacheStatus status) throws IOException {
-        // long tini = System.currentTimeMillis();
         HTTPMessage res = recv();
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
-
-        replyTextTm = System.currentTimeMillis();
 
         TransferInputStream transferInput;
         String head = res.getHeader("Transfer-Encoding");
@@ -172,28 +149,8 @@ public class JPIPSocket extends HTTPSocket {
         if ("close".equals(res.getHeader("Connection"))) {
             super.close();
         }
-        replyDataTm = System.currentTimeMillis();
-        receivedData = transferInput.getTotalLength();
-
-        // System.out.format("Bandwidth: %.2f KB/seg.\n", (double)(receivedData
-        // * 1.0) / (double)(replyDataTm - tini));
 
         return jpipRes;
-    }
-
-    // Returns the time when received the headers of last response
-    public long getReplyTextTime() {
-        return replyTextTm;
-    }
-
-    // Returns the time when received the data of last response
-    public long getReplyDataTime() {
-        return replyDataTm;
-    }
-
-    // Returns the amount of data (bytes) of the last response
-    public int getReceivedData() {
-        return receivedData;
     }
 
 }
