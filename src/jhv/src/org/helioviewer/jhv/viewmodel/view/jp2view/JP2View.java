@@ -215,7 +215,6 @@ public class JP2View extends AbstractView {
         if (camera != null) {
             viewpoint = camera.getViewpoint();
         }
-
         signalRender(_jp2Image, targetFrame, factor);
     }
 

@@ -1,62 +1,23 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.kakadu;
 
-import java.awt.Rectangle;
 import java.nio.charset.StandardCharsets;
 
 import kdu_jni.Jp2_input_box;
 import kdu_jni.Jp2_family_src;
 import kdu_jni.Jp2_locator;
 import kdu_jni.KduException;
-import kdu_jni.Kdu_coords;
-import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 
-import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
 
 /**
- * A collection of useful static methods.
- *
  * @author caplins
  * @author Benjamin Wamsler
  * @author Juan Pablo
  */
-public class KakaduUtils {
-
-    /**
-     * Converts a Kdu_dims object to its Java equivalent (Rectangle).
-     *
-     * @param dims
-     *            Kdu_dims to convert
-     * @return Rectangle equivalent to the given Kdu_dims
-     */
-    public static Rectangle kdu_dimsToRect(Kdu_dims dims) throws KduException {
-        Kdu_coords pos = dims.Access_pos();
-        Kdu_coords siz = dims.Access_size();
-        return new Rectangle(pos.Get_x(), pos.Get_y(), siz.Get_x(), siz.Get_y());
-    }
-
-    /**
-     * Converts a SubImage object to a Kdu_dims object
-     *
-     * @param roi
-     *            SubImage to convert
-     * @return Kdu_dims equivalent to the given SubImage
-     */
-    public static Kdu_dims roiToKdu_dims(SubImage roi) throws KduException {
-        Kdu_dims dims = new Kdu_dims();
-
-        Kdu_coords pos = dims.Access_pos();
-        pos.Set_x(roi.x);
-        pos.Set_y(roi.y);
-        Kdu_coords siz = dims.Access_size();
-        siz.Set_x(roi.width);
-        siz.Set_y(roi.height);
-
-        return dims;
-    }
+public class KakaduMeta {
 
     /**
      * Searches the _familySrc for a box of type _boxType (the box types are
@@ -158,8 +119,7 @@ public class KakaduUtils {
      * @throws JHV_KduException
      */
     private static Jp2_input_box findBox2(Jp2_input_box supBox, long boxType, int boxNumber) throws JHV_KduException {
-        Jp2_input_box box = null;
-
+        Jp2_input_box box;
         try {
             box = new Jp2_input_box();
             if (!box.Open(supBox))
@@ -180,7 +140,6 @@ public class KakaduUtils {
         } catch (KduException ex) {
             throw new JHV_KduException("Internal Kakadu Error(findBox2 " + boxNumber + "): " + ex.getMessage(), ex);
         }
-
         return box;
     }
 
@@ -209,55 +168,28 @@ public class KakaduUtils {
 
         String xml = null;
         if (xmlBox != null) {
-            try {
-                // Grab the xml data if available
-                int len = (int) xmlBox.Get_remaining_bytes();
-                if (len > 0) {
-                    byte[] buf = new byte[len];
-                    xmlBox.Read(buf, len);
-                    xml = new String(buf, StandardCharsets.UTF_8);
-                }
-                xmlBox.Native_destroy();
-            } catch (KduException ex) {
-                throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
-            }
+            xml = xmlBox2xml(xmlBox);
+            xmlBox.Native_destroy();
         }
 
         if (assocBox != null) {
             assocBox.Native_destroy();
-            assocBox = null;
         }
         if (assoc2Box != null) {
             assoc2Box.Native_destroy();
-            assoc2Box = null;
         }
         if (findBoxResult[1] != null) {
             findBoxResult[1].Native_destroy();
-            findBoxResult[1] = null;
         }
         if (findBoxResult[0] != null) {
             findBoxResult[0].Native_destroy();
-            findBoxResult[0] = null;
         }
-        if (xml != null) {
-            try {
-                if (xml.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>") != 0)
-                    xml = xml.substring(xml.indexOf("<meta>"));
-                if (xml.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>") != 0)
-                    xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + xml;
-            } catch (Exception ex) {
-                throw new JHV_KduException("Failed parsing XML data", ex);
-            }
-        }
-
         return xml;
     }
 
     private static String xmlBox2xml(Jp2_input_box xmlBox) throws JHV_KduException {
         String xml = null;
-
         try {
-            // Grab the xml data if available
             int len = (int) xmlBox.Get_remaining_bytes();
             if (len > 0) {
                 byte[] buf = new byte[len];
@@ -267,7 +199,7 @@ public class KakaduUtils {
         } catch (KduException ex) {
             throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
         }
-
+/* wtf?
         if (xml != null) {
             try {
                 if (xml.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>") != 0)
@@ -278,7 +210,7 @@ public class KakaduUtils {
                 throw new JHV_KduException("Failed parsing XML data", ex);
             }
         }
-
+*/
         return xml;
     }
 
@@ -294,7 +226,6 @@ public class KakaduUtils {
                 box.Close();
                 box.Open_next();
             }
-
             if (!box.Exists() || box.Get_box_type() != boxType) {
                 return false;
             }
@@ -346,5 +277,32 @@ public class KakaduUtils {
             findBoxResult[0].Native_destroy();
         }
     }
+
+/*
+    private static final long[] xmlFilter = { Kdu_global.jp2_xml_4cc };
+
+    public static void cacheMetaData(Jpx_source jpx, MetaData[] metaDataList) throws Exception {
+        XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
+
+        Jpx_meta_manager metaManager = jpx.Access_meta_manager();
+        metaManager.Set_box_filter(1, xmlFilter);
+
+        Jpx_metanode metaNode = new Jpx_metanode();
+        Kdu_dims dims = new Kdu_dims();
+        for (int i = 0; i < metaDataList.length; i++) {
+            metaNode = metaManager.Enumerate_matches(metaNode, -1, i + 1, false, dims, 0);
+            Jpx_metanode xmlNode = metaNode.Get_descendant(0);
+            if (xmlNode.Exists() && xmlNode.Get_box_type() == xmlFilter[0]) {
+                Jp2_input_box xmlBox = new Jp2_input_box();
+                if (xmlNode.Open_existing(xmlBox)) {
+                    hvMetaData.parseXML(xmlBox2xml(xmlBox));
+                    metaDataList[i] = new HelioviewerMetaData(hvMetaData, i);
+                    hvMetaData.destroyXML();
+                    xmlBox.Close();
+                }
+            }
+        }
+    }
+*/
 
 }
