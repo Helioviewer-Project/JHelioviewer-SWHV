@@ -41,12 +41,12 @@ public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements J
     }
 
     @Override
-    public boolean imageComplete(int frame, int level) {
+    public boolean frameLevelComplete(int frame, int level) {
         return true;
     }
 
     @Override
-    public void setImageComplete(int frame, int level) {
+    public void setFrameLevelComplete(int frame, int level) {
     }
 
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
@@ -182,7 +181,7 @@ class J2KReader implements Runnable {
 
                 // choose cache strategy
                 boolean singleFrame = false;
-                if (num_layers <= 1 /* one frame */ || (!Layers.isMoviePlaying() /*! */ && !cacheStatusRef.imageComplete(frame, level))) {
+                if (num_layers <= 1 /* one frame */ || params.priority) {
                     singleFrame = true;
                 }
 
@@ -232,12 +231,12 @@ class J2KReader implements Runnable {
                         // tell the cache status
                         if (singleFrame) {
                             cacheStatusRef.setVisibleStatus(frame, CacheStatus.COMPLETE);
-                            cacheStatusRef.setImageComplete(frame, level);
+                            cacheStatusRef.setFrameLevelComplete(frame, level);
                             parentViewRef.signalRenderFromReader(parentImageRef, frame, params.factor); // refresh current image
                         } else {
                             for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
                                 cacheStatusRef.setVisibleStatus(j, CacheStatus.COMPLETE);
-                                cacheStatusRef.setImageComplete(j, level);
+                                cacheStatusRef.setFrameLevelComplete(j, level);
                             }
                         }
                     }
@@ -263,6 +262,7 @@ class J2KReader implements Runnable {
 
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && !stopReading && !cacheStatusRef.levelComplete(level)) {
+                    params.priority = false;
                     readerSignal.signal(params);
                 }
              } catch (IOException e) {

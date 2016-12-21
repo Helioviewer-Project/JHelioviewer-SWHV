@@ -28,7 +28,7 @@ class JP2ViewExecutor {
             return;
 
         blockingQueue.poll();
-        executor.execute(new J2KRender(view, params, !image.getImageCacheStatus().imageComplete(frame, params.resolution.level)));
+        executor.execute(new J2KRender(view, params, !image.getImageCacheStatus().frameLevelComplete(frame, params.resolution.level)));
     }
 
     void abolish() {

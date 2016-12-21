@@ -218,10 +218,13 @@ public class JP2Image {
         }
         factor = Math.min(factor, adj);
 
-        JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, factor);
-
         int level = res.level;
-        if (!imageCacheStatus.imageComplete(frame, level) && (!Layers.isMoviePlaying() || level < oldLevel)) {
+        boolean frameLevelComplete = imageCacheStatus.frameLevelComplete(frame, level);
+        boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
+
+        JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, factor, priority);
+
+        if (priority || (!frameLevelComplete && level < oldLevel)) {
             imageCacheStatus.downgradeVisibleStatus(level);
             signalReader(params);
         }
@@ -230,7 +233,7 @@ public class JP2Image {
         return params;
     }
 
-    private int oldLevel = 1000;
+    private int oldLevel = 10000;
 
     URI getURI() {
         return uri;
