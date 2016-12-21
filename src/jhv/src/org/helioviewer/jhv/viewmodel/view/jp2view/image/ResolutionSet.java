@@ -54,7 +54,6 @@ public class ResolutionSet {
     public static class ResolutionLevel {
 
         public final int level;
-        public final float scaleLevel;
 
         public final int width;
         public final int height;
@@ -65,7 +64,6 @@ public class ResolutionSet {
         // Private constructor
         private ResolutionLevel(int _level, int _width, int _height, double _factorX, double _factorY) {
             level = _level;
-            scaleLevel = 1f / (1 << level);
             width = _width;
             height = _height;
             factorX = _factorX;

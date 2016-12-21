@@ -51,21 +51,22 @@ class J2KRender implements Runnable {
         else
             compositor.Cull_inactive_ilayers(MAX_INACTIVE_LAYERS);
 
-        int numLayer = params.compositionLayer;
-        int numComponents = params.components;
+        JP2Image image = params.jp2Image;
         SubImage subImage = params.subImage;
+        int frame = params.compositionLayer;
+        int numComponents = image.getNumComponents(frame);
 
         Kdu_ilayer_ref ilayer;
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
 
         if (numComponents < 3) {
             // alpha tbd
-            ilayer = compositor.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
+            ilayer = compositor.Add_primitive_ilayer(frame, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
         } else {
-            ilayer = compositor.Add_ilayer(numLayer, dimsRef1, dimsRef2);
+            ilayer = compositor.Add_ilayer(frame, dimsRef1, dimsRef2);
         }
 
-        compositor.Set_scale(false, false, false, params.resolution.scaleLevel, (float) params.factor);
+        compositor.Set_scale(false, false, false, 1f / (1 << params.resolution.level), (float) params.factor);
         Kdu_dims requestedRegion = jhvToKdu_dims(subImage.x, subImage.y, subImage.width, subImage.height);
         compositor.Set_buffer_surface(requestedRegion);
 
@@ -133,7 +134,7 @@ class J2KRender implements Runnable {
             data = new ARGBInt32ImageData(false, aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
 
-        MetaData metaData = params.jp2Image.metaDataList[numLayer];
+        MetaData metaData = image.metaDataList[frame];
         data.setMetaData(metaData);
         data.setViewpoint(params.viewpoint);
         data.setRegion(metaData.roiToRegion(subImage, params.resolution.factorX, params.resolution.factorY));

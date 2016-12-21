@@ -218,7 +218,7 @@ public class JP2Image {
         }
         factor = Math.min(factor, adj);
 
-        JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, imageCacheStatus.getResolutionSet(frame).numComps, factor);
+        JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, factor);
 
         int level = res.level;
         if (!imageCacheStatus.imageComplete(frame, level) && (!Layers.isMoviePlaying() || level < oldLevel)) {
@@ -271,7 +271,7 @@ public class JP2Image {
         return imageCacheStatus.getResolutionSet(frame).getResolutionLevel(level);
     }
 
-    protected int getNumComponents(int frame) {
+    int getNumComponents(int frame) {
         return imageCacheStatus.getResolutionSet(frame).numComps;
     }
 
