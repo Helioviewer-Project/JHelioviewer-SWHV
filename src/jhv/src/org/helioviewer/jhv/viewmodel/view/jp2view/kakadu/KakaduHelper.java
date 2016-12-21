@@ -58,7 +58,7 @@ public class KakaduHelper {
             compositor.Set_scale(false, false, false, 1f / (1 << i));
             dims = new Kdu_dims();
             if (!compositor.Get_total_composition_dims(dims))
-                break;
+                throw new KduException(">> cannot determine dimensions for stream " + frame);
 
             siz = dims.Access_size();
             int width = siz.Get_x(), height = siz.Get_y();
