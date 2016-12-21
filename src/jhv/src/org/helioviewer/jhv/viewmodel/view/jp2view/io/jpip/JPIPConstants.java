@@ -86,7 +86,7 @@ public class JPIPConstants {
     /**
      * The maximum length in bytes of a JPIP request.
      */
-    public static final int MAX_REQUEST_LEN = 8 * 1024 * 1024;
+    public static final int MAX_REQUEST_LEN = 2 * 1024 * 1024;
 
     public static final int META_REQUEST_LEN = 2000000;
 

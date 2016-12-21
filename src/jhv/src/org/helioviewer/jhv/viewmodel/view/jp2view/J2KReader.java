@@ -33,18 +33,7 @@ class J2KReader implements Runnable {
 
     private final JP2ImageCacheStatus cacheStatusRef;
 
-    /// The JPIPSocket used to connect to the server
     private JPIPSocket socket;
-
-    /**
-     * The time when the last response was received. It is used for performing
-     * the flow control. A negative value means that there is not a previous
-     * valid response to take into account.
-     */
-    private long lastResponseTime = -1;
-
-    /** The current length in bytes to use for requests */
-    private int jpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
 
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
@@ -86,49 +75,8 @@ class J2KReader implements Runnable {
         readerSignal.signal(params);
     }
 
-    /**
-     * This method perfoms the flow control, that is, adjusts dynamically the
-     * value of the variable <code>JPIP_REQUEST_LEN</code>. The used algorithm
-     * is the same as the used one by the viewer kdu_show of Kakadu
-     */
-    private void flowControl() {
-        int adjust = 0;
-        int receivedBytes = socket.getReceivedData();
-        long replyTextTime = socket.getReplyTextTime();
-        long replyDataTime = socket.getReplyDataTime();
-
-        if ((receivedBytes - jpipRequestLen) < (jpipRequestLen >> 1) && receivedBytes > (jpipRequestLen >> 1)) {
-            long tdat = replyDataTime - replyTextTime;
-            if (tdat > 10000)
-                adjust = -1;
-            else if (lastResponseTime > 0) {
-                long tgap = replyTextTime - lastResponseTime;
-
-                if ((tgap + tdat) < 1000)
-                    adjust = +2;
-                else {
-                    double gapRatio = tgap / (double) (tgap + tdat);
-                    double targetRatio = (tdat + tgap) / 10000.;
-
-                    if (gapRatio > targetRatio)
-                        adjust = +2;
-                    else
-                        adjust = -1;
-                }
-            }
-        }
-
-        jpipRequestLen += (jpipRequestLen >> 2) * adjust;
-        if (jpipRequestLen > JPIPConstants.MAX_REQUEST_LEN)
-            jpipRequestLen = JPIPConstants.MAX_REQUEST_LEN;
-        if (jpipRequestLen < JPIPConstants.MIN_REQUEST_LEN)
-            jpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
-
-        lastResponseTime = replyDataTime;
-    }
-
     private static String createQuery(String fSiz, int iniLayer, int endLayer) {
-        return JPIPQuery.create("context", "jpxl<" + iniLayer + '-' + endLayer + '>', "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
+        return JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "context", "jpxl<" + iniLayer + '-' + endLayer + '>', "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
     }
 
     private static String[] createSingleQuery(int width, int height, int frame) {
@@ -201,8 +149,6 @@ class J2KReader implements Runnable {
                         current_step = frame / JPIPConstants.MAX_REQ_LAYERS;
                 }
 
-                lastResponseTime = -1;
-
                 // send queries until everything is complete or caching is interrupted
                 int complete_steps = 0;
                 boolean stopReading = false;
@@ -217,11 +163,9 @@ class J2KReader implements Runnable {
                     }
 
                     // update requested package size
-                    socket.send(stepQuerys[current_step] + "len=" + jpipRequestLen);
+                    socket.send(stepQuerys[current_step]);
                     // receive and add data to cache
                     JPIPResponse res = socket.receive(cacheRef, cacheStatusRef);
-                    // update optimal package size
-                    flowControl();
                     // react if query complete
                     if (res.isResponseComplete()) {
                         // mark query as complete
