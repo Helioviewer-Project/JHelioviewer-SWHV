@@ -40,12 +40,12 @@ public class JP2ImageCacheStatusInitial implements JP2ImageCacheStatus {
     }
 
     @Override
-    public boolean imageComplete(int frame, int level) {
+    public boolean frameLevelComplete(int frame, int level) {
         return false;
     }
 
     @Override
-    public void setImageComplete(int frame, int level) {
+    public void setFrameLevelComplete(int frame, int level) {
     }
 
 }

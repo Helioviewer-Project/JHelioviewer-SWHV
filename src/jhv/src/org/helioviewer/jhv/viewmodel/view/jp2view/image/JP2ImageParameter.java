@@ -13,14 +13,16 @@ public class JP2ImageParameter {
     public final ResolutionLevel resolution;
     public final int compositionLayer;
     public final double factor;
+    public boolean priority;
 
-    public JP2ImageParameter(JP2Image _jp2Image, Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer, double _factor) {
+    public JP2ImageParameter(JP2Image _jp2Image, Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer, double _factor, boolean _priority) {
         jp2Image = _jp2Image;
         viewpoint = _p;
         subImage = _roi;
         resolution = _resolution;
         compositionLayer = _compositionLayer;
         factor = _factor;
+        priority = _priority;
     }
 
     @Override
