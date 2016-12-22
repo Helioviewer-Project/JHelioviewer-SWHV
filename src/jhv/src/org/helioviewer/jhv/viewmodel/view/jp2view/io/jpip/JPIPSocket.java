@@ -9,7 +9,6 @@ import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JPIPCache;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.FixedSizedInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.TransferInputStream;
