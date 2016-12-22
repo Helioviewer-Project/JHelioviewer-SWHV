@@ -4,13 +4,13 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 /**
@@ -111,13 +111,15 @@ class TimeSlider extends JSlider implements LazyComponent {
                     if (end == begin)
                         end++;
 
-                    CacheStatus cacheStatus = view.getImageCacheStatus(i);
-                    if (cacheStatus == CacheStatus.PARTIAL) {
-                        g2d.setColor(partialCachedColor);
-                    } else if (cacheStatus == CacheStatus.COMPLETE) {
-                        g2d.setColor(completeCachedColor);
-                    } else {
+                    AtomicBoolean status = view.getImageCacheStatus(i);
+                    if (status == null)
                         g2d.setColor(notCachedColor);
+                    else {
+                        boolean complete = status.get();
+                        if (complete)
+                            g2d.setColor(completeCachedColor);
+                        else
+                            g2d.setColor(partialCachedColor);
                     }
                     g2d.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
                 }

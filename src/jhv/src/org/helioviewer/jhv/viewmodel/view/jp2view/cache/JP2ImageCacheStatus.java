@@ -1,24 +1,21 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
-public interface JP2ImageCacheStatus extends ImageCacheStatus {
+public interface JP2ImageCacheStatus {
 
-    void setVisibleStatus(int frame, CacheStatus newStatus);
-
-    // Downgrades the status from complete to partial, if necessary
-    void downgradeVisibleStatus(int level);
-
-    // Returns the highest frame until which the status is at least PARTIAL
     int getImageCachedPartiallyUntil();
 
     ResolutionSet getResolutionSet(int frame);
 
     boolean levelComplete(int level);
 
-    boolean frameLevelComplete(int frame, int level);
+    AtomicBoolean frameLevelComplete(int frame, int level);
 
     void setFrameLevelComplete(int frame, int level);
+
+    void setFrameLevelPartial(int frame);
 
 }

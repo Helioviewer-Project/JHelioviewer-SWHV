@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import kdu_jni.KduException;
 
 import org.helioviewer.jhv.base.logging.Log;
@@ -9,17 +11,16 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 
 public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
+    // r/w J2KReader, r MoviePanel/EDT
+
     private final int maxFrame;
     private final ResolutionSet[] resolutionSet;
     private KakaduEngine engine;
 
-    // r/w image load, r/w J2KReader, r MoviePanel/EDT
-    private final CacheStatus[] imageStatus;
     private int imagePartialUntil = 0;
 
     public JP2ImageCacheStatusRemote(KakaduEngine _engine, int _maxFrame) throws KduException {
         maxFrame = _maxFrame;
-        imageStatus = new CacheStatus[maxFrame + 1];
 
         engine = _engine;
         resolutionSet = new ResolutionSet[maxFrame + 1];
@@ -36,43 +37,12 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
         engine = null;
     }
 
-    // not threadsafe
-    @Override
-    public void setVisibleStatus(int frame, CacheStatus newStatus) {
-        imageStatus[frame] = newStatus;
-        if (resolutionSet[frame] == null) {
-            try {
-                resolutionSet[frame] = KakaduHelper.getResolutionSet(engine.getCompositor(), frame);
-                destroyIfFull();
-            } catch (KduException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    // not threadsafe
-    @Override
-    public CacheStatus getVisibleStatus(int frame) {
-        return imageStatus[frame];
-    }
-
-    // not threadsafe
-    @Override
-    public void downgradeVisibleStatus(int level) {
-        for (int i = 0; i <= maxFrame; i++) {
-            if (imageStatus[i] == CacheStatus.COMPLETE && (resolutionSet[i] == null || !resolutionSet[i].getComplete(level))) { //!
-                imageStatus[i] = CacheStatus.PARTIAL;
-            }
-        }
-    }
-
     @Override
     public int getImageCachedPartiallyUntil() {
         int i;
         for (i = imagePartialUntil; i <= maxFrame; i++) {
-            if (imageStatus[i] != CacheStatus.PARTIAL && imageStatus[i] != CacheStatus.COMPLETE) {
+            if (resolutionSet[i] == null)
                 break;
-            }
         }
         imagePartialUntil = Math.max(0, i - 1);
         return imagePartialUntil;
@@ -87,32 +57,55 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
         return resolutionSet[frame];
     }
 
+    private boolean fullyComplete;
+    private static final AtomicBoolean full = new AtomicBoolean(true);
+
     @Override
     public boolean levelComplete(int level) {
         if (fullyComplete)
             return true;
 
         for (int i = 0; i <= maxFrame; i++) {
-            if (resolutionSet[i] == null || !resolutionSet[i].getComplete(level)) {
+            if (resolutionSet[i] == null)
                 return false;
-            }
+            AtomicBoolean status = resolutionSet[i].getComplete(level);
+            if (status == null || !status.get())
+                return false;
         }
         if (level == 0)
             fullyComplete = true;
         return true;
     }
 
-    private boolean fullyComplete;
 
     @Override
-    public boolean frameLevelComplete(int frame, int level) {
-        return resolutionSet[frame] != null && resolutionSet[frame].getComplete(level);
+    public AtomicBoolean frameLevelComplete(int frame, int level) {
+        if (fullyComplete)
+            return full;
+        if (resolutionSet[frame] == null)
+            return null;
+        return resolutionSet[frame].getComplete(level);
     }
 
     @Override
     public void setFrameLevelComplete(int frame, int level) {
-        if (resolutionSet[frame] != null) {
+        if (fullyComplete)
+            return;
+
+        setFrameLevelPartial(frame);
+        if (resolutionSet[frame] != null)
             resolutionSet[frame].setComplete(level);
+    }
+
+    @Override
+    public void setFrameLevelPartial(int frame) {
+        if (resolutionSet[frame] == null) {
+            try {
+                resolutionSet[frame] = KakaduHelper.getResolutionSet(engine.getCompositor(), frame);
+                destroyIfFull();
+            } catch (KduException e) {
+                e.printStackTrace();
+            }
         }
     }
 
