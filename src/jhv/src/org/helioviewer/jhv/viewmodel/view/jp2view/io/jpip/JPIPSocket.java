@@ -10,7 +10,6 @@ import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JPIPCache;
-import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.ChunkedInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.FixedSizedInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.TransferInputStream;
@@ -32,13 +31,13 @@ public class JPIPSocket extends HTTPSocket {
 
     private static final String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
 
-    public JPIPSocket(URI uri, JPIPCache cache, JP2ImageCacheStatus status) throws IOException {
+    public JPIPSocket(URI uri, JPIPCache cache) throws IOException {
         connect(uri);
 
         jpipPath = uri.getPath();
 
         send(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0")); // deliberately short
-        JPIPResponse res = receive(cache, status);
+        JPIPResponse res = receive(cache);
 
         String cnew = res.getCNew();
         if (cnew == null)
@@ -97,7 +96,7 @@ public class JPIPSocket extends HTTPSocket {
     }
 
     // Receives a JPIPResponse returning null if EOS reached
-    public JPIPResponse receive(JPIPCache cache, JP2ImageCacheStatus status) throws IOException {
+    public JPIPResponse receive(JPIPCache cache) throws IOException {
         HTTPMessage res = recv();
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
@@ -141,7 +140,7 @@ public class JPIPSocket extends HTTPSocket {
 
         JPIPResponse jpipRes = new JPIPResponse(res.getHeader("JPIP-cnew"));
         try {
-            jpipRes.readSegments(input, cache, status);
+            jpipRes.readSegments(input, cache);
         } finally {
             input.close(); // make sure the stream is exhausted
         }

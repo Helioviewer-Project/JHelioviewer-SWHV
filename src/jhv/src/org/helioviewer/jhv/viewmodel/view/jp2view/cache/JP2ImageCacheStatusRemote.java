@@ -40,7 +40,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     @Override
     public void setVisibleStatus(int frame, CacheStatus newStatus) {
         imageStatus[frame] = newStatus;
-        if (resolutionSet[frame] == null && newStatus == CacheStatus.PARTIAL) {
+        if (resolutionSet[frame] == null) {
             try {
                 resolutionSet[frame] = KakaduHelper.getResolutionSet(engine.getCompositor(), frame);
                 destroyIfFull();

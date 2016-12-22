@@ -92,7 +92,7 @@ public class JP2Image {
                     cacheRender = new Kdu_cache();
                     cacheRender.Attach_to(cacheReader);
                     // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
-                    initRemote(cacheReader, initialCacheStatus);
+                    initRemote(cacheReader);
                     break;
                 case "file":
                     // nothing
@@ -131,23 +131,23 @@ public class JP2Image {
         }
     }
 
-    private void initRemote(JHV_Kdu_cache cache, JP2ImageCacheStatus status) throws JHV_KduException {
+    private void initRemote(JHV_Kdu_cache cache) throws JHV_KduException {
         try {
             // Connect to the JPIP server and add the necessary initial data (the main header as well as the metadata) to cache
-            socket = new JPIPSocket(uri, cache, status);
+            socket = new JPIPSocket(uri, cache);
 
             JPIPResponse res;
             String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
             do {
                 socket.send(req);
-                res = socket.receive(cache, status);
+                res = socket.receive(cache);
             } while (!res.isResponseComplete());
 
             if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
                 req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
                 do {
                     socket.send(req);
-                    res = socket.receive(cache, status);
+                    res = socket.receive(cache);
                 } while (!res.isResponseComplete() && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
             }
         } catch (IOException e) {
