@@ -18,7 +18,6 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -103,11 +102,8 @@ class DownloadedJPXData implements ImageDataHandler {
             region = imageData.getRegion();
             byte[] data = (byte[]) imageData.getBuffer().array();
             bufferedImage = createBufferedImage(w, h, data);
+            hasData = true;
 
-            if (!hasData) {
-                hasData = true;
-                LineDataSelectorModel.downloadFinished(EVEPlugin.rd);
-            }
             DrawController.fireRedrawRequest();
         }
     }
