@@ -1,16 +1,14 @@
 package org.helioviewer.jhv.viewmodel.imagecache;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class ImageCacheStatusLocal implements ImageCacheStatus {
 
-    protected final int maxFrame;
-
-    public ImageCacheStatusLocal(int _maxFrame) {
-        maxFrame = _maxFrame;
-    }
+    private static final AtomicBoolean full = new AtomicBoolean(true);
 
     @Override
-    public CacheStatus getVisibleStatus(int frame) {
-        return CacheStatus.COMPLETE;
+    public AtomicBoolean getVisibleStatus(int frame) {
+        return full;
     }
 
 }

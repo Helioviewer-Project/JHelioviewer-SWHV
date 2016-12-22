@@ -1,11 +1,13 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.image;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 // A class describing the available resolution levels for a given image
 public class ResolutionSet {
 
     // The indices represent the number of discardLayers
     private final ResolutionLevel[] resolutions;
-    private final boolean[] complete;
+    private final AtomicBoolean[] complete;
     private final int numLevels;
     public final int numComps;
 
@@ -13,16 +15,19 @@ public class ResolutionSet {
         numLevels = _numLevels;
         numComps = _numComps;
         resolutions = new ResolutionLevel[numLevels];
-        complete = new boolean[numLevels];
+
+        complete = new AtomicBoolean[numLevels];
+        for (int i = 0; i < numLevels; i++)
+            complete[i] = new AtomicBoolean();
     }
 
-    public void setComplete(int idx) {
-        for (int i = idx; i < numLevels; i++)
-            complete[i] = true;
+    public void setComplete(int level) {
+        for (int i = level; i < numLevels; i++)
+            complete[i].set(true);
     }
 
-    public boolean getComplete(int idx) {
-        return complete[idx];
+    public AtomicBoolean getComplete(int level) {
+        return complete[Math.min(level, numLevels - 1)];
     }
 
     public void addResolutionLevel(int discardLayer, int width, int height, double scaleX, double scaleY) {

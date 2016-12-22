@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.viewmodel.imagecache;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public interface ImageCacheStatus {
 
-    enum CacheStatus {
-        PARTIAL, COMPLETE
-    }
-
-    CacheStatus getVisibleStatus(int frame);
+    AtomicBoolean getVisibleStatus(int frame);
 
 }

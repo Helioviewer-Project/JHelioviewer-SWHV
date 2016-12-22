@@ -2,6 +2,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
@@ -216,13 +217,14 @@ public class JP2Image {
         factor = Math.min(factor, adj);
 
         int level = res.level;
-        boolean frameLevelComplete = imageCacheStatus.frameLevelComplete(frame, level);
+
+        AtomicBoolean status = imageCacheStatus.frameLevelComplete(frame, level);
+        boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
 
         JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, factor, priority);
 
         if (priority || (!frameLevelComplete && level < oldLevel)) {
-            imageCacheStatus.downgradeVisibleStatus(level);
             signalReader(params);
         }
         oldLevel = level;
@@ -231,6 +233,10 @@ public class JP2Image {
     }
 
     private int oldLevel = 10000;
+
+    AtomicBoolean getVisibleStatus(int frame) {
+        return imageCacheStatus.frameLevelComplete(frame, oldLevel);
+    }
 
     URI getURI() {
         return uri;
@@ -323,7 +329,7 @@ public class JP2Image {
         return cacheReader;
     }
 
-    JP2ImageCacheStatus getImageCacheStatus() {
+    JP2ImageCacheStatus getStatusCache() {
         return imageCacheStatus;
     }
 

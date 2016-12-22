@@ -2,6 +2,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
 import java.net.URI;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
@@ -9,7 +10,6 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
@@ -149,8 +149,7 @@ public class JP2View extends AbstractView {
     public void setFrame(JHVDate time) {
         int frame = getFrameNumber(time);
         if (frame != targetFrame) {
-            CacheStatus status = _jp2Image.getImageCacheStatus().getVisibleStatus(frame);
-            if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE)
+            if (frame > _jp2Image.getStatusCache().getImageCachedPartiallyUntil())
                 return;
             targetFrame = frame;
         }
@@ -244,8 +243,8 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public CacheStatus getImageCacheStatus(int frame) {
-        return _jp2Image.getImageCacheStatus().getVisibleStatus(frame);
+    public AtomicBoolean getImageCacheStatus(int frame) {
+        return _jp2Image.getVisibleStatus(frame);
     }
 
 }

@@ -4,12 +4,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 
 class JP2ViewExecutor {
@@ -23,12 +23,12 @@ class JP2ViewExecutor {
     void execute(Camera camera, Viewport vp, Position.Q viewpoint, JP2View view, JP2Image image, int frame, double factor) {
         // order is important, this will signal reader
         JP2ImageParameter params = image.calculateParameter(camera, vp, viewpoint, frame, factor);
-        CacheStatus status = image.getImageCacheStatus().getVisibleStatus(frame);
-        if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) // avoid empty image at startup
+        AtomicBoolean status = image.getStatusCache().frameLevelComplete(frame, params.resolution.level);
+        if (status == null)
             return;
 
         blockingQueue.poll();
-        executor.execute(new J2KRender(view, params, !image.getImageCacheStatus().frameLevelComplete(frame, params.resolution.level)));
+        executor.execute(new J2KRender(view, params, !status.get()));
     }
 
     void abolish() {

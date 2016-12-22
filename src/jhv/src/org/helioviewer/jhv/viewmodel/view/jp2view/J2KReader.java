@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
@@ -45,7 +44,7 @@ class J2KReader implements Runnable {
 
         num_layers = parentImageRef.getMaximumFrameNumber() + 1;
         cacheRef = parentImageRef.getReaderCache();
-        cacheStatusRef = parentImageRef.getImageCacheStatus();
+        cacheStatusRef = parentImageRef.getStatusCache();
         socket = parentImageRef.getSocket();
 
         myThread = new Thread(this, "Reader " + parentImageRef.getName());
@@ -174,22 +173,20 @@ class J2KReader implements Runnable {
 
                         // tell the cache status
                         if (singleFrame) {
-                            cacheStatusRef.setVisibleStatus(frame, CacheStatus.COMPLETE);
                             cacheStatusRef.setFrameLevelComplete(frame, level);
                             parentViewRef.signalRenderFromReader(parentImageRef, frame, params.factor); // refresh current image
                         } else {
                             for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
-                                cacheStatusRef.setVisibleStatus(j, CacheStatus.COMPLETE);
                                 cacheStatusRef.setFrameLevelComplete(j, level);
                             }
                         }
                     } else {
                         // tell the cache status
                         if (singleFrame) {
-                            cacheStatusRef.setVisibleStatus(frame, CacheStatus.PARTIAL);
+                            cacheStatusRef.setFrameLevelPartial(frame);
                         } else {
                             for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
-                                cacheStatusRef.setVisibleStatus(j, CacheStatus.PARTIAL);
+                                cacheStatusRef.setFrameLevelPartial(j);
                             }
                         }
                     }
