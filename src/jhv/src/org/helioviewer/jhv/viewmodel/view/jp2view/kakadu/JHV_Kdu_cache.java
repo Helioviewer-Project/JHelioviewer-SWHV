@@ -5,7 +5,7 @@ import java.io.IOException;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 
-import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JPIPCache;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPCache;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDataSegment;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
 

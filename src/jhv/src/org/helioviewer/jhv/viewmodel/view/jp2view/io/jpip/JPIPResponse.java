@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ProtocolException;
 
-import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JPIPCache;
-
 /**
  * A response to a JPIPRequest, encapsulates the JPIPDataSegments
  *

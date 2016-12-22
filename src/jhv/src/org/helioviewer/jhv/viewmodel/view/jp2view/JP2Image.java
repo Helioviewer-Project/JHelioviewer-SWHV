@@ -24,7 +24,6 @@ import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.viewmodel.view.ViewROI;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
-import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusInitial;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemote;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
@@ -83,7 +82,6 @@ public class JP2Image {
             throw new JHV_KduException("File extension not supported");
 
         try {
-            JP2ImageCacheStatusInitial initialCacheStatus = new JP2ImageCacheStatusInitial();
             String scheme = uri.getScheme().toLowerCase();
             switch (scheme) {
                 case "http":
@@ -120,7 +118,6 @@ public class JP2Image {
 
             if (cacheReader != null) { // remote
                 imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader, frameCount - 1);
-                imageCacheStatus.setVisibleStatus(0, initialCacheStatus.getVisibleStatus(0));
                 reader = new J2KReader(_view, this);
             } else {
                 imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader, frameCount - 1);
