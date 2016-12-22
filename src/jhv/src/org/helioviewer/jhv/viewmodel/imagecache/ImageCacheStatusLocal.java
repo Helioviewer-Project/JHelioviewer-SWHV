@@ -9,10 +9,6 @@ public class ImageCacheStatusLocal implements ImageCacheStatus {
     }
 
     @Override
-    public void setVisibleStatus(int frame, CacheStatus newStatus) {
-    }
-
-    @Override
     public CacheStatus getVisibleStatus(int frame) {
         return CacheStatus.COMPLETE;
     }
