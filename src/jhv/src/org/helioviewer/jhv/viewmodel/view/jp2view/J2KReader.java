@@ -121,7 +121,7 @@ class J2KReader implements Runnable {
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
-                    socket = new JPIPSocket(parentImageRef.getURI(), cacheRef, cacheStatusRef);
+                    socket = new JPIPSocket(parentImageRef.getURI(), cacheRef);
                 }
 
                 int frame = params.compositionLayer;
@@ -165,7 +165,7 @@ class J2KReader implements Runnable {
                     // update requested package size
                     socket.send(stepQuerys[current_step]);
                     // receive and add data to cache
-                    JPIPResponse res = socket.receive(cacheRef, cacheStatusRef);
+                    JPIPResponse res = socket.receive(cacheRef);
                     // react if query complete
                     if (res.isResponseComplete()) {
                         // mark query as complete
@@ -183,7 +183,17 @@ class J2KReader implements Runnable {
                                 cacheStatusRef.setFrameLevelComplete(j, level);
                             }
                         }
+                    } else {
+                        // tell the cache status
+                        if (singleFrame) {
+                            cacheStatusRef.setVisibleStatus(frame, CacheStatus.PARTIAL);
+                        } else {
+                            for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
+                                cacheStatusRef.setVisibleStatus(j, CacheStatus.PARTIAL);
+                            }
+                        }
                     }
+
                     MoviePanel.cacheStatusChanged();
 
                     // select next query based on strategy
