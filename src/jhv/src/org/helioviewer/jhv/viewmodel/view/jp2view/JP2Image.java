@@ -148,6 +148,13 @@ public class JP2Image {
                     res = socket.receive(cache);
                 } while (!res.isResponseComplete() && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
             }
+
+            // prime first image
+            req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "context", "jpxl<0-0>", "fsiz", "16,16,closest", "rsiz", "16,16", "roff", "0,0");
+            do {
+                socket.send(req);
+                res = socket.receive(cache);
+            } while (!res.isResponseComplete());
         } catch (IOException e) {
             initCloseSocket();
             throw new JHV_KduException("Error in the server communication: " + e.getMessage(), e);
