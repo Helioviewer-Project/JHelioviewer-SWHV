@@ -6,8 +6,6 @@ public interface ImageCacheStatus {
         PARTIAL, COMPLETE
     }
 
-    void setVisibleStatus(int frame, CacheStatus newStatus);
-
     CacheStatus getVisibleStatus(int frame);
 
 }
