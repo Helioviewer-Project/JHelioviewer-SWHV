@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
-import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
@@ -14,6 +14,8 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 class J2KReader implements Runnable {
+
+    private final ArrayBlockingQueue<JP2ImageParameter> queue = new ArrayBlockingQueue<>(1);
 
     // The thread that this object runs on
     private final Thread myThread;
@@ -33,8 +35,6 @@ class J2KReader implements Runnable {
     private final JP2ImageCacheStatus cacheStatusRef;
 
     private JPIPSocket socket;
-
-    private final BooleanSignal readerSignal = new BooleanSignal(false);
 
     private final int num_layers;
 
@@ -58,6 +58,7 @@ class J2KReader implements Runnable {
             return;
         isAbolished = true;
 
+        queue.poll();
         while (myThread.isAlive()) {
             try {
                 if (socket != null)
@@ -71,7 +72,8 @@ class J2KReader implements Runnable {
     }
 
     void signalReader(JP2ImageParameter params) {
-        readerSignal.signal(params);
+        queue.poll();
+        queue.offer(params);
     }
 
     private static String createQuery(String fSiz, int iniLayer, int endLayer) {
@@ -110,9 +112,8 @@ class J2KReader implements Runnable {
     public void run() {
         while (!isAbolished) {
             JP2ImageParameter params;
-            // wait for signal
             try {
-                params = readerSignal.waitForSignal();
+                params = queue.take();
             } catch (InterruptedException e) {
                 continue;
             }
@@ -122,7 +123,6 @@ class J2KReader implements Runnable {
     }
 
     private boolean request(JP2ImageParameter params) {
-        dengo:
         while (true) {
             try {
                 if (socket.isClosed()) {
@@ -168,9 +168,8 @@ class J2KReader implements Runnable {
                         continue;
                     }
 
-                    // update requested package size
-                    socket.send(stepQuerys[current_step]);
                     // receive and add data to cache
+                    socket.send(stepQuerys[current_step]);
                     JPIPResponse res = socket.receive(cacheRef);
                     // react if query complete
                     if (res.isResponseComplete()) {
@@ -205,7 +204,7 @@ class J2KReader implements Runnable {
                         current_step++;
 
                     // check whether caching has to be interrupted
-                    if (readerSignal.isSignaled() || Thread.interrupted())
+                    if (Thread.interrupted() || queue.size() != 0)
                         stopReading = true;
                 }
                 // suicide if fully done
@@ -220,7 +219,7 @@ class J2KReader implements Runnable {
                 // if single frame & not interrupted & incomplete -> go on reading
                 if (singleFrame && !stopReading && !cacheStatusRef.levelComplete(level)) {
                     params.priority = false;
-                    continue dengo;
+                    continue;
                 }
              } catch (IOException e) {
                 try {
@@ -228,7 +227,7 @@ class J2KReader implements Runnable {
                 } catch (IOException ioe) {
                     Log.error("J2KReader.run() > Error closing socket", ioe);
                 }
-                continue dengo; // try again
+                continue; // try again
             }
             return false; // back to waiting
         }
