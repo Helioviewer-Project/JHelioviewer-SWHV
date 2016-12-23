@@ -30,8 +30,8 @@ public class HTTPSocket extends Socket {
     /** The default port for the HTTP socket */
     private static final int PORT = 80;
 
-    private static final int TIMEOUT_CONNECT = 10000;
-    private static final int TIMEOUT_READ = 10000;
+    private static final int TIMEOUT_CONNECT = 30000;
+    private static final int TIMEOUT_READ = 30000;
 
     protected InputStream inputStream;
 
