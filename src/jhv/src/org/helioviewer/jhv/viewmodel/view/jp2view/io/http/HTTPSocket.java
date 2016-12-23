@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.http;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -55,6 +56,8 @@ public class HTTPSocket extends Socket {
         setKeepAlive(true);
         setTcpNoDelay(true);
         connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TIMEOUT_CONNECT);
+
+        inputStream = new BufferedInputStream(getInputStream(), 65536);
     }
 
     /**
@@ -65,7 +68,7 @@ public class HTTPSocket extends Socket {
      *         <code>null</code> if the end of stream was reached.
      * @throws IOException
      */
-    protected HTTPMessage recv(InputStream inputStream) throws IOException {
+    protected HTTPMessage recv() throws IOException {
         String line = LineRead.readAsciiLine(inputStream);
         String parts[] = line.split(" ", 3);
         if (parts.length != 3) {

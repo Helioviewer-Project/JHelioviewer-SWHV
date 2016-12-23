@@ -130,13 +130,13 @@ public class ChunkedInputStream extends TransferInputStream {
     @Override
     public void close() throws IOException {
         if (!closed) {
-            /* try {
+            try {
                 if (!eof) {
                     // read and discard the remainder of the message
                     byte buf[] = new byte[1024];
                     while (read(buf) >= 0) ;
                 }
-            } finally */ {
+            } finally {
                 eof = true;
                 closed = true;
             }
