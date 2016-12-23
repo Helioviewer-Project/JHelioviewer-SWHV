@@ -137,23 +137,20 @@ public class JP2Image {
             JPIPResponse res;
             String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
             do {
-                socket.send(req);
-                res = socket.receive(cache);
+                res = socket.send(req, cache);
             } while (!res.isResponseComplete());
 
             if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
                 req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
                 do {
-                    socket.send(req);
-                    res = socket.receive(cache);
+                    res = socket.send(req, cache);
                 } while (!res.isResponseComplete() && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
             }
 
             // prime first image
             req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "context", "jpxl<0-0>", "fsiz", "16,16,closest", "rsiz", "16,16", "roff", "0,0");
             do {
-                socket.send(req);
-                res = socket.receive(cache);
+                res = socket.send(req, cache);
             } while (!res.isResponseComplete());
         } catch (IOException e) {
             initCloseSocket();
