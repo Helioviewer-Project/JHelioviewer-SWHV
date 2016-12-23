@@ -116,7 +116,14 @@ class J2KReader implements Runnable {
             } catch (InterruptedException e) {
                 continue;
             }
+            if (request(params))
+                return;
+        }
+    }
 
+    private boolean request(JP2ImageParameter params) {
+        dengo:
+        while (true) {
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
@@ -191,16 +198,15 @@ class J2KReader implements Runnable {
                         }
                     }
 
-                    MoviePanel.cacheStatusChanged();
+                    MoviePanel.cacheStatusChanged(); //!
 
                     // select next query based on strategy
                     if (!singleFrame)
                         current_step++;
 
                     // check whether caching has to be interrupted
-                    if (readerSignal.isSignaled() || Thread.interrupted()) {
+                    if (readerSignal.isSignaled() || Thread.interrupted())
                         stopReading = true;
-                    }
                 }
                 // suicide if fully done
                 if (cacheStatusRef.levelComplete(0)) {
@@ -208,13 +214,13 @@ class J2KReader implements Runnable {
                         socket.close();
                     } catch (IOException ignore) {
                     }
-                    return;
+                    return true;
                 }
 
-                // if single frame & not interrupted & incomplete -> signal again to go on reading
+                // if single frame & not interrupted & incomplete -> go on reading
                 if (singleFrame && !stopReading && !cacheStatusRef.levelComplete(level)) {
                     params.priority = false;
-                    readerSignal.signal(params);
+                    continue dengo;
                 }
              } catch (IOException e) {
                 try {
@@ -222,9 +228,9 @@ class J2KReader implements Runnable {
                 } catch (IOException ioe) {
                     Log.error("J2KReader.run() > Error closing socket", ioe);
                 }
-                // Send signal to try again
-                readerSignal.signal(params);
+                continue dengo; // try again
             }
+            return false; // back to waiting
         }
     }
 
