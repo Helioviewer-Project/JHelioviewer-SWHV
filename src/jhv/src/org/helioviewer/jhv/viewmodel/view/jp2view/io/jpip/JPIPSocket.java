@@ -35,9 +35,7 @@ public class JPIPSocket extends HTTPSocket {
 
         jpipPath = uri.getPath();
 
-        send(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0")); // deliberately short
-        JPIPResponse res = receive(cache);
-
+        JPIPResponse res = send(JPIPQuery.create(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), cache); // deliberately short
         String cnew = res.getCNew();
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
@@ -66,7 +64,7 @@ public class JPIPSocket extends HTTPSocket {
 
         try {
             if (jpipChannelID != null) {
-                send(JPIPQuery.create(0, "cclose", jpipChannelID));
+                send(JPIPQuery.create(0, "cclose", jpipChannelID), null);
             }
         } catch (IOException ignore) {
             // no problem, server may have closed the socket
@@ -75,8 +73,7 @@ public class JPIPSocket extends HTTPSocket {
         }
     }
 
-    // Sends a JPIP request
-    public void send(String queryStr) throws IOException {
+    public JPIPResponse send(String queryStr, JPIPCache cache) throws IOException {
         // Add a necessary JPIP request field
         if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
             queryStr += "&cid=" + jpipChannelID;
@@ -88,14 +85,14 @@ public class JPIPSocket extends HTTPSocket {
         req.setHeader("Accept-Encoding", "gzip");
         req.setHeader("Cache-Control", "no-cache");
         req.setHeader("Host", getHost() + ':' + getPort());
-        String res = "GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n";
+        queryStr = "GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n";
 
         // Writes the result to the output stream
-        getOutputStream().write(res.getBytes(StandardCharsets.UTF_8));
-    }
+        getOutputStream().write(queryStr.getBytes(StandardCharsets.UTF_8));
 
-    // Receives a JPIPResponse returning null if EOS reached
-    public JPIPResponse receive(JPIPCache cache) throws IOException {
+        if (cache == null) // not interested in response
+            return null;
+
         HTTPMessage res = recv();
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
