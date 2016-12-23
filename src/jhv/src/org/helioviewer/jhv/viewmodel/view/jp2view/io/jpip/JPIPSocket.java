@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -94,9 +93,7 @@ public class JPIPSocket extends HTTPSocket {
         if (cache == null) // not interested in response
             return null;
 
-        BufferedInputStream inputStream = new BufferedInputStream(getInputStream(), 65536);
-
-        HTTPMessage res = recv(inputStream);
+        HTTPMessage res = recv();
         if (!"image/jpp-stream".equals(res.getHeader("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 
