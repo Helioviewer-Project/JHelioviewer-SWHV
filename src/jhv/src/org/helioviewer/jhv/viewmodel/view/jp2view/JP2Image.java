@@ -15,7 +15,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
@@ -24,6 +23,7 @@ import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.PixelBasedMetaData;
+import org.helioviewer.jhv.viewmodel.view.ViewROI;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemote;
@@ -181,22 +181,18 @@ public class JP2Image {
             reader.signalReader(params);
     }
 
-    private static final Region unitRadius = new Region(-1, -1, 2, 2);
-
     // Recalculates the image parameters used within the jp2-package
     JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
-        double ratio = 2 * camera.getWidth() / vp.height;
-        Region mr = metaDataList[frame].getPhysicalRegion();
-        int totalHeight = (int) (mr.height / ratio);
-        ResolutionLevel res = imageCacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
-        double currentMeterPerPixel = mr.width / res.width;
+        MetaData m = metaDataList[frame];
+        Region mr = m.getPhysicalRegion();
+        Region r = ViewROI.updateROI(camera, vp, p, m);
 
-        Region r;
-        if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            r = unitRadius;
-        } else {
-            r = mr;
-        }
+        double ratio = 2 * camera.getWidth() / vp.height;
+        int totalHeight = (int) (mr.height / ratio);
+
+        ResolutionLevel res = imageCacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
+
+        double currentMeterPerPixel = mr.width / res.width;
         int imageWidth = (int) Math.ceil(r.width / currentMeterPerPixel); // +1 account for floor ??
         int imageHeight = (int) Math.ceil(r.height / currentMeterPerPixel);
 
@@ -225,11 +221,13 @@ public class JP2Image {
         factor = Math.min(factor, adj);
 
         int level = res.level;
+
         AtomicBoolean status = imageCacheStatus.frameLevelComplete(frame, level);
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
 
         JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, factor, priority);
+
         if (priority || (!frameLevelComplete && level < oldLevel)) {
             signalReader(params);
         }
