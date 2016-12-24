@@ -216,7 +216,6 @@ class J2KReader implements Runnable {
                     readerSignal.signal(params);
                 }
              } catch (IOException e) {
-                e.printStackTrace();
                 try {
                     socket.close();
                 } catch (IOException ioe) {
