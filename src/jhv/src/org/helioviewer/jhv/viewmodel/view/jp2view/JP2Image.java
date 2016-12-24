@@ -148,7 +148,7 @@ public class JP2Image {
             }
 
             // prime first image
-            req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "context", "jpxl<0-0>", "fsiz", "16,16,closest", "rsiz", "16,16", "roff", "0,0");
+            req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "context", "jpxl<0-0>", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
             do {
                 res = socket.send(req, cache);
             } while (!res.isResponseComplete());
@@ -185,7 +185,7 @@ public class JP2Image {
     JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
         MetaData m = metaDataList[frame];
         Region mr = m.getPhysicalRegion();
-        Region r = mr; //ViewROI.updateROI(camera, vp, p, m);
+        Region r = ViewROI.updateROI(camera, vp, p, m);
 
         double ratio = 2 * camera.getWidth() / vp.height;
         int totalHeight = (int) (mr.height / ratio + .5);
@@ -221,7 +221,7 @@ public class JP2Image {
         factor = Math.min(factor, adj);
 
         int level = res.level;
-        AtomicBoolean status = imageCacheStatus.frameLevelComplete(frame, level);
+        AtomicBoolean status = imageCacheStatus.getFrameLevelStatus(frame, level);
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
 
@@ -237,7 +237,7 @@ public class JP2Image {
     private int oldLevel = 10000;
 
     AtomicBoolean getVisibleStatus(int frame) {
-        return imageCacheStatus.frameLevelComplete(frame, oldLevel);
+        return imageCacheStatus.getFrameLevelStatus(frame, oldLevel);
     }
 
     URI getURI() {

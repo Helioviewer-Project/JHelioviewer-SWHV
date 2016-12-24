@@ -10,9 +10,9 @@ public interface JP2ImageCacheStatus {
 
     ResolutionSet getResolutionSet(int frame);
 
-    boolean levelComplete(int level);
+    boolean isLevelComplete(int level);
 
-    AtomicBoolean frameLevelComplete(int frame, int level);
+    AtomicBoolean getFrameLevelStatus(int frame, int level);
 
     void setFrameLevelComplete(int frame, int level);
 

@@ -23,7 +23,7 @@ class JP2ViewExecutor {
     void execute(Camera camera, Viewport vp, Position.Q viewpoint, JP2View view, JP2Image image, int frame, double factor) {
         // order is important, this will signal reader
         JP2ImageParameter params = image.calculateParameter(camera, vp, viewpoint, frame, factor);
-        AtomicBoolean status = image.getStatusCache().frameLevelComplete(frame, params.resolution.level);
+        AtomicBoolean status = image.getStatusCache().getFrameLevelStatus(frame, params.resolution.level);
         if (status == null)
             return;
 

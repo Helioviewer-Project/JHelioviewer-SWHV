@@ -202,7 +202,7 @@ class J2KReader implements Runnable {
                     }
                 }
                 // suicide if fully done
-                if (cacheStatusRef.levelComplete(0)) {
+                if (cacheStatusRef.isLevelComplete(0)) {
                     try {
                         socket.close();
                     } catch (IOException ignore) {
@@ -211,11 +211,12 @@ class J2KReader implements Runnable {
                 }
 
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
-                if (singleFrame && !stopReading && !cacheStatusRef.levelComplete(level)) {
+                if (singleFrame && !stopReading && !cacheStatusRef.isLevelComplete(level)) {
                     params.priority = false;
                     readerSignal.signal(params);
                 }
              } catch (IOException e) {
+                // e.printStackTrace();
                 try {
                     socket.close();
                 } catch (IOException ioe) {

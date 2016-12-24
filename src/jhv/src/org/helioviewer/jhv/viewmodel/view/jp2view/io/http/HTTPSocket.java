@@ -11,41 +11,20 @@ import java.net.URI;
 import org.helioviewer.jhv.base.ProxySettings;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.LineRead;
 
-/**
- * The class <code>HTTPSocket</code> is a simple implementation for read/write
- * HTTP messages. In this version are only supported to send requests and to
- * receive responses.
- *
- * @author Juan Pablo Garcia Ortiz
- * @version 0.1
- */
 public class HTTPSocket extends Socket {
 
-    /** The last used port */
-    private int lastUsedPort = 0;
-
-    /** The last used host */
-    private String lastUsedHost = null;
-
-    /** The default port for the HTTP socket */
+    private static final int TIMEOUT_CONNECT = 10000;
+    private static final int TIMEOUT_READ = 10000;
     private static final int PORT = 80;
 
-    private static final int TIMEOUT_CONNECT = 30000;
-    private static final int TIMEOUT_READ = 30000;
+    private int lastUsedPort = 0;
+    private String lastUsedHost = null;
 
     protected InputStream inputStream;
 
-    protected HTTPSocket() {
+    protected HTTPSocket(URI uri) throws IOException {
         super(ProxySettings.proxy);
-    }
 
-    /**
-     * Connects to the specified host via the supplied URI.
-     *
-     * @param uri
-     * @throws IOException
-     */
-    protected void connect(URI uri) throws IOException {
         int port = uri.getPort();
         lastUsedPort = port <= 0 ? PORT : port;
         lastUsedHost = uri.getHost();
@@ -56,7 +35,6 @@ public class HTTPSocket extends Socket {
         setKeepAlive(true);
         setTcpNoDelay(true);
         connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TIMEOUT_CONNECT);
-
         inputStream = new BufferedInputStream(getInputStream(), 65536);
     }
 
