@@ -34,12 +34,12 @@ public class JP2ImageCacheStatusLocal implements JP2ImageCacheStatus {
     }
 
     @Override
-    public boolean levelComplete(int level) {
+    public boolean isLevelComplete(int level) {
         return true;
     }
 
     @Override
-    public AtomicBoolean frameLevelComplete(int frame, int level) {
+    public AtomicBoolean getFrameLevelStatus(int frame, int level) {
         return full;
     }
 

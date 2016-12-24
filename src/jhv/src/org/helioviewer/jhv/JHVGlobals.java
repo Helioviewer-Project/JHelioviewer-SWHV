@@ -37,7 +37,7 @@ public class JHVGlobals {
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator();
 
-    public static final int hiDpiCutoff = 2048;
+    public static final int hiDpiCutoff = 1024;
 
     private static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("MAIN", 10);
 

@@ -15,7 +15,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.TransferInputStream;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPMessage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.http.HTTPSocket;
 
-// Assumes a persistent HTTP connection.
+// Assumes a persistent HTTP connection
 public class JPIPSocket extends HTTPSocket {
 
     // The jpip channel ID for the connection (persistent)
@@ -31,7 +31,7 @@ public class JPIPSocket extends HTTPSocket {
     private static final String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
 
     public JPIPSocket(URI uri, JPIPCache cache) throws IOException {
-        connect(uri);
+        super(uri);
 
         jpipPath = uri.getPath();
 

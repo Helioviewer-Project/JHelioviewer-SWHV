@@ -61,7 +61,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     private static final AtomicBoolean full = new AtomicBoolean(true);
 
     @Override
-    public boolean levelComplete(int level) {
+    public boolean isLevelComplete(int level) {
         if (fullyComplete)
             return true;
 
@@ -79,7 +79,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
 
     @Override
-    public AtomicBoolean frameLevelComplete(int frame, int level) {
+    public AtomicBoolean getFrameLevelStatus(int frame, int level) {
         if (fullyComplete)
             return full;
         if (resolutionSet[frame] == null)
