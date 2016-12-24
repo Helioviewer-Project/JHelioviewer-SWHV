@@ -185,10 +185,10 @@ public class JP2Image {
     JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
         MetaData m = metaDataList[frame];
         Region mr = m.getPhysicalRegion();
-        Region r = ViewROI.updateROI(camera, vp, p, m);
+        Region r = mr; //ViewROI.updateROI(camera, vp, p, m);
 
         double ratio = 2 * camera.getWidth() / vp.height;
-        int totalHeight = (int) (mr.height / ratio);
+        int totalHeight = (int) (mr.height / ratio + .5);
 
         ResolutionLevel res = imageCacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
 
@@ -221,13 +221,11 @@ public class JP2Image {
         factor = Math.min(factor, adj);
 
         int level = res.level;
-
         AtomicBoolean status = imageCacheStatus.frameLevelComplete(frame, level);
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
 
         JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, factor, priority);
-
         if (priority || (!frameLevelComplete && level < oldLevel)) {
             signalReader(params);
         }
