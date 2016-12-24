@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
@@ -14,8 +14,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 class J2KReader implements Runnable {
-
-    private final ArrayBlockingQueue<JP2ImageParameter> queue = new ArrayBlockingQueue<>(1);
 
     // The thread that this object runs on
     private final Thread myThread;
@@ -35,6 +33,8 @@ class J2KReader implements Runnable {
     private final JP2ImageCacheStatus cacheStatusRef;
 
     private JPIPSocket socket;
+
+    private final BooleanSignal readerSignal = new BooleanSignal(false);
 
     private final int num_layers;
 
@@ -58,7 +58,6 @@ class J2KReader implements Runnable {
             return;
         isAbolished = true;
 
-        queue.poll();
         while (myThread.isAlive()) {
             try {
                 if (socket != null)
@@ -72,8 +71,7 @@ class J2KReader implements Runnable {
     }
 
     void signalReader(JP2ImageParameter params) {
-        queue.poll();
-        queue.offer(params);
+        readerSignal.signal(params);
     }
 
     private static String createQuery(String fSiz, int iniLayer, int endLayer) {
@@ -112,18 +110,13 @@ class J2KReader implements Runnable {
     public void run() {
         while (!isAbolished) {
             JP2ImageParameter params;
+            // wait for signal
             try {
-                params = queue.take();
+                params = readerSignal.waitForSignal();
             } catch (InterruptedException e) {
                 continue;
             }
-            if (request(params))
-                return;
-        }
-    }
 
-    private boolean request(JP2ImageParameter params) {
-        while (true) {
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
@@ -168,8 +161,9 @@ class J2KReader implements Runnable {
                         continue;
                     }
 
-                    // receive and add data to cache
+                    // update requested package size
                     JPIPResponse res = socket.send(stepQuerys[current_step], cacheRef);
+                    // receive and add data to cache
                     // react if query complete
                     if (res.isResponseComplete()) {
                         // mark query as complete
@@ -196,15 +190,16 @@ class J2KReader implements Runnable {
                         }
                     }
 
-                    MoviePanel.cacheStatusChanged(); //!
+                    MoviePanel.cacheStatusChanged();
 
                     // select next query based on strategy
                     if (!singleFrame)
                         current_step++;
 
                     // check whether caching has to be interrupted
-                    if (Thread.interrupted() || queue.size() != 0)
+                    if (readerSignal.isSignaled() || Thread.interrupted()) {
                         stopReading = true;
+                    }
                 }
                 // suicide if fully done
                 if (cacheStatusRef.levelComplete(0)) {
@@ -212,23 +207,24 @@ class J2KReader implements Runnable {
                         socket.close();
                     } catch (IOException ignore) {
                     }
-                    return true;
+                    return;
                 }
 
-                // if single frame & not interrupted & incomplete -> go on reading
+                // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && !stopReading && !cacheStatusRef.levelComplete(level)) {
                     params.priority = false;
-                    continue;
+                    readerSignal.signal(params);
                 }
              } catch (IOException e) {
+                e.printStackTrace();
                 try {
                     socket.close();
                 } catch (IOException ioe) {
                     Log.error("J2KReader.run() > Error closing socket", ioe);
                 }
-                continue; // try again
+                // Send signal to try again
+                readerSignal.signal(params);
             }
-            return false; // back to waiting
         }
     }
 
