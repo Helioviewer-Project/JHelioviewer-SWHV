@@ -54,6 +54,7 @@ class SpaceObject {
         objectList.add(new JSeparator());
 
         objectList.add(new SpaceObject("Solar%20Orbiter", "Solar Orbiter", 2));
+        objectList.add(new SpaceObject("SPP", "Solar Probe Plus", 2));
         objectList.add(new SpaceObject("PROBA3", "PROBA3", 2));
     }
 
