@@ -229,11 +229,10 @@ public class JHVEventCache {
     }
 
     private static void removeEventType(JHVEventType eventType, boolean keepActive) {
-        if (!keepActive) {
-            activeEventTypes.remove(eventType);
-        } else {
+        if (keepActive)
             deleteFromCache(eventType);
-        }
+        else
+            activeEventTypes.remove(eventType);
     }
 
     private static void deleteFromCache(JHVEventType eventType) {

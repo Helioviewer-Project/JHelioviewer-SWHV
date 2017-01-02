@@ -55,7 +55,6 @@ public class ComponentUtils {
     public static class SmallPanel extends JPanel {
 
         public SmallPanel() {
-            super();
         }
 
         public SmallPanel(LayoutManager layout) {

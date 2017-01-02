@@ -41,10 +41,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         uri = view.getURI();
 
         APIRequest req = view.getAPIRequest();
-        if (req == null)
-            downloadURI = uri;
-        else
-            downloadURI = req.fileRequest;
+        downloadURI = req == null ? uri : req.fileRequest;
 
         layer = view.getImageLayer();
 

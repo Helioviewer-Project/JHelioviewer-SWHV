@@ -161,9 +161,8 @@ class J2KReader implements Runnable {
                         continue;
                     }
 
-                    // update requested package size
-                    JPIPResponse res = socket.send(stepQuerys[current_step], cacheRef);
                     // receive and add data to cache
+                    JPIPResponse res = socket.send(stepQuerys[current_step], cacheRef);
                     // react if query complete
                     if (res.isResponseComplete()) {
                         // mark query as complete

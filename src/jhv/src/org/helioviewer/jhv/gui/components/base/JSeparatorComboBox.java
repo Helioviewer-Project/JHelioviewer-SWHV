@@ -29,7 +29,6 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
     private boolean separatorSelected = false;
 
     public JSeparatorComboBox() {
-        super();
         _init();
     }
 
