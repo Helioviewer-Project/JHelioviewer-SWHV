@@ -13,7 +13,7 @@ public class JPIPQuery {
                 buf.append('&');
             isKey = !isKey;
         }
-        return buf.toString() + "len=" + len;
+        return buf + "len=" + len;
     }
 
 }

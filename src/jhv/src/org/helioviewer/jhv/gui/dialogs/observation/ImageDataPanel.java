@@ -208,21 +208,21 @@ public class ImageDataPanel extends ObservationDialogPanel {
         public void setEndTime(long endTime, boolean byUser) {
             calendarEndDate.setTime(endTime);
             textEndTime.setText(TimeUtils.timeDateFormat.format(endTime));
-            if (!setFromOutside) {
-                ObservationDialogDateModel.setEndTime(endTime, byUser);
-            } else {
+
+            if (setFromOutside)
                 setFromOutside = false;
-            }
+            else
+                ObservationDialogDateModel.setEndTime(endTime, byUser);
         }
 
         public void setStartTime(long startTime, boolean byUser) {
             calendarStartDate.setTime(startTime);
             textStartTime.setText(TimeUtils.timeDateFormat.format(startTime));
-            if (!setFromOutside) {
-                ObservationDialogDateModel.setStartTime(startTime, byUser);
-            } else {
+
+            if (setFromOutside)
                 setFromOutside = false;
-            }
+            else
+                ObservationDialogDateModel.setStartTime(startTime, byUser);
         }
 
         /**

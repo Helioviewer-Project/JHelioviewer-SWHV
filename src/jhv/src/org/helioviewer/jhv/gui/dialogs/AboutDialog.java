@@ -52,7 +52,7 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
 
         JEditorPane content = new JEditorPane("text/html", "<html><center><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" +
                 "<b>" + getVersionString() + "</b><br>" +
-                '\u00A9' + "2016 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>" +
+                '\u00A9' + "2017 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>" +
                 "Part of the ESA/NASA Helioviewer Project<br>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>" +
                 "JHelioviewer is released under the<br>" +

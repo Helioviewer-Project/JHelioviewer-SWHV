@@ -63,11 +63,11 @@ public interface UpdateViewpoint {
                 long tPositionEnd = positionLoad.getEndTime();
 
                 long currentCameraTime;
-                if (tLayerEnd != tLayerStart) {
-                    currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (time.milli - tLayerStart) / (double) (tLayerEnd - tLayerStart));
-                } else {
+                if (tLayerEnd == tLayerStart)
                     currentCameraTime = tPositionEnd;
-                }
+                else
+                    currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (time.milli - tLayerStart) / (double) (tLayerEnd - tLayerStart));
+
                 Position.Q pos = positionLoad.getInterpolatedPosition(currentCameraTime);
                 if (pos != null)
                     return pos;
