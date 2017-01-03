@@ -516,8 +516,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     private static final Timer sliderTimer = new Timer(1000 / 10, new SliderListener());
 
-    public static final BusyIndicator busyIndicator = new BusyIndicator();
-
     private static volatile boolean cacheChanged = false;
 
     // accessed from J2KReader threads
@@ -531,7 +529,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            busyIndicator.actionPerformed(e);
+            BusyIndicator.incrementAngle();
 
             if (cacheChanged) {
                 cacheChanged = false;

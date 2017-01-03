@@ -6,19 +6,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
-import java.beans.PropertyChangeEvent;
 
-import javax.swing.JComponent;
-import javax.swing.JLayer;
-import javax.swing.plaf.LayerUI;
+import javax.swing.JLabel;
 
-@SuppressWarnings({ "serial", "rawtypes"})
-public class BusyIndicator extends LayerUI<JComponent> implements ActionListener {
-
-    private int angle;
+public class BusyIndicator {
 
     private static int brightness(Color c) {
         int r = c.getRed();
@@ -29,51 +21,53 @@ public class BusyIndicator extends LayerUI<JComponent> implements ActionListener
         return (cmax + cmin) / 2;
     }
 
-    @Override
-    public void paint(Graphics g, JComponent c) {
-        super.paint(g, c);
+    @SuppressWarnings("serial")
+    public static class BusyLabel extends JLabel {
 
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        @Override
+        public void paint(Graphics g1) {
+            Graphics2D g = (Graphics2D) g1.create();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
-        int w = c.getWidth();
-        int h = c.getHeight();
-        double s = Math.min(w, h) / 4.;
-        double cx = w / 2.;
-        double cy = h / 2.;
+            int w = getWidth();
+            int h = getHeight();
 
-        g2.setStroke(new BasicStroke((float) (s / 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2.rotate(angle * (Math.PI / 180), cx, cy);
+            Color c = getBackground();
+            g.setPaint(c);
+            g.fillRect(0, 0, w, h);
 
-        if (brightness(c.getBackground()) > 127)
-            g2.setPaint(Color.black);
-        else
-            g2.setPaint(Color.white);
+            double s = Math.min(w, h) / 4.;
+            double cx = w / 2.;
+            double cy = h / 2.;
 
-        Line2D line = new Line2D.Double(cx + s, cy, cx + s * 2, cy);
-        for (int i = 0; i < 12; i++) {
-            g2.draw(line);
-            g2.rotate(-Math.PI / 6, cx, cy);
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (11 - i) / 11f));
+            g.setStroke(new BasicStroke((float) (s / 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.rotate(angle, cx, cy);
+
+            if (brightness(c) > 127)
+                g.setPaint(Color.black);
+            else
+                g.setPaint(Color.white);
+
+            Line2D line = new Line2D.Double(cx + s, cy, cx + s * 2, cy);
+            for (int i = 0; i < 12; i++) {
+                g.draw(line);
+                g.rotate(-Math.PI / 6, cx, cy);
+                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (11 - i) / 11f));
+            }
+
+            g.dispose();
+
+            paintBorder(g1);
         }
 
-        g2.dispose();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        firePropertyChange("tick", 0, 1);
-        angle += 6;
-        if (angle >= 360)
-            angle = 0;
-    }
+    private static final double dangle = Math.PI / 30;
+    private static double angle;
 
-    @Override
-    public void applyPropertyChange(PropertyChangeEvent pce, JLayer l) {
-        if ("tick".equals(pce.getPropertyName())) {
-            l.repaint();
-        }
+    public static void incrementAngle() {
+        angle += dangle;
     }
 
 }
