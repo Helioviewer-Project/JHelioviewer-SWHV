@@ -112,7 +112,9 @@ class J2KReader implements Runnable {
             JP2ImageParameter params;
             // wait for signal
             try {
+                parentImageRef.setDownloading(false);
                 params = readerSignal.waitForSignal();
+                parentImageRef.setDownloading(true);
             } catch (InterruptedException e) {
                 continue;
             }
@@ -202,6 +204,7 @@ class J2KReader implements Runnable {
                 }
                 // suicide if fully done
                 if (cacheStatusRef.isLevelComplete(0)) {
+                    parentImageRef.setDownloading(false);
                     try {
                         socket.close();
                     } catch (IOException ignore) {
