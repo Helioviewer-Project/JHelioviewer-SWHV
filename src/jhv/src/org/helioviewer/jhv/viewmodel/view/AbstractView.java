@@ -128,4 +128,9 @@ public abstract class AbstractView implements View {
         dataHandler = _dataHandler;
     }
 
+    @Override
+    public boolean isDownloading() {
+        return false;
+    }
+
 }

@@ -41,6 +41,8 @@ public interface Renderable {
 
     boolean isDeletable();
 
+    boolean isDownloading();
+
     void init(GL2 gl);
 
     void dispose(GL2 gl);

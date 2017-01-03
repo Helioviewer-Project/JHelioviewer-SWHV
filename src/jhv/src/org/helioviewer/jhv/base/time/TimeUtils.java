@@ -28,7 +28,7 @@ public class TimeUtils {
     public static final JHVDate MAXIMAL_DATE = new JHVDate("2050-01-01T00:00:00");
 
     public static long parse(String date) {
-        return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(TimeUtils.ZERO).toEpochMilli();
+        return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
     }
 
 }

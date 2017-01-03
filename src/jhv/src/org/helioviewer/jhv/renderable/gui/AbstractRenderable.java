@@ -51,6 +51,11 @@ public abstract class AbstractRenderable implements Renderable {
     }
 
     @Override
+    public boolean isDownloading() {
+        return false;
+    }
+
+    @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
     }
 
