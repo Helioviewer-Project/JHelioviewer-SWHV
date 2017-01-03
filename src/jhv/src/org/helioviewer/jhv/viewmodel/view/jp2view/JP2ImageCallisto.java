@@ -33,4 +33,8 @@ public class JP2ImageCallisto extends JP2Image {
         return params;
     }
 
+    @Override
+    void setDownloading(boolean val) {
+    }
+
 }

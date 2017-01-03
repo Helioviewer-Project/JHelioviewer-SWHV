@@ -94,6 +94,8 @@ public interface View {
 
     void setDataHandler(ImageDataHandler dataHandler);
 
+    boolean isDownloading();
+
     JHVDate getFrameTime(int frame);
     JHVDate getFirstTime();
     JHVDate getLastTime();

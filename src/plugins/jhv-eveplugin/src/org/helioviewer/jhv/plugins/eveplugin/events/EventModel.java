@@ -109,7 +109,6 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             }
 
             eventUnderMouse = shouldRedraw;
-
         }
     }
 

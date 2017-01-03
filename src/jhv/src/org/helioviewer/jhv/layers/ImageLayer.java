@@ -407,6 +407,11 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         Displayer.display();
     }
 
+    @Override
+    public boolean isDownloading() {
+        return view == null ? false : view.isDownloading();
+    }
+
     void setOpacity(float opacity) {
         optionsPanel.setOpacity(opacity);
     }
@@ -424,9 +429,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     public APIRequest getAPIRequest() {
-        if (view != null)
-            return view.getAPIRequest();
-        return null;
+        return view == null ? null : view.getAPIRequest();
     }
 
 }

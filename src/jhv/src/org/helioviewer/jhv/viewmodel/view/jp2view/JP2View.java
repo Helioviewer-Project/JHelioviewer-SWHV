@@ -247,4 +247,9 @@ public class JP2View extends AbstractView {
         return _jp2Image.getVisibleStatus(frame);
     }
 
+    @Override
+    public boolean isDownloading() {
+        return _jp2Image.isDownloading();
+    }
+
 }
