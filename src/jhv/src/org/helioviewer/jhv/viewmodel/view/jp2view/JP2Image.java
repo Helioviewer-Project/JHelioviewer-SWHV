@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -328,14 +327,11 @@ public class JP2Image {
         }
     }
 
-    private boolean isDownloading;
+    private volatile boolean isDownloading;
 
     void setDownloading(boolean val) {
-/*        EventQueue.invokeLater(() -> {
-            isDownloading = val;
-            ImageViewerGui.getRenderableContainer().fireDownloadUpdated();
-        });
-*/    }
+        isDownloading = val;
+    }
 
     boolean isDownloading() {
         return isDownloading;

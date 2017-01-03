@@ -409,7 +409,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public boolean isDownloading() {
-        return view == null ? false : view.isDownloading();
+        return view != null && view.isDownloading();
     }
 
     void setOpacity(float opacity) {

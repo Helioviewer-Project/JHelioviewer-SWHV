@@ -49,9 +49,10 @@ public class RenderableContainerPanel extends JPanel {
     private static final int VISIBLE_COL = 0;
     private static final int TITLE_COL = 1;
     public static final int TIME_COL = 2;
-    private static final int REMOVE_COL = 3;
+    public static final int DOWNLOAD_COL = 3;
+    private static final int REMOVE_COL = 4;
 
-    public static final int NUMBER_COLUMNS = 4;
+    public static final int NUMBER_COLUMNS = 5;
     private static final int NUMBEROFVISIBLEROWS = 7;
 
     private final RenderableContainerTable grid;
@@ -183,6 +184,10 @@ public class RenderableContainerPanel extends JPanel {
         grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new RenderableTimeCellRenderer());
         int timeWidth = new JLabel("2000-01-01T00:00:00").getPreferredSize().width;
         grid.getColumnModel().getColumn(TIME_COL).setMinWidth(timeWidth);
+
+        grid.getColumnModel().getColumn(DOWNLOAD_COL).setCellRenderer(new RenderableDownloadingCellRenderer());
+        grid.getColumnModel().getColumn(DOWNLOAD_COL).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(DOWNLOAD_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RenderableRemoveCellRenderer(ICON_WIDTH));
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
