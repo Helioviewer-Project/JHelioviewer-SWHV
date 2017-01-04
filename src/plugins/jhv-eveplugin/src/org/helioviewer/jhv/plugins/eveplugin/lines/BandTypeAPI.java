@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
@@ -101,8 +100,8 @@ public class BandTypeAPI {
         return group.bandtypes.toArray(new BandType[group.bandtypes.size()]);
     }
 
-    public static List<BandGroup> getOrderedGroups() {
-        return orderedGroups;
+    public static BandGroup[] getGroups() {
+        return orderedGroups.toArray(new BandGroup[orderedGroups.size()]);
     }
 
 }
