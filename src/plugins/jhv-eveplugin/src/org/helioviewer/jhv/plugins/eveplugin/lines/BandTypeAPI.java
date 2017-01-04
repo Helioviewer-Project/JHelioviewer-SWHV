@@ -47,10 +47,8 @@ public class BandTypeAPI {
                 }
                 if (job.has("range")) {
                     JSONArray rangeArray = job.getJSONArray("range");
-                    Double v0 = rangeArray.getDouble(0);
-                    Double v1 = rangeArray.getDouble(1);
-                    bandtypes[i].setMin(v0);
-                    bandtypes[i].setMax(v1);
+                    bandtypes[i].setMin(rangeArray.getDouble(0));
+                    bandtypes[i].setMax(rangeArray.getDouble(1));
                 }
                 if (job.has("unitLabel")) {
                     bandtypes[i].setUnitLabel(job.getString("unitLabel"));
@@ -63,9 +61,10 @@ public class BandTypeAPI {
                 }
                 if (job.has("warnLevels")) {
                     JSONArray warnLevels = job.getJSONArray("warnLevels");
+                    HashMap<String, Double> store = bandtypes[i].getWarnLevels();
                     for (int j = 0; j < warnLevels.length(); j++) {
                         JSONObject helpobj = warnLevels.getJSONObject(j);
-                        bandtypes[i].warnLevels.put(helpobj.getString("warnLabel"), helpobj.getDouble("warnValue"));
+                        store.put(helpobj.getString("warnLabel"), helpobj.getDouble("warnValue"));
                     }
                 }
                 if (job.has("group")) {
