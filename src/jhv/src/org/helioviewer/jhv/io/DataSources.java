@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -64,7 +65,8 @@ public class DataSources {
     }
 
     public static String[] getServers() {
-        return serverSettings.keySet().stream().toArray(String[]::new);
+        Set<String> set = serverSettings.keySet();
+        return set.toArray(new String[set.size()]);
     }
 
     public static String getPreferredServer() {

@@ -78,7 +78,7 @@ public class TimelineDataPanel extends ObservationDialogPanel implements LineDat
     }
 
     public void setupDatasets() {
-        DefaultComboBoxModel<BandGroup> model = new DefaultComboBoxModel<>(BandTypeAPI.getOrderedGroups().stream().toArray(BandGroup[]::new));
+        DefaultComboBoxModel<BandGroup> model = new DefaultComboBoxModel<>(BandTypeAPI.getGroups());
         if (model.getSize() > 0) {
             comboBoxGroup.setModel(model);
             comboBoxGroup.setSelectedIndex(0);
