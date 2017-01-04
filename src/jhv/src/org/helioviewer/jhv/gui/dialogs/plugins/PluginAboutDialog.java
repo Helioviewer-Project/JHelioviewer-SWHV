@@ -20,7 +20,7 @@ import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
-// Dialog that is used to display information about a plug-in.
+// Dialog that is used to display information about a plug-in
 @SuppressWarnings("serial")
 class PluginAboutDialog extends JDialog implements HyperlinkListener {
 
@@ -59,35 +59,24 @@ class PluginAboutDialog extends JDialog implements HyperlinkListener {
         getRootPane().setFocusable(true);
     }
 
-    /**
-     * Creates a new JEditorPane in order to display information.
-     * */
     private JEditorPane getTextArea(String text) {
         JEditorPane pane = new JEditorPane("text/html", text);
         pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         pane.setEditable(false);
         pane.setOpaque(false);
         pane.addHyperlinkListener(this);
-
         return pane;
     }
 
-    /**
-     * Creates the header text of the dialog.
-     * */
     private String getHeaderText() {
         String pluginName = plugin.getName() == null ? "Unknown plug-in name" : plugin.getName();
         return "<html><center><font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + (getFont().getSize() + 2) + ";\">" +
                 "<b>" + pluginName + "</b></font></center></html>";
     }
 
-    /**
-     * Creates the text containing information about the plug-in and license.
-     * */
     private String getContentText() {
         String pluginDesc = plugin.getDescription() == null ? "No description available" : plugin.getDescription();
         String pluginLicense = plugin.getAboutLicenseText() == null ? " " : plugin.getAboutLicenseText();
-
         return "<html><center><font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">" +
                 "<p><b>Plug-in description</b><br>" + pluginDesc + "</p><p><b>Plug-in license information</b><br>" + pluginLicense + "</p></font></center></html>";
     }
@@ -103,9 +92,6 @@ class PluginAboutDialog extends JDialog implements HyperlinkListener {
         setVisible(true);
     }
 
-    /**
-     * Opens a browser or email client after clicking on a hyperlink.
-     */
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {

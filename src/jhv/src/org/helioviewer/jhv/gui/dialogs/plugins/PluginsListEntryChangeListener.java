@@ -4,6 +4,4 @@ interface PluginsListEntryChangeListener {
 
     void listChanged();
 
-    void itemChanged();
-
 }

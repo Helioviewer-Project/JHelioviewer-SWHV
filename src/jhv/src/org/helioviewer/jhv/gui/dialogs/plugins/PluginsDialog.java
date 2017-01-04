@@ -28,8 +28,6 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 @SuppressWarnings("serial")
 public class PluginsDialog extends JDialog implements ShowableDialog, PluginsListEntryChangeListener {
 
-    private boolean changesMade = false;
-
     private static final Dimension DIALOG_SIZE_MINIMUM = new Dimension(400, 500);
     private static final Dimension DIALOG_SIZE_PREFERRED = new Dimension(400, 500);
 
@@ -107,9 +105,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
         getRootPane().registerKeyboardAction(e -> closeDialog(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
-    /**
-     * Updates visual components according to the current state.
-     * */
     private void updateVisualComponents() {
         if (pluginList.getNumberOfItems() > 0) {
             listLayout.show(listContainerPane, "list");
@@ -127,22 +122,13 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
             default:
                 break;
             }
-
             listLayout.show(listContainerPane, "empty");
         }
     }
 
-    /**
-     * This method will close the dialog and handles things which have to be
-     * done before. This includes saving the settings and rebuild the viewchains
-     * with the current activated plug ins.
-     */
     private void closeDialog() {
-        if (changesMade) {
-            // save plug-in settings to XML file
-            PluginManager.getSingletonInstance().saveSettings();
-        }
-        // close dialog
+        // save plug-in settings to XML file
+        PluginManager.getSingletonInstance().saveSettings();
         dispose();
     }
 
@@ -150,31 +136,23 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
      * Removes all entries from the plug-in list and adds all available plug-ins
      * to the list again.
      * */
-    private void updatePluginList() {
-        PluginContainer[] plugins = PluginManager.getSingletonInstance().getAllPlugins();
-        int filterIndex = filterComboBox.getSelectedIndex();
-
-        PluginsListEntry entry = pluginList.getSelectedEntry();
-        String selectedPlugin = entry == null ? null : entry.getPluginContainer().getName();
-
+    public void updatePluginList() {
         pluginList.removeAllEntries();
 
-        for (PluginContainer plugin : plugins) {
+        int filterIndex = filterComboBox.getSelectedIndex();
+        for (PluginContainer plugin : PluginManager.getSingletonInstance().getAllPlugins()) {
             if (filterIndex == 0 || (plugin.isActive() && filterIndex == 1) || (!plugin.isActive() && filterIndex == 2)) {
                 pluginList.addEntry(plugin.getName(), new PluginsListEntry(plugin, pluginList));
             }
         }
-        pluginList.selectItem(selectedPlugin);
+        pluginList.updateList();
 
         updateVisualComponents();
     }
 
     @Override
     public void showDialog() {
-        changesMade = false;
-
         updatePluginList();
-        pluginList.selectFirstItem();
 
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
@@ -183,14 +161,8 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
     }
 
     @Override
-    public void itemChanged() {
-        changesMade = true;
-        updatePluginList();
-    }
-
-    @Override
     public void listChanged() {
-        updateVisualComponents();
+        updatePluginList();
     }
 
     @Override
