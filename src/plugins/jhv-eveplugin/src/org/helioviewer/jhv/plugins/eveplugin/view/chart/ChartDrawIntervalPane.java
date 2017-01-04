@@ -50,8 +50,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
 
     @Override
     protected void paintComponent(Graphics g1) {
-        super.paintComponent(g1);
-
         Graphics2D g = (Graphics2D) g1;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setFont(DrawConstants.font);

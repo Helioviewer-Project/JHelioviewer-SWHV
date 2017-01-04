@@ -50,28 +50,27 @@ class CollapsiblePaneButton extends JToggleButton {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-
+    protected void paintComponent(Graphics g1) {
+        Graphics2D g = (Graphics2D) g1.create();
         int w = getWidth();
         int h = getHeight();
         Point p0 = new Point(0, 0);
         Point ph = new Point(0, h);
 
         if (isSelected()) {
-            g2.setPaint(new GradientPaint(p0, dark, ph, bright));
-            g2.fillRect(0, 0, w, h / 2);
-            g2.setPaint(new GradientPaint(p0, bright, ph, dark));
-            g2.fillRect(0, h / 2, w, h / 2);
+            g.setPaint(new GradientPaint(p0, dark, ph, bright));
+            g.fillRect(0, 0, w, h / 2);
+            g.setPaint(new GradientPaint(p0, bright, ph, dark));
+            g.fillRect(0, h / 2, w, h / 2);
         } else {
-            g2.setPaint(new GradientPaint(p0, dark, ph, color));
-            g2.fillRect(0, 0, w, h / 2);
-            g2.setPaint(new GradientPaint(p0, color, ph, dark));
-            g2.fillRect(0, h / 2, w, h / 2);
+            g.setPaint(new GradientPaint(p0, dark, ph, color));
+            g.fillRect(0, 0, w, h / 2);
+            g.setPaint(new GradientPaint(p0, color, ph, dark));
+            g.fillRect(0, h / 2, w, h / 2);
         }
-        g2.dispose();
+        g.dispose();
 
-        super.paintComponent(g);
+        super.paintComponent(g1);
     }
 
 }
