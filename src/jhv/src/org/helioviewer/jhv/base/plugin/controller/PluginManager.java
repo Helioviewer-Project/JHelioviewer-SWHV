@@ -6,8 +6,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -25,7 +25,7 @@ public class PluginManager {
     private static final PluginManager singletonInstance = new PluginManager();
 
     private final PluginSettings pluginSettings = PluginSettings.getSingletonInstance();
-    private final Map<Plugin, PluginContainer> plugins = new HashMap<>();
+    private final HashMap<Plugin, PluginContainer> plugins = new HashMap<>();
 
     private PluginManager() {
     }
@@ -60,7 +60,8 @@ public class PluginManager {
      * @return a list with all loaded plug-ins.
      */
     public PluginContainer[] getAllPlugins() {
-        return plugins.values().stream().toArray(PluginContainer[]::new);
+        Collection<PluginContainer> col = plugins.values();
+        return col.toArray(new PluginContainer[col.size()]);
     }
 
     /**
@@ -92,7 +93,7 @@ public class PluginManager {
 
             URLClassLoader classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
             Object obj = classLoader.loadClass(className).getConstructor().newInstance();
-            Log.info("PluginManager: Load plugin class: " + className);
+            // Log.info("PluginManager: Load plugin class: " + className);
             if (obj instanceof Plugin) {
                 addPlugin((Plugin) obj, pluginLocation);
             } else {

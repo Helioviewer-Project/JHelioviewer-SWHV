@@ -32,7 +32,6 @@ class PluginsListEntry extends JPanel implements MouseListener {
     private final PluginsList list;
 
     private final LinkLabel infoLabel = new LinkLabel("More");
-
     private final JLabel preferencesLabel = new JLabel();
     private final JLabel enableLabel = new JLabel();
 
@@ -47,7 +46,6 @@ class PluginsListEntry extends JPanel implements MouseListener {
 
         // description
         JLabel descLabel = new JLabel(getDescriptionText());
-
         JPanel descPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
         descPane.setOpaque(false);
         descPane.add(descLabel);
@@ -94,9 +92,7 @@ class PluginsListEntry extends JPanel implements MouseListener {
         return plugin.getDescription() == null ? "" : plugin.getDescription();
     }
 
-    /**
-     * Updates the icon and tool tip text of the activation "button".
-     * */
+    // Updates the icon and tool tip text of the activation "button"
     private void updateEnableLabel() {
         if (plugin.isActive()) {
             enableLabel.setIcon(IconBank.getIcon(JHVIcon.CONNECTED));
@@ -107,9 +103,7 @@ class PluginsListEntry extends JPanel implements MouseListener {
         }
     }
 
-    /**
-     * Return the corresponding plug-in object.
-     * */
+    // Return the corresponding plug-in object
     public PluginContainer getPluginContainer() {
         return plugin;
     }
@@ -140,7 +134,7 @@ class PluginsListEntry extends JPanel implements MouseListener {
         plugin.changeSettings();
 
         updateEnableLabel();
-        list.fireItemChanged();
+        list.fireListChanged();
     }
 
     @Override

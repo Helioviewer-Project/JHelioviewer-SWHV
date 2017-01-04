@@ -97,7 +97,6 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
 
             text.append("<p>============ Plugin: ").append(pluginName).append(" ============<br>");
             text.append(pluginAboutLicense);
-
         }
 
         JEditorPane license = new JEditorPane("text/html", text.toString());
@@ -136,9 +135,6 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
         setVisible(true);
     }
 
-    /**
-     * Opens a browser or email client after clicking on a hyperlink.
-     */
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
@@ -151,11 +147,6 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
         }
     }
 
-    /**
-     * Formats the version and revision string
-     *
-     * @return the formatted version and revision string
-     */
     private static String getVersionString() {
         String versionString = JHVGlobals.getJhvVersion();
         String revisionString = JHVGlobals.getJhvRevision();
