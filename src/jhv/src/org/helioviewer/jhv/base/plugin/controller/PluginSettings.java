@@ -141,19 +141,6 @@ public class PluginSettings {
     }
 
     /**
-     * Removes a plugin from the XML settings file
-     *
-     * @param pluginContainer
-     *            Container of the plugin which should be removed
-     */
-    public void removePluginFromXML(PluginContainer pluginContainer) {
-        Node pluginNode = findNode(pluginsRootNode, "PluginLocation", pluginContainer.getPluginLocation().getPath());
-        if (pluginNode != null) {
-            pluginsRootNode.removeChild(pluginNode);
-        }
-    }
-
-    /**
      * Adds or updates the information of a passed plug-in to the internal XML
      * document. This method does not save the XML document to the corresponding
      * settings file!

@@ -92,7 +92,6 @@ class PluginsListEntry extends JPanel implements MouseListener {
         return plugin.getDescription() == null ? "" : plugin.getDescription();
     }
 
-    // Updates the icon and tool tip text of the activation "button"
     private void updateEnableLabel() {
         if (plugin.isActive()) {
             enableLabel.setIcon(IconBank.getIcon(JHVIcon.CONNECTED));
@@ -103,32 +102,16 @@ class PluginsListEntry extends JPanel implements MouseListener {
         }
     }
 
-    // Return the corresponding plug-in object
-    public PluginContainer getPluginContainer() {
-        return plugin;
-    }
-
-    /**
-     * Shows up the about dialog containing additional information about the
-     * corresponding plug-in.
-     * */
     private void showAboutDialog() {
         PluginAboutDialog.showDialog(plugin.getPlugin());
     }
 
-    /**
-     * Shows up the preferences dialog of the corresponding plug-in.
-     * */
     private void showPreferencesDialog() {
     }
 
-    /**
-     * Enables or disables the corresponding plug-in.
-     * */
     private void setPluginActive(boolean active) {
-        if (plugin.isActive() == active) {
+        if (plugin.isActive() == active)
             return;
-        }
 
         plugin.setActive(active);
         plugin.changeSettings();
@@ -166,7 +149,6 @@ class PluginsListEntry extends JPanel implements MouseListener {
     public void mouseReleased(MouseEvent e) {
     }
 
-    // Link Label
     private static class LinkLabel extends JLabel {
 
         public LinkLabel(String text) {
