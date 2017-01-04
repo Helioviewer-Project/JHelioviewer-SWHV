@@ -23,4 +23,7 @@ class RenderableTableCellRenderer extends DefaultTableCellRenderer {
     @Override
     public void repaint(int x, int y, int width, int height) {}
 
+    @Override
+    public void setValue(Object value) {}
+
 }
