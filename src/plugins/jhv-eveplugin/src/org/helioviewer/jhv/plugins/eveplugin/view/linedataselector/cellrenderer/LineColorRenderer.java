@@ -16,25 +16,23 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 @SuppressWarnings("serial")
 public class LineColorRenderer extends DefaultTableCellRenderer {
 
+    private final Color defaultColor = getBackground();
     private final LineColorPanel lineColorPanel = new LineColorPanel();
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        Color back = isSelected ? table.getSelectionBackground() : defaultColor;
+        lineColorPanel.setLineColor(back);
+        lineColorPanel.setBackground(back);
+
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof LineDataSelectorElement) {
             LineDataSelectorElement ldse = (LineDataSelectorElement) value;
-            Color c = ldse.getDataColor();
-            if (c != null && ldse instanceof Band) {
-                lineColorPanel.setLineColor(c);
-                lineColorPanel.setBackground(label.getBackground());
-                return lineColorPanel;
+            if (ldse instanceof Band) {
+                lineColorPanel.setLineColor(ldse.getDataColor());
             }
         }
-
-        label.setText(null);
-        label.setBorder(LineDataSelectorTablePanel.commonBorder);
-        return label;
+        return lineColorPanel;
     }
 
     private static class LineColorPanel extends JPanel {
@@ -52,8 +50,10 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            g.setColor(c);
-            g.fillRect(0, getHeight() / 2 - 1, getWidth(), 2);
+            if (c != null) {
+                g.setColor(c);
+                g.fillRect(0, getHeight() / 2 - 1, getWidth(), 2);
+            }
         }
 
     }
