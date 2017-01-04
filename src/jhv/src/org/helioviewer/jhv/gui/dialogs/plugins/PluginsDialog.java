@@ -127,7 +127,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
     }
 
     private void closeDialog() {
-        // save plug-in settings to XML file
         PluginManager.getSingletonInstance().saveSettings();
         dispose();
     }
