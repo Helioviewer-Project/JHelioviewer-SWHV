@@ -8,16 +8,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JLayer;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
@@ -28,24 +31,19 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 @SuppressWarnings("serial")
 public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionListener {
 
-    /** The event type for which the event panel is created */
+    // The event type for which the event panel is created
     private final SWEKEventType eventType;
 
-    /** The label holding the loading text */
-    private final JLabel loadingLabel;
+    private final JLabel loadingLabel = new JLabel("    ");
+    private final JLayer<JComponent> layer = new JLayer<>(null, MoviePanel.busyIndicator);
 
-    /** The timer handling the loading animation */
-    private final Timer loadingTimer;
-
-    private int loadingStep;
+    // The timer handling the loading animation
+    private final Timer loadingTimer = new Timer(500, this);
 
     public EventPanel(SWEKEventType _eventType) {
         eventType = _eventType;
         setLayout(new BorderLayout());
         SWEKTreeModel.addSWEKTreeModelListener(this);
-
-        loadingTimer = new Timer(500, this);
-        loadingStep = 0;
 
         EventTypePanelModel eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(eventType));
         eventPanelModel.addEventPanelModelListener(SWEKPlugin.downloadManager);
@@ -72,10 +70,11 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         add(eventTypeTree, BorderLayout.CENTER);
 
         FilterDialog filterDialog = new FilterDialog(eventType);
-        SmallPanel filterPanel = new SmallPanel();
-        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
+        SmallPanel filterPanel = new SmallPanel(new BorderLayout());
+        //filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
         filterPanel.setOpaque(true);
         filterPanel.setBackground(Color.WHITE);
+        filterPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
 
         if (eventType.containsFilter()) {
             JButton filterButton = new JButton("Filter");
@@ -88,11 +87,10 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
                     filterDialog.setLocation(windowLocation);
                 }
             });
-            filterPanel.add(filterButton);
+            filterPanel.add(filterButton, BorderLayout.CENTER);
         }
 
-        loadingLabel = new JLabel();
-        filterPanel.add(loadingLabel);
+        filterPanel.add(layer, BorderLayout.LINE_END);
         filterPanel.setSmall();
         add(filterPanel, BorderLayout.LINE_END);
     }
@@ -100,8 +98,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     @Override
     public void startedDownloadingEventType(SWEKEventType _eventType) {
         if (eventType.equals(_eventType) && !loadingTimer.isRunning()) {
-            loadingLabel.setText("Loading   ");
-            loadingStep = 0;
+            layer.setView(loadingLabel);
             loadingTimer.start();
         }
     }
@@ -110,31 +107,13 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     public void stoppedDownloadingEventType(SWEKEventType _eventType) {
         if (eventType.equals(_eventType) && loadingTimer.isRunning()) {
             loadingTimer.stop();
-            loadingLabel.setText("          ");
-            loadingStep = 0;
+            layer.setView(null);
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        switch (loadingStep) {
-        case 0:
-            loadingLabel.setText("Loading   ");
-            break;
-        case 1:
-            loadingLabel.setText("Loading.  ");
-            break;
-        case 2:
-            loadingLabel.setText("Loading.. ");
-            break;
-        case 3:
-            loadingLabel.setText("Loading...");
-            loadingStep = -1;
-            break;
-        default:
-            break;
-        }
-        loadingStep++;
+        layer.repaint();
     }
 
 }
