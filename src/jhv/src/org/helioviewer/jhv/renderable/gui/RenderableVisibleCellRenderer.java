@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.renderable.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
@@ -11,6 +11,7 @@ import javax.swing.SwingConstants;
 class RenderableVisibleCellRenderer extends RenderableTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
+    private final Color defaultColor = getBackground();
 
     public RenderableVisibleCellRenderer() {
         checkBox.setHorizontalAlignment(SwingConstants.CENTER);
@@ -21,16 +22,12 @@ class RenderableVisibleCellRenderer extends RenderableTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof Renderable) {
-            checkBox.setBackground(label.getBackground());
             checkBox.setSelected(((Renderable) value).isVisible());
-            return checkBox;
         }
-
-        label.setBorder(RenderableContainerPanel.commonBorder);
-        return label;
+        checkBox.setBackground(isSelected ? table.getSelectionBackground() : defaultColor);
+        return checkBox;
     }
 
 }

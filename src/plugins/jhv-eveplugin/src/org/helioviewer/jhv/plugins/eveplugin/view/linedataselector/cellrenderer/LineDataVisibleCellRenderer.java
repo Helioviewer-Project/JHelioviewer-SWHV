@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -15,6 +15,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
+    private final Color defaultColor = getBackground();
 
     public LineDataVisibleCellRenderer() {
         checkBox.setHorizontalAlignment(SwingConstants.CENTER);
@@ -25,16 +26,12 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof LineDataSelectorElement) {
-            checkBox.setBackground(label.getBackground());
             checkBox.setSelected(((LineDataSelectorElement) value).isVisible());
-            return checkBox;
         }
-
-        label.setBorder(LineDataSelectorTablePanel.commonBorder);
-        return label;
+        checkBox.setBackground(isSelected ? table.getSelectionBackground() : defaultColor);
+        return checkBox;
     }
 
 }
