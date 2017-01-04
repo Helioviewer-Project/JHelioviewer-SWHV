@@ -63,7 +63,6 @@ class TimeSlider extends JSlider implements LazyComponent {
         private static final Color completeCachedColor = new Color(0x4040FF);
 
         private static final BasicStroke thickStroke = new BasicStroke(4);
-        private static final BasicStroke thinStroke = new BasicStroke(1);
 
         public TimeSliderUI(JSlider component) {
             super(component);
@@ -91,17 +90,15 @@ class TimeSlider extends JSlider implements LazyComponent {
 
         // Draws the different region (no/partial/complete information
         @Override
-        public void paintTrack(Graphics g) {
-            if (!(g instanceof Graphics2D))
-                return;
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setStroke(thickStroke);
+        public void paintTrack(Graphics g1) {
+            Graphics2D g = (Graphics2D) g1.create();
+            g.setStroke(thickStroke);
 
             int y = slider.getSize().height / 2;
             View view = Layers.getActiveView();
             if (view == null) {
-                g2d.setColor(notCachedColor);
-                g2d.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
+                g.setColor(notCachedColor);
+                g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else {
                 int len = view.getMaximumFrameNumber();
                 for (int i = 0; i < len; i++) {
@@ -113,18 +110,18 @@ class TimeSlider extends JSlider implements LazyComponent {
 
                     AtomicBoolean status = view.getImageCacheStatus(i);
                     if (status == null)
-                        g2d.setColor(notCachedColor);
+                        g.setColor(notCachedColor);
                     else {
                         boolean complete = status.get();
                         if (complete)
-                            g2d.setColor(completeCachedColor);
+                            g.setColor(completeCachedColor);
                         else
-                            g2d.setColor(partialCachedColor);
+                            g.setColor(partialCachedColor);
                     }
-                    g2d.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
+                    g.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
                 }
             }
-            g2d.setStroke(thinStroke);
+            g.dispose();
         }
 
         // Overrides the track listener to access currentX

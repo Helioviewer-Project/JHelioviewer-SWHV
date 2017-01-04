@@ -204,6 +204,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     public static void unsetMovie() {
         timeSlider.setMaximum(0);
         timeSlider.setValue(0);
+        timeSlider.repaint();
         setEnabledState(false);
 
         clickRecordButton();
@@ -213,6 +214,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     public static void setMovie(View view) {
         timeSlider.setMaximum(view.getMaximumFrameNumber());
         timeSlider.setValue(view.getCurrentFrameNumber());
+        timeSlider.repaint();
         setEnabledState(true);
 
         recordButton.setEnabled(true);
