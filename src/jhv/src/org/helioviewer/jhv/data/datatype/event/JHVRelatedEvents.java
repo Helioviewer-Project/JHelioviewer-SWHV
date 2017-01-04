@@ -179,12 +179,4 @@ public class JHVRelatedEvents {
         eventsMap.get(eventType).put(interval, this);
     }
 
-    public JHVEvent get(int uniqueID) {
-        for (JHVEvent evt : events) {
-            if (evt.getUniqueID() == uniqueID)
-                return evt;
-        }
-        return null;
-    }
-
 }

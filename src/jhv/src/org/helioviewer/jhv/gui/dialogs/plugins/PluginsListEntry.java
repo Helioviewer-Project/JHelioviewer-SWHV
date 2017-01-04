@@ -32,7 +32,6 @@ class PluginsListEntry extends JPanel implements MouseListener {
     private final PluginsList list;
 
     private final LinkLabel infoLabel = new LinkLabel("More");
-    private final JLabel preferencesLabel = new JLabel();
     private final JLabel enableLabel = new JLabel();
 
     public PluginsListEntry(PluginContainer _plugin, PluginsList _list) {
@@ -54,11 +53,7 @@ class PluginsListEntry extends JPanel implements MouseListener {
         // "buttons"
         JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPane.setOpaque(false);
-        // buttonPane.add(preferencesLabel);
         buttonPane.add(enableLabel);
-
-        preferencesLabel.setIcon(IconBank.getIcon(JHVIcon.ADD));
-        preferencesLabel.setToolTipText("Shows up the preference dialog of the plug-in.");
 
         updateEnableLabel();
 
@@ -78,7 +73,6 @@ class PluginsListEntry extends JPanel implements MouseListener {
         descLabel.addMouseListener(this);
         infoLabel.addMouseListener(this);
         buttonPane.addMouseListener(this);
-        preferencesLabel.addMouseListener(this);
         enableLabel.addMouseListener(this);
     }
 
@@ -102,13 +96,6 @@ class PluginsListEntry extends JPanel implements MouseListener {
         }
     }
 
-    private void showAboutDialog() {
-        PluginAboutDialog.showDialog(plugin.getPlugin());
-    }
-
-    private void showPreferencesDialog() {
-    }
-
     private void setPluginActive(boolean active) {
         if (plugin.isActive() == active)
             return;
@@ -125,9 +112,7 @@ class PluginsListEntry extends JPanel implements MouseListener {
         list.selectItem(plugin.getName());
 
         if (e.getSource().equals(infoLabel)) {
-            showAboutDialog();
-        } else if (e.getSource().equals(preferencesLabel)) {
-            showPreferencesDialog();
+            PluginAboutDialog.showDialog(plugin.getPlugin());
         } else if (e.getSource().equals(enableLabel)) {
             setPluginActive(!plugin.isActive());
         }
