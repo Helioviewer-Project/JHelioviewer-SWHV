@@ -96,9 +96,8 @@ class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionLi
             Matcher m = Regex.HREF.matcher(strValue);
             String url = m.find() ? m.group(1) : strValue;
             return Regex.WEB_URL.matcher(url).matches() ? url : null;
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
