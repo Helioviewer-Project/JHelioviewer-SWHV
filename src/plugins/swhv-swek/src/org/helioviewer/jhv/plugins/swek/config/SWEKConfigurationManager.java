@@ -272,10 +272,9 @@ public class SWEKConfigurationManager {
 
     private static SWEKParameterFilter parseParameterFilter(JSONObject jsonObject) throws JSONException {
         JSONObject filterobject = jsonObject.optJSONObject("filter");
-        if (filterobject != null) {
-            return new SWEKParameterFilter(parseFilterType(filterobject), parseMin(filterobject), parseMax(filterobject), parseStartValue(filterobject), parseStepSize(filterobject), parseUnits(filterobject), parseDbType(filterobject));
-        }
-        return null;
+        if (filterobject == null)
+            return null;
+        return new SWEKParameterFilter(parseFilterType(filterobject), parseMin(filterobject), parseMax(filterobject), parseStartValue(filterobject), parseStepSize(filterobject), parseUnits(filterobject), parseDbType(filterobject));
     }
 
     private static String parseDbType(JSONObject filterobject) throws JSONException {
