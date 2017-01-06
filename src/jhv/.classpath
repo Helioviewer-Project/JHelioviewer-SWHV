@@ -14,6 +14,6 @@
     <classpathentry kind="lib" path="../lib/log4j-1.2.16.jar"/>
     <classpathentry kind="lib" path="../lib/nom-tam-fits-1.15.1.jar"/>
     <classpathentry kind="lib" path="../lib/org.everit.json.schema-1.4.1.jar"/>
-    <classpathentry kind="lib" path="../lib/sqlite-jdbc-3.15.1.jar"/>
+    <classpathentry kind="lib" path="../lib/sqlite-jdbc-3.16.1.jar"/>
     <classpathentry kind="output" path="bin"/>
 </classpath>
