@@ -292,7 +292,7 @@ public class RenderableContainerPanel extends JPanel {
         return rowHeight;
     }
 
-    private void setOptionsPanel(Renderable renderable) {
+    public void setOptionsPanel(Renderable renderable) {
         optionsPanelWrapper.removeAll();
         Component optionsPanel = renderable.getOptionsPanel();
         if (optionsPanel != null) {
