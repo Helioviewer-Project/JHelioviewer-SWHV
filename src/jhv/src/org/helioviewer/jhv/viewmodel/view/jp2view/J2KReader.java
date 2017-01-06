@@ -91,7 +91,7 @@ class J2KReader implements Runnable {
         String[] stepQuerys = new String[num_steps];
         String fSiz = width + "," + height;
 
-        int lpf = 0, lpi = 0, max_layers = num_layers - 1;
+        int lpf = -1, lpi = 0, max_layers = num_layers - 1;
         for (int i = 0; i < num_steps; i++) {
             lpf += JPIPConstants.MAX_REQ_LAYERS;
             if (lpf > max_layers)
