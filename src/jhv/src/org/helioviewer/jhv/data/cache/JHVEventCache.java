@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.container.cache;
+package org.helioviewer.jhv.data.cache;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,14 +13,11 @@ import java.util.SortedMap;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.data.container.JHVEventCacheRequestHandler;
-import org.helioviewer.jhv.data.container.JHVEventHandler;
-import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
+import org.helioviewer.jhv.data.event.JHVAssociation;
+import org.helioviewer.jhv.data.event.JHVEvent;
+import org.helioviewer.jhv.data.event.JHVEventType;
+import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 
 public class JHVEventCache {
 
@@ -36,49 +33,6 @@ public class JHVEventCache {
     private static JHVEventCacheRequestHandler incomingRequestManager;
 
     private static JHVRelatedEvents lastHighlighted = null;
-
-    public static class SortedDateInterval implements Comparable<SortedDateInterval> {
-
-        public long start;
-        public long end;
-        private final int id;
-        private static int id_gen = Integer.MIN_VALUE;
-
-        public SortedDateInterval(long _start, long _end) {
-            start = _start;
-            end = _end;
-            id = id_gen++;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof SortedDateInterval && compareTo((SortedDateInterval) o) == 0;
-        }
-
-        @Override
-        public int hashCode() {
-            assert false : "hashCode not designed";
-        return 42;
-        }
-
-        @Override
-        public int compareTo(SortedDateInterval o2) {
-            if (start < o2.start) {
-                return -1;
-            }
-            if (start == o2.start && end < o2.end) {
-                return -1;
-            }
-            if (start == o2.start && end == o2.end && o2.id < id) {
-                return -1;
-            }
-            if (start == o2.start && end == o2.end && o2.id == id) {
-                return 0;
-            }
-            return 1;
-        }
-
-    }
 
     public static void registerHandler(JHVEventCacheRequestHandler _incomingRequestManager) {
         incomingRequestManager = _incomingRequestManager;

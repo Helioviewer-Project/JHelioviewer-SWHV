@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.container.cache;
+package org.helioviewer.jhv.data.cache;
 
 import java.awt.Color;
 

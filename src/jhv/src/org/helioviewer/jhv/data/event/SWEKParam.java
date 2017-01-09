@@ -1,6 +1,6 @@
-package org.helioviewer.jhv.data.datatype.event;
+package org.helioviewer.jhv.data.event;
 
-import org.helioviewer.jhv.data.container.cache.SWEKOperand;
+import org.helioviewer.jhv.data.cache.SWEKOperand;
 
 public class SWEKParam {
 

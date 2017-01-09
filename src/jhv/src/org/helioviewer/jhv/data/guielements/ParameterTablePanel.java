@@ -20,7 +20,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
+import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 
 @SuppressWarnings("serial")

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.datatype.event;
+package org.helioviewer.jhv.data.cache;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -9,8 +9,10 @@ import java.util.TreeMap;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.data.container.cache.JHVCacheColors;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
+import org.helioviewer.jhv.data.event.JHVAssociation;
+import org.helioviewer.jhv.data.event.JHVEvent;
+import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
+import org.helioviewer.jhv.data.event.JHVEventType;
 
 public class JHVRelatedEvents {
 

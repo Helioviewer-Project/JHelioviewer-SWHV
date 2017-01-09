@@ -13,12 +13,12 @@ import java.util.SortedMap;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.data.container.JHVEventHandler;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
-import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.data.cache.JHVEventCache;
+import org.helioviewer.jhv.data.cache.JHVEventHandler;
+import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
+import org.helioviewer.jhv.data.cache.SortedDateInterval;
+import org.helioviewer.jhv.data.event.JHVEventParameter;
+import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;

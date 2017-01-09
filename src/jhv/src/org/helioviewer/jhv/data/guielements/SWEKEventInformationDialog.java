@@ -12,9 +12,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
-import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.data.cache.JHVEventCache;
+import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
+import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
 import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
 import org.helioviewer.jhv.database.EventDatabase;

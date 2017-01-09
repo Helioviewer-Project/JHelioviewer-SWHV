@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKEventType;
 
 public interface SWEKTreeModelListener {
 

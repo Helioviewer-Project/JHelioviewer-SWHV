@@ -135,7 +135,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
      * Removes all entries from the plug-in list and adds all available plug-ins
      * to the list again.
      * */
-    public void updatePluginList() {
+    private void updatePluginList() {
         pluginList.removeAllEntries();
 
         int filterIndex = filterComboBox.getSelectedIndex();

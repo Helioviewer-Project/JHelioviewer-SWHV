@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKParser;
+import org.helioviewer.jhv.data.event.JHVEvent;
+import org.helioviewer.jhv.data.event.JHVEventType;
+import org.helioviewer.jhv.data.event.SWEKParser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
