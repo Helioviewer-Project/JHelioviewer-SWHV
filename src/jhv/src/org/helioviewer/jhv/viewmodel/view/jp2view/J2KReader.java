@@ -78,19 +78,12 @@ class J2KReader implements Runnable {
         return JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "context", "jpxl<" + iniLayer + '-' + endLayer + '>', "fsiz", fSiz + ",closest", "rsiz", fSiz, "roff", "0,0");
     }
 
-    private static String[] createSingleQuery(int width, int height, int frame) {
-        String fSiz = width + "," + height;
-        return new String[] { createQuery(fSiz, frame, frame) };
-    }
-
-    private String[] createMultiQuery(int width, int height) {
+    private String[] createMultiQuery(String fSiz) {
         int num_steps = num_layers / JPIPConstants.MAX_REQ_LAYERS;
         if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
             num_steps++;
 
         String[] stepQuerys = new String[num_steps];
-        String fSiz = width + "," + height;
-
         int lpf = -1, lpi = 0, max_layers = num_layers - 1;
         for (int i = 0; i < num_steps; i++) {
             lpf += JPIPConstants.MAX_REQ_LAYERS;
@@ -137,11 +130,12 @@ class J2KReader implements Runnable {
                 // build query based on strategy
                 int current_step;
                 String[] stepQuerys;
+                String fSiz = params.resolution.width + "," + params.resolution.height;
                 if (singleFrame) {
-                    stepQuerys = createSingleQuery(params.resolution.width, params.resolution.height, frame);
+                    stepQuerys = new String[] { createQuery(fSiz, frame, frame) };
                     current_step = 0;
                 } else {
-                    stepQuerys = createMultiQuery(params.resolution.width, params.resolution.height);
+                    stepQuerys = createMultiQuery(fSiz);
 
                     int partial = cacheStatusRef.getImageCachedPartiallyUntil();
                     if (partial < num_layers - 1)
@@ -224,10 +218,15 @@ class J2KReader implements Runnable {
                 } catch (IOException ioe) {
                     Log.error("J2KReader.run() > Error closing socket", ioe);
                 }
-                // Send signal to try again
-                readerSignal.signal(params);
+
+                if (retries++ < 13)
+                    readerSignal.signal(params); // signal to retry
+                else
+                    Log.error("Retry limit reached: " + parentImageRef.getURI()); // something may be terribly wrong
             }
         }
     }
+
+    private int retries = 0;
 
 }
