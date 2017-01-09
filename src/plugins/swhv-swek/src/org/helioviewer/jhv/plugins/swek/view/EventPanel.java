@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;

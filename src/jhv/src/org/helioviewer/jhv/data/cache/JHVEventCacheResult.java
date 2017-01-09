@@ -1,13 +1,11 @@
-package org.helioviewer.jhv.data.container.cache;
+package org.helioviewer.jhv.data.cache;
 
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.data.event.JHVEventType;
 
 public class JHVEventCacheResult {
 

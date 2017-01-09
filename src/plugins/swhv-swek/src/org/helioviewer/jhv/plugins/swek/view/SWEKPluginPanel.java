@@ -7,7 +7,7 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKEventType;
 
 // The main visual component of the SWEK-plugin
 @SuppressWarnings("serial")

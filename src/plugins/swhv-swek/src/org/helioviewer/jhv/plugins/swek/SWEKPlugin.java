@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.plugins.swek;
 
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache;
+import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;

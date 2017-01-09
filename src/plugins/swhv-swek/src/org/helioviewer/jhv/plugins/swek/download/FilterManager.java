@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKParam;
-import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
+import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKParam;
+import org.helioviewer.jhv.data.event.SWEKParameter;
 
 // Manages the filters for the different event types
 public class FilterManager {

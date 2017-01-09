@@ -2,7 +2,7 @@ package org.helioviewer.jhv.data.guielements.model;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
+import org.helioviewer.jhv.data.event.JHVEventParameter;
 
 // The model for parameter table panel
 @SuppressWarnings("serial")

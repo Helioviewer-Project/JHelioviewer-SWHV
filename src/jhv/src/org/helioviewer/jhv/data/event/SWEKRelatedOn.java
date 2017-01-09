@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.datatype.event;
+package org.helioviewer.jhv.data.event;
 
 // Holds the related parameters of related events
 public class SWEKRelatedOn {

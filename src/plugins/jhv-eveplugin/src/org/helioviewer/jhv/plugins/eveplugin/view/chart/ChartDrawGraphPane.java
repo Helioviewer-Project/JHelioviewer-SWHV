@@ -31,8 +31,8 @@ import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache;
-import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.data.cache.JHVEventCache;
+import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.datatype.event;
+package org.helioviewer.jhv.data.event;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

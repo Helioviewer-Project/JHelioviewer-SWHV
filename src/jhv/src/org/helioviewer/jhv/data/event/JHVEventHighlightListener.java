@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.datatype.event;
+package org.helioviewer.jhv.data.event;
 
 public interface JHVEventHighlightListener {
 

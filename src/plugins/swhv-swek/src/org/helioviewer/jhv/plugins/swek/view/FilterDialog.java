@@ -11,7 +11,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
