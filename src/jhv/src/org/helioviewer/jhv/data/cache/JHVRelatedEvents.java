@@ -31,12 +31,14 @@ public class JHVRelatedEvents {
         color = JHVCacheColors.getNextColor();
         highlighted = false;
 
+        events.add(event);
+
         if (!eventsMap.containsKey(eventType)) {
             eventsMap.put(eventType, new TreeMap<>());
         }
+
         interval.start = event.start;
         interval.end = event.end;
-        events.add(event);
         eventsMap.get(eventType).put(interval, this);
     }
 
@@ -61,16 +63,17 @@ public class JHVRelatedEvents {
     }
 
     public void merge(JHVRelatedEvents found, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+        events.addAll(found.events);
+        associations.addAll(found.associations);
+
         if (!eventsMap.containsKey(eventType)) {
             eventsMap.put(eventType, new TreeMap<>());
         }
         eventsMap.get(eventType).remove(interval);
         eventsMap.get(eventType).remove(found.interval);
 
-        interval.start = Math.min(interval.start, found.getStart());
-        interval.end = Math.max(interval.end, found.getEnd());
-        events.addAll(found.events);
-        associations.addAll(found.associations);
+        interval.start = Math.min(interval.start, found.interval.start);
+        interval.end = Math.max(interval.end, found.interval.end);
         eventsMap.get(eventType).put(interval, this);
     }
 
@@ -162,22 +165,26 @@ public class JHVRelatedEvents {
     }
 
     private void resetTime(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+        long start = Long.MAX_VALUE;
+        long end = Long.MIN_VALUE;
+        for (JHVEvent evt : events) {
+            long time = evt.start;
+            if (time < start) {
+                start = time;
+            }
+            time = evt.end;
+            if (time > end) {
+                end = time;
+            }
+        }
+
         if (!eventsMap.containsKey(eventType)) {
             eventsMap.put(eventType, new TreeMap<>());
         }
         eventsMap.get(eventType).remove(interval);
-        interval.start = Long.MAX_VALUE;
-        interval.end = Long.MIN_VALUE;
-        for (JHVEvent evt : events) {
-            long time = evt.start;
-            if (time < interval.start) {
-                interval.start = time;
-            }
-            time = evt.end;
-            if (time > interval.end) {
-                interval.end = time;
-            }
-        }
+
+        interval.start = start;
+        interval.end = end;
         eventsMap.get(eventType).put(interval, this);
     }
 
