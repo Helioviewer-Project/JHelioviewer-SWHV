@@ -108,6 +108,22 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     }
 
     private enum RecordSize {
+        H2160 {
+            @Override
+            public String toString() {
+                return "3840×2160";
+            }
+
+            @Override
+            protected Dimension getSize() {
+                return new Dimension(3840, 2160);
+            }
+
+            @Override
+            protected boolean isInternal() {
+                return true;
+            }
+        },
         H1080 {
             @Override
             public String toString() {
@@ -117,22 +133,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
             @Override
             protected Dimension getSize() {
                 return new Dimension(1920, 1080);
-            }
-
-            @Override
-            protected boolean isInternal() {
-                return true;
-            }
-        },
-        H720 {
-            @Override
-            public String toString() {
-                return "1280×720";
-            }
-
-            @Override
-            protected Dimension getSize() {
-                return new Dimension(1280, 720);
             }
 
             @Override
@@ -350,7 +350,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         c.gridx = 2;
         recordPanel.add(new JLabel("Size", JLabel.RIGHT), c);
 
-        JComboBox<RecordSize> recordSizeCombo = new JComboBox<>(new RecordSize[]{RecordSize.ORIGINAL, RecordSize.H720, RecordSize.H1080});
+        JComboBox<RecordSize> recordSizeCombo = new JComboBox<>(new RecordSize[]{RecordSize.ORIGINAL, RecordSize.H1080, RecordSize.H2160});
         recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
         recordSizeCombo.addActionListener(e -> recordButton.setRecordSize((RecordSize) (recordSizeCombo.getSelectedItem())));
         c.gridx = 3;
