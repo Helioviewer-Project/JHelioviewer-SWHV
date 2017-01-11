@@ -33,16 +33,14 @@ class J2KRender implements Runnable {
     private static final int[] firstComponent = { 0 };
 
     // A reference to the JP2View this object is owned by
-    private final JP2View parentViewRef;
-    private final JP2Image parentImageRef;
+    private final JP2View viewRef;
 
     private final JP2ImageParameter params;
 
     private final boolean discard;
 
-    J2KRender(JP2View _parentViewRef, JP2Image _parentImageRef, JP2ImageParameter _currParams, boolean _discard) {
-        parentViewRef = _parentViewRef;
-        parentImageRef = _parentImageRef;
+    J2KRender(JP2View _viewRef, JP2ImageParameter _currParams, boolean _discard) {
+        viewRef = _viewRef;
         params = _currParams;
         discard = _discard;
     }
@@ -55,7 +53,7 @@ class J2KRender implements Runnable {
 
         SubImage subImage = params.subImage;
         int frame = params.frame;
-        int numComponents = parentImageRef.getNumComponents(frame);
+        int numComponents = viewRef.getNumComponents(frame);
 
         Kdu_ilayer_ref ilayer;
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
@@ -135,12 +133,12 @@ class J2KRender implements Runnable {
             data = new ARGBInt32ImageData(false, aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
 
-        MetaData metaData = parentImageRef.metaData[frame];
+        MetaData metaData = viewRef.metaData[frame];
         data.setMetaData(metaData);
         data.setViewpoint(params.viewpoint);
         data.setRegion(metaData.roiToRegion(subImage, params.resolution.factorX, params.resolution.factorY));
 
-        EventQueue.invokeLater(() -> parentViewRef.setImageData(data));
+        EventQueue.invokeLater(() -> viewRef.setImageData(data));
     }
 
     @Override
@@ -148,7 +146,7 @@ class J2KRender implements Runnable {
         try {
             KakaduEngine kduEngine = engineLocal.get();
             if (kduEngine == null) {
-                kduEngine = parentImageRef.getRenderEngine(threadLocal.get());
+                kduEngine = viewRef.getRenderEngine(threadLocal.get());
                 engineLocal.set(kduEngine);
             }
             renderLayer(kduEngine.getCompositor());

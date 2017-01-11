@@ -22,7 +22,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ImageCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
@@ -45,14 +44,13 @@ class DownloadedJPXData implements ImageDataHandler {
     public DownloadedJPXData(JP2ViewCallisto _view, long start) {
         if (_view != null) { // null for empty
             try {
-                JP2ImageCallisto image = _view.getJP2Image();
-                ResolutionSet.ResolutionLevel resLevel = image.getResolutionLevel(0, 0);
+                ResolutionSet.ResolutionLevel resLevel = _view.getResolutionLevel(0, 0);
                 jp2Width = resLevel.width;
                 jp2Height = resLevel.height;
 
                 XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
 
-                hvMetaData.parseXML(image.getXML(0));
+                hvMetaData.parseXML(_view.getXMLMetaData());
                 endFreq = hvMetaData.tryGetDouble("STARTFRQ");
                 startFreq = hvMetaData.tryGetDouble("END-FREQ");
                 startDate = TimeUtils.parse(hvMetaData.get("DATE-OBS"));
@@ -121,7 +119,7 @@ class DownloadedJPXData implements ImageDataHandler {
             TimeAxis xAxis = DrawController.selectedAxis;
             Rectangle roi = getROI(xAxis, EVEPlugin.rd.getYAxis());
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
-                view.getJP2Image().setRegion(roi);
+                view.setRegion(roi);
                 view.render(null, null, last_resolution);
             }
         }
