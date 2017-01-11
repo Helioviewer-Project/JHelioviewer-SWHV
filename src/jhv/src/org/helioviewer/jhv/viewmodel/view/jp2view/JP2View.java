@@ -4,7 +4,6 @@ import java.awt.EventQueue;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
@@ -13,11 +12,10 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 
 // This class is responsible for reading and decoding of JPEG2000 images
 public class JP2View extends AbstractView {
-
-    private final JP2ViewExecutor executor = new JP2ViewExecutor();
 
     protected JP2Image _jp2Image;
 
@@ -28,14 +26,14 @@ public class JP2View extends AbstractView {
     private long frameCountStart;
     private float frameRate;
 
-    private MetaData[] metaDataArray;
+    private MetaData[] metaData;
     private int maximumFrame;
 
     public void setJP2Image(JP2Image newJP2Image) {
         _jp2Image = newJP2Image;
 
-        metaDataArray = _jp2Image.metaDataList;
-        maximumFrame = metaDataArray.length - 1;
+        metaData = _jp2Image.metaData;
+        maximumFrame = metaData.length - 1;
         frameCountStart = System.currentTimeMillis();
     }
 
@@ -51,13 +49,10 @@ public class JP2View extends AbstractView {
             return;
         isAbolished = true;
 
-        new Thread(() -> {
-            executor.abolish();
-            if (_jp2Image != null) {
-                _jp2Image.abolish();
-                _jp2Image = null;
-            }
-        }).start();
+        if (_jp2Image != null) {
+            _jp2Image.abolish();
+            _jp2Image = null;
+        }
     }
 
     // if instance was built before cancelling
@@ -128,21 +123,21 @@ public class JP2View extends AbstractView {
         case SWING:
             if (targetFrame == maximumFrame) {
                 Layers.setAnimationMode(AnimationMode.SWINGDOWN);
-                return metaDataArray[targetFrame - 1].getViewpoint().time;
+                return metaData[targetFrame - 1].getViewpoint().time;
             }
             break;
         case SWINGDOWN:
             if (targetFrame == 0) {
                 Layers.setAnimationMode(AnimationMode.SWING);
-                return metaDataArray[1].getViewpoint().time;
+                return metaData[1].getViewpoint().time;
             }
-            return metaDataArray[targetFrame - 1].getViewpoint().time;
+            return metaData[targetFrame - 1].getViewpoint().time;
         default: // LOOP
             if (next > maximumFrame) {
-                return metaDataArray[0].getViewpoint().time;
+                return metaData[0].getViewpoint().time;
             }
         }
-        return metaDataArray[next].getViewpoint().time;
+        return metaData[next].getViewpoint().time;
     }
 
     @Override
@@ -160,7 +155,7 @@ public class JP2View extends AbstractView {
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
-            currentDiff = metaDataArray[++frame].getViewpoint().time.milli - time.milli;
+            currentDiff = metaData[++frame].getViewpoint().time.milli - time.milli;
         } while (currentDiff < 0 && frame < maximumFrame);
 
         if (-lastDiff < currentDiff) {
@@ -177,54 +172,38 @@ public class JP2View extends AbstractView {
         } else if (frame > maximumFrame) {
             frame = maximumFrame;
         }
-
-        return metaDataArray[frame].getViewpoint().time;
+        return metaData[frame].getViewpoint().time;
     }
 
     @Override
     public JHVDate getFirstTime() {
-        return metaDataArray[0].getViewpoint().time;
+        return metaData[0].getViewpoint().time;
     }
 
     @Override
     public JHVDate getLastTime() {
-        return metaDataArray[maximumFrame].getViewpoint().time;
+        return metaData[maximumFrame].getViewpoint().time;
     }
 
     @Override
     public JHVDate getFrameTime(JHVDate time) {
-        return metaDataArray[getFrameNumber(time)].getViewpoint().time;
+        return metaData[getFrameNumber(time)].getViewpoint().time;
     }
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return metaDataArray[getFrameNumber(time)];
+        return metaData[getFrameNumber(time)];
     }
-
-    // //
-
-    private Camera camera;
-    private Viewport vp;
-    private Position.Q viewpoint;
 
     @Override
-    public void render(Camera _camera, Viewport _vp, double factor) {
-        vp = _vp;
-        camera = _camera;
-        if (camera != null) {
-            viewpoint = camera.getViewpoint();
-        }
-        signalRender(_jp2Image, targetFrame, factor);
+    public void render(Camera camera, Viewport vp, double factor) {
+        _jp2Image.signalRender(this, camera, vp, camera == null ? null : camera.getViewpoint(), targetFrame, factor);
     }
 
-    void signalRenderFromReader(JP2Image image, int frame, double factor) {
-        if (isAbolished || frame != targetFrame)
+    void signalRenderFromReader(JP2ImageParameter params) {
+        if (isAbolished || params.frame != targetFrame)
             return;
-        EventQueue.invokeLater(() -> signalRender(image, frame, factor));
-    }
-
-    private void signalRender(JP2Image image, int frame, double factor) {
-        executor.execute(camera, vp, viewpoint, this, image, frame, factor);
+        EventQueue.invokeLater(() -> _jp2Image.execute(this, params, false));
     }
 
     @Override

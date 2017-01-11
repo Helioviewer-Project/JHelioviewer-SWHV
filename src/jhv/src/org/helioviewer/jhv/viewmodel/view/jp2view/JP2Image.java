@@ -2,6 +2,10 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import kdu_jni.Jpx_source;
@@ -18,6 +22,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -45,20 +50,17 @@ public class JP2Image {
     private static final String[] SUPPORTED_EXTENSIONS = { ".jp2", ".jpx" };
 
     private final URI uri;
-
-    private JHV_Kdu_cache cacheReader;
-    private Kdu_cache cacheRender;
-
     private final int frameCount;
     private final int[] builtinLUT;
-
-    private JPIPSocket socket;
-
     private final JP2ImageCacheStatus imageCacheStatus;
 
     private J2KReader reader;
+    private JHV_Kdu_cache cacheReader;
+    private Kdu_cache cacheRender;
 
-    final MetaData[] metaDataList;
+    private JPIPSocket socket;
+
+    final MetaData[] metaData;
 
     /**
      * Constructor
@@ -110,11 +112,11 @@ public class JP2Image {
 
             builtinLUT = KakaduHelper.getLUT(jpx);
 
-            metaDataList = new MetaData[frameCount];
-            KakaduMeta.cacheMetaData(kduReader.getFamilySrc(), metaDataList);
+            metaData = new MetaData[frameCount];
+            KakaduMeta.cacheMetaData(kduReader.getFamilySrc(), metaData);
             for (int i = 0; i < frameCount; i++) {
-                if (metaDataList[i] == null)
-                    metaDataList[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
+                if (metaData[i] == null)
+                    metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
             }
 
             if (cacheReader != null) { // remote
@@ -169,6 +171,35 @@ public class JP2Image {
         }
     }
 
+    private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
+    // no need to intercept exceptions
+    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
+                                                                    new JHVThread.NamedThreadFactory("Render"),
+                                                                    new ThreadPoolExecutor.DiscardPolicy());
+
+    private void execute(Camera camera, Viewport vp, Position.Q viewpoint, JP2View view, JP2Image image, int frame, double factor) {
+        // order is important, this will signal reader
+        JP2ImageParameter params = image.calculateParameter(camera, vp, viewpoint, frame, factor);
+        AtomicBoolean status = image.getStatusCache().getFrameLevelStatus(frame, params.resolution.level);
+        if (status == null)
+            return;
+
+        execute(view, params, !status.get());
+    }
+
+    void execute(JP2View view, JP2ImageParameter params, boolean discard) {
+        blockingQueue.poll();
+        executor.execute(new J2KRender(view, this, params, discard));
+    }
+
+    private void abolishExecutor() {
+        try {
+            executor.shutdown();
+            while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
+        } catch (Exception ignore) {
+        }
+    }
+
     KakaduEngine getRenderEngine(Kdu_thread_env threadEnv) throws KduException, IOException {
         Thread.currentThread().setName("Render " + getName());
         KakaduEngine engine = new KakaduEngine(cacheRender, uri);
@@ -181,9 +212,13 @@ public class JP2Image {
             reader.signalReader(params);
     }
 
+    void signalRender(JP2View view, Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
+        execute(camera, vp, p, view, this, frame, factor);
+    }
+
     // Recalculates the image parameters used within the jp2-package
     JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
-        MetaData m = metaDataList[frame];
+        MetaData m = metaData[frame];
         Region mr = m.getPhysicalRegion();
         Region r = ViewROI.updateROI(camera, vp, p, m);
 
@@ -225,7 +260,7 @@ public class JP2Image {
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
 
-        JP2ImageParameter params = new JP2ImageParameter(this, p, subImage, res, frame, factor, priority);
+        JP2ImageParameter params = new JP2ImageParameter(p, subImage, res, frame, factor, priority);
         if (priority || (!frameLevelComplete && level < oldLevel)) {
             signalReader(params);
         }
@@ -245,7 +280,7 @@ public class JP2Image {
     }
 
     String getName() {
-        MetaData m = metaDataList[0];
+        MetaData m = metaData[0];
         if (m instanceof ObserverMetaData) {
             return ((ObserverMetaData) m).getFullName();
         } else {
@@ -301,6 +336,7 @@ public class JP2Image {
         isAbolished = true;
 
         new Thread(() -> {
+            abolishExecutor();
             if (reader != null) {
                 reader.abolish();
                 reader = null;
@@ -353,9 +389,9 @@ public class JP2Image {
     }
 
     private LUT getAssociatedLUT() {
-        MetaData metaData = metaDataList[0];
-        if (metaData instanceof HelioviewerMetaData) {
-            return LUT.get((HelioviewerMetaData) metaData);
+        MetaData m = metaData[0];
+        if (m instanceof HelioviewerMetaData) {
+            return LUT.get((HelioviewerMetaData) m);
         }
         return null;
     }
