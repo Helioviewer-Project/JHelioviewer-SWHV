@@ -23,7 +23,7 @@ public class JP2ViewCallisto extends JP2View {
     private Rectangle region;
 
     @Override
-    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
+    JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
         ResolutionLevel res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
 
