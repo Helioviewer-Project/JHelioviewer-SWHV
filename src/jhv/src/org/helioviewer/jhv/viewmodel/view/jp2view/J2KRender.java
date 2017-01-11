@@ -34,13 +34,15 @@ class J2KRender implements Runnable {
 
     // A reference to the JP2View this object is owned by
     private final JP2View parentViewRef;
+    private final JP2Image parentImageRef;
 
     private final JP2ImageParameter params;
 
     private final boolean discard;
 
-    J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams, boolean _discard) {
+    J2KRender(JP2View _parentViewRef, JP2Image _parentImageRef, JP2ImageParameter _currParams, boolean _discard) {
         parentViewRef = _parentViewRef;
+        parentImageRef = _parentImageRef;
         params = _currParams;
         discard = _discard;
     }
@@ -51,10 +53,9 @@ class J2KRender implements Runnable {
         else
             compositor.Cull_inactive_ilayers(MAX_INACTIVE_LAYERS);
 
-        JP2Image image = params.jp2Image;
         SubImage subImage = params.subImage;
-        int frame = params.compositionLayer;
-        int numComponents = image.getNumComponents(frame);
+        int frame = params.frame;
+        int numComponents = parentImageRef.getNumComponents(frame);
 
         Kdu_ilayer_ref ilayer;
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
@@ -134,7 +135,7 @@ class J2KRender implements Runnable {
             data = new ARGBInt32ImageData(false, aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
 
-        MetaData metaData = image.metaDataList[frame];
+        MetaData metaData = parentImageRef.metaData[frame];
         data.setMetaData(metaData);
         data.setViewpoint(params.viewpoint);
         data.setRegion(metaData.roiToRegion(subImage, params.resolution.factorX, params.resolution.factorY));
@@ -147,7 +148,7 @@ class J2KRender implements Runnable {
         try {
             KakaduEngine kduEngine = engineLocal.get();
             if (kduEngine == null) {
-                kduEngine = params.jp2Image.getRenderEngine(threadLocal.get());
+                kduEngine = parentImageRef.getRenderEngine(threadLocal.get());
                 engineLocal.set(kduEngine);
             }
             renderLayer(kduEngine.getCompositor());

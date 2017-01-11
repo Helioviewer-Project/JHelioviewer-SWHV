@@ -118,7 +118,7 @@ class J2KReader implements Runnable {
                     socket = new JPIPSocket(parentImageRef.getURI(), cacheRef);
                 }
 
-                int frame = params.compositionLayer;
+                int frame = params.frame;
                 int level = params.resolution.level;
 
                 // choose cache strategy
@@ -168,7 +168,7 @@ class J2KReader implements Runnable {
                         // tell the cache status
                         if (singleFrame) {
                             cacheStatusRef.setFrameLevelComplete(frame, level);
-                            parentViewRef.signalRenderFromReader(parentImageRef, frame, params.factor); // refresh current image
+                            parentViewRef.signalRenderFromReader(params); // refresh current image
                         } else {
                             for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
                                 cacheStatusRef.setFrameLevelComplete(j, level);

@@ -27,14 +27,10 @@ public class JP2ImageCallisto extends JP2Image {
         ResolutionLevel res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
 
-        JP2ImageParameter params = new JP2ImageParameter(this, null, subImage, res, frame, factor, true);
+        JP2ImageParameter params = new JP2ImageParameter(null, subImage, res, frame, factor, true);
         signalReader(params);
 
         return params;
-    }
-
-    @Override
-    void setDownloading(boolean val) {
     }
 
 }
