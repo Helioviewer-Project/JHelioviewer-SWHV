@@ -10,8 +10,6 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.fitsview.FITSView;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ImageCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2View;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
@@ -82,11 +80,9 @@ public class APIRequestManager {
             } else {
                 JP2View view;
                 if (req == null || req.sourceId != APIRequest.CallistoID) {
-                    view = new JP2View();
-                    view.setJP2Image(new JP2Image(uri, view));
+                    view = new JP2View(uri);
                 } else {
-                    view = new JP2ViewCallisto();
-                    view.setJP2Image(new JP2ImageCallisto(uri, view));
+                    view = new JP2ViewCallisto(uri);
                 }
                 view.setAPIRequest(req);
                 return view;

@@ -21,11 +21,8 @@ class J2KReader implements Runnable {
     // A boolean flag used for stopping the thread
     private volatile boolean isAbolished;
 
-    // A reference to the JP2Image this object is owned by
-    private final JP2Image parentImageRef;
-
     // A reference to the JP2View this object is owned by
-    private final JP2View parentViewRef;
+    private final JP2View viewRef;
 
     // The a reference to the cache object used by the run method
     private final JHV_Kdu_cache cacheRef;
@@ -36,18 +33,17 @@ class J2KReader implements Runnable {
 
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
-    private final int num_layers;
+    private final int numLayers;
 
-    J2KReader(JP2View _imageViewRef, JP2Image _jp2ImageRef) {
-        parentViewRef = _imageViewRef;
-        parentImageRef = _jp2ImageRef;
+    J2KReader(JP2View _viewRef) {
+        viewRef = _viewRef;
 
-        num_layers = parentImageRef.getMaximumFrameNumber() + 1;
-        cacheRef = parentImageRef.getReaderCache();
-        cacheStatusRef = parentImageRef.getStatusCache();
-        socket = parentImageRef.getSocket();
+        numLayers = viewRef.getMaximumFrameNumber() + 1;
+        cacheRef = viewRef.getReaderCache();
+        cacheStatusRef = viewRef.getStatusCache();
+        socket = viewRef.getSocket();
 
-        myThread = new Thread(this, "Reader " + parentImageRef.getName());
+        myThread = new Thread(this, "Reader " + viewRef.getName());
         myThread.setDaemon(true);
         myThread.start();
     }
@@ -79,12 +75,12 @@ class J2KReader implements Runnable {
     }
 
     private String[] createMultiQuery(String fSiz) {
-        int num_steps = num_layers / JPIPConstants.MAX_REQ_LAYERS;
-        if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
+        int num_steps = numLayers / JPIPConstants.MAX_REQ_LAYERS;
+        if ((numLayers % JPIPConstants.MAX_REQ_LAYERS) != 0)
             num_steps++;
 
         String[] stepQuerys = new String[num_steps];
-        int lpf = -1, lpi = 0, max_layers = num_layers - 1;
+        int lpf = -1, lpi = 0, max_layers = numLayers - 1;
         for (int i = 0; i < num_steps; i++) {
             lpf += JPIPConstants.MAX_REQ_LAYERS;
             if (lpf > max_layers)
@@ -105,9 +101,9 @@ class J2KReader implements Runnable {
             JP2ImageParameter params;
             // wait for signal
             try {
-                parentImageRef.setDownloading(false);
+                viewRef.setDownloading(false);
                 params = readerSignal.waitForSignal();
-                parentImageRef.setDownloading(true);
+                viewRef.setDownloading(true);
             } catch (InterruptedException e) {
                 continue;
             }
@@ -115,7 +111,7 @@ class J2KReader implements Runnable {
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
-                    socket = new JPIPSocket(parentImageRef.getURI(), cacheRef);
+                    socket = new JPIPSocket(viewRef.getURI(), cacheRef);
                 }
 
                 int frame = params.frame;
@@ -123,7 +119,7 @@ class J2KReader implements Runnable {
 
                 // choose cache strategy
                 boolean singleFrame = false;
-                if (num_layers <= 1 /* one frame */ || params.priority) {
+                if (numLayers <= 1 /* one frame */ || params.priority) {
                     singleFrame = true;
                 }
 
@@ -138,7 +134,7 @@ class J2KReader implements Runnable {
                     stepQuerys = createMultiQuery(fSiz);
 
                     int partial = cacheStatusRef.getImageCachedPartiallyUntil();
-                    if (partial < num_layers - 1)
+                    if (partial < numLayers - 1)
                         current_step = partial / JPIPConstants.MAX_REQ_LAYERS;
                     else
                         current_step = frame / JPIPConstants.MAX_REQ_LAYERS;
@@ -168,9 +164,9 @@ class J2KReader implements Runnable {
                         // tell the cache status
                         if (singleFrame) {
                             cacheStatusRef.setFrameLevelComplete(frame, level);
-                            parentViewRef.signalRenderFromReader(params); // refresh current image
+                            viewRef.signalRenderFromReader(params); // refresh current image
                         } else {
-                            for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
+                            for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, numLayers); j++) {
                                 cacheStatusRef.setFrameLevelComplete(j, level);
                             }
                         }
@@ -179,7 +175,7 @@ class J2KReader implements Runnable {
                         if (singleFrame) {
                             cacheStatusRef.setFrameLevelPartial(frame);
                         } else {
-                            for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
+                            for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, numLayers); j++) {
                                 cacheStatusRef.setFrameLevelPartial(j);
                             }
                         }
@@ -198,7 +194,7 @@ class J2KReader implements Runnable {
                 }
                 // suicide if fully done
                 if (cacheStatusRef.isLevelComplete(0)) {
-                    parentImageRef.setDownloading(false);
+                    viewRef.setDownloading(false);
                     try {
                         socket.close();
                     } catch (IOException ignore) {
@@ -222,7 +218,7 @@ class J2KReader implements Runnable {
                 if (retries++ < 13)
                     readerSignal.signal(params); // signal to retry
                 else
-                    Log.error("Retry limit reached: " + parentImageRef.getURI()); // something may be terribly wrong
+                    Log.error("Retry limit reached: " + viewRef.getURI()); // something may be terribly wrong
             }
         }
     }

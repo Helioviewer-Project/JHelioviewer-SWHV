@@ -1,57 +1,174 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
+import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import kdu_jni.Jpx_source;
+import kdu_jni.KduException;
+import kdu_jni.Kdu_cache;
+import kdu_jni.Kdu_thread_env;
+
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
+import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
+import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
+import org.helioviewer.jhv.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.viewmodel.view.ViewROI;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusLocal;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemote;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
+import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMeta;
 
 // This class is responsible for reading and decoding of JPEG2000 images
 public class JP2View extends AbstractView {
 
-    protected JP2Image _jp2Image;
+    private static final String[] SUPPORTED_EXTENSIONS = { ".jp2", ".jpx" };
 
     private int targetFrame = 0;
     private int trueFrame = -1;
 
     private int frameCount = 0;
-    private long frameCountStart;
+    private long frameCountStart = System.currentTimeMillis();
     private float frameRate;
 
-    private MetaData[] metaData;
-    private int maximumFrame;
+    private final URI uri;
+    private final int maximumFrame;
+    private final int[] builtinLUT;
+    private final JP2ImageCacheStatus imageCacheStatus;
 
-    public void setJP2Image(JP2Image newJP2Image) {
-        _jp2Image = newJP2Image;
+    private J2KReader reader;
+    private JHV_Kdu_cache cacheReader;
+    private Kdu_cache cacheRender;
 
-        metaData = _jp2Image.metaData;
-        maximumFrame = metaData.length - 1;
-        frameCountStart = System.currentTimeMillis();
+    private JPIPSocket socket;
+
+    final MetaData[] metaData;
+
+    public JP2View(URI _uri) throws Exception {
+        uri = _uri;
+
+        String name = uri.getPath().toLowerCase();
+        boolean supported = false;
+        for (String ext : SUPPORTED_EXTENSIONS)
+            if (name.endsWith(ext))
+                supported = true;
+        if (!supported)
+            throw new JHV_KduException("File extension not supported");
+
+        try {
+            String scheme = uri.getScheme().toLowerCase();
+            switch (scheme) {
+                case "http":
+                case "jpip":
+                    cacheReader = new JHV_Kdu_cache();
+                    cacheRender = new Kdu_cache();
+                    cacheRender.Attach_to(cacheReader);
+                    // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
+                    initRemote(cacheReader);
+                    break;
+                case "file":
+                    // nothing
+                    break;
+                default:
+                    throw new JHV_KduException(scheme + " scheme not supported!");
+            }
+
+            KakaduEngine kduReader = new KakaduEngine(cacheReader, uri);
+            Jpx_source jpx = kduReader.getJpxSource();
+
+            // Retrieve the number of composition layers
+            int[] tempVar = new int[1];
+            jpx.Count_compositing_layers(tempVar);
+            maximumFrame = tempVar[0] - 1;
+
+            builtinLUT = KakaduHelper.getLUT(jpx);
+
+            metaData = new MetaData[maximumFrame + 1];
+            KakaduMeta.cacheMetaData(kduReader.getFamilySrc(), metaData);
+            for (int i = 0; i <= maximumFrame; i++) {
+                if (metaData[i] == null)
+                    metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
+            }
+
+            if (cacheReader != null) { // remote
+                imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader, maximumFrame);
+                reader = new J2KReader(this);
+            } else {
+                imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader, maximumFrame);
+            }
+        } catch (KduException e) {
+            e.printStackTrace();
+            throw new JHV_KduException("Failed to create Kakadu machinery: " + e.getMessage(), e);
+        }
     }
 
-    public String getXMLMetaData() {
-        return _jp2Image.getXML(trueFrame + 1);
+    private void initRemote(JHV_Kdu_cache cache) throws JHV_KduException {
+        try {
+            // Connect to the JPIP server and add the necessary initial data (the main header as well as the metadata) to cache
+            socket = new JPIPSocket(uri, cache);
+
+            JPIPResponse res;
+            String req = JPIPQuery.create(JPIPConstants.META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
+            do {
+                res = socket.send(req, cache);
+            } while (!res.isResponseComplete());
+
+            if (!cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
+                req = JPIPQuery.create(JPIPConstants.MIN_REQUEST_LEN, "stream", "0");
+                do {
+                    res = socket.send(req, cache);
+                } while (!res.isResponseComplete() && !cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
+            }
+
+            // prime first image
+            req = JPIPQuery.create(JPIPConstants.MAX_REQUEST_LEN, "context", "jpxl<0-0>", "fsiz", "64,64,closest", "rsiz", "64,64", "roff", "0,0");
+            do {
+                res = socket.send(req, cache);
+            } while (!res.isResponseComplete());
+        } catch (IOException e) {
+            initCloseSocket();
+            throw new JHV_KduException("Error in the server communication: " + e.getMessage(), e);
+        }
     }
 
-    private volatile boolean isAbolished = false;
-
-    @Override
-    public void abolish() {
-        if (isAbolished)
-            return;
-        isAbolished = true;
-
-        if (_jp2Image != null) {
-            _jp2Image.abolish();
-            _jp2Image = null;
+    private void initCloseSocket() {
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                Log.error("JP2Image.initRemote() > Error closing socket.", e);
+            }
+            socket = null;
         }
     }
 
@@ -62,6 +179,42 @@ public class JP2View extends AbstractView {
             abolish();
         } finally {
             super.finalize();
+        }
+    }
+
+    private volatile boolean isAbolished = false;
+
+    @Override
+    public void abolish() {
+        if (isAbolished)
+            return;
+        isAbolished = true;
+
+        new Thread(() -> {
+            abolishExecutor();
+            if (reader != null) {
+                reader.abolish();
+                reader = null;
+            }
+            kduDestroy();
+        }).start();
+    }
+
+    private void kduDestroy() {
+        try {
+            if (cacheRender != null) {
+                cacheRender.Close();
+                cacheRender.Native_destroy();
+            }
+            if (cacheReader != null) {
+                cacheReader.Close();
+                cacheReader.Native_destroy();
+            }
+        } catch (KduException e) {
+            e.printStackTrace();
+        } finally {
+            cacheRender = null;
+            cacheReader = null;
         }
     }
 
@@ -144,7 +297,7 @@ public class JP2View extends AbstractView {
     public void setFrame(JHVDate time) {
         int frame = getFrameNumber(time);
         if (frame != targetFrame) {
-            if (frame > _jp2Image.getStatusCache().getImageCachedPartiallyUntil())
+            if (frame > imageCacheStatus.getImageCachedPartiallyUntil())
                 return;
             targetFrame = frame;
         }
@@ -196,39 +349,204 @@ public class JP2View extends AbstractView {
     }
 
     @Override
+    public String getName() {
+        MetaData m = metaData[0];
+        if (m instanceof ObserverMetaData) {
+            return ((ObserverMetaData) m).getFullName();
+        } else {
+            String name = uri.getPath();
+            return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
+        }
+    }
+
+    @Override
+    public URI getURI() {
+        return uri;
+    }
+
+    @Override
+    public LUT getDefaultLUT() {
+        if (builtinLUT != null) {
+            return new LUT(getName() + " built-in", builtinLUT/* , builtinLUT */);
+        }
+        return getAssociatedLUT();
+    }
+
+    private LUT getAssociatedLUT() {
+        MetaData m = metaData[0];
+        if (m instanceof HelioviewerMetaData) {
+            return LUT.get((HelioviewerMetaData) m);
+        }
+        return null;
+    }
+
+    private volatile boolean isDownloading;
+
+    void setDownloading(boolean val) {
+        isDownloading = val;
+    }
+
+    @Override
+    public boolean isDownloading() {
+        return isDownloading;
+    }
+
+    private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
+    // no need to intercept exceptions
+    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
+                                                                    new JHVThread.NamedThreadFactory("Render"),
+                                                                    new ThreadPoolExecutor.DiscardPolicy());
+
+    private void execute(Camera camera, Viewport vp, Position.Q viewpoint, int frame, double factor) {
+        // order is important, this will signal reader
+        JP2ImageParameter params = calculateParameter(camera, vp, viewpoint, frame, factor);
+        AtomicBoolean status = imageCacheStatus.getFrameLevelStatus(frame, params.resolution.level);
+        if (status == null)
+            return;
+
+        execute(params, !status.get());
+    }
+
+    private void execute(JP2ImageParameter params, boolean discard) {
+        blockingQueue.poll();
+        executor.execute(new J2KRender(this, params, discard));
+    }
+
+    @Override
     public void render(Camera camera, Viewport vp, double factor) {
-        _jp2Image.signalRender(this, camera, vp, camera == null ? null : camera.getViewpoint(), targetFrame, factor);
+        execute(camera, vp, camera == null ? null : camera.getViewpoint(), targetFrame, factor);
     }
 
     void signalRenderFromReader(JP2ImageParameter params) {
         if (isAbolished || params.frame != targetFrame)
             return;
-        EventQueue.invokeLater(() -> _jp2Image.execute(this, params, false));
+        EventQueue.invokeLater(() -> execute(params, false));
     }
 
-    @Override
-    public String getName() {
-        return _jp2Image.getName();
+    private void abolishExecutor() {
+        try {
+            executor.shutdown();
+            while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
+        } catch (Exception ignore) {
+        }
     }
 
-    @Override
-    public URI getURI() {
-        return _jp2Image.getURI();
+    KakaduEngine getRenderEngine(Kdu_thread_env threadEnv) throws KduException, IOException {
+        Thread.currentThread().setName("Render " + getName());
+        KakaduEngine engine = new KakaduEngine(cacheRender, uri);
+        engine.getCompositor().Set_thread_env(threadEnv, null);
+        return engine;
     }
 
-    @Override
-    public LUT getDefaultLUT() {
-        return _jp2Image.getDefaultLUT();
+    protected void signalReader(JP2ImageParameter params) {
+        if (reader != null)
+            reader.signalReader(params);
     }
+
+    // Recalculates the image parameters used within the jp2-package
+    JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
+        MetaData m = metaData[frame];
+        Region mr = m.getPhysicalRegion();
+        Region r = ViewROI.updateROI(camera, vp, p, m);
+
+        double ratio = 2 * camera.getWidth() / vp.height;
+        int totalHeight = (int) (mr.height / ratio + .5);
+
+        ResolutionLevel res = imageCacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
+
+        double currentMeterPerPixel = mr.width / res.width;
+        int imageWidth = (int) Math.ceil(r.width / currentMeterPerPixel); // +1 account for floor ??
+        int imageHeight = (int) Math.ceil(r.height / currentMeterPerPixel);
+
+        double posX = (r.ulx - mr.ulx) / mr.width * res.width;
+        double posY = (r.uly - mr.uly) / mr.height * res.height;
+        int imagePositionX = (int) Math.floor(+posX);
+        int imagePositionY = (int) Math.floor(-posY);
+
+        SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.width, res.height);
+
+        int maxDim = Math.max(subImage.width, subImage.height);
+        double adj = 1;
+        if (maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying() && !ImageViewerGui.getGLListener().isRecording()) {
+            adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
+            if (adj > 0.5)
+                adj = 1;
+            else if (adj > 0.25)
+                adj = 0.5;
+            else if (adj > 0.125)
+                adj = 0.25;
+            else if (adj > 0.0625)
+                adj = 0.125;
+            else if (adj > 0.03125)
+                adj = 0.0625;
+        }
+        factor = Math.min(factor, adj);
+
+        int level = res.level;
+        AtomicBoolean status = imageCacheStatus.getFrameLevelStatus(frame, level);
+        boolean frameLevelComplete = status != null && status.get();
+        boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
+
+        JP2ImageParameter params = new JP2ImageParameter(p, subImage, res, frame, factor, priority);
+        if (priority || (!frameLevelComplete && level < oldLevel)) {
+            signalReader(params);
+        }
+        oldLevel = level;
+
+        return params;
+    }
+
+    private int oldLevel = 10000;
 
     @Override
     public AtomicBoolean getImageCacheStatus(int frame) {
-        return _jp2Image.getVisibleStatus(frame);
+        // visible status
+        return imageCacheStatus.getFrameLevelStatus(frame, oldLevel);
     }
 
-    @Override
-    public boolean isDownloading() {
-        return _jp2Image.isDownloading();
+    public ResolutionLevel getResolutionLevel(int frame, int level) {
+        return imageCacheStatus.getResolutionSet(frame).getResolutionLevel(level);
+    }
+
+    /**
+     * Returns the socket, if in remote mode.
+     *
+     * The socket is returned only one time. After calling this function for the
+     * first time, it will always return null.
+     *
+     * @return Socket connected to the server
+     */
+    JPIPSocket getSocket() {
+        if (socket == null)
+            return null;
+
+        JPIPSocket output = socket;
+        socket = null;
+        return output;
+    }
+
+    int getNumComponents(int frame) {
+        return imageCacheStatus.getResolutionSet(frame).numComps;
+    }
+
+    JHV_Kdu_cache getReaderCache() {
+        return cacheReader;
+    }
+
+    JP2ImageCacheStatus getStatusCache() {
+        return imageCacheStatus;
+    }
+
+    // very slow
+    public String getXMLMetaData() {
+        String xml = null;
+        try {
+            KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri);
+            xml = KakaduMeta.getXml(kduTmp.getFamilySrc(), trueFrame + 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return xml;
     }
 
 }
