@@ -3,10 +3,6 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import kdu_jni.Jpx_source;
@@ -24,7 +20,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
@@ -61,6 +56,7 @@ public class JP2View extends AbstractView {
     private long frameCountStart = System.currentTimeMillis();
     private float frameRate;
 
+    private final RenderExecutor executor = new RenderExecutor();
     private final URI uri;
     private final int maximumFrame;
     private final int[] builtinLUT;
@@ -191,7 +187,7 @@ public class JP2View extends AbstractView {
         isAbolished = true;
 
         new Thread(() -> {
-            abolishExecutor();
+            executor.abolish();
             if (reader != null) {
                 reader.abolish();
                 reader = null;
@@ -391,44 +387,15 @@ public class JP2View extends AbstractView {
         return isDownloading;
     }
 
-    private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
-    // no need to intercept exceptions
-    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
-                                                                    new JHVThread.NamedThreadFactory("Render"),
-                                                                    new ThreadPoolExecutor.DiscardPolicy());
-
-    private void execute(Camera camera, Viewport vp, Position.Q viewpoint, int frame, double factor) {
-        // order is important, this will signal reader
-        JP2ImageParameter params = calculateParameter(camera, vp, viewpoint, frame, factor);
-        AtomicBoolean status = imageCacheStatus.getFrameLevelStatus(frame, params.resolution.level);
-        if (status == null)
-            return;
-
-        execute(params, !status.get());
-    }
-
-    private void execute(JP2ImageParameter params, boolean discard) {
-        blockingQueue.poll();
-        executor.execute(new J2KRender(this, params, discard));
-    }
-
     @Override
     public void render(Camera camera, Viewport vp, double factor) {
-        execute(camera, vp, camera == null ? null : camera.getViewpoint(), targetFrame, factor);
+        executor.execute(this, camera, vp, camera == null ? null : camera.getViewpoint(), targetFrame, factor);
     }
 
     void signalRenderFromReader(JP2ImageParameter params) {
         if (isAbolished || params.frame != targetFrame)
             return;
-        EventQueue.invokeLater(() -> execute(params, false));
-    }
-
-    private void abolishExecutor() {
-        try {
-            executor.shutdown();
-            while (!executor.awaitTermination(1000L, TimeUnit.MILLISECONDS)) ;
-        } catch (Exception ignore) {
-        }
+        EventQueue.invokeLater(() -> executor.execute(this, params, false));
     }
 
     KakaduEngine getRenderEngine(Kdu_thread_env threadEnv) throws KduException, IOException {
@@ -501,7 +468,12 @@ public class JP2View extends AbstractView {
     @Override
     public AtomicBoolean getImageCacheStatus(int frame) {
         // visible status
-        return imageCacheStatus.getFrameLevelStatus(frame, oldLevel);
+        return getImageCacheStatus(frame, oldLevel);
+    }
+
+    AtomicBoolean getImageCacheStatus(int frame, int level) {
+        // actual status
+        return imageCacheStatus.getFrameLevelStatus(frame, level);
     }
 
     public ResolutionLevel getResolutionLevel(int frame, int level) {
