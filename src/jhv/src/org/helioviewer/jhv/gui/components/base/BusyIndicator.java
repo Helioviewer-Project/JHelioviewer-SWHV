@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.components.base;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -13,15 +12,6 @@ import javax.swing.plaf.LayerUI;
 
 @SuppressWarnings("serial")
 public class BusyIndicator extends LayerUI<JComponent> {
-
-    private static int brightness(Color c) {
-        int r = c.getRed();
-        int g = c.getGreen();
-        int b = c.getBlue();
-        int cmax = Math.max(Math.max(r, g), b);
-        int cmin = Math.min(Math.min(r, g), b);
-        return (cmax + cmin) / 2;
-    }
 
     @Override
     public void paint(Graphics g1, JComponent c) {
@@ -39,11 +29,7 @@ public class BusyIndicator extends LayerUI<JComponent> {
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         g.setStroke(new BasicStroke((float) (s / 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.rotate(angle, cx, cy);
-
-        if (brightness(c.getBackground()) > 127)
-            g.setColor(Color.black);
-        else
-            g.setColor(Color.white);
+        g.setColor(c.getForeground());
 
         Line2D line = new Line2D.Double(cx + s, cy, cx + s * 2, cy);
         for (int i = 0; i < 12; i++) {
