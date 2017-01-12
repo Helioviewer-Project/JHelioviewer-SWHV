@@ -1,13 +1,10 @@
 package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -15,9 +12,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -35,12 +30,8 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 @SuppressWarnings("serial")
 public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkListener {
 
-    private final JScrollPane scrollPane;
-
     public AboutDialog() {
         super(ImageViewerGui.getMainFrame(), "About JHelioviewer", true);
-        setLayout(new BorderLayout());
-        setResizable(false);
 
         JPanel contentPane = new JPanel(new BorderLayout());
 
@@ -48,39 +39,24 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
         logo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         contentPane.add(logo, BorderLayout.WEST);
 
-        Font font = getFont();
-
-        JEditorPane content = new JEditorPane("text/html", "<html><center><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" +
-                "<b>" + getVersionString() + "</b><br>" +
-                '\u00A9' + "2017 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>" +
-                "Part of the ESA/NASA Helioviewer Project<br>" +
-                "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>" +
-                "JHelioviewer is released under the<br>" +
-                "<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>" +
-                "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>" +
-                "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>" +
-                "</font></center></html>");
-        content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        content.setEditable(false);
-        content.setOpaque(false);
-        content.addHyperlinkListener(this);
-        contentPane.add(content, BorderLayout.CENTER);
-
-        JPanel boxPanel = new JPanel();
-        boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.PAGE_AXIS));
-
-        boxPanel.add(new JSeparator());
         StringBuilder text = new StringBuilder();
-        text.append("<html><font style=\"font-family: '").append(font.getFamily()).append("'; font-size: ").append(font.getSize()).append(";\">");
-        text.append("This software uses the <a href=\"http://www.kakadusoftware.com\">Kakadu JPEG2000 Toolkit</a>,<br> " + '\u00A9' + " 2015, NewSouth Innovations Ltd (NSI), <a href=Kakadu.txt>(License)</a><br>");
-        text.append("<p>This software uses <a href=\"https://jogamp.org\">JogAmp</a>, the Java high performance libraries for 3D Graphics, Multimedia and Processing,<br>").append('\u00A9').append(" JogAmp Community and others<br>");
-        text.append("<p>This software uses <a href=\"https://commons.apache.org\">Apache Commons</a>,<br>").append('\u00A9').append(" 2001-2015, The Apache Software Foundation<br>");
-        text.append("<p>This software uses <a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> from the Apache Logging Services Project, licensed under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License version 2.0</a>,<br>" + '\u00A9' + " 2010, The Apache Software Foundation<br>");
+        text.append("<center><b>" + getVersionString() + "</b><br>");
+        text.append("©2017 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>");
+        text.append("Part of the ESA/NASA Helioviewer Project<br>");
+        text.append("Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>");
+        text.append("JHelioviewer is released under the<br>");
+        text.append("<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>");
+        text.append("<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>");
+        text.append("Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a></center>");
+        text.append("<hr>This software uses the <a href=\"http://www.kakadusoftware.com\">Kakadu JPEG2000 Toolkit</a>,<br>©2015, NewSouth Innovations Ltd (NSI), <a href=Kakadu.txt>(License)</a><br>");
+        text.append("<p>This software uses <a href=\"https://jogamp.org\">JogAmp</a>, the Java high performance libraries for 3D Graphics, Multimedia and Processing,<br>©JogAmp Community and others<br>");
+        text.append("<p>This software uses <a href=\"https://commons.apache.org\">Apache Commons</a>,<br>©2001-2015, The Apache Software Foundation<br>");
+        text.append("<p>This software uses <a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> from the Apache Logging Services Project, licensed under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License version 2.0</a>,<br>©2010, The Apache Software Foundation<br>");
         text.append("<p>This software uses the <a href=\"https://github.com/stleary/JSON-java\">JSON in Java</a> Library, licensed under a custom <a href=\"http://www.json.org/license.html\">License</a>.");
         text.append("<p>This software uses the <a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial SQLite JDBC Driver</a>, licensed under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License version 2.0</a>.<br>");
         text.append("<p>This software uses <a href=\"http://jcodec.org\">JCodec</a>, licensed under the FreeBSD License.<br>");
         text.append("<p>This software uses the <a href=\"http://nom-tam-fits.github.io/nom-tam-fits/\">FITS in Java</a> public domain library.");
-        text.append("<p>This software uses the <a href=\"http://www.davekoelle.com/alphanum.html\">Alphanum Algorithm</a>, licensed under the LGPLv2.1.<br> Its source code can be downloaded <a href=\"http://jhelioviewer.org/libjhv/external/AlphanumComparator.java\">here</a>.<br>");
+        text.append("<p>This software uses the <a href=\"http://www.davekoelle.com/alphanum.html\">Alphanum Algorithm</a>, licensed under the LGPLv2.1.<br>Its source code can be downloaded <a href=\"http://jhelioviewer.org/libjhv/external/AlphanumComparator.java\">here</a>.<br>");
 
         for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {
             Plugin plugin = pluginContainer.getPlugin();
@@ -95,32 +71,24 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
                 pluginAboutLicense = "No License Text Available.";
             }
 
-            text.append("<p>============ Plugin: ").append(pluginName).append(" ============<br>");
-            text.append(pluginAboutLicense);
+            text.append("<hr><b>" + pluginName + "</b><br>" + pluginAboutLicense);
         }
 
-        JEditorPane license = new JEditorPane("text/html", text.toString());
-
-        license.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        license.setEditable(false);
-        license.setOpaque(false);
-        license.addHyperlinkListener(this);
-        boxPanel.add(license);
+        JEditorPane content = new JEditorPane("text/html", text.toString());
+        content.setOpaque(false);
+        content.setEditable(false);
+        content.addHyperlinkListener(this);
+        content.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        contentPane.add(content, BorderLayout.CENTER);
 
         JPanel closeButtonContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dispose());
         closeButtonContainer.add(closeButton);
-        boxPanel.add(closeButtonContainer);
+        contentPane.add(closeButtonContainer, BorderLayout.SOUTH);
 
-        contentPane.add(boxPanel, BorderLayout.SOUTH);
-
-        scrollPane = new JScrollPane(contentPane);
-        scrollPane.getVerticalScrollBar().setBlockIncrement(100);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(100);
-        add(scrollPane);
-
-        setPreferredSize(new Dimension(getPreferredSize().width + 50, 600));
+        add(new JScrollPane(contentPane));
 
         getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
@@ -131,7 +99,6 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
     public void showDialog() {
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
         setVisible(true);
     }
 
