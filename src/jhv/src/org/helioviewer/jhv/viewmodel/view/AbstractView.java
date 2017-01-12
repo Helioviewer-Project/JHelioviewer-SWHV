@@ -45,7 +45,7 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public AtomicBoolean getVisibleCacheStatus(int frame) {
+    public AtomicBoolean getFrameCacheStatus(int frame) {
         return fullCache;
     }
 

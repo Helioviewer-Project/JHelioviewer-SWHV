@@ -96,7 +96,7 @@ public interface View {
 
     boolean isComplete();
 
-    AtomicBoolean getVisibleCacheStatus(int frame);
+    AtomicBoolean getFrameCacheStatus(int frame);
 
     JHVDate getFrameTime(int frame);
     JHVDate getFirstTime();
