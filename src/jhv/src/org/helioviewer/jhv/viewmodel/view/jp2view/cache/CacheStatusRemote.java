@@ -11,8 +11,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 
 public class CacheStatusRemote implements CacheStatus {
 
-    // r/w J2KReader, r MoviePanel/EDT
-
     private final int maxFrame;
     private final ResolutionSet[] resolutionSet;
     private KakaduEngine engine;
@@ -76,7 +74,6 @@ public class CacheStatusRemote implements CacheStatus {
             fullyComplete = true;
         return true;
     }
-
 
     @Override
     public AtomicBoolean getFrameStatus(int frame, int level) {
