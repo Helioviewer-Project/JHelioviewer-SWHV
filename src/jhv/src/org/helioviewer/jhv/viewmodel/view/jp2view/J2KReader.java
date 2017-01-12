@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
@@ -27,7 +27,7 @@ class J2KReader implements Runnable {
     // The a reference to the cache object used by the run method
     private final JHV_Kdu_cache cacheRef;
 
-    private final JP2ImageCacheStatus cacheStatusRef;
+    private final CacheStatus cacheStatusRef;
 
     private JPIPSocket socket;
 
@@ -40,7 +40,7 @@ class J2KReader implements Runnable {
 
         numFrames = viewRef.getMaximumFrameNumber() + 1;
         cacheRef = viewRef.getReaderCache();
-        cacheStatusRef = viewRef.getStatusCache();
+        cacheStatusRef = viewRef.getCacheStatus();
         socket = viewRef.getSocket();
 
         myThread = new Thread(this, "Reader " + viewRef.getName());
@@ -133,7 +133,7 @@ class J2KReader implements Runnable {
                 } else {
                     stepQuerys = createMultiQuery(fSiz);
 
-                    int partial = cacheStatusRef.getImageCachedPartiallyUntil();
+                    int partial = cacheStatusRef.getPartialUntil();
                     if (partial < numFrames - 1)
                         currentStep = partial / JPIPConstants.MAX_REQ_LAYERS;
                     else
@@ -163,20 +163,20 @@ class J2KReader implements Runnable {
 
                         // tell the cache status
                         if (singleFrame) {
-                            cacheStatusRef.setFrameLevelComplete(frame, level);
+                            cacheStatusRef.setFrameComplete(frame, level);
                             viewRef.signalRenderFromReader(params); // refresh current image
                         } else {
                             for (int j = currentStep * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((currentStep + 1) * JPIPConstants.MAX_REQ_LAYERS, numFrames); j++) {
-                                cacheStatusRef.setFrameLevelComplete(j, level);
+                                cacheStatusRef.setFrameComplete(j, level);
                             }
                         }
                     } else {
                         // tell the cache status
                         if (singleFrame) {
-                            cacheStatusRef.setFrameLevelPartial(frame);
+                            cacheStatusRef.setFramePartial(frame);
                         } else {
                             for (int j = currentStep * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((currentStep + 1) * JPIPConstants.MAX_REQ_LAYERS, numFrames); j++) {
-                                cacheStatusRef.setFrameLevelPartial(j);
+                                cacheStatusRef.setFramePartial(j);
                             }
                         }
                     }
@@ -193,7 +193,7 @@ class J2KReader implements Runnable {
                     }
                 }
                 // suicide if fully done
-                if (cacheStatusRef.isLevelComplete(0)) {
+                if (cacheStatusRef.isComplete(0)) {
                     viewRef.setDownloading(false);
                     try {
                         socket.close();
@@ -203,7 +203,7 @@ class J2KReader implements Runnable {
                 }
 
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
-                if (singleFrame && !stopReading && !cacheStatusRef.isLevelComplete(level)) {
+                if (singleFrame && !stopReading && !cacheStatusRef.isComplete(level)) {
                     params.priority = false;
                     readerSignal.signal(params);
                 }

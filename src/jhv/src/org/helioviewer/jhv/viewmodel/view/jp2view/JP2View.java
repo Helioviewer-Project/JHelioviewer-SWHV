@@ -27,9 +27,9 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
 import org.helioviewer.jhv.viewmodel.view.ViewROI;
-import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
-import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusLocal;
-import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemote;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.CacheStatus;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.CacheStatusLocal;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.CacheStatusRemote;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
@@ -59,7 +59,7 @@ public class JP2View extends AbstractView {
     private final URI uri;
     private final int maxFrame;
     private final int[] builtinLUT;
-    private final JP2ImageCacheStatus imageCacheStatus;
+    private final CacheStatus cacheStatus;
 
     private J2KReader reader;
     private JHV_Kdu_cache cacheReader;
@@ -116,10 +116,10 @@ public class JP2View extends AbstractView {
             }
 
             if (cacheReader != null) { // remote
-                imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader, maxFrame);
+                cacheStatus = new CacheStatusRemote(kduReader, maxFrame);
                 reader = new J2KReader(this);
             } else {
-                imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader, maxFrame);
+                cacheStatus = new CacheStatusLocal(kduReader, maxFrame);
             }
         } catch (KduException e) {
             e.printStackTrace();
@@ -292,7 +292,7 @@ public class JP2View extends AbstractView {
     public void setFrame(JHVDate time) {
         int frame = getFrameNumber(time);
         if (frame != targetFrame) {
-            if (frame > imageCacheStatus.getImageCachedPartiallyUntil())
+            if (frame > cacheStatus.getPartialUntil())
                 return;
             targetFrame = frame;
         }
@@ -418,7 +418,7 @@ public class JP2View extends AbstractView {
         double ratio = 2 * camera.getWidth() / vp.height;
         int totalHeight = (int) (mr.height / ratio + .5);
 
-        ResolutionLevel res = imageCacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
+        ResolutionLevel res = cacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
 
         double currentMeterPerPixel = mr.width / res.width;
         int imageWidth = (int) Math.ceil(r.width / currentMeterPerPixel); // +1 account for floor ??
@@ -449,37 +449,33 @@ public class JP2View extends AbstractView {
         factor = Math.min(factor, adj);
 
         int level = res.level;
-        AtomicBoolean status = imageCacheStatus.getFrameLevelStatus(frame, level);
+        AtomicBoolean status = cacheStatus.getFrameStatus(frame, level);
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
 
         JP2ImageParameter params = new JP2ImageParameter(p, subImage, res, frame, factor, priority);
-        if (priority || (!frameLevelComplete && level < oldLevel)) {
+        if (priority || (!frameLevelComplete && level < currentLevel)) {
             signalReader(params);
         }
-        oldLevel = level;
+        currentLevel = level;
 
         return params;
     }
 
-    private int oldLevel = 10000;
+    private int currentLevel = 10000;
 
     @Override
     public AtomicBoolean getFrameCacheStatus(int frame) {
-        return getImageCacheStatus(frame, oldLevel);
+        return cacheStatus.getFrameStatus(frame, currentLevel);
     }
 
     @Override
     public boolean isComplete() {
-        return imageCacheStatus.isLevelComplete(oldLevel);
-    }
-
-    AtomicBoolean getImageCacheStatus(int frame, int level) {
-        return imageCacheStatus.getFrameLevelStatus(frame, level);
+        return cacheStatus.isComplete(currentLevel);
     }
 
     public ResolutionLevel getResolutionLevel(int frame, int level) {
-        return imageCacheStatus.getResolutionSet(frame).getResolutionLevel(level);
+        return cacheStatus.getResolutionSet(frame).getResolutionLevel(level);
     }
 
     /**
@@ -500,15 +496,15 @@ public class JP2View extends AbstractView {
     }
 
     int getNumComponents(int frame) {
-        return imageCacheStatus.getResolutionSet(frame).numComps;
+        return cacheStatus.getResolutionSet(frame).numComps;
     }
 
     JHV_Kdu_cache getReaderCache() {
         return cacheReader;
     }
 
-    JP2ImageCacheStatus getStatusCache() {
-        return imageCacheStatus;
+    CacheStatus getCacheStatus() {
+        return cacheStatus;
     }
 
     // very slow
