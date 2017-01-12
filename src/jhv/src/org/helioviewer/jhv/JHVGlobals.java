@@ -166,16 +166,18 @@ public class JHVGlobals {
         if (System.getProperty("jhv.os").equals("mac")) {
             try {
                 String msg = "Export of " + moviePath + " finished.";
-                File jarPath = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-                String[] cmd = {
-                    jarPath.getCanonicalFile().getParentFile().getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
-                    "-message", "\"" + msg + "\"",
-                    "-execute", "open " + "\"" + openURL + "\"",
-                    "-title", "JHelioviewer"
-                };
-                Log.info("JHVGlobals.displayNotification " + Arrays.toString(cmd));
-                Runtime.getRuntime().exec(cmd);
-                return;
+                File jarParent = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getCanonicalFile().getParentFile();
+                if (jarParent != null) {
+                    String[] cmd = {
+                        jarParent.getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
+                        "-message", "\"" + msg + "\"",
+                        "-execute", "open " + "\"" + openURL + "\"",
+                        "-title", "JHelioviewer"
+                    };
+                    Log.info("JHVGlobals.displayNotification " + Arrays.toString(cmd));
+                    Runtime.getRuntime().exec(cmd);
+                    return;
+                }
             } catch (Exception e) {
                 StringWriter errors = new StringWriter();
                 e.printStackTrace(new PrintWriter(errors));
