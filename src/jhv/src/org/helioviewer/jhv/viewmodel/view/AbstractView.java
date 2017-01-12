@@ -8,15 +8,15 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public abstract class AbstractView implements View {
 
+    private static final AtomicBoolean fullCache = new AtomicBoolean(true);
+
     private ImageLayer imageLayer;
-    private ImageCacheStatusLocal cacheStatus;
     protected ImageData imageData = null;
     protected MetaData _metaData;
 
@@ -45,11 +45,13 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public AtomicBoolean getImageCacheStatus(int frame) {
-        if (cacheStatus == null) {
-            cacheStatus = new ImageCacheStatusLocal();
-        }
-        return cacheStatus.getVisibleStatus(frame);
+    public AtomicBoolean getVisibleCacheStatus(int frame) {
+        return fullCache;
+    }
+
+    @Override
+    public boolean isComplete() {
+        return true;
     }
 
     @Override

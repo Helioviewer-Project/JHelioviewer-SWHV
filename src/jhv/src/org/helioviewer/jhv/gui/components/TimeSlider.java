@@ -108,7 +108,7 @@ class TimeSlider extends JSlider implements LazyComponent {
                     if (end == begin)
                         end++;
 
-                    AtomicBoolean status = view.getImageCacheStatus(i);
+                    AtomicBoolean status = view.getVisibleCacheStatus(i);
                     if (status == null)
                         g.setColor(notCachedColor);
                     else {
