@@ -40,7 +40,7 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
         contentPane.add(logo, BorderLayout.WEST);
 
         StringBuilder text = new StringBuilder();
-        text.append("<center><b>" + getVersionString() + "</b><br>");
+        text.append("<center><b>").append(getVersionString()).append("</b><br>");
         text.append("©2017 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>");
         text.append("Part of the ESA/NASA Helioviewer Project<br>");
         text.append("Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>");
@@ -71,7 +71,7 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
                 pluginAboutLicense = "No License Text Available.";
             }
 
-            text.append("<hr><b>" + pluginName + "</b><br>" + pluginAboutLicense);
+            text.append("<hr><b>").append(pluginName).append("</b><br>").append(pluginAboutLicense);
         }
 
         JEditorPane content = new JEditorPane("text/html", text.toString());
