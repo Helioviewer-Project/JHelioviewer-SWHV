@@ -9,7 +9,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 
-public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
+public class CacheStatusRemote implements CacheStatus {
 
     // r/w J2KReader, r MoviePanel/EDT
 
@@ -17,9 +17,9 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     private final ResolutionSet[] resolutionSet;
     private KakaduEngine engine;
 
-    private int imagePartialUntil = 0;
+    private int partialUntil = 0;
 
-    public JP2ImageCacheStatusRemote(KakaduEngine _engine, int _maxFrame) throws KduException {
+    public CacheStatusRemote(KakaduEngine _engine, int _maxFrame) throws KduException {
         maxFrame = _maxFrame;
 
         engine = _engine;
@@ -38,14 +38,14 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     }
 
     @Override
-    public int getImageCachedPartiallyUntil() {
+    public int getPartialUntil() {
         int i;
-        for (i = imagePartialUntil; i <= maxFrame; i++) {
+        for (i = partialUntil; i <= maxFrame; i++) {
             if (resolutionSet[i] == null)
                 break;
         }
-        imagePartialUntil = Math.max(0, i - 1);
-        return imagePartialUntil;
+        partialUntil = Math.max(0, i - 1);
+        return partialUntil;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     private static final AtomicBoolean full = new AtomicBoolean(true);
 
     @Override
-    public boolean isLevelComplete(int level) {
+    public boolean isComplete(int level) {
         if (fullyComplete)
             return true;
 
@@ -79,7 +79,7 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
 
     @Override
-    public AtomicBoolean getFrameLevelStatus(int frame, int level) {
+    public AtomicBoolean getFrameStatus(int frame, int level) {
         if (fullyComplete)
             return full;
         if (resolutionSet[frame] == null)
@@ -88,17 +88,17 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
     }
 
     @Override
-    public void setFrameLevelComplete(int frame, int level) {
+    public void setFrameComplete(int frame, int level) {
         if (fullyComplete)
             return;
 
-        setFrameLevelPartial(frame);
+        setFramePartial(frame);
         if (resolutionSet[frame] != null)
             resolutionSet[frame].setComplete(level);
     }
 
     @Override
-    public void setFrameLevelPartial(int frame) {
+    public void setFramePartial(int frame) {
         if (resolutionSet[frame] == null) {
             try {
                 resolutionSet[frame] = KakaduHelper.getResolutionSet(engine.getCompositor(), frame);

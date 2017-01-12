@@ -8,13 +8,13 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 
-public class JP2ImageCacheStatusLocal implements JP2ImageCacheStatus {
+public class CacheStatusLocal implements CacheStatus {
 
     private static final AtomicBoolean full = new AtomicBoolean(true);
     private final ResolutionSet[] resolutionSet;
     private final int maxFrame;
 
-    public JP2ImageCacheStatusLocal(KakaduEngine engine, int _maxFrame) throws KduException {
+    public CacheStatusLocal(KakaduEngine engine, int _maxFrame) throws KduException {
         maxFrame = _maxFrame;
         resolutionSet = new ResolutionSet[maxFrame + 1];
         for (int i = 0; i <= maxFrame; ++i) {
@@ -24,7 +24,7 @@ public class JP2ImageCacheStatusLocal implements JP2ImageCacheStatus {
     }
 
     @Override
-    public int getImageCachedPartiallyUntil() {
+    public int getPartialUntil() {
         return maxFrame;
     }
 
@@ -34,21 +34,21 @@ public class JP2ImageCacheStatusLocal implements JP2ImageCacheStatus {
     }
 
     @Override
-    public boolean isLevelComplete(int level) {
+    public boolean isComplete(int level) {
         return true;
     }
 
     @Override
-    public AtomicBoolean getFrameLevelStatus(int frame, int level) {
+    public AtomicBoolean getFrameStatus(int frame, int level) {
         return full;
     }
 
     @Override
-    public void setFrameLevelComplete(int frame, int level) {
+    public void setFrameComplete(int frame, int level) {
     }
 
     @Override
-    public void setFrameLevelPartial(int frame) {
+    public void setFramePartial(int frame) {
     }
 
 }
