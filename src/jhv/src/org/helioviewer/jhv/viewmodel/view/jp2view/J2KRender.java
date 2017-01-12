@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
-import java.awt.EventQueue;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -17,7 +16,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
-import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
@@ -132,13 +130,7 @@ class J2KRender implements Runnable {
         } else {
             data = new ARGBInt32ImageData(false, aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
-
-        MetaData metaData = viewRef.metaData[frame];
-        data.setMetaData(metaData);
-        data.setViewpoint(params.viewpoint);
-        data.setRegion(metaData.roiToRegion(subImage, params.resolution.factorX, params.resolution.factorY));
-
-        EventQueue.invokeLater(() -> viewRef.setImageData(data));
+        viewRef.setDataFromRender(params, data);
     }
 
     @Override

@@ -212,22 +212,6 @@ public class JP2View extends AbstractView {
         }
     }
 
-    /**
-     * This function is used as a callback function which is called by
-     * {@link J2KRender} when it has finished decoding an image.
-     */
-    void setImageData(ImageData newImageData) {
-        int frame = newImageData.getMetaData().getFrameNumber();
-        if (frame != trueFrame) {
-            trueFrame = frame;
-            ++fpsCount;
-        }
-
-        if (dataHandler != null) {
-            dataHandler.handleData(newImageData);
-        }
-    }
-
     @Override
     public float getCurrentFramerate() {
         long currentTime = System.currentTimeMillis();
@@ -363,10 +347,7 @@ public class JP2View extends AbstractView {
         if (builtinLUT != null) {
             return new LUT(getName() + " built-in", builtinLUT/* , builtinLUT */);
         }
-        return getAssociatedLUT();
-    }
 
-    private LUT getAssociatedLUT() {
         MetaData m = metaData[0];
         if (m instanceof HelioviewerMetaData) {
             return LUT.get((HelioviewerMetaData) m);
@@ -394,6 +375,25 @@ public class JP2View extends AbstractView {
         if (isAbolished || params.frame != targetFrame)
             return;
         EventQueue.invokeLater(() -> executor.execute(this, params, false));
+    }
+
+    void setDataFromRender(ImageParams params, ImageData data) {
+        if (isAbolished)
+            return;
+
+        int frame = params.frame;
+        if (frame != trueFrame) {
+            trueFrame = frame;
+            ++fpsCount;
+        }
+
+        MetaData m = metaData[frame];
+        data.setMetaData(m);
+        data.setViewpoint(params.viewpoint);
+        data.setRegion(m.roiToRegion(params.subImage, params.resolution.factorX, params.resolution.factorY));
+
+        if (dataHandler != null)
+            EventQueue.invokeLater(() -> dataHandler.handleData(data));
     }
 
     KakaduEngine getRenderEngine(Kdu_thread_env threadEnv) throws KduException, IOException {
