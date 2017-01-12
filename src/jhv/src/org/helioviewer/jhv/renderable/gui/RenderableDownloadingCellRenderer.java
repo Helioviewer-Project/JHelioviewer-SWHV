@@ -23,7 +23,7 @@ class RenderableDownloadingCellRenderer extends RenderableTableCellRenderer {
         if (value instanceof Renderable && ((Renderable) value).isDownloading()) {
             table.repaint(); // lazy
 
-            layer.setBackground(label.getBackground());
+            layer.setForeground(label.getForeground());
             layer.setView(label);
             return layer;
         }

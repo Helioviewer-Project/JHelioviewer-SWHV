@@ -27,7 +27,7 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
         if (value instanceof LineDataSelectorElement && ((LineDataSelectorElement) value).isDownloading()) {
             table.repaint();
 
-            layer.setBackground(label.getBackground());
+            layer.setForeground(label.getForeground());
             layer.setView(label);
             return layer;
         }
