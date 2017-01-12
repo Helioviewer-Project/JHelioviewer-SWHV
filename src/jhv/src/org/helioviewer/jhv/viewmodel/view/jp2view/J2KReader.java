@@ -33,12 +33,12 @@ class J2KReader implements Runnable {
 
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
-    private final int numLayers;
+    private final int numFrames;
 
     J2KReader(JP2View _viewRef) {
         viewRef = _viewRef;
 
-        numLayers = viewRef.getMaximumFrameNumber() + 1;
+        numFrames = viewRef.getMaximumFrameNumber() + 1;
         cacheRef = viewRef.getReaderCache();
         cacheStatusRef = viewRef.getStatusCache();
         socket = viewRef.getSocket();
@@ -75,21 +75,21 @@ class J2KReader implements Runnable {
     }
 
     private String[] createMultiQuery(String fSiz) {
-        int num_steps = numLayers / JPIPConstants.MAX_REQ_LAYERS;
-        if ((numLayers % JPIPConstants.MAX_REQ_LAYERS) != 0)
-            num_steps++;
+        int numSteps = numFrames / JPIPConstants.MAX_REQ_LAYERS;
+        if ((numFrames % JPIPConstants.MAX_REQ_LAYERS) != 0)
+            numSteps++;
 
-        String[] stepQuerys = new String[num_steps];
-        int lpf = -1, lpi = 0, max_layers = numLayers - 1;
-        for (int i = 0; i < num_steps; i++) {
+        String[] stepQuerys = new String[numSteps];
+        int lpf = -1, lpi = 0, maxFrame = numFrames - 1;
+        for (int i = 0; i < numSteps; i++) {
             lpf += JPIPConstants.MAX_REQ_LAYERS;
-            if (lpf > max_layers)
-                lpf = max_layers;
+            if (lpf > maxFrame)
+                lpf = maxFrame;
 
             stepQuerys[i] = createQuery(fSiz, lpi, lpf);
 
             lpi = lpf + 1;
-            if (lpi > max_layers)
+            if (lpi > maxFrame)
                 lpi = 0;
         }
         return stepQuerys;
@@ -119,54 +119,54 @@ class J2KReader implements Runnable {
 
                 // choose cache strategy
                 boolean singleFrame = false;
-                if (numLayers <= 1 /* one frame */ || params.priority) {
+                if (numFrames <= 1 /* one frame */ || params.priority) {
                     singleFrame = true;
                 }
 
                 // build query based on strategy
-                int current_step;
+                int currentStep;
                 String[] stepQuerys;
                 String fSiz = params.resolution.width + "," + params.resolution.height;
                 if (singleFrame) {
                     stepQuerys = new String[] { createQuery(fSiz, frame, frame) };
-                    current_step = 0;
+                    currentStep = 0;
                 } else {
                     stepQuerys = createMultiQuery(fSiz);
 
                     int partial = cacheStatusRef.getImageCachedPartiallyUntil();
-                    if (partial < numLayers - 1)
-                        current_step = partial / JPIPConstants.MAX_REQ_LAYERS;
+                    if (partial < numFrames - 1)
+                        currentStep = partial / JPIPConstants.MAX_REQ_LAYERS;
                     else
-                        current_step = frame / JPIPConstants.MAX_REQ_LAYERS;
+                        currentStep = frame / JPIPConstants.MAX_REQ_LAYERS;
                 }
 
                 // send queries until everything is complete or caching is interrupted
-                int complete_steps = 0;
+                int completeSteps = 0;
                 boolean stopReading = false;
-                while (!stopReading && complete_steps < stepQuerys.length) {
-                    if (current_step >= stepQuerys.length)
-                        current_step = 0;
+                while (!stopReading && completeSteps < stepQuerys.length) {
+                    if (currentStep >= stepQuerys.length)
+                        currentStep = 0;
 
                     // if query is already complete, go to next step
-                    if (stepQuerys[current_step] == null) {
-                        current_step++;
+                    if (stepQuerys[currentStep] == null) {
+                        currentStep++;
                         continue;
                     }
 
                     // receive and add data to cache
-                    JPIPResponse res = socket.send(stepQuerys[current_step], cacheRef);
+                    JPIPResponse res = socket.send(stepQuerys[currentStep], cacheRef);
                     // react if query complete
                     if (res.isResponseComplete()) {
                         // mark query as complete
-                        complete_steps++;
-                        stepQuerys[current_step] = null;
+                        completeSteps++;
+                        stepQuerys[currentStep] = null;
 
                         // tell the cache status
                         if (singleFrame) {
                             cacheStatusRef.setFrameLevelComplete(frame, level);
                             viewRef.signalRenderFromReader(params); // refresh current image
                         } else {
-                            for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, numLayers); j++) {
+                            for (int j = currentStep * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((currentStep + 1) * JPIPConstants.MAX_REQ_LAYERS, numFrames); j++) {
                                 cacheStatusRef.setFrameLevelComplete(j, level);
                             }
                         }
@@ -175,7 +175,7 @@ class J2KReader implements Runnable {
                         if (singleFrame) {
                             cacheStatusRef.setFrameLevelPartial(frame);
                         } else {
-                            for (int j = current_step * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, numLayers); j++) {
+                            for (int j = currentStep * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((currentStep + 1) * JPIPConstants.MAX_REQ_LAYERS, numFrames); j++) {
                                 cacheStatusRef.setFrameLevelPartial(j);
                             }
                         }
@@ -185,7 +185,7 @@ class J2KReader implements Runnable {
 
                     // select next query based on strategy
                     if (!singleFrame)
-                        current_step++;
+                        currentStep++;
 
                     // check whether caching has to be interrupted
                     if (readerSignal.isSignaled() || Thread.interrupted()) {

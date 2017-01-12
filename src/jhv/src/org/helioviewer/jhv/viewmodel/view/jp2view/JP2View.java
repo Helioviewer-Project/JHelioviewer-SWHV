@@ -24,7 +24,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
-import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
 import org.helioviewer.jhv.viewmodel.view.ViewROI;
@@ -52,13 +51,13 @@ public class JP2View extends AbstractView {
     private int targetFrame = 0;
     private int trueFrame = -1;
 
-    private int frameCount = 0;
-    private long frameCountStart = System.currentTimeMillis();
-    private float frameRate;
+    private int fpsCount = 0;
+    private long fpsTime = System.currentTimeMillis();
+    private float fps;
 
     private final RenderExecutor executor = new RenderExecutor();
     private final URI uri;
-    private final int maximumFrame;
+    private final int maxFrame;
     private final int[] builtinLUT;
     private final JP2ImageCacheStatus imageCacheStatus;
 
@@ -105,22 +104,22 @@ public class JP2View extends AbstractView {
             // Retrieve the number of composition layers
             int[] tempVar = new int[1];
             jpx.Count_compositing_layers(tempVar);
-            maximumFrame = tempVar[0] - 1;
+            maxFrame = tempVar[0] - 1;
 
             builtinLUT = KakaduHelper.getLUT(jpx);
 
-            metaData = new MetaData[maximumFrame + 1];
+            metaData = new MetaData[maxFrame + 1];
             KakaduMeta.cacheMetaData(kduReader.getFamilySrc(), metaData);
-            for (int i = 0; i <= maximumFrame; i++) {
+            for (int i = 0; i <= maxFrame; i++) {
                 if (metaData[i] == null)
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
             }
 
             if (cacheReader != null) { // remote
-                imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader, maximumFrame);
+                imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader, maxFrame);
                 reader = new J2KReader(this);
             } else {
-                imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader, maximumFrame);
+                imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader, maxFrame);
             }
         } catch (KduException e) {
             e.printStackTrace();
@@ -222,7 +221,7 @@ public class JP2View extends AbstractView {
         int frame = newImageData.getMetaData().getFrameNumber();
         if (frame != trueFrame) {
             trueFrame = frame;
-            ++frameCount;
+            ++fpsCount;
         }
 
         if (dataHandler != null) {
@@ -233,25 +232,25 @@ public class JP2View extends AbstractView {
     @Override
     public float getCurrentFramerate() {
         long currentTime = System.currentTimeMillis();
-        long delta = currentTime - frameCountStart;
+        long delta = currentTime - fpsTime;
 
         if (delta > 1000) {
-            frameRate = 1000 * frameCount / (float) delta;
-            frameCount = 0;
-            frameCountStart = currentTime;
+            fps = 1000 * fpsCount / (float) delta;
+            fpsCount = 0;
+            fpsTime = currentTime;
         }
 
-        return frameRate;
+        return fps;
     }
 
     @Override
     public boolean isMultiFrame() {
-        return maximumFrame > 0;
+        return maxFrame > 0;
     }
 
     @Override
     public int getMaximumFrameNumber() {
-        return maximumFrame;
+        return maxFrame;
     }
 
     @Override
@@ -265,12 +264,12 @@ public class JP2View extends AbstractView {
         int next = targetFrame + 1;
         switch (mode) {
         case STOP:
-            if (next > maximumFrame) {
+            if (next > maxFrame) {
                 return null;
             }
             break;
         case SWING:
-            if (targetFrame == maximumFrame) {
+            if (targetFrame == maxFrame) {
                 Layers.setAnimationMode(AnimationMode.SWINGDOWN);
                 return metaData[targetFrame - 1].getViewpoint().time;
             }
@@ -282,7 +281,7 @@ public class JP2View extends AbstractView {
             }
             return metaData[targetFrame - 1].getViewpoint().time;
         default: // LOOP
-            if (next > maximumFrame) {
+            if (next > maxFrame) {
                 return metaData[0].getViewpoint().time;
             }
         }
@@ -305,7 +304,7 @@ public class JP2View extends AbstractView {
         do {
             lastDiff = currentDiff;
             currentDiff = metaData[++frame].getViewpoint().time.milli - time.milli;
-        } while (currentDiff < 0 && frame < maximumFrame);
+        } while (currentDiff < 0 && frame < maxFrame);
 
         if (-lastDiff < currentDiff) {
             return frame - 1;
@@ -318,8 +317,8 @@ public class JP2View extends AbstractView {
     public JHVDate getFrameTime(int frame) {
         if (frame < 0) {
             frame = 0;
-        } else if (frame > maximumFrame) {
-            frame = maximumFrame;
+        } else if (frame > maxFrame) {
+            frame = maxFrame;
         }
         return metaData[frame].getViewpoint().time;
     }
@@ -331,7 +330,7 @@ public class JP2View extends AbstractView {
 
     @Override
     public JHVDate getLastTime() {
-        return metaData[maximumFrame].getViewpoint().time;
+        return metaData[maxFrame].getViewpoint().time;
     }
 
     @Override
@@ -347,8 +346,8 @@ public class JP2View extends AbstractView {
     @Override
     public String getName() {
         MetaData m = metaData[0];
-        if (m instanceof ObserverMetaData) {
-            return ((ObserverMetaData) m).getFullName();
+        if (m instanceof HelioviewerMetaData) {
+            return ((HelioviewerMetaData) m).getFullName();
         } else {
             String name = uri.getPath();
             return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));

@@ -14,7 +14,7 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 
-public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData {
+public class HelioviewerMetaData extends AbstractMetaData {
 
     private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("display.normalize"));
 
@@ -284,27 +284,22 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
                           roi.width * factorX * unitPerPixelX, roi.height * factorY * unitPerPixelY);
     }
 
-    @Override
     public String getDetector() {
         return detector;
     }
 
-    @Override
     public String getInstrument() {
         return instrument;
     }
 
-    @Override
     public String getMeasurement() {
         return measurement;
     }
 
-    @Override
     public String getObservatory() {
         return observatory;
     }
 
-    @Override
     public String getFullName() {
         return fullName;
     }
