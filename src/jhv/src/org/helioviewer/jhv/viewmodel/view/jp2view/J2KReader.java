@@ -6,7 +6,7 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.concurrency.BooleanSignal;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
@@ -66,7 +66,7 @@ class J2KReader implements Runnable {
         }
     }
 
-    void signalReader(JP2ImageParameter params) {
+    void signalReader(ImageParams params) {
         readerSignal.signal(params);
     }
 
@@ -98,7 +98,7 @@ class J2KReader implements Runnable {
     @Override
     public void run() {
         while (!isAbolished) {
-            JP2ImageParameter params;
+            ImageParams params;
             // wait for signal
             try {
                 viewRef.setDownloading(false);

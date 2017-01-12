@@ -18,7 +18,7 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
 
@@ -35,11 +35,11 @@ class J2KRender implements Runnable {
     // A reference to the JP2View this object is owned by
     private final JP2View viewRef;
 
-    private final JP2ImageParameter params;
+    private final ImageParams params;
 
     private final boolean discard;
 
-    J2KRender(JP2View _viewRef, JP2ImageParameter _currParams, boolean _discard) {
+    J2KRender(JP2View _viewRef, ImageParams _currParams, boolean _discard) {
         viewRef = _viewRef;
         params = _currParams;
         discard = _discard;

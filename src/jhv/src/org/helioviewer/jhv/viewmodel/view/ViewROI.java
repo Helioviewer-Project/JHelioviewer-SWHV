@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
@@ -39,7 +38,7 @@ public class ViewROI {
         }
     }
 
-    public static Region updateROI(Camera camera, Viewport vp, Position.Q p, MetaData m) {
+    public static Region updateROI(Camera camera, Viewport vp, MetaData m) {
         Region newRegion;
 
         if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
@@ -52,8 +51,6 @@ public class ViewROI {
                 dePoints[i].x = CameraHelper.deNormalizeX(vp, pointlist[i].x);
                 dePoints[i].y = CameraHelper.deNormalizeY(vp, pointlist[i].y);
             }
-
-            camera.push(p);
 
             Quat cameraRotation = camera.getRotation();
             Quat imageRotation = m.getViewpoint().orientation;
@@ -93,8 +90,6 @@ public class ViewROI {
                     }
                 }
             }
-
-            camera.pop();
 
             if (minPhysicalX > maxPhysicalX || minPhysicalY > maxPhysicalY) {
                 newRegion = m.getPhysicalRegion();
