@@ -99,6 +99,9 @@ class TimeSlider extends JSlider implements LazyComponent {
             if (view == null) {
                 g.setColor(notCachedColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
+            } else if (view.isComplete()){
+                g.setColor(completeCachedColor);
+                g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else {
                 int len = view.getMaximumFrameNumber();
                 for (int i = 0; i < len; i++) {
@@ -108,7 +111,7 @@ class TimeSlider extends JSlider implements LazyComponent {
                     if (end == begin)
                         end++;
 
-                    AtomicBoolean status = view.getVisibleCacheStatus(i);
+                    AtomicBoolean status = view.getFrameCacheStatus(i);
                     if (status == null)
                         g.setColor(notCachedColor);
                     else {
