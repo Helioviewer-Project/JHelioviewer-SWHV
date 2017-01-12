@@ -465,13 +465,11 @@ public class JP2View extends AbstractView {
     private int oldLevel = 10000;
 
     @Override
-    public AtomicBoolean getImageCacheStatus(int frame) {
-        // visible status
+    public AtomicBoolean getVisibleCacheStatus(int frame) {
         return getImageCacheStatus(frame, oldLevel);
     }
 
     AtomicBoolean getImageCacheStatus(int frame, int level) {
-        // actual status
         return imageCacheStatus.getFrameLevelStatus(frame, level);
     }
 

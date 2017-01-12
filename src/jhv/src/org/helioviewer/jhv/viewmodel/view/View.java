@@ -60,8 +60,6 @@ public interface View {
 
     LUT getDefaultLUT();
 
-    AtomicBoolean getImageCacheStatus(int frame);
-
     /**
      * Returns the frame rate on which the View is operating right now.
      *
@@ -95,6 +93,10 @@ public interface View {
     void setDataHandler(ImageDataHandler dataHandler);
 
     boolean isDownloading();
+
+    boolean isComplete();
+
+    AtomicBoolean getVisibleCacheStatus(int frame);
 
     JHVDate getFrameTime(int frame);
     JHVDate getFirstTime();
