@@ -6,11 +6,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ImageParams;
 
 class RenderExecutor {
 
@@ -20,9 +19,9 @@ class RenderExecutor {
                                                                     new JHVThread.NamedThreadFactory("Render"),
                                                                     new ThreadPoolExecutor.DiscardPolicy());
 
-    void execute(JP2View view, Camera camera, Viewport vp, Position.Q viewpoint, int frame, double factor) {
+    void execute(JP2View view, Camera camera, Viewport vp, int frame, double factor) {
         // order is important, this will signal reader
-        JP2ImageParameter params = view.calculateParameter(camera, vp, viewpoint, frame, factor);
+        ImageParams params = view.calculateParams(camera, vp, frame, factor);
         AtomicBoolean status = view.getCacheStatus().getFrameStatus(frame, params.resolution.level);
         if (status == null)
             return;
@@ -30,7 +29,7 @@ class RenderExecutor {
         execute(view, params, !status.get());
     }
 
-    void execute(JP2View view, JP2ImageParameter params, boolean discard) {
+    void execute(JP2View view, ImageParams params, boolean discard) {
         blockingQueue.poll();
         executor.execute(new J2KRender(view, params, discard));
     }

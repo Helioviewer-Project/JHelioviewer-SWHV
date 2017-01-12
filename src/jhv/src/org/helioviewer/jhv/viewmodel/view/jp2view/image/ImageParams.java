@@ -4,7 +4,7 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
-public class JP2ImageParameter {
+public class ImageParams {
 
     public final Position.Q viewpoint;
     public final SubImage subImage;
@@ -13,7 +13,7 @@ public class JP2ImageParameter {
     public final double factor;
     public boolean priority;
 
-    public JP2ImageParameter(Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _frame, double _factor, boolean _priority) {
+    public ImageParams(Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _frame, double _factor, boolean _priority) {
         viewpoint = _p;
         subImage = _roi;
         resolution = _resolution;
@@ -24,10 +24,10 @@ public class JP2ImageParameter {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof JP2ImageParameter))
+        if (!(o instanceof ImageParams))
             return false;
 
-        JP2ImageParameter p = (JP2ImageParameter) o;
+        ImageParams p = (ImageParams) o;
         return frame == p.frame && factor == p.factor &&
                viewpoint.equals(p.viewpoint) && subImage.equals(p.subImage) && resolution.equals(p.resolution);
     }
@@ -40,7 +40,7 @@ public class JP2ImageParameter {
 
     @Override
     public String toString() {
-        return "ImageViewParams[ " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + frame + "] " + factor + "]";
+        return "ImageParams[ " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + frame + "] " + factor + "]";
     }
 
 }

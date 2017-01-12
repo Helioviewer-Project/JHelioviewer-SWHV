@@ -11,7 +11,6 @@ import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.lut.LUT;
@@ -30,7 +29,7 @@ import org.helioviewer.jhv.viewmodel.view.ViewROI;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.CacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.CacheStatusRemote;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
@@ -388,10 +387,10 @@ public class JP2View extends AbstractView {
 
     @Override
     public void render(Camera camera, Viewport vp, double factor) {
-        executor.execute(this, camera, vp, camera == null ? null : camera.getViewpoint(), targetFrame, factor);
+        executor.execute(this, camera, vp, targetFrame, factor);
     }
 
-    void signalRenderFromReader(JP2ImageParameter params) {
+    void signalRenderFromReader(ImageParams params) {
         if (isAbolished || params.frame != targetFrame)
             return;
         EventQueue.invokeLater(() -> executor.execute(this, params, false));
@@ -404,16 +403,16 @@ public class JP2View extends AbstractView {
         return engine;
     }
 
-    protected void signalReader(JP2ImageParameter params) {
+    protected void signalReader(ImageParams params) {
         if (reader != null)
             reader.signalReader(params);
     }
 
     // Recalculates the image parameters used within the jp2-package
-    JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
+    ImageParams calculateParams(Camera camera, Viewport vp, int frame, double factor) {
         MetaData m = metaData[frame];
         Region mr = m.getPhysicalRegion();
-        Region r = ViewROI.updateROI(camera, vp, p, m);
+        Region r = ViewROI.updateROI(camera, vp, m);
 
         double ratio = 2 * camera.getWidth() / vp.height;
         int totalHeight = (int) (mr.height / ratio + .5);
@@ -453,7 +452,7 @@ public class JP2View extends AbstractView {
         boolean frameLevelComplete = status != null && status.get();
         boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
 
-        JP2ImageParameter params = new JP2ImageParameter(p, subImage, res, frame, factor, priority);
+        ImageParams params = new ImageParams(camera.getViewpoint(), subImage, res, frame, factor, priority);
         if (priority || (!frameLevelComplete && level < currentLevel)) {
             signalReader(params);
         }
