@@ -60,7 +60,7 @@ public class BrightnessPanel implements ActionListener, ChangeListener, FilterDe
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        float brightness = brightnessSlider.getValue() / 100f;
+        float brightness = 0.1f * (brightnessSlider.getValue() / 10);
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBrightness(brightness);
         brightnessLabel.setText(String.format("%.1f", brightness));
         Displayer.display();
