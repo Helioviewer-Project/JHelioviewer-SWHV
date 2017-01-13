@@ -41,7 +41,7 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     if (enhanced == 1) {
         appliedFactor *= factor;
     }
-    color.r = clamp(appliedFactor * color.r, 0., 1.);
+
     if (isdifference != NODIFFERENCE) {
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
         color.r = clamp(color.r, -truncationValue,truncationValue) / truncationValue;
@@ -65,6 +65,7 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     }
 
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
+    color.r = clamp(appliedFactor * color.r, 0., 1.);
     color.r = pow(color.r, gamma);
     color.rgb = texture1D(lut, color.r).rgb;
     color.a = alpha;
