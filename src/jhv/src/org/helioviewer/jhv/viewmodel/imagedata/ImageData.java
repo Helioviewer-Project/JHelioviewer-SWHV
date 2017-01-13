@@ -51,4 +51,8 @@ public interface ImageData {
 
     void setUploaded(boolean uploaded);
 
+    float getAutoContrast();
+
+    void setAutoContrast(float factor);
+
 }

@@ -20,6 +20,7 @@ public abstract class AbstractImageData implements ImageData {
     private MetaData metaData;
     private Position.Q viewpoint;
     private boolean uploaded = false;
+    private float autoContrast = 1;
 
     /**
      * Default constructor.
@@ -112,6 +113,16 @@ public abstract class AbstractImageData implements ImageData {
     @Override
     public void setUploaded(boolean _uploaded) {
         uploaded = _uploaded;
+    }
+
+    @Override
+    public float getAutoContrast() {
+        return autoContrast;
+    }
+
+    @Override
+    public void setAutoContrast(float factor) {
+        autoContrast = factor;
     }
 
 }

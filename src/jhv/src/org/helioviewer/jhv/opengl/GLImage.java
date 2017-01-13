@@ -64,7 +64,7 @@ public class GLImage {
         shader.setGamma(gamma);
         shader.setAlpha(opacity);
         shader.setEnhanced(gl, enhanced);
-        shader.setBrightnessFactor(gl, imageData.getMetaData().getBrightnessFactor());
+        shader.setBrightnessFactor(gl, imageData.getMetaData().getBrightnessFactor() * imageData.getAutoContrast());
 
         int w = imageData.getWidth();
         int h = imageData.getHeight();
