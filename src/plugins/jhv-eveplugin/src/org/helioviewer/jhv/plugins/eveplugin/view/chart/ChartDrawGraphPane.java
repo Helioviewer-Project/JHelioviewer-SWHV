@@ -54,10 +54,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         MOVIELINE, CHART, NODRAG
     }
 
-    private Point mousePressedPosition = null;
-    private Point mouseDragPosition = null;
+    private Point mousePressedPosition;
+    private Point mouseDragPosition;
 
-    private BufferedImage screenImage = null;
+    private BufferedImage screenImage;
 
     private final Stroke boldStroke = new BasicStroke(2);
     private final Stroke thinStroke = new BasicStroke(0.5f);
