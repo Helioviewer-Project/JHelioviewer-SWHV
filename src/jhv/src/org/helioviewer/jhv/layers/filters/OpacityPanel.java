@@ -25,14 +25,14 @@ public class OpacityPanel implements ChangeListener, FilterDetails {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setOpacity(opacitySlider.getValue() / 100.f);
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setOpacity(opacitySlider.getValue() / 100f);
         opacityLabel.setText(opacitySlider.getValue() + "%");
         Displayer.display();
     }
 
     // opacity must be within [0, 1]
     public void setValue(float opacity) {
-        opacitySlider.setValue((int) (opacity * 100.f));
+        opacitySlider.setValue((int) (opacity * 100f));
     }
 
     @Override

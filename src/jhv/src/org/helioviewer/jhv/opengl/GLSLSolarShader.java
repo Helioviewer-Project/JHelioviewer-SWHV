@@ -28,7 +28,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int hgltParamRef;
     private int hglnParamRef;
 
-    private int contrastParamRef;
+    private int brightnessParamRef;
     private int alphaParamRef;
     private int cutOffRadiusRef;
     private int outerCutOffRadiusRef;
@@ -36,7 +36,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int cutOffValueRef;
     private int polarRadiiRef;
     private int enhancedParamRef;
-    private int brightnessFactorRef;
 
     private int rectRef;
     private int differenceRectRef;
@@ -55,7 +54,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] hgltParamFloat = new float[1];
     private final float[] hglnParamFloat = new float[1];
     private final float[] gammaParamFloat = new float[1];
-    private final float[] contrastParamFloat = new float[1];
+    private final float[] brightnessParamFloat = new float[1];
     private final float[] alphaParamFloat = new float[1];
     private final float[] cutOffRadiusFloat = new float[1];
     private final float[] outerCutOffRadiusFloat = new float[1];
@@ -63,7 +62,6 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] cutOffValueFloat = new float[3];
     private final float[] polarRadii = new float[2];
     private final int[] enhanced = new int[1];
-    private final float[] brightnessFactor = new float[1];
 
     private final float[] rectVertex = new float[4];
     private final float[] differencerect = new float[4];
@@ -96,14 +94,13 @@ public class GLSLSolarShader extends GLSLShader {
         hglnParamRef = gl.glGetUniformLocation(progID, "hgln");
         polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
 
-        contrastParamRef = gl.glGetUniformLocation(progID, "contrast");
+        brightnessParamRef = gl.glGetUniformLocation(progID, "brightness");
         alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
         cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
         outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
         cutOffDirectionRef = gl.glGetUniformLocation(progID, "cutOffDirection");
         cutOffValueRef = gl.glGetUniformLocation(progID, "cutOffValue");
         enhancedParamRef = gl.glGetUniformLocation(progID, "enhanced");
-        brightnessFactorRef = gl.glGetUniformLocation(progID, "brightnessFactor");
 
         rectRef = gl.glGetUniformLocation(progID, "rect");
         differenceRectRef = gl.glGetUniformLocation(progID, "differencerect");
@@ -179,7 +176,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     public void filter(GL2 gl) {
         gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
-        gl.glUniform1fv(contrastParamRef, 1, contrastParamFloat, 0);
+        gl.glUniform1fv(brightnessParamRef, 1, brightnessParamFloat, 0);
         gl.glUniform1fv(truncationValueRef, 1, truncationValueFloat, 0);
         gl.glUniform1iv(isDifferenceValueRef, 1, isDifferenceValue, 0);
         gl.glUniform1fv(hgltParamRef, 1, hgltParamFloat, 0);
@@ -216,8 +213,8 @@ public class GLSLSolarShader extends GLSLShader {
         alphaParamFloat[0] = alpha;
     }
 
-    public void setContrast(float contrast) {
-        contrastParamFloat[0] = contrast;
+    public void setBrightness(float brightness) {
+        brightnessParamFloat[0] = brightness;
     }
 
     public void setGamma(float gamma) {
@@ -276,11 +273,6 @@ public class GLSLSolarShader extends GLSLShader {
             enhanced[0] = 0;
             gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
         }
-    }
-
-    public void setBrightnessFactor(GL2 gl, float _brightnessFactor) {
-        brightnessFactor[0] = _brightnessFactor;
-        gl.glUniform1fv(brightnessFactorRef, 1, brightnessFactor, 0);
     }
 
 }

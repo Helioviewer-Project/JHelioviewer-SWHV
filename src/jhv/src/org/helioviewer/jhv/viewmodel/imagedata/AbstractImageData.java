@@ -21,7 +21,7 @@ public abstract class AbstractImageData implements ImageData {
     private MetaData metaData;
     private Position.Q viewpoint;
     private boolean uploaded = false;
-    private float autoContrast = 1;
+    private float autoBrightness = 1;
 
     /**
      * Default constructor.
@@ -117,15 +117,15 @@ public abstract class AbstractImageData implements ImageData {
     }
 
     @Override
-    public float getAutoContrast() {
-        return autoContrast;
+    public float getAutoBrightness() {
+        return autoBrightness;
     }
 
-    private static final double CONTRAST_F1 = 0.001;
-    private static final double CONTRAST_F2 = 128 + 64 + 32;
+    private static final double BRIGHTNESS_F1 = 0.001;
+    private static final double BRIGHTNESS_F2 = 128 + 64 + 32;
 
     @Override
-    public void setAutoContrast() {
+    public void setAutoBrightness() {
         if (!(buffer instanceof ByteBuffer))
             return;
 
@@ -140,17 +140,17 @@ public abstract class AbstractImageData implements ImageData {
         int j;
         for (j = 255; j >= 0; j--) {
             ct += histogram[j];
-            if (ct > CONTRAST_F1 * len) {
+            if (ct > BRIGHTNESS_F1 * len) {
                 break;
             }
         }
 
-        double factor = CONTRAST_F2 / j;
+        double factor = BRIGHTNESS_F2 / j;
         // System.out.println(">> " + factor + " " + j);
         if (j != 0 && factor > 1) {
             if (factor > 2)
                 factor = 2;
-            autoContrast = (float) factor;
+            autoBrightness = (float) factor;
         }
     }
 
