@@ -23,7 +23,7 @@ public class ImageLayerOptions extends SmallPanel {
         opacityPanel = new OpacityPanel();
         ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel();
         lutPanel = new LUTPanel();
-        GammaCorrectionPanel gammaCorrectionPanel = new GammaCorrectionPanel();
+        ContrastPanel contrastPanel = new ContrastPanel();
         BrightnessPanel brightnessPanel = new BrightnessPanel();
         SharpenPanel sharpenPanel = new SharpenPanel();
 
@@ -46,7 +46,7 @@ public class ImageLayerOptions extends SmallPanel {
         c.gridy++;
         addToGridBag(c, sharpenPanel);
         c.gridy++;
-        addToGridBag(c, gammaCorrectionPanel);
+        addToGridBag(c, contrastPanel);
         c.gridy++;
         addToGridBag(c, brightnessPanel);
         c.gridy++;

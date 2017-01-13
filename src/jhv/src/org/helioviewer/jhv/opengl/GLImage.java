@@ -19,7 +19,7 @@ public class GLImage {
     private GLTexture diffTex;
 
     private float brightness = 1f;
-    private float gamma = 1f;
+    private float contrast = 1f;
     private float opacity = 1f;
     private float sharpen = 0f;
     private ColorMask colorMask = new ColorMask(true, true, true);
@@ -61,7 +61,7 @@ public class GLImage {
 
         shader.colorMask = colorMask;
         shader.setBrightness(brightness * imageData.getAutoBrightness() * imageData.getMetaData().getBrightnessFactor());
-        shader.setGamma(gamma);
+        shader.setContrast(contrast);
         shader.setAlpha(opacity);
         shader.setEnhanced(gl, enhanced);
 
@@ -175,8 +175,8 @@ public class GLImage {
         brightness = _brightness;
     }
 
-    public void setGamma(float _gamma) {
-        gamma = _gamma;
+    public void setContrast(float _contrast) {
+        contrast = _contrast;
     }
 
     public void setOpacity(float _opacity) {
@@ -207,32 +207,16 @@ public class GLImage {
         differenceMode = _differenceMode;
     }
 
-    public boolean getDifferenceMode() {
-        return differenceMode;
-    }
-
     public void setBaseDifferenceMode(boolean selected) {
         baseDifferenceMode = selected;
-    }
-
-    public boolean getBaseDifferenceMode() {
-        return baseDifferenceMode;
     }
 
     public void setBaseDifferenceNoRot(boolean _baseDifferenceNoRot) {
         baseDifferenceNoRot = _baseDifferenceNoRot;
     }
 
-    public boolean getBaseDifferenceNoRot() {
-        return baseDifferenceNoRot;
-    }
-
     public void setRunDiffNoRot(boolean _runningDifferenceNoRot) {
         runningDifferenceNoRot = _runningDifferenceNoRot;
-    }
-
-    public boolean getRunDiffNoRot() {
-        return runningDifferenceNoRot;
     }
 
     public void setTruncation(float _truncation) {
@@ -243,40 +227,12 @@ public class GLImage {
         enhanced = _enhanced;
     }
 
-    public boolean getEnhanced() {
-        return enhanced;
+    public boolean getDifferenceMode() {
+        return differenceMode;
     }
 
-    public float getTruncation() {
-        return truncation;
-    }
-
-    public float getOpacity() {
-        return opacity;
-    }
-
-    public float getBrightness() {
-        return brightness;
-    }
-
-    public float getSharpen() {
-        return sharpen;
-    }
-
-    public float getGamma() {
-        return gamma;
-    }
-
-    public ColorMask getColorMask() {
-        return colorMask;
-    }
-
-    public LUT getLUT() {
-        return lut;
-    }
-
-    public boolean getInvertLUT() {
-        return invertLUT;
+    public boolean getBaseDifferenceMode() {
+        return baseDifferenceMode;
     }
 
 }

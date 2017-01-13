@@ -16,7 +16,7 @@ uniform vec3 pixelSizeWeighting;
 //rect=(llx, lly, 1/w, 1/h)
 uniform vec4 rect;
 uniform vec4 differencerect;
-uniform float gamma;
+uniform float contrast;
 uniform float brightness;
 uniform sampler1D lut;
 uniform float alpha;
@@ -37,9 +37,9 @@ uniform vec2 polarRadii;
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     float tmpConvolutionSum = 0.;
     vec4 color = texture2D(image, texcoord);
-    float appliedFactor = brightness;
+    float abrightness = brightness;
     if (enhanced == 1) {
-        appliedFactor *= factor;
+        abrightness *= factor;
     }
 
     if (isdifference != NODIFFERENCE) {
@@ -65,8 +65,7 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     }
 
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
-    color.r = clamp(appliedFactor * color.r, 0., 1.);
-    color.r = pow(color.r, gamma);
+    color.r = abrightness * ((1.0 - contrast) * 0.5 + contrast * color.r);
     color.rgb = texture1D(lut, color.r).rgb;
     color.a = alpha;
     return color;
