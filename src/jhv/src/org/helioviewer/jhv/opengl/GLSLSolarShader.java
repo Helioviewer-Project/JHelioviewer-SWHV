@@ -24,7 +24,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int isDiscRef;
 
     private int pixelSizeWeightingRef;
-    private int gammaParamRef;
+    private int contrastParamRef;
     private int hgltParamRef;
     private int hglnParamRef;
 
@@ -53,7 +53,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] truncationValueFloat = new float[1];
     private final float[] hgltParamFloat = new float[1];
     private final float[] hglnParamFloat = new float[1];
-    private final float[] gammaParamFloat = new float[1];
+    private final float[] contrastParamFloat = new float[1];
     private final float[] brightnessParamFloat = new float[1];
     private final float[] alphaParamFloat = new float[1];
     private final float[] cutOffRadiusFloat = new float[1];
@@ -89,7 +89,7 @@ public class GLSLSolarShader extends GLSLShader {
         isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
 
         pixelSizeWeightingRef = gl.glGetUniformLocation(progID, "pixelSizeWeighting");
-        gammaParamRef = gl.glGetUniformLocation(progID, "gamma");
+        contrastParamRef = gl.glGetUniformLocation(progID, "contrast");
         hgltParamRef = gl.glGetUniformLocation(progID, "hglt");
         hglnParamRef = gl.glGetUniformLocation(progID, "hgln");
         polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
@@ -182,7 +182,7 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(hgltParamRef, 1, hgltParamFloat, 0);
         gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
 
-        gl.glUniform1fv(gammaParamRef, 1, gammaParamFloat, 0);
+        gl.glUniform1fv(contrastParamRef, 1, contrastParamFloat, 0);
         gl.glUniform1fv(alphaParamRef, 1, alphaParamFloat, 0);
         gl.glUniform3fv(pixelSizeWeightingRef, 1, sharpenParamFloat, 0);
         gl.glUniform4fv(rectRef, 1, rectVertex, 0);
@@ -217,8 +217,8 @@ public class GLSLSolarShader extends GLSLShader {
         brightnessParamFloat[0] = brightness;
     }
 
-    public void setGamma(float gamma) {
-        gammaParamFloat[0] = gamma;
+    public void setContrast(float contrast) {
+        contrastParamFloat[0] = contrast;
     }
 
     public void setFactors(float weighting, float pixelWidth, float pixelHeight, float span) {
