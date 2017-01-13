@@ -7,6 +7,8 @@
 #define PI 3.1415926535897932384626433832795
 #define TWOPI 2.*3.1415926535897932384626433832795
 
+#define truncationValue 0.2
+
 uniform sampler2D image;
 uniform int isdifference;
 uniform int enhanced;
@@ -36,7 +38,6 @@ uniform vec2 polarRadii;
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     float tmpConvolutionSum = 0.;
     vec4 color = texture2D(image, texcoord);
-    float truncationValue = 0.2;
     float abrightness = brightness;
     if (enhanced == 1) {
         abrightness *= factor;
