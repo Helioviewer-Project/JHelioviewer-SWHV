@@ -12,7 +12,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     int pixelWidth;
     int pixelHeight;
-    float brightnessFactor = 1f;
+    float brightnessFactor = 1;
 
     Position.L viewpointL = Sun.EpochEarthL;
     Position.Q viewpoint = Sun.EpochEarthQ;

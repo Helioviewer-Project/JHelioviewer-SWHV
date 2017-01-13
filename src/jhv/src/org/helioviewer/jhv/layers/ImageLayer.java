@@ -352,11 +352,12 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         imageData = newImageData;
 
         if (autoContrast && imageData.getBuffer() instanceof ByteBuffer) {
-            autoContrast(((ByteBuffer) imageData.getBuffer()).array());
+            autoContrast(imageData);
         }
     }
 
-    private static void autoContrast(byte[] ba) {
+    private static void autoContrast(ImageData _imageData) {
+        byte[] ba = ((ByteBuffer) _imageData.getBuffer()).array();
         int len = ba.length;
         int[] histogram = new int[256];
         for (int i = 0; i < len; i++) {
@@ -377,18 +378,12 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         if (j != 0 && factor > 1) {
             if (factor > 2)
                 factor = 2;
-            for (int i = 0; i < len; i++) {
-                ba[i] = clipByte((int) (getUnsigned(ba[i]) * factor + 0.5));
-            }
+            _imageData.setAutoContrast((float) factor);
         }
     }
 
     private static int getUnsigned(byte b) {
         return (b + 256) & 0xFF;
-    }
-
-    private static byte clipByte(int val) {
-        return (byte) (val > 255 ? 255 : val & 0xFF);
     }
 
     public ImageData getImageData() {
