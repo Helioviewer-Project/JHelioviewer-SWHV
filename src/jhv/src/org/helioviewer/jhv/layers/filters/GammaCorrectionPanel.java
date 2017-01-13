@@ -28,7 +28,6 @@ public class GammaCorrectionPanel implements ChangeListener, FilterDetails {
     @Override
     public void stateChanged(ChangeEvent e) {
         float gamma = (float) Math.exp(gammaSlider.getValue() * factor);
-
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setGamma(gamma);
         gammaLabel.setText(String.format("%.1f", gamma));
         Displayer.display();

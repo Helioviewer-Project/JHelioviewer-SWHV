@@ -18,7 +18,7 @@ public class GLImage {
     private GLTexture lutTex;
     private GLTexture diffTex;
 
-    private float contrast = 0f;
+    private float brightness = 1f;
     private float gamma = 1f;
     private float opacity = 1f;
     private float sharpen = 0f;
@@ -60,11 +60,10 @@ public class GLImage {
         applyRunningDifference(gl, shader);
 
         shader.colorMask = colorMask;
-        shader.setContrast(contrast);
+        shader.setBrightness(brightness * imageData.getAutoBrightness() * imageData.getMetaData().getBrightnessFactor());
         shader.setGamma(gamma);
         shader.setAlpha(opacity);
         shader.setEnhanced(gl, enhanced);
-        shader.setBrightnessFactor(gl, imageData.getMetaData().getBrightnessFactor() * imageData.getAutoContrast());
 
         int w = imageData.getWidth();
         int h = imageData.getHeight();
@@ -172,8 +171,8 @@ public class GLImage {
             diffTex.delete(gl);
     }
 
-    public void setContrast(float _contrast) {
-        contrast = _contrast;
+    public void setBrightness(float _brightness) {
+        brightness = _brightness;
     }
 
     public void setGamma(float _gamma) {
@@ -256,8 +255,8 @@ public class GLImage {
         return opacity;
     }
 
-    public float getContrast() {
-        return contrast;
+    public float getBrightness() {
+        return brightness;
     }
 
     public float getSharpen() {

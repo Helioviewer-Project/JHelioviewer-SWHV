@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,64 +22,63 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 
-public class ContrastPanel implements ActionListener, ChangeListener, FilterDetails {
-
-    private static final float sliderToContrastScale = 25.f;
+public class BrightnessPanel implements ActionListener, ChangeListener, FilterDetails {
 
     private static final Icon enhanceIcon = IconBank.getIcon(JHVIcon.BLANK);
     private static final Border loweredBorder = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
     private static final Border raisedBorder = BorderFactory.createBevelBorder(BevelBorder.RAISED);
 
-    private final JSlider contrastSlider;
-    private final JLabel contrastLabel;
+    private final JSlider brightnessSlider;
+    private final JLabel brightnessLabel;
     private final JPanel buttonPanel;
     private final JToggleButton autoButton;
 
-    public ContrastPanel() {
-        contrastLabel = new JLabel("0");
-        contrastSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
-        contrastSlider.addChangeListener(this);
-        WheelSupport.installMouseWheelSupport(contrastSlider);
+    public BrightnessPanel() {
+        brightnessLabel = new JLabel("1.0");
+        brightnessSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
+        brightnessSlider.addChangeListener(this);
+        WheelSupport.installMouseWheelSupport(brightnessSlider);
 
         autoButton = new JToggleButton(enhanceIcon);
-        autoButton.setToolTipText("Auto contrast");
+        autoButton.setToolTipText("Auto brightness");
         autoButton.setBorder(raisedBorder);
         autoButton.addActionListener(this);
 
-        buttonPanel = new JPanel();
-        buttonPanel.add(contrastLabel);
-        buttonPanel.add(autoButton);
+        buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.add(brightnessLabel, BorderLayout.LINE_START);
+        buttonPanel.add(autoButton, BorderLayout.LINE_END);
     }
 
    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == autoButton) {
             autoButton.setBorder(autoButton.isSelected() ? loweredBorder : raisedBorder);
-            ((ImageLayerOptions) getComponent().getParent()).setAutoContrast(autoButton.isSelected());
+            ((ImageLayerOptions) getComponent().getParent()).setAutoBrightness(autoButton.isSelected());
             Displayer.render(1);
         }
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setContrast(contrastSlider.getValue() / sliderToContrastScale);
-        contrastLabel.setText(Integer.toString(contrastSlider.getValue()));
+        float brightness = brightnessSlider.getValue() / 100f;
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBrightness(brightness);
+        brightnessLabel.setText(String.format("%.1f", brightness));
         Displayer.display();
     }
 
     @Override
     public Component getTitle() {
-        return new JLabel("Contrast", JLabel.RIGHT);
+        return new JLabel("Brightness");
     }
 
     @Override
     public Component getComponent() {
-        return contrastSlider;
+        return brightnessSlider;
     }
 
     @Override
     public Component getLabel() {
-        //return contrastLabel;
+        //return brightnessLabel;
         return buttonPanel;
     }
 

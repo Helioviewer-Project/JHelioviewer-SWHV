@@ -17,7 +17,7 @@ uniform vec3 pixelSizeWeighting;
 uniform vec4 rect;
 uniform vec4 differencerect;
 uniform float gamma;
-uniform float contrast;
+uniform float brightness;
 uniform sampler1D lut;
 uniform float alpha;
 uniform float cutOffRadius;
@@ -33,12 +33,11 @@ uniform vec2 viewportOffset;
 uniform vec3 cutOffDirection;
 uniform float cutOffValue;
 uniform vec2 polarRadii;
-uniform float brightnessFactor;
 
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     float tmpConvolutionSum = 0.;
     vec4 color = texture2D(image, texcoord);
-    float appliedFactor = brightnessFactor;
+    float appliedFactor = brightness;
     if (enhanced == 1) {
         appliedFactor *= factor;
     }
@@ -67,7 +66,6 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
 
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
     color.r = pow(color.r, gamma);
-    color.r = 0.5 * sign(2.0 * color.r - 1.0) * pow(abs(2.0 * color.r - 1.0), pow(1.5, -contrast)) + 0.5;
     color.rgb = texture1D(lut, color.r).rgb;
     color.a = alpha;
     return color;

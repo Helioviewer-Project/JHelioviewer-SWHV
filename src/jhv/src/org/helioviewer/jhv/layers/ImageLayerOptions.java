@@ -24,7 +24,7 @@ public class ImageLayerOptions extends SmallPanel {
         ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel();
         lutPanel = new LUTPanel();
         GammaCorrectionPanel gammaCorrectionPanel = new GammaCorrectionPanel();
-        ContrastPanel contrastPanel = new ContrastPanel();
+        BrightnessPanel brightnessPanel = new BrightnessPanel();
         SharpenPanel sharpenPanel = new SharpenPanel();
 
         setLayout(new GridBagLayout());
@@ -48,7 +48,7 @@ public class ImageLayerOptions extends SmallPanel {
         c.gridy++;
         addToGridBag(c, gammaCorrectionPanel);
         c.gridy++;
-        addToGridBag(c, contrastPanel);
+        addToGridBag(c, brightnessPanel);
         c.gridy++;
         addToGridBag(c, lutPanel);
         c.gridy++;
@@ -96,8 +96,8 @@ public class ImageLayerOptions extends SmallPanel {
         return imageLayer.getView();
     }
 
-    public void setAutoContrast(boolean b) {
-        imageLayer.setAutoContrast(b);
+    public void setAutoBrightness(boolean b) {
+        imageLayer.setAutoBrightness(b);
     }
 
 }

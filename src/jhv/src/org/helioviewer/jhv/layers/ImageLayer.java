@@ -332,7 +332,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private ImageData prevImageData;
     private ImageData baseImageData;
 
-    private boolean autoContrast = false;
+    private boolean autoBrightness;
 
     private void setImageData(ImageData newImageData) {
         int frame = newImageData.getMetaData().getFrameNumber();
@@ -348,8 +348,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
         imageData = newImageData;
 
-        if (autoContrast)
-            imageData.setAutoContrast();
+        if (autoBrightness)
+            imageData.setAutoBrightness();
     }
 
     public ImageData getImageData() {
@@ -376,8 +376,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         optionsPanel.setOpacity(opacity);
     }
 
-    void setAutoContrast(boolean b) {
-        autoContrast = b;
+    void setAutoBrightness(boolean b) {
+        autoBrightness = b;
     }
 
     GLImage getGLImage() {
