@@ -18,9 +18,9 @@ public class GLSLShader {
     private final String vertex;
     private final String fragment;
 
-    public GLSLShader(String vertex, String fragment) {
-        this.vertex = vertex;
-        this.fragment = fragment;
+    public GLSLShader(String _vertex, String _fragment) {
+        vertex = _vertex;
+        fragment = _fragment;
     }
 
     protected final void _init(GL2 gl) {

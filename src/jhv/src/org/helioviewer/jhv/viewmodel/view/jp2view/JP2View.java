@@ -58,6 +58,7 @@ public class JP2View extends AbstractView {
     private final URI uri;
     private final int maxFrame;
     private final int[] builtinLUT;
+    private final MetaData[] metaData;
     private final CacheStatus cacheStatus;
 
     private J2KReader reader;
@@ -65,8 +66,6 @@ public class JP2View extends AbstractView {
     private Kdu_cache cacheRender;
 
     private JPIPSocket socket;
-
-    final MetaData[] metaData;
 
     public JP2View(URI _uri) throws Exception {
         uri = _uri;

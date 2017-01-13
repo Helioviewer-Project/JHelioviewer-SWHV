@@ -171,20 +171,20 @@ public class GLImage {
             diffTex.delete(gl);
     }
 
-    public void setContrast(float contrast) {
-        this.contrast = contrast;
+    public void setContrast(float _contrast) {
+        contrast = _contrast;
     }
 
-    public void setGamma(float gamma) {
-        this.gamma = gamma;
+    public void setGamma(float _gamma) {
+        gamma = _gamma;
     }
 
-    public void setOpacity(float opacity) {
-        this.opacity = opacity;
+    public void setOpacity(float _opacity) {
+        opacity = _opacity;
     }
 
-    public void setSharpen(float sharpen) {
-        this.sharpen = sharpen;
+    public void setSharpen(float _sharpen) {
+        sharpen = _sharpen;
     }
 
     public void setColorMask(boolean redColormask, boolean greenColormask, boolean blueColormask) {
@@ -203,8 +203,8 @@ public class GLImage {
         lutChanged = true;
     }
 
-    public void setDifferenceMode(boolean differenceMode) {
-        this.differenceMode = differenceMode;
+    public void setDifferenceMode(boolean _differenceMode) {
+        differenceMode = _differenceMode;
     }
 
     public boolean getDifferenceMode() {
@@ -219,28 +219,28 @@ public class GLImage {
         return baseDifferenceMode;
     }
 
-    public void setBaseDifferenceNoRot(boolean baseDifferenceNoRot) {
-        this.baseDifferenceNoRot = baseDifferenceNoRot;
+    public void setBaseDifferenceNoRot(boolean _baseDifferenceNoRot) {
+        baseDifferenceNoRot = _baseDifferenceNoRot;
     }
 
     public boolean getBaseDifferenceNoRot() {
         return baseDifferenceNoRot;
     }
 
-    public void setRunDiffNoRot(boolean runningDifferenceNoRot) {
-        this.runningDifferenceNoRot = runningDifferenceNoRot;
+    public void setRunDiffNoRot(boolean _runningDifferenceNoRot) {
+        runningDifferenceNoRot = _runningDifferenceNoRot;
     }
 
     public boolean getRunDiffNoRot() {
         return runningDifferenceNoRot;
     }
 
-    public void setTruncation(float truncation) {
-        this.truncation = truncation;
+    public void setTruncation(float _truncation) {
+        truncation = _truncation;
     }
 
-    public void setEnhanced(boolean enhanced) {
-        this.enhanced = enhanced;
+    public void setEnhanced(boolean _enhanced) {
+        enhanced = _enhanced;
     }
 
     public boolean getEnhanced() {

@@ -16,8 +16,8 @@ public class JCodecExporter implements MovieExporter {
     private int height;
 
     @Override
-    public void open(String path, int w, int h, int fps) throws Exception {
-        this.path = path;
+    public void open(String _path, int w, int h, int fps) throws Exception {
+        path = _path;
         height = h;
         encoder = new JHVSequenceEncoder(new File(path), w, h, fps);
     }

@@ -22,8 +22,8 @@ import org.helioviewer.jhv.viewmodel.view.View;
 @SuppressWarnings("serial")
 class TimeSlider extends JSlider implements LazyComponent {
 
-    public TimeSlider(int orientation, int min, int max, int value) {
-        super(orientation, min, max, value);
+    public TimeSlider(int _orientation, int min, int max, int value) {
+        super(_orientation, min, max, value);
         setUI(new TimeSliderUI(this));
     }
 
@@ -69,7 +69,7 @@ class TimeSlider extends JSlider implements LazyComponent {
         }
 
         @Override
-        protected TrackListener createTrackListener(JSlider slider) {
+        protected TrackListener createTrackListener(JSlider _slider) {
             return new TimeTrackListener();
         }
 

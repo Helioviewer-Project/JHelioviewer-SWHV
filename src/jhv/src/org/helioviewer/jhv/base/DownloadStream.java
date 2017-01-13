@@ -57,20 +57,20 @@ public class DownloadStream {
         ignore400 = _ignore400;
     }
 
-    public DownloadStream(URL url, boolean ignore400) {
-        this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), ignore400);
+    private DownloadStream(URL _url, boolean _ignore400) {
+        this(_url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), _ignore400);
     }
 
-    public DownloadStream(String url, boolean ignore400) throws MalformedURLException {
-        this(new URL(url), ignore400);
+    public DownloadStream(String _url, boolean _ignore400) throws MalformedURLException {
+        this(new URL(_url), _ignore400);
     }
 
-    public DownloadStream(URL url) {
-        this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), false);
+    public DownloadStream(URL _url) {
+        this(_url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), false);
     }
 
-    public DownloadStream(String url) throws MalformedURLException {
-        this(new URL(url));
+    public DownloadStream(String _url) throws MalformedURLException {
+        this(new URL(_url));
     }
 
     public boolean isResponse400() {
