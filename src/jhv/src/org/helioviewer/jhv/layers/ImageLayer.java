@@ -332,8 +332,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private ImageData prevImageData;
     private ImageData baseImageData;
 
-    private boolean autoBrightness;
-
     private void setImageData(ImageData newImageData) {
         int frame = newImageData.getMetaData().getFrameNumber();
         if (frame == 0) {
@@ -348,7 +346,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
         imageData = newImageData;
 
-        if (autoBrightness)
+        if (glImage.getAutoBrightness())
             imageData.setAutoBrightness();
     }
 
@@ -374,10 +372,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     void setOpacity(float opacity) {
         optionsPanel.setOpacity(opacity);
-    }
-
-    void setAutoBrightness(boolean b) {
-        autoBrightness = b;
     }
 
     GLImage getGLImage() {

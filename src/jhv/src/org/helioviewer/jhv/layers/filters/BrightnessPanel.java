@@ -53,7 +53,7 @@ public class BrightnessPanel implements ActionListener, ChangeListener, FilterDe
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == autoButton) {
             autoButton.setBorder(autoButton.isSelected() ? loweredBorder : raisedBorder);
-            ((ImageLayerOptions) getComponent().getParent()).setAutoBrightness(autoButton.isSelected());
+            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setAutoBrightness(autoButton.isSelected());
             Displayer.render(1);
         }
     }

@@ -39,6 +39,7 @@ public class GLImage {
     private boolean baseDifferenceNoRot = false;
     private boolean runningDifferenceNoRot = false;
     private boolean enhanced = false;
+    private boolean autoBrightness = false;
 
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
@@ -218,6 +219,14 @@ public class GLImage {
 
     public void setEnhanced(boolean _enhanced) {
         enhanced = _enhanced;
+    }
+
+    public void setAutoBrightness(boolean _autoBrightness) {
+        autoBrightness = _autoBrightness;
+    }
+
+    public boolean getAutoBrightness() {
+        return autoBrightness;
     }
 
     public boolean getDifferenceMode() {

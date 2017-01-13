@@ -96,8 +96,4 @@ public class ImageLayerOptions extends SmallPanel {
         return imageLayer.getView();
     }
 
-    public void setAutoBrightness(boolean b) {
-        imageLayer.setAutoBrightness(b);
-    }
-
 }
