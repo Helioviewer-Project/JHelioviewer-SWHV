@@ -38,7 +38,7 @@ public class GLImage {
     private boolean baseDifferenceMode = false;
     private boolean baseDifferenceNoRot = false;
     private boolean runningDifferenceNoRot = false;
-    private float truncation = 1f - 0.8f;
+    private float truncation = 1 - 0.8f;
     private boolean enhanced = false;
 
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
@@ -217,10 +217,6 @@ public class GLImage {
 
     public void setRunDiffNoRot(boolean _runningDifferenceNoRot) {
         runningDifferenceNoRot = _runningDifferenceNoRot;
-    }
-
-    public void setTruncation(float _truncation) {
-        truncation = _truncation;
     }
 
     public void setEnhanced(boolean _enhanced) {

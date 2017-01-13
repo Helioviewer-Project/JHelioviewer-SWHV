@@ -12,30 +12,22 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.io.DownloadViewTask;
 
 @SuppressWarnings("serial")
-public class RunningDifferencePanel implements ChangeListener {
+public class RunningDifferencePanel {
 
     private static final String[] combolist = { "No difference images", "Running difference", "Base difference" };
 
     private final JPanel diffPanel = new JPanel();
-    private final JSpinner truncateSpinner;
     private final JCheckBox diffRot;
     private final JPanel radPanel;
 
@@ -77,17 +69,6 @@ public class RunningDifferencePanel implements ChangeListener {
         metaButton.setContentAreaFilled(false);
 
         diffPanel.setLayout(new BoxLayout(diffPanel, BoxLayout.PAGE_AXIS));
-
-        JLabel truncateLabel = new JLabel("Contrast boost", JLabel.RIGHT);
-
-        truncateSpinner = new JSpinner();
-        truncateSpinner.setModel(new SpinnerNumberModel(Float.valueOf(0.8f), Float.valueOf(0), Float.valueOf(0.99f), Float.valueOf(0.01f)));
-        truncateSpinner.addChangeListener(this);
-        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(truncateSpinner, "0%");
-        truncateSpinner.setEditor(editor);
-        editor.getTextField().setColumns(3);
-        editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
-        WheelSupport.installMouseWheelSupport(truncateSpinner);
 
         JComboBox<String> comboBox = new JComboBox<>(combolist);
         JPanel topPanel = new JPanel(new GridBagLayout());
@@ -153,10 +134,6 @@ public class RunningDifferencePanel implements ChangeListener {
         gc.gridy = 0;
         gc.gridx = 0;
         radPanel.add(diffRot, gc);
-        gc.gridx = 1;
-        radPanel.add(truncateLabel, gc);
-        gc.gridx = 2;
-        radPanel.add(truncateSpinner, gc);
 
         c.weightx = 1;
         c.weighty = 1;
@@ -179,13 +156,6 @@ public class RunningDifferencePanel implements ChangeListener {
 
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(differenceMode);
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceMode(baseDifferenceMode);
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        float value = ((SpinnerNumberModel) truncateSpinner.getModel()).getNumber().floatValue();
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setTruncation(1 - value);
-        Displayer.display();
     }
 
     public Component getComponent() {
