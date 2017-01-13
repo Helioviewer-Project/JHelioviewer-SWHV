@@ -53,6 +53,6 @@ public interface ImageData {
 
     float getAutoContrast();
 
-    void setAutoContrast(float factor);
+    void setAutoContrast();
 
 }

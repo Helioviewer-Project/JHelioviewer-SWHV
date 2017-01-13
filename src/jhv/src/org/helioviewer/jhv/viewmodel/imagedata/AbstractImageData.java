@@ -2,6 +2,7 @@ package org.helioviewer.jhv.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
@@ -120,9 +121,41 @@ public abstract class AbstractImageData implements ImageData {
         return autoContrast;
     }
 
+    private static final double CONTRAST_F1 = 0.001;
+    private static final double CONTRAST_F2 = 128 + 64 + 32;
+
     @Override
-    public void setAutoContrast(float factor) {
-        autoContrast = factor;
+    public void setAutoContrast() {
+        if (!(buffer instanceof ByteBuffer))
+            return;
+
+        byte[] ba = ((ByteBuffer) buffer).array();
+        int len = ba.length;
+        int[] histogram = new int[256];
+        for (int i = 0; i < len; i++) {
+            histogram[getUnsigned(ba[i])]++;
+        }
+
+        long ct = 0;
+        int j;
+        for (j = 255; j >= 0; j--) {
+            ct += histogram[j];
+            if (ct > CONTRAST_F1 * len) {
+                break;
+            }
+        }
+
+        double factor = CONTRAST_F2 / j;
+        // System.out.println(">> " + factor + " " + j);
+        if (j != 0 && factor > 1) {
+            if (factor > 2)
+                factor = 2;
+            autoContrast = (float) factor;
+        }
+    }
+
+    private static int getUnsigned(byte b) {
+        return (b + 256) & 0xFF;
     }
 
 }
