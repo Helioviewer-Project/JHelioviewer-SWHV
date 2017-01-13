@@ -15,6 +15,8 @@ public interface MetaData {
 
     int getPixelHeight();
 
+    float getBrightnessFactor();
+
     Position.Q getViewpoint();
 
     double getInnerCutOffRadius();

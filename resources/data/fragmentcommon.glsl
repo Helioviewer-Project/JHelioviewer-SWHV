@@ -33,42 +33,38 @@ uniform vec2 viewportOffset;
 uniform vec3 cutOffDirection;
 uniform float cutOffValue;
 uniform vec2 polarRadii;
+uniform float brightnessFactor;
 
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     float tmpConvolutionSum = 0.;
     vec4 color = texture2D(image, texcoord);
-    float appliedfactor = 1.;
-    if(enhanced==1) {
-        appliedfactor = factor;
+    float appliedFactor = brightnessFactor;
+    if (enhanced == 1) {
+        appliedFactor *= factor;
     }
-    color.r = clamp(appliedfactor * color.r, 0., 1.);
-    if(isdifference != NODIFFERENCE){
+    color.r = clamp(appliedFactor * color.r, 0., 1.);
+    if (isdifference != NODIFFERENCE) {
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
-        color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
-        color.r = (color.r + 1.0)/2.0;
+        color.r = clamp(color.r, -truncationValue,truncationValue) / truncationValue;
+        color.r = (color.r + 1.0) / 2.0;
         vec4 diffcolor;
-        for(int i=0; i<3; i++)
-        {
-            for(int j=0; j<3; j++)
-            {
-                diffcolor.r = texture2D(image, texcoord + vec2(i-1, j-1)*pixelSizeWeighting.xy).r 
-                            - texture2D(differenceImage, difftexcoord + vec2(i-1, j-1)*pixelSizeWeighting.xy).r;
-                diffcolor.r = clamp(diffcolor.r,-truncationValue,truncationValue)/truncationValue;
-                diffcolor.r = (diffcolor.r + 1.0)/2.0;
-                tmpConvolutionSum += diffcolor.r * unsharpMaskingKernel[3*i+j]; 
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                diffcolor.r = texture2D(image, texcoord + vec2(i - 1, j - 1) * pixelSizeWeighting.xy).r
+                            - texture2D(differenceImage, difftexcoord + vec2(i - 1, j - 1) * pixelSizeWeighting.xy).r;
+                diffcolor.r = clamp(diffcolor.r, -truncationValue, truncationValue) / truncationValue;
+                diffcolor.r = (diffcolor.r + 1.0) / 2.0;
+                tmpConvolutionSum += diffcolor.r * unsharpMaskingKernel[3 * i + j];
+            }
+        }
+    } else {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                tmpConvolutionSum += texture2D(image, texcoord + vec2(i - 1, j - 1) * pixelSizeWeighting.xy).r * unsharpMaskingKernel[3 * i + j];
             }
         }
     }
-    else{
-        for(int i=0; i<3; i++)
-        {
-            for(int j=0; j<3; j++)
-            {
-                tmpConvolutionSum += texture2D(image, texcoord + vec2(i-1, j-1)*pixelSizeWeighting.xy).r * unsharpMaskingKernel[3*i+j];
-            }
-        }
-    }
-    
+
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
     color.r = pow(color.r, gamma);
     color.r = 0.5 * sign(2.0 * color.r - 1.0) * pow(abs(2.0 * color.r - 1.0), pow(1.5, -contrast)) + 0.5;
@@ -77,34 +73,31 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     return color;
 }
 
-void clamp_texcoord(vec2 texcoord){
-    if(texcoord.x<0.||texcoord.y<0.||texcoord.x>1.||texcoord.y>1.)
+void clamp_texcoord(vec2 texcoord) {
+    if (texcoord.x < 0. || texcoord.y < 0. || texcoord.x > 1. || texcoord.y > 1.)
         discard;
 }
 
-vec3 rotate_vector_inverse( vec4 quat, vec3 vec )
-{
-    return vec + 2.0 * cross( cross( vec, quat.xyz ) + quat.w * vec, quat.xyz );
-}
-vec3 rotate_vector( vec4 quat, vec3 vec )
-{
-    return vec + 2.0 * cross( quat.xyz, cross( quat.xyz, vec ) + quat.w * vec );
+vec3 rotate_vector_inverse(vec4 quat, vec3 vec) {
+    return vec + 2.0 * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
 }
 
-float intersectPlane(vec4 vecin)
-{   
+vec3 rotate_vector(vec4 quat, vec3 vec) {
+    return vec + 2.0 * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
+}
+
+float intersectPlane(vec4 vecin) {
     vec3 altnormal = rotate_vector(cameraDifferenceRotationQuat, vec3(0., 0., 1.));
-    if(altnormal.z <0.){
+    if (altnormal.z < 0.) {
         discard;
     }
-    return -dot(altnormal.xy,vecin.xy)/altnormal.z;
+    return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
 
-float intersectPlanediff(vec4 vecin)
-{   
+float intersectPlanediff(vec4 vecin) {
     vec3 altnormal = rotate_vector(diffcameraDifferenceRotationQuat, vec3(0., 0., 1.));
-    if(altnormal.z <0.){
+    if (altnormal.z < 0.) {
         discard;
     }
-    return -dot(altnormal.xy,vecin.xy)/altnormal.z;
+    return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
