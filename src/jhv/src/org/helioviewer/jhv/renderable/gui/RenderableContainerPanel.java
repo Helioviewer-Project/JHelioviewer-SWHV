@@ -49,7 +49,7 @@ public class RenderableContainerPanel extends JPanel {
     private static final int VISIBLE_COL = 0;
     private static final int TITLE_COL = 1;
     public static final int TIME_COL = 2;
-    public static final int DOWNLOAD_COL = 3;
+    private static final int DOWNLOAD_COL = 3;
     private static final int REMOVE_COL = 4;
 
     public static final int NUMBER_COLUMNS = 5;

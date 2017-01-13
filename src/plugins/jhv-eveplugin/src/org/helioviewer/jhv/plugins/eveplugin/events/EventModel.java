@@ -181,11 +181,11 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
         private final int yPosition;
 
-        public EventPlotConfiguration(JHVRelatedEvents event, int x0, int x1, int yPosition) {
-            this.event = event;
-            this.x0 = x0;
-            this.x1 = x1;
-            this.yPosition = yPosition;
+        public EventPlotConfiguration(JHVRelatedEvents _event, int _x0, int _x1, int _yPosition) {
+            event = _event;
+            x0 = _x0;
+            x1 = _x1;
+            yPosition = _yPosition;
         }
 
         public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight, boolean drawHighlighted) {
