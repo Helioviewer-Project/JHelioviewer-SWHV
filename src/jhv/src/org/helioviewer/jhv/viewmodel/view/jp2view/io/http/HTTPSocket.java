@@ -13,8 +13,8 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.LineRead;
 
 public class HTTPSocket extends Socket {
 
-    private static final int TIMEOUT_CONNECT = 10000;
-    private static final int TIMEOUT_READ = 10000;
+    private static final int TIMEOUT_CONNECT = 20000;
+    private static final int TIMEOUT_READ = 20000;
     private static final int PORT = 80;
 
     private int lastUsedPort = 0;
