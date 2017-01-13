@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
-import java.awt.FlowLayout;
+//import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -10,7 +10,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
+//import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
@@ -28,8 +28,8 @@ public class RunningDifferencePanel {
     private static final String[] combolist = { "No difference images", "Running difference", "Base difference" };
 
     private final JPanel diffPanel = new JPanel();
-    private final JCheckBox diffRot;
-    private final JPanel radPanel;
+    // private final JCheckBox diffRot;
+    // private final JPanel radPanel;
 
     public RunningDifferencePanel() {
         JButton downloadButton = new JButton(new AbstractAction() {
@@ -73,14 +73,6 @@ public class RunningDifferencePanel {
         JComboBox<String> comboBox = new JComboBox<>(combolist);
         JPanel topPanel = new JPanel(new GridBagLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        radPanel = new JPanel(new FlowLayout());
-        radPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        radPanel.setVisible(false);
-
-        //
-        comboBox.setSelectedItem(0);
-        diffRot = new JCheckBox("Rotation correction");
-        diffRot.setSelected(true);
 
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
@@ -115,6 +107,14 @@ public class RunningDifferencePanel {
             topPanel.revalidate();
             topPanel.repaint();
         });
+
+/*
+        radPanel = new JPanel(new FlowLayout());
+        radPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        radPanel.setVisible(false);
+        diffRot = new JCheckBox("Rotation correction");
+        diffRot.setSelected(true);
+
         diffRot.addItemListener(e -> {
             if (comboBox.getSelectedItem().equals(combolist[2])) {
                 ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceNoRot(!diffRot.isSelected());
@@ -144,16 +144,18 @@ public class RunningDifferencePanel {
         c.gridx = 0;
         c.gridwidth = 3;
         topPanel.add(radPanel, c);
+*/
     }
 
     private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
-        if (showExtraPanel) {
+/*
+       if (showExtraPanel) {
             radPanel.setVisible(true);
             ((ImageLayerOptions) getComponent().getParent()).getGLImage().setRunDiffNoRot(!diffRot.isSelected());
         } else {
             radPanel.setVisible(false);
         }
-
+*/
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(differenceMode);
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceMode(baseDifferenceMode);
     }
