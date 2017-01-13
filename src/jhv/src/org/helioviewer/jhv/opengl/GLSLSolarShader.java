@@ -19,7 +19,6 @@ public class GLSLSolarShader extends GLSLShader {
     public static final int BASEDIFFERENCE_NO_ROT = 3;
     public static final int BASEDIFFERENCE_ROT = 4;
 
-    private int truncationValueRef;
     private int isDifferenceValueRef;
     private int isDiscRef;
 
@@ -50,7 +49,6 @@ public class GLSLSolarShader extends GLSLShader {
     private final int[] isDiscValue = new int[1];
 
     private final float[] sharpenParamFloat = new float[3];
-    private final float[] truncationValueFloat = new float[1];
     private final float[] hgltParamFloat = new float[1];
     private final float[] hglnParamFloat = new float[1];
     private final float[] contrastParamFloat = new float[1];
@@ -84,7 +82,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     @Override
     protected void _after_init(GL2 gl) {
-        truncationValueRef = gl.glGetUniformLocation(progID, "truncationValue");
         isDifferenceValueRef = gl.glGetUniformLocation(progID, "isdifference");
         isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
 
@@ -177,7 +174,6 @@ public class GLSLSolarShader extends GLSLShader {
     public void filter(GL2 gl) {
         gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
         gl.glUniform1fv(brightnessParamRef, 1, brightnessParamFloat, 0);
-        gl.glUniform1fv(truncationValueRef, 1, truncationValueFloat, 0);
         gl.glUniform1iv(isDifferenceValueRef, 1, isDifferenceValue, 0);
         gl.glUniform1fv(hgltParamRef, 1, hgltParamFloat, 0);
         gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
@@ -229,10 +225,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     public void setIsDifference(int isDifference) {
         isDifferenceValue[0] = isDifference;
-    }
-
-    public void setTruncationValue(float truncationValue) {
-        truncationValueFloat[0] = truncationValue;
     }
 
     public void setViewport(float offsetX, float offsetY, float width, float height) {

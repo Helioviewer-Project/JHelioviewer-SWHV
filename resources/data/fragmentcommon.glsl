@@ -8,7 +8,6 @@
 #define TWOPI 2.*3.1415926535897932384626433832795
 
 uniform sampler2D image;
-uniform float truncationValue;
 uniform int isdifference;
 uniform int enhanced;
 uniform sampler2D differenceImage;
@@ -37,6 +36,7 @@ uniform vec2 polarRadii;
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     float tmpConvolutionSum = 0.;
     vec4 color = texture2D(image, texcoord);
+    float truncationValue = 0.2;
     float abrightness = brightness;
     if (enhanced == 1) {
         abrightness *= factor;
@@ -44,7 +44,7 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
 
     if (isdifference != NODIFFERENCE) {
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
-        color.r = clamp(color.r, -truncationValue,truncationValue) / truncationValue;
+        color.r = clamp(color.r, -truncationValue, truncationValue) / truncationValue;
         color.r = (color.r + 1.0) / 2.0;
         vec4 diffcolor;
         for (int i = 0; i < 3; i++) {

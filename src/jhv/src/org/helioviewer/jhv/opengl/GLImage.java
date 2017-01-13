@@ -38,7 +38,6 @@ public class GLImage {
     private boolean baseDifferenceMode = false;
     private boolean baseDifferenceNoRot = false;
     private boolean runningDifferenceNoRot = false;
-    private float truncation = 1 - 0.8f;
     private boolean enhanced = false;
 
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
@@ -117,8 +116,6 @@ public class GLImage {
                     shader.setIsDifference(GLSLSolarShader.RUNNINGDIFFERENCE_ROT);
                 }
             }
-
-            shader.setTruncationValue(truncation);
             diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
         } else {
             shader.setIsDifference(GLSLSolarShader.NODIFFERENCE);
