@@ -18,6 +18,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.io.DownloadViewTask;
+import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 
 @SuppressWarnings("serial")
 public class RunningDifferencePanel {
@@ -66,11 +67,11 @@ public class RunningDifferencePanel {
         JComboBox<String> comboBox = new JComboBox<>(combolist);
         comboBox.addActionListener(e -> {
             if (comboBox.getSelectedItem().equals(combolist[0])) {
-                setDifferenceModetoJP2View(false, false);
+                setDifferenceMode(DifferenceMode.None);
             } else if (comboBox.getSelectedItem().equals(combolist[1])) {
-                setDifferenceModetoJP2View(true, false);
+                setDifferenceMode(DifferenceMode.RunningRotation);
             } else if (comboBox.getSelectedItem().equals(combolist[2])) {
-                setDifferenceModetoJP2View(true, true);
+                setDifferenceMode(DifferenceMode.Base);
             }
         });
 
@@ -91,9 +92,8 @@ public class RunningDifferencePanel {
         topPanel.add(downloadButton, c);
     }
 
-    private void setDifferenceModetoJP2View(boolean differenceMode, boolean baseDifferenceMode) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(differenceMode);
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBaseDifferenceMode(baseDifferenceMode);
+    private void setDifferenceMode(DifferenceMode diffMode) {
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(diffMode);
         Displayer.display();
     }
 

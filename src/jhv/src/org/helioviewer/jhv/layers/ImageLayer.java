@@ -20,6 +20,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.LoadRemoteTask;
 import org.helioviewer.jhv.opengl.GLImage;
+import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
@@ -209,9 +210,11 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             Quat q = camera.getRotation();
             shader.bindMatrix(gl, vpmi.getFloatArray());
             shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getViewpoint().orientation));
-            if (glImage.getBaseDifferenceMode()) {
+
+            DifferenceMode diffMode = glImage.getDifferenceMode();
+            if (diffMode == DifferenceMode.BaseRotation) {
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getViewpoint().orientation));
-            } else if (glImage.getDifferenceMode()) {
+            } else if (diffMode == DifferenceMode.RunningRotation) {
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getViewpoint().orientation));
             }
             shader.bindAngles(gl, imageData.getMetaData().getViewpointL());

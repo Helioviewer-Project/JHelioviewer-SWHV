@@ -13,12 +13,6 @@ public class GLSLSolarShader extends GLSLShader {
     public static final GLSLSolarShader polar = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentpolar.glsl");
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentlogpolar.glsl");
 
-    public static final int NODIFFERENCE = 0;
-    public static final int RUNNINGDIFFERENCE_NO_ROT = 1;
-    public static final int RUNNINGDIFFERENCE_ROT = 2;
-    public static final int BASEDIFFERENCE_NO_ROT = 3;
-    public static final int BASEDIFFERENCE_ROT = 4;
-
     private int isDifferenceValueRef;
     private int isDiscRef;
 
