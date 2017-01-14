@@ -63,7 +63,6 @@ public class BrightnessPanel implements ChangeListener, FilterDetails {
 
     @Override
     public Component getLabel() {
-        //return brightnessLabel;
         return buttonPanel;
     }
 

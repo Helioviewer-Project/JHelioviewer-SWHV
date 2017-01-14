@@ -3,6 +3,8 @@ package org.helioviewer.jhv.layers;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.swing.BorderFactory;
+
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.layers.filters.*;
@@ -28,6 +30,7 @@ public class ImageLayerOptions extends SmallPanel {
         SharpenPanel sharpenPanel = new SharpenPanel();
 
         setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.CENTER;
