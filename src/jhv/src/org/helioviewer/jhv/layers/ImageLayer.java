@@ -345,9 +345,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
 
         imageData = newImageData;
-
-        if (glImage.getAutoBrightness())
-            imageData.setAutoBrightness();
     }
 
     public ImageData getImageData() {
@@ -384,6 +381,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     public APIRequest getAPIRequest() {
         return view == null ? null : view.getAPIRequest();
+    }
+
+    double getAutoBrightness() {
+        return imageData.getAutoBrightness();
     }
 
 }
