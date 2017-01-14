@@ -14,6 +14,10 @@ import com.jogamp.opengl.GL2;
 
 public class GLImage {
 
+    public enum DifferenceMode {
+        None, Running, RunningRotation, Base, BaseRotation
+    };
+
     private GLTexture tex;
     private GLTexture lutTex;
     private GLTexture diffTex;
@@ -22,23 +26,18 @@ public class GLImage {
     private float contrast = 1f;
     private float opacity = 1f;
     private float sharpen = 0f;
+    private boolean enhanced = false;
     private ColorMask colorMask = new ColorMask(true, true, true);
+    private DifferenceMode diffMode = DifferenceMode.None;
 
     private LUT lut = gray;
     private LUT lastLut;
 
     private boolean invertLUT = false;
     private boolean lastInverted = false;
-
     private boolean lutChanged = true;
 
     private static final LUT gray = LUT.get("Gray");
-
-    private boolean differenceMode = false;
-    private boolean baseDifferenceMode = false;
-    private boolean baseDifferenceNoRot = false;
-    private boolean runningDifferenceNoRot = false;
-    private boolean enhanced = false;
 
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
@@ -47,8 +46,8 @@ public class GLImage {
             tex.copyImageData2D(gl, imageData);
         }
 
-        ImageData prevFrame = baseDifferenceMode ? baseImageData : prevImageData;
-        if (differenceMode && prevFrame != null) {
+        ImageData prevFrame = isBaseDiff() ? baseImageData : prevImageData;
+        if (diffMode != DifferenceMode.None && prevFrame != null) {
             diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
             diffTex.copyImageData2D(gl, prevFrame);
         }
@@ -56,13 +55,13 @@ public class GLImage {
 
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         applyRegion(imageData, prevImageData, baseImageData, shader);
-        applyRunningDifference(gl, shader);
 
         shader.colorMask = colorMask;
         shader.setBrightness(brightness * imageData.getMetaData().getBrightnessFactor());
         shader.setContrast(contrast);
         shader.setAlpha(opacity);
         shader.setEnhanced(gl, enhanced);
+        shader.setIsDifference(diffMode.ordinal());
 
         int w = imageData.getWidth();
         int h = imageData.getHeight();
@@ -72,14 +71,22 @@ public class GLImage {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
+    private boolean isBaseDiff() {
+        return diffMode == DifferenceMode.Base || diffMode == DifferenceMode.BaseRotation;
+    }
+
+    private boolean isRunningDiff() {
+        return diffMode == DifferenceMode.Running || diffMode == DifferenceMode.RunningRotation;
+    }
+
     private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         Region r = imageData.getRegion();
         shader.changeRect(r.llx, r.lly, 1. / r.width, 1. / r.height);
 
         Region diffRegion = null;
-        if (!baseDifferenceMode && prevImageData != null) {
+        if (!isBaseDiff() && prevImageData != null) {
             diffRegion = prevImageData.getRegion();
-        } else if (baseDifferenceMode && baseImageData != null) {
+        } else if (isBaseDiff() && baseImageData != null) {
             diffRegion = baseImageData.getRegion();
         }
 
@@ -90,7 +97,7 @@ public class GLImage {
         MetaData metadata = imageData.getMetaData();
         shader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
         if (!Displayer.getShowCorona())
-            shader.setOuterCutOffRadius(1.);
+            shader.setOuterCutOffRadius(1);
 
         if (metadata.getCutOffValue() > 0) {
             Vec3 cdir = metadata.getCutOffDirection();
@@ -101,31 +108,10 @@ public class GLImage {
         }
     }
 
-    private void applyRunningDifference(GL2 gl, GLSLSolarShader shader) {
-        if (baseDifferenceMode || differenceMode) {
-            if (baseDifferenceMode) {
-                if (baseDifferenceNoRot) {
-                    shader.setIsDifference(GLSLSolarShader.BASEDIFFERENCE_NO_ROT);
-                } else {
-                    shader.setIsDifference(GLSLSolarShader.BASEDIFFERENCE_ROT);
-                }
-            } else {
-                if (runningDifferenceNoRot) {
-                    shader.setIsDifference(GLSLSolarShader.RUNNINGDIFFERENCE_NO_ROT);
-                } else {
-                    shader.setIsDifference(GLSLSolarShader.RUNNINGDIFFERENCE_ROT);
-                }
-            }
-            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
-        } else {
-            shader.setIsDifference(GLSLSolarShader.NODIFFERENCE);
-        }
-    }
-
     private void applyLUT(GL2 gl) {
         lutTex.bind(gl, GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE1);
 
-        LUT currlut = differenceMode || baseDifferenceMode ? gray : lut;
+        LUT currlut = diffMode == DifferenceMode.None ? lut : gray;
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
 
@@ -200,32 +186,16 @@ public class GLImage {
         lutChanged = true;
     }
 
-    public void setDifferenceMode(boolean _differenceMode) {
-        differenceMode = _differenceMode;
-    }
-
-    public void setBaseDifferenceMode(boolean selected) {
-        baseDifferenceMode = selected;
-    }
-
-    public void setBaseDifferenceNoRot(boolean _baseDifferenceNoRot) {
-        baseDifferenceNoRot = _baseDifferenceNoRot;
-    }
-
-    public void setRunDiffNoRot(boolean _runningDifferenceNoRot) {
-        runningDifferenceNoRot = _runningDifferenceNoRot;
-    }
-
     public void setEnhanced(boolean _enhanced) {
         enhanced = _enhanced;
     }
 
-    public boolean getDifferenceMode() {
-        return differenceMode;
+    public void setDifferenceMode(DifferenceMode mode) {
+        diffMode = mode;
     }
 
-    public boolean getBaseDifferenceMode() {
-        return baseDifferenceMode;
+    public DifferenceMode getDifferenceMode() {
+        return diffMode;
     }
 
 }
