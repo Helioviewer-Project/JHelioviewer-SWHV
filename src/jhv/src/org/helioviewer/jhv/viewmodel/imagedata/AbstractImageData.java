@@ -21,16 +21,7 @@ public abstract class AbstractImageData implements ImageData {
     private MetaData metaData;
     private Position.Q viewpoint;
     private boolean uploaded = false;
-    private float autoBrightness = 1;
 
-    /**
-     * Default constructor.
-     *
-     * @param newWidth
-     *            width of the image
-     * @param newHeight
-     *            height of the image
-     */
     AbstractImageData(int newWidth, int newHeight, int newBpp) {
         width = newWidth;
         height = newHeight;
@@ -116,18 +107,13 @@ public abstract class AbstractImageData implements ImageData {
         uploaded = _uploaded;
     }
 
-    @Override
-    public float getAutoBrightness() {
-        return autoBrightness;
-    }
-
     private static final double BRIGHTNESS_F1 = 0.001;
     private static final double BRIGHTNESS_F2 = 128 + 64 + 32;
 
     @Override
-    public void setAutoBrightness() {
+    public double getAutoBrightness() {
         if (!(buffer instanceof ByteBuffer))
-            return;
+            return 1;
 
         byte[] ba = ((ByteBuffer) buffer).array();
         int len = ba.length;
@@ -150,8 +136,9 @@ public abstract class AbstractImageData implements ImageData {
         if (j != 0 && factor > 1) {
             if (factor > 2)
                 factor = 2;
-            autoBrightness = (float) factor;
+            return factor;
         }
+        return 1;
     }
 
     private static int getUnsigned(byte b) {

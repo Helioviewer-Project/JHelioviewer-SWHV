@@ -51,8 +51,6 @@ public interface ImageData {
 
     void setUploaded(boolean uploaded);
 
-    float getAutoBrightness();
-
-    void setAutoBrightness();
+    double getAutoBrightness();
 
 }
