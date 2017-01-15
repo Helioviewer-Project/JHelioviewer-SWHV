@@ -6,7 +6,7 @@ import java.sql.Statement;
 
 import org.helioviewer.jhv.base.logging.Log;
 
-public class JHVDatabase {
+class JHVDatabase {
 
     public static void close(ResultSet rs) {
         if (rs != null) {

@@ -765,7 +765,7 @@ public class EventDatabase {
         }
     }
 
-    public static ArrayList<JsonEvent> relations2Program(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
+    private static ArrayList<JsonEvent> relations2Program(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
         FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<>(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
         executor.execute(ft);
         try {
@@ -892,7 +892,7 @@ public class EventDatabase {
         }
     }
 
-    public static JsonEvent event2Program(int event_id) {
+    private static JsonEvent event2Program(int event_id) {
         FutureTask<JsonEvent> ft = new FutureTask<>(new Event2Program(event_id));
         executor.execute(ft);
         JsonEvent evt = null;
