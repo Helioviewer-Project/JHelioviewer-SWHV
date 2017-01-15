@@ -16,7 +16,7 @@ public class GLImage {
 
     public enum DifferenceMode {
         None, Running, RunningRotation, Base, BaseRotation
-    };
+    }
 
     private GLTexture tex;
     private GLTexture lutTex;
