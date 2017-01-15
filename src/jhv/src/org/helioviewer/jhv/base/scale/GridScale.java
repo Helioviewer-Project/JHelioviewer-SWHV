@@ -20,13 +20,13 @@ public abstract class GridScale {
 
     public static GridScale current = ortho;
 
-    public abstract double scaleX(double val);
+    protected abstract double scaleX(double val);
 
-    public abstract double invScaleX(double val);
+    protected abstract double invScaleX(double val);
 
-    public abstract double scaleY(double val);
+    protected abstract double scaleY(double val);
 
-    public abstract double invScaleY(double val);
+    protected abstract double invScaleY(double val);
 
     public abstract double getInterpolatedXValue(double v);
 

@@ -23,7 +23,28 @@ import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 @SuppressWarnings("serial")
 public class RunningDifferencePanel {
 
-    private static final String[] combolist = { "No difference images", "Running difference", "Base difference" };
+    private enum DifferenceModeChoice {
+        None("No difference images", DifferenceMode.None),
+        Running("Running difference", DifferenceMode.RunningRotation),
+        Base("Base difference", DifferenceMode.BaseRotation);
+
+        private final String str;
+        private final DifferenceMode mode;
+
+        DifferenceModeChoice(String s, DifferenceMode m) {
+            str = s;
+            mode = m;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+
+        public DifferenceMode getDiffMode() {
+            return mode;
+        }
+    }
 
     private final JPanel topPanel = new JPanel(new GridBagLayout());
 
@@ -64,15 +85,10 @@ public class RunningDifferencePanel {
         downloadButton.setFocusPainted(false);
         downloadButton.setContentAreaFilled(false);
 
-        JComboBox<String> comboBox = new JComboBox<>(combolist);
+        JComboBox<DifferenceModeChoice> comboBox = new JComboBox<>(DifferenceModeChoice.values());
         comboBox.addActionListener(e -> {
-            if (comboBox.getSelectedItem().equals(combolist[0])) {
-                setDifferenceMode(DifferenceMode.None);
-            } else if (comboBox.getSelectedItem().equals(combolist[1])) {
-                setDifferenceMode(DifferenceMode.RunningRotation);
-            } else if (comboBox.getSelectedItem().equals(combolist[2])) {
-                setDifferenceMode(DifferenceMode.Base);
-            }
+            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(((DifferenceModeChoice) comboBox.getSelectedItem()).getDiffMode());
+            Displayer.display();
         });
 
         GridBagConstraints c = new GridBagConstraints();
@@ -90,11 +106,6 @@ public class RunningDifferencePanel {
         topPanel.add(metaButton, c);
         c.gridx = 2;
         topPanel.add(downloadButton, c);
-    }
-
-    private void setDifferenceMode(DifferenceMode diffMode) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(diffMode);
-        Displayer.display();
     }
 
     public Component getComponent() {
