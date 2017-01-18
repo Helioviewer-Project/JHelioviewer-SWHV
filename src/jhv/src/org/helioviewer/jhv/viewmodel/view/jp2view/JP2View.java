@@ -391,8 +391,10 @@ public class JP2View extends AbstractView {
         data.setViewpoint(params.viewpoint);
         data.setRegion(m.roiToRegion(params.subImage, params.resolution.factorX, params.resolution.factorY));
 
-        if (dataHandler != null)
-            EventQueue.invokeLater(() -> dataHandler.handleData(data));
+        EventQueue.invokeLater(() -> {
+            if (dataHandler != null)
+                dataHandler.handleData(data);
+        });
     }
 
     KakaduEngine getRenderEngine(Kdu_thread_env threadEnv) throws KduException, IOException {
