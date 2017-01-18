@@ -371,9 +371,12 @@ public class JP2View extends AbstractView {
     }
 
     void signalRenderFromReader(ImageParams params) {
-        if (isAbolished || params.frame != targetFrame)
+        if (isAbolished)
             return;
-        EventQueue.invokeLater(() -> executor.execute(this, params, false));
+        EventQueue.invokeLater(() -> {
+            if (params.frame == targetFrame)
+                executor.execute(this, params, false);
+        });
     }
 
     void setDataFromRender(ImageParams params, ImageData data) {
