@@ -13,24 +13,21 @@ import org.helioviewer.jhv.layers.ImageLayerOptions;
 
 public class ContrastPanel implements ChangeListener, FilterDetails {
 
-    private final JSlider contrastSlider;
-    private final JLabel contrastLabel;
+    private final JSlider slider;
+    private final JLabel label;
     private final int STEP = 10;
 
     public ContrastPanel() {
-        contrastLabel = new JLabel("1.0");
-        contrastSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
-        contrastSlider.setMinorTickSpacing(STEP);
-        contrastSlider.setSnapToTicks(true);
-        contrastSlider.addChangeListener(this);
-        WheelSupport.installMouseWheelSupport(contrastSlider);
+        slider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
+        label = new JLabel(String.format("%3d%%", slider.getValue()), JLabel.RIGHT);
+        slider.addChangeListener(this);
+        WheelSupport.installMouseWheelSupport(slider);
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        float contrast = 0.1f * (contrastSlider.getValue() / STEP);
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setContrast(contrast);
-        contrastLabel.setText(String.format("%.1f", contrast));
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setContrast(slider.getValue() / 100f);
+        label.setText(String.format("%3d%%", slider.getValue()));
         Displayer.display();
     }
 
@@ -41,12 +38,12 @@ public class ContrastPanel implements ChangeListener, FilterDetails {
 
     @Override
     public Component getComponent() {
-        return contrastSlider;
+        return slider;
     }
 
     @Override
     public Component getLabel() {
-        return contrastLabel;
+        return label;
     }
 
 }

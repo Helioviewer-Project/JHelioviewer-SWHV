@@ -13,26 +13,26 @@ import org.helioviewer.jhv.layers.ImageLayerOptions;
 
 public class OpacityPanel implements ChangeListener, FilterDetails {
 
-    private final JSlider opacitySlider;
-    private final JLabel opacityLabel;
+    private final JSlider slider;
+    private final JLabel label;
 
     public OpacityPanel() {
-        opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
-        opacityLabel = new JLabel(opacitySlider.getValue() + "%");
-        opacitySlider.addChangeListener(this);
-        WheelSupport.installMouseWheelSupport(opacitySlider);
+        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+        label = new JLabel(String.format("%3d%%", slider.getValue()), JLabel.RIGHT);
+        slider.addChangeListener(this);
+        WheelSupport.installMouseWheelSupport(slider);
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setOpacity(opacitySlider.getValue() / 100f);
-        opacityLabel.setText(opacitySlider.getValue() + "%");
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setOpacity(slider.getValue() / 100f);
+        label.setText(String.format("%3d%%", slider.getValue()));
         Displayer.display();
     }
 
     // opacity must be within [0, 1]
     public void setValue(float opacity) {
-        opacitySlider.setValue((int) (opacity * 100f));
+        slider.setValue((int) (opacity * 100f));
     }
 
     @Override
@@ -42,12 +42,12 @@ public class OpacityPanel implements ChangeListener, FilterDetails {
 
     @Override
     public Component getComponent() {
-        return opacitySlider;
+        return slider;
     }
 
     @Override
     public Component getLabel() {
-        return opacityLabel;
+        return label;
     }
 
 }
