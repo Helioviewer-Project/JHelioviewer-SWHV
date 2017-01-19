@@ -45,6 +45,14 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
+
+        retrieveResponse();
+    }
+
+    private void retrieveResponse() {
+        if (instrument.equals("AIA")) {
+            responseFactor = AIAResponse.get(viewpoint.time.toString().substring(0, 10), measurement);
+        }
     }
 
     // magic
