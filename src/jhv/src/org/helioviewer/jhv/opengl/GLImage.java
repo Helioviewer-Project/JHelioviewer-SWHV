@@ -57,7 +57,7 @@ public class GLImage {
         applyRegion(imageData, prevImageData, baseImageData, shader);
 
         shader.colorMask = colorMask;
-        shader.setBrightness(brightness * imageData.getMetaData().getBrightnessFactor());
+        shader.setBrightness((float) (brightness * imageData.getMetaData().getResponseFactor()));
         shader.setContrast(contrast);
         shader.setAlpha(opacity);
         shader.setEnhanced(gl, enhanced);
