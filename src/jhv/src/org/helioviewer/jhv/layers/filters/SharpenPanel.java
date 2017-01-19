@@ -13,20 +13,20 @@ import org.helioviewer.jhv.layers.ImageLayerOptions;
 
 public class SharpenPanel implements ChangeListener, FilterDetails {
 
-    private final JSlider sharpeningSlider;
-    private final JLabel sharpeningLabel;
+    private final JSlider slider;
+    private final JLabel label;
 
     public SharpenPanel() {
-        sharpeningLabel = new JLabel("0%");
-        sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-        sharpeningSlider.addChangeListener(this);
-        WheelSupport.installMouseWheelSupport(sharpeningSlider);
+        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
+        label = new JLabel(String.format("%3d%%", slider.getValue()), JLabel.RIGHT);
+        slider.addChangeListener(this);
+        WheelSupport.installMouseWheelSupport(slider);
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setSharpen(sharpeningSlider.getValue() / 10.f);
-        sharpeningLabel.setText(sharpeningSlider.getValue() + "%");
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setSharpen(slider.getValue() / 10f);
+        label.setText(String.format("%3d%%", slider.getValue()));
         Displayer.display();
     }
 
@@ -37,12 +37,12 @@ public class SharpenPanel implements ChangeListener, FilterDetails {
 
     @Override
     public Component getComponent() {
-        return sharpeningSlider;
+        return slider;
     }
 
     @Override
     public Component getLabel() {
-        return sharpeningLabel;
+        return label;
     }
 
 }
