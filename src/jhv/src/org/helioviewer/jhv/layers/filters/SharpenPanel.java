@@ -18,7 +18,7 @@ public class SharpenPanel implements ChangeListener, FilterDetails {
 
     public SharpenPanel() {
         slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-        label = new JLabel(String.format("%3d%%", slider.getValue()), JLabel.RIGHT);
+        label = new JLabel(BrightnessPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(slider);
     }
@@ -26,7 +26,7 @@ public class SharpenPanel implements ChangeListener, FilterDetails {
     @Override
     public void stateChanged(ChangeEvent e) {
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setSharpen(slider.getValue() / 10f);
-        label.setText(String.format("%3d%%", slider.getValue()));
+        label.setText(BrightnessPanel.align3(slider.getValue()));
         Displayer.display();
     }
 

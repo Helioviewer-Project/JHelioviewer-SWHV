@@ -21,9 +21,17 @@ public class BrightnessPanel implements ChangeListener, FilterDetails {
     private final JLabel label;
     private final JPanel buttonPanel;
 
+    static String align3(int value) {
+        if (value < 10)
+            return "\u2007\u2007" + value + "%";
+        if (value < 100)
+            return "\u2007" + value + "%";
+        return value + "%";
+    }
+
     public BrightnessPanel() {
         slider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
-        label = new JLabel(String.format("%3d%%", slider.getValue()), JLabel.RIGHT);
+        label = new JLabel(BrightnessPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(slider);
 
@@ -46,7 +54,7 @@ public class BrightnessPanel implements ChangeListener, FilterDetails {
     @Override
     public void stateChanged(ChangeEvent e) {
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBrightness(slider.getValue() / 100f);
-        label.setText(String.format("%3d%%", slider.getValue()));
+        label.setText(BrightnessPanel.align3(slider.getValue()));
         Displayer.display();
     }
 
