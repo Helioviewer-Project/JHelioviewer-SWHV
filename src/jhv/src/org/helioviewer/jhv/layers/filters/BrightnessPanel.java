@@ -20,11 +20,14 @@ public class BrightnessPanel implements ChangeListener, FilterDetails {
     private final JSlider brightnessSlider;
     private final JLabel brightnessLabel;
     private final JPanel buttonPanel;
+    private final int STEP = 10;
 
     public BrightnessPanel() {
         brightnessLabel = new JLabel("1.0");
         brightnessSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
         brightnessSlider.addChangeListener(this);
+        brightnessSlider.setMinorTickSpacing(STEP);
+        brightnessSlider.setSnapToTicks(true);
         WheelSupport.installMouseWheelSupport(brightnessSlider);
 
         JButton autoButton = new JButton("Auto");
@@ -45,7 +48,7 @@ public class BrightnessPanel implements ChangeListener, FilterDetails {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        float brightness = 0.1f * (brightnessSlider.getValue() / 10);
+        float brightness = 0.1f * (brightnessSlider.getValue() / STEP);
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBrightness(brightness);
         brightnessLabel.setText(String.format("%.1f", brightness));
         Displayer.display();

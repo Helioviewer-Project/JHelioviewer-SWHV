@@ -15,17 +15,20 @@ public class ContrastPanel implements ChangeListener, FilterDetails {
 
     private final JSlider contrastSlider;
     private final JLabel contrastLabel;
+    private final int STEP = 10;
 
     public ContrastPanel() {
         contrastLabel = new JLabel("1.0");
         contrastSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
+        contrastSlider.setMinorTickSpacing(STEP);
+        contrastSlider.setSnapToTicks(true);
         contrastSlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(contrastSlider);
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        float contrast = 0.1f * (contrastSlider.getValue() / 10);
+        float contrast = 0.1f * (contrastSlider.getValue() / STEP);
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setContrast(contrast);
         contrastLabel.setText(String.format("%.1f", contrast));
         Displayer.display();
