@@ -12,7 +12,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     int pixelWidth;
     int pixelHeight;
-    final float brightnessFactor = 1; // tbd
+    double responseFactor = 1;
 
     Position.L viewpointL = Sun.EpochEarthL;
     Position.Q viewpoint = Sun.EpochEarthQ;
@@ -44,8 +44,8 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public float getBrightnessFactor() {
-        return brightnessFactor;
+    public double getResponseFactor() {
+        return responseFactor;
     }
 
     @Override
