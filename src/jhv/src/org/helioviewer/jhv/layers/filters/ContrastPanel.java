@@ -19,7 +19,7 @@ public class ContrastPanel implements ChangeListener, FilterDetails {
 
     public ContrastPanel() {
         slider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
-        label = new JLabel(String.format("%3d%%", slider.getValue()), JLabel.RIGHT);
+        label = new JLabel(BrightnessPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(slider);
     }
@@ -27,7 +27,7 @@ public class ContrastPanel implements ChangeListener, FilterDetails {
     @Override
     public void stateChanged(ChangeEvent e) {
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setContrast(slider.getValue() / 100f);
-        label.setText(String.format("%3d%%", slider.getValue()));
+        label.setText(BrightnessPanel.align3(slider.getValue()));
         Displayer.display();
     }
 
