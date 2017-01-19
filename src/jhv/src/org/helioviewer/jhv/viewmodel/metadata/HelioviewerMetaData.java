@@ -158,7 +158,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
         // DATE-OBS unusable for MDI and early EIT
         if (instrument.equals("MDI") || instrument.equals("EIT")) {
-            observedDate = m.get("DATE_OBS").replace("Z", "");
+            observedDate = m.get("DATE_OBS");
         } else {
             observedDate = m.get("DATE-OBS");
             if (observedDate == null) {
@@ -166,12 +166,10 @@ public class HelioviewerMetaData extends AbstractMetaData {
                 if (observedDate != null) {
                     if (instrument.equals("LASCO"))
                         observedDate = observedDate.replace('/', '-') + 'T' + m.get("TIME_OBS");
-                    else if (instrument.equals("HMI"))
-                        observedDate = observedDate.replace("Z", "");
                 }
             }
         }
-        return observedDate == null ? TimeUtils.EPOCH : new JHVDate(observedDate);
+        return observedDate == null ? TimeUtils.EPOCH : new JHVDate(observedDate.substring(0, 19)); // truncate
     }
 
     private void retrievePosition(MetaDataContainer m, JHVDate dateObs) {
