@@ -42,14 +42,6 @@ public class DownloadStream {
     private final URL url;
     private final boolean ignore400;
 
-    static {
-        try {
-            SSLCert.addRootCA("DST_Root_CA_X3.pem");
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
     private DownloadStream(URL _url, int _connectTimeout, int _readTimeout, boolean _ignore400) {
         url = _url;
         readTimeout = _readTimeout;
