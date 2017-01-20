@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 class AIAResponse {
 
-    private static final String extPath = "https://github.com/mjpauly/aia/blob/master/";
+    private static final String extPath = "https://raw.githubusercontent.com/mjpauly/aia/master/";
     private static final String intPath = "/data/";
     private static final String dataFile = "aia_rescaling_data.json";
 
@@ -26,7 +26,7 @@ class AIAResponse {
         return new URL(extPath + dataFile);
     }
 
-    private static URL getInternalURL() throws MalformedURLException {
+    private static URL getInternalURL() {
         return FileUtils.getResourceUrl(intPath + dataFile);
     }
 
@@ -57,7 +57,7 @@ class AIAResponse {
             else if (firstDate.compareTo(date) > 0)
                 date = firstDate;
 
-            String key = pass + "_filtered";
+            String key = pass; //+ "_filtered";
             if (!referenceData.has(key) || !responseData.getJSONObject(date).has(key)) // exception if date missing
                 return 1;
 
