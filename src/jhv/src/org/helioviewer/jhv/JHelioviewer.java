@@ -19,6 +19,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.LoadStartup;
+import org.helioviewer.jhv.viewmodel.metadata.AIAResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
 // Main
@@ -78,10 +79,15 @@ public class JHelioviewer {
         FileUtils.deleteDir(JHVDirectory.PLUGINSCACHE.getFile());
         JHVDirectory.PLUGINSCACHE.getFile().mkdirs();
 
+        ProxySettings.init();
+        try {
+            AIAResponse.load();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         EventQueue.invokeLater(() -> {
             UIGlobals.setUIFont(UIGlobals.UIFont);
-
-            ProxySettings.init();
 
             Log.info("Start main window");
             ExitHooks.attach();
@@ -97,8 +103,8 @@ public class JHelioviewer {
                     JHVLoader.loadBundledPlugin("SWEKPlugin.jar");
                     JHVLoader.loadBundledPlugin("PfssPlugin.jar");
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             // after loading plugins fix the minimum width of left pane

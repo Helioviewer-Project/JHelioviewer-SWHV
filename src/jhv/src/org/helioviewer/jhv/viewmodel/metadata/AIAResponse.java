@@ -10,13 +10,13 @@ import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.json.JSONObject;
 
-class AIAResponse {
+public class AIAResponse {
 
     private static final String extPath = "https://raw.githubusercontent.com/mjpauly/aia/master/";
     private static final String intPath = "/data/";
     private static final String dataFile = "aia_rescaling_data.json";
 
-    private static volatile boolean loaded;
+    private static boolean loaded;
     private static JSONObject responseData;
     private static JSONObject referenceData;
     private static String firstDate;
@@ -34,7 +34,7 @@ class AIAResponse {
         return JSONUtils.getJSONStream(new DownloadStream(url).getInput());
     }
 
-    private static void load() throws Exception {
+    public static void load() throws Exception {
         JSONObject data = getResponseData(getInternalURL());
         String[] keys = JSONObject.getNames(data);
         Arrays.sort(keys);
@@ -43,15 +43,14 @@ class AIAResponse {
         lastDate = keys[keys.length - 1];
         responseData = data;
         referenceData = data.getJSONObject("2010-05-01");
+        loaded = true;
     }
 
     static double get(String date, String pass) {
-        try {
-            if (!loaded) {
-                load();
-                loaded = true;
-            }
+        if (!loaded)
+            return 1;
 
+        try {
             if (lastDate.compareTo(date) < 0)
                 date = lastDate;
             else if (firstDate.compareTo(date) > 0)
