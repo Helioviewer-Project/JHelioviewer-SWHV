@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -37,7 +38,8 @@ public class LUTPanel implements ActionListener, FilterDetails {
     public LUTPanel() {
         lutMap = LUT.copyMap(); // duplicate
 
-        combobox = new JComboBox<>(lutMap.keySet().stream().toArray(String[]::new));
+        Set<String> set = lutMap.keySet();
+        combobox = new JComboBox<>(set.toArray(new String[set.size()]));
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
         combobox.addActionListener(this);
