@@ -74,7 +74,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     private final JButton closeButton = new JButton("Close");
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
-    private final DefaultTableModel fitsModel = new LocalTableModel(null, new Object[] { "FITS Key", "value" });
+    private final DefaultTableModel fitsModel = new LocalTableModel(null, new Object[] { "FITS Keyword", "Value" });
     private final DefaultListModel<String> jhList = new DefaultListModel<>();
     private final DefaultListModel<String> basicList = new DefaultListModel<>();
 
@@ -214,14 +214,13 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         if (!(metaData instanceof HelioviewerMetaData)) {
             metaDataOK = false;
             resetData();
-            addDataItem("Error: No metadata is available.", basicList);
+            addDataItem("Error: No metadata is available", basicList);
         } else {
             HelioviewerMetaData m = (HelioviewerMetaData) metaData;
             metaDataOK = true;
             resetData();
-            addDataItem("-------------------------------", basicList);
-            addDataItem("       Basic Information       ", basicList);
-            addDataItem("-------------------------------", basicList);
+            addDataItem("Basic Information", basicList);
+            addDataItem("-----------------", basicList);
             addDataItem("Observatory: " + m.getObservatory(), basicList);
             addDataItem("Instrument: " + m.getInstrument(), basicList);
             addDataItem("Detector: " + m.getDetector(), basicList);
@@ -282,9 +281,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
                 break;
             case "helioviewer":
                 lastNodeSeen = nodeName;
-                addDataItem("-------------------------------", jhList);
-                addDataItem("      Helioviewer Header", jhList);
-                addDataItem("-------------------------------", jhList);
+                addDataItem("Helioviewer Header", jhList);
+                addDataItem("------------------", jhList);
                 break;
             default:
                 addDataItem(nodeName, nodeValue, lastNodeSeen.equals("fits"));

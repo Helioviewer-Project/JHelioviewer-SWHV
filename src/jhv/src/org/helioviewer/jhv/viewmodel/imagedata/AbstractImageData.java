@@ -130,18 +130,17 @@ public abstract class AbstractImageData implements ImageData {
                 break;
             }
         }
+        if (j == 0)
+            return 1;
 
         double factor = BRIGHTNESS_F2 / j;
         // System.out.println(">> " + factor + " " + j);
-        if (j != 0) {
-            factor /= metaData.getResponseFactor();
-            if (factor > 2)
-                factor = 2;
-            else if (factor < 0.5)
-                factor = 0.5;
-            return factor;
-        }
-        return 1;
+        factor /= metaData.getResponseFactor();
+        if (factor > 2)
+            factor = 2;
+        else if (factor < 0.5)
+            factor = 0.5;
+        return factor;
     }
 
     private static int getUnsigned(byte b) {

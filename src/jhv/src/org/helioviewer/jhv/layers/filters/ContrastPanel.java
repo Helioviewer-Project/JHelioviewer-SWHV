@@ -15,7 +15,6 @@ public class ContrastPanel implements ChangeListener, FilterDetails {
 
     private final JSlider slider;
     private final JLabel label;
-    private final int STEP = 10;
 
     public ContrastPanel() {
         slider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
