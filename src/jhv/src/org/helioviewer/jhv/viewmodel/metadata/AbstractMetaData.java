@@ -3,6 +3,7 @@ package org.helioviewer.jhv.viewmodel.metadata;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 
 public abstract class AbstractMetaData implements MetaData {
@@ -76,6 +77,11 @@ public abstract class AbstractMetaData implements MetaData {
     @Override
     public Vec3 getCutOffDirection() {
         return cutOffDirection;
+    }
+
+    @Override
+    public Quat getCenterRotation() {
+        return viewpoint.orientation;
     }
 
 }

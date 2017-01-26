@@ -29,6 +29,13 @@ public class HelioviewerMetaData extends AbstractMetaData {
     private double sunPositionX = 0;
     private double sunPositionY = 0;
 
+    private Quat centerRotation;
+
+    @Override
+    public Quat getCenterRotation() {
+        return centerRotation;
+    }
+
     public HelioviewerMetaData(MetaDataContainer m, int frame) {
         frameNumber = frame;
 
@@ -41,6 +48,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
         fullName = fullName.intern();
 
         retrievePosition(m, retrieveDateTime(m));
+        centerRotation = retrieveCenterRotation(m);
         retrievePixelParameters(m);
 
         retrieveOcculterRadii(m);
@@ -211,6 +219,20 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
         viewpoint = new Position.Q(dateObs, distanceObs, new Quat(theta, phi));
         viewpointL = new Position.L(dateObs, distanceObs, phi, theta);
+    }
+
+    private Quat retrieveCenterRotation(MetaDataContainer m) {
+        if (instrument.equals("AIA")) {
+            double crota = m.tryGetDouble("CROTA");
+            if (crota == 0) {
+                crota = m.tryGetDouble("CROTA1");
+                if (crota == 0)
+                    crota = m.tryGetDouble("CROTA2");
+            }
+            if (!Double.isNaN(crota))
+                return Quat.rotate(Quat.createRotation(-crota / MathUtils.radeg, new Vec3(0, 0, 1)), viewpoint.orientation);
+        }
+        return viewpoint.orientation;
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
