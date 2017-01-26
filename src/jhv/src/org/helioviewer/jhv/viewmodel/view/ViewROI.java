@@ -53,7 +53,7 @@ public class ViewROI {
             }
 
             Quat cameraRotation = camera.getRotation();
-            Quat imageRotation = m.getViewpoint().orientation;
+            Quat imageRotation = m.getCenterRotation();
 
             Quat camDiff = Quat.rotateWithConjugate(cameraRotation, imageRotation);
             for (int i = 0; i < pointlist.length; i++) {
