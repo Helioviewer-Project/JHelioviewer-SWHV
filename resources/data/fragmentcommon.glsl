@@ -62,11 +62,11 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
 
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
 
-    float hiLevel = levels.y;
+    float scale = levels.y;
     if (enhanced == 1) {
-        hiLevel *= factor;
+        scale *= factor;
     }
-    color.r = hiLevel * color.r + levels.x;
+    color.r = scale * color.r + levels.x;
 
     color.rgb = texture1D(lut, color.r).rgb;
     color.a = alpha;

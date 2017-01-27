@@ -199,9 +199,9 @@ public class GLSLSolarShader extends GLSLShader {
         alphaParamFloat[0] = alpha;
     }
 
-    public void setLevels(float loLevel, float hiLevel) {
-        levelsParamFloat[0] = loLevel;
-        levelsParamFloat[1] = hiLevel;
+    public void setLevels(float offset, float scale) {
+        levelsParamFloat[0] = offset;
+        levelsParamFloat[1] = scale;
     }
 
     public void setFactors(float weighting, float pixelWidth, float pixelHeight, float span) {
