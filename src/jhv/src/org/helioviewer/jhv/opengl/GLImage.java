@@ -23,7 +23,7 @@ public class GLImage {
     private GLTexture diffTex;
 
     private float brightness = 1f;
-    private float contrast = 1f;
+    private float contrast = 0f;
     private float opacity = 1f;
     private float sharpen = 0f;
     private boolean enhanced = false;
