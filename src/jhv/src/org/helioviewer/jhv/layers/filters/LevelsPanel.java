@@ -45,7 +45,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
         slider = new RangeSlider(-100, 200, 0, 100);
         slider.setRangeDraggable(true);
         slider.addChangeListener(this);
-//        WheelSupport.installMouseWheelSupport(slider);
+        WheelSupport.installMouseWheelSupport(slider);
 
         label = new JLabel(format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
         label.setMinimumSize(new JLabel(format(-100, -100)).getPreferredSize());
@@ -58,6 +58,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
         autoButton.setToolTipText("Auto brightness");
         autoButton.addActionListener(e -> {
             double auto = ((ImageLayerOptions) getComponent().getParent()).getAutoBrightness();
+            slider.setLowValue(0);
             slider.setHighValue((int) (auto * 100));
         });
 
