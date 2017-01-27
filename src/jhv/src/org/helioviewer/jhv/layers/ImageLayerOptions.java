@@ -49,8 +49,8 @@ public class ImageLayerOptions extends SmallPanel {
         c.gridy++;
         addToGridBag(c, sharpenPanel);
         c.gridy++;
-        addToGridBag(c, contrastPanel);
-        c.gridy++;
+//        addToGridBag(c, contrastPanel);
+//        c.gridy++;
         addToGridBag(c, brightnessPanel);
         c.gridy++;
         addToGridBag(c, lutPanel);
