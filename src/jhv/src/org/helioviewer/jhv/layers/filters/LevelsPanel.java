@@ -3,11 +3,8 @@ package org.helioviewer.jhv.layers.filters;
 import java.awt.BorderLayout;
 import java.awt.Component;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -15,6 +12,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 
+import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.RangeSlider;
 
 public class LevelsPanel implements ChangeListener, FilterDetails {
@@ -48,13 +46,9 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
         WheelSupport.installMouseWheelSupport(slider);
 
         label = new JLabel(format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
-        label.setMinimumSize(new JLabel(format(-100, -100)).getPreferredSize());
+        // label.setMinimumSize(new JLabel(format(-100, -100)).getPreferredSize());
 
-        JButton autoButton = new JButton("Auto");
-        autoButton.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
-        autoButton.setBorderPainted(false);
-        autoButton.setFocusPainted(false);
-        autoButton.setContentAreaFilled(false);
+        JideButton autoButton = new JideButton("Auto");
         autoButton.setToolTipText("Auto brightness");
         autoButton.addActionListener(e -> {
             double auto = ((ImageLayerOptions) getComponent().getParent()).getAutoBrightness();

@@ -29,7 +29,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
     private double sunPositionX = 0;
     private double sunPositionY = 0;
 
-    private Quat centerRotation;
+    private final Quat centerRotation;
 
     @Override
     public Quat getCenterRotation() {

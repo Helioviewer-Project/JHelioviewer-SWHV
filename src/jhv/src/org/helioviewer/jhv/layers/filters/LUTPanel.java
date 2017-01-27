@@ -6,14 +6,10 @@ import java.awt.event.ActionListener;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.border.Border;
-import javax.swing.border.BevelBorder;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Displayer;
@@ -21,19 +17,19 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 
+import com.jidesoft.swing.JideToggleButton;
+
 public class LUTPanel implements ActionListener, FilterDetails {
 
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
     private static final Icon enhanceIcon = IconBank.getIcon(JHVIcon.LAYER_IMAGE);
-    private static final Border loweredBorder = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
-    private static final Border raisedBorder = BorderFactory.createBevelBorder(BevelBorder.RAISED);
 
     private final Map<String, LUT> lutMap;
 
     private final JComboBox<String> combobox;
     private final JPanel buttonPanel;
-    private final JToggleButton invertButton;
-    private final JToggleButton enhanceButton;
+    private final JideToggleButton invertButton;
+    private final JideToggleButton enhanceButton;
 
     public LUTPanel() {
         lutMap = LUT.copyMap(); // duplicate
@@ -44,14 +40,12 @@ public class LUTPanel implements ActionListener, FilterDetails {
         combobox.setToolTipText("Choose a color table");
         combobox.addActionListener(this);
 
-        invertButton = new JToggleButton(invertIcon);
+        invertButton = new JideToggleButton(invertIcon);
         invertButton.setToolTipText("Invert color table");
-        invertButton.setBorder(raisedBorder);
         invertButton.addActionListener(this);
 
-        enhanceButton = new JToggleButton(enhanceIcon);
+        enhanceButton = new JideToggleButton(enhanceIcon);
         enhanceButton.setToolTipText("Enhance off-disk corona");
-        enhanceButton.setBorder(raisedBorder);
         enhanceButton.addActionListener(this);
 
         buttonPanel = new JPanel();
@@ -61,16 +55,9 @@ public class LUTPanel implements ActionListener, FilterDetails {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == invertButton) {
-            invertButton.setBorder(invertButton.isSelected() ? loweredBorder : raisedBorder);
-        } else if (e.getSource() == enhanceButton) {
-            boolean isSelected = enhanceButton.isSelected();
-            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setEnhanced(isSelected);
-            enhanceButton.setBorder(isSelected ? loweredBorder : raisedBorder);
-        }
-
         LUT newMap = lutMap.get(combobox.getSelectedItem());
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLUT(newMap, invertButton.isSelected());
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setEnhanced(enhanceButton.isSelected());
         Displayer.display();
     }
 
