@@ -18,7 +18,7 @@ public class OpacityPanel implements ChangeListener, FilterDetails {
 
     public OpacityPanel() {
         slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
-        label = new JLabel(BrightnessPanel.align3(slider.getValue()), JLabel.RIGHT);
+        label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(slider);
     }
@@ -26,7 +26,7 @@ public class OpacityPanel implements ChangeListener, FilterDetails {
     @Override
     public void stateChanged(ChangeEvent e) {
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setOpacity(slider.getValue() / 100f);
-        label.setText(BrightnessPanel.align3(slider.getValue()));
+        label.setText(LevelsPanel.align3(slider.getValue()));
         Displayer.display();
     }
 

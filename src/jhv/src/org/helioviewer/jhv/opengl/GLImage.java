@@ -22,10 +22,10 @@ public class GLImage {
     private GLTexture lutTex;
     private GLTexture diffTex;
 
-    private float brightness = 1f;
-    private float contrast = 0f;
-    private float opacity = 1f;
-    private float sharpen = 0f;
+    private float loLevel = 0;
+    private float hiLevel = 1;
+    private float opacity = 1;
+    private float sharpen = 0;
     private boolean enhanced = false;
     private ColorMask colorMask = new ColorMask(true, true, true);
     private DifferenceMode diffMode = DifferenceMode.None;
@@ -57,8 +57,7 @@ public class GLImage {
         applyRegion(imageData, prevImageData, baseImageData, shader);
 
         shader.colorMask = colorMask;
-        shader.setBrightness((float) (brightness * imageData.getMetaData().getResponseFactor()));
-        shader.setContrast(contrast);
+        shader.setLevels(loLevel, (float) (hiLevel * imageData.getMetaData().getResponseFactor()));
         shader.setAlpha(opacity);
         shader.setEnhanced(gl, enhanced);
         shader.setIsDifference(diffMode.ordinal());
@@ -154,12 +153,9 @@ public class GLImage {
             diffTex.delete(gl);
     }
 
-    public void setBrightness(float _brightness) {
-        brightness = _brightness;
-    }
-
-    public void setContrast(float _contrast) {
-        contrast = _contrast;
+    public void setLevels(float _loLevel, float _hiLevel) {
+        loLevel = _loLevel;
+        hiLevel = _hiLevel;
     }
 
     public void setOpacity(float _opacity) {
