@@ -17,7 +17,7 @@ import org.helioviewer.jhv.layers.ImageLayerOptions;
 
 import com.jidesoft.swing.RangeSlider;
 
-public class BrightnessPanel implements ChangeListener, FilterDetails {
+public class LevelsPanel implements ChangeListener, FilterDetails {
 
     private final RangeSlider slider;
     private final JLabel label;
@@ -38,10 +38,10 @@ public class BrightnessPanel implements ChangeListener, FilterDetails {
     }
 
     private String format(int low, int high) {
-        return "<html>" + BrightnessPanel.align3(low) + "<br>" + BrightnessPanel.align3(high);
+        return "<html>" + align3(low) + "<br>" + align3(high);
     }
 
-    public BrightnessPanel() {
+    public LevelsPanel() {
         slider = new RangeSlider(-100, 200, 0, 100);
         slider.setRangeDraggable(true);
         slider.addChangeListener(this);
@@ -68,8 +68,7 @@ public class BrightnessPanel implements ChangeListener, FilterDetails {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setContrast(slider.getLowValue() / 100f);
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBrightness(slider.getHighValue() / 100f);
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLevels(slider.getLowValue() / 100f, slider.getHighValue() / 100f);
         label.setText(format(slider.getLowValue(), slider.getHighValue()));
         Displayer.display();
     }

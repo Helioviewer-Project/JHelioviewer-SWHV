@@ -17,11 +17,10 @@ public class GLSLSolarShader extends GLSLShader {
     private int isDiscRef;
 
     private int pixelSizeWeightingRef;
-    private int contrastParamRef;
     private int hgltParamRef;
     private int hglnParamRef;
 
-    private int brightnessParamRef;
+    private int levelsParamRef;
     private int alphaParamRef;
     private int cutOffRadiusRef;
     private int outerCutOffRadiusRef;
@@ -45,8 +44,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] sharpenParamFloat = new float[3];
     private final float[] hgltParamFloat = new float[1];
     private final float[] hglnParamFloat = new float[1];
-    private final float[] contrastParamFloat = new float[1];
-    private final float[] brightnessParamFloat = new float[1];
+    private final float[] levelsParamFloat = new float[2];
     private final float[] alphaParamFloat = new float[1];
     private final float[] cutOffRadiusFloat = new float[1];
     private final float[] outerCutOffRadiusFloat = new float[1];
@@ -80,12 +78,11 @@ public class GLSLSolarShader extends GLSLShader {
         isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
 
         pixelSizeWeightingRef = gl.glGetUniformLocation(progID, "pixelSizeWeighting");
-        contrastParamRef = gl.glGetUniformLocation(progID, "contrast");
         hgltParamRef = gl.glGetUniformLocation(progID, "hglt");
         hglnParamRef = gl.glGetUniformLocation(progID, "hgln");
         polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
 
-        brightnessParamRef = gl.glGetUniformLocation(progID, "brightness");
+        levelsParamRef = gl.glGetUniformLocation(progID, "levels");
         alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
         cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
         outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
@@ -167,12 +164,11 @@ public class GLSLSolarShader extends GLSLShader {
 
     public void filter(GL2 gl) {
         gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
-        gl.glUniform1fv(brightnessParamRef, 1, brightnessParamFloat, 0);
         gl.glUniform1iv(isDifferenceValueRef, 1, isDifferenceValue, 0);
         gl.glUniform1fv(hgltParamRef, 1, hgltParamFloat, 0);
         gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
 
-        gl.glUniform1fv(contrastParamRef, 1, contrastParamFloat, 0);
+        gl.glUniform2fv(levelsParamRef, 1, levelsParamFloat, 0);
         gl.glUniform1fv(alphaParamRef, 1, alphaParamFloat, 0);
         gl.glUniform3fv(pixelSizeWeightingRef, 1, sharpenParamFloat, 0);
         gl.glUniform4fv(rectRef, 1, rectVertex, 0);
@@ -203,12 +199,9 @@ public class GLSLSolarShader extends GLSLShader {
         alphaParamFloat[0] = alpha;
     }
 
-    public void setBrightness(float brightness) {
-        brightnessParamFloat[0] = brightness;
-    }
-
-    public void setContrast(float contrast) {
-        contrastParamFloat[0] = contrast;
+    public void setLevels(float loLevel, float hiLevel) {
+        levelsParamFloat[0] = loLevel;
+        levelsParamFloat[1] = hiLevel;
     }
 
     public void setFactors(float weighting, float pixelWidth, float pixelHeight, float span) {
