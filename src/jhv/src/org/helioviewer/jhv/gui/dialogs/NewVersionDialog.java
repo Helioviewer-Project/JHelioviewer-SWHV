@@ -63,9 +63,8 @@ public class NewVersionDialog extends JDialog implements ShowableDialog {
         closeButtonContainer.add(downloadButton);
         add(closeButtonContainer, BorderLayout.SOUTH);
 
-        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(downloadButton);
-        getRootPane().setFocusable(true);
+        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     public void init(String message) {

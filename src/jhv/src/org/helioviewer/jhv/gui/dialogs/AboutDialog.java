@@ -26,7 +26,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
-// Dialog that is used to display information about the program, including version and contact information
 @SuppressWarnings("serial")
 public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkListener {
 
