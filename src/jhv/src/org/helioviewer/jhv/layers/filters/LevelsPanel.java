@@ -65,7 +65,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
     public void stateChanged(ChangeEvent e) {
         int lo = slider.getLowValue();
         int hi = slider.getHighValue();
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLevels(lo / 100f, (hi - lo) / 100f);
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBrightness(lo / 100f, (hi - lo) / 100f);
         label.setText(format(lo, hi));
         Displayer.display();
     }

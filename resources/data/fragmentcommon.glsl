@@ -18,7 +18,7 @@ uniform vec3 pixelSizeWeighting;
 uniform vec4 rect;
 uniform vec4 differencerect;
 uniform sampler1D lut;
-uniform vec2 levels;
+uniform vec2 brightness;
 uniform float alpha;
 uniform float cutOffRadius;
 uniform float outerCutOffRadius;
@@ -62,11 +62,11 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
 
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
 
-    float scale = levels.y;
+    float scale = brightness.y;
     if (enhanced == 1) {
         scale *= factor;
     }
-    color.r = scale * color.r + levels.x;
+    color.r = scale * color.r + brightness.x;
 
     color.rgb = texture1D(lut, color.r).rgb;
     color.a = alpha;
