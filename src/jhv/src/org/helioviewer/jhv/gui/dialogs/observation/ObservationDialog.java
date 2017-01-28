@@ -84,7 +84,14 @@ public class ObservationDialog extends JDialog {
             }
         });
 
+        pack();
+        Dimension dim = getPreferredSize();
+        if (dim != null) { // satisfy coverity
+            setMinimumSize(dim);
+        }
+
         getRootPane().registerKeyboardAction(e -> cancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().setDefaultButton(btnImages);
     }
 
     // Shows up the dialog and initializes the UI with the given panel.
@@ -100,21 +107,15 @@ public class ObservationDialog extends JDialog {
             btnImages.setText("Change");
         }
 
-        pack();
-        Dimension dim = getPreferredSize();
-        if (dim != null) { // satisfy coverity
-            setMinimumSize(dim);
-            pack();
-        }
 
+        pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-        getRootPane().setDefaultButton(btnImages);
         setVisible(true);
     }
 
     public void loadButtonPressed() {
         if (observationPanel.loadButtonPressed(layer))
-            dispose();
+            setVisible(false);
     }
 
     public void setAvailabilityStatus(boolean status) {
@@ -123,7 +124,7 @@ public class ObservationDialog extends JDialog {
 
     private void cancel() {
         layer.unload();
-        dispose();
+        setVisible(false);
     }
 
 }
