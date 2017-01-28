@@ -140,8 +140,9 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
 
         setMetaData(view);
 
-        getRootPane().setDefaultButton(closeButton);
         getRootPane().registerKeyboardAction(e -> closePressed(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().setDefaultButton(closeButton);
+        getRootPane().setFocusable(true);
     }
 
     private static class WrappedTextCellRenderer extends JTextArea implements ListCellRenderer<Object> {

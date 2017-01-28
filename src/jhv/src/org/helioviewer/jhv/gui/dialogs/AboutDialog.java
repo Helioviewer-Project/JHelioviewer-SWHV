@@ -90,8 +90,9 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
 
         add(new JScrollPane(contentPane));
 
-        getRootPane().setDefaultButton(closeButton);
         getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().setDefaultButton(closeButton);
+        getRootPane().setFocusable(true);
     }
 
     @Override

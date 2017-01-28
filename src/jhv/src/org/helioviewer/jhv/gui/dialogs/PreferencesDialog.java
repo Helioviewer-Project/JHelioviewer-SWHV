@@ -52,7 +52,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         setResizable(false);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
-
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel paramsSubPanel = new JPanel(new BorderLayout());
@@ -74,10 +73,10 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         acceptBtn.addActionListener(e -> {
             saveSettings();
-            dispose();
+            setVisible(false);
         });
 
-        cancelBtn.addActionListener(e -> dispose());
+        cancelBtn.addActionListener(e -> setVisible(false));
 
         if (System.getProperty("jhv.os").equals("windows")) {
             btnPanel.add(acceptBtn);
@@ -88,9 +87,9 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         }
 
         mainPanel.add(btnPanel, BorderLayout.SOUTH);
-
         getContentPane().add(mainPanel);
-        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(acceptBtn);
         getRootPane().setFocusable(true);
     }
@@ -116,9 +115,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      * @return General parameters panel
      */
     private JPanel createParametersPanel() {
-        JPanel paramsPanel = new JPanel();
+        JPanel paramsPanel = new JPanel(new GridLayout(0, 1));
         paramsPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        paramsPanel.setLayout(new GridLayout(0, 1));
 
         JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         row_1.add(new JLabel("Preferred server", JLabel.RIGHT));
@@ -179,7 +177,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
             Object[][] tableData = {
                 { "Default recording directory", settings.getProperty("default.save.path") },
-                { "Default download path", settings.getProperty("default.local.path") },
+                { "Default download directory", settings.getProperty("default.local.path") },
                 { "Proxy username", settings.getProperty("default.proxyUsername") },
                 { "Proxy password", pass },
             };

@@ -27,6 +27,7 @@ public class TimelineDialog extends JDialog {
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
         contentPane.setBorder(BorderFactory.createEmptyBorder(3, 9, 1, 9));
+        contentPane.setFocusable(true);
         setContentPane(contentPane);
 
         JButton availabilityButton = new JButton("Available data");
@@ -51,8 +52,8 @@ public class TimelineDialog extends JDialog {
             setMinimumSize(dim);
         }
 
-        getRootPane().setDefaultButton(btnAdd);
         getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().setDefaultButton(btnAdd);
     }
 
     public TimelineDataPanel getObservationPanel() {

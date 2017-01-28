@@ -41,8 +41,9 @@ public class ExportReadyDialog extends JDialog implements ShowableDialog {
         closeButtonContainer.add(closeButton);
         add(closeButtonContainer, BorderLayout.SOUTH);
 
-        getRootPane().setDefaultButton(closeButton);
         getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().setDefaultButton(closeButton);
+        getRootPane().setFocusable(true);
     }
 
     public void init(String message) {
