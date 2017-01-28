@@ -55,6 +55,7 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
         text.append("<p>This software uses the <a href=\"https://github.com/stleary/JSON-java\">JSON in Java</a> Library, licensed under a custom <a href=\"http://www.json.org/license.html\">License</a>.");
         text.append("<p>This software uses the <a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial SQLite JDBC Driver</a>, licensed under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License version 2.0</a>.<br>");
         text.append("<p>This software uses <a href=\"http://jcodec.org\">JCodec</a>, licensed under the FreeBSD License.<br>");
+        text.append("<p>This software uses <a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, © 2002-2017, JIDE Software, Inc.<br>");
         text.append("<p>This software uses the <a href=\"http://nom-tam-fits.github.io/nom-tam-fits/\">FITS in Java</a> public domain library.");
         text.append("<p>This software uses the <a href=\"http://www.davekoelle.com/alphanum.html\">Alphanum Algorithm</a>, licensed under the LGPLv2.1.<br>Its source code can be downloaded <a href=\"http://jhelioviewer.org/libjhv/external/AlphanumComparator.java\">here</a>.<br>");
 
@@ -84,15 +85,14 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
 
         JPanel closeButtonContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
+        closeButton.addActionListener(e -> setVisible(false));
         closeButtonContainer.add(closeButton);
         contentPane.add(closeButtonContainer, BorderLayout.SOUTH);
 
         add(new JScrollPane(contentPane));
 
-        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
-        getRootPane().setFocusable(true);
+        getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     @Override
