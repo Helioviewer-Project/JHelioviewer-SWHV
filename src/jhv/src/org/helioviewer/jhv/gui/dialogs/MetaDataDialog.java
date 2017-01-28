@@ -5,8 +5,6 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -55,9 +53,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-// Dialog that is used to display meta data for an image.
 @SuppressWarnings("serial")
-public class MetaDataDialog extends JDialog implements ActionListener, ShowableDialog {
+public class MetaDataDialog extends JDialog implements ShowableDialog {
 
     private static class LocalTableModel extends DefaultTableModel {
 
@@ -71,7 +68,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }
     }
 
-    private final JButton closeButton = new JButton("Close");
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
     private final DefaultTableModel fitsModel = new LocalTableModel(null, new Object[] { "FITS Keyword", "Value" });
@@ -87,8 +83,17 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
         setLayout(new BorderLayout());
 
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> closePressed());
+
+        exportFitsButton.addActionListener(e -> {
+            DOMSource source = new DOMSource(xmlDoc.getDocumentElement().getElementsByTagName("fits").item(0));
+            boolean saveSuccessful = saveXMLDocument(source, outFileName);
+            if (saveSuccessful)
+                JOptionPane.showMessageDialog(this, "Fits data saved to " + outFileName);
+        });
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(exportFitsButton);
         bottomPanel.add(closeButton);
 
@@ -133,14 +138,10 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         add(sp, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.PAGE_END);
 
-        closeButton.addActionListener(this);
-        exportFitsButton.addActionListener(this);
-
         setMetaData(view);
 
-        getRootPane().registerKeyboardAction(e -> closePressed(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
-        getRootPane().setFocusable(true);
+        getRootPane().registerKeyboardAction(e -> closePressed(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     private static class WrappedTextCellRenderer extends JTextArea implements ListCellRenderer<Object> {
@@ -193,20 +194,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     private void closePressed() {
         xmlDoc = null;
         resetData();
-        dispose();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent _a) {
-        if (_a.getSource() == closeButton) {
-            closePressed();
-        } else if (_a.getSource() == exportFitsButton) {
-            DOMSource source = new DOMSource(xmlDoc.getDocumentElement().getElementsByTagName("fits").item(0));
-
-            boolean saveSuccessful = saveXMLDocument(source, outFileName);
-            if (saveSuccessful)
-                JOptionPane.showMessageDialog(this, "Fits data saved to " + outFileName);
-        }
+        setVisible(false);
     }
 
     private void setMetaData(View v) {
