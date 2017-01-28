@@ -40,7 +40,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
     }
 
     public LevelsPanel() {
-        slider = new RangeSlider(-100, 200, 0, 100);
+        slider = new RangeSlider(-101, 201, 0, 100);
         slider.setRangeDraggable(true);
         slider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(slider);
