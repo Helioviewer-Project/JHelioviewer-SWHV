@@ -20,7 +20,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int hgltParamRef;
     private int hglnParamRef;
 
-    private int levelsParamRef;
+    private int brightParamRef;
     private int alphaParamRef;
     private int cutOffRadiusRef;
     private int outerCutOffRadiusRef;
@@ -44,7 +44,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] sharpenParamFloat = new float[3];
     private final float[] hgltParamFloat = new float[1];
     private final float[] hglnParamFloat = new float[1];
-    private final float[] levelsParamFloat = new float[2];
+    private final float[] brightParamFloat = new float[2];
     private final float[] alphaParamFloat = new float[1];
     private final float[] cutOffRadiusFloat = new float[1];
     private final float[] outerCutOffRadiusFloat = new float[1];
@@ -82,7 +82,7 @@ public class GLSLSolarShader extends GLSLShader {
         hglnParamRef = gl.glGetUniformLocation(progID, "hgln");
         polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
 
-        levelsParamRef = gl.glGetUniformLocation(progID, "levels");
+        brightParamRef = gl.glGetUniformLocation(progID, "brightness");
         alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
         cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
         outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
@@ -168,7 +168,7 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(hgltParamRef, 1, hgltParamFloat, 0);
         gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
 
-        gl.glUniform2fv(levelsParamRef, 1, levelsParamFloat, 0);
+        gl.glUniform2fv(brightParamRef, 1, brightParamFloat, 0);
         gl.glUniform1fv(alphaParamRef, 1, alphaParamFloat, 0);
         gl.glUniform3fv(pixelSizeWeightingRef, 1, sharpenParamFloat, 0);
         gl.glUniform4fv(rectRef, 1, rectVertex, 0);
@@ -199,9 +199,9 @@ public class GLSLSolarShader extends GLSLShader {
         alphaParamFloat[0] = alpha;
     }
 
-    public void setLevels(float offset, float scale) {
-        levelsParamFloat[0] = offset;
-        levelsParamFloat[1] = scale;
+    public void setBrightness(float offset, float scale) {
+        brightParamFloat[0] = offset;
+        brightParamFloat[1] = scale;
     }
 
     public void setFactors(float weighting, float pixelWidth, float pixelHeight, float span) {

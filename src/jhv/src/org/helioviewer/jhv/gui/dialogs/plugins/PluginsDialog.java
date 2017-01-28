@@ -31,14 +31,12 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
     private static final Dimension DIALOG_SIZE_MINIMUM = new Dimension(400, 500);
     private static final Dimension DIALOG_SIZE_PREFERRED = new Dimension(400, 500);
 
-    private final JComboBox<String> filterComboBox = new JComboBox<>(new String[]{"All", "Enabled", "Disabled"});
+    private final JComboBox<String> filterComboBox = new JComboBox<>(new String[]{ "All", "Enabled", "Disabled" });
 
     private final JLabel emptyLabel = new JLabel("No plug-ins available", JLabel.CENTER);
     private final PluginsList pluginList = new PluginsList();
     private final JPanel listContainerPane = new JPanel();
     private final CardLayout listLayout = new CardLayout();
-
-    private final JButton closeButton = new JButton("Close");
 
     public PluginsDialog() {
         super(ImageViewerGui.getMainFrame(), "Plug-in Manager", true);
@@ -91,10 +89,11 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
         JPanel centerPane = new JPanel(new BorderLayout());
         centerPane.add(installedPane, BorderLayout.CENTER);
         // footer
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> closeDialog());
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         footer.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
         footer.add(closeButton);
-        closeButton.addActionListener(e -> closeDialog());
         // content pane
         contentPane.setLayout(new BorderLayout());
         contentPane.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
@@ -102,6 +101,9 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
         contentPane.add(centerPane, BorderLayout.CENTER);
         contentPane.add(footer, BorderLayout.PAGE_END);
 
+        updatePluginList();
+
+        getRootPane().setDefaultButton(closeButton);
         getRootPane().registerKeyboardAction(e -> closeDialog(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
@@ -128,13 +130,9 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
 
     private void closeDialog() {
         PluginManager.getSingletonInstance().saveSettings();
-        dispose();
+        setVisible(false);
     }
 
-    /**
-     * Removes all entries from the plug-in list and adds all available plug-ins
-     * to the list again.
-     * */
     private void updatePluginList() {
         pluginList.removeAllEntries();
 
@@ -145,17 +143,13 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
             }
         }
         pluginList.updateList();
-
         updateVisualComponents();
     }
 
     @Override
     public void showDialog() {
-        updatePluginList();
-
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-        getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }
 

@@ -57,7 +57,7 @@ public class GLImage {
         applyRegion(imageData, prevImageData, baseImageData, shader);
 
         shader.colorMask = colorMask;
-        shader.setLevels(brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()));
+        shader.setBrightness(brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()));
         shader.setAlpha(opacity);
         shader.setEnhanced(gl, enhanced);
         shader.setIsDifference(diffMode.ordinal());
@@ -153,7 +153,7 @@ public class GLImage {
             diffTex.delete(gl);
     }
 
-    public void setLevels(float offset, float scale) {
+    public void setBrightness(float offset, float scale) {
         brightOffset = offset;
         brightScale = scale;
     }
