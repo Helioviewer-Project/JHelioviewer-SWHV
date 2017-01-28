@@ -44,27 +44,28 @@ public class NewVersionDialog extends JDialog implements ShowableDialog {
 
         JButton closeButton = new JButton("Close");
         closeButtonContainer.add(closeButton);
-        closeButton.addActionListener(e -> dispose());
+        closeButton.addActionListener(e -> setVisible(false));
 
         if (!verbose) {
             JButton laterButton = new JButton("Remind me later");
             closeButtonContainer.add(laterButton);
             laterButton.addActionListener(e -> {
-                dispose();
+                setVisible(false);
                 nextCheck = suspendedStarts;
             });
         }
 
         JButton downloadButton = new JButton("Download");
         downloadButton.addActionListener(e -> {
-            dispose();
+            setVisible(false);
             JHVGlobals.openURL(JHVGlobals.downloadURL);
         });
         closeButtonContainer.add(downloadButton);
         add(closeButtonContainer, BorderLayout.SOUTH);
 
+        getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(downloadButton);
-        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().setFocusable(true);
     }
 
     public void init(String message) {

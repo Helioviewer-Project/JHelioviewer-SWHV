@@ -52,10 +52,10 @@ public class TextDialog extends JDialog implements ShowableDialog {
         add(scrollPane, BorderLayout.NORTH);
 
         JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
+        closeButton.addActionListener(e -> setVisible(false));
         add(closeButton, BorderLayout.EAST);
 
-        getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
         getRootPane().setFocusable(true);
     }
