@@ -77,6 +77,11 @@ public class ObservationDialog extends JDialog {
             public void windowClosing(WindowEvent e) {
                 cancel();
             }
+
+            @Override
+            public void windowOpened(WindowEvent e) {
+                observationPanel.focusTree();
+            }
         });
 
         getRootPane().registerKeyboardAction(e -> cancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);

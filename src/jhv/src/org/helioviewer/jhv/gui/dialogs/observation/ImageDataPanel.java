@@ -57,6 +57,10 @@ public class ImageDataPanel extends ObservationDialogPanel {
         add(instrumentsPane);
     }
 
+    void focusTree() {
+        sourcesTree.requestFocus();
+    }
+
     public void setupSources(DataSourcesParser parser) {
         if (!sourcesTree.setParsedData(parser)) // not preferred
             return;
