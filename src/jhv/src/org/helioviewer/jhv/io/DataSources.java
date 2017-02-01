@@ -46,6 +46,22 @@ public class DataSources {
                 }
             });
             /*
+            put("GSFC SCI Test", new HashMap<String, String>() {
+                {
+                    put("API.dataSources.path", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.jp2images.path", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJP2Image&");
+                    put("API.jp2series.path", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJPX&");
+                    put("default.label", "Goddard Space Flight Center SCI Test");
+                }
+            });
+            put("GSFC NDC Test", new HashMap<String, String>() {
+                {
+                    put("API.dataSources.path", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.jp2images.path", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJP2Image&");
+                    put("API.jp2series.path", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJPX&");
+                    put("default.label", "Goddard Space Flight Center NDC Test");
+                }
+            });
             put("LOCALHOST", new HashMap<String, String>() {
                 {
                     put("API.dataSources.path", "http://localhost:8080/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
