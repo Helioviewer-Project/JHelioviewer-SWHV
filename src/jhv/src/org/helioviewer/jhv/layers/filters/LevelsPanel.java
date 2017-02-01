@@ -2,6 +2,8 @@ package org.helioviewer.jhv.layers.filters;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -41,6 +43,16 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
 
     public LevelsPanel() {
         slider = new RangeSlider(-101, 201, 0, 100);
+        slider.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    slider.setLowValue(0);
+                    slider.setHighValue(100);
+                } else
+                    super.mouseClicked(e);
+            }
+        });
         slider.setRangeDraggable(true);
         slider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(slider);

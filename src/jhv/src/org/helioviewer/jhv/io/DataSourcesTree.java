@@ -85,7 +85,7 @@ public class DataSourcesTree extends JTree {
 
         addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 TreePath path;
                 if (e.getClickCount() == 2 && getRowForLocation(e.getX(), e.getY()) != -1 && (path = getPathForLocation(e.getX(), e.getY())) != null) {
                     Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
