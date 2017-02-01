@@ -21,6 +21,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
 
     private final RangeSlider slider;
     private final JLabel label;
+    private final JideButton autoButton;
     private final JPanel buttonPanel;
 
     static String align3(int value) {
@@ -60,7 +61,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
         label = new JLabel(format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
         // label.setMinimumSize(new JLabel(format(-100, -100)).getPreferredSize());
 
-        JideButton autoButton = new JideButton("Auto");
+        autoButton = new JideButton("Auto");
         autoButton.setToolTipText("Auto brightness");
         autoButton.addActionListener(e -> {
             double auto = ((ImageLayerOptions) getComponent().getParent()).getAutoBrightness();
@@ -95,6 +96,10 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
     @Override
     public Component getLabel() {
         return buttonPanel;
+    }
+
+    public void syncFont() {
+        autoButton.setFont(label.getFont());
     }
 
 }
