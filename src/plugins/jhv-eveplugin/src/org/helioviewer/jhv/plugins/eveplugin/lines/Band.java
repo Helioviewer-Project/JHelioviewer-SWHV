@@ -149,7 +149,7 @@ public class Band extends AbstractLineDataSelectorElement {
         if (isVisible) {
             updateWarnLevels(graphArea);
             graphPolylines.clear();
-            bandCache.createPolyLines(timeAxis, yAxis, graphPolylines);
+            bandCache.createPolyLines(graphArea, timeAxis, yAxis, graphPolylines);
         }
     }
 

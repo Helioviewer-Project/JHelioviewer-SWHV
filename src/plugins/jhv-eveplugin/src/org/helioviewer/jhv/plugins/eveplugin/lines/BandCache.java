@@ -9,7 +9,6 @@ import java.util.List;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 
@@ -75,21 +74,20 @@ class BandCache {
         return new float[] { min, max };
     }
 
-    void createPolyLines(TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines) {
+    void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines) {
         long keyEnd = date2key(timeAxis.end);
         long key = date2key(timeAxis.start);
         int level = 0;
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
         double noelements = (timeAxis.end - timeAxis.start) / elsz;
-        Rectangle graphArea = DrawController.getGraphArea();
 
         double graphWidth = graphArea.width * GLInfo.pixelScaleFloat[0];
         while (level < MAX_LEVEL - 1 && noelements > graphWidth) {
             level++;
             factor *= FACTOR_STEP;
             elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-            noelements = (timeAxis.end - timeAxis.start) / (elsz);
+            noelements = (timeAxis.end - timeAxis.start) / elsz;
         }
         ArrayList<Integer> tvalues = new ArrayList<>();
         ArrayList<Integer> tdates = new ArrayList<>();
