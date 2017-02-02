@@ -19,7 +19,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
     public DataSourcesTask(String server, Schema _schema) {
         parser = new DataSourcesParser(server);
         schema = _schema;
-        url = DataSources.getServerSetting(server, "API.dataSources.path");
+        url = DataSources.getServerSetting(server, "API.getDataSources");
         setThreadName("MAIN--DataSources");
     }
 

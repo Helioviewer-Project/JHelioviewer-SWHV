@@ -2,6 +2,8 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,11 +21,15 @@ import org.json.JSONTokener;
 @SuppressWarnings("serial")
 public class DataSources {
 
+    static final Set<String> SupportedObservatories = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+        "SOHO", "SDO", "STEREO_A", "STEREO_B", "PROBA2", "ROB-USET", "ROB-Humain", "NSO-GONG", "NSO-SOLIS", "Kanzelhoehe", "NRH", "Yohkoh", "Hinode", "TRACE"
+    )));
+
     private static final HashMap<String, HashMap<String, String>> serverSettings = new HashMap<String, HashMap<String, String>>() {
         {
             put("ROB", new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
+                    put("API.getDataSources", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php?action=getJPX&");
                     put("default.label", "Royal Observatory of Belgium");
@@ -31,7 +37,7 @@ public class DataSources {
             });
             put("IAS", new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.getDataSources", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
                     put("default.label", "Institut d'Astrophysique Spatiale");
@@ -39,7 +45,7 @@ public class DataSources {
             });
             put("GSFC", new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.getDataSources", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "https://api.helioviewer.org/v2/getJP2Image/?");
                     put("API.jp2series.path", "https://api.helioviewer.org/v2/getJPX/?");
                     put("default.label", "Goddard Space Flight Center");
@@ -48,7 +54,7 @@ public class DataSources {
             /*
             put("GSFC SCI Test", new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.getDataSources", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJPX&");
                     put("default.label", "Goddard Space Flight Center SCI Test");
@@ -56,7 +62,7 @@ public class DataSources {
             });
             put("GSFC NDC Test", new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.getDataSources", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJPX&");
                     put("default.label", "Goddard Space Flight Center NDC Test");
@@ -64,7 +70,7 @@ public class DataSources {
             });
             put("LOCALHOST", new HashMap<String, String>() {
                 {
-                    put("API.dataSources.path", "http://localhost:8080/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
+                    put("API.getDataSources", "http://localhost:8080/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                     put("API.jp2images.path", "http://localhost:8080/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.jp2series.path", "http://localhost:8080/helioviewer/api/index.php?action=getJPX&");
                     put("default.label", "Localhost");
@@ -95,33 +101,13 @@ public class DataSources {
     }
 
     public static void saveServerSettings(String server) {
-        Map<String, String> map = serverSettings.get(server);
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
-        }
+        Settings.getSingletonInstance().setProperty("default.server", server);
     }
 
-    static final HashSet<String> SupportedObservatories = new HashSet<>();
-
     public static void loadSources() {
-        String prop = Settings.getSingletonInstance().getProperty("supported.data.sources");
-        if (prop != null && SupportedObservatories.isEmpty()) {
-            String supportedObservatories[] = prop.split(" ");
-            for (String s : supportedObservatories) {
-                if (!s.isEmpty()) {
-                    SupportedObservatories.add(s);
-                }
-            }
-        }
-
-        String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
-        if (datasourcesPath.contains("ias.u-psud.fr")) {
-            preferredServer = "IAS";
-        } else if (datasourcesPath.contains("helioviewer.org")) {
-            preferredServer = "GSFC";
-        } else {
+        preferredServer = Settings.getSingletonInstance().getProperty("default.server");
+        if (preferredServer == null || getServerSetting(preferredServer, "API.getDataSources") == null)
             preferredServer = "ROB";
-        }
         saveServerSettings(preferredServer);
 
         try (InputStream is = FileUtils.getResourceInputStream("/data/sources_v1.0.json")) {
