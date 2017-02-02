@@ -16,6 +16,7 @@ import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 
 public class HelioviewerMetaData extends AbstractMetaData {
 
+    private static final boolean normalizeAIA = Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("display.normalizeAIA"));
     private static final boolean normalizeRadius = Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("display.normalize"));
 
     private String instrument = "";
@@ -58,7 +59,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
     }
 
     private void retrieveResponse() {
-        if (instrument.equals("AIA")) {
+        if (normalizeAIA && instrument.equals("AIA")) {
             responseFactor = AIAResponse.get(viewpoint.time.toString().substring(0, 10), measurement);
         }
     }

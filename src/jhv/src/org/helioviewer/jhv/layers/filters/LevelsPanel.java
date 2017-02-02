@@ -50,8 +50,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
                 if (e.getClickCount() == 2) {
                     slider.setLowValue(0);
                     slider.setHighValue(100);
-                } else
-                    super.mouseClicked(e);
+                }
             }
         });
         slider.setRangeDraggable(true);
