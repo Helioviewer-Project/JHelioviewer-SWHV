@@ -43,6 +43,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     private JCheckBox loadDefaultMovie;
     private JCheckBox normalizeRadius;
+    private JCheckBox normalizeAIA;
     private DefaultsSelectionPanel defaultsPanel;
 
     private final Settings settings = Settings.getSingletonInstance();
@@ -104,6 +105,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private void saveSettings() {
         settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovie.isSelected()));
         settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected()));
+        settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected()));
 
         defaultsPanel.saveSettings();
         settings.save();
@@ -118,24 +120,23 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         JPanel paramsPanel = new JPanel(new GridLayout(0, 1));
         paramsPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
-        JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row_1.add(new JLabel("Preferred server", JLabel.RIGHT));
+        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        row1.add(new JLabel("Preferred server", JLabel.RIGHT));
 
         JComboBox<String> combo = new JComboBox<>(DataSources.getServers());
         combo.setSelectedItem(DataSources.getPreferredServer());
         combo.addActionListener(e -> DataSources.saveServerSettings((String) combo.getSelectedItem()));
-        row_1.add(combo);
-        paramsPanel.add(row_1);
-
-        JPanel row0 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-
+        row1.add(combo);
         loadDefaultMovie = new JCheckBox("Load default movie at start-up", Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
-        row0.add(loadDefaultMovie);
+        row1.add(loadDefaultMovie);
+        paramsPanel.add(row1);
 
+        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness (needs restart)", Boolean.parseBoolean(settings.getProperty("display.normalizeAIA")));
+        row2.add(normalizeAIA);
         normalizeRadius = new JCheckBox("Normalize solar radius (needs restart)", Boolean.parseBoolean(settings.getProperty("display.normalize")));
-        row0.add(normalizeRadius);
-
-        paramsPanel.add(row0);
+        row2.add(normalizeRadius);
+        paramsPanel.add(row2);
 
         return paramsPanel;
     }
