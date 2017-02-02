@@ -15,6 +15,7 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 
 @SuppressWarnings("serial")
@@ -113,7 +114,7 @@ public class DataSourcesTree extends JTree {
             }
         }
 
-        boolean preferred = server.equals(DataSources.getPreferredServer());
+        boolean preferred = server.equals(Settings.getSingletonInstance().getProperty("default.server"));
         if (preferred && parser.defaultNode != null)
             setSelectionPath(new TreePath(parser.defaultNode.getPath()));
         return preferred;
