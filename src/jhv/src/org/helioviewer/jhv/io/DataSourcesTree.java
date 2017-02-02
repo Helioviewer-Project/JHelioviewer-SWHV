@@ -170,8 +170,7 @@ public class DataSourcesTree extends JTree {
                 super.setSelectionPath(path);
                 selectedPath = path;
 
-                boolean isROB = "ROB".equals(((SourceItem) node.getUserObject()).server);
-                ObservationDialog.getInstance().setAvailabilityStatus(isROB);
+                ObservationDialog.getInstance().setAvailabilityStatus(DataSources.getServerSetting(((SourceItem) node.getUserObject()).server, "availability.images") != null);
             }
         }
 

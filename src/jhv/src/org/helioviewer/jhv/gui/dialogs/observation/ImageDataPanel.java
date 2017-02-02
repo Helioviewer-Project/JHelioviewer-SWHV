@@ -26,6 +26,7 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
 
@@ -80,9 +81,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
     }
 
-    int getSourceId() {
+    String getAvailabilityURL() {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        return item == null ? -1 : item.sourceId;
+        return item == null ? null : DataSources.getServerSetting(item.server, "availability.images") + "#IID" + item.sourceId;
     }
 
     public long getStartTime() {
