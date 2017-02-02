@@ -30,24 +30,25 @@ public class DataSources {
             put("ROB", new HashMap<String, String>() {
                 {
                     put("API.getDataSources", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
-                    put("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&");
-                    put("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php?action=getJPX&");
+                    put("API.getJP2Image", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&");
+                    put("API.getJPX", "http://swhv.oma.be/hv/api/index.php?action=getJPX&");
                     put("default.label", "Royal Observatory of Belgium");
+                    put("availability.images", "http://swhv.oma.be/availability/images/availability/availability.html");
                 }
             });
             put("IAS", new HashMap<String, String>() {
                 {
                     put("API.getDataSources", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
-                    put("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
-                    put("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
+                    put("API.getJP2Image", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
+                    put("API.getJPX", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
                     put("default.label", "Institut d'Astrophysique Spatiale");
                 }
             });
             put("GSFC", new HashMap<String, String>() {
                 {
                     put("API.getDataSources", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
-                    put("API.jp2images.path", "https://api.helioviewer.org/v2/getJP2Image/?");
-                    put("API.jp2series.path", "https://api.helioviewer.org/v2/getJPX/?");
+                    put("API.getJP2Image", "https://api.helioviewer.org/v2/getJP2Image/?");
+                    put("API.getJPX", "https://api.helioviewer.org/v2/getJPX/?");
                     put("default.label", "Goddard Space Flight Center");
                 }
             });
@@ -55,24 +56,24 @@ public class DataSources {
             put("GSFC SCI Test", new HashMap<String, String>() {
                 {
                     put("API.getDataSources", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
-                    put("API.jp2images.path", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJP2Image&");
-                    put("API.jp2series.path", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJPX&");
+                    put("API.getJP2Image", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJP2Image&");
+                    put("API.getJPX", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJPX&");
                     put("default.label", "Goddard Space Flight Center SCI Test");
                 }
             });
             put("GSFC NDC Test", new HashMap<String, String>() {
                 {
                     put("API.getDataSources", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
-                    put("API.jp2images.path", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJP2Image&");
-                    put("API.jp2series.path", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJPX&");
+                    put("API.getJP2Image", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJP2Image&");
+                    put("API.getJPX", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJPX&");
                     put("default.label", "Goddard Space Flight Center NDC Test");
                 }
             });
             put("LOCALHOST", new HashMap<String, String>() {
                 {
                     put("API.getDataSources", "http://localhost:8080/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
-                    put("API.jp2images.path", "http://localhost:8080/helioviewer/api/index.php?action=getJP2Image&");
-                    put("API.jp2series.path", "http://localhost:8080/helioviewer/api/index.php?action=getJPX&");
+                    put("API.getJP2Image", "http://localhost:8080/helioviewer/api/index.php?action=getJP2Image&");
+                    put("API.getJPX", "http://localhost:8080/helioviewer/api/index.php?action=getJPX&");
                     put("default.label", "Localhost");
                 }
             });

@@ -31,11 +31,11 @@ public class APIRequest {
 
         String jpipReq, fileReq;
         if (startTime == endTime) {
-            fileReq = DataSources.getServerSetting(server, "API.jp2images.path") + "sourceId=" + Integer.toString(sourceId) +
+            fileReq = DataSources.getServerSetting(server, "API.getJP2Image") + "sourceId=" + Integer.toString(sourceId) +
                                                    "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
             jpipReq = fileReq + "&jpip=true";
         } else {
-            fileReq = DataSources.getServerSetting(server, "API.jp2series.path") + "sourceId=" + Integer.toString(sourceId) +
+            fileReq = DataSources.getServerSetting(server, "API.getJPX") + "sourceId=" + Integer.toString(sourceId) +
                                                    "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
             if (cadence != CADENCE_ANY) {
                 fileReq += "&cadence=" + Integer.toString(cadence);
