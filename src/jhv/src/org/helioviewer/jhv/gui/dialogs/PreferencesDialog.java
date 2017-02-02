@@ -124,8 +124,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         row1.add(new JLabel("Preferred server", JLabel.RIGHT));
 
         JComboBox<String> combo = new JComboBox<>(DataSources.getServers());
-        combo.setSelectedItem(DataSources.getPreferredServer());
-        combo.addActionListener(e -> DataSources.saveServerSettings((String) combo.getSelectedItem()));
+        combo.setSelectedItem(Settings.getSingletonInstance().getProperty("default.server"));
+        combo.addActionListener(e -> Settings.getSingletonInstance().setProperty("default.server", (String) combo.getSelectedItem()));
         row1.add(combo);
         loadDefaultMovie = new JCheckBox("Load default movie at start-up", Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
         row1.add(loadDefaultMovie);

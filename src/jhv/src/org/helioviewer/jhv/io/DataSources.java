@@ -80,8 +80,6 @@ public class DataSources {
         }
     };
 
-    private static String preferredServer;
-
     public static HashMap<String, HashMap<String, String>> getConfiguration() {
         return serverSettings;
     }
@@ -91,24 +89,16 @@ public class DataSources {
         return set.toArray(new String[set.size()]);
     }
 
-    public static String getPreferredServer() {
-        return preferredServer;
-    }
-
     public static String getServerSetting(String server, String setting) {
         Map<String, String> settings = serverSettings.get(server);
         return settings == null ? null : settings.get(setting);
     }
 
-    public static void saveServerSettings(String server) {
-        Settings.getSingletonInstance().setProperty("default.server", server);
-    }
-
     public static void loadSources() {
-        preferredServer = Settings.getSingletonInstance().getProperty("default.server");
-        if (preferredServer == null || getServerSetting(preferredServer, "API.getDataSources") == null)
-            preferredServer = "ROB";
-        saveServerSettings(preferredServer);
+        String server = Settings.getSingletonInstance().getProperty("default.server");
+        if (server == null || getServerSetting(server, "API.getDataSources") == null)
+            server = "ROB";
+        Settings.getSingletonInstance().setProperty("default.server", server);
 
         try (InputStream is = FileUtils.getResourceInputStream("/data/sources_v1.0.json")) {
             JSONObject rawSchema = new JSONObject(new JSONTokener(is));
