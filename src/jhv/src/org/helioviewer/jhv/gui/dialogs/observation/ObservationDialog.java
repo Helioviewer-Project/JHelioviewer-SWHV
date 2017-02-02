@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -51,14 +50,7 @@ public class ObservationDialog extends JDialog {
         contentPane.setBorder(BorderFactory.createEmptyBorder(3, 9, 1, 9));
         contentPane.setFocusable(true);
 
-        availabilityButton.addActionListener(e -> {
-            String url = Settings.getSingletonInstance().getProperty("availability.images.url");
-            int sourceId = observationPanel.getSourceId();
-            if (sourceId != -1)
-                url += "#IID" + sourceId;
-
-            JHVGlobals.openURL(url);
-        });
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(observationPanel.getAvailabilityURL()));
 
         btnImages.addActionListener(e -> loadButtonPressed());
         JButton btnClose = new JButton("Cancel");
