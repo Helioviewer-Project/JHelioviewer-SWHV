@@ -159,8 +159,4 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
         updatePluginList();
     }
 
-    @Override
-    public void init() {
-    }
-
 }

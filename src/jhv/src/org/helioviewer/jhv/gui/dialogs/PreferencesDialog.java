@@ -262,14 +262,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     }
 
-    @Override
-    public void init() {
-    }
-
     public static void dialogShow() {
-        PreferencesDialog dialog = new PreferencesDialog();
-        dialog.init();
-        dialog.showDialog();
+        new PreferencesDialog().showDialog();
     }
 
 }

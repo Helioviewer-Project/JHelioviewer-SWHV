@@ -4,6 +4,4 @@ public interface ShowableDialog {
 
     void showDialog();
 
-    void init();
-
 }

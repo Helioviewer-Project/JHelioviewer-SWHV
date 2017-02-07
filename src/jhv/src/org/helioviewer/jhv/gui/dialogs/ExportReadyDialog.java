@@ -51,10 +51,6 @@ public class ExportReadyDialog extends JDialog implements ShowableDialog {
     }
 
     @Override
-    public void init() {
-    }
-
-    @Override
     public void showDialog() {
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());

@@ -329,8 +329,4 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
         return false;
     }
 
-    @Override
-    public void init() {
-    }
-
 }
