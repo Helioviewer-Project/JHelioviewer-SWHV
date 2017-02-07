@@ -27,33 +27,6 @@ public class ExitHooks {
             JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
             return false;
         }
-
-/*
-        final ExecutorService executor = Executors.newFixedThreadPool(4);
-        Future<?> futureFileDelete = executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                File[] tempFiles = JHVDirectory.TEMP.getFile().listFiles();
-                for (File tempFile : tempFiles) {
-                    tempFile.delete();
-                }
-            }
-        });
-        executor.shutdown();
-
-        try {
-            futureFileDelete.get(1500, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Log.warn("FileDelete job was interrupted");
-        } catch (ExecutionException e) {
-            Log.warn("Caught exception on FileDelete: " + e);
-        } catch (TimeoutException e) {
-            futureFileDelete.cancel(true);
-            Log.warn("Timeout upon deleting temporary files");
-        }
-*/
-
-        System.exit(0);
         return true;
     }
 

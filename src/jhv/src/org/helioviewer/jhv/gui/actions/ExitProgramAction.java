@@ -24,7 +24,8 @@ public class ExitProgramAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ExitHooks.exitProgram();
+        if (ExitHooks.exitProgram())
+            System.exit(0);
     }
 
 }
