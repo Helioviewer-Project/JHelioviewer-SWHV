@@ -24,7 +24,6 @@ public class ShowDialogAction extends AbstractAction {
         try {
             if (dialog == null)
                 dialog = dialogToShow.getConstructor().newInstance();
-            dialog.init();
             dialog.showDialog();
         } catch (Exception ex) {
             ex.printStackTrace();

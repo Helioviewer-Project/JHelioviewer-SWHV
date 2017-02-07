@@ -67,8 +67,4 @@ public class TextDialog extends JDialog implements ShowableDialog {
         setVisible(true);
     }
 
-    @Override
-    public void init() {
-    }
-
 }
