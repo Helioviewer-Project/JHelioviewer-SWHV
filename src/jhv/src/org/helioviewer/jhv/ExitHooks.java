@@ -23,11 +23,8 @@ public class ExitHooks {
     }
 
     public static boolean exitProgram() {
-        if (Layers.getNumLayers() > 0 &&
-            JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
-            return false;
-        }
-        return true;
+        return !(Layers.getNumLayers() > 0 &&
+                JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION);
     }
 
 }

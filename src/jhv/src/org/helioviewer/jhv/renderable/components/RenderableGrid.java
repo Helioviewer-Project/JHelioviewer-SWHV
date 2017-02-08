@@ -396,6 +396,7 @@ public class RenderableGrid extends AbstractRenderable {
             }
             gl.glPopMatrix();
             gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
+            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
         }
         gl.glPopMatrix();
     }
@@ -527,6 +528,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
         gl.glBufferData(GL2.GL_ARRAY_BUFFER, colorBuffer.capacity() * Buffers.SIZEOF_FLOAT, colorBuffer, GL2.GL_STATIC_DRAW);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
     private static int generate(GL2 gl) {

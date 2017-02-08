@@ -236,6 +236,7 @@ public class PfssData {
         gl.glLineWidth(PfssSettings.LINE_WIDTH);
         gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, vertices.limit() / 7);
 
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
         gl.glDepthMask(true);
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
