@@ -19,6 +19,10 @@ public class ShowDialogAction extends AbstractAction {
         dialogToShow = (Class<ShowableDialog>) dialog;
     }
 
+    public void show() {
+        actionPerformed(new ActionEvent("", 0, null));
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         try {

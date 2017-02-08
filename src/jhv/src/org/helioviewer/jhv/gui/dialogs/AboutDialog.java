@@ -130,8 +130,4 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
         return JHVGlobals.programName + " " + versionString + " - Revision " + revisionString;
     }
 
-    public static void dialogShow() {
-        new AboutDialog().showDialog();
-    }
-
 }
