@@ -3,27 +3,22 @@ package org.helioviewer.jhv.platform;
 import java.lang.reflect.Method;
 
 import org.helioviewer.jhv.ExitHooks;
-import org.helioviewer.jhv.gui.dialogs.AboutDialog;
-import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
 
-@SuppressWarnings("rawtypes")
 public class OSXHandler {
 
-    public static void aboutHandler() {
+    public static void aboutHandler(Object action) {
         try {
-            Class[] cArg = new Class[0];
-            Method m = AboutDialog.class.getMethod("dialogShow", cArg);
-            OSXAdapter.setAboutHandler("", m);
+            Method m = action.getClass().getDeclaredMethod("show", (Class[]) null);
+            OSXAdapter.setAboutHandler(action, m);
         } catch (NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
         }
     }
 
-    public static void preferencesHandler() {
+    public static void preferencesHandler(Object action) {
         try {
-            Class[] cArg = new Class[0];
-            Method m = PreferencesDialog.class.getMethod("dialogShow", cArg);
-            OSXAdapter.setPreferencesHandler("", m);
+            Method m = action.getClass().getDeclaredMethod("show", (Class[]) null);
+            OSXAdapter.setPreferencesHandler(action, m);
         } catch (NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
         }
@@ -31,8 +26,7 @@ public class OSXHandler {
 
     public static void quitHandler() {
         try {
-            Class[] cArg = new Class[0];
-            Method m = ExitHooks.class.getMethod("exitProgram", cArg);
+            Method m = ExitHooks.class.getMethod("exitProgram", (Class[]) null);
             OSXAdapter.setQuitHandler("", m);
         } catch (NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
