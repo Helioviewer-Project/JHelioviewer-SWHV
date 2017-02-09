@@ -127,12 +127,7 @@ class OSXAdapter implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (isCorrectMethod(method, args)) {
-            boolean handled;
-            if (args.length == 1) {
-                handled = callTarget(args[0]);
-            } else {
-                handled = callTarget(args[0], args[1]);
-            }
+            boolean handled = args.length == 1 ? callTarget(args[0]) : callTarget(args[0], args[1]);
             if (!JAVA9)
                 setApplicationEventHandled(args[0], handled);
         }

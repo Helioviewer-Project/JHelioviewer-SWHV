@@ -39,14 +39,8 @@ public class ViewROI {
     }
 
     public static Region updateROI(Camera camera, Viewport vp, MetaData m) {
-        Region newRegion;
-
-        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
-            double minPhysicalX = Double.MAX_VALUE;
-            double minPhysicalY = Double.MAX_VALUE;
-            double maxPhysicalX = Double.MIN_VALUE;
-            double maxPhysicalY = Double.MIN_VALUE;
-
+        switch (Displayer.mode) {
+        case ORTHO:
             for (int i = 0; i < pointlist.length; i++) {
                 dePoints[i].x = CameraHelper.deNormalizeX(vp, pointlist[i].x);
                 dePoints[i].y = CameraHelper.deNormalizeY(vp, pointlist[i].y);
@@ -54,8 +48,12 @@ public class ViewROI {
 
             Quat cameraRotation = camera.getRotation();
             Quat imageRotation = m.getCenterRotation();
-
             Quat camDiff = Quat.rotateWithConjugate(cameraRotation, imageRotation);
+
+            double minPhysicalX = Double.MAX_VALUE;
+            double minPhysicalY = Double.MAX_VALUE;
+            double maxPhysicalX = Double.MIN_VALUE;
+            double maxPhysicalY = Double.MIN_VALUE;
             for (int i = 0; i < pointlist.length; i++) {
                 Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
                 if (hitPoint != null) {
@@ -66,11 +64,9 @@ public class ViewROI {
                 }
             }
 
-            Vec3 startPoint, endPoint, rotationAxis;
-
-            startPoint = cameraRotation.rotateVector(Vec3.ZAxis);
-            endPoint = imageRotation.rotateVector(Vec3.ZAxis);
-            rotationAxis = Vec3.cross(startPoint, endPoint);
+            Vec3 startPoint = cameraRotation.rotateVector(Vec3.ZAxis);
+            Vec3 endPoint = imageRotation.rotateVector(Vec3.ZAxis);
+            Vec3 rotationAxis = Vec3.cross(startPoint, endPoint);
             double rotationAngleZ = Math.abs(Math.atan2(rotationAxis.length(), Vec3.dot(startPoint, endPoint)));
 
             startPoint = cameraRotation.rotateVector(Vec3.YAxis);
@@ -92,7 +88,7 @@ public class ViewROI {
             }
 
             if (minPhysicalX > maxPhysicalX || minPhysicalY > maxPhysicalY) {
-                newRegion = m.getPhysicalRegion();
+                return m.getPhysicalRegion();
             } else {
                 double widthxAdd = Math.abs(extraSize * (maxPhysicalX - minPhysicalX));
                 double widthyAdd = Math.abs(extraSize * (maxPhysicalY - minPhysicalY));
@@ -115,18 +111,17 @@ public class ViewROI {
                 double regionHeight = maxPhysicalY - minPhysicalY;
 
                 if (regionWidth > 0 && regionHeight > 0) {
-                    newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
+                    return new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
                 } else {
-                    newRegion = new Region(minPhysicalX, minPhysicalY, 0, 0);
                     Log.info("ViewROI.updateROI: empty ROI");
+                    return new Region(minPhysicalX, minPhysicalY, 0, 0);
                 }
             }
-        } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            newRegion = unitRadius;
-        } else {
-            newRegion = m.getPhysicalRegion();
+        case LATITUDINAL:
+            return unitRadius;
+        default:
+            return m.getPhysicalRegion();
         }
-        return newRegion;
     }
 
 }

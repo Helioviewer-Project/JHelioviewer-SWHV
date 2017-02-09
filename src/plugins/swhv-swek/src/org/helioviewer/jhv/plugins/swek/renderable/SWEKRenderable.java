@@ -99,16 +99,15 @@ public class SWEKRenderable extends AbstractRenderable {
         int lineResolution = 2;
         int angularResolution = (int) (angularWidthDegree / 4);
 
-        double thetaStart = principalAngle - angularWidth / 2.;
-        double thetaEnd = principalAngle + angularWidth / 2.;
-
         Position.Q p = evt.getPositionInformation().getEarthPosition();
         Color color = evtr.getColor();
 
         gl.glColor3f(0, 0, 0);
         gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);
 
+        double thetaStart = principalAngle - angularWidth / 2.;
         interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.orientation);
+        double thetaEnd = principalAngle + angularWidth / 2.;
         interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.orientation);
 
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
