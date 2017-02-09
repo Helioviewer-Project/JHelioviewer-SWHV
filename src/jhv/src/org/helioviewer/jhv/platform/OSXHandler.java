@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.platform;
 
+import java.awt.Desktop;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.ExitHooks;
-
-import java.awt.Desktop;
 
 public class OSXHandler {
 
@@ -21,12 +21,12 @@ public class OSXHandler {
                     Object adapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { handlerClass }, adapter);
                     addHandlerMethod.invoke(Desktop.getDesktop(), new Object[] { adapterProxy });
                  } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.error(e);
                  }
             } else
                 OSXAdapter.setAboutHandler(action, m);
-        } catch (NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.error(e);
         }
     }
 
@@ -41,12 +41,12 @@ public class OSXHandler {
                     Object adapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { handlerClass }, adapter);
                     addHandlerMethod.invoke(Desktop.getDesktop(), new Object[] { adapterProxy });
                  } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.error(e);
                  }
             } else
                 OSXAdapter.setPreferencesHandler(action, m);
-        } catch (NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.error(e);
         }
     }
 
@@ -65,8 +65,8 @@ public class OSXHandler {
                             try {
                                 Method meth = response.getClass().getDeclaredMethod(sign);
                                 meth.invoke(response, (Object[]) null);
-                            } catch (NoSuchMethodException e) {
-                                e.printStackTrace();
+                            } catch (Exception e) {
+                                Log.error(e);
                             }
 
                             return res;
@@ -77,12 +77,12 @@ public class OSXHandler {
                     Object adapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { handlerClass }, adapter);
                     addHandlerMethod.invoke(Desktop.getDesktop(), new Object[] { adapterProxy });
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.error(e);
                 }
             } else
                 OSXAdapter.setQuitHandler("", m);
-        } catch (NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.error(e);
         }
     }
 
