@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import org.helioviewer.jhv.base.logging.Log;
+
 class OSXAdapter implements InvocationHandler {
 
     static final boolean JAVA9 = !(Double.parseDouble(System.getProperty("java.specification.version")) < 1.9);
@@ -33,9 +35,8 @@ class OSXAdapter implements InvocationHandler {
         try {
             Method enableAboutMethod = macOSXApplication.getClass().getDeclaredMethod("setEnabledAboutMenu", boolean.class);
             enableAboutMethod.invoke(macOSXApplication, enableAboutMenu);
-        } catch (Exception ex) {
-            System.err.println("OSXAdapter could not access the About Menu");
-            ex.printStackTrace();
+        } catch (Exception e) {
+            Log.error("OSXAdapter could not access the About Menu", e);
         }
     }
 
@@ -51,9 +52,8 @@ class OSXAdapter implements InvocationHandler {
         try {
             Method enablePrefsMethod = macOSXApplication.getClass().getDeclaredMethod("setEnabledPreferencesMenu", boolean.class);
             enablePrefsMethod.invoke(macOSXApplication, enablePrefsMenu);
-        } catch (Exception ex) {
-            System.err.println("OSXAdapter could not access the About Menu");
-            ex.printStackTrace();
+        } catch (Exception e) {
+            Log.error("OSXAdapter could not access the About Menu", e);
         }
     }
 
@@ -94,11 +94,10 @@ class OSXAdapter implements InvocationHandler {
                 Object osxAdapterProxy = Proxy.newProxyInstance(classLoader, new Class<?>[] { applicationListenerClass }, adapter);
                 addListenerMethod.invoke(macOSXApplication, osxAdapterProxy);
             }
-        } catch (ClassNotFoundException cnfe) {
-            System.err.println("This version of Mac OS X does not support the Apple EAWT.  ApplicationEvent handling has been disabled (" + cnfe + ")");
-        } catch (Exception ex) { // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
-            System.err.println("Mac OS X Adapter could not talk to EAWT:");
-            ex.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            Log.error("This version of Mac OS X does not support the Apple EAWT. ApplicationEvent handling has been disabled", e);
+        } catch (Exception e) { // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
+            Log.error("Mac OS X Adapter could not talk to EAWT", e);
         }
     }
 
@@ -134,7 +133,7 @@ class OSXAdapter implements InvocationHandler {
     // Compare the method that was called to the intended method when the OSXAdapter instance was created
     // (e.g. handleAbout, handleQuit, handleOpenFile, etc.)
     protected boolean isCorrectMethod(Method method, Object[] args) {
-        return (targetMethod != null && args.length == 1 && proxySignature.equals(method.getName()));
+        return targetMethod != null && args.length == 1 && proxySignature.equals(method.getName());
     }
 
     // It is important to mark the ApplicationEvent as handled and cancel the default behavior
@@ -145,9 +144,8 @@ class OSXAdapter implements InvocationHandler {
                 Method setHandledMethod = event.getClass().getDeclaredMethod("setHandled", boolean.class);
                 // If the target method returns a boolean, use that as a hint
                 setHandledMethod.invoke(event, handled);
-            } catch (Exception ex) {
-                System.err.println("OSXAdapter was unable to handle an ApplicationEvent: " + event);
-                ex.printStackTrace();
+            } catch (Exception e) {
+                Log.error("OSXAdapter was unable to handle an ApplicationEvent: " + event, e);
             }
         }
     }
