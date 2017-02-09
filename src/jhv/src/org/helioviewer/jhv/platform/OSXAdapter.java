@@ -117,12 +117,22 @@ class OSXAdapter implements InvocationHandler {
         return result == null || Boolean.parseBoolean(result.toString());
     }
 
+    public boolean callTarget(Object appleEvent, Object response) throws InvocationTargetException, IllegalAccessException {
+        Object result = targetMethod.invoke(targetObject, (Object[]) null);
+        return result == null || Boolean.parseBoolean(result.toString());
+    }
+
     // InvocationHandler implementation
     // This is the entry point for our proxy object; it is called every time an ApplicationListener method is invoked
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (isCorrectMethod(method, args)) {
-            boolean handled = callTarget(args[0]);
+            boolean handled;
+            if (args.length == 1) {
+                handled = callTarget(args[0]);
+            } else {
+                handled = callTarget(args[0], args[1]);
+            }
             if (!JAVA9)
                 setApplicationEventHandled(args[0], handled);
         }
@@ -133,7 +143,7 @@ class OSXAdapter implements InvocationHandler {
     // Compare the method that was called to the intended method when the OSXAdapter instance was created
     // (e.g. handleAbout, handleQuit, handleOpenFile, etc.)
     protected boolean isCorrectMethod(Method method, Object[] args) {
-        return targetMethod != null && args.length == 1 && proxySignature.equals(method.getName());
+        return targetMethod != null && args.length > 0 && proxySignature.equals(method.getName());
     }
 
     // It is important to mark the ApplicationEvent as handled and cancel the default behavior

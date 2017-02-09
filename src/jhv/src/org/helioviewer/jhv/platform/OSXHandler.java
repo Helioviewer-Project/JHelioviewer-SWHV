@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.platform;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -51,10 +52,26 @@ public class OSXHandler {
 
     public static void quitHandler() {
         try {
-            Method m = ExitHooks.class.getMethod("exitProgram", (Class[]) null);
+            Method m = ExitHooks.class.getDeclaredMethod("exitProgram", (Class[]) null);
             if (OSXAdapter.JAVA9) {
                 try {
-                    OSXAdapter adapter = new OSXAdapter("handleQuitRequestWith", "", m);
+                    OSXAdapter adapter = new OSXAdapter("handleQuitRequestWith", "", m) {
+                        @Override
+                        public boolean callTarget(Object appleEvent, Object response) throws InvocationTargetException, IllegalAccessException {
+                            Object result = targetMethod.invoke(targetObject, (Object[]) null);
+                            boolean res = result == null || Boolean.parseBoolean(result.toString());
+
+                            String sign = res ? "performQuit" : "cancelQuit";
+                            try {
+                                Method meth = response.getClass().getDeclaredMethod(sign);
+                                meth.invoke(response, (Object[]) null);
+                            } catch (NoSuchMethodException e) {
+                                e.printStackTrace();
+                            }
+
+                            return res;
+                        }
+                    };
                     Class<?> handlerClass = Class.forName("java.awt.desktop.QuitHandler");
                     Method addHandlerMethod = Desktop.class.getDeclaredMethod("setQuitHandler", new Class<?>[] { handlerClass });
                     Object adapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { handlerClass }, adapter);
