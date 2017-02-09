@@ -17,7 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings("unchecked")
 public class ComesepDownloader extends SWEKDownloader {
 
     private static final String _baseurl = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
@@ -67,12 +67,12 @@ public class ComesepDownloader extends SWEKDownloader {
     protected boolean parseAssociations(JSONObject eventJSON) {
         JSONArray associations = eventJSON.getJSONArray("associations");
         int len = associations.length();
-        Pair<String, String>[] assocs = new Pair[len];
+        Pair<?,?>[] assocs = new Pair<?,?>[len];
         for (int i = 0; i < len; i++) {
             JSONObject asobj = associations.getJSONObject(i);
             assocs[i] = new Pair<>(asobj.getString("parent"), asobj.getString("child"));
         }
-        return EventDatabase.dump_association2db(assocs) != -1;
+        return EventDatabase.dump_association2db((Pair<String,String>[]) assocs) != -1;
     }
 
     @Override
