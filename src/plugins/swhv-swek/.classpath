@@ -7,6 +7,7 @@
     <classpathentry kind="lib" path="resources"/>
     <classpathentry kind="lib" path="../lib/commons-lang3-3.5.jar"/>
     <classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
+    <classpathentry kind="lib" path="../lib/jide-oss-3.6.16.jar"/>
     <classpathentry kind="lib" path="../lib/jogl-all.jar"/>
     <classpathentry kind="lib" path="../lib/json.jar"/>
     <classpathentry kind="output" path="bin"/>
