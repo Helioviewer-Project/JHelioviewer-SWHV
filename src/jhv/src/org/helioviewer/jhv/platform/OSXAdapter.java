@@ -5,8 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-@SuppressWarnings("rawtypes")
-public class OSXAdapter implements InvocationHandler {
+class OSXAdapter implements InvocationHandler {
+
+    static final boolean JAVA9 = !(Double.parseDouble(System.getProperty("java.specification.version")) < 1.9);
 
     protected final Object targetObject;
     protected final Method targetMethod;
@@ -90,7 +91,7 @@ public class OSXAdapter implements InvocationHandler {
             // Create a proxy object around this handler that can be reflectively added as an Apple ApplicationListener
             ClassLoader classLoader = OSXAdapter.class.getClassLoader();
             if (classLoader != null) { // impossible
-                Object osxAdapterProxy = Proxy.newProxyInstance(classLoader, new Class[] { applicationListenerClass }, adapter);
+                Object osxAdapterProxy = Proxy.newProxyInstance(classLoader, new Class<?>[] { applicationListenerClass }, adapter);
                 addListenerMethod.invoke(macOSXApplication, osxAdapterProxy);
             }
         } catch (ClassNotFoundException cnfe) {
@@ -123,7 +124,8 @@ public class OSXAdapter implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (isCorrectMethod(method, args)) {
             boolean handled = callTarget(args[0]);
-            setApplicationEventHandled(args[0], handled);
+            if (!JAVA9)
+                setApplicationEventHandled(args[0], handled);
         }
         // All of the ApplicationListener methods are void; return null regardless of what happens
         return null;
