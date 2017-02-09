@@ -17,9 +17,9 @@ public class OSXHandler {
                 try {
                     OSXAdapter adapter = new OSXAdapter("handleAbout", action, m);
                     Class<?> handlerClass = Class.forName("java.awt.desktop.AboutHandler");
-                    Method addHandlerMethod = Desktop.class.getDeclaredMethod("setAboutHandler", new Class<?>[] { handlerClass });
+                    Method addHandlerMethod = Desktop.class.getDeclaredMethod("setAboutHandler", handlerClass);
                     Object adapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { handlerClass }, adapter);
-                    addHandlerMethod.invoke(Desktop.getDesktop(), new Object[] { adapterProxy });
+                    addHandlerMethod.invoke(Desktop.getDesktop(), adapterProxy);
                  } catch (Exception e) {
                     Log.error(e);
                  }
@@ -37,9 +37,9 @@ public class OSXHandler {
                 try {
                     OSXAdapter adapter = new OSXAdapter("handlePreferences", action, m);
                     Class<?> handlerClass = Class.forName("java.awt.desktop.PreferencesHandler");
-                    Method addHandlerMethod = Desktop.class.getDeclaredMethod("setPreferencesHandler", new Class<?>[] { handlerClass });
+                    Method addHandlerMethod = Desktop.class.getDeclaredMethod("setPreferencesHandler", handlerClass);
                     Object adapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { handlerClass }, adapter);
-                    addHandlerMethod.invoke(Desktop.getDesktop(), new Object[] { adapterProxy });
+                    addHandlerMethod.invoke(Desktop.getDesktop(), adapterProxy);
                  } catch (Exception e) {
                     Log.error(e);
                  }
@@ -73,9 +73,9 @@ public class OSXHandler {
                         }
                     };
                     Class<?> handlerClass = Class.forName("java.awt.desktop.QuitHandler");
-                    Method addHandlerMethod = Desktop.class.getDeclaredMethod("setQuitHandler", new Class<?>[] { handlerClass });
+                    Method addHandlerMethod = Desktop.class.getDeclaredMethod("setQuitHandler", handlerClass);
                     Object adapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { handlerClass }, adapter);
-                    addHandlerMethod.invoke(Desktop.getDesktop(), new Object[] { adapterProxy });
+                    addHandlerMethod.invoke(Desktop.getDesktop(), adapterProxy);
                 } catch (Exception e) {
                     Log.error(e);
                 }

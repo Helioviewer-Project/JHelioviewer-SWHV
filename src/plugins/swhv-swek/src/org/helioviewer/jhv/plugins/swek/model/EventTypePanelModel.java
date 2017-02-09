@@ -18,7 +18,6 @@ public class EventTypePanelModel implements TreeModel {
     /** The event type for this model */
     private final SWEKTreeModelEventType eventType;
 
-    /** Holds the TreeModelListeners */
     // private final List<TreeModelListener> listeners = new HashSet<TreeModelListener>();
 
     /** Holds the EventPanelModelListeners */
