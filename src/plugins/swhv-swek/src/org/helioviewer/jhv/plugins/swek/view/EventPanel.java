@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -27,7 +28,8 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 
-// Panel to display one event type
+import com.jidesoft.swing.JideButton;
+
 @SuppressWarnings("serial")
 public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionListener {
 
@@ -69,14 +71,14 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
 
         add(eventTypeTree, BorderLayout.CENTER);
 
-        SmallPanel filterPanel = new SmallPanel(new BorderLayout());
+        SmallPanel filterPanel = new SmallPanel(new FlowLayout());
         filterPanel.setOpaque(true);
         filterPanel.setBackground(Color.WHITE);
         filterPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
 
         if (eventType.containsFilter()) {
             FilterDialog filterDialog = new FilterDialog(eventType);
-            JButton filterButton = new JButton("Filter");
+            JideButton filterButton = new JideButton("Filter");
             filterButton.addActionListener(e -> filterDialog.setVisible(true));
             filterButton.addMouseListener(new MouseAdapter() {
                 @Override
@@ -86,10 +88,10 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
                     filterDialog.setLocation(windowLocation);
                 }
             });
-            filterPanel.add(filterButton, BorderLayout.CENTER);
+            filterPanel.add(filterButton);
         }
 
-        filterPanel.add(layer, BorderLayout.LINE_END);
+        filterPanel.add(layer);
         filterPanel.setSmall();
         add(filterPanel, BorderLayout.LINE_END);
     }

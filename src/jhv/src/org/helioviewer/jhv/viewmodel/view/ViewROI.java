@@ -109,7 +109,6 @@ public class ViewROI {
 
                 double regionWidth = maxPhysicalX - minPhysicalX;
                 double regionHeight = maxPhysicalY - minPhysicalY;
-
                 if (regionWidth > 0 && regionHeight > 0) {
                     return new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
                 } else {
