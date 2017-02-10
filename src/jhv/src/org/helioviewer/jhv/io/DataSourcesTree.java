@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
+import javax.swing.text.Position;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -17,6 +18,8 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+
+import com.jidesoft.swing.SearchableUtils;
 
 @SuppressWarnings("serial")
 public class DataSourcesTree extends JTree {
@@ -83,6 +86,7 @@ public class DataSourcesTree extends JTree {
 
         setSelectionModel(new OneLeafTreeSelectionModel());
         ToolTipManager.sharedInstance().registerComponent(this);
+        SearchableUtils.installSearchable(this).setRecursive(true);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -95,6 +99,11 @@ public class DataSourcesTree extends JTree {
                 }
             }
         });
+    }
+
+    @Override
+    public TreePath getNextMatch(String prefix, int startingRow, Position.Bias bias) {
+        return null; // disable builtin search
     }
 
     private static void reattach(DefaultMutableTreeNode tgt, DefaultMutableTreeNode src) {
