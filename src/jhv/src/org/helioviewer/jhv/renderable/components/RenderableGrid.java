@@ -128,14 +128,14 @@ public class RenderableGrid extends AbstractRenderable {
             return;
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
         {
-            drawGridFlat(gl, scale, vp);
+            drawGridFlat(gl, vp);
             if (showLabels) {
-                drawGridTextFlat(gl, pixelsPerSolarRadius, scale, vp);
+                drawGridTextFlat(pixelsPerSolarRadius, scale, vp);
             }
         }
     }
 
-    private static void drawGridFlat(GL2 gl, GridScale scale, Viewport vp) {
+    private static void drawGridFlat(GL2 gl, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
 
@@ -169,7 +169,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private static void drawGridTextFlat(GL2 gl, int size, GridScale scale, Viewport vp) {
+    private static void drawGridTextFlat(int size, GridScale scale, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
         TextRenderer renderer = GLText.getRenderer(size);

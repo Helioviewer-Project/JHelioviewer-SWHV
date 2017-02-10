@@ -207,12 +207,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         List<LineDataSelectorElement> els = LineDataSelectorModel.getAllLineDataSelectorElements();
         boolean isEmpty = true;
         for (LineDataSelectorElement el : els) {
-            el.draw(plotG, fullG, graphArea, DrawController.selectedAxis, mousePosition);
+            el.draw(plotG, graphArea, DrawController.selectedAxis, mousePosition);
             isEmpty = isEmpty && el.isEmpty();
         }
         drawLabels(fullG, graphArea, DrawController.selectedAxis, isEmpty);
         for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
-            el.drawHighlighted(plotG, fullG, graphArea, DrawController.selectedAxis, mousePosition);
+            el.drawHighlighted(plotG, graphArea, DrawController.selectedAxis, mousePosition);
         }
     }
 
