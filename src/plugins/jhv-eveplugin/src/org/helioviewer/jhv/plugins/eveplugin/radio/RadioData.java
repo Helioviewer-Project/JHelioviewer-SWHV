@@ -58,17 +58,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
-        int[] source = lut2.getLut8();
-        int len = source.length;
-/*
-        int[] inv = new int[len];
-        int offset = len - 1;
-        for (int i = 0; i < len / 2; i++) {
-            inv[i] = source[offset - i];
-            inv[offset - i] = source[i];
-        }
-*/
-        return new IndexColorModel(8, len, source, 0, false, -1, DataBuffer.TYPE_BYTE);
+        int[] source = lut2.getLut8Inv();
+        return new IndexColorModel(8, source.length, source, 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 
     static void setLUT(LUT lut) {

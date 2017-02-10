@@ -40,6 +40,17 @@ public class LUT {
         return lut8;
     }
 
+    public int[] getLut8Inv() {
+        int[] inv = new int[lut8.length];
+        int off = lut8.length - 1;
+
+        for (int i = 0; i < lut8.length / 2; i++) {
+            inv[i] = lut8[off - i];
+            inv[off - i] = lut8[i];
+        }
+        return inv;
+    }
+
     private static final TreeMap<String, LUT> standardList = new TreeMap<>(JHVGlobals.alphanumComparator);
     // List of rules to apply
     private static JSONArray colorRules;
