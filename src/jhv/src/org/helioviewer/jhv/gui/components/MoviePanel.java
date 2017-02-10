@@ -37,7 +37,6 @@ import javax.swing.event.ChangeListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -179,9 +178,9 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     private static JComboBox<SpeedUnit> speedUnitComboBox;
     private static JComboBox<AnimationMode> animationModeComboBox;
 
-    private static SmallPanel speedPanel;
-    private static SmallPanel modePanel;
-    private static SmallPanel recordPanel;
+    private static final JPanel speedPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+    private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+    private static final JPanel recordPanel = new JPanel(new GridBagLayout());
 
     // Icons
     private static final Icon playIcon = IconBank.getIcon(JHVIcon.PLAY);
@@ -284,7 +283,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         // It is not included in the main Panel to save space if it is not shown
 
         // Speed
-        speedPanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         speedPanel.add(new JLabel("Speed", JLabel.RIGHT));
 
         int speedMin = 1, speedMax = 60;
@@ -305,7 +303,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         speedPanel.add(speedUnitComboBox);
 
         // Animation mode
-        modePanel = new SmallPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
 
         animationModeComboBox = new JComboBox<>(new AnimationMode[]{AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING});
@@ -313,8 +310,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         animationModeComboBox.addActionListener(e -> Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem()));
         modePanel.add(animationModeComboBox);
 
-        recordPanel = new SmallPanel(new GridBagLayout());
-
+        // Record
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
         c.gridy = 0;
@@ -362,10 +358,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         add(modePanel);
         add(recordPanel);
 
-        speedPanel.setSmall();
-        modePanel.setSmall();
-        recordPanel.setSmall();
-
+        ComponentUtils.smallVariant(this);
         setEnabledState(false);
         sliderTimer.start();
     }

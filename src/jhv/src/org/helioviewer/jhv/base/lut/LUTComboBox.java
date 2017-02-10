@@ -16,7 +16,7 @@ public class LUTComboBox extends JComboBox<String> {
     public LUTComboBox() {
         lutMap = LUT.copyMap(); // duplicate
         Set<String> set = lutMap.keySet();
-        setModel(new DefaultComboBoxModel<String>(set.toArray(new String[set.size()])));
+        setModel(new DefaultComboBoxModel<>(set.toArray(new String[set.size()])));
         setToolTipText("Choose a color table");
         SearchableUtils.installSearchable(this);
     }

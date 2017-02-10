@@ -72,20 +72,4 @@ public class Message {
         EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (msg == null || msg.isEmpty() ? "No warning details available." : msg)), "Warning", JOptionPane.WARNING_MESSAGE));
     }
 
-    /**
-     * A central warning handler. Displays a warning message in a JOptionDialog.
-     * 
-     * @param _title
-     *            title of the warning message.
-     * @param _msg
-     *            the message which has to be displayed.
-     */
-    public static void warnTitle(String _title, Object _msg) {
-        if (Thread.currentThread().isInterrupted())
-            return;
-
-        String msg = _msg.toString();
-        EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, (msg == null || msg.isEmpty() ? "No warning details available." : msg), _title, JOptionPane.WARNING_MESSAGE));
-    }
-
 }
