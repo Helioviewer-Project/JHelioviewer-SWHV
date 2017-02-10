@@ -99,7 +99,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
                     int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
                     int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
-                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition, event.isHighlighted(), false);
+                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition, event.isHighlighted());
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                         highlightedEvent = rEvent;
@@ -118,7 +118,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             if (highlightedEvent != null) {
                 int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
                 int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getEnd());
-                EventPlotConfiguration.draw(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition, highlightedEvent.isHighlighted(), true);
+                EventPlotConfiguration.draw(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition, highlightedEvent.isHighlighted());
             }
             JHVEventCache.highlight(highlightedEvent);
         }
@@ -188,7 +188,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             yPosition = _yPosition;
         }
 
-        public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight, boolean drawHighlighted) {
+        public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight) {
             int spacePerLine = 3;
             int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
             int w = Math.max(x1 - x0, 1);
