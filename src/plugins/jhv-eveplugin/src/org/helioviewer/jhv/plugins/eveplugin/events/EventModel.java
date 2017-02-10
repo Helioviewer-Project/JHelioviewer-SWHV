@@ -68,7 +68,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     @Override
-    public void draw(Graphics2D g, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }
@@ -113,7 +113,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     @Override
-    public void drawHighlighted(Graphics2D g, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
         if (mousePosition != null) {
             if (highlightedEvent != null) {
                 int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());

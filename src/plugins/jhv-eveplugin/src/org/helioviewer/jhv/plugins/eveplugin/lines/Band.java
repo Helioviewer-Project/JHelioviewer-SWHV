@@ -118,7 +118,7 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void draw(Graphics2D g, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }
@@ -216,7 +216,7 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void drawHighlighted(Graphics2D graphG, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
     }
 
 }

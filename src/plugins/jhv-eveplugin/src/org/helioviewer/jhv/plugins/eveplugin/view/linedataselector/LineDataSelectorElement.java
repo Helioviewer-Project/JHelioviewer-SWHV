@@ -31,9 +31,9 @@ public interface LineDataSelectorElement {
 
     boolean showYAxis();
 
-    void draw(Graphics2D graphG, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+    void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
-    void drawHighlighted(Graphics2D graphG, Graphics2D fullG, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+    void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
     YAxis getYAxis();
 
