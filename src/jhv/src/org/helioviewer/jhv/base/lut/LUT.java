@@ -41,12 +41,11 @@ public class LUT {
     }
 
     public int[] getLut8Inv() {
-        int[] inv = new int[lut8.length];
-        int off = lut8.length - 1;
+        int len = lut8.length;
+        int[] inv = new int[len];
 
-        for (int i = 0; i < lut8.length / 2; i++) {
-            inv[i] = lut8[off - i];
-            inv[off - i] = lut8[i];
+        for (int i = 0; i < len; i++) {
+            inv[i] = lut8[len - 1 - i];
         }
         return inv;
     }
