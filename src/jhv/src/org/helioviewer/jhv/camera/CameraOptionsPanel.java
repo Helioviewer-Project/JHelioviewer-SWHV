@@ -119,8 +119,7 @@ public class CameraOptionsPanel extends SmallPanel implements PositionLoadFire {
         fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
         fovPanel.add(new JLabel("FOV angle"));
 
-        JSpinner fovSpinner = new JSpinner();
-        fovSpinner.setModel(new SpinnerNumberModel(Double.valueOf(FOVAngleDefault), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
+        JSpinner fovSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(FOVAngleDefault), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
         fovSpinner.addChangeListener(e -> {
             FOVAngle = (Double) fovSpinner.getValue() * Math.PI / 180.;
             Displayer.display();
