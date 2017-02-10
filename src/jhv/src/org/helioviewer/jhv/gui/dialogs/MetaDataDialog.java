@@ -9,6 +9,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -53,24 +55,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.jidesoft.swing.SearchableUtils;
+
 @SuppressWarnings("serial")
 public class MetaDataDialog extends JDialog implements ShowableDialog {
 
-    private static class LocalTableModel extends DefaultTableModel {
+    private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
-        public LocalTableModel(Object[][] object, Object[] objects) {
-            super(object, objects);
-        }
-
+    private final DefaultTableModel fitsModel = new DefaultTableModel(null, new Object[] { "FITS Keyword", "Value" }) {
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
         }
-    }
-
-    private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
-
-    private final DefaultTableModel fitsModel = new LocalTableModel(null, new Object[] { "FITS Keyword", "Value" });
+    };
     private final DefaultListModel<String> jhList = new DefaultListModel<>();
     private final DefaultListModel<String> basicList = new DefaultListModel<>();
 
@@ -115,6 +112,7 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
         JTable fTable = new JTable(fitsModel);
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(fitsModel);
         fTable.setRowSorter(sorter);
+        SearchableUtils.installSearchable(fTable);
 
         JPanel sp = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -139,6 +137,13 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
         add(bottomPanel, BorderLayout.PAGE_END);
 
         setMetaData(view);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                fTable.requestFocus();
+            }
+        });
 
         getRootPane().registerKeyboardAction(e -> closePressed(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
