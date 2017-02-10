@@ -3,15 +3,13 @@ package org.helioviewer.jhv.layers.filters;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.Icon;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.lut.LUT;
+import org.helioviewer.jhv.base.lut.LUTComboBox;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -24,21 +22,14 @@ public class LUTPanel implements ActionListener, FilterDetails {
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
     private static final Icon enhanceIcon = IconBank.getIcon(JHVIcon.LAYER_IMAGE);
 
-    private final Map<String, LUT> lutMap;
-
-    private final JComboBox<String> combobox;
+    private final LUTComboBox lutCombo;
     private final JPanel buttonPanel;
     private final JideToggleButton invertButton;
     private final JideToggleButton enhanceButton;
 
     public LUTPanel() {
-        lutMap = LUT.copyMap(); // duplicate
-
-        Set<String> set = lutMap.keySet();
-        combobox = new JComboBox<>(set.toArray(new String[set.size()]));
-        combobox.setMaximumSize(combobox.getPreferredSize());
-        combobox.setToolTipText("Choose a color table");
-        combobox.addActionListener(this);
+        lutCombo = new LUTComboBox();
+        lutCombo.addActionListener(this);
 
         invertButton = new JideToggleButton(invertIcon);
         invertButton.setToolTipText("Invert color table");
@@ -55,24 +46,13 @@ public class LUTPanel implements ActionListener, FilterDetails {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        LUT newMap = lutMap.get(combobox.getSelectedItem());
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLUT(newMap, invertButton.isSelected());
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLUT(lutCombo.getLUT(), invertButton.isSelected());
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setEnhanced(enhanceButton.isSelected());
         Displayer.display();
     }
 
     public void setLUT(LUT lut) {
-        String name;
-        if (lut != null) {
-            name = lut.getName();
-            if (lutMap.get(name) == null) {
-                lutMap.put(name, lut);
-                combobox.addItem(name);
-            }
-        } else // e.g. RGB
-            name = "Gray";
-
-        combobox.setSelectedItem(name);
+        lutCombo.setLUT(lut);
     }
 
     @Override
@@ -82,7 +62,7 @@ public class LUTPanel implements ActionListener, FilterDetails {
 
     @Override
     public Component getComponent() {
-        return combobox;
+        return lutCombo;
     }
 
     @Override
