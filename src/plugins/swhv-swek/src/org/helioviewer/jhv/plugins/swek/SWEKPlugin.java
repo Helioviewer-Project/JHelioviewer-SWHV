@@ -6,7 +6,6 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.event.SWEKEventType;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
@@ -28,8 +27,6 @@ public class SWEKPlugin implements Plugin {
         for (SWEKEventType eventType : SWEKConfigurationManager.loadConfiguration()) {
             swekPanel.add(new EventPanel(eventType));
         }
-        ComponentUtils.smallVariant(swekPanel);
-
         JHVEventCache.registerHandler(downloadManager);
     }
 
