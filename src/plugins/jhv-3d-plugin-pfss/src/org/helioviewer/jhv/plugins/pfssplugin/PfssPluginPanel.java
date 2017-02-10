@@ -7,22 +7,22 @@ import java.awt.event.ItemEvent;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-class PfssPluginPanel extends SmallPanel {
+class PfssPluginPanel extends JPanel {
 
     public PfssPluginPanel() {
         setLayout(new GridBagLayout());
 
-        JSpinner levelSpinner = new JSpinner();
-        levelSpinner.setModel(new SpinnerNumberModel(0, 0, 8, 1));
+        JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 8, 1));
         levelSpinner.addChangeListener(e -> {
             PfssSettings.qualityReduction = 8 - (Integer) levelSpinner.getValue();
             Displayer.display();
@@ -60,7 +60,7 @@ class PfssPluginPanel extends SmallPanel {
         c0.gridx = 3;
         add(availabilityButton, c0);
 
-        setSmall();
+        ComponentUtils.smallVariant(this);
     }
 
     @Override

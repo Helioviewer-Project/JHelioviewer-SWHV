@@ -281,14 +281,13 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         private static final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
 
-        private final JSpinner spinnerCadence = new JSpinner();
+        private final JSpinner spinnerCadence = new JSpinner(new SpinnerNumberModel(30, 1, 1000000, 1));
         private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
         public CadencePanel() {
             setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
             spinnerCadence.setPreferredSize(new Dimension(50, 25));
-            spinnerCadence.setModel(new SpinnerNumberModel(30, 1, 1000000, 1));
 
             comboUnit.setSelectedItem("min");
             comboUnit.addActionListener(e -> spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4));
@@ -305,7 +304,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         // Returns the number of seconds of the selected cadence
         public int getCadence() {
-            int value = ((SpinnerNumberModel) spinnerCadence.getModel()).getNumber().intValue();
+            int value = (Integer) spinnerCadence.getValue();
 
             switch (comboUnit.getSelectedIndex()) {
             case 1: // min
