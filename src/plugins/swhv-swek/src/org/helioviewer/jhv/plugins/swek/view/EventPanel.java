@@ -19,7 +19,6 @@ import javax.swing.JTree;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.data.event.SWEKEventType;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
@@ -70,7 +69,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
 
         add(eventTypeTree, BorderLayout.CENTER);
 
-        SmallPanel filterPanel = new SmallPanel(new FlowLayout());
+        JPanel filterPanel = new JPanel(new FlowLayout());
         filterPanel.setOpaque(true);
         filterPanel.setBackground(Color.WHITE);
         filterPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
@@ -89,9 +88,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
             });
             filterPanel.add(filterButton);
         }
-
         filterPanel.add(layer);
-        filterPanel.setSmall();
         add(filterPanel, BorderLayout.LINE_END);
     }
 

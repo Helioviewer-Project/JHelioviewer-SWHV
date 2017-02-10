@@ -4,13 +4,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 
 @SuppressWarnings("serial")
-class SWEKRenderableOptionsPanel extends SmallPanel {
+class SWEKRenderableOptionsPanel extends JPanel {
 
     boolean icons = true;
 
@@ -33,7 +34,7 @@ class SWEKRenderableOptionsPanel extends SmallPanel {
         });
         add(check, c0);
 
-        setSmall();
+        ComponentUtils.smallVariant(this);
     }
 
 }
