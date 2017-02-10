@@ -10,9 +10,10 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.data.event.SWEKEventType;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
 
@@ -27,8 +28,7 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
         addWindowFocusListener(this);
 
         List<FilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(eventType, this);
-        SmallPanel filterPanel = new SmallPanel();
-        filterPanel.setLayout(new GridLayout(filterPanels.size() + 1, 1));
+        JPanel filterPanel = new JPanel(new GridLayout(filterPanels.size() + 1, 1));
         filterPanel.setOpaque(false);
         filterPanel.setBackground(Color.white);
         for (FilterPanel afp : filterPanels) {
@@ -47,11 +47,10 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
             }
             applyButton.setEnabled(false);
         });
-
         filterPanel.add(applyButton);
-        filterPanel.setSmall();
 
         setContentPane(filterPanel);
+        ComponentUtils.smallVariant(this);
         pack();
     }
 
