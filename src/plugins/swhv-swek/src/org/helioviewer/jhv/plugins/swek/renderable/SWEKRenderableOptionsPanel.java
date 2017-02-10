@@ -28,7 +28,7 @@ class SWEKRenderableOptionsPanel extends JPanel {
 
         JCheckBox check = new JCheckBox("Icons", icons);
         check.setHorizontalTextPosition(SwingConstants.LEFT);
-        check.addItemListener(e -> {
+        check.addActionListener(e -> {
             icons = !icons;
             Displayer.display();
         });

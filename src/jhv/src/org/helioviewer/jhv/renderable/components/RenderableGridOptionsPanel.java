@@ -45,7 +45,7 @@ class RenderableGridOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.EAST;
         JCheckBox axis = new JCheckBox("Solar axis", grid.getShowAxis());
         axis.setHorizontalTextPosition(SwingConstants.LEFT);
-        axis.addItemListener(e -> {
+        axis.addActionListener(e -> {
             grid.showAxis(axis.isSelected());
             Displayer.display();
         });
@@ -55,7 +55,7 @@ class RenderableGridOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.EAST;
         JCheckBox labels = new JCheckBox("Grid labels", grid.getShowLabels());
         labels.setHorizontalTextPosition(SwingConstants.LEFT);
-        labels.addItemListener(e -> {
+        labels.addActionListener(e -> {
             grid.showLabels(labels.isSelected());
             Displayer.display();
         });
@@ -67,7 +67,7 @@ class RenderableGridOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.EAST;
         JCheckBox radial = new JCheckBox("Radial grid", grid.getShowRadial());
         radial.setHorizontalTextPosition(SwingConstants.LEFT);
-        radial.addItemListener(e -> {
+        radial.addActionListener(e -> {
             grid.showRadial(radial.isSelected());
             Displayer.display();
         });
