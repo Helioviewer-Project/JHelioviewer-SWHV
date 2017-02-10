@@ -19,6 +19,7 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JSeparatorComboBox;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
@@ -96,7 +97,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             }
         });
 
-        setSmall();
+        ComponentUtils.smallVariant(this);
     }
 
     private void addSyncButtons(GridBagConstraints c) {
