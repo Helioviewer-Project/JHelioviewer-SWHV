@@ -4,15 +4,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JButton;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.lut.LUTComboBox;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 
 @SuppressWarnings("serial")
-class RadioOptionsPanel extends SmallPanel {
+class RadioOptionsPanel extends JPanel {
 
     public RadioOptionsPanel(String selected) {
         setLayout(new GridBagLayout());
@@ -37,7 +38,7 @@ class RadioOptionsPanel extends SmallPanel {
         c.gridy = 0;
         add(availabilityButton, c);
 
-        setSmall();
+        ComponentUtils.smallVariant(this);
     }
 
 }
