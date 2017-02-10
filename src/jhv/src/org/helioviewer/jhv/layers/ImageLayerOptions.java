@@ -4,15 +4,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.layers.filters.*;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class ImageLayerOptions extends SmallPanel {
+public class ImageLayerOptions extends JPanel {
 
     private final ImageLayer imageLayer;
     private final OpacityPanel opacityPanel;
@@ -54,7 +55,7 @@ public class ImageLayerOptions extends SmallPanel {
         c.gridy++;
         addToGridBag(c, channelMixerPanel);
 
-        setSmall();
+        ComponentUtils.smallVariant(this);
         levelsPanel.syncFont(); // JideButton does not respect variant small
     }
 

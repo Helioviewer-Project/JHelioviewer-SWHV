@@ -2,9 +2,6 @@ package org.helioviewer.jhv.gui;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.LayoutManager;
-
-import javax.swing.JPanel;
 
 import com.jidesoft.swing.JideSwingUtilities;
 
@@ -38,21 +35,6 @@ public class ComponentUtils {
 
     public static void smallVariant(Component c) {
         JideSwingUtilities.putClientPropertyRecursively(c, "JComponent.sizeVariant", "small");
-    }
-
-    @SuppressWarnings("serial")
-    public static class SmallPanel extends JPanel {
-
-        public SmallPanel() {
-        }
-
-        public SmallPanel(LayoutManager layout) {
-            super(layout);
-        }
-
-        public void setSmall() {
-            smallVariant(this);
-        }
     }
 
 }

@@ -19,7 +19,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
@@ -27,7 +27,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 @SuppressWarnings("serial")
-public class CameraOptionsPanel extends SmallPanel implements PositionLoadFire {
+public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
 
     private enum CameraMode {
         OBSERVER, EARTH, EXPERT
@@ -140,7 +140,7 @@ public class CameraOptionsPanel extends SmallPanel implements PositionLoadFire {
         c.gridy = 1;
         add(fovPanel, c);
 
-        setSmall();
+        ComponentUtils.smallVariant(this);
 
         PositionLoad positionLoad = new PositionLoad(this);
         ((UpdateViewpoint.UpdateViewpointExpert) UpdateViewpoint.updateExpert).setPositionLoad(positionLoad);
