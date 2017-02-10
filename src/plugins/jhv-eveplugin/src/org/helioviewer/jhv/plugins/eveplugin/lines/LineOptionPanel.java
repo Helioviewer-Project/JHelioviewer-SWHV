@@ -7,14 +7,15 @@ import java.awt.Insets;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
 
 @SuppressWarnings("serial")
-class LineOptionPanel extends SmallPanel {
+class LineOptionPanel extends JPanel {
 
     public LineOptionPanel(Band band) {
         setLayout(new GridBagLayout());
@@ -46,7 +47,7 @@ class LineOptionPanel extends SmallPanel {
         availabilityButton.addActionListener(e -> JHVGlobals.openURL(EVESettings.availabilityURL + "#" + band.getBandType().getName()));
         add(availabilityButton, c);
 
-        setSmall();
+        ComponentUtils.smallVariant(this);
     }
 
 }

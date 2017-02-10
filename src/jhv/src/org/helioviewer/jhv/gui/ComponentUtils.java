@@ -4,8 +4,9 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.LayoutManager;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import com.jidesoft.swing.JideSwingUtilities;
 
 public class ComponentUtils {
 
@@ -35,20 +36,8 @@ public class ComponentUtils {
         container.setVisible(visible);
     }
 
-    private static void setClientProperty(Component container, String property, String value) {
-        if (container instanceof Container) {
-            Component[] components = ((Container) container).getComponents();
-            for (Component component : components) {
-                if (component instanceof JComponent)
-                    ((JComponent) component).putClientProperty(property, value);
-                if (component instanceof Container) {
-                    setClientProperty(component, property, value);
-                }
-            }
-        }
-
-        if (container instanceof JComponent)
-            ((JComponent) container).putClientProperty(property, value);
+    public static void smallVariant(Component c) {
+        JideSwingUtilities.putClientPropertyRecursively(c, "JComponent.sizeVariant", "small");
     }
 
     @SuppressWarnings("serial")
@@ -62,7 +51,7 @@ public class ComponentUtils {
         }
 
         public void setSmall() {
-            setClientProperty(this, "JComponent.sizeVariant", "small");
+            smallVariant(this);
         }
     }
 
