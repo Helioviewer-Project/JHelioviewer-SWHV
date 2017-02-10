@@ -10,26 +10,6 @@ class SWEKIconBank {
 
     private static final HashMap<String, ImageIcon> iconBank = new HashMap<>();
 
-    /**
-     * Adds a new Icon to the icon bank.
-     * 
-     * @param eventType
-     *            the event type for which an icon was added
-     * @param icon
-     *            the icon corresponding to the event
-     */
-    public static void addIcon(String eventType, ImageIcon icon) {
-        iconBank.put(eventType, icon);
-    }
-
-    /**
-     * Gets the Icon for the given icon name.
-     * 
-     * @param iconName
-     *            the name of the icon.
-     * @return the icon corresponding with the given name or the "other" icon if
-     *         the name was not known.
-     */
     public static ImageIcon getIcon(String iconName) {
         ImageIcon tempIcon = iconBank.get(iconName);
         return tempIcon == null ? iconBank.get("Other") : tempIcon;
