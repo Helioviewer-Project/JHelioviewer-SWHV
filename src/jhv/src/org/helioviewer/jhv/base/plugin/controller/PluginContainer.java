@@ -2,14 +2,11 @@ package org.helioviewer.jhv.base.plugin.controller;
 
 import java.net.URI;
 
-import org.helioviewer.jhv.base.plugin.interfaces.Container;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 
-/**
- * The basic class which manages the interface between JHV and the contained
- * plugin. It manages the current status of the corresponding plug-in.
- */
-public class PluginContainer implements Container {
+// The basic class which manages the interface between JHV and the contained
+// plugin. It manages the current status of the corresponding plug-in.
+public class PluginContainer {
 
     private final Plugin plugin;
     private final URI pluginLocation;
@@ -21,29 +18,18 @@ public class PluginContainer implements Container {
         pluginActive = _pluginActive;
     }
 
-    @Override
     public String getName() {
         return plugin.getName();
     }
 
-    @Override
     public String getDescription() {
         return plugin.getDescription();
     }
 
-    @Override
     public boolean isActive() {
         return pluginActive;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * If the new active status is the same as the current status the method
-     * will do nothing. Otherwise it installs the plug-in if the new status is
-     * true or uninstalls the plug-in if the new status is false.
-     */
-    @Override
     public void setActive(boolean active) {
         if (pluginActive == active)
             return;
@@ -55,7 +41,6 @@ public class PluginContainer implements Container {
             plugin.uninstallPlugin();
     }
 
-    @Override
     public void changeSettings() {
         PluginSettings.getSingletonInstance().pluginSettingsToXML(this);
     }
@@ -68,7 +53,6 @@ public class PluginContainer implements Container {
         return pluginLocation;
     }
 
-    @Override
     public String toString() {
         return plugin.getName();
     }
