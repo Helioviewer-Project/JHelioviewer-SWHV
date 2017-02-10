@@ -42,7 +42,7 @@ class PfssPluginPanel extends JPanel {
         add(levelSpinner, c0);
 
         JCheckBox fixedColors = new JCheckBox("Fixed colors", false);
-        fixedColors.addItemListener(e -> {
+        fixedColors.addActionListener(e -> {
             PfssSettings.fixedColor = fixedColors.isSelected();
             Displayer.display();
         });

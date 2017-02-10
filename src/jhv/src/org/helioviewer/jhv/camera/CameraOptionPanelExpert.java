@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -146,12 +145,10 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     private void addObjectCombobox(GridBagConstraints c) {
         JSeparatorComboBox objectCombobox = new JSeparatorComboBox(SpaceObject.getObjectList().toArray());
         objectCombobox.setSelectedItem(SpaceObject.earth);
-        objectCombobox.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                String object = ((SpaceObject) e.getItem()).getUrlName();
-                positionLoad.setObserver(object, true);
-                // Displayer.render();
-            }
+        objectCombobox.addActionListener(e -> {
+            String object = ((SpaceObject) objectCombobox.getSelectedItem()).getUrlName();
+            positionLoad.setObserver(object, true);
+            // Displayer.render();
         });
         add(objectCombobox, c);
     }
