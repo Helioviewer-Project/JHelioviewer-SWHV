@@ -2,23 +2,23 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ItemEvent;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-class RenderableGridOptionsPanel extends SmallPanel {
+class RenderableGridOptionsPanel extends JPanel {
 
     private static final double min = 5, max = 90;
 
@@ -46,7 +46,7 @@ class RenderableGridOptionsPanel extends SmallPanel {
         JCheckBox axis = new JCheckBox("Solar axis", grid.getShowAxis());
         axis.setHorizontalTextPosition(SwingConstants.LEFT);
         axis.addItemListener(e -> {
-            grid.showAxis(e.getStateChange() == ItemEvent.SELECTED);
+            grid.showAxis(axis.isSelected());
             Displayer.display();
         });
         add(axis, c0);
@@ -56,7 +56,7 @@ class RenderableGridOptionsPanel extends SmallPanel {
         JCheckBox labels = new JCheckBox("Grid labels", grid.getShowLabels());
         labels.setHorizontalTextPosition(SwingConstants.LEFT);
         labels.addItemListener(e -> {
-            grid.showLabels(e.getStateChange() == ItemEvent.SELECTED);
+            grid.showLabels(labels.isSelected());
             Displayer.display();
         });
         add(labels, c0);
@@ -68,7 +68,7 @@ class RenderableGridOptionsPanel extends SmallPanel {
         JCheckBox radial = new JCheckBox("Radial grid", grid.getShowRadial());
         radial.setHorizontalTextPosition(SwingConstants.LEFT);
         radial.addItemListener(e -> {
-            grid.showRadial(e.getStateChange() == ItemEvent.SELECTED);
+            grid.showRadial(radial.isSelected());
             Displayer.display();
         });
         add(radial, c0);
@@ -105,7 +105,7 @@ class RenderableGridOptionsPanel extends SmallPanel {
         c0.anchor = GridBagConstraints.WEST;
         add(gridResolutionYSpinner, c0);
 
-        setSmall();
+        ComponentUtils.smallVariant(this);
     }
 
     private void createGridChoiceBox() {

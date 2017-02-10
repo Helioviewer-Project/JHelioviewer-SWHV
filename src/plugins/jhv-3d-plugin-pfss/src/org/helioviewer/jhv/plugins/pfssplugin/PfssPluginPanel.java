@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ItemEvent;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -44,7 +43,7 @@ class PfssPluginPanel extends JPanel {
 
         JCheckBox fixedColors = new JCheckBox("Fixed colors", false);
         fixedColors.addItemListener(e -> {
-            PfssSettings.fixedColor = (e.getStateChange() == ItemEvent.SELECTED);
+            PfssSettings.fixedColor = fixedColors.isSelected();
             Displayer.display();
         });
 

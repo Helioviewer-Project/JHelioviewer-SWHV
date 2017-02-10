@@ -5,30 +5,39 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ComponentUtils.SmallPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-class RenderableMiniviewOptionsPanel extends SmallPanel {
+class RenderableMiniviewOptionsPanel extends JPanel {
 
     private static final int DEFAULT = 10;
+    private static final int MIN = 5;
+    private static final int MAX = 15;
     int scale = DEFAULT;
 
     private final RenderableMiniview miniview;
-    private JSpinner xSpinner;
 
     public RenderableMiniviewOptionsPanel(RenderableMiniview _miniview) {
         miniview = _miniview;
+        setLayout(new GridBagLayout());
 
-        createXSpinner();
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(DEFAULT), Double.valueOf(MIN), Double.valueOf(MAX), Double.valueOf(1)));
+        JFormattedTextField f = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+        f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%", MIN, MAX));
 
-        GridBagLayout gridBagLayout = new GridBagLayout();
-        setLayout(gridBagLayout);
+        spinner.addChangeListener(e -> {
+            scale = ((Double) spinner.getValue()).intValue();
+            miniview.reshapeViewport();
+            Displayer.display();
+        });
+        WheelSupport.installMouseWheelSupport(spinner);
 
         GridBagConstraints c0 = new GridBagConstraints();
         c0.anchor = GridBagConstraints.EAST;
@@ -40,24 +49,9 @@ class RenderableMiniviewOptionsPanel extends SmallPanel {
 
         c0.anchor = GridBagConstraints.WEST;
         c0.gridx = 1;
-        add(xSpinner, c0);
+        add(spinner, c0);
 
-        setSmall();
-    }
-
-    private void createXSpinner() {
-        int min = 5, max = 15;
-
-        xSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(DEFAULT), Double.valueOf(min), Double.valueOf(max), Double.valueOf(1)));
-        JFormattedTextField f = ((JSpinner.DefaultEditor) xSpinner.getEditor()).getTextField();
-        f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%", min, max));
-
-        xSpinner.addChangeListener(e -> {
-            scale = ((Double) xSpinner.getValue()).intValue();
-            miniview.reshapeViewport();
-            Displayer.display();
-        });
-        WheelSupport.installMouseWheelSupport(xSpinner);
+        ComponentUtils.smallVariant(this);
     }
 
 }
