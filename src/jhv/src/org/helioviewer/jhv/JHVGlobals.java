@@ -16,17 +16,12 @@ import java.util.jar.Manifest;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import org.helioviewer.jhv.base.AlphanumComparator;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.dialogs.ExportReadyDialog;
 import org.helioviewer.jhv.threads.JHVExecutor;
 
-/**
- * Intended to be a class for static functions and fields relevant to the
- * application as a whole.
- *
- * @author caplins
- */
+import com.jidesoft.comparator.AlphanumComparator;
+
 public class JHVGlobals {
 
     public static final String programName = "ESA JHelioviewer";
@@ -35,7 +30,7 @@ public class JHVGlobals {
     private static String revision = "";
     private static String agent = "JHV/SWHV-";
 
-    public static final AlphanumComparator alphanumComparator = new AlphanumComparator();
+    public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
     public static final int hiDpiCutoff = 1024;
 
