@@ -217,13 +217,13 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
             if (hl) {
-                drawText(graphArea, g, event, x0, y, w, h, mousePosition);
+                drawText(graphArea, g, event, y, mousePosition);
             }
 
             return containsMouse ? highlightedEvent = event : null;
         }
 
-        private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int x, int y, int w, int h, Point mousePosition) {
+        private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, Point mousePosition) {
             if (mousePosition != null) {
                 long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
                 ArrayList<String> txts = new ArrayList<>();
