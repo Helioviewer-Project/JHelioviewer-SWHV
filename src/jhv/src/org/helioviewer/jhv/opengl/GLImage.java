@@ -112,21 +112,7 @@ public class GLImage {
 
         LUT currlut = diffMode == DifferenceMode.None ? lut : gray;
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
-            int[] intLUT;
-
-            if (invertLUT) {
-                int[] sourceLUT = currlut.getLut8();
-                intLUT = new int[sourceLUT.length];
-
-                int offset = sourceLUT.length - 1;
-                for (int i = 0; i < sourceLUT.length / 2; i++) {
-                    intLUT[i] = sourceLUT[offset - i];
-                    intLUT[offset - i] = sourceLUT[i];
-                }
-            } else {
-                intLUT = currlut.getLut8();
-            }
-
+            int[] intLUT = invertLUT ? currlut.getLut8Inv() : currlut.getLut8();
             IntBuffer lutBuffer = IntBuffer.wrap(intLUT);
             lastLut = currlut;
             lastInverted = invertLUT;

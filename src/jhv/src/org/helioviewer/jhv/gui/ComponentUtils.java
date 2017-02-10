@@ -7,19 +7,6 @@ import com.jidesoft.swing.JideSwingUtilities;
 
 public class ComponentUtils {
 
-    public static void setEnabled(Component container, boolean enable) {
-        if (container instanceof Container) {
-            Component[] components = ((Container) container).getComponents();
-            for (Component component : components) {
-                component.setEnabled(enable);
-                if (component instanceof Container) {
-                    setEnabled(component, enable);
-                }
-            }
-        }
-        container.setEnabled(enable);
-    }
-
     public static void setVisible(Component container, boolean visible) {
         if (container instanceof Container) {
             Component[] components = ((Container) container).getComponents();
@@ -31,6 +18,10 @@ public class ComponentUtils {
             }
         }
         container.setVisible(visible);
+    }
+
+    public static void setEnabled(Component c, boolean enable) {
+        JideSwingUtilities.setEnabledRecursively(c, enable);
     }
 
     public static void smallVariant(Component c) {
