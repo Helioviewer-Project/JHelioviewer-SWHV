@@ -6,24 +6,11 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.FileUtils;
+import com.jidesoft.icons.IconsFactory;
 
-/**
- * This class provides access to all images, icons and cursors which are used by
- * the program.
- *
- * @author caplins
- * @author dmueller
- * @author Stephan Pagel
- */
 public class IconBank {
-    /**
-     * The enum has all the icons, you supply these enums to the getIcon method.
-     *
-     * @author caplins cleaned up unused icons
-     * @author dmueller
-     *
-     */
+
+    // The enum has all the icons, you supply these enums to the getIcon method.
     public enum JHVIcon {
         // The formatter will not merge together multiple lines, if at least one
         // empty line is inserted in between:
@@ -98,9 +85,6 @@ public class IconBank {
         }
     }
 
-    /** The location of the image files relative to this folder. */
-    private static final String RESOURCE_PATH = "/images/";
-
     /**
      * Returns the ImageIcon associated with the given enum
      *
@@ -109,7 +93,7 @@ public class IconBank {
      * @return the image icon of the given enum
      * */
     public static ImageIcon getIcon(JHVIcon icon) {
-        return new ImageIcon(FileUtils.getResourceUrl(RESOURCE_PATH + icon.getFilename()));
+        return IconsFactory.getImageIcon(IconBank.class, "/images/" + icon.getFilename());
     }
 
     public static ImageIcon getIcon(JHVIcon icon, int w, int h) {
