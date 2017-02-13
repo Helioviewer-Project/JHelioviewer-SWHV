@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui;
 
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.font.TextAttribute;
@@ -75,9 +76,16 @@ public class UIGlobals {
 
         try (InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf")) {
             UIFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(UIFontRoboto);
         } catch (Exception e) {
             Log.warn("Font not loaded correctly, fallback to default");
             UIFontRoboto = new Font("SansSerif", Font.PLAIN, defaultSize);
+        }
+        try (InputStream is = FileUtils.getResourceInputStream("/fonts/ionicons.ttf")) {
+            UIFontION = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(UIFontION);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -100,6 +108,7 @@ public class UIGlobals {
 
     public static Font UIFontMono;
 
+    public static Font UIFontION;
     public static Font UIFontRoboto;
 
     public static Cursor openHandCursor;
