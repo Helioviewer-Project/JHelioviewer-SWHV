@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 import java.awt.BorderLayout;
 import java.util.Calendar;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -11,8 +10,7 @@ import javax.swing.JToggleButton;
 import org.helioviewer.jhv.base.astronomy.Carrington;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -44,14 +42,12 @@ class DrawControllerOptionsPanel extends JPanel {
             new ZoomComboboxItem(ZOOM.Hour, 1)
         };
         zoomCombo = new JComboBox<>(items);
-        zoomCombo.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         zoomCombo.addActionListener(e -> {
             ZoomComboboxItem item = (ZoomComboboxItem) zoomCombo.getSelectedItem();
             zoomTo(item.zoom, item.number);
         });
 
-        lockButton = new JToggleButton(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
-        lockButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        lockButton = new JToggleButton(Buttons.unlock);
         lockButton.setBorderPainted(false);
         lockButton.setFocusPainted(false);
         lockButton.setContentAreaFilled(false);
@@ -59,7 +55,7 @@ class DrawControllerOptionsPanel extends JPanel {
         lockButton.setEnabled(Layers.getActiveView() != null);
         lockButton.addActionListener(e -> {
             DrawController.setLocked(lockButton.isSelected());
-            lockButton.setIcon(lockButton.isSelected() ? IconBank.getIcon(JHVIcon.MOVIE_LINK) : IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
+            lockButton.setText(lockButton.isSelected() ? Buttons.lock : Buttons.unlock);
         });
 
         add(lockButton, BorderLayout.CENTER);
