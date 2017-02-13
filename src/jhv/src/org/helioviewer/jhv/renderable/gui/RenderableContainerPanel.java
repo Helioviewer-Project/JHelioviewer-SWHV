@@ -27,8 +27,6 @@ import javax.swing.event.TableModelEvent;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
@@ -133,13 +131,13 @@ public class RenderableContainerPanel extends JPanel {
             NewLayerAction layerAction = new NewLayerAction(true, false);
             layerAction.actionPerformed(new ActionEvent(addLayerButton, 0, ""));
         });
-        addLayerButton.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
+        addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
 
-        JButton syncSpanButton = new JButton(IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME));
-        syncSpanButton.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
+        JButton syncSpanButton = new JButton(Buttons.syncLayers);
+        // syncSpanButton.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
         syncSpanButton.setToolTipText("Synchronize layers time span");
         syncSpanButton.setBorderPainted(false);
         syncSpanButton.setFocusPainted(false);
@@ -150,7 +148,7 @@ public class RenderableContainerPanel extends JPanel {
         });
 
         JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
-        multiview.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
+        // multiview.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
         multiview.addActionListener(e -> {
             Displayer.multiview = multiview.isSelected();
