@@ -29,7 +29,6 @@ import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -257,10 +256,9 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         recordButton = new RecordButton();
         buttonPanel.add(recordButton);
 
-        advancedButton = new JButton("Options", IconBank.getIcon(JHVIcon.SHOW_MORE));
+        advancedButton = new JButton(Buttons.optionsDown);
         advancedButton.setToolTipText("Options to control playback and recording");
         advancedButton.addActionListener(e -> setAdvanced(!isAdvanced));
-        advancedButton.setHorizontalTextPosition(SwingConstants.LEADING);
         advancedButton.setBorderPainted(false);
         advancedButton.setFocusPainted(false);
         advancedButton.setContentAreaFilled(false);
@@ -270,7 +268,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         previousFrameButton.setPreferredSize(new Dimension(previousFrameButton.getMinimumSize().width, recordButtonHeight));
         playButton.setPreferredSize(new Dimension(playButton.getMinimumSize().width, recordButtonHeight));
         nextFrameButton.setPreferredSize(new Dimension(nextFrameButton.getMinimumSize().width, recordButtonHeight));
-        advancedButton.setPreferredSize(new Dimension(advancedButton.getMinimumSize().width, recordButtonHeight));
 
         secondLine.add(buttonPanel, BorderLayout.WEST);
 
@@ -421,7 +418,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     public static void setAdvanced(boolean advanced) {
         isAdvanced = advanced;
-        advancedButton.setIcon(advanced ? closeIcon : openIcon);
+        advancedButton.setText(advanced ? Buttons.optionsUp : Buttons.optionsDown);
         modePanel.setVisible(advanced);
         speedPanel.setVisible(advanced);
         recordPanel.setVisible(advanced);
