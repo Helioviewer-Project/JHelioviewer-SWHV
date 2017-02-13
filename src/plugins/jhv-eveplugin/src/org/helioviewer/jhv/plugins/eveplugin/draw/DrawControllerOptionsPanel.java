@@ -5,7 +5,6 @@ import java.util.Calendar;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 
 import org.helioviewer.jhv.base.astronomy.Carrington;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -14,11 +13,13 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
 
+import com.jidesoft.swing.JideToggleButton;
+
 @SuppressWarnings("serial")
 class DrawControllerOptionsPanel extends JPanel {
 
     private final JComboBox<ZoomComboboxItem> zoomCombo;
-    final JToggleButton lockButton;
+    final JideToggleButton lockButton;
 
     private enum ZOOM {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
@@ -47,10 +48,7 @@ class DrawControllerOptionsPanel extends JPanel {
             zoomTo(item.zoom, item.number);
         });
 
-        lockButton = new JToggleButton(Buttons.unlock);
-        lockButton.setBorderPainted(false);
-        lockButton.setFocusPainted(false);
-        lockButton.setContentAreaFilled(false);
+        lockButton = new JideToggleButton(Buttons.unlock);
         lockButton.setToolTipText("Synchronize time series with movie");
         lockButton.setEnabled(Layers.getActiveView() != null);
         lockButton.addActionListener(e -> {

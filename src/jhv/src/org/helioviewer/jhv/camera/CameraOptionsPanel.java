@@ -10,7 +10,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,11 +19,12 @@ import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
@@ -94,23 +94,10 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
         c.gridx = 1;
         c.weightx = 0;
 
-        JButton infoButton = new JButton(new AbstractAction() {
-            {
-                putValue(SHORT_DESCRIPTION, "Show viewpoint info");
-                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new TextDialog("Viewpoint options information", explanation).showDialog();
-            }
-        });
-        infoButton.setBorder(null);
-        infoButton.setText(null);
-        infoButton.setBorderPainted(false);
-        infoButton.setFocusPainted(false);
-        infoButton.setContentAreaFilled(false);
-        add(infoButton, c);
+        JideButton info = new JideButton(Buttons.info);
+        info.setToolTipText("Show viewpoint info");
+        info.addActionListener(e -> new TextDialog("Viewpoint options information", explanation).showDialog());
+        add(info, c);
 
         // fov
         double min = 0, max = 180;

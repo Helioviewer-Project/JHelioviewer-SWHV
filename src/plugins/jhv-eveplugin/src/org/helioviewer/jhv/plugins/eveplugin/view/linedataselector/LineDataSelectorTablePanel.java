@@ -11,7 +11,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -29,6 +28,8 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.RemoveCellRenderer;
+
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 public class LineDataSelectorTablePanel extends JPanel {
@@ -97,12 +98,8 @@ public class LineDataSelectorTablePanel extends JPanel {
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         jsp.getViewport().setBackground(Color.WHITE);
 
-        JButton addLayerButton = new JButton(Buttons.newLayer);
+        JideButton addLayerButton = new JideButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> EVEPlugin.td.showDialog());
-        addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        addLayerButton.setBorderPainted(false);
-        addLayerButton.setFocusPainted(false);
-        addLayerButton.setContentAreaFilled(false);
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
