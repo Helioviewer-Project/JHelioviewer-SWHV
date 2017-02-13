@@ -3,9 +3,7 @@ package org.helioviewer.jhv.layers.filters;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -49,38 +47,24 @@ public class RunningDifferencePanel {
     private final JPanel topPanel = new JPanel(new GridBagLayout());
 
     public RunningDifferencePanel() {
-        JButton metaButton = new JButton(new AbstractAction() {
-            {
-                putValue(SHORT_DESCRIPTION, "Show metadata of selected layer");
-                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                MetaDataDialog dialog = new MetaDataDialog(((ImageLayerOptions) getComponent().getParent()).getView());
-                dialog.showDialog();
-            }
+        JButton metaButton = new JButton(IconBank.getIcon(JHVIcon.INFO));
+        metaButton.setToolTipText("Show metadata of selected layer");
+        metaButton.addActionListener(e -> {
+            MetaDataDialog dialog = new MetaDataDialog(((ImageLayerOptions) getComponent().getParent()).getView());
+            dialog.showDialog();
         });
         metaButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
-        metaButton.setText(null);
         metaButton.setBorderPainted(false);
         metaButton.setFocusPainted(false);
         metaButton.setContentAreaFilled(false);
 
-        JButton downloadButton = new JButton(new AbstractAction() {
-            {
-                putValue(SHORT_DESCRIPTION, "Download selected layer");
-                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWNLOAD));
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DownloadViewTask downloadTask = new DownloadViewTask(((ImageLayerOptions) getComponent().getParent()).getView());
-                JHVGlobals.getExecutorService().execute(downloadTask);
-            }
+        JButton downloadButton = new JButton(IconBank.getIcon(JHVIcon.DOWNLOAD));
+        downloadButton.setToolTipText("Download selected layer");
+        downloadButton.addActionListener(e -> {
+            DownloadViewTask downloadTask = new DownloadViewTask(((ImageLayerOptions) getComponent().getParent()).getView());
+            JHVGlobals.getExecutorService().execute(downloadTask);
         });
         downloadButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 2));
-        downloadButton.setText(null);
         downloadButton.setBorderPainted(false);
         downloadButton.setFocusPainted(false);
         downloadButton.setContentAreaFilled(false);
