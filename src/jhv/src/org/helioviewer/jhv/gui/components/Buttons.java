@@ -4,25 +4,40 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 public class Buttons {
 
-    public static final String optionsDown = "<html>Options&nbsp;<font face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_CHEVRON_DOWN.getCode()));
-    public static final String optionsUp = "<html>Options&nbsp;<font face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_CHEVRON_UP.getCode()));
+    public static final String optionsDown = "<html>Options&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_DOWN.getCode()));
+    public static final String optionsUp = "<html>Options&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_UP.getCode()));
 
-    public static final String play = "<html><body style='width: 16px'><center><font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_PLAY.getCode()));
-    public static final String pause = "<html><body style='width: 16px'><center><font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_PAUSE.getCode()));
-    public static final String prev = "<html><body style='width: 16px'><center><font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_CHEVRON_LEFT.getCode()));
-    public static final String next = "<html><body style='width: 16px'><center><font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_CHEVRON_RIGHT.getCode()));
-    public static final String record = "<html><body style='width: 16px'><center><font size=5 color=#f2363a face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_RECORD.getCode()));
+    public static final String play = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_PLAY.getCode()));
+    public static final String pause = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_PAUSE.getCode()));
+    public static final String prev = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_LEFT.getCode()));
+    public static final String next = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_RIGHT.getCode()));
+    public static final String record = "<html><body style='width: 16px'><center><font face='Material Design Icons' color=#f2363a size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_RECORD.getCode()));
 
-    public static final String newLayer = "<html><font face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ANDROID_ADD_CIRCLE.getCode())) + "</font>&nbsp;New Layer";
-    public static final String syncLayers = "<html>&nbsp;<font size=4 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ANDROID_SYNC.getCode())) + "</font>&nbsp;";
+    public static final String newLayer = "<html><font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_PLUS_CIRCLE.getCode())) + "</font>&nbsp;New Layer";
+    public static final String syncLayers = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_SYNC.getCode())) + "</font>&nbsp;";
 
-    public static final String lock = "<html>&nbsp;<font size=4 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_LOCKED.getCode())) + "</font>&nbsp;";
-    public static final String unlock = "<html>&nbsp;<font size=4 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_UNLOCKED.getCode())) + "</font>&nbsp;";
+    public static final String lock = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_LOCK.getCode())) + "</font>&nbsp;";
+    public static final String unlock = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_LOCK_OPEN.getCode())) + "</font>&nbsp;";
 
-    public static final String info = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_INFORMATION_CIRCLED.getCode())) + "</font>&nbsp;";
-    public static final String download = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ANDROID_DOWNLOAD.getCode())) + "</font>&nbsp;";
+    public static final String info = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_INFORMATION.getCode())) + "</font>&nbsp;";
+    public static final String download = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_DOWNLOAD.getCode())) + "</font>&nbsp;";
 
-    public static final String invert = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ARROW_GRAPH_DOWN_RIGHT.getCode())) + "</font>&nbsp;";
-    public static final String corona = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ANDROID_SUNNY.getCode())) + "</font>&nbsp;";
+    public static final String invert = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_INVERT_COLORS.getCode())) + "</font>&nbsp;";
+    public static final String corona = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_WHITE_BALANCE_SUNNY.getCode())) + "</font>&nbsp;";
 
 }
