@@ -129,8 +129,6 @@ public class LineDataSelectorTablePanel extends JPanel {
         grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new LineDataSelectorElementRenderer());
-        // grid.getColumnModel().getColumn(TITLE_COL).setPreferredWidth(80);
-        // grid.getColumnModel().getColumn(TITLE_COL).setMaxWidth(80);
 
         grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new LineColorRenderer());
         grid.getColumnModel().getColumn(LINECOLOR_COL).setPreferredWidth(20);
@@ -198,9 +196,6 @@ public class LineDataSelectorTablePanel extends JPanel {
                 repaint();
             }
         });
-        // grid.setDragEnabled(true);
-        // grid.setDropMode(DropMode.INSERT_ROWS);
-        // grid.setTransferHandler(new TableRowTransferHandler(grid));
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {

@@ -22,8 +22,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.border.MatteBorder;
 import javax.swing.table.TableModel;
 import javax.swing.event.TableModelEvent;
 
@@ -46,8 +44,6 @@ import org.helioviewer.jhv.renderable.gui.cellrenderer.VisibleCellRenderer;
 
 @SuppressWarnings("serial")
 public class RenderableContainerPanel extends JPanel {
-
-    static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
     private static final int ICON_WIDTH = 12;
 
