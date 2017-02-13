@@ -13,16 +13,16 @@ public class Buttons {
     public static final String next = "<html><body style='width: 16px'><center><font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_CHEVRON_RIGHT.getCode()));
     public static final String record = "<html><body style='width: 16px'><center><font size=5 color=#f2363a face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_RECORD.getCode()));
 
-    public static final String newLayer = "<html><font face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_PLUS.getCode())) + "</font>&nbsp;New Layer";
-    public static final String syncLayers = "<html>&nbsp;<font face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ANDROID_SYNC.getCode())) + "</font>&nbsp;";
+    public static final String newLayer = "<html><font face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ANDROID_ADD_CIRCLE.getCode())) + "</font>&nbsp;New Layer";
+    public static final String syncLayers = "<html>&nbsp;<font size=4 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ANDROID_SYNC.getCode())) + "</font>&nbsp;";
 
-    public static final String lock = "<html>&nbsp;<font face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_LOCKED.getCode())) + "</font>&nbsp;";
-    public static final String unlock = "<html>&nbsp;<font face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_UNLOCKED.getCode())) + "</font>&nbsp;";
+    public static final String lock = "<html>&nbsp;<font size=4 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_LOCKED.getCode())) + "</font>&nbsp;";
+    public static final String unlock = "<html>&nbsp;<font size=4 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_UNLOCKED.getCode())) + "</font>&nbsp;";
 
-    public static final String info = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_IOS_INFORMATION_OUTLINE.getCode())) + "</font>&nbsp;";
-    public static final String download = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_IOS_DOWNLOAD_OUTLINE.getCode())) + "</font>&nbsp;";
+    public static final String info = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_INFORMATION_CIRCLED.getCode())) + "</font>&nbsp;";
+    public static final String download = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ANDROID_DOWNLOAD.getCode())) + "</font>&nbsp;";
 
-    public static final String invert = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_IOS_REVERSE_CAMERA_OUTLINE.getCode())) + "</font>&nbsp;";
-    public static final String corona = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_IOS_SUNNY.getCode())) + "</font>&nbsp;";
+    public static final String invert = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ARROW_GRAPH_DOWN_RIGHT.getCode())) + "</font>&nbsp;";
+    public static final String corona = "<html>&nbsp;<font size=5 face=Ionicons>" + StringEscapeUtils.escapeHtml4(String.valueOf(Ionicons.ION_ANDROID_SUNNY.getCode())) + "</font>&nbsp;";
 
 }
