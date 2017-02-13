@@ -5,14 +5,14 @@ import java.awt.Font;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.gui.components.Ionicons;
+import org.helioviewer.jhv.gui.components.MaterialDesign;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 @SuppressWarnings("serial")
 public class RemoveCellRenderer extends TableCellRenderer {
 
-    private static final String close = String.valueOf(Ionicons.ION_ANDROID_CLOSE.getCode());
-    private final Font font = UIGlobals.UIFontION.deriveFont(getFont().getSize2D());
+    private static final String close = String.valueOf(MaterialDesign.MDI_CLOSE.getCode());
+    private final Font font = UIGlobals.UIFontMDI.deriveFont(getFont().getSize2D());
 
     public RemoveCellRenderer() {
         setHorizontalAlignment(SwingConstants.CENTER);

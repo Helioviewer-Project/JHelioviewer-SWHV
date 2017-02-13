@@ -81,9 +81,9 @@ public class UIGlobals {
             Log.warn("Font not loaded correctly, fallback to default");
             UIFontRoboto = new Font("SansSerif", Font.PLAIN, defaultSize);
         }
-        try (InputStream is = FileUtils.getResourceInputStream("/fonts/ionicons.ttf")) {
-            UIFontION = Font.createFont(Font.TRUETYPE_FONT, is);
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(UIFontION);
+        try (InputStream is = FileUtils.getResourceInputStream("/fonts/materialdesignicons-webfont.ttf")) {
+            UIFontMDI = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(UIFontMDI);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,7 +108,7 @@ public class UIGlobals {
 
     public static Font UIFontMono;
 
-    public static Font UIFontION;
+    public static Font UIFontMDI;
     public static Font UIFontRoboto;
 
     public static Cursor openHandCursor;
