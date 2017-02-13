@@ -16,14 +16,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
@@ -99,10 +97,9 @@ public class LineDataSelectorTablePanel extends JPanel {
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         jsp.getViewport().setBackground(Color.WHITE);
 
-        JButton addLayerButton = new JButton("New Layer", IconBank.getIcon(JHVIcon.ADD));
+        JButton addLayerButton = new JButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> EVEPlugin.td.showDialog());
         addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        addLayerButton.setHorizontalTextPosition(SwingConstants.TRAILING);
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
