@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
@@ -14,7 +15,6 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,6 +40,8 @@ import org.helioviewer.jhv.renderable.gui.cellrenderer.RemoveCellRenderer;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RenderableCellRenderer;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.TimeCellRenderer;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.VisibleCellRenderer;
+
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 public class RenderableContainerPanel extends JPanel {
@@ -126,29 +128,20 @@ public class RenderableContainerPanel extends JPanel {
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         jsp.getViewport().setBackground(Color.WHITE);
 
-        JButton addLayerButton = new JButton(Buttons.newLayer);
+        JideButton addLayerButton = new JideButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> {
             NewLayerAction layerAction = new NewLayerAction(true, false);
             layerAction.actionPerformed(new ActionEvent(addLayerButton, 0, ""));
         });
-        addLayerButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        addLayerButton.setBorderPainted(false);
-        addLayerButton.setFocusPainted(false);
-        addLayerButton.setContentAreaFilled(false);
 
-        JButton syncSpanButton = new JButton(Buttons.syncLayers);
-        // syncSpanButton.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
+        JideButton syncSpanButton = new JideButton(Buttons.syncLayers);
         syncSpanButton.setToolTipText("Synchronize layers time span");
-        syncSpanButton.setBorderPainted(false);
-        syncSpanButton.setFocusPainted(false);
-        syncSpanButton.setContentAreaFilled(false);
         syncSpanButton.addActionListener(e -> {
             Layers.syncLayersSpan();
             renderableContainer.fireListeners();
         });
 
         JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
-        // multiview.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
         multiview.addActionListener(e -> {
             Displayer.multiview = multiview.isSelected();
@@ -157,7 +150,10 @@ public class RenderableContainerPanel extends JPanel {
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
-        addLayerButtonWrapper.add(syncSpanButton, BorderLayout.CENTER);
+
+        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        flowPanel.add(syncSpanButton);
+        addLayerButtonWrapper.add(flowPanel, BorderLayout.CENTER);
         addLayerButtonWrapper.add(multiview, BorderLayout.EAST);
 
         JPanel jspContainer = new JPanel(new BorderLayout());

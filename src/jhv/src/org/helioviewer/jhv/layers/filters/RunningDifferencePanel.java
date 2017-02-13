@@ -4,19 +4,18 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.io.DownloadViewTask;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
+
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 public class RunningDifferencePanel {
@@ -47,27 +46,19 @@ public class RunningDifferencePanel {
     private final JPanel topPanel = new JPanel(new GridBagLayout());
 
     public RunningDifferencePanel() {
-        JButton metaButton = new JButton(IconBank.getIcon(JHVIcon.INFO));
+        JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
         metaButton.addActionListener(e -> {
             MetaDataDialog dialog = new MetaDataDialog(((ImageLayerOptions) getComponent().getParent()).getView());
             dialog.showDialog();
         });
-        metaButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
-        metaButton.setBorderPainted(false);
-        metaButton.setFocusPainted(false);
-        metaButton.setContentAreaFilled(false);
 
-        JButton downloadButton = new JButton(IconBank.getIcon(JHVIcon.DOWNLOAD));
+        JideButton downloadButton = new JideButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
             DownloadViewTask downloadTask = new DownloadViewTask(((ImageLayerOptions) getComponent().getParent()).getView());
             JHVGlobals.getExecutorService().execute(downloadTask);
         });
-        downloadButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 2));
-        downloadButton.setBorderPainted(false);
-        downloadButton.setFocusPainted(false);
-        downloadButton.setContentAreaFilled(false);
 
         JComboBox<DifferenceModeChoice> comboBox = new JComboBox<>(DifferenceModeChoice.values());
         comboBox.addActionListener(e -> {
