@@ -140,7 +140,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         grid.getColumnModel().getColumn(LOADING_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(LOADING_COL).setMaxWidth(ICON_WIDTH + 2);
 
-        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RemoveCellRenderer(ICON_WIDTH));
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RemoveCellRenderer());
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 

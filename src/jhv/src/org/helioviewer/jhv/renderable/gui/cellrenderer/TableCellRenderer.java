@@ -1,9 +1,15 @@
-package org.helioviewer.jhv.renderable.gui;
+package org.helioviewer.jhv.renderable.gui.cellrenderer;
 
+import java.awt.Color;
+
+import javax.swing.border.Border;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 @SuppressWarnings("serial")
-class RenderableTableCellRenderer extends DefaultTableCellRenderer {
+class TableCellRenderer extends DefaultTableCellRenderer {
+
+    static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
     @Override
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}

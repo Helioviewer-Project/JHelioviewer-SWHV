@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.gui;
+package org.helioviewer.jhv.renderable.gui.cellrenderer;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -7,17 +7,19 @@ import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.renderable.gui.Renderable;
+
 @SuppressWarnings("serial")
-class RenderableVisibleCellRenderer extends RenderableTableCellRenderer {
+public class VisibleCellRenderer extends TableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
     private final Color defaultColor = getBackground();
 
-    public RenderableVisibleCellRenderer() {
+    public VisibleCellRenderer() {
         checkBox.setHorizontalAlignment(SwingConstants.CENTER);
         checkBox.putClientProperty("JComponent.sizeVariant", "mini");
         checkBox.setBorderPainted(true);
-        checkBox.setBorder(RenderableContainerPanel.commonBorder);
+        checkBox.setBorder(TableCellRenderer.commonBorder);
     }
 
     @Override
