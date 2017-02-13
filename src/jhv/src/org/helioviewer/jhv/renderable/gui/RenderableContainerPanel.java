@@ -32,6 +32,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -127,13 +128,12 @@ public class RenderableContainerPanel extends JPanel {
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
         jsp.getViewport().setBackground(Color.WHITE);
 
-        JButton addLayerButton = new JButton("New Layer", IconBank.getIcon(JHVIcon.ADD));
+        JButton addLayerButton = new JButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> {
             NewLayerAction layerAction = new NewLayerAction(true, false);
             layerAction.actionPerformed(new ActionEvent(addLayerButton, 0, ""));
         });
         addLayerButton.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
-        addLayerButton.setHorizontalTextPosition(SwingConstants.TRAILING);
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);

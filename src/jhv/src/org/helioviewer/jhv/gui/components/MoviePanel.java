@@ -18,15 +18,12 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
-import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
@@ -36,8 +33,6 @@ import javax.swing.event.ChangeListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
@@ -47,6 +42,9 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
+
+import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements ChangeListener, MouseListener, MouseWheelListener {
@@ -166,13 +164,13 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     // Gui elements
     private static TimeSlider timeSlider;
     private static JLabel frameNumberLabel;
-    private static JButton previousFrameButton;
-    private static JButton nextFrameButton;
-    private static JButton playButton;
+    private static JideButton prevFrameButton;
+    private static JideButton nextFrameButton;
+    private static JideButton playButton;
 
     private static RecordButton recordButton;
 
-    private static JButton advancedButton;
+    private static JideButton advancedButton;
     private static JSpinner speedSpinner;
     private static JComboBox<SpeedUnit> speedUnitComboBox;
     private static JComboBox<AnimationMode> animationModeComboBox;
@@ -180,13 +178,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     private static final JPanel speedPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
     private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
     private static final JPanel recordPanel = new JPanel(new GridBagLayout());
-
-    // Icons
-    private static final Icon playIcon = IconBank.getIcon(JHVIcon.PLAY);
-    private static final Icon pauseIcon = IconBank.getIcon(JHVIcon.PAUSE);
-    private static final Icon recordIcon = IconBank.getIcon(JHVIcon.RECORD);
-    private static final Icon openIcon = IconBank.getIcon(JHVIcon.SHOW_MORE);
-    private static final Icon closeIcon = IconBank.getIcon(JHVIcon.SHOW_LESS);
 
     private static boolean someoneIsDragging = false;
 
@@ -236,19 +227,19 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         JPanel secondLine = new JPanel(new BorderLayout());
 
         // Control buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 0));
 
-        previousFrameButton = new JButton(IconBank.getIcon(JHVIcon.BACK));
-        previousFrameButton.setToolTipText("Step to previous frame");
-        previousFrameButton.addActionListener(getPreviousFrameAction());
-        buttonPanel.add(previousFrameButton);
+        prevFrameButton = new JideButton(Buttons.prev);
+        prevFrameButton.setToolTipText("Step to previous frame");
+        prevFrameButton.addActionListener(getPreviousFrameAction());
+        buttonPanel.add(prevFrameButton);
 
-        playButton = new JButton(playIcon);
+        playButton = new JideButton(Buttons.play);
         playButton.setToolTipText("Play movie");
         playButton.addActionListener(getPlayPauseAction());
         buttonPanel.add(playButton);
 
-        nextFrameButton = new JButton(IconBank.getIcon(JHVIcon.FORWARD));
+        nextFrameButton = new JideButton(Buttons.next);
         nextFrameButton.setToolTipText("Step to next frame");
         nextFrameButton.addActionListener(getNextFrameAction());
         buttonPanel.add(nextFrameButton);
@@ -256,18 +247,10 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         recordButton = new RecordButton();
         buttonPanel.add(recordButton);
 
-        advancedButton = new JButton(Buttons.optionsDown);
+        advancedButton = new JideButton(Buttons.optionsDown);
         advancedButton.setToolTipText("Options to control playback and recording");
         advancedButton.addActionListener(e -> setAdvanced(!isAdvanced));
-        advancedButton.setBorderPainted(false);
-        advancedButton.setFocusPainted(false);
-        advancedButton.setContentAreaFilled(false);
         buttonPanel.add(advancedButton);
-
-        int recordButtonHeight = recordButton.getMinimumSize().height;
-        previousFrameButton.setPreferredSize(new Dimension(previousFrameButton.getMinimumSize().width, recordButtonHeight));
-        playButton.setPreferredSize(new Dimension(playButton.getMinimumSize().width, recordButtonHeight));
-        nextFrameButton.setPreferredSize(new Dimension(nextFrameButton.getMinimumSize().width, recordButtonHeight));
 
         secondLine.add(buttonPanel, BorderLayout.WEST);
 
@@ -351,11 +334,14 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
         add(timeSlider);
         add(secondLine);
+
+        ComponentUtils.smallVariant(speedPanel);
+        ComponentUtils.smallVariant(modePanel);
+        ComponentUtils.smallVariant(recordPanel);
         add(speedPanel);
         add(modePanel);
         add(recordPanel);
 
-        ComponentUtils.smallVariant(this);
         setEnabledState(false);
         sliderTimer.start();
     }
@@ -369,13 +355,13 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         ComponentUtils.setEnabled(recordPanel, enabled);
     }
 
-    private static class RecordButton extends JToggleButton implements ActionListener {
+    private static class RecordButton extends JideToggleButton implements ActionListener {
 
         private RecordMode mode = RecordMode.LOOP;
         private RecordSize size = RecordSize.ORIGINAL;
 
         public RecordButton() {
-            super("REC", recordIcon);
+            super(Buttons.record);
             setToolTipText("Record movie");
             addActionListener(this);
         }
@@ -383,13 +369,11 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
-                setText("BUSY");
                 int fps = 20;
                 if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND)
                     fps = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
                 ExportMovie.start(size.getSize().width, size.getSize().height, size.isInternal(), fps, mode);
             } else {
-                setText("REC");
                 ExportMovie.stop();
             }
         }
@@ -409,7 +393,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         timeSlider.setEnabled(enabled);
         playButton.setEnabled(enabled);
         nextFrameButton.setEnabled(enabled);
-        previousFrameButton.setEnabled(enabled);
+        prevFrameButton.setEnabled(enabled);
         recordButton.setEnabled(enabled);
         speedSpinner.setEnabled(enabled);
         speedUnitComboBox.setEnabled(enabled);
@@ -497,10 +481,10 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     public static void setPlayState(boolean play) {
         if (!someoneIsDragging) {
             if (play) {
-                playButton.setIcon(pauseIcon);
+                playButton.setText(Buttons.pause);
                 playButton.setToolTipText("Pause movie");
             } else {
-                playButton.setIcon(playIcon);
+                playButton.setText(Buttons.play);
                 playButton.setToolTipText("Play movie");
             }
         }
@@ -545,7 +529,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     }
 
     private static AbstractAction playPauseAction = null;
-    private static AbstractAction previousFrameAction = null;
+    private static AbstractAction prevFrameAction = null;
     private static AbstractAction nextFrameAction = null;
 
     public static AbstractAction getPlayPauseAction() {
@@ -555,9 +539,9 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     }
 
     public static AbstractAction getPreviousFrameAction() {
-        if (previousFrameAction == null)
-            previousFrameAction = new PreviousFrameAction();
-        return previousFrameAction;
+        if (prevFrameAction == null)
+            prevFrameAction = new PreviousFrameAction();
+        return prevFrameAction;
     }
 
     public static AbstractAction getNextFrameAction() {
