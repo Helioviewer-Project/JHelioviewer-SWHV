@@ -273,9 +273,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     void fireLoaded(String state) {
-        String htmlstart = "<html><body style='width: 200px'>";
-        String htmlend = "</body></html>";
-        loadedLabel.setText(htmlstart + "Status: " + state + htmlend);
+        loadedLabel.setText("<html><body style='width: 200px'>Status: " + state);
     }
 
 }
