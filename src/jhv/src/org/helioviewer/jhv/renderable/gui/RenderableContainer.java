@@ -195,6 +195,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
+        Displayer.display(); // e.g., PFSS renderable
     }
 
     public void fireListeners() {
