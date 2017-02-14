@@ -37,9 +37,9 @@ public class TopToolBar extends JToolBar {
 
     private InteractionMode interactionMode;
 
-    private JideToggleButton panButton;
-    private JideToggleButton rotateButton;
-    private JideToggleButton annotateButton;
+    private final JideToggleButton panButton;
+    private final JideToggleButton rotateButton;
+    private final JideToggleButton annotateButton;
 
     public TopToolBar() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -56,11 +56,25 @@ public class TopToolBar extends JToolBar {
         Dimension dim = new Dimension(32, 32);
 
         // Zoom
-        addButton(new JideButton(new ZoomInAction()));
-        addButton(new JideButton(new ZoomOutAction()));
-        addButton(new JideButton(new ZoomFitAction()));
-        addButton(new JideButton(new ZoomOneToOneAction()));
-        addButton(new JideButton(new ResetCameraAction()));
+        JideButton zoomIn = new JideButton(Buttons.zoomIn);
+        zoomIn.addActionListener(new ZoomInAction());
+        addButton(zoomIn);
+
+        JideButton zoomOut = new JideButton(Buttons.zoomOut);
+        zoomOut.addActionListener(new ZoomOutAction());
+        addButton(zoomOut);
+
+        JideButton zoomFit = new JideButton(Buttons.zoomFit);
+        zoomFit.addActionListener(new ZoomFitAction());
+        addButton(zoomFit);
+
+        JideButton zoomOne = new JideButton(Buttons.zoomOne);
+        zoomOne.addActionListener(new ZoomOneToOneAction());
+        addButton(zoomOne);
+
+        JideButton resetCamera = new JideButton(Buttons.resetCamera);
+        resetCamera.addActionListener(new ResetCameraAction());
+        addButton(resetCamera);
 
         add(new JToolBar.Separator(dim));
 
@@ -163,7 +177,9 @@ public class TopToolBar extends JToolBar {
 
         add(new JToolBar.Separator(dim));
 
-        addButton(new JideButton(new SDOCutOutAction()));
+        JideButton cutOut = new JideButton(Buttons.cutOut);
+        cutOut.addActionListener(new SDOCutOutAction());
+        addButton(cutOut);
     }
 
     private void setActiveInteractionMode(InteractionMode mode) {

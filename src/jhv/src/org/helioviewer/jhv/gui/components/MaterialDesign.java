@@ -1752,8 +1752,8 @@ public enum MaterialDesign {
         throw new IllegalArgumentException("Icon description '" + description + "' is invalid!");
     }
 
-    private String description;
-    private char code;
+    private final String description;
+    private final char code;
 
     MaterialDesign(String description, char code) {
         this.description = description;

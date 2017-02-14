@@ -9,7 +9,6 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -19,7 +18,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
 public class ZoomOneToOneAction extends AbstractAction {
 
     public ZoomOneToOneAction() {
-        super(Buttons.one);
+        super("Actual Size");
         putValue(SHORT_DESCRIPTION, "Zoom to native resolution");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
