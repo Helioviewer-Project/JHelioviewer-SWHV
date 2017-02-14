@@ -40,6 +40,9 @@ public class Buttons {
     public static final String corona = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_WHITE_BALANCE_SUNNY.getCode())) + "</font>&nbsp;";
 
+    public static final String calendar = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CALENDAR.getCode())) + "</font>&nbsp;";
+
     // toolbar
 
     public static final String cutOut = "<html><font face='Material Design Icons' size=5>" +

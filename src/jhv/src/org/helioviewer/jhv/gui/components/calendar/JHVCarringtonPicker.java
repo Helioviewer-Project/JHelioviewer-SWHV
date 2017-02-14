@@ -3,9 +3,6 @@ package org.helioviewer.jhv.gui.components.calendar;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,7 +11,6 @@ import java.awt.event.FocusListener;
 import java.util.HashSet;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -25,12 +21,14 @@ import org.helioviewer.jhv.base.astronomy.Carrington;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
+import com.jidesoft.swing.JideButton;
+
 @SuppressWarnings("serial")
 public class JHVCarringtonPicker extends JPanel implements FocusListener, ActionListener, JHVCalendarListener {
 
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
 
-    private final JButton crPopupButton;
+    private final JideButton crPopupButton = new JideButton("CR");
     private Popup crPopup = null;
     private JHVCarrington carringtonPanel = null;
     private long time;
@@ -38,10 +36,6 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
     public JHVCarringtonPicker() {
         setLayout(new BorderLayout());
 
-        crPopupButton = new JButton("CR");
-        crPopupButton.setMargin(new Insets(0, 0, 0, 0));
-        FontMetrics fm = crPopupButton.getFontMetrics(crPopupButton.getFont());
-        crPopupButton.setPreferredSize(new Dimension(fm.stringWidth("CR") + 14, fm.getHeight()));
         crPopupButton.addFocusListener(this);
         crPopupButton.addActionListener(this);
         add(crPopupButton);

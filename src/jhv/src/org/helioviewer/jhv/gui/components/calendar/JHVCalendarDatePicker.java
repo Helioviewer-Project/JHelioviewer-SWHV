@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.components.calendar;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,8 +17,6 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -27,8 +24,9 @@ import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.Buttons;
+
+import com.jidesoft.swing.JideButton;
 
 /**
  * This component allows to select a date or enter a date by hand. It works
@@ -36,7 +34,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * a {@link JHVCalendar} component.
  *
  * @see JHVCalendar
- * @author Stephan Pagel
  */
 @SuppressWarnings("serial")
 public class JHVCalendarDatePicker extends JPanel implements FocusListener, ActionListener, KeyListener, JHVCalendarListener {
@@ -47,14 +44,11 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
     private final JHVCalendar jhvCalendar = new JHVCalendar(true);
     private final JTextField textField = new JTextField();
 
-    private static final Icon icon = IconBank.getIcon(JHVIcon.DATE);
-
     public JTextField getTextField() {
         return textField;
     }
 
-    private final JButton calPopupButton;
-
+    private final JideButton calPopupButton = new JideButton(Buttons.calendar);
     private Popup calPopup = null;
 
     public JHVCalendarDatePicker() {
@@ -65,9 +59,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         textField.addFocusListener(this);
         textField.addKeyListener(this);
 
-        // set up popup button
-        calPopupButton = new JButton(icon);
-        calPopupButton.setPreferredSize(new Dimension(icon.getIconWidth() + 14, calPopupButton.getPreferredSize().height));
         calPopupButton.addFocusListener(this);
         calPopupButton.addActionListener(this);
 
