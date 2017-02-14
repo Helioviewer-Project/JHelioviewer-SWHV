@@ -15,15 +15,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.Buttons;
 
 /**
- * Visual list entry for each plug-in. Provides functions to
- * enable/disable a plug-in and to display additional information about the
- * plug-in.
- * 
- * @author Stephan Pagel
+ * Visual list entry for each plug-in. Provides functions to enable/disable
+ * a plug-in and to display additional information about the plug-in.
  * */
 @SuppressWarnings("serial")
 class PluginsListEntry extends JPanel implements MouseListener {
@@ -88,10 +84,10 @@ class PluginsListEntry extends JPanel implements MouseListener {
 
     private void updateEnableLabel() {
         if (plugin.isActive()) {
-            enableLabel.setIcon(IconBank.getIcon(JHVIcon.CONNECTED));
+            enableLabel.setText(Buttons.plugOn);
             enableLabel.setToolTipText("Disable plug-in");
         } else {
-            enableLabel.setIcon(IconBank.getIcon(JHVIcon.DISCONNECTED));
+            enableLabel.setText(Buttons.plugOff);
             enableLabel.setToolTipText("Enable plug-in");
         }
     }
