@@ -4,10 +4,10 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 public class Buttons {
 
-    public static final String optionsDown = "<html>Options&nbsp;<font face='Material Design Icons' size=4>" +
+    public static final String optionsRight = "<html>Options<font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_RIGHT.getCode()));
+    public static final String optionsDown = "<html>Options<font face='Material Design Icons' size=4>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_DOWN.getCode()));
-    public static final String optionsUp = "<html>Options&nbsp;<font face='Material Design Icons' size=4>" +
-        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_UP.getCode()));
 
     public static final String play = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_PLAY.getCode()));
