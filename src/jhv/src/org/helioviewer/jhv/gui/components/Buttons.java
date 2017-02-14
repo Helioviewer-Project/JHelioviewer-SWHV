@@ -4,6 +4,11 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 public class Buttons {
 
+    public static final String chevronRight = "<html><font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_RIGHT.getCode())) + "</font>&nbsp;";
+    public static final String chevronDown = "<html><font face='Material Design Icons' size=4>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_DOWN.getCode())) + "</font>&nbsp;";
+
     public static final String optionsRight = "<html>Options<font face='Material Design Icons' size=4>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_RIGHT.getCode()));
     public static final String optionsDown = "<html>Options<font face='Material Design Icons' size=4>" +
