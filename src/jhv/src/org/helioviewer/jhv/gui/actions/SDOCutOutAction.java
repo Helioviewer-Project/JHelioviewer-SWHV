@@ -6,8 +6,7 @@ import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
@@ -20,8 +19,8 @@ public class SDOCutOutAction extends AbstractAction {
     private static final String baseURL = "http://www.lmsal.com/get_aia_data/?";
     private static final double AIA_CDELT = 0.6;
 
-    public SDOCutOutAction(boolean small, boolean useIcon) {
-        super("SDO Cut-out", useIcon ? IconBank.getIcon(JHVIcon.SDO_CUTOUT) : null);
+    public SDOCutOutAction() {
+        super(Buttons.cutOut);
         putValue(SHORT_DESCRIPTION, "SDO cut-out service");
     }
 

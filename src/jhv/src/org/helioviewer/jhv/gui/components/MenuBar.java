@@ -32,7 +32,7 @@ public class MenuBar extends JMenuBar {
     public MenuBar() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
-        fileMenu.add(new NewLayerAction(true, false));
+        fileMenu.add(new NewLayerAction());
         fileMenu.add(new OpenLocalFileAction());
         // fileMenu.add(new ShowDialogAction("Open Remote Image...", OpenRemoteFileDialog.class));
 
@@ -48,13 +48,13 @@ public class MenuBar extends JMenuBar {
         viewMenu.setMnemonic(KeyEvent.VK_V);
         viewMenu.add(new ToggleFullscreenAction());
         viewMenu.addSeparator();
-        viewMenu.add(new ZoomOneToOneAction(true, false));
-        viewMenu.add(new ZoomFitAction(true, false));
-        viewMenu.add(new ZoomInAction(true, false));
-        viewMenu.add(new ZoomOutAction(true, false));
+        viewMenu.add(new ZoomOneToOneAction());
+        viewMenu.add(new ZoomFitAction());
+        viewMenu.add(new ZoomInAction());
+        viewMenu.add(new ZoomOutAction());
         viewMenu.addSeparator();
-        viewMenu.add(new ResetCameraAction(true, false));
-        viewMenu.add(new ClearAnnotationsAction(true, false));
+        viewMenu.add(new ResetCameraAction());
+        viewMenu.add(new ClearAnnotationsAction());
         add(viewMenu);
 
         JMenu movieMenu = new JMenu("Movie");

@@ -8,15 +8,14 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
 public class ZoomInAction extends AbstractAction {
 
-    public ZoomInAction(boolean small, boolean useIcon) {
-        super("Zoom In", useIcon ? IconBank.getIcon(small ? JHVIcon.ZOOM_IN_SMALL : JHVIcon.ZOOM_IN) : null);
+    public ZoomInAction() {
+        super(Buttons.zoomIn);
         putValue(SHORT_DESCRIPTION, "Zoom in");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());

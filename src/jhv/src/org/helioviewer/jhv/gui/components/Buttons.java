@@ -40,4 +40,31 @@ public class Buttons {
     public static final String corona = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_WHITE_BALANCE_SUNNY.getCode())) + "</font>&nbsp;";
 
+    // toolbar
+
+    public static final String cutOut = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_VECTOR_CIRCLE_VARIANT.getCode()));
+    public static final String projection = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CUBE_OUTLINE.getCode()));
+    public static final String offDisk = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_WEATHER_SUNNY.getCode()));
+    public static final String track = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CROSSHAIRS_GPS.getCode()));
+    public static final String annotate = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_SHAPE_POLYGON_PLUS.getCode()));
+    public static final String rotate = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_ROTATE_3D.getCode()));
+    public static final String pan = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CURSOR_MOVE.getCode()));
+    public static final String reset = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CROSSHAIRS.getCode()));
+    public static final String one = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_PLUS_ONE.getCode()));
+    public static final String fit = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CROP_LANDSCAPE.getCode()));
+    public static final String zoomOut = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_MAGNIFY_MINUS.getCode()));
+    public static final String zoomIn = "<html><font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_MAGNIFY_PLUS.getCode()));
+
 }
