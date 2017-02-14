@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.dialogs.plugins;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
@@ -28,9 +27,6 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 @SuppressWarnings("serial")
 public class PluginsDialog extends JDialog implements ShowableDialog, PluginsListEntryChangeListener {
 
-    private static final Dimension DIALOG_SIZE_MINIMUM = new Dimension(400, 500);
-    private static final Dimension DIALOG_SIZE_PREFERRED = new Dimension(400, 500);
-
     private final JComboBox<String> filterComboBox = new JComboBox<>(new String[]{ "All", "Enabled", "Disabled" });
 
     private final JLabel emptyLabel = new JLabel("No plug-ins available", JLabel.CENTER);
@@ -40,10 +36,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, PluginsLis
 
     public PluginsDialog() {
         super(ImageViewerGui.getMainFrame(), "Plug-in Manager", true);
-
-        // dialog
-        setMinimumSize(DIALOG_SIZE_MINIMUM);
-        setPreferredSize(DIALOG_SIZE_PREFERRED);
 
         JPanel contentPane = new JPanel();
         setContentPane(contentPane);
