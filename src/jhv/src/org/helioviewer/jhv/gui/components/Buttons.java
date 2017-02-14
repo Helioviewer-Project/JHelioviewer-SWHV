@@ -43,6 +43,11 @@ public class Buttons {
     public static final String calendar = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CALENDAR.getCode())) + "</font>&nbsp;";
 
+    public static final String plugOn = "<html>&nbsp;<font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_POWER_PLUG.getCode())) + "</font>&nbsp;";
+    public static final String plugOff = "<html>&nbsp;<font face='Material Design Icons' size=5>" +
+        StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_POWER_PLUG_OFF.getCode())) + "</font>&nbsp;";
+
     // toolbar
 
     public static final String cutOut = "<html><font face='Material Design Icons' size=5>" +
