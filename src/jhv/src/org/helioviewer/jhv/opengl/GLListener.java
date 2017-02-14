@@ -186,8 +186,9 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) {
-        if (!EventQueue.isDispatchThread()) {
+        if (!EventQueue.isDispatchThread()) { // seldom
             EventQueue.invokeLater(Displayer::display);
+            return;
         }
 
         GL2 gl = (GL2) drawable.getGL();
