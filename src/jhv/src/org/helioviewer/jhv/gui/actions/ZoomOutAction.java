@@ -8,14 +8,13 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
 public class ZoomOutAction extends AbstractAction {
 
     public ZoomOutAction() {
-        super(Buttons.zoomOut);
+        super("Zoom Out");
         putValue(SHORT_DESCRIPTION, "Zoom out");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());

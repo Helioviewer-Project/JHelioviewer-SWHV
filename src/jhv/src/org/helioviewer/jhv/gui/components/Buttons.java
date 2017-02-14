@@ -59,11 +59,11 @@ public class Buttons {
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_ROTATE_3D.getCode()));
     public static final String pan = "<html><font face='Material Design Icons' size=5>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CURSOR_MOVE.getCode()));
-    public static final String reset = "<html><font face='Material Design Icons' size=5>" +
+    public static final String resetCamera = "<html><font face='Material Design Icons' size=5>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CROSSHAIRS.getCode()));
-    public static final String one = "<html><font face='Material Design Icons' size=5>" +
+    public static final String zoomOne = "<html><font face='Material Design Icons' size=5>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_PLUS_ONE.getCode()));
-    public static final String fit = "<html><font face='Material Design Icons' size=5>" +
+    public static final String zoomFit = "<html><font face='Material Design Icons' size=5>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CROP_LANDSCAPE.getCode()));
     public static final String zoomOut = "<html><font face='Material Design Icons' size=5>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_MAGNIFY_MINUS.getCode()));
