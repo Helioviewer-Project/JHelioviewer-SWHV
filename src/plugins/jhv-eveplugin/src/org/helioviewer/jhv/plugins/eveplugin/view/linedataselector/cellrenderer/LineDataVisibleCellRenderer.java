@@ -5,7 +5,6 @@ import java.awt.Component;
 
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
@@ -18,7 +17,7 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
     private final Color defaultColor = getBackground();
 
     public LineDataVisibleCellRenderer() {
-        checkBox.setHorizontalAlignment(SwingConstants.CENTER);
+        setHorizontalAlignment(CENTER);
         checkBox.putClientProperty("JComponent.sizeVariant", "mini");
         checkBox.setBorderPainted(true);
         checkBox.setBorder(LineDataSelectorTablePanel.commonBorder);

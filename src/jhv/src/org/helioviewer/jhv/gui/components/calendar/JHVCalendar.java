@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashSet;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -23,8 +22,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import com.jidesoft.swing.JideButton;
 
 /**
  * This component allows to select a date. There are 3 different views:<br>
@@ -186,20 +184,14 @@ class JHVCalendar extends JPanel {
      */
     private class NavigationPanel extends JPanel implements ActionListener {
 
-        private final JButton quickForwardButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_DOUBLEARROW_RIGHT));
-        private final JButton quickBackButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_DOUBLEARROW_LEFT));
-        private final JButton forwardButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_RIGHT));
-        private final JButton backButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_LEFT));
-        private final JButton selectButton = new JButton();
+        private final JideButton quickForwardButton = new JideButton(">>");
+        private final JideButton quickBackButton = new JideButton("<<");
+        private final JideButton forwardButton = new JideButton(">");
+        private final JideButton backButton = new JideButton("<");
+        private final JideButton selectButton = new JideButton();
 
         public NavigationPanel() {
             setLayout(new BorderLayout());
-
-            quickForwardButton.setPreferredSize(new Dimension(24, quickForwardButton.getPreferredSize().height));
-            quickBackButton.setPreferredSize(new Dimension(24, quickBackButton.getPreferredSize().height));
-
-            forwardButton.setPreferredSize(new Dimension(24, forwardButton.getPreferredSize().height));
-            backButton.setPreferredSize(new Dimension(24, backButton.getPreferredSize().height));
 
             JPanel forwardButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
             forwardButtonPanel.add(forwardButton);
@@ -216,17 +208,10 @@ class JHVCalendar extends JPanel {
             add(selectionButtonPanel, BorderLayout.CENTER);
             add(backButtonPanel, BorderLayout.WEST);
 
-            addActionListeners();
-        }
-
-        /**
-         * Sets the needed action listeners to the visual components.
-         */
-        private void addActionListeners() {
             quickForwardButton.addActionListener(this);
+            quickBackButton.addActionListener(this);
             forwardButton.addActionListener(this);
             backButton.addActionListener(this);
-            quickBackButton.addActionListener(this);
             selectButton.addActionListener(this);
         }
 
@@ -494,7 +479,7 @@ class JHVCalendar extends JPanel {
             // set basic layout
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
             // set up button
-            JButton dateButton = new JButton("Today is " + dateFormat.format(new Date()));
+            JideButton dateButton = new JideButton("Today is " + dateFormat.format(new Date()));
             // set the calendar component to the current date
             dateButton.addActionListener(e -> {
                 changeDisplayMode(DisplayMode.DAYS);
