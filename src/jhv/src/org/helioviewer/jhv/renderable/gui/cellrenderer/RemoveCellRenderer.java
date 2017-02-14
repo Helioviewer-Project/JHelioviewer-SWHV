@@ -2,8 +2,6 @@ package org.helioviewer.jhv.renderable.gui.cellrenderer;
 
 import java.awt.Font;
 
-import javax.swing.SwingConstants;
-
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.MaterialDesign;
 import org.helioviewer.jhv.renderable.gui.Renderable;
@@ -15,7 +13,7 @@ public class RemoveCellRenderer extends TableCellRenderer {
     private final Font font = UIGlobals.UIFontMDI.deriveFont(getFont().getSize2D());
 
     public RemoveCellRenderer() {
-        setHorizontalAlignment(SwingConstants.CENTER);
+        setHorizontalAlignment(CENTER);
     }
 
     @Override
