@@ -8,6 +8,7 @@ import java.awt.Point;
 
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 
 @SuppressWarnings("serial")
 class CollapsiblePaneButton extends JToggleButton {
@@ -16,10 +17,11 @@ class CollapsiblePaneButton extends JToggleButton {
     private final Color bright;
     private final Color dark;
 
-    public CollapsiblePaneButton(String title) {
-        super(title);
+    public CollapsiblePaneButton() {
         setContentAreaFilled(false);
-        setFocusPainted(false); // used for demonstration
+        setFocusPainted(false);
+        setBorderPainted(false);
+        setHorizontalAlignment(SwingConstants.LEFT);
 
         bright = brighter(color, 0.85);
         dark = darker(color, 0.9);

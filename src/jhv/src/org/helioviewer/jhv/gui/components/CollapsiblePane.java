@@ -6,14 +6,10 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 /**
@@ -25,28 +21,22 @@ import org.helioviewer.jhv.gui.UIGlobals;
 @SuppressWarnings("serial")
 public class CollapsiblePane extends JComponent implements ActionListener {
 
-    private static final ImageIcon expandedIcon = IconBank.getIcon(JHVIcon.DOWN2);
-    private static final ImageIcon collapsedIcon = IconBank.getIcon(JHVIcon.RIGHT2);
-
     final CollapsiblePaneButton toggleButton;
     private final JPanel component;
+    private String title;
 
-    public CollapsiblePane(String title, Component managed, boolean startExpanded) {
+    public CollapsiblePane(String _title, Component managed, boolean startExpanded) {
         setLayout(new BorderLayout());
 
-        toggleButton = new CollapsiblePaneButton(title);
-        toggleButton.setBorderPainted(false);
-        toggleButton.setHorizontalAlignment(SwingConstants.LEFT);
+        toggleButton = new CollapsiblePaneButton();
         toggleButton.setSelected(startExpanded);
         toggleButton.setFont(UIGlobals.UIFontSmallBold);
-        if (startExpanded) {
-            toggleButton.setIcon(IconBank.getIcon(JHVIcon.DOWN2));
-        } else {
-            toggleButton.setIcon(IconBank.getIcon(JHVIcon.RIGHT2));
-        }
-        toggleButton.setPreferredSize(new Dimension(0, UIGlobals.UIFontSmallBold.getSize() + 4));
+        int height = toggleButton.getFontMetrics(UIGlobals.UIFontSmallBold).getHeight();
+        toggleButton.setPreferredSize(new Dimension(0, height + 4));
         toggleButton.addActionListener(this);
         add(toggleButton, BorderLayout.PAGE_START);
+
+        setTitle(_title);
 
         component = new JPanel(new BorderLayout());
         component.add(managed);
@@ -54,20 +44,24 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         add(component, BorderLayout.CENTER);
     }
 
-    public void setTitle(String title) {
-        toggleButton.setText(title);
+    public void setTitle(String _title) {
+        title = _title;
+        if (toggleButton.isSelected())
+            toggleButton.setText(Buttons.chevronDown + title);
+        else
+            toggleButton.setText(Buttons.chevronRight + title);
     }
 
     private void expand() {
         toggleButton.setSelected(true);
         ComponentUtils.setVisible(component, true);
-        toggleButton.setIcon(expandedIcon);
+        setTitle(title);
     }
 
     private void collapse() {
         toggleButton.setSelected(false);
         ComponentUtils.setVisible(component, false);
-        toggleButton.setIcon(collapsedIcon);
+        setTitle(title);
     }
 
     @Override
