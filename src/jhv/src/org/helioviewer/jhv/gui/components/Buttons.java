@@ -17,7 +17,7 @@ public class Buttons {
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_LEFT.getCode()));
     public static final String next = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_CHEVRON_RIGHT.getCode()));
-    public static final String record = "<html><body style='width: 16px'><center><font face='Material Design Icons' color=#f2363a size=5>" +
+    public static final String record = "<html><body style='width: 16px'><center><font face='Material Design Icons' color=#800000 size=5>" +
         StringEscapeUtils.escapeHtml4(String.valueOf(MaterialDesign.MDI_RECORD.getCode()));
 
     public static final String newLayer = "<html><font face='Material Design Icons' size=4>" +

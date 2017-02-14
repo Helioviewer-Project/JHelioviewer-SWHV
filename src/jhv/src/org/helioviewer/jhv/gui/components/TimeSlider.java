@@ -59,8 +59,8 @@ class TimeSlider extends JSlider implements LazyComponent {
     private static class TimeSliderUI extends BasicSliderUI {
 
         private static final Color notCachedColor = Color.LIGHT_GRAY;
-        private static final Color partialCachedColor = new Color(0x57A8FF);
-        private static final Color completeCachedColor = new Color(0x007AFF);
+        private static final Color partialCachedColor = Color.GRAY;
+        private static final Color completeCachedColor = Color.BLACK;
 
         private static final BasicStroke thickStroke = new BasicStroke(4);
 
