@@ -9,15 +9,14 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.input.KeyShortcuts;
 
 @SuppressWarnings("serial")
 public class ZoomFitAction extends AbstractAction {
 
-    public ZoomFitAction(boolean small, boolean useIcon) {
-        super("Zoom to Fit", useIcon ? IconBank.getIcon(small ? JHVIcon.ZOOM_FIT_SMALL : JHVIcon.ZOOM_FIT) : null);
+    public ZoomFitAction() {
+        super(Buttons.fit);
         putValue(SHORT_DESCRIPTION, "Zoom to fit");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_9, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());

@@ -130,7 +130,7 @@ public class RenderableContainerPanel extends JPanel {
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> {
-            NewLayerAction layerAction = new NewLayerAction(true, false);
+            NewLayerAction layerAction = new NewLayerAction();
             layerAction.actionPerformed(new ActionEvent(addLayerButton, 0, ""));
         });
 

@@ -5,20 +5,14 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.Buttons;
 
-/**
- * Action that resets the view transformation of the current camera
- * to its default settings
- */
 @SuppressWarnings("serial")
 public class ResetCameraAction extends AbstractAction {
 
-    public ResetCameraAction(boolean small, boolean useIcon) {
-        super("Reset Camera", useIcon ? IconBank.getIcon(JHVIcon.RESET) : null);
+    public ResetCameraAction() {
+        super(Buttons.reset);
         putValue(SHORT_DESCRIPTION, "Reset camera position to default");
-        //putValue(MNEMONIC_KEY, KeyEvent.VK_R);
     }
 
     @Override

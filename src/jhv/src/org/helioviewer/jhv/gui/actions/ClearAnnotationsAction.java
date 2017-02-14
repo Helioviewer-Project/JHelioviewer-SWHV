@@ -5,15 +5,13 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 @SuppressWarnings("serial")
 public class ClearAnnotationsAction extends AbstractAction {
 
-    public ClearAnnotationsAction(boolean small, boolean useIcon) {
-        super("Clear Annotations", useIcon ? IconBank.getIcon(JHVIcon.RESET) : null);
+    public ClearAnnotationsAction() {
+        super("Clear Annotations");
         putValue(SHORT_DESCRIPTION, "Clear any annotation");
     }
 

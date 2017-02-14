@@ -8,8 +8,6 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.input.KeyShortcuts;
@@ -20,8 +18,8 @@ import org.helioviewer.jhv.viewmodel.view.View;
 @SuppressWarnings("serial")
 public class NewLayerAction extends AbstractAction {
 
-    public NewLayerAction(boolean small, boolean useIcon) {
-        super("New Layer...", useIcon ? IconBank.getIcon(JHVIcon.ADD) : null);
+    public NewLayerAction() {
+        super("New Layer...");
         putValue(SHORT_DESCRIPTION, "Add new layer");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
