@@ -402,7 +402,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     public static void setAdvanced(boolean advanced) {
         isAdvanced = advanced;
-        advancedButton.setText(advanced ? Buttons.optionsUp : Buttons.optionsDown);
+        advancedButton.setText(advanced ? Buttons.optionsDown : Buttons.optionsRight);
         modePanel.setVisible(advanced);
         speedPanel.setVisible(advanced);
         recordPanel.setVisible(advanced);
