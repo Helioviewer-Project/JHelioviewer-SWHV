@@ -40,8 +40,6 @@ import com.jidesoft.swing.JideButton;
  * This component acts as a subcomponent of the {@link JHVCalendarDatePicker}
  * too. It represents the content of the popup window of the
  * JHVCalendarDatePicker.
- *
- * @author Stephan Pagel
  */
 @SuppressWarnings("serial")
 class JHVCalendar extends JPanel {
@@ -179,8 +177,6 @@ class JHVCalendar extends JPanel {
     /**
      * Panel which acts as a container for the navigation buttons on the top of
      * the calendar component.
-     *
-     * @author Stephan Pagel
      */
     private class NavigationPanel extends JPanel implements ActionListener {
 
@@ -304,8 +300,6 @@ class JHVCalendar extends JPanel {
     /**
      * Panel which acts as a container of the grid which displays the period of
      * the current view controller.
-     *
-     * @author Stephan Pagel
      */
     private class SelectionPanel extends JPanel {
 
@@ -455,9 +449,6 @@ class JHVCalendar extends JPanel {
     /**
      * Table cell renderer for the used JTable. This renderer displays all cell
      * entries centered.
-     *
-     * @author Stephan Pagel
-     *
      */
     private static class CenterTableCellRenderer extends DefaultTableCellRenderer {
 
@@ -470,8 +461,6 @@ class JHVCalendar extends JPanel {
     /**
      * Panel which acts as a container of the button which displays the current
      * date and allows to set the current date to the calendar component.
-     *
-     * @author Stephan Pagel
      */
     private class BottomPanel extends JPanel {
 
