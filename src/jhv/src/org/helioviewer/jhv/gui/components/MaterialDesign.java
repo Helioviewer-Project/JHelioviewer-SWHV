@@ -1743,15 +1743,6 @@ public enum MaterialDesign {
     MDI_YOUTUBE_PLAY("mdi-youtube-play", '\uf5c3'),
     MDI_ZIP_BOX("mdi-zip-box", '\uf5c4');
 
-    public static MaterialDesign findByDescription(String description) {
-        for (MaterialDesign font : values()) {
-            if (font.getDescription().equals(description)) {
-                return font;
-            }
-        }
-        throw new IllegalArgumentException("Icon description '" + description + "' is invalid!");
-    }
-
     private final String description;
     private final char code;
 
