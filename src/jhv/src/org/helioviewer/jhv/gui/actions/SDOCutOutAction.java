@@ -20,7 +20,6 @@ public class SDOCutOutAction extends AbstractAction {
 
     public SDOCutOutAction() {
         super("SDO Cut-out");
-        putValue(SHORT_DESCRIPTION, "SDO cut-out service");
     }
 
     @Override

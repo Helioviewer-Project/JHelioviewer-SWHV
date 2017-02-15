@@ -15,7 +15,6 @@ public class ZoomOutAction extends AbstractAction {
 
     public ZoomOutAction() {
         super("Zoom Out");
-        putValue(SHORT_DESCRIPTION, "Zoom out");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);

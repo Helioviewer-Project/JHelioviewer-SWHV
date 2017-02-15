@@ -15,7 +15,6 @@ public class ExitProgramAction extends AbstractAction {
 
     public ExitProgramAction() {
         super("Quit");
-        putValue(SHORT_DESCRIPTION, "Quit program");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);

@@ -12,7 +12,6 @@ public class WindowZoomAction extends AbstractAction {
 
     public WindowZoomAction() {
         super("Zoom");
-        putValue(SHORT_DESCRIPTION, "Zoom window");
     }
 
     @Override

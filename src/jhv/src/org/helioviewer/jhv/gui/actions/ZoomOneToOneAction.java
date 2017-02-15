@@ -19,7 +19,6 @@ public class ZoomOneToOneAction extends AbstractAction {
 
     public ZoomOneToOneAction() {
         super("Actual Size");
-        putValue(SHORT_DESCRIPTION, "Zoom to native resolution");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);

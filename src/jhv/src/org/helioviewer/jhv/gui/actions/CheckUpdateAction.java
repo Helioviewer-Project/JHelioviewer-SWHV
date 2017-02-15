@@ -7,15 +7,14 @@ import javax.swing.AbstractAction;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.JHVUpdate;
 
-// Action that checks for updates
 @SuppressWarnings("serial")
 public class CheckUpdateAction extends AbstractAction {
 
     public CheckUpdateAction() {
         super("Check for Updates...");
-        putValue(SHORT_DESCRIPTION, "Check for newer releases");
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         try {
             JHVUpdate update = new JHVUpdate(true);

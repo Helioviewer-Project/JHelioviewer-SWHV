@@ -16,7 +16,6 @@ public class WindowMinimizeAction extends AbstractAction {
 
     public WindowMinimizeAction() {
         super("Minimize");
-        putValue(SHORT_DESCRIPTION, "Minimize window");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);

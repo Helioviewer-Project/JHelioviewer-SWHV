@@ -16,7 +16,6 @@ public class ZoomFitAction extends AbstractAction {
 
     public ZoomFitAction() {
         super("Zoom to Fit");
-        putValue(SHORT_DESCRIPTION, "Zoom to fit");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_9, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);

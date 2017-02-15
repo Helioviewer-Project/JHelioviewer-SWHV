@@ -12,7 +12,6 @@ public class ClearAnnotationsAction extends AbstractAction {
 
     public ClearAnnotationsAction() {
         super("Clear Annotations");
-        putValue(SHORT_DESCRIPTION, "Clear any annotation");
     }
 
     @Override
