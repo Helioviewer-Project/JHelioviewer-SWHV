@@ -17,7 +17,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.gui.dialogs.ExportReadyDialog;
+import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.threads.JHVExecutor;
 
 import com.jidesoft.comparator.AlphanumComparator;
@@ -180,12 +180,7 @@ public class JHVGlobals {
             }
         }
         // otherwise
-        try {
-            ExportReadyDialog dialog = new ExportReadyDialog();
-            dialog.init("Export of <a href=\"" + openURL + "\">" + moviePath + "</a> finished.");
-            dialog.showDialog();
-        } catch (Exception ignore) {
-        }
+        new TextDialog("Export Ready", "Export of <a href=\"" + openURL + "\">" + moviePath + "</a> finished.", false).showDialog();
     }
 
 }

@@ -3,8 +3,10 @@ package org.helioviewer.jhv.base;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -112,6 +114,18 @@ public class FileUtils {
             }
         }
         return dir.delete();
+    }
+
+    public static String URL2String(URL url) {
+        StringBuilder sb = new StringBuilder();
+        try (Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)))) {
+            while (scanner.hasNext()) {
+                sb.append(scanner.nextLine()).append('\n');
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
     }
 
 }
