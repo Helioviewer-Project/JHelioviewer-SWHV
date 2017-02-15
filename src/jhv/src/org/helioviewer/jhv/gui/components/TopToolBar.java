@@ -58,22 +58,27 @@ public class TopToolBar extends JToolBar {
         // Zoom
         JideButton zoomIn = new JideButton(Buttons.zoomIn);
         zoomIn.addActionListener(new ZoomInAction());
+        zoomIn.setToolTipText("Zoom in");
         addButton(zoomIn);
 
         JideButton zoomOut = new JideButton(Buttons.zoomOut);
         zoomOut.addActionListener(new ZoomOutAction());
+        zoomOut.setToolTipText("Zoom out");
         addButton(zoomOut);
 
         JideButton zoomFit = new JideButton(Buttons.zoomFit);
         zoomFit.addActionListener(new ZoomFitAction());
+        zoomFit.setToolTipText("Zoom to fit");
         addButton(zoomFit);
 
         JideButton zoomOne = new JideButton(Buttons.zoomOne);
         zoomOne.addActionListener(new ZoomOneToOneAction());
+        zoomOne.setToolTipText("Zoom to native resolution");
         addButton(zoomOne);
 
         JideButton resetCamera = new JideButton(Buttons.resetCamera);
         resetCamera.addActionListener(new ResetCameraAction());
+        resetCamera.setToolTipText("Reset camera position to default");
         addButton(resetCamera);
 
         add(new JToolBar.Separator(dim));
@@ -179,6 +184,7 @@ public class TopToolBar extends JToolBar {
 
         JideButton cutOut = new JideButton(Buttons.cutOut);
         cutOut.addActionListener(new SDOCutOutAction());
+        cutOut.setToolTipText("SDO cut-out service");
         addButton(cutOut);
     }
 

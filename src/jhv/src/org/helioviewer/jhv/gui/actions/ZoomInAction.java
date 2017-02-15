@@ -15,7 +15,6 @@ public class ZoomInAction extends AbstractAction {
 
     public ZoomInAction() {
         super("Zoom In");
-        putValue(SHORT_DESCRIPTION, "Zoom in");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);

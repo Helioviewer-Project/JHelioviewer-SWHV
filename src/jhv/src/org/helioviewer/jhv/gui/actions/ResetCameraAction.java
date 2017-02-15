@@ -11,7 +11,6 @@ public class ResetCameraAction extends AbstractAction {
 
     public ResetCameraAction() {
         super("Reset Camera");
-        putValue(SHORT_DESCRIPTION, "Reset camera position to default");
     }
 
     @Override

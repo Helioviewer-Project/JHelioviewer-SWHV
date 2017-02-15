@@ -21,7 +21,6 @@ public class ToggleFullscreenAction extends AbstractAction {
 
     public ToggleFullscreenAction() {
         super("Toggle Full Screen");
-        putValue(SHORT_DESCRIPTION, "Toggle full screen");
 
         KeyStroke toggleKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, toggleKey);

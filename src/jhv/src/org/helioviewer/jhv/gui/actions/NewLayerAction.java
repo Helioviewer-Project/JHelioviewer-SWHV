@@ -20,7 +20,6 @@ public class NewLayerAction extends AbstractAction {
 
     public NewLayerAction() {
         super("New Layer...");
-        putValue(SHORT_DESCRIPTION, "Add new layer");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);
