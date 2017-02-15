@@ -1,19 +1,15 @@
 package org.helioviewer.jhv.gui.dialogs;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
@@ -25,26 +21,14 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
 
     private final String text;
 
-    public TextDialog(String title, URL textFile) {
-        super(ImageViewerGui.getMainFrame(), title, true);
-        setResizable(false);
-
-        StringBuilder sb = new StringBuilder();
-        try (Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream(), StandardCharsets.UTF_8)))) {
-            String linebreak = System.getProperty("line.separator");
-            while (scanner.hasNext()) {
-                sb.append(scanner.nextLine()).append(linebreak);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        text = sb.toString();
-    }
-
     public TextDialog(String title, String _text) {
         super(ImageViewerGui.getMainFrame(), title, true);
-        text = _text;
+        text = _text.replace("\n", "<br>");
+    }
+
+    public TextDialog(String title, String _text, boolean resizable) {
+        this(title, _text);
+        setResizable(resizable);
     }
 
     @Override
@@ -70,12 +54,15 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public JComponent createContentPanel() {
-        JTextArea textArea = new JTextArea(text);
-        textArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(scrollPane.getPreferredSize().width + 50, 500));
+        JTextPane pane = new JTextPane();
+        pane.setContentType("text/html");
+        pane.setText(text);
+        pane.setEditable(false);
+        pane.addHyperlinkListener(JHVGlobals.hyperOpenURL);
+        pane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        return scrollPane;
+        return new JScrollPane(pane);
     }
 
     @Override

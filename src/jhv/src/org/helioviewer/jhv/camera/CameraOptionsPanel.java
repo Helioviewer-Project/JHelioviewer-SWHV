@@ -39,10 +39,10 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
     private final CameraOptionPanelExpert expertOptionPanel;
     private CameraOptionPanel currentOptionPanel;
 
-    private static final String explanation = "Observer: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
-                                              "Earth: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
-                                              "Other: view from selected object.\nCamera time defined by timestamps of the master layer, unless " +
-                                              "\"Use master layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.";
+    private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
+                                              "<b>Earth</b>: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
+                                              "<b>Other</b>: view from selected object.\nCamera time defined by timestamps of the master layer, unless " +
+                                              "\"Use master layer timestamps\" is off.\nIn that case, camera time is interpolated in the configured time interval.";
 
     public CameraOptionsPanel() {
         setLayout(new GridBagLayout());
@@ -96,7 +96,7 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
 
         JideButton info = new JideButton(Buttons.info);
         info.setToolTipText("Show viewpoint info");
-        info.addActionListener(e -> new TextDialog("Viewpoint options information", explanation).showDialog());
+        info.addActionListener(e -> new TextDialog("Viewpoint options information", explanation, false).showDialog());
         add(info, c);
 
         // fov

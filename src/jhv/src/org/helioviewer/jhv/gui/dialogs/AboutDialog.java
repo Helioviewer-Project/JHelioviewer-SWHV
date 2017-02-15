@@ -17,6 +17,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
@@ -105,7 +106,8 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
-                TextDialog textDialog = new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')), ImageViewerGui.class.getResource("/licenses/" + e.getDescription()));
+                TextDialog textDialog = new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')), 
+                                                       FileUtils.URL2String(ImageViewerGui.class.getResource("/licenses/" + e.getDescription())));
                 textDialog.showDialog();
             } else {
                 JHVGlobals.openURL(e.getURL().toString());
