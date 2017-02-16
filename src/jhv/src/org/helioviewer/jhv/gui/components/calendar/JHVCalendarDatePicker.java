@@ -4,12 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,18 +34,13 @@ import com.jidesoft.swing.JideButton;
  * @see JHVCalendar
  */
 @SuppressWarnings("serial")
-public class JHVCalendarDatePicker extends JPanel implements FocusListener, ActionListener, KeyListener, JHVCalendarListener {
+public class JHVCalendarDatePicker extends JPanel implements FocusListener, JHVCalendarListener {
 
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
     private final Calendar calendar = new GregorianCalendar();
 
     private final JHVCalendar jhvCalendar = new JHVCalendar(true);
     private final JTextField textField = new JTextField();
-
-    public JTextField getTextField() {
-        return textField;
-    }
-
     private final JideButton calPopupButton = new JideButton(Buttons.calendar);
     private Popup calPopup = null;
 
@@ -57,10 +50,26 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         // set up text field
         textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));
         textField.addFocusListener(this);
-        textField.addKeyListener(this);
+        textField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    setDateFromTextField();
+                    informAllJHVCalendarListeners();
+                }
+            }
+        });
 
         calPopupButton.addFocusListener(this);
-        calPopupButton.addActionListener(this);
+        calPopupButton.addActionListener(e -> {
+            setDateFromTextField();
+            if (calPopup == null) {
+                calPopupButton.requestFocus();
+                showCalPopup();
+            } else {
+                hideCalPopup();
+            }
+        });
 
         // place sub components
         add(calPopupButton, BorderLayout.EAST);
@@ -99,50 +108,16 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
 
     @Override
     public void focusLost(FocusEvent e) {
-        // has popup button or a subcomponent of jhvCalendar lost the focus?
-        if (e.getComponent() == calPopupButton || (jhvCalendar != null && jhvCalendar.isAncestorOf(e.getComponent()))) {
-            // if the receiver of the focus is not a subcomponent of the
-            // jhvCalendar than hide the popup
-            if (jhvCalendar != null && !jhvCalendar.isAncestorOf(e.getOppositeComponent())) {
-                hideCalPopup();
-            }
+        // if the receiver of the focus is not a subcomponent of the jhvCalendar and
+        // the popup button or a subcomponent of jhvCalendar lost the focus than hide the popup
+        if (!jhvCalendar.isAncestorOf(e.getOppositeComponent()) && (e.getComponent() == calPopupButton || jhvCalendar.isAncestorOf(e.getComponent()))) {
+            hideCalPopup();
         }
-
         // has textfield lost the focus
         if (e.getComponent() == textField) {
             setDateFromTextField();
             informAllJHVCalendarListeners();
         }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // open or close the popup window when the event was fired by the
-        // corresponding popup button
-        if (e.getSource() == calPopupButton) {
-            setDateFromTextField();
-            if (calPopup == null) {
-                showCalPopup();
-            } else {
-                hideCalPopup();
-            }
-        }
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            setDateFromTextField();
-            informAllJHVCalendarListeners();
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
     }
 
     private void setDateFromTextField() {
@@ -152,6 +127,10 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         } catch (ParseException e) {
             textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));
         }
+    }
+
+    private void setDateFromCalendar() {
+        setTime(jhvCalendar.getDate().getTime());
     }
 
     /**
@@ -175,7 +154,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         // correct position of popup when it does not fit into screen area
         x = x + jhvCalendar.getSize().width > Toolkit.getDefaultToolkit().getScreenSize().width ? Toolkit.getDefaultToolkit().getScreenSize().width - jhvCalendar.getSize().width : x;
         x = x < 0 ? 0 : x;
-
         y = y + jhvCalendar.getSize().height > Toolkit.getDefaultToolkit().getScreenSize().height ? textField.getLocationOnScreen().y - jhvCalendar.getSize().height : y;
         y = y < 0 ? 0 : y;
 
@@ -186,8 +164,17 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         calPopup.show();
     }
 
+    // Closes the popup window if it is still displayed.
+    private void hideCalPopup() {
+        if (calPopup != null) {
+            setDateFromCalendar();
+            calPopup.hide();
+            calPopup = null;
+        }
+    }
+
     /**
-     * Adds to all subcomponents of a component the focus listener off this
+     * Adds to all subcomponents of a component the focus listener of this
      * class.
      *
      * @param parent
@@ -201,16 +188,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
             if (component instanceof JComponent) {
                 addFocusListenerToAllChildren((JComponent) component);
             }
-        }
-    }
-
-    /**
-     * Closes the popup window if it is still displayed.
-     */
-    private void hideCalPopup() {
-        if (calPopup != null) {
-            calPopup.hide();
-            calPopup = null;
         }
     }
 

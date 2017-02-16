@@ -5,8 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -156,28 +154,38 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private void addBeginDatePanel(GridBagConstraints c) {
         beginDatePicker = new JHVCalendarDatePicker();
-        beginDatePicker.getTextField().addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                setBeginTime(true);
-            }
-        });
         beginTimePicker = new TimeTextField();
-        addBeginDatePanel = new JPanel();
-        addBeginDatePanel.setLayout(new BoxLayout(addBeginDatePanel, BoxLayout.LINE_AXIS));
+        beginDatePicker.addJHVCalendarListener(e -> setBeginTime(true));
+        beginTimePicker.addActionListener(e -> setBeginTime(true));
 
         JLabel beginDateLabel = new JLabel("Begin", JLabel.RIGHT);
         beginDateLabel.setPreferredSize(new Dimension(40, 0));
 
+        addBeginDatePanel = new JPanel();
+        addBeginDatePanel.setLayout(new BoxLayout(addBeginDatePanel, BoxLayout.LINE_AXIS));
         addBeginDatePanel.add(beginDateLabel);
-
-        beginDatePicker.addJHVCalendarListener(e -> setBeginTime(true));
-        beginTimePicker.addActionListener(e -> setBeginTime(true));
-
         addBeginDatePanel.add(beginDatePicker);
         addBeginDatePanel.add(beginTimePicker);
         addBeginDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(addBeginDatePanel, c);
+    }
+
+    private void addEndDatePanel(GridBagConstraints c) {
+        endDatePicker = new JHVCalendarDatePicker();
+        endTimePicker = new TimeTextField();
+        endDatePicker.addJHVCalendarListener(e -> setEndTime(true));
+        endTimePicker.addActionListener(e -> setEndTime(true));
+
+        JLabel endDateLabel = new JLabel("End", JLabel.RIGHT);
+        endDateLabel.setPreferredSize(new Dimension(40, 0));
+
+        addEndDatePanel = new JPanel();
+        addEndDatePanel.setLayout(new BoxLayout(addEndDatePanel, BoxLayout.LINE_AXIS));
+        addEndDatePanel.add(endDateLabel);
+        addEndDatePanel.add(endDatePicker);
+        addEndDatePanel.add(endTimePicker);
+        addEndDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
+        add(addEndDatePanel, c);
     }
 
     private void setEndTime(boolean applyChanges) {
@@ -244,32 +252,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         endDatePicker.setTime(endTime.milli - endTime.milli % TimeUtils.DAY_IN_MILLIS);
         endTimePicker.setText(TimeUtils.timeDateFormat.format(endTime.milli));
         setEndTime(applyChanges);
-    }
-
-    private void addEndDatePanel(GridBagConstraints c) {
-        endDatePicker = new JHVCalendarDatePicker();
-        endDatePicker.getTextField().addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                setEndTime(true);
-            }
-        });
-        endTimePicker = new TimeTextField();
-        addEndDatePanel = new JPanel();
-        addEndDatePanel.setLayout(new BoxLayout(addEndDatePanel, BoxLayout.LINE_AXIS));
-
-        JLabel endDateLabel = new JLabel("End", JLabel.RIGHT);
-        endDateLabel.setPreferredSize(new Dimension(40, 0));
-        addEndDatePanel.add(endDateLabel);
-
-        endDatePicker.addJHVCalendarListener(e -> setEndTime(true));
-        endTimePicker.addActionListener(e -> setEndTime(true));
-
-        addEndDatePanel.add(endDatePicker);
-        addEndDatePanel.add(endTimePicker);
-        addEndDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
-
-        add(addEndDatePanel, c);
     }
 
     void fireLoaded(String state) {
