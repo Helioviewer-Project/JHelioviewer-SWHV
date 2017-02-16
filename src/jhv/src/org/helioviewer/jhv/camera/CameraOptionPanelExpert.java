@@ -1,10 +1,12 @@
 package org.helioviewer.jhv.camera;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -58,8 +60,10 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         c.gridy = 4;
         add(exactDateCheckBox, c);
         c.gridy = 5;
+        startDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(startDateTimePanel, c);
         c.gridy = 6;
+        endDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(endDateTimePanel, c);
         c.gridy = 7;
         addSyncButtons(c);
