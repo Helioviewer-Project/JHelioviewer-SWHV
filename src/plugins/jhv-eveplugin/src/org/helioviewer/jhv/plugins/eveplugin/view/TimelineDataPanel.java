@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.eveplugin.view;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -46,13 +45,10 @@ public class TimelineDataPanel extends ObservationDialogPanel implements LineDat
         calendarStartDate.addJHVCalendarListener(e -> ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true));
         calendarStartDate.setToolTipText("UTC date for observation start");
 
-        JPanel startDatePane = new JPanel(new BorderLayout());
-        startDatePane.add(new JLabel("Start date"), BorderLayout.PAGE_START);
-        startDatePane.add(calendarStartDate, BorderLayout.CENTER);
-
-        JPanel timePane = new JPanel(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
-        timePane.add(startDatePane);
-        add(timePane);
+        JPanel datePane = new JPanel(new BorderLayout());
+        datePane.add(new JLabel("Start date"), BorderLayout.PAGE_START);
+        datePane.add(calendarStartDate, BorderLayout.CENTER);
+        add(datePane);
 
         JPanel dataPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();

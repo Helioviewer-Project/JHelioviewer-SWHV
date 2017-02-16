@@ -114,8 +114,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
         ObservationDialogDateModel.setStartTime(getStartTime(), true);
         ObservationDialogDateModel.setEndTime(getEndTime(), true);
 
-        // show message if start date before end date
-        if (getStartTime() < getEndTime()) {
+        // show message if end date before start date
+        if (getStartTime() > getEndTime()) {
             JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
             return false;
         }
