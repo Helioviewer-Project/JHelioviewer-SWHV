@@ -1,12 +1,10 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -15,12 +13,9 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.gui.components.base.JSeparatorComboBox;
-import org.helioviewer.jhv.gui.components.base.TimeTextField;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -28,21 +23,14 @@ import org.helioviewer.jhv.viewmodel.view.View;
 @SuppressWarnings("serial")
 public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener {
 
-    private final JLabel loadedLabel;
+    private final PositionLoad positionLoad;
 
-    private JPanel addBeginDatePanel;
-    private JHVCalendarDatePicker beginDatePicker;
-    private TimeTextField beginTimePicker;
-
-    private JPanel addEndDatePanel;
-    private JHVCalendarDatePicker endDatePicker;
-    private TimeTextField endTimePicker;
+    private final JLabel loadedLabel = new JLabel("Status: Not loaded");
+    private final JCheckBox exactDateCheckBox = new JCheckBox("Use master layer timestamps", true);
+    private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
+    private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
 
     private JPanel buttonPanel;
-
-    private final JCheckBox exactDateCheckBox;
-
-    private final PositionLoad positionLoad;
 
     CameraOptionPanelExpert(PositionLoad _positionLoad) {
         positionLoad = _positionLoad;
@@ -60,37 +48,35 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         JPanel loadedLabelPanel = new JPanel();
         loadedLabelPanel.setLayout(new BoxLayout(loadedLabelPanel, BoxLayout.LINE_AXIS));
-
-        loadedLabel = new JLabel("Status: Not loaded");
         loadedLabelPanel.add(loadedLabel);
         c.gridy = 1;
         add(loadedLabelPanel, c);
         c.gridy = 2;
         add(new JSeparator(SwingConstants.HORIZONTAL), c);
         c.gridy = 3;
-
         addObjectCombobox(c);
-        exactDateCheckBox = new JCheckBox("Use master layer timestamps", true);
         c.gridy = 4;
         add(exactDateCheckBox, c);
         c.gridy = 5;
-        addBeginDatePanel(c);
+        add(startDateTimePanel, c);
         c.gridy = 6;
-        addEndDatePanel(c);
-        addBeginDatePanel.setVisible(false);
-        addEndDatePanel.setVisible(false);
+        add(endDateTimePanel, c);
         c.gridy = 7;
-
         addSyncButtons(c);
-        buttonPanel.setVisible(false);
 
+        startDateTimePanel.addListener(e -> setStartTime(true));
+        endDateTimePanel.addListener(e -> setEndTime(true));
+
+        startDateTimePanel.setVisible(false);
+        endDateTimePanel.setVisible(false);
+        buttonPanel.setVisible(false);
         exactDateCheckBox.addActionListener(e -> {
             boolean selected = !exactDateCheckBox.isSelected();
-            addBeginDatePanel.setVisible(selected);
-            addEndDatePanel.setVisible(selected);
+            startDateTimePanel.setVisible(selected);
+            endDateTimePanel.setVisible(selected);
             buttonPanel.setVisible(selected);
             if (selected) {
-                setBeginTime(false);
+                setStartTime(false);
                 setEndTime(true);
             }
         });
@@ -113,11 +99,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         buttonPanel = new JPanel(new GridLayout(0, 3));
 
-        synchronizeWithLayersButton.getMaximumSize().width = 15;
         buttonPanel.add(synchronizeWithLayersButton);
-        synchronizeWithCurrentButton.getMaximumSize().width = 15;
         buttonPanel.add(synchronizeWithCurrentButton);
-        synchronizeWithNowButton.getMaximumSize().width = 15;
         buttonPanel.add(synchronizeWithNowButton);
 
         add(buttonPanel, c);
@@ -138,7 +121,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         if (exactDateCheckBox.isSelected()) {
             syncWithLayer();
         }
-        // Displayer.render();
     }
 
     private void addObjectCombobox(GridBagConstraints c) {
@@ -152,106 +134,42 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         add(objectCombobox, c);
     }
 
-    private void addBeginDatePanel(GridBagConstraints c) {
-        beginDatePicker = new JHVCalendarDatePicker();
-        beginTimePicker = new TimeTextField();
-        beginDatePicker.addJHVCalendarListener(e -> setBeginTime(true));
-        beginTimePicker.addActionListener(e -> setBeginTime(true));
-
-        JLabel beginDateLabel = new JLabel("Begin", JLabel.RIGHT);
-        beginDateLabel.setPreferredSize(new Dimension(40, 0));
-
-        addBeginDatePanel = new JPanel();
-        addBeginDatePanel.setLayout(new BoxLayout(addBeginDatePanel, BoxLayout.LINE_AXIS));
-        addBeginDatePanel.add(beginDateLabel);
-        addBeginDatePanel.add(beginDatePicker);
-        addBeginDatePanel.add(beginTimePicker);
-        addBeginDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
-        add(addBeginDatePanel, c);
-    }
-
-    private void addEndDatePanel(GridBagConstraints c) {
-        endDatePicker = new JHVCalendarDatePicker();
-        endTimePicker = new TimeTextField();
-        endDatePicker.addJHVCalendarListener(e -> setEndTime(true));
-        endTimePicker.addActionListener(e -> setEndTime(true));
-
-        JLabel endDateLabel = new JLabel("End", JLabel.RIGHT);
-        endDateLabel.setPreferredSize(new Dimension(40, 0));
-
-        addEndDatePanel = new JPanel();
-        addEndDatePanel.setLayout(new BoxLayout(addEndDatePanel, BoxLayout.LINE_AXIS));
-        addEndDatePanel.add(endDateLabel);
-        addEndDatePanel.add(endDatePicker);
-        addEndDatePanel.add(endTimePicker);
-        addEndDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
-        add(addEndDatePanel, c);
+    private void setStartTime(boolean applyChanges) {
+        positionLoad.setBeginTime(startDateTimePanel.getTime(), applyChanges);
     }
 
     private void setEndTime(boolean applyChanges) {
-        positionLoad.setEndTime(endDatePicker.getTime() + endTimePicker.getTime(), applyChanges);
-    }
-
-    private void setBeginTime(boolean applyChanges) {
-        positionLoad.setBeginTime(beginDatePicker.getTime() + beginTimePicker.getTime(), applyChanges);
+        positionLoad.setEndTime(endDateTimePanel.getTime(), applyChanges);
     }
 
     @Override
     void syncWithLayer() {
-        syncWithLayerBeginTime(false);
-        syncWithLayerEndTime(true);
-    }
-
-    private void syncWithLayerBeginTime(boolean applyChanges) {
         View view = Layers.getActiveView();
         if (view == null)
             return;
 
-        JHVDate startTime = view.getFirstTime();
-        beginDatePicker.setTime(startTime.milli - startTime.milli % TimeUtils.DAY_IN_MILLIS);
-        beginTimePicker.setText(TimeUtils.timeDateFormat.format(startTime.milli));
-        setBeginTime(applyChanges);
+        startDateTimePanel.setTime(view.getFirstTime().milli);
+        endDateTimePanel.setTime(view.getLastTime().milli);
+        setStartTime(false);
+        setEndTime(true);
     }
 
     private void syncBothLayerNow() {
         long now = System.currentTimeMillis();
-        long syncTime = now - now % TimeUtils.DAY_IN_MILLIS;
-        String timeText = TimeUtils.timeDateFormat.format(now);
 
-        beginDatePicker.setTime(syncTime);
-        beginTimePicker.setText(timeText);
-
-        endDatePicker.setTime(syncTime);
-        endTimePicker.setText(timeText);
-
-        setBeginTime(false);
+        startDateTimePanel.setTime(now);
+        endDateTimePanel.setTime(now);
+        setStartTime(false);
         setEndTime(true);
     }
 
     private void syncWithLayerCurrentTime() {
-        JHVDate currentTime = Layers.getLastUpdatedTimestamp();
-        long syncTime = currentTime.milli - currentTime.milli % TimeUtils.DAY_IN_MILLIS;
-        String timeText = TimeUtils.timeDateFormat.format(currentTime.milli);
+        long now = Layers.getLastUpdatedTimestamp().milli;
 
-        endDatePicker.setTime(syncTime);
-        endTimePicker.setText(timeText);
-
-        beginDatePicker.setTime(syncTime);
-        beginTimePicker.setText(timeText);
-
-        setBeginTime(false);
+        startDateTimePanel.setTime(now);
+        endDateTimePanel.setTime(now);
+        setStartTime(false);
         setEndTime(true);
-    }
-
-    private void syncWithLayerEndTime(boolean applyChanges) {
-        View view = Layers.getActiveView();
-        if (view == null)
-            return;
-
-        JHVDate endTime = view.getLastTime();
-        endDatePicker.setTime(endTime.milli - endTime.milli % TimeUtils.DAY_IN_MILLIS);
-        endTimePicker.setText(TimeUtils.timeDateFormat.format(endTime.milli));
-        setEndTime(applyChanges);
     }
 
     void fireLoaded(String state) {
