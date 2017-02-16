@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -39,7 +38,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
         c.weighty = 0;
         c.gridx = 0;
