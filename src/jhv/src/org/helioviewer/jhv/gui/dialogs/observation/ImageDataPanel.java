@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.dialogs.observation;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -45,16 +44,9 @@ public class ImageDataPanel extends ObservationDialogPanel {
     ImageDataPanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        JPanel timePane = new JPanel();
-        timePane.setLayout(new BoxLayout(timePane, BoxLayout.PAGE_AXIS));
-        timePane.add(timeSelectionPanel);
-        timePane.add(cadencePanel);
-
-        JPanel instrumentsPane = new JPanel(new BorderLayout());
-        instrumentsPane.add(new JScrollPane(sourcesTree));
-
-        add(timePane);
-        add(instrumentsPane);
+        add(timeSelectionPanel);
+        add(cadencePanel);
+        add(new JScrollPane(sourcesTree));
     }
 
     void focusTree() {
@@ -234,7 +226,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         public CadencePanel() {
             setLayout(new FlowLayout(FlowLayout.RIGHT, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
-            spinnerCadence.setPreferredSize(new Dimension(50, 25));
+            spinnerCadence.setPreferredSize(new Dimension(55, 25));
             comboUnit.setSelectedItem("min");
             comboUnit.addActionListener(e -> spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4));
 
