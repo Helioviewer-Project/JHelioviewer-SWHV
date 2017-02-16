@@ -2,6 +2,8 @@ package org.helioviewer.jhv.gui.dialogs.observation;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 
 import javax.swing.BoxLayout;
@@ -120,8 +122,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
         ObservationDialogDateModel.setStartTime(getStartTime(), true);
         ObservationDialogDateModel.setEndTime(getEndTime(), true);
 
-        // check if start date is before end date -> if not show message
-        if (timeSelectionPanel.getStartTime() < timeSelectionPanel.getEndTime()) {
+        // show message if start date before end date
+        if (getStartTime() < getEndTime()) {
             JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -148,16 +150,35 @@ public class ImageDataPanel extends ObservationDialogPanel {
         public TimeSelectionPanel() {
             ObservationDialogDateModel.addListener(this);
 
-            startDateTimePanel.addListener(e -> setStartTime(getStartTime(), true));
-            endDateTimePanel.addListener(e -> setEndTime(getEndTime(), true));
+            startDateTimePanel.addListener(e -> setStartTime(startDateTimePanel.getTime(), true));
+            endDateTimePanel.addListener(e -> setEndTime(endDateTimePanel.getTime(), true));
             startCarrington.addJHVCalendarListener(e -> setStartTime(startCarrington.getTime(), true));
             endCarrington.addJHVCalendarListener(e -> setEndTime(endCarrington.getTime(), true));
 
-            setLayout(new GridLayout(2, 1, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
             startDateTimePanel.add(startCarrington);
             endDateTimePanel.add(endCarrington);
-            add(startDateTimePanel);
-            add(endDateTimePanel);
+
+            setLayout(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.anchor = GridBagConstraints.LINE_START;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.weighty = 0;
+
+            c.gridy = 0;
+            c.gridx = 0;
+            c.weightx = 1;
+            add(startDateTimePanel, c);
+            c.gridx = 1;
+            c.weightx = 0;
+            add(startCarrington, c);
+
+            c.gridy = 1;
+            c.gridx = 0;
+            c.weightx = 1;
+            add(endDateTimePanel, c);
+            c.gridx = 1;
+            c.weightx = 0;
+            add(endCarrington, c);
         }
 
         public void setStartTime(long time, boolean byUser) {
