@@ -106,8 +106,8 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
-                TextDialog textDialog = new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')), 
-                                                       FileUtils.URL2String(ImageViewerGui.class.getResource("/licenses/" + e.getDescription())));
+                TextDialog textDialog = new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')),
+                                                       FileUtils.URL2String(ImageViewerGui.class.getResource("/licenses/" + e.getDescription())), true);
                 textDialog.showDialog();
             } else {
                 JHVGlobals.openURL(e.getURL().toString());
