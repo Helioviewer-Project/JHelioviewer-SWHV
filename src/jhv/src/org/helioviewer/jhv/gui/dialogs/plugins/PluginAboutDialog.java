@@ -97,7 +97,7 @@ class PluginAboutDialog extends JDialog implements HyperlinkListener {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
                 TextDialog textDialog = new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')),
-                                                       FileUtils.URL2String(ImageViewerGui.class.getResource("/licenses/" + e.getDescription())));
+                                                       FileUtils.URL2String(ImageViewerGui.class.getResource("/licenses/" + e.getDescription())), true);
                 textDialog.showDialog();
             } else {
                 JHVGlobals.openURL(e.getURL().toString());
