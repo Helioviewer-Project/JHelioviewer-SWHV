@@ -34,7 +34,7 @@ import com.jidesoft.swing.JideButton;
  * @see JHVCalendar
  */
 @SuppressWarnings("serial")
-public class JHVCalendarDatePicker extends JPanel implements FocusListener, JHVCalendarListener {
+public class JHVCalendarDatePicker extends JPanel implements FocusListener {
 
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
     private final Calendar calendar = new GregorianCalendar();
@@ -55,7 +55,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, JHVC
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     setDateFromTextField();
-                    informAllJHVCalendarListeners();
                 }
             }
         });
@@ -77,7 +76,8 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, JHVC
 
         jhvCalendar.setPreferredSize(jhvCalendar.getMinimumSize());
         jhvCalendar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        jhvCalendar.addJHVCalendarListener(this);
+        jhvCalendar.addJHVCalendarListener(e -> hideCalPopup());
+
         addFocusListenerToAllChildren(jhvCalendar);
     }
 
@@ -116,7 +116,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, JHVC
         // has textfield lost the focus
         if (e.getComponent() == textField) {
             setDateFromTextField();
-            informAllJHVCalendarListeners();
         }
     }
 
@@ -127,10 +126,12 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, JHVC
         } catch (ParseException e) {
             textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));
         }
+        informAllJHVCalendarListeners();
     }
 
     private void setDateFromCalendar() {
         setTime(jhvCalendar.getDate().getTime());
+        informAllJHVCalendarListeners();
     }
 
     /**
@@ -189,21 +190,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, JHVC
                 addFocusListenerToAllChildren((JComponent) component);
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(JHVCalendarEvent e) {
-        if (e.getSource().equals(jhvCalendar)) {
-            // close popup
-            hideCalPopup();
-            // set selected date
-            setTime(jhvCalendar.getDate().getTime());
-        }
-        // inform all listeners of this class that a new date was choosen by the user
-        informAllJHVCalendarListeners();
     }
 
     public void setTime(long time) {
