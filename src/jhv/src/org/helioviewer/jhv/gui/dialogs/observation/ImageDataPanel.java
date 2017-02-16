@@ -17,10 +17,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.gui.components.base.TimeTextField;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
-import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
+import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
@@ -124,7 +121,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         ObservationDialogDateModel.setEndTime(getEndTime(), true);
 
         // check if start date is before end date -> if not show message
-        if (!timeSelectionPanel.isStartTimeBeforeEndTime()) {
+        if (timeSelectionPanel.getStartTime() < timeSelectionPanel.getEndTime()) {
             JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -139,128 +136,56 @@ public class ImageDataPanel extends ObservationDialogPanel {
     }
 
     // Time Selection Panel
-    private static class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
+    private static class TimeSelectionPanel extends JPanel implements ObservationDialogDateModelListener {
 
-        private final TimeTextField textStartTime;
-        private final TimeTextField textEndTime;
-        private final JHVCalendarDatePicker calendarStartDate;
-        private final JHVCalendarDatePicker calendarEndDate;
-        private final JHVCarringtonPicker carringtonStart;
-        private final JHVCarringtonPicker carringtonEnd;
+        private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
+        private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
+        private final JHVCarringtonPicker startCarrington = new JHVCarringtonPicker();
+        private final JHVCarringtonPicker endCarrington = new JHVCarringtonPicker();
 
         private boolean setFromOutside = false;
 
         public TimeSelectionPanel() {
             ObservationDialogDateModel.addListener(this);
 
-            setLayout(new GridLayout(2, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
+            startDateTimePanel.addListener(e -> setStartTime(getStartTime(), true));
+            endDateTimePanel.addListener(e -> setEndTime(getEndTime(), true));
+            startCarrington.addJHVCalendarListener(e -> setStartTime(startCarrington.getTime(), true));
+            endCarrington.addJHVCalendarListener(e -> setEndTime(endCarrington.getTime(), true));
 
-            // create end date picker
-            calendarEndDate = new JHVCalendarDatePicker();
-            calendarEndDate.addJHVCalendarListener(this);
-            calendarEndDate.setToolTipText("UTC date for observation end");
-
-            // create end time field
-            textEndTime = new TimeTextField();
-            textEndTime.setToolTipText("UTC time for observation end. If equal to start time, a single image closest to the time will be added.");
-
-            // create end date Carrington picker
-            carringtonEnd = new JHVCarringtonPicker();
-            carringtonEnd.addJHVCalendarListener(this);
-            carringtonEnd.setToolTipText("Carrington rotation for observation end");
-            carringtonEnd.setTime(getEndTime());
-
-            // create start date picker
-            calendarStartDate = new JHVCalendarDatePicker();
-            calendarStartDate.addJHVCalendarListener(this);
-            calendarStartDate.setToolTipText("UTC date for observation start");
-
-            // create start time field
-            textStartTime = new TimeTextField();
-            textStartTime.setToolTipText("UTC time for observation start");
-
-            // create start date Carrington picker
-            carringtonStart = new JHVCarringtonPicker();
-            carringtonStart.addJHVCalendarListener(this);
-            carringtonStart.setToolTipText("Carrington rotation for observation start");
-            carringtonStart.setTime(getStartTime());
-
-            // add components to panel
-            JPanel startDatePane = new JPanel(new BorderLayout());
-            startDatePane.add(new JLabel("Start date"), BorderLayout.PAGE_START);
-            startDatePane.add(calendarStartDate, BorderLayout.CENTER);
-            startDatePane.add(carringtonStart, BorderLayout.LINE_END);
-
-            JPanel startTimePane = new JPanel(new BorderLayout());
-            startTimePane.add(new JLabel("Start time"), BorderLayout.PAGE_START);
-            startTimePane.add(textStartTime, BorderLayout.CENTER);
-
-            JPanel endDatePane = new JPanel(new BorderLayout());
-            endDatePane.add(new JLabel("End date"), BorderLayout.PAGE_START);
-            endDatePane.add(calendarEndDate, BorderLayout.CENTER);
-            endDatePane.add(carringtonEnd, BorderLayout.LINE_END);
-
-            JPanel endTimePane = new JPanel(new BorderLayout());
-            endTimePane.add(new JLabel("End time"), BorderLayout.PAGE_START);
-            endTimePane.add(textEndTime, BorderLayout.CENTER);
-
-            add(startDatePane);
-            add(startTimePane);
-            add(endDatePane);
-            add(endTimePane);
+            setLayout(new GridLayout(2, 1, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
+            startDateTimePanel.add(startCarrington);
+            endDateTimePanel.add(endCarrington);
+            add(startDateTimePanel);
+            add(endDateTimePanel);
         }
 
-        public void setEndTime(long endTime, boolean byUser) {
-            calendarEndDate.setTime(endTime);
-            textEndTime.setText(TimeUtils.timeDateFormat.format(endTime));
+        public void setStartTime(long time, boolean byUser) {
+            startDateTimePanel.setTime(time);
+            startCarrington.setTime(time);
 
             if (setFromOutside)
                 setFromOutside = false;
             else
-                ObservationDialogDateModel.setEndTime(endTime, byUser);
+                ObservationDialogDateModel.setStartTime(time, byUser);
         }
 
-        public void setStartTime(long startTime, boolean byUser) {
-            calendarStartDate.setTime(startTime);
-            textStartTime.setText(TimeUtils.timeDateFormat.format(startTime));
+        public void setEndTime(long time, boolean byUser) {
+            endDateTimePanel.setTime(time);
+            endCarrington.setTime(time);
 
             if (setFromOutside)
                 setFromOutside = false;
             else
-                ObservationDialogDateModel.setStartTime(startTime, byUser);
-        }
-
-        /**
-         * JHV calendar listener which notices when the user has chosen a date
-         * by using the calendar component.
-         */
-        @Override
-        public void actionPerformed(JHVCalendarEvent e) {
-            if (e.getSource() == calendarStartDate) {
-                long time = getStartTime();
-                setStartTime(time, true);
-                carringtonStart.setTime(time);
-            } else if (e.getSource() == calendarEndDate) {
-                long time = getEndTime();
-                setEndTime(time, true);
-                carringtonEnd.setTime(time);
-            } else if (e.getSource() == carringtonStart) {
-                setStartTime(carringtonStart.getTime(), true);
-            } else if (e.getSource() == carringtonEnd) {
-                setEndTime(carringtonEnd.getTime(), true);
-            }
-        }
-
-        boolean isStartTimeBeforeEndTime() {
-            return calendarStartDate.getTime() <= calendarEndDate.getTime();
+                ObservationDialogDateModel.setEndTime(time, byUser);
         }
 
         private long getStartTime() {
-            return (calendarStartDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textStartTime.getTime();
+            return startDateTimePanel.getTime();
         }
 
         private long getEndTime() {
-            return (calendarEndDate.getTime() / TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS + textEndTime.getTime();
+            return endDateTimePanel.getTime();
         }
 
         @Override
@@ -274,6 +199,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
             setFromOutside = true;
             setEndTime(endTime, false);
         }
+
     }
 
     // Cadence Panel

@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,24 +19,20 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 public class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListener {
 
     private final HashSet<ActionListener> listeners = new HashSet<>();
-    private final JHVCalendarDatePicker datePicker;
-    private final TimeTextField timePicker;
+    private final JHVCalendarDatePicker datePicker = new JHVCalendarDatePicker();
+    private final TimeTextField timePicker = new TimeTextField();
 
     public DateTimePanel(String text) {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-        datePicker = new JHVCalendarDatePicker();
-        timePicker = new TimeTextField();
-        datePicker.addJHVCalendarListener(this);
-        timePicker.addActionListener(this);
-
         JLabel label = new JLabel(text, JLabel.RIGHT);
         label.setPreferredSize(new Dimension(40, 0));
-
         add(label);
         add(datePicker);
         add(timePicker);
-        add(Box.createRigidArea(new Dimension(40, 0)));
+
+        datePicker.addJHVCalendarListener(this);
+        timePicker.addActionListener(this);
     }
 
     public long getTime() {
