@@ -2,9 +2,9 @@ package org.helioviewer.jhv.gui.dialogs.observation;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -232,21 +232,15 @@ public class ImageDataPanel extends ObservationDialogPanel {
         private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
         public CadencePanel() {
-            setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
+            setLayout(new FlowLayout(FlowLayout.RIGHT, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
             spinnerCadence.setPreferredSize(new Dimension(50, 25));
-
             comboUnit.setSelectedItem("min");
             comboUnit.addActionListener(e -> spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4));
 
-            JPanel panel = new JPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-            panel.add(spinnerCadence);
-            panel.add(comboUnit);
-
-            JLabel labelTimeStep = new JLabel("Time step", JLabel.RIGHT);
-            add(labelTimeStep);
-            add(panel);
+            add(new JLabel("Time step", JLabel.RIGHT));
+            add(spinnerCadence);
+            add(comboUnit);
         }
 
         // Returns the number of seconds of the selected cadence
