@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.HashSet;
@@ -24,45 +22,31 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class JHVCarringtonPicker extends JPanel implements FocusListener, ActionListener, JHVCalendarListener {
+public class JHVCarringtonPicker extends JPanel implements FocusListener {
 
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
 
     private final JideButton crPopupButton = new JideButton("CR");
+    private final JHVCarrington carringtonPanel = new JHVCarrington();
     private Popup crPopup = null;
-    private JHVCarrington carringtonPanel = null;
     private long time;
 
     public JHVCarringtonPicker() {
         setLayout(new BorderLayout());
 
         crPopupButton.addFocusListener(this);
-        crPopupButton.addActionListener(this);
-        add(crPopupButton);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // open or close the popup window when the event was fired by the
-        // corresponding popup button
-        if (e.getSource() == crPopupButton) {
+        crPopupButton.addActionListener(e -> {
             if (crPopup == null) {
+                crPopupButton.requestFocus();
                 showCRPopup();
             } else {
                 hideCRPopup();
             }
-        }
-    }
+        });
+        add(crPopupButton);
 
-    @Override
-    public void actionPerformed(JHVCalendarEvent e) {
-        if (e.getSource().equals(carringtonPanel)) {
-            // close popup
-            hideCRPopup();
-            carringtonPanel = null;
-        }
-        // inform all listeners of this class that a new date was choosen by the user
-        informAllJHVCalendarListeners();
+        carringtonPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        addFocusListenerToAllChildren(carringtonPanel);
     }
 
     public void addJHVCalendarListener(JHVCalendarListener l) {
@@ -71,6 +55,11 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     public void removeJHVCalendarListener(JHVCalendarListener l) {
         listeners.remove(l);
+    }
+
+    private void setTimeFromCarrington(long _time) {
+        setTime(_time);
+        informAllJHVCalendarListeners();
     }
 
     public void setTime(long _time) {
@@ -96,29 +85,21 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     @Override
     public void focusLost(FocusEvent e) {
-        // has popup button or a subcomponent of jhvCalendar lost the focus?
-        if (e.getComponent() == crPopupButton || (carringtonPanel != null && carringtonPanel.isAncestorOf(e.getComponent()))) {
-            // if the receiver of the focus is not a subcomponent of the
-            // jhvCalendar than hide the popup
-            if (carringtonPanel != null && !carringtonPanel.isAncestorOf(e.getOppositeComponent())) {
-                hideCRPopup();
-            }
+        if (!carringtonPanel.isAncestorOf(e.getOppositeComponent()) && (e.getComponent() == crPopupButton || carringtonPanel.isAncestorOf(e.getComponent()))) {
+            hideCRPopup();
         }
     }
 
     private void hideCRPopup() {
         if (crPopup != null) {
             crPopup.hide();
+            informAllJHVCalendarListeners();
             crPopup = null;
         }
     }
 
     private void showCRPopup() {
-        // set up the popup content
-        carringtonPanel = new JHVCarrington();
-        carringtonPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        carringtonPanel.addJHVCalendarListener(this);
-        addFocusListenerToAllChildren(carringtonPanel);
+        carringtonPanel.setTime(time);
 
         // get position for popup
         int x = crPopupButton.getLocationOnScreen().x;
@@ -126,19 +107,12 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
         // create popup
         PopupFactory factory = PopupFactory.getSharedInstance();
-        crPopup = factory.getPopup(crPopupButton, carringtonPanel, x, y);
-        crPopup.show();
-
-        // carringtonPicker.componentResized(null);
 
         // correct position of popup when it does not fit into screen area
         x = x + carringtonPanel.getSize().width > Toolkit.getDefaultToolkit().getScreenSize().width ? Toolkit.getDefaultToolkit().getScreenSize().width - carringtonPanel.getSize().width : x;
         x = x < 0 ? 0 : x;
-
         y = y + carringtonPanel.getSize().height > Toolkit.getDefaultToolkit().getScreenSize().height ? crPopupButton.getLocationOnScreen().y - carringtonPanel.getSize().height : y;
         y = y < 0 ? 0 : y;
-
-        crPopup.hide();
 
         // show popup
         crPopup = factory.getPopup(crPopupButton, carringtonPanel, x, y);
@@ -165,34 +139,21 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener, Action
 
     private class JHVCarrington extends JPanel {
 
-        private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
         private final JComboBox<Integer> crCombo = new JComboBox<>(createCRList());
 
         public JHVCarrington() {
             setLayout(new BorderLayout());
 
-            double cr = Carrington.time2CR(new JHVDate(time)) - Carrington.CR_MINIMAL;
-            crCombo.setSelectedIndex((int) Math.round(cr));
             crCombo.addActionListener(e -> {
-                time = Carrington.CR_start[crCombo.getSelectedIndex()];
-                informAllJHVCalendarListeners();
+                setTimeFromCarrington(Carrington.CR_start[crCombo.getSelectedIndex()]);
+                hideCRPopup();
             });
             add(crCombo);
         }
 
-        public void addJHVCalendarListener(JHVCalendarListener l) {
-            listeners.add(l);
-        }
-
-        public void removeJHVCalendarListener(JHVCalendarListener l) {
-            listeners.remove(l);
-        }
-
-        private void informAllJHVCalendarListeners() {
-            JHVCalendarEvent e = new JHVCalendarEvent(this);
-            for (JHVCalendarListener l : listeners) {
-                l.actionPerformed(e);
-            }
+        public void setTime(long t) {
+            int cr = (int) Math.round(Carrington.time2CR(new JHVDate(t)) - Carrington.CR_MINIMAL);
+            crCombo.setSelectedIndex(cr);
         }
 
         private Integer[] createCRList() {
