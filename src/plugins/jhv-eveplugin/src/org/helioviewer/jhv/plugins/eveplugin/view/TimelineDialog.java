@@ -1,68 +1,87 @@
 package org.helioviewer.jhv.plugins.eveplugin.view;
 
-import java.awt.FlowLayout;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
 
+import com.jidesoft.dialog.ButtonPanel;
+import com.jidesoft.dialog.StandardDialog;
+
 @SuppressWarnings("serial")
-public class TimelineDialog extends JDialog {
+public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     private final TimelineDataPanel observationPanel = new TimelineDataPanel();
 
     public TimelineDialog() {
         super(ImageViewerGui.getMainFrame(), true);
         setResizable(false);
-
-        JPanel contentPane = new JPanel();
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-        contentPane.setBorder(BorderFactory.createEmptyBorder(3, 9, 1, 9));
-        contentPane.setFocusable(true);
-        setContentPane(contentPane);
-
-        JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(EVESettings.availabilityURL));
-
-        JButton btnAdd = new JButton("Add");
-        btnAdd.addActionListener(e -> loadButtonPressed());
-        JButton btnClose = new JButton("Cancel");
-        btnClose.addActionListener(e -> setVisible(false));
-
-        JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 3));
-        buttonPane.add(availabilityButton);
-        buttonPane.add(btnClose);
-        buttonPane.add(btnAdd);
-
-        contentPane.add(observationPanel);
-        contentPane.add(buttonPane);
-
-        getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        getRootPane().setDefaultButton(btnAdd);
+        observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
     }
 
-    public TimelineDataPanel getObservationPanel() {
+    @Override
+    public ButtonPanel createButtonPanel() {
+        AbstractAction close = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        };
+        setDefaultCancelAction(close);
+
+        JButton cancelBtn = new JButton(close);
+        cancelBtn.setText("Cancel");
+
+        AbstractAction load = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (observationPanel.loadButtonPressed(null))
+                    setVisible(false);
+            }
+        };
+        setDefaultAction(load);
+
+        JButton addBtn = new JButton(close);
+        addBtn.setText("Add");
+        setInitFocusedComponent(addBtn);
+
+        JButton availabilityBtn = new JButton("Available data");
+        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(EVESettings.availabilityURL));
+
+        ButtonPanel panel = new ButtonPanel();
+        panel.add(addBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
+        panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
+        panel.add(availabilityBtn, ButtonPanel.OTHER_BUTTON);
+
+        return panel;
+    }
+
+    @Override
+    public JComponent createContentPanel() {
         return observationPanel;
     }
 
+    @Override
+    public JComponent createBannerPanel() {
+        return null;
+    }
+
+    @Override
     public void showDialog() {
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
     }
 
-    private void loadButtonPressed() {
-        if (observationPanel.loadButtonPressed(null))
-            setVisible(false);
+    public TimelineDataPanel getObservationPanel() {
+        return observationPanel;
     }
 
 }
