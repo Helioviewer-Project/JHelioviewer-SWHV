@@ -43,7 +43,7 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
         setInitFocusedComponent(button);
 
         ButtonPanel panel = new ButtonPanel();
-        panel.add(button);
+        panel.add(button, ButtonPanel.AFFIRMATIVE_BUTTON);
 
         return panel;
     }
