@@ -1,16 +1,13 @@
 package org.helioviewer.jhv.plugins.eveplugin.view;
 
-import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
@@ -38,36 +35,34 @@ public class TimelineDataPanel extends ObservationDialogPanel implements LineDat
     private final JComboBox<BandType> comboBoxData = new JComboBox<>();
 
     public TimelineDataPanel() {
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new GridBagLayout());
 
         comboBoxGroup.addActionListener(e -> updateGroupValues());
-
         calendarStartDate.addJHVCalendarListener(e -> ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true));
         calendarStartDate.setToolTipText("UTC date for observation start");
 
-        JPanel datePane = new JPanel(new BorderLayout());
-        datePane.add(new JLabel("Start date"), BorderLayout.PAGE_START);
-        datePane.add(calendarStartDate, BorderLayout.CENTER);
-        add(datePane);
-
-        JPanel dataPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.5;
-        dataPane.add(new JLabel("Group", JLabel.RIGHT), c);
-        c.gridx = 1;
+        c.weightx = 1;
+
         c.gridy = 0;
-        dataPane.add(comboBoxGroup, c);
         c.gridx = 0;
-        c.gridy = 1;
-        dataPane.add(new JLabel("Dataset", JLabel.RIGHT), c);
+        add(new JLabel("Start date", JLabel.RIGHT), c);
         c.gridx = 1;
+        add(calendarStartDate, c);
+
         c.gridy = 1;
-        dataPane.add(comboBoxData, c);
-        add(dataPane, BorderLayout.CENTER);
+        c.gridx = 0;
+        add(new JLabel("Group", JLabel.RIGHT), c);
+        c.gridx = 1;
+        add(comboBoxGroup, c);
+
+        c.gridy = 2;
+        c.gridx = 0;
+        add(new JLabel("Dataset", JLabel.RIGHT), c);
+        c.gridx = 1;
+        add(comboBoxData, c);
 
         Layers.addTimespanListener(this);
         ObservationDialogDateModel.addListener(this);
