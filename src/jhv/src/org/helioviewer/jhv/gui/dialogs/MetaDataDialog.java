@@ -1,50 +1,40 @@
 package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.gui.components.CollapsiblePane;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -68,75 +58,69 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
             return false;
         }
     };
-    private final DefaultListModel<String> jhList = new DefaultListModel<>();
-    private final DefaultListModel<String> basicList = new DefaultListModel<>();
 
-    private Document xmlDoc = null;
-    private boolean metaDataOK;
-    private String outFileName;
+    private final StringBuilder basicSB = new StringBuilder();
+    private final StringBuilder hvSB = new StringBuilder();
 
     public MetaDataDialog(View view) {
         super(ImageViewerGui.getMainFrame(), "Image Information");
-
         setLayout(new BorderLayout());
 
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> closePressed());
+        setMetaData(view);
 
-        exportFitsButton.addActionListener(e -> {
-            DOMSource source = new DOMSource(xmlDoc.getDocumentElement().getElementsByTagName("fits").item(0));
-            boolean saveSuccessful = saveXMLDocument(source, outFileName);
-            if (saveSuccessful)
-                JOptionPane.showMessageDialog(this, "Fits data saved to " + outFileName);
-        });
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> setVisible(false));
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(exportFitsButton);
         bottomPanel.add(closeButton);
-
-        JList<String> basicBox = new JList<>(basicList);
-        basicBox.setCellRenderer(new WrappedTextCellRenderer());
-        JList<String> jhBox = new JList<>(jhList);
-        jhBox.setCellRenderer(new WrappedTextCellRenderer());
-
-        ComponentListener cl = new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // force cache invalidation by temporarily setting fixed height
-                ((JList<?>) e.getComponent()).setFixedCellHeight(10);
-                ((JList<?>) e.getComponent()).setFixedCellHeight(-1);
-            }
-        };
-        jhBox.addComponentListener(cl);
 
         JTable fTable = new JTable(fitsModel);
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(fitsModel);
         fTable.setRowSorter(sorter);
         SearchableUtils.installSearchable(fTable);
 
+        JTextArea basicArea = new JTextArea(basicSB.toString());
+        basicArea.setEditable(false);
+        CollapsiblePane basicPane = new CollapsiblePane("Basic Information", new JScrollPane(basicArea), true) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                super.actionPerformed(e);
+                pack();
+            }
+        };
+
+        JTextArea hvArea = new JTextArea(hvSB.toString());
+        hvArea.setEditable(false);
+        hvArea.setLineWrap(true);
+        hvArea.setWrapStyleWord(true);
+        CollapsiblePane hvPane = new CollapsiblePane("Helioviewer Header", new JScrollPane(hvArea), true) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                super.actionPerformed(e);
+                pack();
+            }
+        };
+
         JPanel sp = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 1;
-        c.weighty = 0;
-
-        c.gridx = 0;
-        c.gridy = 0;
-
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.BOTH;
-        c.gridwidth = 1;
-        sp.add((basicBox), c);
-        c.weighty = 3;
+        c.weightx = 1;
+        c.gridx = 0;
+
+        c.weighty = 0.1;
+        c.gridy = 0;
+        sp.add(basicPane, c);
+        c.weighty = 1;
         c.gridy = 1;
         sp.add(new JScrollPane(fTable), c);
-        c.weighty = 1.25;
+        c.weighty = 0.1;
         c.gridy = 2;
-        sp.add(new JScrollPane(jhBox), c);
+        sp.add(hvPane, c);
 
         add(sp, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.PAGE_END);
-
-        setMetaData(view);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -145,50 +129,11 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
             }
         });
 
-        getRootPane().registerKeyboardAction(e -> closePressed(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         getRootPane().setDefaultButton(closeButton);
         getRootPane().setFocusable(true);
     }
 
-    private static class WrappedTextCellRenderer extends JTextArea implements ListCellRenderer<Object> {
-
-        public WrappedTextCellRenderer() {
-            setLineWrap(true);
-            setWrapStyleWord(true);
-            setFont(UIGlobals.UIFontMono);
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            if (value != null) {
-                setText(value.toString().trim());
-                int width = list.getWidth();
-                if (width > 0)
-                    setSize(width, Short.MAX_VALUE);
-            }
-            return this;
-        }
-
-    }
-
-    private void resetData() {
-        if (metaDataOK) {
-            exportFitsButton.setEnabled(true);
-        } else {
-            exportFitsButton.setEnabled(false);
-        }
-    }
-
-    private void addDataItem(String key, DefaultListModel<String> model) {
-        model.addElement(key);
-    }
-
-    private void addDataItem(String nodeName, String nodeValue, boolean isFits) {
-        if (isFits)
-            fitsModel.addRow(new Object[] { nodeName, nodeValue });
-        else
-            jhList.addElement(nodeName + ": " + nodeValue);
-    }
 
     @Override
     public void showDialog() {
@@ -197,29 +142,20 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
         setVisible(true);
     }
 
-    private void closePressed() {
-        xmlDoc = null;
-        resetData();
-        setVisible(false);
-    }
-
     private void setMetaData(View v) {
         MetaData metaData = v.getImageLayer().getMetaData();
-        if (!(metaData instanceof HelioviewerMetaData)) {
-            metaDataOK = false;
-            resetData();
-            addDataItem("Error: No metadata is available", basicList);
+        boolean metaDataOK = metaData instanceof HelioviewerMetaData;
+        exportFitsButton.setEnabled(metaDataOK);
+
+        if (!metaDataOK) {
+            basicSB.append("Error: No metadata is available");
         } else {
             HelioviewerMetaData m = (HelioviewerMetaData) metaData;
-            metaDataOK = true;
-            resetData();
-            addDataItem("Basic Information", basicList);
-            addDataItem("-----------------", basicList);
-            addDataItem("Observatory: " + m.getObservatory(), basicList);
-            addDataItem("Instrument: " + m.getInstrument(), basicList);
-            addDataItem("Detector: " + m.getDetector(), basicList);
-            addDataItem("Measurement: " + m.getMeasurement(), basicList);
-            addDataItem("Observation Date: " + m.getViewpoint().time, basicList);
+            basicSB.append("Observatory: ").append(m.getObservatory()).append('\n');
+            basicSB.append("Instrument: ").append(m.getInstrument()).append('\n');
+            basicSB.append("Detector: ").append(m.getDetector()).append('\n');
+            basicSB.append("Measurement: ").append(m.getMeasurement()).append('\n');
+            basicSB.append("Observation Date: ").append(m.getViewpoint().time);
 
             String xmlText = null;
             if (v instanceof JP2View) {
@@ -236,21 +172,35 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
 
                     // Send xml data to meta data dialog box
                     Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
-                    writeXMLData(root, 0);
+                    writeXMLData(root);
                     root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
                     if (root != null) {
-                        writeXMLData(root, 0);
+                        writeXMLData(root);
                     }
 
-                    // set the xml data for the MetaDataDialog
-                    xmlDoc = doc;
                     // export file name
-                    outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName() + "__" + TimeUtils.filenameDateFormat.format(m.getViewpoint().time.milli) + ".fits.xml";
+                    final String xml = xmlText;
+                    String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.filenameDateFormat.format(m.getViewpoint().time.milli) + ".fits.xml";
+                    exportFitsButton.addActionListener(e -> {
+                        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName), StandardCharsets.UTF_8))) {
+                            writer.write(xml, 0, xml.length());
+                            JOptionPane.showMessageDialog(this, "Fits data saved to " + outFileName);
+                        } catch (Exception ex) {
+                            Log.error("Failed to write XML: " + ex);
+                        }
+                    });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    private void addDataItem(String nodeName, String nodeValue, boolean isFits) {
+        if (isFits)
+            fitsModel.addRow(new Object[] { nodeName, nodeValue });
+        else
+            hvSB.append(nodeName).append(": ").append(nodeValue).append('\n');
     }
 
     /**
@@ -259,12 +209,10 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
      *
      * @param node
      *            Node to write
-     * @param indent
-     *            Number of tabstops to insert
      */
     private String lastNodeSeen = null;
 
-    private void writeXMLData(Node node, int indent) {
+    private void writeXMLData(Node node) {
         // get element name and value
         String nodeName = node.getNodeName();
         String nodeValue = getElementValue(node);
@@ -275,8 +223,6 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
                 break;
             case "helioviewer":
                 lastNodeSeen = nodeName;
-                addDataItem("Helioviewer Header", jhList);
-                addDataItem("------------------", jhList);
                 break;
             default:
                 addDataItem(nodeName, nodeValue, lastNodeSeen.equals("fits"));
@@ -288,7 +234,7 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                writeXMLData(child, indent + 1);
+                writeXMLData(child);
             }
         }
     }
@@ -313,25 +259,6 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
             }
         }
         return "";
-    }
-
-    /**
-     * This routine saves the fits data into an XML file.
-     *
-     * @param source
-     *            XML document to save
-     * @param filename
-     *            XML file name
-     */
-    private static boolean saveXMLDocument(DOMSource source, String filename) {
-        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(new File(filename)))) {
-            StreamResult result = new StreamResult(os);
-            TransformerFactory.newInstance().newTransformer().transform(source, result);
-            return true;
-        } catch (Exception e) {
-            Log.error("Failed to write XML: " + e);
-        }
-        return false;
     }
 
 }
