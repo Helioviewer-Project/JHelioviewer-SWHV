@@ -5,26 +5,25 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -37,9 +36,11 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.DataSources;
 
-// Dialog that allows the user to change default preferences and settings
+import com.jidesoft.dialog.ButtonPanel;
+import com.jidesoft.dialog.StandardDialog;
+
 @SuppressWarnings("serial")
-public class PreferencesDialog extends JDialog implements ShowableDialog {
+public class PreferencesDialog extends StandardDialog implements ShowableDialog {
 
     private JCheckBox loadDefaultMovie;
     private JCheckBox normalizeRadius;
@@ -51,48 +52,53 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     public PreferencesDialog() {
         super(ImageViewerGui.getMainFrame(), "Preferences", true);
         setResizable(false);
+    }
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        JPanel panel = new JPanel(new BorderLayout());
+    @Override
+    public ButtonPanel createButtonPanel() {
+        AbstractAction close = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        };
+        setDefaultCancelAction(close);
 
-        JPanel paramsSubPanel = new JPanel(new BorderLayout());
-        paramsSubPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 0, 3));
-        paramsSubPanel.add(createParametersPanel(), BorderLayout.CENTER);
+        JButton cancelBtn = new JButton(close);
+        cancelBtn.setText("Cancel");
 
-        JPanel defaultsSubPanel = new JPanel(new BorderLayout());
-        defaultsSubPanel.setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 3));
-        defaultsSubPanel.add(createDefaultSaveDirPanel(), BorderLayout.CENTER);
+        AbstractAction save = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveSettings();
+                setVisible(false);
+            }
+        };
+        setDefaultAction(save);
 
-        panel.add(paramsSubPanel, BorderLayout.NORTH);
-        panel.add(defaultsSubPanel, BorderLayout.CENTER);
+        JButton okBtn = new JButton(save);
+        okBtn.setText("Save");
+        setInitFocusedComponent(okBtn);
 
-        mainPanel.add(panel, BorderLayout.CENTER);
+        ButtonPanel panel = new ButtonPanel();
+        panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
+        panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
 
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton acceptBtn = new JButton("Save");
-        JButton cancelBtn = new JButton("Cancel");
+        return panel;
+    }
 
-        acceptBtn.addActionListener(e -> {
-            saveSettings();
-            setVisible(false);
-        });
+    @Override
+    public JComponent createContentPanel() {
+        defaultsPanel = new DefaultsSelectionPanel();
+        defaultsPanel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
+        return defaultsPanel;
+    }
 
-        cancelBtn.addActionListener(e -> setVisible(false));
-
-        if (System.getProperty("jhv.os").equals("windows")) {
-            btnPanel.add(acceptBtn);
-            btnPanel.add(cancelBtn);
-        } else {
-            btnPanel.add(cancelBtn);
-            btnPanel.add(acceptBtn);
-        }
-
-        mainPanel.add(btnPanel, BorderLayout.SOUTH);
-        getContentPane().add(mainPanel);
-
-        getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        getRootPane().setDefaultButton(acceptBtn);
-        getRootPane().setFocusable(true);
+    @Override
+    public JComponent createBannerPanel() {
+        JPanel panel = createParametersPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
+        return panel;
     }
 
     @Override
@@ -106,57 +112,31 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovie.isSelected()));
         settings.setProperty("display.normalize", Boolean.toString(normalizeRadius.isSelected()));
         settings.setProperty("display.normalizeAIA", Boolean.toString(normalizeAIA.isSelected()));
-
         defaultsPanel.saveSettings();
         settings.save();
     }
 
-    /**
-     * Creates the general parameters panel.
-     *
-     * @return General parameters panel
-     */
     private JPanel createParametersPanel() {
-        JPanel paramsPanel = new JPanel(new GridLayout(0, 1));
-        paramsPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         row1.add(new JLabel("Preferred server", JLabel.RIGHT));
-
         JComboBox<String> combo = new JComboBox<>(DataSources.getServers());
         combo.setSelectedItem(Settings.getSingletonInstance().getProperty("default.server"));
         combo.addActionListener(e -> Settings.getSingletonInstance().setProperty("default.server", (String) combo.getSelectedItem()));
         row1.add(combo);
         loadDefaultMovie = new JCheckBox("Load default movie at start-up", Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
         row1.add(loadDefaultMovie);
-        paramsPanel.add(row1);
 
         JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness (needs restart)", Boolean.parseBoolean(settings.getProperty("display.normalizeAIA")));
         row2.add(normalizeAIA);
         normalizeRadius = new JCheckBox("Normalize solar radius (needs restart)", Boolean.parseBoolean(settings.getProperty("display.normalize")));
         row2.add(normalizeRadius);
+
+        JPanel paramsPanel = new JPanel(new GridLayout(0, 1));
+        paramsPanel.add(row1);
         paramsPanel.add(row2);
 
         return paramsPanel;
-    }
-
-    /**
-     * Creates the default save directories panel.
-     *
-     * @return Default save directories panel
-     */
-    private JPanel createDefaultSaveDirPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder(" Settings "));
-
-        defaultsPanel = new DefaultsSelectionPanel();
-        defaultsPanel.setPreferredSize(new Dimension(450, 150));
-        defaultsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        panel.add(defaultsPanel, BorderLayout.CENTER);
-
-        return panel;
     }
 
     private static class DefaultsSelectionPanel extends JPanel {
@@ -166,7 +146,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         public DefaultsSelectionPanel() {
             super(new BorderLayout());
-            // setPreferredSize(new Dimension(150, 180));
+            setPreferredSize(new Dimension(0, 150));
 
             Settings settings = Settings.getSingletonInstance();
             String pass = settings.getProperty("default.proxyPassword");
