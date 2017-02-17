@@ -23,7 +23,6 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
     public TimelineDialog() {
         super(ImageViewerGui.getMainFrame(), true);
         setResizable(false);
-        observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
     }
 
     @Override
@@ -48,15 +47,15 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         };
         setDefaultAction(load);
 
-        JButton addBtn = new JButton(close);
-        addBtn.setText("Add");
-        setInitFocusedComponent(addBtn);
+        JButton okBtn = new JButton(load);
+        okBtn.setText("Add");
+        setInitFocusedComponent(okBtn);
 
         JButton availabilityBtn = new JButton("Available data");
         availabilityBtn.addActionListener(e -> JHVGlobals.openURL(EVESettings.availabilityURL));
 
         ButtonPanel panel = new ButtonPanel();
-        panel.add(addBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
+        panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
         panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
         panel.add(availabilityBtn, ButtonPanel.OTHER_BUTTON);
 
@@ -65,6 +64,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public JComponent createContentPanel() {
+        observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
         return observationPanel;
     }
 
