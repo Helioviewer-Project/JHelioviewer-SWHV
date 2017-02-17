@@ -1,13 +1,8 @@
 package org.helioviewer.jhv.gui.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
@@ -15,15 +10,14 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -45,11 +39,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.jidesoft.dialog.ButtonPanel;
+import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.SearchableUtils;
 
 @SuppressWarnings("serial")
-public class MetaDataDialog extends JDialog implements ShowableDialog {
+public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
+    private JPanel content = new JPanel(new GridBagLayout());
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
     private final DefaultTableModel fitsModel = new DefaultTableModel(null, new Object[] { "FITS Keyword", "Value" }) {
@@ -58,27 +55,19 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
             return false;
         }
     };
+    private final JTable fitsTable = new JTable(fitsModel);
 
     private final StringBuilder basicSB = new StringBuilder();
     private final StringBuilder hvSB = new StringBuilder();
 
     public MetaDataDialog(View view) {
         super(ImageViewerGui.getMainFrame(), "Image Information");
-        setLayout(new BorderLayout());
 
         setMetaData(view);
 
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> setVisible(false));
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.add(exportFitsButton);
-        bottomPanel.add(closeButton);
-
-        JTable fTable = new JTable(fitsModel);
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(fitsModel);
-        fTable.setRowSorter(sorter);
-        SearchableUtils.installSearchable(fTable);
+        fitsTable.setRowSorter(sorter);
+        SearchableUtils.installSearchable(fitsTable);
 
         JTextArea basicArea = new JTextArea(basicSB.toString());
         basicArea.setEditable(false);
@@ -102,7 +91,6 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
             }
         };
 
-        JPanel sp = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.BOTH;
@@ -111,29 +99,46 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
 
         c.weighty = 0.1;
         c.gridy = 0;
-        sp.add(basicPane, c);
+        content.add(basicPane, c);
         c.weighty = 1;
         c.gridy = 1;
-        sp.add(new JScrollPane(fTable), c);
+        content.add(new JScrollPane(fitsTable), c);
         c.weighty = 0.1;
         c.gridy = 2;
-        sp.add(hvPane, c);
-
-        add(sp, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.PAGE_END);
-
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-                fTable.requestFocus();
-            }
-        });
-
-        getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        getRootPane().setDefaultButton(closeButton);
-        getRootPane().setFocusable(true);
+        content.add(hvPane, c);
     }
 
+    @Override
+    public ButtonPanel createButtonPanel() {
+        AbstractAction close = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        };
+        setDefaultAction(close);
+        setDefaultCancelAction(close);
+
+        JButton button = new JButton(close);
+        button.setText("Close");
+        setInitFocusedComponent(fitsTable);
+
+        ButtonPanel panel = new ButtonPanel();
+        panel.add(button, ButtonPanel.AFFIRMATIVE_BUTTON);
+        panel.add(exportFitsButton, ButtonPanel.OTHER_BUTTON);
+
+        return panel;
+    }
+
+    @Override
+    public JComponent createContentPanel() {
+        return content;
+    }
+
+    @Override
+    public JComponent createBannerPanel() {
+        return null;
+    }
 
     @Override
     public void showDialog() {
@@ -178,7 +183,6 @@ public class MetaDataDialog extends JDialog implements ShowableDialog {
                         writeXMLData(root);
                     }
 
-                    // export file name
                     final String xml = xmlText;
                     String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.filenameDateFormat.format(m.getViewpoint().time.milli) + ".fits.xml";
                     exportFitsButton.addActionListener(e -> {
