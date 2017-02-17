@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -25,6 +24,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -46,7 +46,7 @@ import com.jidesoft.swing.SearchableUtils;
 @SuppressWarnings("serial")
 public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
-    private JPanel content = new JPanel(new GridBagLayout());
+    private final JPanel content = new JPanel(new GridBagLayout());
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
     private final DefaultTableModel fitsModel = new DefaultTableModel(null, new Object[] { "FITS Keyword", "Value" }) {
@@ -188,10 +188,11 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                     exportFitsButton.addActionListener(e -> {
                         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName), StandardCharsets.UTF_8))) {
                             writer.write(xml, 0, xml.length());
-                            JOptionPane.showMessageDialog(this, "Fits data saved to " + outFileName);
                         } catch (Exception ex) {
                             Log.error("Failed to write XML: " + ex);
+                            return; // try with resources
                         }
+                        JHVGlobals.displayNotification(outFileName);
                     });
                 } catch (Exception e) {
                     e.printStackTrace();
