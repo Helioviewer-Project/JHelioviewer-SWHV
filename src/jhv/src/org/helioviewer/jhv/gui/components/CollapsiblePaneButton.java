@@ -13,11 +13,16 @@ import javax.swing.SwingConstants;
 @SuppressWarnings("serial")
 class CollapsiblePaneButton extends JToggleButton {
 
-    private static final Color color = new JPanel().getBackground();
+    private final Color color;
     private final Color bright;
     private final Color dark;
 
     public CollapsiblePaneButton() {
+        Color c = new JPanel().getBackground();
+        if (c == null) // synth laf
+            c = Color.GRAY;
+        color = c;
+
         setContentAreaFilled(false);
         setFocusPainted(false);
         setBorderPainted(false);
