@@ -1,10 +1,6 @@
 package org.helioviewer.jhv.gui.dialogs;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -29,23 +25,7 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public ButtonPanel createButtonPanel() {
-        AbstractAction close = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        };
-        setDefaultAction(close);
-        setDefaultCancelAction(close);
-
-        JButton button = new JButton(close);
-        button.setText("Close");
-        setInitFocusedComponent(button);
-
-        ButtonPanel panel = new ButtonPanel();
-        panel.add(button, ButtonPanel.AFFIRMATIVE_BUTTON);
-
-        return panel;
+        return new CloseButtonPanel(this);
     }
 
     @Override
