@@ -20,7 +20,6 @@ import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.helioviewer.jhv.JHVDirectory;
@@ -171,9 +170,8 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
             if (xmlText != null) {
                 try {
-                    InputStream in = new ByteArrayInputStream(xmlText.trim().replace("&", "&amp;").getBytes(StandardCharsets.UTF_8));
-                    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                    Document doc = builder.parse(in);
+                    InputStream in = new ByteArrayInputStream(xmlText.getBytes(StandardCharsets.UTF_8));
+                    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
 
                     // Send xml data to meta data dialog box
                     Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);

@@ -195,7 +195,7 @@ public class FITSImage implements MetaDataContainer {
      * */
     public String getHeaderAsXML() {
         String sep = System.getProperty("line.separator");
-        StringBuilder builder = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + sep + "<meta>" + sep + "<fits>" + sep);
+        StringBuilder builder = new StringBuilder("<meta>" + sep + "<fits>" + sep);
 
         for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext();) {
             HeaderCard headerCard = iter.next();
@@ -205,7 +205,7 @@ public class FITSImage implements MetaDataContainer {
         }
         builder.append("</fits>").append(sep).append("</meta>");
 
-        return builder.toString();
+        return builder.toString().replace("&", "&amp;");
     }
 
     @Override
