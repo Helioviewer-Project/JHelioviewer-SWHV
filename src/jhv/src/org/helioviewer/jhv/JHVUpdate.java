@@ -87,7 +87,7 @@ public class JHVUpdate implements Runnable {
            // String message = in.readLine(); - extra
 
             EventQueue.invokeLater(() -> {
-                String runningVersion = JHVGlobals.getJhvVersion() + '.' + JHVGlobals.getJhvRevision();
+                String runningVersion = JHVGlobals.version + '.' + JHVGlobals.revision;
                 if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
                     Log.info("Found newer version " + version);
 

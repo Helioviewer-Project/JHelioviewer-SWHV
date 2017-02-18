@@ -26,9 +26,9 @@ public class JHVGlobals {
 
     public static final String programName = "ESA JHelioviewer";
     public static final String downloadURL = "http://swhv.oma.be/download/";
-    private static String version = "2.-1.-1";
-    private static String revision = "-1";
-    private static String agent = "JHV/SWHV-";
+    public static String version = "2.-1.-1";
+    public static String revision = "-1";
+    public static String userAgent = "JHV/SWHV-";
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
@@ -60,7 +60,6 @@ public class JHVGlobals {
         File jarPath;
         try {
             jarPath = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            // Log.info("JHVGlobals.determineVersionAndRevision > Look for jar file: " + jarPath.getAbsolutePath());
         } catch (URISyntaxException e1) {
             Log.error("JHVGlobals.determineVersionAndRevision > Could not open code source location: " + JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation());
             Log.warn("JHVGlobals.determineVersionAndRevision > Set version and revision to null.");
@@ -78,13 +77,13 @@ public class JHVGlobals {
                 Attributes mainAttributes = manifest.getMainAttributes();
                 version = mainAttributes.getValue("version");
                 revision = mainAttributes.getValue("revision");
-                agent += version + "." + revision + " (" +
-                         System.getProperty("os.arch") + " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") " +
+                userAgent += version + '.' + revision + " (" +
+                         System.getProperty("os.arch") + ' ' + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ") " +
                          System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
 
                 System.setProperty("jhv.version", version);
                 System.setProperty("jhv.revision", revision);
-                Log.info("Running " + agent);
+                Log.info("Running " + userAgent);
             } catch (IOException e) {
                 Log.error("JHVGlobals.determineVersionAndRevision > Error while reading version and revision from manifest in jar file: " + jarPath, e);
             }
@@ -93,35 +92,6 @@ public class JHVGlobals {
         }
     }
 
-    public static String getJhvFullVersion() {
-        return programName + " " + version + " - Revision " + revision;
-    }
-
-    /**
-     * Returns the version of JHelioviewer as found in the manifest file of the
-     * jar archive
-     *
-     * @return the version or empty string if the classes are not within a jar archive
-     *         or the manifest does not contain the version
-     */
-    public static String getJhvVersion() {
-        return version;
-    }
-
-    /**
-     * Returns the revision of JHelioviewer as found in the manifest file of the
-     * jar archive
-     *
-     * @return the revision or empty string if the classes are not within a jar archive
-     *         or the manifest does not contain the revision
-     */
-    public static String getJhvRevision() {
-        return revision;
-    }
-
-    public static String getUserAgent() {
-        return agent;
-    }
     /**
      * Attempts to create the necessary directories if they do not exist. It
      * gets its list of directories to create from the JHVDirectory class.
