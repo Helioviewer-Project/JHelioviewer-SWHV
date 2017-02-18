@@ -77,28 +77,27 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
 
     @Override
     public JComponent createBannerPanel() {
-        JLabel logo = new JLabel(IconBank.getIcon(JHVIcon.HVLOGO_SMALL));
-        String text = "<center><b>" + JHVGlobals.programName + ' ' + JHVGlobals.version + " - Revision " + JHVGlobals.revision + "</b><br>" +
+        String text = "<center><b><big>" + JHVGlobals.programName + "</big><br>Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br>" +
                 "©2017 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>" +
                 "Part of the ESA/NASA Helioviewer Project<br>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>" +
                 "JHelioviewer is released under the<br>" +
                 "<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>" +
                 "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>" +
-                "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a></center>";
+                "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>";
 
         JTextPane pane = new JTextPane();
-        pane.setBackground(logo.getBackground());
         pane.setContentType("text/html");
         pane.setText(text);
         pane.setEditable(false);
         pane.addHyperlinkListener(this);
         pane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        pane.setOpaque(false);
 
         JPanel banner = new JPanel(new BorderLayout());
-        banner.add(logo, BorderLayout.WEST);
+        banner.add(new JLabel(IconBank.getIcon(JHVIcon.HVLOGO_SMALL)), BorderLayout.WEST);
         banner.add(pane, BorderLayout.EAST);
-        banner.setBorder(BorderFactory.createEmptyBorder(5, 30, 5, 30));
+        banner.setBorder(BorderFactory.createEmptyBorder(5, 35, 5, 35));
         return banner;
     }
 

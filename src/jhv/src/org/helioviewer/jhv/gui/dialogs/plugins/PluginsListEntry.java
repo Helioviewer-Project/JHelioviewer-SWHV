@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
+import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
@@ -100,6 +101,7 @@ class PluginsListEntry extends JPanel implements MouseListener {
 
         plugin.setActive(active);
         plugin.changeSettings();
+        PluginManager.getSingletonInstance().saveSettings();
 
         updateEnableLabel();
         list.fireListChanged();
