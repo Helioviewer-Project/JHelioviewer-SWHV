@@ -1,24 +1,21 @@
 package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
+import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
@@ -27,28 +24,40 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
+import com.jidesoft.dialog.ButtonPanel;
+import com.jidesoft.dialog.StandardDialog;
+
 @SuppressWarnings("serial")
-public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkListener {
+public class AboutDialog extends StandardDialog implements ShowableDialog, HyperlinkListener {
 
     public AboutDialog() {
         super(ImageViewerGui.getMainFrame(), "About JHelioviewer", true);
+        setResizable(false);
+    }
 
-        JPanel contentPane = new JPanel(new BorderLayout());
+    @Override
+    public ButtonPanel createButtonPanel() {
+        AbstractAction close = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        };
+        setDefaultAction(close);
+        setDefaultCancelAction(close);
 
-        JLabel logo = new JLabel(IconBank.getIcon(JHVIcon.HVLOGO_SMALL));
-        logo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        contentPane.add(logo, BorderLayout.WEST);
+        JButton button = new JButton(close);
+        button.setText("Close");
+        setInitFocusedComponent(button);
 
-        StringBuilder text = new StringBuilder();
-        text.append("<center><b>").append(getVersionString()).append("</b><br>");
-        text.append("©2017 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>");
-        text.append("Part of the ESA/NASA Helioviewer Project<br>");
-        text.append("Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>");
-        text.append("JHelioviewer is released under the<br>");
-        text.append("<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>");
-        text.append("<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>");
-        text.append("Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a></center>");
-        text.append("<hr>This software uses the <a href=\"http://www.kakadusoftware.com\">Kakadu JPEG2000 Toolkit</a>,<br>©2015, NewSouth Innovations Ltd (NSI). <a href=Kakadu.txt>License</a><br>");
+        ButtonPanel panel = new ButtonPanel();
+        panel.add(button, ButtonPanel.AFFIRMATIVE_BUTTON);
+        return panel;
+    }
+
+    @Override
+    public JComponent createContentPanel() {
+        StringBuilder text = new StringBuilder("This software uses the <a href=\"http://www.kakadusoftware.com\">Kakadu JPEG2000 Toolkit</a>,<br>©2015, NewSouth Innovations Ltd (NSI). <a href=Kakadu.txt>License</a><br>");
         text.append("<p>This software uses <a href=\"https://jogamp.org\">JogAmp</a>, the Java high performance libraries for 3D Graphics, Multimedia and Processing,<br>©JogAmp Community and others.<br>");
         text.append("<p>This software uses <a href=\"https://commons.apache.org\">Apache Commons</a>, ©2001-2015, The Apache Software Foundation.<br>");
         text.append("<p>This software uses <a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> from the Apache Logging Services Project, licensed under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License version 2.0</a>,<br>©2010, The Apache Software Foundation.<br>");
@@ -74,25 +83,42 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
             text.append("<hr><b>").append(pluginName).append("</b><br>").append(pluginAboutLicense);
         }
 
-        JEditorPane content = new JEditorPane("text/html", text.toString());
-        content.setOpaque(false);
-        content.setEditable(false);
-        content.addHyperlinkListener(this);
-        content.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-        content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        contentPane.add(content, BorderLayout.CENTER);
+        JTextPane pane = new JTextPane();
+        pane.setContentType("text/html");
+        pane.setText(text.toString());
+        pane.setEditable(false);
+        pane.addHyperlinkListener(this);
+        pane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        return new JScrollPane(pane);
+    }
 
-        JPanel closeButtonContainer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> setVisible(false));
-        closeButtonContainer.add(closeButton);
-        contentPane.add(closeButtonContainer, BorderLayout.SOUTH);
+    @Override
+    public JComponent createBannerPanel() {
+        JLabel logo = new JLabel(IconBank.getIcon(JHVIcon.HVLOGO_SMALL));
+        StringBuilder text = new StringBuilder("<center><b>");
+        text.append(JHVGlobals.getJhvFullVersion()).append("</b><br>");
+        text.append("©2017 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>");
+        text.append("Part of the ESA/NASA Helioviewer Project<br>");
+        text.append("Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>");
+        text.append("JHelioviewer is released under the<br>");
+        text.append("<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>");
+        text.append("<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>");
+        text.append("Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a></center>");
 
-        add(new JScrollPane(contentPane));
+        JTextPane pane = new JTextPane();
+        pane.setBackground(logo.getBackground());
+        pane.setContentType("text/html");
+        pane.setText(text.toString());
+        pane.setEditable(false);
+        pane.addHyperlinkListener(this);
+        pane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
-        getRootPane().registerKeyboardAction(e -> setVisible(false), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        getRootPane().setDefaultButton(closeButton);
-        getRootPane().setFocusable(true);
+        JPanel banner = new JPanel(new BorderLayout());
+        banner.add(logo, BorderLayout.WEST);
+        banner.add(pane, BorderLayout.EAST);
+        banner.setBorder(BorderFactory.createEmptyBorder(5, 30, 5, 30));
+        return banner;
     }
 
     @Override
@@ -113,22 +139,6 @@ public class AboutDialog extends JDialog implements ShowableDialog, HyperlinkLis
                 JHVGlobals.openURL(e.getURL().toString());
             }
         }
-    }
-
-    private static String getVersionString() {
-        String versionString = JHVGlobals.getJhvVersion();
-        String revisionString = JHVGlobals.getJhvRevision();
-
-        if (versionString == null) {
-            Log.warn("AboutDialog.getVersionString() > No version found. Use default version and revision strings.");
-            versionString = "2.-1.-1";
-        }
-
-        if (revisionString == null) {
-            Log.warn("AboutDialog.getVersionString() > No revision found. Use default version and revision strings.");
-            revisionString = "-1";
-        }
-        return JHVGlobals.programName + " " + versionString + " - Revision " + revisionString;
     }
 
 }
