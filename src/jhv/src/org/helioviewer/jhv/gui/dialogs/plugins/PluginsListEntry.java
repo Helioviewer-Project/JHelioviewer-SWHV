@@ -15,7 +15,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
+import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 /**
  * Visual list entry for each plug-in. Provides functions to enable/disable
@@ -108,7 +110,12 @@ class PluginsListEntry extends JPanel implements MouseListener {
         list.selectItem(plugin.getName());
 
         if (e.getSource().equals(infoLabel)) {
-            PluginAboutDialog.showDialog(plugin.getPlugin());
+            Plugin p = plugin.getPlugin();
+            String name = p.getName() == null ? "Unknown plug-in name" : p.getName();
+            String desc = p.getDescription() == null ? "No description available" : p.getDescription();
+            String license = p.getAboutLicenseText() == null ? "Unknown license" : p.getAboutLicenseText();
+            String text = "<center><p><big><b>" + name + "</b></big></p><p><b>Plug-in description</b><br>" + desc + "</p><p><b>Plug-in license information</b><br>" + license;
+            new TextDialog("About", text, false).showDialog();
         } else if (e.getSource().equals(enableLabel)) {
             setPluginActive(!plugin.isActive());
         }
