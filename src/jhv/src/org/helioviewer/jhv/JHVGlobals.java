@@ -55,7 +55,6 @@ public class JHVGlobals {
         return connectTimeout;
     }
 
-    // This function must be called prior to the first call to getJhvVersion and getJhvRevision
     public static void determineVersionAndRevision() {
         File jarPath;
         try {
