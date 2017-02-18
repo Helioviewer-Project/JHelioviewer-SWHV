@@ -80,7 +80,7 @@ public class JPIPSocket extends HTTPSocket {
 
         // Build request to send
         HTTPMessage req = new HTTPMessage();
-        req.setHeader("User-Agent", JHVGlobals.getUserAgent());
+        req.setHeader("User-Agent", JHVGlobals.userAgent);
         req.setHeader("Connection", "Keep-Alive");
         req.setHeader("Accept-Encoding", "gzip");
         req.setHeader("Cache-Control", "no-cache");

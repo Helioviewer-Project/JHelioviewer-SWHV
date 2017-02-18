@@ -101,7 +101,7 @@ public class DownloadStream {
             HttpURLConnection httpC = (HttpURLConnection) connection;
             // get compression if supported
             httpC.setRequestProperty("Accept-Encoding", "gzip,deflate");
-            httpC.setRequestProperty("User-Agent", JHVGlobals.getUserAgent());
+            httpC.setRequestProperty("User-Agent", JHVGlobals.userAgent);
 
             // Write post data if necessary
             if (output != null) {

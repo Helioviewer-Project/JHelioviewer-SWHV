@@ -46,7 +46,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
         text.append("<p>This software uses the <a href=\"https://github.com/stleary/JSON-java\">JSON in Java</a> Library, licensed under a custom <a href=\"http://www.json.org/license.html\">License</a>.");
         text.append("<p>This software uses the <a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial SQLite JDBC Driver</a>, licensed under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License version 2.0</a>.<br>");
         text.append("<p>This software uses <a href=\"http://jcodec.org\">JCodec</a>, licensed under the FreeBSD License.<br>");
-        text.append("<p>This software uses <a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, © 2002-2017, JIDE Software, Inc.<br>");
+        text.append("<p>This software uses <a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, ©2002-2017, JIDE Software, Inc.<br>");
         text.append("<p>This software uses the <a href=\"http://nom-tam-fits.github.io/nom-tam-fits/\">FITS in Java</a> public domain library.<br>");
 
         for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {
@@ -78,20 +78,19 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     @Override
     public JComponent createBannerPanel() {
         JLabel logo = new JLabel(IconBank.getIcon(JHVIcon.HVLOGO_SMALL));
-        StringBuilder text = new StringBuilder("<center><b>");
-        text.append(JHVGlobals.getJhvFullVersion()).append("</b><br>");
-        text.append("©2017 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>");
-        text.append("Part of the ESA/NASA Helioviewer Project<br>");
-        text.append("Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>");
-        text.append("JHelioviewer is released under the<br>");
-        text.append("<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>");
-        text.append("<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>");
-        text.append("Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a></center>");
+        String text = "<center><b>" + JHVGlobals.programName + ' ' + JHVGlobals.version + " - Revision " + JHVGlobals.revision + "</b><br>" +
+                "©2017 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>" +
+                "Part of the ESA/NASA Helioviewer Project<br>" +
+                "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br><br>" +
+                "JHelioviewer is released under the<br>" +
+                "<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>" +
+                "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>" +
+                "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a></center>";
 
         JTextPane pane = new JTextPane();
         pane.setBackground(logo.getBackground());
         pane.setContentType("text/html");
-        pane.setText(text.toString());
+        pane.setText(text);
         pane.setEditable(false);
         pane.addHyperlinkListener(this);
         pane.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
