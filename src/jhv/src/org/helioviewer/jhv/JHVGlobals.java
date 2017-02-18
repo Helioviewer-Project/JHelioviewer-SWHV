@@ -26,8 +26,8 @@ public class JHVGlobals {
 
     public static final String programName = "ESA JHelioviewer";
     public static final String downloadURL = "http://swhv.oma.be/download/";
-    private static String version = "";
-    private static String revision = "";
+    private static String version = "2.-1.-1";
+    private static String revision = "-1";
     private static String agent = "JHV/SWHV-";
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
@@ -78,7 +78,7 @@ public class JHVGlobals {
                 Attributes mainAttributes = manifest.getMainAttributes();
                 version = mainAttributes.getValue("version");
                 revision = mainAttributes.getValue("revision");
-                agent += version + "." + revision + " (" + 
+                agent += version + "." + revision + " (" +
                          System.getProperty("os.arch") + " " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") " +
                          System.getProperty("java.vendor") + " JRE " + System.getProperty("java.version");
 
@@ -91,6 +91,10 @@ public class JHVGlobals {
         } else {
             Log.warn("JHVGlobals.determineVersionAndRevision > Classes are not within a jar file. Set version and revision to null.");
         }
+    }
+
+    public static String getJhvFullVersion() {
+        return programName + " " + version + " - Revision " + revision;
     }
 
     /**
