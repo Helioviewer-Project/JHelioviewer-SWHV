@@ -22,7 +22,6 @@ class PluginsList extends JScrollPane {
     private String selectedEntryName = null;
 
     public PluginsList() {
-        super(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         setViewportView(contentPane);
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         contentPane.setBackground(Color.WHITE);

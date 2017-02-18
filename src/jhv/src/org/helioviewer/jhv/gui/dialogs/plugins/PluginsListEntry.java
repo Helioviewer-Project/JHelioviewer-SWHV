@@ -110,7 +110,6 @@ class PluginsListEntry extends JPanel implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         list.selectItem(plugin.getName());
-
         if (e.getSource().equals(infoLabel)) {
             Plugin p = plugin.getPlugin();
             String name = p.getName() == null ? "Unknown plug-in name" : p.getName();
