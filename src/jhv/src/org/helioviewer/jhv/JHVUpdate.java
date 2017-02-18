@@ -91,8 +91,7 @@ public class JHVUpdate implements Runnable {
                 if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
                     Log.info("Found newer version " + version);
 
-                    NewVersionDialog dialog = new NewVersionDialog(verbose);
-                    dialog.init("JHelioviewer " + version + " is now available (you have " + runningVersion + ").");
+                    NewVersionDialog dialog = new NewVersionDialog("JHelioviewer " + version + " is now available (you have " + runningVersion + ").", verbose);
                     dialog.showDialog();
                     if (!verbose) {
                         Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(dialog.getNextCheck()));

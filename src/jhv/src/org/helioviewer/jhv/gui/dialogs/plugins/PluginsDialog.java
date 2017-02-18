@@ -8,7 +8,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
@@ -31,13 +30,12 @@ public class PluginsDialog extends StandardDialog implements ShowableDialog, Plu
         setResizable(false);
 
         JLabel emptyLabel = new JLabel("No plug-ins available", JLabel.CENTER);
-        JScrollPane emptyScrollPane = new JScrollPane(emptyLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         emptyLabel.setFont(emptyLabel.getFont().deriveFont(Font.ITALIC));
         emptyLabel.setHorizontalTextPosition(JLabel.CENTER);
         emptyLabel.setOpaque(true);
         emptyLabel.setBackground(Color.WHITE);
 
-        listContainerPane.add(emptyScrollPane, "empty");
+        listContainerPane.add(emptyLabel, "empty");
         listContainerPane.add(pluginList, "list");
 
         pluginList.addListEntryChangeListener(this);
