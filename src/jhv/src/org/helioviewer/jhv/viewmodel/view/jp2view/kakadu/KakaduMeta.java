@@ -194,7 +194,7 @@ public class KakaduMeta {
             if (len > 0) {
                 byte[] buf = new byte[len];
                 xmlBox.Read(buf, len);
-                xml = new String(buf, StandardCharsets.UTF_8);
+                xml = new String(buf, StandardCharsets.UTF_8).trim().replace("&", "&amp;");
             }
         } catch (KduException ex) {
             throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
