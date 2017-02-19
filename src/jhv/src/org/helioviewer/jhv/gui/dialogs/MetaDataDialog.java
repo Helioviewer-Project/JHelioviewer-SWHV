@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.gui.dialogs;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -13,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -27,7 +24,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.components.CollapsiblePane;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -40,12 +36,13 @@ import org.w3c.dom.NodeList;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
+import com.jidesoft.swing.JideSplitPane;
 import com.jidesoft.swing.SearchableUtils;
 
 @SuppressWarnings("serial")
 public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
-    private final JPanel content = new JPanel(new GridBagLayout());
+    private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
     private final DefaultTableModel fitsModel = new DefaultTableModel(null, new Object[] { "FITS Keyword", "Value" }) {
@@ -62,49 +59,24 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     public MetaDataDialog(View view) {
         super(ImageViewerGui.getMainFrame(), "Image Information");
 
+        exportFitsButton.setEnabled(false);
         setMetaData(view);
 
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(fitsModel);
         fitsTable.setRowSorter(sorter);
         SearchableUtils.installSearchable(fitsTable);
 
-        JTextArea basicArea = new JTextArea(basicSB.toString());
+        JTextArea basicArea = new JTextArea(basicSB.toString().trim());
         basicArea.setEditable(false);
-        CollapsiblePane basicPane = new CollapsiblePane("Basic Information", new JScrollPane(basicArea), true) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                super.actionPerformed(e);
-                pack();
-            }
-        };
 
-        JTextArea hvArea = new JTextArea(hvSB.toString());
+        JTextArea hvArea = new JTextArea(hvSB.toString().trim());
         hvArea.setEditable(false);
         hvArea.setLineWrap(true);
         hvArea.setWrapStyleWord(true);
-        CollapsiblePane hvPane = new CollapsiblePane("Helioviewer Header", new JScrollPane(hvArea), true) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                super.actionPerformed(e);
-                pack();
-            }
-        };
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.CENTER;
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 1;
-        c.gridx = 0;
-
-        c.weighty = 0.1;
-        c.gridy = 0;
-        content.add(basicPane, c);
-        c.weighty = 1;
-        c.gridy = 1;
-        content.add(new JScrollPane(fitsTable), c);
-        c.weighty = 0.1;
-        c.gridy = 2;
-        content.add(hvPane, c);
+        content.add(new JScrollPane(basicArea));
+        content.add(new JScrollPane(fitsTable));
+        content.add(new JScrollPane(hvArea));
     }
 
     @Override
@@ -142,16 +114,14 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     @Override
     public void showDialog() {
         pack();
+        content.setDividerLocation(1, 600);
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
     }
 
     private void setMetaData(View v) {
         MetaData metaData = v.getImageLayer().getMetaData();
-        boolean metaDataOK = metaData instanceof HelioviewerMetaData;
-        exportFitsButton.setEnabled(metaDataOK);
-
-        if (!metaDataOK) {
+        if (!(metaData instanceof HelioviewerMetaData)) {
             basicSB.append("Error: No metadata is available");
         } else {
             HelioviewerMetaData m = (HelioviewerMetaData) metaData;
@@ -159,7 +129,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             basicSB.append("Instrument: ").append(m.getInstrument()).append('\n');
             basicSB.append("Detector: ").append(m.getDetector()).append('\n');
             basicSB.append("Measurement: ").append(m.getMeasurement()).append('\n');
-            basicSB.append("Observation Date: ").append(m.getViewpoint().time);
+            basicSB.append("Observation Date: ").append(m.getViewpoint().time).append('\n');
 
             String xmlText = null;
             if (v instanceof JP2View) {
@@ -183,6 +153,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
                     final String xml = xmlText;
                     String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.filenameDateFormat.format(m.getViewpoint().time.milli) + ".fits.xml";
+                    exportFitsButton.setEnabled(true);
                     exportFitsButton.addActionListener(e -> {
                         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName), StandardCharsets.UTF_8))) {
                             writer.write(xml, 0, xml.length());
