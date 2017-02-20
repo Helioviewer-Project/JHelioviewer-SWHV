@@ -18,6 +18,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.SDOCutOutAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
@@ -124,6 +125,9 @@ public class TopToolBar extends JToolBar {
         circleItem.addActionListener(e -> ImageViewerGui.getAnnotateInteraction().setMode(AnnotationMode.CROSS));
         annotatePopup.add(crossItem);
         annotateGroup.add(crossItem);
+
+        annotatePopup.addSeparator();
+        annotatePopup.add(new ClearAnnotationsAction());
 
         annotateButton.addMouseListener(new MouseAdapter() {
             @Override

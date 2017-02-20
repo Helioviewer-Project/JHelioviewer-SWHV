@@ -34,7 +34,6 @@ public class MenuBar extends JMenuBar {
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(new NewLayerAction());
         fileMenu.add(new OpenLocalFileAction());
-        // fileMenu.add(new ShowDialogAction("Open Remote Image...", OpenRemoteFileDialog.class));
 
         if (System.getProperty("jhv.os").equals("mac")) {
             OSXHandler.quitHandler();
