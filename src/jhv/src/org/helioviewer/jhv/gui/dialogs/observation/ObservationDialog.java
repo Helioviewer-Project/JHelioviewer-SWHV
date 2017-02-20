@@ -1,29 +1,31 @@
 package org.helioviewer.jhv.gui.dialogs.observation;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 
-@SuppressWarnings("serial")
-public class ObservationDialog extends JDialog {
+import com.jidesoft.dialog.ButtonPanel;
+import com.jidesoft.dialog.StandardDialog;
 
-    private final JButton btnImages = new JButton();
-    private final JButton availabilityButton = new JButton("Available data");
+@SuppressWarnings("serial")
+public class ObservationDialog extends StandardDialog {
+
+    private final AbstractAction load = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            loadButtonPressed();
+        }
+    };
+    private final JButton okBtn = new JButton(load);
+    private final JButton availabilityBtn = new JButton("Available data");
 
     private final ImageDataPanel observationPanel = new ImageDataPanel();
     private ImageLayer layer;
@@ -43,47 +45,44 @@ public class ObservationDialog extends JDialog {
 
     private ObservationDialog(JFrame mainFrame) {
         super(mainFrame, true);
+        setResizable(false);
 
-        JPanel contentPane = new JPanel();
-        setContentPane(contentPane);
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-        contentPane.setBorder(BorderFactory.createEmptyBorder(3, 9, 1, 9));
-        contentPane.setFocusable(true);
+        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(observationPanel.getAvailabilityURL()));
+        setInitFocusedComponent(observationPanel.getFocused());
+        setDefaultAction(load);
+    }
 
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(observationPanel.getAvailabilityURL()));
-
-        btnImages.addActionListener(e -> loadButtonPressed());
-        JButton btnClose = new JButton("Cancel");
-        btnClose.addActionListener(e -> cancel());
-
-        JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 3));
-        buttonPane.add(availabilityButton);
-        buttonPane.add(btnClose);
-        buttonPane.add(btnImages);
-
-        contentPane.add(observationPanel);
-        contentPane.add(buttonPane);
-
-        addWindowListener(new WindowAdapter() {
+    @Override
+    public ButtonPanel createButtonPanel() {
+        AbstractAction close = new AbstractAction() {
             @Override
-            public void windowClosing(WindowEvent e) {
-                cancel();
+            public void actionPerformed(ActionEvent e) {
+                layer.unload();
+                setVisible(false);
             }
+        };
+        setDefaultCancelAction(close);
 
-            @Override
-            public void windowOpened(WindowEvent e) {
-                observationPanel.focusTree();
-            }
-        });
+        JButton cancelBtn = new JButton(close);
+        cancelBtn.setText("Cancel");
 
-        pack();
-        Dimension dim = getPreferredSize();
-        if (dim != null) { // satisfy coverity
-            setMinimumSize(dim);
-        }
+        ButtonPanel panel = new ButtonPanel();
+        panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
+        panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
+        panel.add(availabilityBtn, ButtonPanel.OTHER_BUTTON);
 
-        getRootPane().registerKeyboardAction(e -> cancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        getRootPane().setDefaultButton(btnImages);
+        return panel;
+    }
+
+    @Override
+    public JComponent createContentPanel() {
+        observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        return observationPanel;
+    }
+
+    @Override
+    public JComponent createBannerPanel() {
+        return null;
     }
 
     // Shows up the dialog and initializes the UI with the given panel.
@@ -93,12 +92,11 @@ public class ObservationDialog extends JDialog {
 
         if (newLayer) {
             setTitle("New Layer");
-            btnImages.setText("Add");
+            okBtn.setText("Add");
         } else {
             setTitle("Change Layer");
-            btnImages.setText("Change");
+            okBtn.setText("Change");
         }
-
 
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
@@ -111,12 +109,7 @@ public class ObservationDialog extends JDialog {
     }
 
     public void setAvailabilityStatus(boolean status) {
-        availabilityButton.setEnabled(status);
-    }
-
-    private void cancel() {
-        layer.unload();
-        setVisible(false);
+        availabilityBtn.setEnabled(status);
     }
 
 }

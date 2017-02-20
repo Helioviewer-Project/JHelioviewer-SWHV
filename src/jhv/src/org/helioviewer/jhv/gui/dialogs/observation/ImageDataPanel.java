@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -49,8 +50,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
         add(new JScrollPane(sourcesTree));
     }
 
-    void focusTree() {
-        sourcesTree.requestFocus();
+    JComponent getFocused() {
+        return sourcesTree;
     }
 
     public void setupSources(DataSourcesParser parser) {
