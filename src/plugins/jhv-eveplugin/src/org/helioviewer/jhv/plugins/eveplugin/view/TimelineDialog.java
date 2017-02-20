@@ -64,7 +64,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public JComponent createContentPanel() {
-        observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
+        observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return observationPanel;
     }
 

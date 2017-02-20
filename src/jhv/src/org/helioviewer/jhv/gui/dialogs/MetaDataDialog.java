@@ -51,7 +51,6 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             return false;
         }
     };
-    private final JTable fitsTable = new JTable(fitsModel);
 
     private final StringBuilder basicSB = new StringBuilder();
     private final StringBuilder hvSB = new StringBuilder();
@@ -63,7 +62,9 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         setMetaData(view);
 
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(fitsModel);
+        JTable fitsTable = new JTable(fitsModel);
         fitsTable.setRowSorter(sorter);
+        setInitFocusedComponent(fitsTable);
         SearchableUtils.installSearchable(fitsTable);
 
         JTextArea basicArea = new JTextArea(basicSB.toString().trim());
@@ -92,7 +93,6 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
         JButton button = new JButton(close);
         button.setText("Close");
-        setInitFocusedComponent(fitsTable);
 
         ButtonPanel panel = new ButtonPanel();
         panel.add(button, ButtonPanel.AFFIRMATIVE_BUTTON);
