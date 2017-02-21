@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.renderable.gui.cellrenderer;
 
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JCheckBox;
@@ -12,7 +11,6 @@ import org.helioviewer.jhv.renderable.gui.Renderable;
 public class VisibleCellRenderer extends TableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
-    private final Color defaultColor = getBackground();
 
     public VisibleCellRenderer() {
         setHorizontalAlignment(CENTER);
@@ -27,7 +25,7 @@ public class VisibleCellRenderer extends TableCellRenderer {
         if (value instanceof Renderable) {
             checkBox.setSelected(((Renderable) value).isVisible());
         }
-        checkBox.setBackground(isSelected ? table.getSelectionBackground() : defaultColor);
+        checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
         return checkBox;
     }
 

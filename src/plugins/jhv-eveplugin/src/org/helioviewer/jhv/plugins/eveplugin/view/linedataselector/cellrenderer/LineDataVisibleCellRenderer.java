@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer;
 
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JCheckBox;
@@ -14,7 +13,6 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
-    private final Color defaultColor = getBackground();
 
     public LineDataVisibleCellRenderer() {
         setHorizontalAlignment(CENTER);
@@ -29,7 +27,7 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
         if (value instanceof LineDataSelectorElement) {
             checkBox.setSelected(((LineDataSelectorElement) value).isVisible());
         }
-        checkBox.setBackground(isSelected ? table.getSelectionBackground() : defaultColor);
+        checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
         return checkBox;
     }
 
