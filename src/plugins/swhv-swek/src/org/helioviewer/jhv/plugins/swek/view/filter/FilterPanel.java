@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.view.filter;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -39,10 +37,6 @@ public class FilterPanel extends JPanel {
         parameter = _parameter;
         eventType = _eventType;
 
-        setLayout(new BorderLayout());
-        setOpaque(false);
-        setBackground(Color.white);
-
         JCheckBox enableButton = new JCheckBox();
         enableButton.addActionListener(e -> toggleEnabled());
 
@@ -51,18 +45,16 @@ public class FilterPanel extends JPanel {
         spinner.setEnabled(enabled);
         label.setEnabled(enabled);
 
-        JPanel p = new JPanel(new GridBagLayout());
+        setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 0.5;
-        p.add(enableButton, c);
+        add(enableButton, c);
         c.gridx = 1;
-        p.add(label, c);
+        add(label, c);
         c.gridx = 2;
-        p.add(spinner, c);
-
-        add(p, BorderLayout.CENTER);
+        add(spinner, c);
     }
 
     public void removeFilter() {
