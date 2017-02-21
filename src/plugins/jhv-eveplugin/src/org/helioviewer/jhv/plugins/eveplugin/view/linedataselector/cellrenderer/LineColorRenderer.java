@@ -15,12 +15,11 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 @SuppressWarnings("serial")
 public class LineColorRenderer extends DefaultTableCellRenderer {
 
-    private final Color defaultColor = getBackground();
     private final LineColorPanel lineColorPanel = new LineColorPanel();
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        Color back = isSelected ? table.getSelectionBackground() : defaultColor;
+        Color back = isSelected ? table.getSelectionBackground() : table.getBackground();
         lineColorPanel.setLineColor(back);
         lineColorPanel.setBackground(back);
 
