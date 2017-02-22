@@ -15,6 +15,8 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
@@ -59,7 +61,7 @@ public class PfssData {
         vertices = Buffers.newDirectFloatBuffer(len * (3 + 4) + 2 * numberOfLines * (3 + 4));
     }
 
-    private int addColor(Color color, int counter) {
+    private int addColor(@NotNull Color color, int counter) {
         vertices.put(color.getRed() / 255.f);
         vertices.put(color.getGreen() / 255.f);
         vertices.put(color.getBlue() / 255.f);
@@ -192,7 +194,7 @@ public class PfssData {
         }
     }
 
-    public void init(GL2 gl) {
+    public void init(@Nullable GL2 gl) {
         if (gzipFitsFile != null) {
             if (!read)
                 readFitsFile();
@@ -210,14 +212,14 @@ public class PfssData {
         }
     }
 
-    public void clear(GL2 gl) {
+    public void clear(@NotNull GL2 gl) {
         if (init) {
             gl.glDeleteBuffers(1, buffer, 0);
             init = false;
         }
     }
 
-    public void display(GL2 gl) {
+    public void display(@NotNull GL2 gl) {
         if (PfssSettings.qualityReduction != lastQuality || PfssSettings.fixedColor != lastFixedColor) {
             clear(gl);
             init = false;

@@ -8,6 +8,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
@@ -39,6 +41,7 @@ public class PfssPlugin implements Plugin {
         }
     };
 
+    @NotNull
     public static PfssCache getPfsscache() {
         return pfssCache;
     }
@@ -55,16 +58,19 @@ public class PfssPlugin implements Plugin {
         Layers.removeTimespanListener(renderable);
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "This plugin visualizes PFSS model data";
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "PFSS Plugin";
     }
 
+    @NotNull
     @Override
     public String getAboutLicenseText() {
         return "Mozilla Public License Version 2.0";
@@ -74,6 +80,7 @@ public class PfssPlugin implements Plugin {
     public void setState(String state) {
     }
 
+    @Nullable
     @Override
     public String getState() {
         return null;
