@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -29,8 +28,6 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
 
         List<FilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(eventType, this);
         JPanel filterPanel = new JPanel(new GridLayout(filterPanels.size() + 1, 1));
-        filterPanel.setOpaque(false);
-        filterPanel.setBackground(Color.white);
         for (FilterPanel afp : filterPanels) {
             filterPanel.add(afp);
         }

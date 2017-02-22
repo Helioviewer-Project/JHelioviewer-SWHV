@@ -3,7 +3,6 @@ package org.helioviewer.jhv.data.guielements;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -17,7 +16,6 @@ import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.event.JHVEvent;
 
-// This is a panel describing an event in short
 @SuppressWarnings("serial")
 class EventDescriptionPanel extends JPanel implements MouseListener {
 
@@ -28,20 +26,11 @@ class EventDescriptionPanel extends JPanel implements MouseListener {
 
         JLabel labelIcon = new JLabel(revent.getIcon());
 
-        JTextArea textType = new JTextArea(event.getName());
-        textType.setBackground(getBackground());
-        textType.setFont(labelIcon.getFont());
-        textType.setMargin(new Insets(0, 0, 0, 0));
-
         JTextArea textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.start));
-        textStartTime.setBackground(getBackground());
-        textStartTime.setFont(labelIcon.getFont());
-        textStartTime.setMargin(new Insets(0, 0, 0, 0));
+        textStartTime.setOpaque(false);
 
         JTextArea textEndTime = new JTextArea(TimeUtils.utcDateFormat.format(event.end));
-        textEndTime.setBackground(getBackground());
-        textEndTime.setFont(labelIcon.getFont());
-        textEndTime.setMargin(new Insets(0, 0, 0, 0));
+        textEndTime.setOpaque(false);
 
         addMouseListener(this);
         setLayout(new GridBagLayout());

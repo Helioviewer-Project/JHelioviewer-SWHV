@@ -126,6 +126,7 @@ public class RenderableContainerPanel extends JPanel {
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+        jsp.getViewport().setBackground(grid.getBackground());
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> {
