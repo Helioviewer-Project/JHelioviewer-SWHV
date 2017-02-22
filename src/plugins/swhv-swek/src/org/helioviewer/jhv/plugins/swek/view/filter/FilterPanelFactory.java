@@ -14,6 +14,7 @@ import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.plugins.swek.view.FilterDialog;
+import org.jetbrains.annotations.NotNull;
 
 public class FilterPanelFactory {
 
@@ -34,7 +35,8 @@ public class FilterPanelFactory {
         return spinnerFormat.toString();
     }
 
-    private static JSpinner generateFlareSpinner(FilterDialog filterDialog) {
+    @NotNull
+    private static JSpinner generateFlareSpinner(@NotNull FilterDialog filterDialog) {
         /*
         double min = parameter.getParameterFilter().getMin() == null ? 1e-8 : parameter.getParameterFilter().getMin();
         double max = parameter.getParameterFilter().getMax() == null ? 1e-3 : parameter.getParameterFilter().getMin();
@@ -49,7 +51,8 @@ public class FilterPanelFactory {
         return spinner;
     }
 
-    private static JSpinner generateMinOrMaxSpinner(FilterDialog filterDialog, SWEKParameter parameter) {
+    @NotNull
+    private static JSpinner generateMinOrMaxSpinner(@NotNull FilterDialog filterDialog, @NotNull SWEKParameter parameter) {
         double min = parameter.getParameterFilter().getMin() == null ? Double.MIN_VALUE : parameter.getParameterFilter().getMin();
         double max = parameter.getParameterFilter().getMax() == null ? Double.MAX_VALUE : parameter.getParameterFilter().getMax();
         double start = parameter.getParameterFilter().getStartValue() == null ? (max - min) * 0.5 : parameter.getParameterFilter().getStartValue();
@@ -63,7 +66,8 @@ public class FilterPanelFactory {
         return spinner;
     }
 
-    public static List<FilterPanel> createFilterPanel(SWEKEventType eventType, FilterDialog filterDialog) {
+    @NotNull
+    public static List<FilterPanel> createFilterPanel(@NotNull SWEKEventType eventType, @NotNull FilterDialog filterDialog) {
         List<FilterPanel> panels = new ArrayList<>();
         for (SWEKParameter parameter : eventType.getParameterList()) {
             if (parameter.getParameterFilter() != null) {

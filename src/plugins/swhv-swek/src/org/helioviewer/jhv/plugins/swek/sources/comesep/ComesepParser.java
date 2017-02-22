@@ -7,13 +7,15 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.data.event.SWEKParser;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ComesepParser implements SWEKParser {
 
+    @NotNull
     @Override
-    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
+    public JHVEvent parseEventJSON(@NotNull JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
         JHVEvent currentEvent = new JHVEvent(type, id, start, end);
 
         currentEvent.initParams();
@@ -23,7 +25,7 @@ public class ComesepParser implements SWEKParser {
         return currentEvent;
     }
 
-    private static void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
+    private static void parseResult(@NotNull JSONObject result, @NotNull JHVEvent currentEvent) throws JSONException {
         Iterator<String> keys = result.keys();
         while (keys.hasNext()) {
             String key = keys.next();

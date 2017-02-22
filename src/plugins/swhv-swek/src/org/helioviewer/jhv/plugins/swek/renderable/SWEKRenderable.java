@@ -32,6 +32,8 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.jogamp.opengl.GL2;
 
@@ -49,7 +51,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
-    private static void bindTexture(GL2 gl, String key, ImageIcon icon) {
+    private static void bindTexture(GL2 gl, String key, @NotNull ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
             BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -66,7 +68,7 @@ public class SWEKRenderable extends AbstractRenderable {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private static void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q) {
+    private static void interPolatedDraw(@NotNull GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, @NotNull Quat q) {
         gl.glBegin(GL2.GL_LINE_STRIP);
         {
             Vec3 v = new Vec3();
@@ -87,7 +89,7 @@ public class SWEKRenderable extends AbstractRenderable {
 
     private static final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
-    private static void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
+    private static void drawCactusArc(@NotNull GL2 gl, @NotNull JHVRelatedEvents evtr, @NotNull JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
@@ -151,7 +153,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private static void drawPolygon(Camera camera, Viewport vp, @NotNull GL2 gl, @NotNull JHVRelatedEvents evtr, @NotNull JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -196,7 +198,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private static void drawIcon(@NotNull GL2 gl, @NotNull JHVRelatedEvents evtr, @NotNull JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -214,7 +216,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
+    private static void drawImageScale(@NotNull GL2 gl, double theta, double r, double width, double height) {
         double width2 = width / 4.;
         double height2 = height / 4.;
 
@@ -234,7 +236,7 @@ public class SWEKRenderable extends AbstractRenderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private static void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
+    private static void drawIconScale(@NotNull GL2 gl, @NotNull JHVRelatedEvents evtr, @NotNull JHVEvent evt, @NotNull GridScale scale, @NotNull Camera camera, @NotNull Viewport vp) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -252,7 +254,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale, Viewport vp) {
+    private static void drawCactusArcScale(@NotNull GL2 gl, @NotNull JHVRelatedEvents evtr, @NotNull JHVEvent evt, long timestamp, @NotNull GridScale scale, @NotNull Viewport vp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
         double speed = SWEKData.readCMESpeed(evt);
@@ -308,7 +310,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
+    private static void drawImage3d(@NotNull GL2 gl, double x, double y, double z, double width, double height) {
         y = -y;
 
         double width2 = width / 2.;
@@ -352,7 +354,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private static void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
+    private static void drawText(GL2 gl, Viewport vp, @NotNull JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<>();
         JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
         JHVEventParameter[] params = evt.getSimpleVisibleEventParameters();
@@ -367,7 +369,7 @@ public class SWEKRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         if (isVisible[vp.idx]) {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
@@ -388,7 +390,7 @@ public class SWEKRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
+    public void renderScale(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl, GLSLSolarShader shader, @NotNull GridScale scale) {
         if (isVisible[vp.idx]) {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
@@ -421,11 +423,13 @@ public class SWEKRenderable extends AbstractRenderable {
         ImageViewerGui.getInputController().removePlugin(controller);
     }
 
+    @NotNull
     @Override
     public Component getOptionsPanel() {
         return optionsPanel;
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "SWEK Events";
@@ -445,6 +449,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
+    @Nullable
     @Override
     public String getTimeString() {
         return null;
