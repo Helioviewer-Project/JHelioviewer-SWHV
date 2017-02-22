@@ -46,6 +46,8 @@ import org.helioviewer.jhv.plugins.eveplugin.events.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
@@ -54,13 +56,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         MOVIELINE, CHART, NODRAG
     }
 
+    @Nullable
     private Point mousePressedPosition;
+    @Nullable
     private Point mouseDragPosition;
 
     private BufferedImage screenImage;
 
     private final Stroke boldStroke = new BasicStroke(2);
     private final Stroke thinStroke = new BasicStroke(0.5f);
+    @Nullable
     private Point mousePosition;
     private int lastWidth = -1;
     private int lastHeight = -1;
@@ -68,6 +73,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean toRedraw;
     private boolean forceRedrawGraph;
 
+    @NotNull
     private DragMode dragMode = DragMode.NODRAG;
 
     private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener()); // will start on setVisible
@@ -109,7 +115,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private boolean toggleAxisHightlight(Rectangle graphArea) {
+    private boolean toggleAxisHightlight(@NotNull Rectangle graphArea) {
         boolean inLeftYAxis = false;
         boolean inRightYAxes = false;
         int rightYAxisNumber = -2;
@@ -162,7 +168,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         toRedraw = true;
     }
 
-    private void redrawGraph(Rectangle graphArea) {
+    private void redrawGraph(@NotNull Rectangle graphArea) {
         Rectangle graphSize = DrawController.getGraphSize();
         int sx = GLInfo.pixelScale[0], sy = GLInfo.pixelScale[1];
         int width = sx * (int) graphSize.getWidth();
@@ -203,7 +209,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
+    private void drawData(@NotNull Graphics2D fullG, Graphics2D plotG, @NotNull Rectangle graphArea, Point mousePosition) {
         List<LineDataSelectorElement> els = LineDataSelectorModel.getAllLineDataSelectorElements();
         boolean isEmpty = true;
         for (LineDataSelectorElement el : els) {
@@ -216,12 +222,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private static void drawBackground(Graphics2D g, int width, int height) {
+    private static void drawBackground(@NotNull Graphics2D g, int width, int height) {
         g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(0, 0, width, height);
     }
 
-    private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, boolean isEmpty) {
+    private void drawLabels(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, boolean isEmpty) {
         Stroke stroke = g.getStroke();
         g.setStroke(thinStroke);
         {
@@ -242,7 +248,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.setStroke(stroke);
     }
 
-    private void drawTimelineValues(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
+    private void drawTimelineValues(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis) {
         if (mousePosition == null || !graphArea.contains(mousePosition))
             return;
         long ts = timeAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
@@ -274,7 +280,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
     }
 
-    private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis) {
+    private static void drawHorizontalLabels(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis xAxis) {
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(xAxis.start)), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight();
@@ -320,7 +326,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private static void drawNoData(Graphics2D g, Rectangle graphArea) {
+    private static void drawNoData(@NotNull Graphics2D g, @NotNull Rectangle graphArea) {
         String text = DrawConstants.absentText;
         int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
         int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
@@ -330,7 +336,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.drawString(text, x, y);
     }
 
-    private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, LineDataSelectorElement el, int leftSide, boolean highlight) {
+    private void drawVerticalLabels(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull LineDataSelectorElement el, int leftSide, boolean highlight) {
         int axis_x_offset = graphArea.x;
         if (leftSide != -1)
             axis_x_offset += graphArea.width + leftSide * DrawConstants.RIGHT_AXIS_WIDTH;
@@ -388,7 +394,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private static void drawHorizontalTickline(Graphics g, Rectangle graphArea, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt, boolean highlight) {
+    private static void drawHorizontalTickline(@NotNull Graphics g, @NotNull Rectangle graphArea, @NotNull YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt, boolean highlight) {
         String tickText = DrawConstants.valueFormatter.format(tick);
         int y = yAxis.scaledvalue2pixel(graphArea.y, graphArea.height, tick);
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
@@ -410,7 +416,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private static void drawMovieLine(Graphics2D g) {
+    private static void drawMovieLine(@NotNull Graphics2D g) {
         int movieLinePosition = DrawController.getMovieLinePosition();
         ExportMovie.EVEMovieLinePosition = movieLinePosition;
         if (movieLinePosition < 0) {
@@ -421,7 +427,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(@NotNull MouseEvent e) {
         Point p = e.getPoint();
         if (e.getClickCount() == 2) {
             doubleClicked(p);
@@ -440,7 +446,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private static void doubleClicked(Point p) {
+    private static void doubleClicked(@NotNull Point p) {
         DrawController.resetAxis(p);
     }
 
@@ -456,7 +462,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(@NotNull MouseEvent e) {
         Point p = e.getPoint();
         mousePressedPosition = p;
         if (overMovieLine(p/*, drawController.getGraphArea()*/)) {
@@ -469,7 +475,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(@NotNull MouseEvent e) {
         Point p = e.getPoint();
 
         switch (dragMode) {
@@ -492,7 +498,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(@NotNull MouseEvent e) {
         Point p = e.getPoint();
         mouseDragPosition = p;
         if (mousePressedPosition != null) {
@@ -512,7 +518,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePressedPosition = p;
     }
 
-    private static boolean overMovieLine(Point p/*, Rectangle graphArea*/) {
+    private static boolean overMovieLine(@NotNull Point p/*, Rectangle graphArea*/) {
         int movieLinePosition = DrawController.getMovieLinePosition();
         // Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
         return movieLinePosition >= 0 && movieLinePosition - 3 <= p.x && p.x <= movieLinePosition + 3;
@@ -530,7 +536,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(@NotNull MouseEvent e) {
         Rectangle graphArea = DrawController.getGraphArea();
         mousePosition = e.getPoint();
         if (overMovieLine(mousePosition/*, graphArea*/)) {
@@ -551,7 +557,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
+    public void mouseWheelMoved(@NotNull MouseWheelEvent e) {
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             Point p = e.getPoint();
             int scrollDistance = e.getWheelRotation() * e.getScrollAmount();

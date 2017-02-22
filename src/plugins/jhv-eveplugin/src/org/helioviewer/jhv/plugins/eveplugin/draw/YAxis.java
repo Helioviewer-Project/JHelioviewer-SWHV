@@ -1,12 +1,14 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
+import org.jetbrains.annotations.NotNull;
 
 public class YAxis {
 
     public double start;
     public double end;
 
+    @NotNull
     private final YAxisScale scale;
 
     private static final double ZOOMSTEP_PERCENTAGE = 0.02;
@@ -17,7 +19,7 @@ public class YAxis {
     private final double scaledMaxBound;
     private boolean highlighted = false;
 
-    public YAxis(double _start, double _end, String label, boolean isLogScale) {
+    public YAxis(double _start, double _end, @NotNull String label, boolean isLogScale) {
         start = _start;
         end = _end;
         scale = isLogScale ? new YAxisLogScale(label) : new YAxisPositiveIdentityScale(label);
@@ -114,9 +116,10 @@ public class YAxis {
     }
 
     private static class YAxisLogScale implements YAxisScale {
+        @NotNull
         private final String label;
 
-        public YAxisLogScale(String _label) {
+        public YAxisLogScale(@NotNull String _label) {
             label = "log(" + _label.replace("^2", "\u00B2") + ")";
         }
 
@@ -134,6 +137,7 @@ public class YAxis {
             return Math.pow(10, val);
         }
 
+        @NotNull
         @Override
         public String getLabel() {
             return label;
@@ -144,7 +148,7 @@ public class YAxis {
 
         private final String label;
 
-        public YAxisPositiveIdentityScale(String _label) {
+        public YAxisPositiveIdentityScale(@NotNull String _label) {
             label = _label.replace("^2", "\u00B2");
         }
 

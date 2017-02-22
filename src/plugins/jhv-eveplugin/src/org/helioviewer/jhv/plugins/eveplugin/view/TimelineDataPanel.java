@@ -26,6 +26,7 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.DownloadController;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("serial")
 public class TimelineDataPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener {
@@ -111,6 +112,7 @@ public class TimelineDataPanel extends ObservationDialogPanel implements LineDat
         DrawController.setSelectedInterval(interval.start, interval.end);
     }
 
+    @NotNull
     private static Interval defineInterval(long time) {
         Interval movieInterval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
         if (movieInterval.containsPointInclusive(time)) {

@@ -12,6 +12,7 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandType;
+import org.jetbrains.annotations.NotNull;
 
 public class LineDataSelectorModel implements TableModel {
 
@@ -43,11 +44,12 @@ public class LineDataSelectorModel implements TableModel {
         fireListeners();
     }
 
+    @NotNull
     public static List<LineDataSelectorElement> getAllLineDataSelectorElements() {
         return elements;
     }
 
-    public static void removeLineData(LineDataSelectorElement element) {
+    public static void removeLineData(@NotNull LineDataSelectorElement element) {
         elements.remove(element);
         BandColors.resetColor(element.getDataColor());
 
@@ -90,11 +92,13 @@ public class LineDataSelectorModel implements TableModel {
         return NUMBEROFCOLUMNS;
     }
 
+    @NotNull
     @Override
     public String getColumnName(int columnIndex) {
         return Integer.toString(columnIndex);
     }
 
+    @NotNull
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         return LineDataSelectorElement.class;

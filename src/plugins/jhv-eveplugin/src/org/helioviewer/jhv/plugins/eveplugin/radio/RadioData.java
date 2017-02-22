@@ -31,6 +31,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
+import org.jetbrains.annotations.NotNull;
 
 public class RadioData extends AbstractLineDataSelectorElement {
 
@@ -57,12 +58,12 @@ public class RadioData extends AbstractLineDataSelectorElement {
         return !isVisible();
     }
 
-    private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
+    private static IndexColorModel createIndexColorModelFromLUT(@NotNull LUT lut2) {
         int[] source = lut2.getLut8();
         return new IndexColorModel(8, source.length, source, 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 
-    static void setLUT(LUT lut) {
+    static void setLUT(@NotNull LUT lut) {
         colorModel = createIndexColorModelFromLUT(lut);
         for (DownloadedJPXData jp2Data : cache.values()) {
             jp2Data.changeColormap(colorModel);
@@ -133,6 +134,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
             LineDataSelectorModel.downloadStarted(EVEPlugin.rd);
         }
 
+        @NotNull
         @Override
         protected ArrayList<DownloadedJPXData> backgroundWork() {
             ArrayList<DownloadedJPXData> jpList = new ArrayList<>(DAYS_IN_CACHE);
@@ -168,7 +170,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
                     cache.put(jp2Data.getStartDate(), jp2Data);
                 LineDataSelectorModel.downloadFinished(EVEPlugin.rd);
                 DrawController.fireRedrawRequest();
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (@NotNull InterruptedException | ExecutionException e) {
                 Log.error("RadioData error: " + e.getCause().getMessage());
             }
         }
@@ -204,6 +206,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         DrawController.fireRedrawRequest();
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "Callisto Radiogram";
@@ -244,7 +247,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void fetchData(TimeAxis selectedAxis) {
+    public void fetchData(@NotNull TimeAxis selectedAxis) {
         if (isVisible) {
             boolean timediffCond = selectedAxis.end - selectedAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
             if (timediffCond) {
@@ -255,7 +258,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }

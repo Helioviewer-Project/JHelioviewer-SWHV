@@ -20,6 +20,8 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
@@ -93,26 +95,31 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         pluginPanes.remove(plotOne);
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "Timeline Plugin";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "This plugin visualizes 1D and 2D time series";
     }
 
+    @NotNull
     @Override
     public String getAboutLicenseText() {
         return "Mozilla Public License Version 2.0";
     }
 
+    @NotNull
     @Override
     public LinkedList<JComponent> getVisualInterfaces() {
         return pluginPanes;
     }
 
+    @NotNull
     @Override
     public String getTabName() {
         return "Timelines";
@@ -122,6 +129,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     public void setState(String state) {
     }
 
+    @Nullable
     @Override
     public String getState() {
         return null;

@@ -26,12 +26,16 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class EventModel extends AbstractLineDataSelectorElement implements JHVEventHandler {
 
     private static Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
 
+    @Nullable
     private static EventPlotConfiguration eventUnderMouse;
+    @Nullable
     private static JHVRelatedEvents highlightedEvent = null;
     private static int highlightedEventPosition = -1;
 
@@ -41,7 +45,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     @Override
-    public void fetchData(TimeAxis selectedAxis) {
+    public void fetchData(@NotNull TimeAxis selectedAxis) {
         JHVEventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, EVEPlugin.em);
     }
 
@@ -68,7 +72,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     @Override
-    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }
@@ -113,7 +117,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     @Override
-    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void drawHighlighted(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, @Nullable Point mousePosition) {
         if (mousePosition != null) {
             if (highlightedEvent != null) {
                 int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
@@ -124,6 +128,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         }
     }
 
+    @Nullable
     @Override
     public YAxis getYAxis() {
         return null;
@@ -134,11 +139,13 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         isVisible = false;
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "SWEK Events";
     }
 
+    @Nullable
     @Override
     public Color getDataColor() {
         return null;
@@ -149,6 +156,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         return false;
     }
 
+    @Nullable
     @Override
     public Component getOptionsPanel() {
         return null;
@@ -188,7 +196,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             yPosition = _yPosition;
         }
 
-        public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight) {
+        public static JHVRelatedEvents draw(@NotNull Rectangle graphArea, @NotNull JHVRelatedEvents event, int x0, int x1, int yPosition, @NotNull Graphics2D g, @Nullable Point mousePosition, boolean highlight) {
             int spacePerLine = 3;
             int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
             int w = Math.max(x1 - x0, 1);
@@ -223,7 +231,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             return containsMouse ? highlightedEvent = event : null;
         }
 
-        private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, Point mousePosition) {
+        private static void drawText(@NotNull Rectangle graphArea, @NotNull Graphics2D g, @NotNull JHVRelatedEvents event, int y, @Nullable Point mousePosition) {
             if (mousePosition != null) {
                 long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
                 ArrayList<String> txts = new ArrayList<>();
@@ -249,7 +257,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
             }
         }
 
-        private static boolean containsPoint(Point p, int clickx, int clicky, int clickw, int clickh) {
+        private static boolean containsPoint(@Nullable Point p, int clickx, int clicky, int clickw, int clickh) {
             return p != null && p.x >= clickx && p.x <= clickx + clickw && p.y >= clicky && p.y <= clicky + clickh;
         }
     }
@@ -263,7 +271,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     @Override
-    public boolean highLightChanged(Point p) {
+    public boolean highLightChanged(@NotNull Point p) {
         if (!isVisible || events.isEmpty())
             return false;
         if (eventUnderMouse == null)

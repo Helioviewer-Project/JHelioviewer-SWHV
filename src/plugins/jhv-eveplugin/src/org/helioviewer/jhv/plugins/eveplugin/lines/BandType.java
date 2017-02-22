@@ -2,6 +2,8 @@ package org.helioviewer.jhv.plugins.eveplugin.lines;
 
 import java.util.HashMap;
 
+import org.jetbrains.annotations.NotNull;
+
 public class BandType {
 
     private String baseURL;
@@ -42,6 +44,7 @@ public class BandType {
         unitLabel = _unitLabel;
     }
 
+    @NotNull
     public HashMap<String, Double> getWarnLevels() {
         return warnLevels;
     }
@@ -70,7 +73,7 @@ public class BandType {
         return name;
     }
 
-    public void setScale(String scale) {
+    public void setScale(@NotNull String scale) {
         isLog = scale.equals("logarithmic");
     }
 

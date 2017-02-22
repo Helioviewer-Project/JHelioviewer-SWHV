@@ -28,6 +28,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.RemoveCellRenderer;
+import org.jetbrains.annotations.NotNull;
 
 import com.jidesoft.swing.JideButton;
 
@@ -43,6 +44,7 @@ public class LineDataSelectorTablePanel extends JPanel {
     private static final int LINECOLOR_COL = 3;
     private static final int REMOVE_COL = 4;
 
+    @NotNull
     private final JPanel optionsPanelWrapper;
 
     public LineDataSelectorTablePanel() {
@@ -137,14 +139,14 @@ public class LineDataSelectorTablePanel extends JPanel {
 
         grid.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseReleased(MouseEvent e) {
+            public void mouseReleased(@NotNull MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     handlePopup(e);
                 }
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
+            public void mousePressed(@NotNull MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     handlePopup(e);
                 }
@@ -162,7 +164,7 @@ public class LineDataSelectorTablePanel extends JPanel {
              * Handle with clicks on hide/show/remove layer icons
              */
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(@NotNull MouseEvent e) {
                 Point pt = e.getPoint();
                 int row = grid.rowAtPoint(pt);
                 int col = grid.columnAtPoint(pt);
@@ -208,14 +210,14 @@ public class LineDataSelectorTablePanel extends JPanel {
 
     private int rowHeight = -1;
 
-    private int getGridRowHeight(JTable table) {
+    private int getGridRowHeight(@NotNull JTable table) {
         if (rowHeight == -1) {
             rowHeight = table.getRowHeight() + 4;
         }
         return rowHeight;
     }
 
-    private void setOptionsPanel(LineDataSelectorElement lineDataElement) {
+    private void setOptionsPanel(@NotNull LineDataSelectorElement lineDataElement) {
         optionsPanelWrapper.removeAll();
         Component optionsPanel = lineDataElement.getOptionsPanel();
         if (optionsPanel != null) {
