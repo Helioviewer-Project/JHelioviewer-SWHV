@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
-import java.awt.Color;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -25,9 +25,9 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object whatToDisplay, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         if (whatToDisplay instanceof SWEKTreeModelEventType) {
-            return createLeaf(((SWEKTreeModelEventType) whatToDisplay).getSwekEventType().getEventName(), whatToDisplay);
+            return createLeaf(((SWEKTreeModelEventType) whatToDisplay).getSwekEventType().getEventName(), whatToDisplay, tree.getBackground());
         } else if (whatToDisplay instanceof SWEKTreeModelSupplier) {
-            return createLeaf(((SWEKTreeModelSupplier) whatToDisplay).getSwekSupplier().getSupplierDisplayName(), whatToDisplay);
+            return createLeaf(((SWEKTreeModelSupplier) whatToDisplay).getSwekSupplier().getSupplierDisplayName(), whatToDisplay, tree.getBackground());
         } else {
             return super.getTreeCellRendererComponent(tree, whatToDisplay, selected, expanded, leaf, row, hasFocus);
         }
@@ -64,7 +64,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
      *            What to be displayed
      * @return The panel to be placed in the tree
      */
-    private static JPanel createLeaf(String name, Object whatToDisplay) {
+    private static JPanel createLeaf(String name, Object whatToDisplay, Color back) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
@@ -75,7 +75,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
         JCheckBox checkBox = new JCheckBox(name);
         checkBox.setSelected(((SWEKTreeModelElement) whatToDisplay).isCheckboxSelected());
-        checkBox.setBackground(Color.WHITE);
+        checkBox.setBackground(back);
         panel.add(checkBox, BorderLayout.CENTER);
 
         ComponentUtils.smallVariant(panel);
