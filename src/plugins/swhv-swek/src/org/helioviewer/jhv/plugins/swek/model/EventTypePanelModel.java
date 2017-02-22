@@ -8,6 +8,8 @@ import javax.swing.tree.TreePath;
 
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The model of the event type panel. This model is a TreeModel and is used by
@@ -121,6 +123,7 @@ public class EventTypePanelModel implements TreeModel {
      *
      * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
      */
+    @Nullable
     @Override
     public Object getChild(Object parent, int index) {
         return parent instanceof SWEKTreeModelEventType ? ((SWEKTreeModelEventType) parent).getSwekTreeSuppliers().get(index) : null;
@@ -216,7 +219,7 @@ public class EventTypePanelModel implements TreeModel {
      * @param swekEventType
      *            the event type that became active
      */
-    private void fireNewEventTypeActive(SWEKEventType swekEventType) {
+    private void fireNewEventTypeActive(@NotNull SWEKEventType swekEventType) {
         for (SWEKSupplier supplier : swekEventType.getSuppliers()) {
             fireNewEventTypeAndSourceActive(swekEventType, supplier);
         }
@@ -228,7 +231,7 @@ public class EventTypePanelModel implements TreeModel {
      * @param swekEventType
      *            the event type that became inactive
      */
-    private void fireNewEventTypeInactive(SWEKEventType swekEventType) {
+    private void fireNewEventTypeInactive(@NotNull SWEKEventType swekEventType) {
         for (SWEKSupplier supplier : swekEventType.getSuppliers()) {
             fireNewEventTypeAndSourceInactive(swekEventType, supplier);
         }

@@ -13,6 +13,8 @@ import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
 import org.helioviewer.jhv.plugins.swek.view.EventPanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SWEKPlugin implements Plugin {
 
@@ -49,11 +51,13 @@ public class SWEKPlugin implements Plugin {
         ImageViewerGui.getLeftContentPane().revalidate();
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "Space Weather Event Knowledgebase Plugin";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "This plugin visualizes space weather relevant events";
@@ -63,11 +67,13 @@ public class SWEKPlugin implements Plugin {
     public void setState(String state) {
     }
 
+    @Nullable
     @Override
     public String getState() {
         return null;
     }
 
+    @NotNull
     @Override
     public String getAboutLicenseText() {
         return "Mozilla Public License Version 2.0";

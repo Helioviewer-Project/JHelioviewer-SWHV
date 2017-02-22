@@ -22,6 +22,7 @@ import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +32,7 @@ public class HEKDownloader extends SWEKDownloader {
 
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
-    private static void patch_event(JSONObject result, JHVEventType type) {
+    private static void patch_event(@NotNull JSONObject result, @NotNull JHVEventType type) {
         boolean c1 = type.getEventType().getEventName().equals("Flare");
         boolean c2 = type.getSupplier().getSupplierName().equals("SWPC");
         boolean c = c1 && c2;
@@ -41,7 +42,7 @@ public class HEKDownloader extends SWEKDownloader {
     }
 
     @Override
-    protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
+    protected boolean parseEvents(@NotNull JSONObject eventJSON, @NotNull JHVEventType type) {
         JSONArray results = eventJSON.getJSONArray("result");
         ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
 
@@ -87,7 +88,7 @@ public class HEKDownloader extends SWEKDownloader {
                         }
                     }
                 }
-            } catch (JSONException | ParseException e) {
+            } catch (@NotNull JSONException | ParseException e) {
                 return false;
             }
 
@@ -100,7 +101,7 @@ public class HEKDownloader extends SWEKDownloader {
     }
 
     @Override
-    protected boolean parseAssociations(JSONObject eventJSON) {
+    protected boolean parseAssociations(@NotNull JSONObject eventJSON) {
         JSONArray associations = eventJSON.getJSONArray("association");
         int len = associations.length();
         Pair<?,?>[] assocs = new Pair<?,?>[len];
@@ -111,8 +112,9 @@ public class HEKDownloader extends SWEKDownloader {
         return EventDatabase.dump_association2db((Pair<String,String>[]) assocs) != -1;
     }
 
+    @NotNull
     @Override
-    protected String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page) {
+    protected String createURL(@NotNull SWEKEventType eventType, long start, long end, @NotNull List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(_baseURL);
         baseURL.append("cmd=search&");
         baseURL.append("type=column&");
@@ -132,7 +134,8 @@ public class HEKDownloader extends SWEKDownloader {
         return baseURL.toString();
     }
 
-    private static StringBuilder appendParams(StringBuilder baseURL, List<SWEKParam> params) {
+    @NotNull
+    private static StringBuilder appendParams(@NotNull StringBuilder baseURL, @NotNull List<SWEKParam> params) {
         int paramCount = 1;
 
         for (SWEKParam param : params) {

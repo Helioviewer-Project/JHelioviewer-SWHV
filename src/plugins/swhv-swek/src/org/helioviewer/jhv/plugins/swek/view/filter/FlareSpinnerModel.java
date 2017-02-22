@@ -2,6 +2,9 @@ package org.helioviewer.jhv.plugins.swek.view.filter;
 
 import javax.swing.AbstractSpinnerModel;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 @SuppressWarnings("serial")
 class FlareSpinnerModel extends AbstractSpinnerModel {
 
@@ -18,7 +21,7 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
     }
 
     @Override
-    public void setValue(Object value) {
+    public void setValue(@NotNull Object value) {
         curval = value.toString();
         fireStateChanged();
     }
@@ -32,6 +35,7 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         }
     }
 
+    @Nullable
     @Override
     public Object getNextValue() {
         if (curval.length() >= 2) {
@@ -65,6 +69,7 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         }
     }
 
+    @Nullable
     @Override
     public Object getPreviousValue() {
         if (curval.length() >= 2) {

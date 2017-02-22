@@ -15,10 +15,12 @@ import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.download.FilterManager;
 import org.helioviewer.jhv.plugins.swek.view.FilterDialog;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("serial")
 public class FilterPanel extends JPanel {
 
+    @NotNull
     private final JLabel label;
     private final JSpinner spinner;
 

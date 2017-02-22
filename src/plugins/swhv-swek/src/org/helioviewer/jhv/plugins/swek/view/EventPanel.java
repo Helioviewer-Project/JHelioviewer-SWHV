@@ -24,6 +24,8 @@ import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.jidesoft.swing.JideButton;
 
@@ -34,6 +36,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     private final SWEKEventType eventType;
 
     private final JLabel loadingLabel = new JLabel("    ");
+    @Nullable
     private final JLayer<JComponent> layer = new JLayer<>(null, MoviePanel.busyIndicator);
 
     // The timer handling the loading animation
@@ -53,7 +56,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
         eventTypeTree.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(@NotNull MouseEvent e) {
                 int clickedOnRow = eventTypeTree.getRowForLocation(e.getX(), e.getY());
                 eventPanelModel.rowClicked(clickedOnRow);
                 // eventTypeTree.revalidate();
@@ -78,7 +81,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
             filterButton.addActionListener(e -> filterDialog.setVisible(true));
             filterButton.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mousePressed(MouseEvent e) {
+                public void mousePressed(@NotNull MouseEvent e) {
                     Point pressedLocation = e.getLocationOnScreen();
                     Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
                     filterDialog.setLocation(windowLocation);
