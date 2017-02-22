@@ -14,19 +14,19 @@ import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.CancelTask;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.jogamp.opengl.GL2;
 
 public class PfssRenderable extends AbstractRenderable implements TimespanListener {
 
-    private final PfssPluginPanel optionsPanel;
+    @NotNull
+    private final PfssPluginPanel optionsPanel = new PfssPluginPanel();
+    @Nullable
     private PfssData previousPfssData = null;
 
-    public PfssRenderable() {
-        optionsPanel = new PfssPluginPanel();
-    }
-
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         if (!isVisible[vp.idx])
             return;
 
@@ -47,22 +47,26 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(@NotNull GL2 gl) {
         dispose(gl);
     }
 
+    @NotNull
     @Override
     public Component getOptionsPanel() {
         return optionsPanel;
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "PFSS Model";
     }
 
+    @Nullable
     private String datetime = null;
 
+    @Nullable
     @Override
     public String getTimeString() {
         return datetime;
@@ -87,7 +91,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(@NotNull GL2 gl) {
         PfssPlugin.getPfsscache().destroy(gl);
     }
 
