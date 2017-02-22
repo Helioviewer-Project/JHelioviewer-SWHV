@@ -11,14 +11,18 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("serial")
 public class LoadingCellRenderer extends DefaultTableCellRenderer {
 
+    @Nullable
     private final JLayer<JComponent> layer = new JLayer<>(null, MoviePanel.busyIndicator);
 
+    @Nullable
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+    public Component getTableCellRendererComponent(@NotNull JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         label.setBorder(LineDataSelectorTablePanel.commonBorder);
         label.setText(null);

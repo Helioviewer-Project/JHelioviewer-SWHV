@@ -9,6 +9,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.jetbrains.annotations.NotNull;
 
 public class DownloadController {
 
@@ -17,7 +18,7 @@ public class DownloadController {
     private static final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<>();
 
-    public static void updateBand(Band band, long start, long end) {
+    public static void updateBand(@NotNull Band band, long start, long end) {
         List<Interval> missingIntervalsNoExtend = band.getMissingDaysInInterval(start, end);
         if (!missingIntervalsNoExtend.isEmpty()) {
             // extend
@@ -46,7 +47,7 @@ public class DownloadController {
         }
     }
 
-    private static void addFutureJobs(List<Future<?>> newFutureJobs, Band band) {
+    private static void addFutureJobs(@NotNull List<Future<?>> newFutureJobs, Band band) {
         List<Future<?>> fj = new ArrayList<>();
         if (futureJobs.containsKey(band)) {
             fj = futureJobs.get(band);
@@ -55,7 +56,7 @@ public class DownloadController {
         futureJobs.put(band, fj);
     }
 
-    private static ArrayList<Interval> getIntervals(Band band, long start, long end) {
+    private static ArrayList<Interval> getIntervals(@NotNull Band band, long start, long end) {
         List<Interval> missingIntervals = band.addRequest(start, end);
         if (missingIntervals.isEmpty()) {
             return null;
@@ -98,7 +99,8 @@ public class DownloadController {
         LineDataSelectorModel.downloadFinished(band);
     }
 
-    private static List<Future<?>> addDownloads(DownloadThread[] jobs) {
+    @NotNull
+    private static List<Future<?>> addDownloads(@NotNull DownloadThread[] jobs) {
         List<Future<?>> futureJobs = new ArrayList<>();
         for (DownloadThread job : jobs) {
             Band band = job.getBand();
