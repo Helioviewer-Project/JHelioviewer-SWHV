@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.display;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Viewport {
 
     public final double aspect;
@@ -25,6 +27,7 @@ public class Viewport {
         return px >= x && px < x + width && py >= yAWT && py < yAWT + height;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "Offset: " + x + "," + yGL + " Size: " + width + "," + height;
