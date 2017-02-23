@@ -40,7 +40,7 @@ public class Buttons {
         uc2ent(MaterialDesign.MDI_LOCK_OPEN) + "</font>&nbsp;";
 
     public static final String info = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_INFORMATION) + "</font>&nbsp;";
+        uc2ent(MaterialDesign.MDI_INFORMATION_VARIANT) + "</font>&nbsp;";
     public static final String download = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
         uc2ent(MaterialDesign.MDI_DOWNLOAD) + "</font>&nbsp;";
 

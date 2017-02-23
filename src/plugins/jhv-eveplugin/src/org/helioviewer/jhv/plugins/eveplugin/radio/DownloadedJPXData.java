@@ -236,11 +236,7 @@ class DownloadedJPXData implements ImageDataHandler {
         g.fillRect(dx0, ga.y, dwidth, ga.height);
         g.setColor(Color.WHITE);
 
-        String text = "Fetching data";
-        if (downloadJPXFailed) {
-            text = "No data available";
-        }
-
+        String text = downloadJPXFailed ? "No data available" : "Fetching data";
         Rectangle2D r = g.getFontMetrics().getStringBounds(text, g);
         int tWidth = (int) r.getWidth();
         int tHeight = (int) r.getHeight();
