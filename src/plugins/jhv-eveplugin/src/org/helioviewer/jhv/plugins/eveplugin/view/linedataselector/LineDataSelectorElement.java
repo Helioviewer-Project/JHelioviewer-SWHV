@@ -19,7 +19,7 @@ public interface LineDataSelectorElement {
 
     boolean isVisible();
 
-    String getName();
+    @NotNull String getName();
 
     @Nullable Color getDataColor();
 

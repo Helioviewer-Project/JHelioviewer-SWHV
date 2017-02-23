@@ -4,6 +4,7 @@ import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
+import org.jetbrains.annotations.NotNull;
 
 import com.jogamp.opengl.GL2;
 
@@ -56,23 +57,23 @@ public abstract class AbstractRenderable implements Renderable {
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
+    public void renderScale(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl, @NotNull GLSLSolarShader shader, @NotNull GridScale scale) {
     }
 
     @Override
-    public void prerender(GL2 gl) {
+    public void prerender(@NotNull GL2 gl) {
     }
 
     @Override
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+    public void renderFloat(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
     }
 
     @Override
-    public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
+    public void renderMiniview(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
     }
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+    public void renderFullFloat(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
     }
 
 }

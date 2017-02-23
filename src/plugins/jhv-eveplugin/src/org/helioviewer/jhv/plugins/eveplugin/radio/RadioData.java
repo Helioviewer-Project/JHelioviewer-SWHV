@@ -36,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 public class RadioData extends AbstractLineDataSelectorElement {
 
     @NotNull
-    private static YAxis yAxis = new YAxis(400, 20, "Mhz", false);
+    private static final YAxis yAxis = new YAxis(400, 20, "Mhz", false);
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
