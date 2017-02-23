@@ -10,27 +10,27 @@ public class RequestCache {
 
     private ArrayList<Interval> cache = new ArrayList<>();
 
-    public List<Interval> adaptRequestCache(long startDate, long endDate) {
+    public List<Interval> adaptRequestCache(long start, long end) {
         ArrayList<Interval> missingIntervals = new ArrayList<>();
-        Interval interval = new Interval(startDate, endDate);
+        Interval interval = new Interval(start, end);
 
         if (cache.isEmpty()) {
             missingIntervals.add(interval);
             cache.add(interval);
         } else {
             missingIntervals = getMissingIntervals(interval.start, interval.end);
-            updateRequestCache(startDate, endDate);
+            updateRequestCache(start, end);
         }
         return missingIntervals;
     }
 
-    private void updateRequestCache(long startDate, long endDate) {
-        cache.add(new Interval(startDate, endDate));
+    private void updateRequestCache(long start, long end) {
+        cache.add(new Interval(start, end));
         cache = merge(cache);
     }
 
-    public void removeRequestedInterval(Interval ri) {
-        cache = remove(cache, ri);
+    public void removeRequestedInterval(long start, long end) {
+        cache = remove(cache, new Interval(start, end));
     }
 
     public ArrayList<Interval> getAllRequestIntervals() {
@@ -73,7 +73,7 @@ public class RequestCache {
     }
 
     private static ArrayList<Interval> merge(ArrayList<Interval> intervals) {
-        if (intervals == null || intervals.size() <= 1)
+        if (intervals.size() <= 1) // cannot be null
             return intervals;
 
         Collections.sort(intervals);

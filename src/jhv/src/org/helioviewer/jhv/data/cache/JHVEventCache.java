@@ -76,7 +76,7 @@ public class JHVEventCache {
     }
 
     public static void intervalsNotDownloaded(JHVEventType eventType, Interval interval) {
-        removeRequestedIntervals(eventType, interval);
+        downloadedCache.get(eventType).removeRequestedInterval(interval.start, interval.end);
         get(interval.start, interval.end, interval.start, interval.end);
     }
 
@@ -205,10 +205,6 @@ public class JHVEventCache {
 
     public static Collection<Interval> getAllRequestIntervals(JHVEventType eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
-    }
-
-    private static void removeRequestedIntervals(JHVEventType eventType, Interval interval) {
-        downloadedCache.get(eventType).removeRequestedInterval(interval);
     }
 
     private static void _eventTypeActivated(JHVEventType eventType) {
