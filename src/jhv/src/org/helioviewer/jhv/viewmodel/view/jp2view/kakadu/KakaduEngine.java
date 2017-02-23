@@ -60,9 +60,6 @@ public class KakaduEngine {
         } catch (KduException e) {
             e.printStackTrace();
         } finally {
-            compositor = null;
-            jpxSrc = null;
-            familySrc = null;
             super.finalize();
         }
     }
