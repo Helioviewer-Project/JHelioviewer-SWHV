@@ -15,7 +15,6 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -194,11 +193,11 @@ public class PfssData {
         }
     }
 
-    public void init(@Nullable GL2 gl) {
+    public void init(@NotNull GL2 gl) {
         if (gzipFitsFile != null) {
             if (!read)
                 readFitsFile();
-            if (!init && read && gl != null) {
+            if (!init && read) {
                 buffer = new int[1];
                 gl.glGenBuffers(1, buffer, 0);
 
