@@ -173,12 +173,12 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public void render(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
-        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. }, GLSLSolarShader.ortho, null);
+        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. }, GLSLSolarShader.ortho, GridScale.ortho);
     }
 
     @Override
     public void renderMiniview(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
-        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. }, GLSLSolarShader.ortho, null);
+        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. }, GLSLSolarShader.ortho, GridScale.ortho);
     }
 
     @Override
@@ -219,8 +219,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getCenterRotation()));
             }
             shader.bindAngles(gl, imageData.getMetaData().getViewpointL());
-            if (scale != null)
-                shader.setPolarRadii(gl, scale.getYstart(), scale.getYstop());
+            shader.setPolarRadii(gl, scale.getYstart(), scale.getYstop());
             camera.pop();
 
             enablePositionVBO(gl);
