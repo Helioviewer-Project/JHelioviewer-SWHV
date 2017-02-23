@@ -33,6 +33,8 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     private static Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
 
+    @NotNull
+    private final YAxis yAxis = new YAxis(0, 0, "Events", false);
     @Nullable
     private static EventPlotConfiguration eventUnderMouse;
     @Nullable
@@ -128,10 +130,10 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         }
     }
 
-    @Nullable
+    @NotNull
     @Override
     public YAxis getYAxis() {
-        return null;
+        return yAxis;
     }
 
     @Override

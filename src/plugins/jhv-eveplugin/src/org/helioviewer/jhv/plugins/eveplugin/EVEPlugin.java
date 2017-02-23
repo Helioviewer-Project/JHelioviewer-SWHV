@@ -126,7 +126,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     }
 
     @Override
-    public void setState(String state) {
+    public void setState(@NotNull String state) {
     }
 
     @Nullable

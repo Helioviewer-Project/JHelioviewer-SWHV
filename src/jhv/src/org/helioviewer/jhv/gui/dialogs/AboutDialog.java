@@ -51,18 +51,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
 
         for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {
             Plugin plugin = pluginContainer.getPlugin();
-            String pluginName = plugin.getName();
-            String pluginAboutLicense = plugin.getAboutLicenseText();
-
-            if (pluginName == null || pluginName.isEmpty()) {
-                pluginName = "Unknown Plugin";
-            }
-
-            if (pluginAboutLicense == null || pluginAboutLicense.isEmpty()) {
-                pluginAboutLicense = "No License Text Available.";
-            }
-
-            text.append("<hr><b>").append(pluginName).append("</b><br>").append(pluginAboutLicense);
+            text.append("<hr><b>").append(plugin.getName()).append("</b><br>").append(plugin.getAboutLicenseText());
         }
 
         JTextPane pane = new JTextPane();

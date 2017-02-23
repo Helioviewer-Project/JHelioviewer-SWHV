@@ -77,7 +77,7 @@ public class PfssPlugin implements Plugin {
     }
 
     @Override
-    public void setState(String state) {
+    public void setState(@NotNull String state) {
     }
 
     @Nullable
