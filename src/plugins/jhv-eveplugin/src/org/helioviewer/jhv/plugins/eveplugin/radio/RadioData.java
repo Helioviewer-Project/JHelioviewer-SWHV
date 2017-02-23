@@ -306,7 +306,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void drawHighlighted(@NotNull Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void drawHighlighted(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, Point mousePosition) {
     }
 
 }
