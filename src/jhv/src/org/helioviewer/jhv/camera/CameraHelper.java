@@ -8,6 +8,8 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.jogamp.opengl.GL2;
 
@@ -17,12 +19,12 @@ public class CameraHelper {
     private static final double clipFar = Sun.Radius * 10000;
     private static final double[] identity = Mat4.identity().m;
 
-    public static Mat4 getOrthoMatrixInverse(Camera camera, Viewport vp) {
+    public static Mat4 getOrthoMatrixInverse(@NotNull Camera camera, @NotNull Viewport vp) {
         double width = camera.getWidth();
         return Mat4.orthoInverse(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
     }
 
-    public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
+    public static void applyPerspectiveLatitudinal(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 
@@ -33,7 +35,7 @@ public class CameraHelper {
         gl.glLoadMatrixd(identity, 0);
     }
 
-    public static void applyPerspective(Camera camera, Viewport vp, GL2 gl) {
+    public static void applyPerspective(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 
@@ -47,35 +49,35 @@ public class CameraHelper {
         gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
-    private static double computeNormalizedX(Viewport vp, double screenX) {
+    private static double computeNormalizedX(@NotNull Viewport vp, double screenX) {
         return 2. * ((screenX - vp.x) / vp.width - 0.5);
     }
 
-    private static double computeNormalizedY(Viewport vp, double screenY) {
+    private static double computeNormalizedY(@NotNull Viewport vp, double screenY) {
         return -2. * ((screenY - vp.yAWT) / vp.height - 0.5);
     }
 
-    public static double deNormalizeX(Viewport vp, double normalizedX) {
+    public static double deNormalizeX(@NotNull Viewport vp, double normalizedX) {
         return 0.5 * vp.width * (1 + normalizedX) + vp.x;
     }
 
-    public static double deNormalizeY(Viewport vp, double normalizedY) {
+    public static double deNormalizeY(@NotNull Viewport vp, double normalizedY) {
         return 0.5 * vp.height * (1 - normalizedY) + vp.yAWT;
     }
 
-    public static double computeUpX(Camera camera, Viewport vp, double screenX) {
+    public static double computeUpX(@NotNull Camera camera, @NotNull Viewport vp, double screenX) {
         double width = camera.getWidth();
         Vec2 translation = camera.getCurrentTranslation();
         return computeNormalizedX(vp, screenX) * width * vp.aspect - translation.x;
     }
 
-    public static double computeUpY(Camera camera, Viewport vp, double screenY) {
+    public static double computeUpY(@NotNull Camera camera, @NotNull Viewport vp, double screenY) {
         double width = camera.getWidth();
         Vec2 translation = camera.getCurrentTranslation();
         return computeNormalizedY(vp, screenY) * width - translation.y;
     }
 
-    public static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, double screenX, double screenY) {
+    public static Vec3 getVectorFromSphereTrackball(@NotNull Camera camera, @NotNull Viewport vp, double screenX, double screenY) {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
@@ -89,7 +91,8 @@ public class CameraHelper {
         return camera.getCurrentDragRotation().rotateInverseVector(hitPoint);
     }
 
-    public static Vec3 getVectorFromSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
+    @Nullable
+    public static Vec3 getVectorFromSphere(@NotNull Camera camera, @NotNull Viewport vp, double screenX, double screenY, @NotNull Quat rotation, boolean correctDrag) {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
@@ -103,7 +106,8 @@ public class CameraHelper {
         return rotation.rotateInverseVector(hitPoint);
     }
 
-    public static Vec3 getVectorFromPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
+    @Nullable
+    public static Vec3 getVectorFromPlane(@NotNull Camera camera, @NotNull Viewport vp, double screenX, double screenY, @NotNull Quat rotation, boolean correctDrag) {
         Quat currentDragRotation = camera.getCurrentDragRotation();
         Vec3 altnormal = rotation.rotateVector(Vec3.ZAxis);
         if (correctDrag)
@@ -122,7 +126,8 @@ public class CameraHelper {
         return rotation.rotateInverseVector(hitPoint);
     }
 
-    public static Vec3 getVectorFromSphereOrPlane(Camera camera, Viewport vp, double x, double y, Quat cameraDifferenceRotation) {
+    @Nullable
+    public static Vec3 getVectorFromSphereOrPlane(@NotNull Camera camera, @NotNull Viewport vp, double x, double y, @NotNull Quat cameraDifferenceRotation) {
         Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, cameraDifferenceRotation, false);
         if (rotatedHitPoint != null && rotatedHitPoint.z > 0.)
             return rotatedHitPoint;
@@ -130,7 +135,7 @@ public class CameraHelper {
         return getVectorFromPlane(camera, vp, x, y, cameraDifferenceRotation, false);
     }
 
-    public static void zoomToFit(Camera camera) {
+    public static void zoomToFit(@NotNull Camera camera) {
         double size = 1;
         if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
             size = Layers.getLargestPhysicalHeight();
