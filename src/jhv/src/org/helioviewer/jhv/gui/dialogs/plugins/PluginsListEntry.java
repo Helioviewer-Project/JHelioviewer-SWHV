@@ -17,6 +17,7 @@ import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Visual list entry for each plug-in. Provides functions to enable/disable
@@ -36,7 +37,7 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
 
         JTextPane pane = new JTextPane();
         pane.setContentType("text/html");
-        pane.setText("<b>" + plugin.getName() + "</b><br>" + (plugin.getDescription() == null ? "" : plugin.getDescription()) + " <a href=''>More...</a>");
+        pane.setText("<b>" + plugin.getName() + "</b><br>" + plugin.getDescription() + " <a href=''>More...</a>");
         pane.setEditable(false);
         pane.setOpaque(false);
         pane.addHyperlinkListener(this);
@@ -77,7 +78,7 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
     }
 
     @Override
-    public void hyperlinkUpdate(HyperlinkEvent e) {
+    public void hyperlinkUpdate(@NotNull HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
                 Plugin p = plugin.getPlugin();
@@ -90,7 +91,7 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(@NotNull MouseEvent e) {
         list.selectItem(plugin.getName());
         if (e.getSource().equals(enableLabel)) {
             setPluginActive(!plugin.isActive());
