@@ -10,6 +10,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -29,11 +30,11 @@ public class RenderableTimeStamp extends AbstractRenderable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
     }
 
     @Override
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+    public void renderFloat(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         if (!isVisible[vp.idx])
             return;
 
@@ -57,11 +58,11 @@ public class RenderableTimeStamp extends AbstractRenderable {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(@NotNull GL2 gl) {
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(@NotNull GL2 gl) {
         dispose(gl);
     }
 
@@ -70,6 +71,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
         return null;
     }
 
+    @NotNull
     @Override
     public String getName() {
         return name;
@@ -86,7 +88,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(@NotNull GL2 gl) {
     }
 
 }

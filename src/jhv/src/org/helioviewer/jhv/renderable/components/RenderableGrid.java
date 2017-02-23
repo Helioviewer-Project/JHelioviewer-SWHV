@@ -18,6 +18,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import com.jogamp.common.nio.Buffers;
@@ -123,7 +124,7 @@ public class RenderableGrid extends AbstractRenderable {
     private static final int FLAT_STEPS_RADIAL = 10;
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
+    public void renderScale(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl, @NotNull GLSLSolarShader shader, @NotNull GridScale scale) {
         if (!isVisible[vp.idx])
             return;
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
@@ -195,7 +196,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         if (!isVisible[vp.idx])
             return;
 
@@ -506,7 +507,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(@NotNull GL2 gl) {
         FloatBuffer positionBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 2);
         FloatBuffer colorBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 3);
 
@@ -538,7 +539,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(@NotNull GL2 gl) {
         dispose(gl);
     }
 
@@ -547,6 +548,7 @@ public class RenderableGrid extends AbstractRenderable {
         return optionsPanel;
     }
 
+    @NotNull
     @Override
     public String getName() {
         return name;
@@ -605,7 +607,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(@NotNull GL2 gl) {
         gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
         gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
     }

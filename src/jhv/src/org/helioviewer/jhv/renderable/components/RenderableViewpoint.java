@@ -9,12 +9,13 @@ import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.jetbrains.annotations.NotNull;
 
 import com.jogamp.opengl.GL2;
 
 public class RenderableViewpoint extends AbstractRenderable {
 
-    private final CameraOptionsPanel optionsPanel;
+    private final CameraOptionsPanel optionsPanel = new CameraOptionsPanel();
     private static final double epsilon = 0.01;
 
     private static final float lineWidth = 2;
@@ -24,12 +25,8 @@ public class RenderableViewpoint extends AbstractRenderable {
 
     private String timeString = null;
 
-    public RenderableViewpoint() {
-        optionsPanel = new CameraOptionsPanel();
-    }
-
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         if (!isVisible[vp.idx])
             return;
 
@@ -114,7 +111,7 @@ public class RenderableViewpoint extends AbstractRenderable {
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(@NotNull GL2 gl) {
         dispose(gl);
     }
 
@@ -123,6 +120,7 @@ public class RenderableViewpoint extends AbstractRenderable {
         return optionsPanel;
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "Viewpoint";
@@ -145,11 +143,11 @@ public class RenderableViewpoint extends AbstractRenderable {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(@NotNull GL2 gl) {
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(@NotNull GL2 gl) {
     }
 
 }

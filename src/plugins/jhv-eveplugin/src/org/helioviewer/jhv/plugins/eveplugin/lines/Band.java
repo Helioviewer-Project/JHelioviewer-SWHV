@@ -80,6 +80,7 @@ public class Band extends AbstractLineDataSelectorElement {
         LineDataSelectorModel.removeLineData(this);
     }
 
+    @NotNull
     @Override
     public String getName() {
         return bandType.getLabel();
