@@ -15,6 +15,8 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +32,8 @@ public class PositionLoad {
     private long endTime = TimeUtils.EPOCH.milli;
 
     private boolean isLoaded = false;
-    private Position.L[] position;
+    @NotNull
+    private Position.L[] position = new Position.L[0];
     private JHVWorker<Position.L[], Void> worker;
 
     private final PositionLoadFire receiver;
@@ -44,6 +47,7 @@ public class PositionLoad {
         private static final String baseURL = "http://swhv.oma.be/position?";
         private static final String target = "SUN";
 
+        @Nullable
         private String report = null;
 
         private final long start;
@@ -82,14 +86,15 @@ public class PositionLoad {
                 Log.debug("Unknown host, network down?", e);
             } catch (IOException e) {
                 report = FAILEDSTATE + ": server error";
-            } catch (JSONException | ParseException | NumberFormatException e) {
+            } catch (@NotNull JSONException | ParseException | NumberFormatException e) {
                 report = FAILEDSTATE + ": JSON parse error";
             }
 
             return null;
         }
 
-        private Position.L[] parseData(JSONObject jsonResult) throws JSONException, ParseException {
+        @NotNull
+        private Position.L[] parseData(@NotNull JSONObject jsonResult) throws JSONException, ParseException {
             JSONArray resArray = jsonResult.getJSONArray("result");
             int resLength = resArray.length();
             Position.L[] ret = new Position.L[resLength];
@@ -127,10 +132,8 @@ public class PositionLoad {
                 }
 
                 if (report == null) {
-                    if (newPosition == null) {
-                        report = "response is void";
-                    } else if (newPosition.length == 0) {
-                        report = "response is zero length array";
+                    if (newPosition == null || newPosition.length == 0) {
+                        report = "empty response";
                     } else {
                         position = newPosition;
                         setLoaded(true);
@@ -157,7 +160,7 @@ public class PositionLoad {
 
     private void applyChanges() {
         setLoaded(false);
-        position = null;
+        position = new Position.L[0];
 
         if (worker != null) {
             worker.cancel(false);
@@ -197,6 +200,7 @@ public class PositionLoad {
         return -1L;
     }
 
+    @Nullable
     public Position.Q getInterpolatedPosition(long currentCameraTime) {
         if (isLoaded && position.length > 0) {
             double dist, hgln, hglt;
