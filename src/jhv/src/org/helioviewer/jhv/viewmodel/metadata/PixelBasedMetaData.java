@@ -3,6 +3,7 @@ package org.helioviewer.jhv.viewmodel.metadata;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
+import org.jetbrains.annotations.NotNull;
 
 public class PixelBasedMetaData extends AbstractMetaData {
 
@@ -20,6 +21,7 @@ public class PixelBasedMetaData extends AbstractMetaData {
         unitPerPixelY = Sun.Radius / pixelHeight;
     }
 
+    @NotNull
     @Override
     public Region roiToRegion(SubImage roi, double factorX, double factorY) {
         return new Region(roi.x * factorX * unitPerPixelX - 0.5, roi.y * factorY * unitPerPixelY - 0.5,
