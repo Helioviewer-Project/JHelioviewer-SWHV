@@ -51,7 +51,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
-    private static void bindTexture(GL2 gl, String key, @NotNull ImageIcon icon) {
+    private static void bindTexture(@NotNull GL2 gl, String key, @NotNull ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
             BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -153,7 +153,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawPolygon(Camera camera, Viewport vp, @NotNull GL2 gl, @NotNull JHVRelatedEvents evtr, @NotNull JHVEvent evt) {
+    private static void drawPolygon(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl, @NotNull JHVRelatedEvents evtr, @NotNull JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -354,7 +354,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private static void drawText(GL2 gl, Viewport vp, @NotNull JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
+    private static void drawText(@NotNull GL2 gl, @NotNull Viewport vp, @NotNull JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<>();
         JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
         JHVEventParameter[] params = evt.getSimpleVisibleEventParameters();
@@ -369,7 +369,7 @@ public class SWEKRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void render(Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
+    public void render(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         if (isVisible[vp.idx]) {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
@@ -390,7 +390,7 @@ public class SWEKRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void renderScale(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl, GLSLSolarShader shader, @NotNull GridScale scale) {
+    public void renderScale(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl, @NotNull GLSLSolarShader shader, @NotNull GridScale scale) {
         if (isVisible[vp.idx]) {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
@@ -411,14 +411,14 @@ public class SWEKRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+    public void renderFullFloat(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         if (SWEKPopupController.mouseOverJHVEvent != null) {
             drawText(gl, vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
         }
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(@NotNull GL2 gl) {
         dispose(gl);
         ImageViewerGui.getInputController().removePlugin(controller);
     }
@@ -461,12 +461,12 @@ public class SWEKRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(@NotNull GL2 gl) {
         setVisible(true);
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(@NotNull GL2 gl) {
         for (GLTexture el : iconCacheId.values()) {
             el.delete(gl);
         }

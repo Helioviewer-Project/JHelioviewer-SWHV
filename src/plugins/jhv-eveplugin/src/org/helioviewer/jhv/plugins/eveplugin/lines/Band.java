@@ -190,10 +190,12 @@ public class Band extends AbstractLineDataSelectorElement {
         return yAxis;
     }
 
+    @NotNull
     public List<Interval> addRequest(long start, long end) {
         return requestCache.adaptRequestCache(start, end);
     }
 
+    @NotNull
     public List<Interval> getMissingDaysInInterval(long start, long end) {
         return requestCache.getMissingIntervals(start, end);
     }
@@ -209,7 +211,7 @@ public class Band extends AbstractLineDataSelectorElement {
         updateGraphsData();
     }
 
-    public void addToCache(float[] values, long[] dates) {
+    public void addToCache(@NotNull float[] values, @NotNull long[] dates) {
         bandCache.addToCache(values, dates);
         updateGraphsData();
         DrawController.fireRedrawRequest();
@@ -221,7 +223,7 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void drawHighlighted(@NotNull Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
     }
 
 }

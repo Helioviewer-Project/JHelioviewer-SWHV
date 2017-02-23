@@ -35,6 +35,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
     private static final int yOffset = 12;
 
     private final Component component;
+    @NotNull
     private final Camera camera;
 
     private static Cursor lastCursor;
@@ -204,7 +205,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
     }
 
     @Nullable
-    private Vec3 getHitPoint(Viewport vp, int x, int y) {
+    private Vec3 getHitPoint(@NotNull Viewport vp, int x, int y) {
         Vec3 hp = CameraHelper.getVectorFromSphere(camera, vp, x, y, camera.getViewpoint().orientation, true);
         if (hp != null)
             hp.y = -hp.y;

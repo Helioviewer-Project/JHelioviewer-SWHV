@@ -32,7 +32,7 @@ public class HEKParser implements SWEKParser {
 
     @NotNull
     @Override
-    public JHVEvent parseEventJSON(@NotNull JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
+    public JHVEvent parseEventJSON(@NotNull JSONObject json, @NotNull JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
         JHVEvent currentEvent = new JHVEvent(type, id, start, end);
 
         currentEvent.initParams();

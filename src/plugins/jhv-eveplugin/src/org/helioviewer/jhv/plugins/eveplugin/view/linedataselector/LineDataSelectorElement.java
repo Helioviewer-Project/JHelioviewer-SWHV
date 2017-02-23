@@ -8,6 +8,8 @@ import java.awt.Rectangle;
 
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface LineDataSelectorElement {
 
@@ -19,23 +21,23 @@ public interface LineDataSelectorElement {
 
     String getName();
 
-    Color getDataColor();
+    @Nullable Color getDataColor();
 
     boolean isDownloading();
 
     boolean hasData();
 
-    Component getOptionsPanel();
+    @Nullable Component getOptionsPanel();
 
     boolean isDeletable();
 
     boolean showYAxis();
 
-    void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+    void draw(@NotNull Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
-    void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+    void drawHighlighted(@NotNull Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
-    YAxis getYAxis();
+    @Nullable YAxis getYAxis();
 
     void fetchData(TimeAxis selectedAxis);
 

@@ -35,7 +35,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class RadioData extends AbstractLineDataSelectorElement {
 
-    private static YAxis yAxis;
+    @NotNull
+    private static YAxis yAxis = new YAxis(400, 20, "Mhz", false);
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
@@ -50,7 +51,6 @@ public class RadioData extends AbstractLineDataSelectorElement {
         String cm = "Spectral";
         colorModel = createIndexColorModelFromLUT(LUT.get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
-        yAxis = new YAxis(400, 20, "Mhz", false);
     }
 
     @Override
@@ -182,6 +182,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
             jpxData.requestData();
     }
 
+    @NotNull
     @Override
     public YAxis getYAxis() {
         return yAxis;
@@ -305,7 +306,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void drawHighlighted(@NotNull Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
     }
 
 }
