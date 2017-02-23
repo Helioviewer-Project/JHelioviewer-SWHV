@@ -37,7 +37,7 @@ public interface LineDataSelectorElement {
 
     void drawHighlighted(@NotNull Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
-    @Nullable YAxis getYAxis();
+    @NotNull YAxis getYAxis();
 
     void fetchData(TimeAxis selectedAxis);
 

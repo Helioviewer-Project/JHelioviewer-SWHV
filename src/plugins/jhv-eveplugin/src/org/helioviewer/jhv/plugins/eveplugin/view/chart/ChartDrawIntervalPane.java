@@ -36,7 +36,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     // private boolean mouseOverLeftGraspPoint = false;
     // private boolean mouseOverRightGraspPoint = false;
     @Nullable
-    private Point mousePressed = null;
+    private Point mousePressed;
 
     private int leftIntervalBorderPosition = -10;
     private int rightIntervalBorderPosition = -10;

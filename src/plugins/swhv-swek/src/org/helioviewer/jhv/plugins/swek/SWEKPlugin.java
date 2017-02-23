@@ -64,7 +64,7 @@ public class SWEKPlugin implements Plugin {
     }
 
     @Override
-    public void setState(String state) {
+    public void setState(@NotNull String state) {
     }
 
     @Nullable
