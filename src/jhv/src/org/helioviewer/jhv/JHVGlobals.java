@@ -122,7 +122,8 @@ public class JHVGlobals {
 
     public static void openURL(String url) {
         try {
-            Desktop.getDesktop().browse(new URI(url));
+            if (url != null)
+                Desktop.getDesktop().browse(new URI(url));
         } catch (Exception e) {
             e.printStackTrace();
         }
