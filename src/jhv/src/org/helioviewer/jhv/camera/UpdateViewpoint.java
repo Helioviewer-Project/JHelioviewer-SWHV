@@ -6,10 +6,11 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
+import org.jetbrains.annotations.NotNull;
 
 public interface UpdateViewpoint {
 
-    Position.Q update(JHVDate time);
+    @NotNull Position.Q update(JHVDate time);
 
     UpdateViewpoint updateEarthFixedDistance = new UpdateViewpointEarthFixedDistance();
     UpdateViewpoint updateEarth = new UpdateViewpointEarth();
@@ -17,23 +18,26 @@ public interface UpdateViewpoint {
     UpdateViewpoint updateObserver = new UpdateViewpointObserver();
 
     class UpdateViewpointEarthFixedDistance implements UpdateViewpoint {
+        @NotNull
         @Override
-        public Position.Q update(JHVDate time) {
+        public Position.Q update(@NotNull JHVDate time) {
             Position.L p = Sun.getEarth(time);
             return new Position.Q(time, Sun.EpochEarthQ.distance, new Quat(0, p.lon));
         }
     }
 
     class UpdateViewpointEarth implements UpdateViewpoint {
+        @NotNull
         @Override
-        public Position.Q update(JHVDate time) {
+        public Position.Q update(@NotNull JHVDate time) {
             return Sun.getEarthQuat(time);
         }
     }
 
     class UpdateViewpointObserver implements UpdateViewpoint {
+        @NotNull
         @Override
-        public Position.Q update(JHVDate time) {
+        public Position.Q update(@NotNull JHVDate time) {
             View view = Layers.getActiveView();
             return view == null ? Sun.getEarthQuat(time) : view.getMetaData(time).getViewpoint();
         }
@@ -47,8 +51,9 @@ public interface UpdateViewpoint {
             positionLoad = _positionLoad;
         }
 
+        @NotNull
         @Override
-        public Position.Q update(JHVDate time) {
+        public Position.Q update(@NotNull JHVDate time) {
             if (positionLoad.isLoaded()) {
                 long tLayerStart = 0, tLayerEnd = 0;
                 // Active layer times

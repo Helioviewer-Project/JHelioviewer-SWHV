@@ -13,6 +13,8 @@ import org.helioviewer.jhv.display.Displayer.DisplayMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.components.RenderableGrid.GridChoiceType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.jogamp.opengl.GL2;
 
@@ -36,7 +38,8 @@ abstract class AbstractAnnotateable implements Annotateable {
         camera = _camera;
     }
 
-    static Vec3 toSpherical(Vec3 p) {
+    @NotNull
+    static Vec3 toSpherical(@NotNull Vec3 p) {
         Vec3 pt = new Vec3();
         pt.x = p.length();
         pt.y = Math.acos(p.y / pt.x);
@@ -45,13 +48,14 @@ abstract class AbstractAnnotateable implements Annotateable {
         return pt;
     }
 
+    @NotNull
     static Vec3 toCart(double y, double z) {
         return new Vec3(radius * Math.sin(y) * Math.sin(z),
                         radius * Math.cos(y),
                         radius * Math.sin(y) * Math.cos(z));
     }
 
-    Vec3 computePoint(int x, int y) {
+    @Nullable Vec3 computePoint(int x, int y) {
         if (Displayer.mode == DisplayMode.ORTHO) {
             return CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
         } else {
@@ -59,7 +63,7 @@ abstract class AbstractAnnotateable implements Annotateable {
         }
     }
 
-    void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
+    void interpolatedLineDraw(@NotNull Viewport vp, @NotNull GL2 gl, @NotNull Vec3 p1s, @NotNull Vec3 p2s, int subdivisions) {
         if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
             gl.glBegin(GL2.GL_LINE_STRIP);
 

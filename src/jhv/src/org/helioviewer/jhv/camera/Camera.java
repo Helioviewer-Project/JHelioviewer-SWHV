@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.jetbrains.annotations.NotNull;
 
 public class Camera {
 
@@ -22,6 +23,7 @@ public class Camera {
 
     private boolean trackingMode;
 
+    @NotNull
     private Position.Q viewpoint = Sun.EpochEarthQ;
 
     private void updateCamera(JHVDate time) {
@@ -54,8 +56,8 @@ public class Camera {
 
     private Position.Q saveViewpoint = null;
 
-    public void push(Position.Q v) {
-        if (!trackingMode && v != null) {
+    public void push(@NotNull Position.Q v) {
+        if (!trackingMode) {
             saveViewpoint = viewpoint;
             viewpoint = v;
             updateRotation();
@@ -72,14 +74,17 @@ public class Camera {
         }
     }
 
+    @NotNull
     public Position.Q getViewpoint() {
         return viewpoint;
     }
 
+    @NotNull
     public Quat getRotation() {
         return rotation;
     }
 
+    @NotNull
     public Vec2 getCurrentTranslation() {
         return currentTranslation;
     }
@@ -89,11 +94,12 @@ public class Camera {
         currentTranslation.y = y;
     }
 
+    @NotNull
     public Quat getCurrentDragRotation() {
         return currentDragRotation;
     }
 
-    void rotateCurrentDragRotation(Quat _currentDragRotation) {
+    void rotateCurrentDragRotation(@NotNull Quat _currentDragRotation) {
         currentDragRotation = Quat.rotate(currentDragRotation, _currentDragRotation);
         updateRotation();
     }
@@ -126,7 +132,7 @@ public class Camera {
         setCameraFOV(fov * (1 + 0.015 * wr));
     }
 
-    public void timeChanged(JHVDate date) {
+    public void timeChanged(@NotNull JHVDate date) {
         if (!trackingMode) {
             updateCamera(date);
         }

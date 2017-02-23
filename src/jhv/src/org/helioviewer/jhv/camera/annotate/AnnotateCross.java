@@ -4,18 +4,21 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.jogamp.opengl.GL2;
 
 public class AnnotateCross extends AbstractAnnotateable {
 
+    @Nullable
     private Vec3 crossPoint;
 
     public AnnotateCross(Camera _camera) {
         super(_camera);
     }
 
-    private void drawCross(Viewport vp, GL2 gl, Vec3 bp) {
+    private void drawCross(@NotNull Viewport vp, @NotNull GL2 gl, @NotNull Vec3 bp) {
         double delta = Math.PI * 2.5 / 180;
         Vec3 p1 = new Vec3(Sun.Radius, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(Sun.Radius, bp.y - delta, bp.z);
@@ -28,7 +31,7 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(Viewport vp, GL2 gl, boolean active) {
+    public void render(@NotNull Viewport vp, @NotNull GL2 gl, boolean active) {
         if (crossPoint == null)
             return;
 
