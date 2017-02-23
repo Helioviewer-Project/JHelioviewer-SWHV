@@ -188,30 +188,16 @@ public class KakaduMeta {
     }
 
     private static String xmlBox2xml(Jp2_input_box xmlBox) throws JHV_KduException {
-        String xml = null;
         try {
             int len = (int) xmlBox.Get_remaining_bytes();
-            if (len > 0) {
-                byte[] buf = new byte[len];
-                xmlBox.Read(buf, len);
-                xml = new String(buf, StandardCharsets.UTF_8).trim().replace("&", "&amp;");
-            }
+            if (len <= 0)
+                return "";
+            byte[] buf = new byte[len];
+            xmlBox.Read(buf, len);
+            return new String(buf, StandardCharsets.UTF_8).trim().replace("&", "&amp;");
         } catch (KduException ex) {
             throw new JHV_KduException("Kakadu core error: " + ex.getMessage(), ex);
         }
-/* wtf?
-        if (xml != null) {
-            try {
-                if (xml.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>") != 0)
-                    xml = xml.substring(xml.indexOf("<meta>"));
-                if (xml.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>") != 0)
-                    xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + xml;
-            } catch (Exception ex) {
-                throw new JHV_KduException("Failed parsing XML data", ex);
-            }
-        }
-*/
-        return xml;
     }
 
     private static boolean myFindBox2(Jp2_input_box box, Jp2_input_box supBox, long boxType, int boxNumber) throws JHV_KduException {
