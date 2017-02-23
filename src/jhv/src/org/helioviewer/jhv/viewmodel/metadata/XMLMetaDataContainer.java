@@ -18,8 +18,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
     private NodeList nodeList;
 
     public void parseXML(String xml) throws Exception {
-        if (xml == null)
-            throw new Exception("No XML data present");
         if (!xml.contains("</meta>")) {
             throw new Exception("XML data incomplete");
         }
