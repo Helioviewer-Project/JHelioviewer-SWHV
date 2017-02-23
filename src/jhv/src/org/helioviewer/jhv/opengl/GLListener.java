@@ -126,13 +126,11 @@ public class GLListener implements GLEventListener {
 
         Mat4 inverse = camera.getRotation().toMatrix().transpose();
         for (Viewport vp : Displayer.getViewports()) {
-            if (vp != null) {
-                gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                CameraHelper.applyPerspective(camera, vp, gl);
-                renderBlackCircle(gl, inverse.m);
-                ImageViewerGui.getRenderableContainer().render(camera, vp, gl);
-                ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
-            }
+            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            CameraHelper.applyPerspective(camera, vp, gl);
+            renderBlackCircle(gl, inverse.m);
+            ImageViewerGui.getRenderableContainer().render(camera, vp, gl);
+            ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
         }
     }
 
@@ -145,24 +143,20 @@ public class GLListener implements GLEventListener {
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Displayer.getViewports()) {
-            if (vp != null) {
-                gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
-                gl.glPushMatrix();
-                gl.glTranslatef((float) (camera.getCurrentTranslation().x), (float) (camera.getCurrentTranslation().y), 0f);
-                ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, Displayer.mode.getSolarShader(), GridScale.current);
-                ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
-                gl.glPopMatrix();
-            }
+            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
+            gl.glPushMatrix();
+            gl.glTranslatef((float) (camera.getCurrentTranslation().x), (float) (camera.getCurrentTranslation().y), 0f);
+            ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, Displayer.mode.getSolarShader(), GridScale.current);
+            ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
+            gl.glPopMatrix();
         }
     }
 
     public static void renderFloatScene(Camera camera, GL2 gl) {
         for (Viewport vp : Displayer.getViewports()) {
-            if (vp != null) {
-                gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                ImageViewerGui.getRenderableContainer().renderFloat(camera, vp, gl);
-            }
+            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            ImageViewerGui.getRenderableContainer().renderFloat(camera, vp, gl);
         }
     }
 
