@@ -122,7 +122,7 @@ public class TopToolBar extends JToolBar {
         annotateGroup.add(circleItem);
 
         JRadioButtonMenuItem crossItem = new JRadioButtonMenuItem("Cross");
-        circleItem.addActionListener(e -> ImageViewerGui.getAnnotateInteraction().setMode(AnnotationMode.CROSS));
+        crossItem.addActionListener(e -> ImageViewerGui.getAnnotateInteraction().setMode(AnnotationMode.CROSS));
         annotatePopup.add(crossItem);
         annotateGroup.add(crossItem);
 
