@@ -62,4 +62,5 @@ public class TimeAxis {
             end = TimeUtils.MINIMAL_DATE.milli + intervalLength;
         }
     }
+
 }

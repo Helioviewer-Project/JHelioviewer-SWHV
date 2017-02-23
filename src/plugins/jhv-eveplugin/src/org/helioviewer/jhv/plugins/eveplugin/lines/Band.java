@@ -122,7 +122,7 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void draw(@NotNull Graphics2D g, @NotNull Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }
@@ -223,7 +223,7 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void drawHighlighted(@NotNull Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void drawHighlighted(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, Point mousePosition) {
     }
 
 }

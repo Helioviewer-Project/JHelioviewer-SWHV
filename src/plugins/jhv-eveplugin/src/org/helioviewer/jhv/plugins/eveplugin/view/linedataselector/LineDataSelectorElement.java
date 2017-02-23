@@ -33,13 +33,13 @@ public interface LineDataSelectorElement {
 
     boolean showYAxis();
 
-    void draw(@NotNull Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+    void draw(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, Point mousePosition);
 
-    void drawHighlighted(@NotNull Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+    void drawHighlighted(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, Point mousePosition);
 
     @NotNull YAxis getYAxis();
 
-    void fetchData(TimeAxis selectedAxis);
+    void fetchData(@NotNull TimeAxis selectedAxis);
 
     void yaxisChanged();
 
