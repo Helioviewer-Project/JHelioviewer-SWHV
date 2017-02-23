@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.JulianDay;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class Carrington {
 
@@ -1090,7 +1091,7 @@ public class Carrington {
     };
 
     // derived from tim2carr
-    public static double time2CR(JHVDate time) {
+    public static double time2CR(@NotNull JHVDate time) {
         double mjd = JulianDay.milli2mjd(time.milli);
         double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / CR_SYNODIC_MEAN + 1.;
 

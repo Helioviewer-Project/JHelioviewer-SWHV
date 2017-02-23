@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.jetbrains.annotations.NotNull;
 
 public class TimeUtils {
 
@@ -27,7 +28,7 @@ public class TimeUtils {
     public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = new JHVDate("2050-01-01T00:00:00");
 
-    public static long parse(String date) {
+    public static long parse(@NotNull String date) {
         return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
     }
 
