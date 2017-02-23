@@ -5,6 +5,7 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractMetaData implements MetaData {
 
@@ -22,13 +23,14 @@ public abstract class AbstractMetaData implements MetaData {
 
     // Serves only for LASCO cutOff edges
     double cutOffValue = -1;
-    Vec3 cutOffDirection;
+    Vec3 cutOffDirection = Vec3.ZERO;
 
     @Override
     public int getFrameNumber() {
         return frameNumber;
     }
 
+    @NotNull
     @Override
     public Region getPhysicalRegion() {
         return region;
@@ -49,11 +51,13 @@ public abstract class AbstractMetaData implements MetaData {
         return responseFactor;
     }
 
+    @NotNull
     @Override
     public Position.Q getViewpoint() {
         return viewpoint;
     }
 
+    @NotNull
     @Override
     public Position.L getViewpointL() {
         return viewpointL;
@@ -74,11 +78,13 @@ public abstract class AbstractMetaData implements MetaData {
         return cutOffValue;
     }
 
+    @NotNull
     @Override
     public Vec3 getCutOffDirection() {
         return cutOffDirection;
     }
 
+    @NotNull
     @Override
     public Quat getCenterRotation() {
         return viewpoint.orientation;

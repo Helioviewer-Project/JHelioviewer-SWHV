@@ -77,6 +77,7 @@ public class CameraHelper {
         return computeNormalizedY(vp, screenY) * width - translation.y;
     }
 
+    @NotNull
     public static Vec3 getVectorFromSphereTrackball(@NotNull Camera camera, @NotNull Viewport vp, double screenX, double screenY) {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
