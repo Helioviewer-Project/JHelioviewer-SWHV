@@ -26,7 +26,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     private PfssData previousPfssData = null;
 
     @Override
-    public void render(Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
+    public void render(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
         if (!isVisible[vp.idx])
             return;
 
@@ -87,7 +87,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(@NotNull GL2 gl) {
     }
 
     @Override

@@ -154,11 +154,11 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     @Override
-    public void handleRequestForInterval(@NotNull JHVEventType jhvType, Interval interval) {
+    public void handleRequestForInterval(@NotNull JHVEventType jhvType, @NotNull Interval interval) {
         startDownloadEventType(jhvType, interval);
     }
 
-    private static void startDownloadEventType(@NotNull JHVEventType jhvType, Interval interval) {
+    private static void startDownloadEventType(@NotNull JHVEventType jhvType, @NotNull Interval interval) {
         SWEKSupplier supplier = jhvType.getSupplier();
         SWEKEventType eventType = jhvType.getEventType();
         List<SWEKParam> params = defineParameters(eventType, supplier);

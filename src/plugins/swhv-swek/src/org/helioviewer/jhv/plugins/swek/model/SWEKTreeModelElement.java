@@ -15,7 +15,7 @@ public class SWEKTreeModelElement {
         icon = null;
     }
 
-    SWEKTreeModelElement(boolean isCheckBoxSelected, ImageIcon _icon) {
+    SWEKTreeModelElement(boolean isCheckBoxSelected, @Nullable ImageIcon _icon) {
         checkboxSelected = isCheckBoxSelected;
         icon = _icon;
     }

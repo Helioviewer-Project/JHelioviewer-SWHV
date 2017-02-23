@@ -209,7 +209,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private void drawData(@NotNull Graphics2D fullG, Graphics2D plotG, @NotNull Rectangle graphArea, Point mousePosition) {
+    private void drawData(@NotNull Graphics2D fullG, @NotNull Graphics2D plotG, @NotNull Rectangle graphArea, Point mousePosition) {
         List<LineDataSelectorElement> els = LineDataSelectorModel.getAllLineDataSelectorElements();
         boolean isEmpty = true;
         for (LineDataSelectorElement el : els) {
