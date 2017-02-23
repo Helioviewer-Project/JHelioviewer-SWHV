@@ -56,6 +56,7 @@ public class YAxis {
         return scaledvalue2pixel(y0, h, scale(value));
     }
 
+    @NotNull
     public String getLabel() {
         return scale.getLabel();
     }
@@ -111,7 +112,7 @@ public class YAxis {
 
         double invScale(double val);
 
-        String getLabel();
+        @NotNull String getLabel();
 
     }
 
@@ -166,6 +167,7 @@ public class YAxis {
             return val;
         }
 
+        @NotNull
         @Override
         public String getLabel() {
             return label;
