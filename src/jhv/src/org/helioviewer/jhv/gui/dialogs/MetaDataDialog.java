@@ -45,7 +45,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
-    private final DefaultTableModel fitsModel = new DefaultTableModel(null, new Object[] { "FITS Keyword", "Value" }) {
+    private final DefaultTableModel fitsModel = new DefaultTableModel(new Object[0][0], new Object[] { "FITS Keyword", "Value" }) {
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
@@ -199,7 +199,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
                 lastNodeSeen = nodeName;
                 break;
             default:
-                addDataItem(nodeName, nodeValue, lastNodeSeen.equals("fits"));
+                addDataItem(nodeName, nodeValue, "fits".equals(lastNodeSeen));
                 break;
         }
 
