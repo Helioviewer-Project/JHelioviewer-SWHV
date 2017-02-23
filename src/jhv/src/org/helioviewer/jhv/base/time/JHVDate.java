@@ -7,7 +7,7 @@ public class JHVDate implements Comparable<JHVDate> {
     private final String string;
     public final long milli;
 
-    public JHVDate(String date) {
+    public JHVDate(@NotNull String date) {
         this(TimeUtils.parse(date));
     }
 
