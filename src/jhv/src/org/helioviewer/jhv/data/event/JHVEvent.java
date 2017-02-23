@@ -15,8 +15,8 @@ public class JHVEvent {
     private JHVEventParameter[] visibleParameters;
     private JHVEventParameter[] simpleVisibleParameters;
 
-    private ArrayList<JHVEventParameter> allParametersArray;
-    private ArrayList<JHVEventParameter> visibleParametersArray;
+    private ArrayList<JHVEventParameter> allParametersArray = new ArrayList<>();
+    private ArrayList<JHVEventParameter> visibleParametersArray = new ArrayList<>();
 
     private final JHVEventType eventType;
     private JHVPositionInformation positionInformation = null;
@@ -109,7 +109,7 @@ public class JHVEvent {
 
     public void finishParams() {
         allParameters = allParametersArray.toArray(new JHVEventParameter[allParametersArray.size()]);
-        allParametersArray = null;
+        allParametersArray = new ArrayList<>();
         visibleParameters = visibleParametersArray.toArray(new JHVEventParameter[visibleParametersArray.size()]);
 
         // maybe should be configured
@@ -120,11 +120,6 @@ public class JHVEvent {
         }
         simpleVisibleParameters = simpleVisibleParametersArray.toArray(new JHVEventParameter[simpleVisibleParametersArray.size()]);
 
-        visibleParametersArray = null;
-    }
-
-    public void initParams() {
-        allParametersArray = new ArrayList<>();
         visibleParametersArray = new ArrayList<>();
     }
 
