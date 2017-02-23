@@ -43,7 +43,6 @@ class DownloadedJPXData implements ImageDataHandler {
     private BufferedImage bufferedImage;
     private Region region;
     private boolean downloadJPXFailed = false;
-    private boolean hasData = false;
 
     public DownloadedJPXData(@Nullable JP2ViewCallisto _view, long start) {
         if (_view != null) { // null for empty
@@ -92,7 +91,7 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     @Override
-    public void handleData(ImageData imageData) {
+    public void handleData(@NotNull ImageData imageData) {
         if (imageData instanceof SingleChannelByte8ImageData) {
             int w = imageData.getWidth();
             int h = imageData.getHeight();
@@ -104,7 +103,6 @@ class DownloadedJPXData implements ImageDataHandler {
             region = imageData.getRegion();
             byte[] data = (byte[]) imageData.getBuffer().array();
             bufferedImage = createBufferedImage(w, h, data);
-            hasData = true;
 
             DrawController.fireRedrawRequest();
         }
@@ -207,10 +205,10 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     void draw(@NotNull Graphics2D g, @NotNull Rectangle ga, @NotNull TimeAxis xAxis, @NotNull YAxis yAxis) {
-        if (hasData) {
+        if (hasData()) {
             int sx0 = 0;
-            int sx1 = bufferedImage.getWidth();
             int sy0 = 0;
+            int sx1 = bufferedImage.getWidth();
             int sy1 = bufferedImage.getHeight();
             long imStart = (long) (startDate + (endDate - startDate) * region.llx / jp2Width);
             long imEnd = (long) (startDate + (endDate - startDate) * region.urx / jp2Width);
@@ -252,18 +250,18 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     boolean isDownloading() {
-        return !hasData && !downloadJPXFailed;
+        return !hasData() && !downloadJPXFailed;
     }
 
     void changeColormap(@NotNull ColorModel cm) {
-        if (hasData) {
+        if (hasData()) {
             BufferedImage old = bufferedImage;
             bufferedImage = new BufferedImage(cm, old.getRaster(), false, null);
         }
     }
 
     public boolean hasData() {
-        return hasData;
+        return bufferedImage != null;
     }
 
 }
