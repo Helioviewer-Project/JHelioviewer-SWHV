@@ -21,6 +21,8 @@ import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
+import com.jidesoft.plaf.LookAndFeelFactory;
+
 public class UIGlobals {
 
     private static final UIGlobals instance = new UIGlobals();
@@ -29,11 +31,12 @@ public class UIGlobals {
         try {
             String laf = UIManager.getSystemLookAndFeelClassName();
             UIManager.setLookAndFeel(laf);
-            if (laf.contains("nimbus") || laf.contains("synth")) { // crash due to uninitialized defaults
+            if (laf.contains("gtk") || laf.contains("nimbus") || laf.contains("synth")) { // crash due to uninitialized defaults
                 UIManager.getDefaults().put("RangeSliderUI", "com.jidesoft.plaf.basic.BasicRangeSliderUI");
                 if (laf.contains("synth"))
                     UIManager.getDefaults().put("textHighlight", new ColorUIResource(255, 255, 255));
             }
+            LookAndFeelFactory.installJideExtension();
         } catch (Exception e) {
             e.printStackTrace();
         }
