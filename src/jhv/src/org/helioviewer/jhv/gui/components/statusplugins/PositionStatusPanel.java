@@ -28,9 +28,9 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         Viewport vp = Displayer.getActiveViewport();
         Vec2 coord = ImageViewerGui.getRenderableGrid().gridPoint(camera, vp, x, y);
 
-        if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
+        if (Displayer.mode == Displayer.DisplayMode.Latitudinal) {
             setText(String.format("(\u03C6,\u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y));
-        } else if (Displayer.mode == Displayer.DisplayMode.POLAR || Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
+        } else if (Displayer.mode == Displayer.DisplayMode.Polar || Displayer.mode == Displayer.DisplayMode.LogPolar) {
             setText(String.format("(\u03B8,\u03c1) : (%.2f\u00B0,%.2fR\u2299)", coord.x, coord.y));
         } else {
             Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getCurrentDragRotation());

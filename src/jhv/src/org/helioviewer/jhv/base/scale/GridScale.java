@@ -14,7 +14,7 @@ import org.helioviewer.jhv.renderable.components.RenderableGrid.GridChoiceType;
 public abstract class GridScale {
 
     public static final GridScale polar = new GridScaleIdentity(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
-    public static final GridScale latitudinal = new GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
+    public static final GridScale lati = new GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
     public static final GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
     public static final GridScale ortho = new GridScaleOrtho(0, 0, 0, 0, Transform.transformlatitudinal);
 

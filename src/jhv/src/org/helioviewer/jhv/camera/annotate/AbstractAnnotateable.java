@@ -9,7 +9,6 @@ import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.Displayer.DisplayMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.components.RenderableGrid.GridChoiceType;
@@ -52,7 +51,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     Vec3 computePoint(int x, int y) {
-        if (Displayer.mode == DisplayMode.ORTHO) {
+        if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
             return CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
         } else {
             return GridScale.current.transformInverse(GridScale.current.mouseToGrid(x, y, Displayer.getActiveViewport(), camera, GridChoiceType.Viewpoint));
@@ -60,7 +59,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
-        if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
+        if (Displayer.mode != Displayer.DisplayMode.Orthographic) {
             gl.glBegin(GL2.GL_LINE_STRIP);
 
             Vec2 previous = null;

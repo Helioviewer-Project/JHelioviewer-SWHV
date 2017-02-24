@@ -40,7 +40,7 @@ public class ViewROI {
 
     public static Region updateROI(Camera camera, Viewport vp, MetaData m) {
         switch (Displayer.mode) {
-        case ORTHO:
+        case Orthographic:
             for (int i = 0; i < pointlist.length; i++) {
                 dePoints[i].x = CameraHelper.deNormalizeX(vp, pointlist[i].x);
                 dePoints[i].y = CameraHelper.deNormalizeY(vp, pointlist[i].y);
@@ -116,7 +116,7 @@ public class ViewROI {
                     return new Region(minPhysicalX, minPhysicalY, 0, 0);
                 }
             }
-        case LATITUDINAL:
+        case Latitudinal:
             return unitRadius;
         default:
             return m.getPhysicalRegion();

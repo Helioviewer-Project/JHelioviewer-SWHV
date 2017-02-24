@@ -181,7 +181,7 @@ public class SWEKRenderable extends AbstractRenderable {
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
 
-                    if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+                    if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
                         gl.glVertex3f((float) (xnew / r), (float) -(ynew / r), (float) (znew / r));
                     } else {
                         pt.x = xnew / r;
@@ -393,7 +393,7 @@ public class SWEKRenderable extends AbstractRenderable {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.getName() == "Coronal Mass Ejection" && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) { // interned
+                if (evt.getName() == "Coronal Mass Ejection" && (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar)) { // interned
                     drawCactusArcScale(gl, evtr, evt, controller.currentTime, scale, vp);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
