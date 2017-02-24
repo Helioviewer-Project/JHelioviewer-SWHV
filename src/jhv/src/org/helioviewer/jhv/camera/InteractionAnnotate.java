@@ -18,7 +18,7 @@ public class InteractionAnnotate extends Interaction {
     public enum AnnotationMode {
         Rectangle, Circle, Cross;
 
-        public Annotateable generateAnnotateable(Camera camera) {
+        Annotateable generateAnnotateable(Camera camera) {
             switch (this) {
             case Circle:
                 return new AnnotateCircle(camera);

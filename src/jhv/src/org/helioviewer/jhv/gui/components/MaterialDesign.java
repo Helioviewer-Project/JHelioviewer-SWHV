@@ -1743,11 +1743,9 @@ public enum MaterialDesign {
     MDI_YOUTUBE_PLAY("mdi-youtube-play", '\uf5c3'),
     MDI_ZIP_BOX("mdi-zip-box", '\uf5c4');
 
-    private final String description;
     public final char code;
 
     MaterialDesign(String _description, char _code) {
-        description = _description;
         code = _code;
     }
 

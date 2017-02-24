@@ -12,9 +12,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
 
+import org.apache.commons.lang3.StringUtils;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -33,14 +35,23 @@ import com.jidesoft.swing.JideToggleButton;
 public class TopToolBar extends JToolBar {
 
     private enum InteractionMode {
-        PAN, ROTATE, ANNOTATE
+        Pan(ImageViewerGui.getPanInteraction(), Buttons.pan),
+        Rotate(ImageViewerGui.getRotateInteraction(), Buttons.rotate),
+        Annotate(ImageViewerGui.getAnnotateInteraction(), Buttons.annotate);
+
+        private final Interaction interaction;
+        private final JideToggleButton button;
+
+        InteractionMode(Interaction _interaction, String s) {
+            interaction = _interaction;
+            button = new JideToggleButton(s);
+            button.addActionListener(e -> setActiveInteractionMode(this));
+            button.setToolTipText(toString());
+        }
+
     }
 
-    private InteractionMode interactionMode;
-
-    private final JideToggleButton panButton;
-    private final JideToggleButton rotateButton;
-    private final JideToggleButton annotateButton;
+    private static InteractionMode interactionMode = InteractionMode.Rotate;
 
     public TopToolBar() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -48,10 +59,9 @@ public class TopToolBar extends JToolBar {
         setRollover(true);
 
         try {
-            interactionMode = InteractionMode.valueOf(Settings.getSingletonInstance().getProperty("display.interaction").toUpperCase());
+            interactionMode = InteractionMode.valueOf(StringUtils.capitalize(Settings.getSingletonInstance().getProperty("display.interaction").toLowerCase()));
         } catch (Exception e) {
             Log.error("Error when reading the interaction mode", e);
-            interactionMode = InteractionMode.ROTATE;
         }
 
         Dimension dim = new Dimension(32, 32);
@@ -87,24 +97,10 @@ public class TopToolBar extends JToolBar {
         // Interaction
         ButtonGroup group = new ButtonGroup();
 
-        panButton = new JideToggleButton(Buttons.pan);
-        panButton.addActionListener(e -> setActiveInteractionMode(InteractionMode.PAN));
-        panButton.setToolTipText("Pan");
-        group.add(panButton);
-        addButton(panButton);
-
-        rotateButton = new JideToggleButton(Buttons.rotate);
-        rotateButton.addActionListener(e -> setActiveInteractionMode(InteractionMode.ROTATE));
-        rotateButton.setToolTipText("Rotate");
-        group.add(rotateButton);
-        addButton(rotateButton);
-
-        annotateButton = new JideToggleButton(Buttons.annotate);
-        annotateButton.addActionListener(e -> setActiveInteractionMode(InteractionMode.ANNOTATE));
-        annotateButton.setToolTipText("Annotate");
-        group.add(annotateButton);
-        addButton(annotateButton);
-
+        for (InteractionMode mode : InteractionMode.values()) {
+            group.add(mode.button);
+            addButton(mode.button);
+        }
         setActiveInteractionMode(interactionMode);
 
         JPopupMenu annotatePopup = new JPopupMenu();
@@ -122,7 +118,7 @@ public class TopToolBar extends JToolBar {
         annotatePopup.addSeparator();
         annotatePopup.add(new ClearAnnotationsAction());
 
-        annotateButton.addMouseListener(new MouseAdapter() {
+        InteractionMode.Annotate.button.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 annotatePopup.show(e.getComponent(), 0, e.getComponent().getHeight());
@@ -179,25 +175,12 @@ public class TopToolBar extends JToolBar {
         addButton(cutOut);
     }
 
-    private void setActiveInteractionMode(InteractionMode mode) {
+    private static void setActiveInteractionMode(InteractionMode mode) {
         interactionMode = mode;
         Settings.getSingletonInstance().setProperty("display.interaction", mode.toString().toLowerCase());
         Settings.getSingletonInstance().save("display.interaction");
-
-        switch (mode) {
-        case PAN:
-            ImageViewerGui.setCurrentInteraction(ImageViewerGui.getPanInteraction());
-            panButton.setSelected(true);
-            break;
-        case ROTATE:
-            ImageViewerGui.setCurrentInteraction(ImageViewerGui.getRotateInteraction());
-            rotateButton.setSelected(true);
-            break;
-        case ANNOTATE:
-            ImageViewerGui.setCurrentInteraction(ImageViewerGui.getAnnotateInteraction());
-            annotateButton.setSelected(true);
-            break;
-        }
+        ImageViewerGui.setCurrentInteraction(mode.interaction);
+        mode.button.setSelected(true);
     }
 
     private void addButton(JideButton b) {
