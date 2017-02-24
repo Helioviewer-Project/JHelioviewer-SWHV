@@ -19,6 +19,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.LoadStartup;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.viewmodel.metadata.AIAResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
@@ -107,11 +108,13 @@ public class JHelioviewer {
                 e.printStackTrace();
             }
 
-            // after loading plugins fix the minimum width of left pane
-            JComponent leftScrollPane = ImageViewerGui.getLeftScrollPane();
-            leftScrollPane.setMinimumSize(new Dimension(leftScrollPane.getPreferredSize().width + ImageViewerGui.SIDE_PANEL_WIDTH_EXTRA, -1));
-
+            // set left pane width to fit the image layer options
+            ImageLayer dummy = ImageLayer.createImageLayer();
             frame.pack();
+            dummy.unload();
+            JComponent leftPane = ImageViewerGui.getLeftScrollPane();
+            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));
+
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
 
