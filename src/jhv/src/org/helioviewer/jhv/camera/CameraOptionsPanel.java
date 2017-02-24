@@ -30,7 +30,7 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
     private enum CameraMode {
         OBSERVER("Observer View"), EARTH("Earth View"), EXPERT("Other view");
 
-        public final String display;
+        private final String display;
 
         CameraMode(String s) {
             display = s;
