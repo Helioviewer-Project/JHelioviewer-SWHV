@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -41,28 +40,6 @@ public class ImageUtils {
         writer.dispose();
 
         // ImageIO.write(image, "png", new File(name));
-    }
-
-    public static BufferedImage stackImages(BufferedImage[] bufImgs, double horizontal, double vertical) {
-        if (bufImgs.length == 0 || bufImgs[0] == null) {
-            return null;
-        }
-
-        // the first layer is strictly copied
-        BufferedImage result = deepCopy(bufImgs[0]);
-        int width = result.getWidth();
-        int height = result.getHeight();
-
-        Graphics2D g = result.createGraphics();
-        for (int i = 1; i < bufImgs.length; i++) {
-            BufferedImage currentImg = bufImgs[i];
-            int offsetX = (int) (horizontal * (width - currentImg.getWidth()));
-            int offsetY = (int) (vertical * (height - currentImg.getHeight()));
-            g.drawImage(currentImg, null, offsetX, offsetY);
-        }
-        g.dispose();
-
-        return result;
     }
 
     public static Color getAverageColor(BufferedImage bufImg) {
