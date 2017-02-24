@@ -30,7 +30,14 @@ import com.jidesoft.swing.JideButton;
 public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
 
     private enum CameraMode {
-        OBSERVER, EARTH, EXPERT
+        OBSERVER("Observer View"), EARTH("Earth View"), EXPERT("Other view");
+
+        public final String display;
+
+        CameraMode(String s) {
+            display = s;
+        }
+
     }
 
     private static final double FOVAngleDefault = 0.8;
@@ -56,39 +63,21 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
         c.fill = GridBagConstraints.HORIZONTAL;
 
         JPanel radio = new JPanel(new FlowLayout(FlowLayout.LEADING));
-
-        JRadioButton observerItem = new JRadioButton(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeCamera(CameraMode.OBSERVER);
-            }
-        });
-        observerItem.setText("Observer View");
-        observerItem.setSelected(true);
-        radio.add(observerItem);
-
-        JRadioButton earthItem = new JRadioButton(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeCamera(CameraMode.EARTH);
-            }
-        });
-        earthItem.setText("Earth View");
-        radio.add(earthItem);
-
-        JRadioButton expertItem = new JRadioButton(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeCamera(CameraMode.EXPERT);
-            }
-        });
-        expertItem.setText("Other View");
-        radio.add(expertItem);
-
         ButtonGroup group = new ButtonGroup();
-        group.add(observerItem);
-        group.add(earthItem);
-        group.add(expertItem);
+
+        for (CameraMode mode : CameraMode.values()) {
+            JRadioButton item = new JRadioButton(new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    changeCamera(mode);
+                }
+            });
+            item.setText(mode.display);
+            group.add(item);
+            radio.add(item);
+            if (mode == CameraMode.OBSERVER)
+                item.setSelected(true);
+        }
 
         add(radio, c);
         c.gridx = 1;
