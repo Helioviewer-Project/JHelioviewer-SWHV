@@ -6,13 +6,11 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 
 import com.jogamp.opengl.GL2;
@@ -67,9 +65,9 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
     }
 
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         for (Renderable renderable : renderables) {
-            renderable.renderScale(camera, vp, gl, shader, scale);
+            renderable.renderScale(camera, vp, gl);
         }
     }
 

@@ -172,25 +172,28 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. }, GLSLSolarShader.ortho, GridScale.ortho);
+        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. });
     }
 
     @Override
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. }, GLSLSolarShader.ortho, GridScale.ortho);
+        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. });
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
-        _render(camera, vp, gl, new double[] { 1., 1., 1., 1. }, shader, scale);
+    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
+        _render(camera, vp, gl, new double[] { 1., 1., 1., 1. });
     }
 
-    private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange, GLSLSolarShader shader, GridScale scale) {
+    private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange) {
         if (imageData == null) {
             return;
         }
         if (!isVisible[vp.idx])
             return;
+
+        GLSLSolarShader shader = Displayer.mode.shader;
+        GridScale scale = Displayer.mode.scale;
 
         shader.bind(gl);
         {

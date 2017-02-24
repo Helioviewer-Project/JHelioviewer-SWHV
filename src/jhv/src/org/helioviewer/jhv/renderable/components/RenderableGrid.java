@@ -14,8 +14,8 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.json.JSONObject;
@@ -91,7 +91,7 @@ public class RenderableGrid extends AbstractRenderable {
     private GridChoiceType gridChoice = GridChoiceType.Viewpoint;
 
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
-        return GridScale.current.mouseToGrid(x, y, vp, camera, gridChoice);
+        return Displayer.mode.scale.mouseToGrid(x, y, vp, camera, gridChoice);
     }
 
     public static Quat getGridQuat(Camera camera, GridChoiceType _gridChoice) { // should be in GridScale
@@ -112,14 +112,14 @@ public class RenderableGrid extends AbstractRenderable {
     private static final int FLAT_STEPS_RADIAL = 10;
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
         {
             drawGridFlat(gl, vp);
             if (showLabels) {
-                drawGridTextFlat(pixelsPerSolarRadius, scale, vp);
+                drawGridTextFlat(pixelsPerSolarRadius, Displayer.mode.scale, vp);
             }
         }
     }

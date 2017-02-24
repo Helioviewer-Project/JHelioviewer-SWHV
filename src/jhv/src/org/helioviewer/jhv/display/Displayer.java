@@ -32,10 +32,6 @@ public class Displayer implements JHVEventHighlightListener {
             scale = _scale;
         }
 
-        public void setGridScale() {
-            GridScale.current = scale;
-        }
-
     }
 
     public static DisplayMode mode = DisplayMode.Orthographic;

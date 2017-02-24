@@ -159,10 +159,7 @@ public class TopToolBar extends JToolBar {
             JRadioButtonMenuItem projectionItem = new JRadioButtonMenuItem(el.toString());
             if (el == Displayer.DisplayMode.Orthographic)
                 projectionItem.setSelected(true);
-            projectionItem.addActionListener(e -> {
-                Displayer.setMode(el);
-                el.setGridScale();
-            });
+            projectionItem.addActionListener(e -> Displayer.setMode(el));
             projectionPopup.add(projectionItem);
             projectionGroup.add(projectionItem);
         }
