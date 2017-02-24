@@ -21,21 +21,17 @@ public class Displayer implements JHVEventHighlightListener {
     public static final double CAMERA_ZOOM_MULTIPLIER_BUTTON = 2.;
 
     public enum DisplayMode {
-        ORTHO, LATITUDINAL, LOGPOLAR, POLAR;
+        ORTHO("Orthographic"), LATITUDINAL("Latitudinal"), LOGPOLAR("LogPolar"), POLAR("Polar");
 
-        public String getLabel() {
-            switch (this) {
-            case ORTHO:
-                return "Orthographic";
-            case POLAR:
-                return "Polar";
-            case LATITUDINAL:
-                return "Latitudinal";
-            case LOGPOLAR:
-                return "LogPolar";
-            default:
-                return "";
-            }
+        private final String display;
+
+        DisplayMode(String s) {
+            display = s;
+        }
+
+        @Override
+        public String toString() {
+            return display;
         }
 
         public GLSLSolarShader getSolarShader() {
