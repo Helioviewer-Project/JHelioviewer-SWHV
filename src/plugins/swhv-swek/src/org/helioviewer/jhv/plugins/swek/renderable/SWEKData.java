@@ -16,7 +16,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.jetbrains.annotations.NotNull;
 
 public class SWEKData implements TimespanListener, JHVEventHandler {
 
@@ -49,7 +48,6 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         requestEvents(true);
     }
 
-    @NotNull
     public static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
         JHVEventCacheResult result = JHVEventCache.get(beginTime, endTime, beginTime, endTime);
@@ -64,7 +62,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         return activeEvents;
     }
 
-    public static double readCMESpeed(@NotNull JHVEvent evt) {
+    public static double readCMESpeed(JHVEvent evt) {
         JHVEventParameter p = evt.getParameter("cme_radiallinvel");
         try {
             if (p != null)
@@ -74,7 +72,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         return 500;
     }
 
-    public static double readCMEPrincipalAngleDegree(@NotNull JHVEvent evt) {
+    public static double readCMEPrincipalAngleDegree(JHVEvent evt) {
         JHVEventParameter p = evt.getParameter("event_coord1");
         try {
             if (p != null)
@@ -84,7 +82,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         return 0;
     }
 
-    public static double readCMEAngularWidthDegree(@NotNull JHVEvent evt) {
+    public static double readCMEAngularWidthDegree(JHVEvent evt) {
         JHVEventParameter p = evt.getParameter("cme_angularwidth");
         try {
             if (p != null)

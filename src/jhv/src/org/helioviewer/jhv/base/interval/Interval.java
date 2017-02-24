@@ -3,7 +3,6 @@ package org.helioviewer.jhv.base.interval;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.jetbrains.annotations.NotNull;
 
 public class Interval implements Comparable<Interval> {
 
@@ -15,7 +14,7 @@ public class Interval implements Comparable<Interval> {
         end = _end;
     }
 
-    public boolean containsInclusive(@NotNull Interval other) {
+    public boolean containsInclusive(Interval other) {
         return containsPointInclusive(other.start) && containsPointInclusive(other.end);
     }
 
@@ -23,11 +22,11 @@ public class Interval implements Comparable<Interval> {
         return time >= start && time <= end;
     }
 
-    public boolean overlaps(@NotNull Interval otherInterval) {
+    public boolean overlaps(Interval otherInterval) {
         return start <= otherInterval.end && end >= otherInterval.start;
     }
 
-    public boolean overlapsInclusive(@NotNull Interval other) {
+    public boolean overlapsInclusive(Interval other) {
         return containsPointInclusive(other.start) || containsPointInclusive(other.end) || other.containsPointInclusive(start) || other.containsPointInclusive(end);
     }
 
@@ -60,8 +59,7 @@ public class Interval implements Comparable<Interval> {
         return new Interval(new_start, new_end);
     }
 
-    @NotNull
-    public static ArrayList<Interval> splitInterval(@NotNull Interval interval, int days) {
+    public static ArrayList<Interval> splitInterval(Interval interval, int days) {
         ArrayList<Interval> intervals = new ArrayList<>();
         long startDate = interval.start;
 
@@ -93,14 +91,13 @@ public class Interval implements Comparable<Interval> {
         return 31 * result + (int) (end ^ (end >>> 32));
     }
 
-    @NotNull
     @Override
     public String toString() {
         return "[" + start + "," + end + ")";
     }
 
     @Override
-    public int compareTo(@NotNull Interval o) {
+    public int compareTo(Interval o) {
         return start < o.start ? -1 : (start > o.start ? 1 : 0);
     }
 

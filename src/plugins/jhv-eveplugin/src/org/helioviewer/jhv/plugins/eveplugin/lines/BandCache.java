@@ -11,7 +11,6 @@ import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.jetbrains.annotations.NotNull;
 
 class BandCache {
 
@@ -33,7 +32,7 @@ class BandCache {
         return hasData;
     }
 
-    void addToCache(@NotNull float[] values, long[] dates) {
+    void addToCache(float[] values, long[] dates) {
         if (values.length != 0) {
             hasData = true;
         }
@@ -50,8 +49,7 @@ class BandCache {
         }
     }
 
-    @NotNull
-    public float[] getBounds(@NotNull TimeAxis timeAxis) {
+    public float[] getBounds(TimeAxis timeAxis) {
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
 
@@ -76,7 +74,7 @@ class BandCache {
         return new float[] { min, max };
     }
 
-    void createPolyLines(@NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, @NotNull YAxis yAxis, @NotNull ArrayList<GraphPolyline> graphPolylines) {
+    void createPolyLines(Rectangle graphArea, TimeAxis timeAxis, YAxis yAxis, ArrayList<GraphPolyline> graphPolylines) {
         long keyEnd = date2key(timeAxis.end);
         long key = date2key(timeAxis.start);
         int level = 0;
@@ -181,12 +179,10 @@ class BandCache {
 
     static class GraphPolyline {
 
-        @NotNull
         public final int[] xPoints;
-        @NotNull
         public final int[] yPoints;
 
-        private GraphPolyline(@NotNull List<Integer> dates, @NotNull List<Integer> values) {
+        private GraphPolyline(List<Integer> dates, List<Integer> values) {
             int llen = dates.size();
             xPoints = new int[llen];
             yPoints = new int[llen];

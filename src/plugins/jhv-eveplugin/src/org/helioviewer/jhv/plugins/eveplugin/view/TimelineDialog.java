@@ -14,8 +14,6 @@ import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("serial")
 public class TimelineDialog extends StandardDialog implements ShowableDialog {
@@ -27,7 +25,6 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         setResizable(false);
     }
 
-    @NotNull
     @Override
     public ButtonPanel createButtonPanel() {
         AbstractAction close = new AbstractAction() {
@@ -65,14 +62,12 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         return panel;
     }
 
-    @NotNull
     @Override
     public JComponent createContentPanel() {
         observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return observationPanel;
     }
 
-    @Nullable
     @Override
     public JComponent createBannerPanel() {
         return null;
@@ -85,7 +80,6 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         setVisible(true);
     }
 
-    @NotNull
     public TimelineDataPanel getObservationPanel() {
         return observationPanel;
     }

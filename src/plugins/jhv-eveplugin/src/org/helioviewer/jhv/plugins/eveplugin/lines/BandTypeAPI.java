@@ -9,7 +9,6 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +32,7 @@ public class BandTypeAPI {
         }
     }
 
-    private static void updateBandTypes(@NotNull JSONArray jsonObjectArray) {
+    private static void updateBandTypes(JSONArray jsonObjectArray) {
         BandType[] bandtypes = new BandType[jsonObjectArray.length()];
         try {
             for (int i = 0; i < jsonObjectArray.length(); i++) {
@@ -78,7 +77,7 @@ public class BandTypeAPI {
         }
     }
 
-    private static void updateBandGroups(@NotNull JSONArray jsonGroupArray) {
+    private static void updateBandGroups(JSONArray jsonGroupArray) {
         try {
             for (int i = 0; i < jsonGroupArray.length(); i++) {
                 BandGroup group = new BandGroup();
@@ -96,7 +95,7 @@ public class BandTypeAPI {
         }
     }
 
-    public static BandType[] getBandTypes(@NotNull BandGroup group) {
+    public static BandType[] getBandTypes(BandGroup group) {
         return group.bandtypes.toArray(new BandType[group.bandtypes.size()]);
     }
 

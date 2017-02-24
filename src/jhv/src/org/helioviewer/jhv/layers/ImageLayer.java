@@ -29,7 +29,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
-import org.jetbrains.annotations.NotNull;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -77,7 +76,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void init(@NotNull GL2 gl) {
+    public void init(GL2 gl) {
         glImage.init(gl);
 
         FloatBuffer positionBuffer = IcoSphere.IcoSphere.a;
@@ -151,7 +150,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void remove(@NotNull GL2 gl) {
+    public void remove(GL2 gl) {
         if (worker != null) {
             worker.cancel(true);
             worker = null;
@@ -164,7 +163,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void prerender(@NotNull GL2 gl) {
+    public void prerender(GL2 gl) {
         if (imageData == null) {
             return;
         }
@@ -172,17 +171,17 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void render(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL2 gl) {
         _render(camera, vp, gl, new double[] { 1., 1., 0., 1. }, GLSLSolarShader.ortho, GridScale.ortho);
     }
 
     @Override
-    public void renderMiniview(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
+    public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
         _render(camera, vp, gl, new double[] { 0., 0., 0., 0. }, GLSLSolarShader.ortho, GridScale.ortho);
     }
 
     @Override
-    public void renderScale(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl, @NotNull GLSLSolarShader shader, @NotNull GridScale scale) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         _render(camera, vp, gl, new double[] { 1., 1., 1., 1. }, shader, scale);
     }
 
@@ -246,7 +245,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void renderFullFloat(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
+    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
         if (imageData == null || worker != null) { // loading something
             int delta = (int) (vp.height * 0.01);
             TextRenderer renderer = GLText.getRenderer(GLText.TEXT_SIZE_LARGE);
@@ -295,7 +294,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         return optionsPanel;
     }
 
-    @NotNull
     @Override
     public String getName() {
         return view == null || worker != null ? loading : view.getName();
@@ -315,7 +313,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void dispose(@NotNull GL2 gl) {
+    public void dispose(GL2 gl) {
         disablePositionVBO(gl);
         disableIndexVBO(gl);
         deletePositionVBO(gl);
@@ -360,7 +358,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void handleData(@NotNull ImageData newImageData) {
+    public void handleData(ImageData newImageData) {
         setImageData(newImageData);
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
         Displayer.display();

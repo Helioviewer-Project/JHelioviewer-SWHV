@@ -11,16 +11,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
-import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("serial")
 public class LineColorRenderer extends DefaultTableCellRenderer {
 
     private final LineColorPanel lineColorPanel = new LineColorPanel();
 
-    @NotNull
     @Override
-    public Component getTableCellRendererComponent(@NotNull JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Color back = isSelected ? table.getSelectionBackground() : table.getBackground();
         lineColorPanel.setLineColor(back);
         lineColorPanel.setBackground(back);
@@ -48,7 +46,7 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
         }
 
         @Override
-        public void paintComponent(@NotNull Graphics g) {
+        public void paintComponent(Graphics g) {
             super.paintComponent(g);
             if (c != null) {
                 g.setColor(c);

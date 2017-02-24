@@ -13,12 +13,11 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
-import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("serial")
 class LineOptionPanel extends JPanel {
 
-    public LineOptionPanel(@NotNull Band band) {
+    public LineOptionPanel(Band band) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();

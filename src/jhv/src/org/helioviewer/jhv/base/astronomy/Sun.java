@@ -5,7 +5,6 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JulianDay;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.jetbrains.annotations.NotNull;
 
 public class Sun {
 
@@ -33,9 +32,7 @@ public class Sun {
     public static final double RadiusFactor_6173 = MeanEarthDistance * Math.tan(959.57 / 3600 * Math.PI / 180);
     public static final double RadiusFactor_6562 = MeanEarthDistance * Math.tan(960.017 / 3600 * Math.PI / 180);
 
-    @NotNull
     public static final Position.L EpochEarthL;
-    @NotNull
     public static final Position.Q EpochEarthQ;
 
     static {
@@ -44,7 +41,7 @@ public class Sun {
     }
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
-    public static Position.L getEarth(@NotNull JHVDate time) {
+    public static Position.L getEarth(JHVDate time) {
         double mjd = JulianDay.milli2mjd(time.milli);
         double t = JulianDay.mjd2jcy(mjd, 2415020.);
 
@@ -92,12 +89,12 @@ public class Sun {
 
     private static final double theta0 = sunRot(JulianDay.milli2mjd(TimeUtils.EPOCH.milli));
 
-    public static Quat getHCI(@NotNull JHVDate time) {
+    public static Quat getHCI(JHVDate time) {
         // 1.7381339560109783
         return new Quat(0, sunRot(JulianDay.milli2mjd(time.milli)) + (1.738033457804639 + EpochEarthL.lon - theta0));
     }
 
-    public static Position.Q getEarthQuat(@NotNull JHVDate time) {
+    public static Position.Q getEarthQuat(JHVDate time) {
         Position.L p = getEarth(time);
         return new Position.Q(time, p.rad, new Quat(p.lat, p.lon));
     }

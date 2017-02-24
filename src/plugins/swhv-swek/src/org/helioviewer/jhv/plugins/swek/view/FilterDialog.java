@@ -15,14 +15,13 @@ import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
-import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("serial")
 public class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
 
     private final JButton applyButton = new JButton("Apply");
 
-    public FilterDialog(@NotNull SWEKEventType eventType) {
+    public FilterDialog(SWEKEventType eventType) {
         setUndecorated(true);
         addFocusListener(this);
         addWindowFocusListener(this);

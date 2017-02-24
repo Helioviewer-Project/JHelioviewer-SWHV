@@ -12,7 +12,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.viewmodel.view.View;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -49,7 +48,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     @Override
-    public void render(@NotNull Camera camera, @NotNull Viewport vp, @NotNull GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL2 gl) {
     }
 
     public static void renderBackground(Camera camera, Viewport vp, GL2 gl) {
@@ -70,7 +69,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     @Override
-    public void remove(@NotNull GL2 gl) {
+    public void remove(GL2 gl) {
         dispose(gl);
     }
 
@@ -79,7 +78,6 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
         return optionsPanel;
     }
 
-    @NotNull
     @Override
     public String getName() {
         return "Miniview";
@@ -96,11 +94,11 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     @Override
-    public void init(@NotNull GL2 gl) {
+    public void init(GL2 gl) {
     }
 
     @Override
-    public void dispose(@NotNull GL2 gl) {
+    public void dispose(GL2 gl) {
     }
 
     @Override

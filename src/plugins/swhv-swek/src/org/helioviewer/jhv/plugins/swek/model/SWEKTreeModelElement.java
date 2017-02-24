@@ -2,12 +2,9 @@ package org.helioviewer.jhv.plugins.swek.model;
 
 import javax.swing.ImageIcon;
 
-import org.jetbrains.annotations.Nullable;
-
 public class SWEKTreeModelElement {
 
     private boolean checkboxSelected;
-    @Nullable
     private final ImageIcon icon;
 
     SWEKTreeModelElement(boolean isCheckBoxSelected) {
@@ -15,7 +12,7 @@ public class SWEKTreeModelElement {
         icon = null;
     }
 
-    SWEKTreeModelElement(boolean isCheckBoxSelected, @Nullable ImageIcon _icon) {
+    SWEKTreeModelElement(boolean isCheckBoxSelected, ImageIcon _icon) {
         checkboxSelected = isCheckBoxSelected;
         icon = _icon;
     }
@@ -28,7 +25,6 @@ public class SWEKTreeModelElement {
         checkboxSelected = _checkboxSelected;
     }
 
-    @Nullable
     public ImageIcon getIcon() {
         return icon;
     }

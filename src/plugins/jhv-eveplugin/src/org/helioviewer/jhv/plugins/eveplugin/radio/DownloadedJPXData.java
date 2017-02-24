@@ -24,12 +24,9 @@ import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 class DownloadedJPXData implements ImageDataHandler {
 
-    @Nullable
     private JP2ViewCallisto view;
 
     private long startDate;
@@ -39,12 +36,11 @@ class DownloadedJPXData implements ImageDataHandler {
     private int jp2Width;
     private int jp2Height;
 
-    @Nullable
     private BufferedImage bufferedImage;
     private Region region;
     private boolean downloadJPXFailed = false;
 
-    public DownloadedJPXData(@Nullable JP2ViewCallisto _view, long start) {
+    public DownloadedJPXData(JP2ViewCallisto _view, long start) {
         if (_view != null) { // null for empty
             try {
                 ResolutionSet.ResolutionLevel resLevel = _view.getResolutionLevel(0, 0);
@@ -91,7 +87,7 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     @Override
-    public void handleData(@NotNull ImageData imageData) {
+    public void handleData(ImageData imageData) {
         if (imageData instanceof SingleChannelByte8ImageData) {
             int w = imageData.getWidth();
             int h = imageData.getHeight();
@@ -108,7 +104,6 @@ class DownloadedJPXData implements ImageDataHandler {
         }
     }
 
-    @NotNull
     private static BufferedImage createBufferedImage(int width, int height, byte[] data) {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, RadioData.getColorModel());
         DataBufferByte dataBuffer = new DataBufferByte(data, width * height);
@@ -128,7 +123,7 @@ class DownloadedJPXData implements ImageDataHandler {
         }
     }
 
-    private double computeResolution(int height, @NotNull TimeAxis xAxis) {
+    private double computeResolution(int height, TimeAxis xAxis) {
         double pixPerTime = jp2Width / (double) (endDate - startDate);
         int width = (int) ((xAxis.end - xAxis.start) * pixPerTime + 0.5);
         double pct = Math.min(width / (double) jp2Width, 1);
@@ -155,7 +150,7 @@ class DownloadedJPXData implements ImageDataHandler {
     private int last_y0 = -1;
     private int last_height = -1;
 
-    private Rectangle getROI(@NotNull TimeAxis xAxis, @NotNull YAxis yAxis) {
+    private Rectangle getROI(TimeAxis xAxis, YAxis yAxis) {
         double visibleStartFreq = startFreq;
         double visibleEndFreq = endFreq;
         if (visibleStartFreq < yAxis.start) {
@@ -204,7 +199,7 @@ class DownloadedJPXData implements ImageDataHandler {
         return new Rectangle(x0, y0, width, height);
     }
 
-    void draw(@NotNull Graphics2D g, @NotNull Rectangle ga, @NotNull TimeAxis xAxis, @NotNull YAxis yAxis) {
+    void draw(Graphics2D g, Rectangle ga, TimeAxis xAxis, YAxis yAxis) {
         if (hasData()) {
             int sx0 = 0;
             int sy0 = 0;
@@ -228,7 +223,7 @@ class DownloadedJPXData implements ImageDataHandler {
         }
     }
 
-    private void drawNoData(@NotNull Graphics2D g, @NotNull Rectangle ga, @NotNull TimeAxis xAxis) {
+    private void drawNoData(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
         int dx0 = xAxis.value2pixel(ga.x, ga.width, Math.max(startDate, xAxis.start));
         int dx1 = xAxis.value2pixel(ga.x, ga.width, Math.min(endDate, xAxis.end));
         int dwidth = dx1 - dx0;
@@ -249,7 +244,7 @@ class DownloadedJPXData implements ImageDataHandler {
         return !hasData() && !downloadJPXFailed;
     }
 
-    void changeColormap(@NotNull ColorModel cm) {
+    void changeColormap(ColorModel cm) {
         if (hasData()) {
             BufferedImage old = bufferedImage;
             bufferedImage = new BufferedImage(cm, old.getRaster(), false, null);

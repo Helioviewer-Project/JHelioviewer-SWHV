@@ -1,13 +1,11 @@
 package org.helioviewer.jhv.base.time;
 
-import org.jetbrains.annotations.NotNull;
-
 public class JHVDate implements Comparable<JHVDate> {
 
     private final String string;
     public final long milli;
 
-    public JHVDate(@NotNull String date) {
+    public JHVDate(String date) {
         this(TimeUtils.parse(date));
     }
 
@@ -19,7 +17,7 @@ public class JHVDate implements Comparable<JHVDate> {
     }
 
     @Override
-    public int compareTo(@NotNull JHVDate dt) {
+    public int compareTo(JHVDate dt) {
         return milli < dt.milli ? -1 : (milli > dt.milli ? +1 : 0);
     }
 

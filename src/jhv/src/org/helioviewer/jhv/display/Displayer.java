@@ -14,7 +14,6 @@ import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.jetbrains.annotations.NotNull;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -24,7 +23,6 @@ public class Displayer implements JHVEventHighlightListener {
     public enum DisplayMode {
         ORTHO, LATITUDINAL, LOGPOLAR, POLAR;
 
-        @NotNull
         public String getLabel() {
             switch (this) {
             case ORTHO:
@@ -40,7 +38,6 @@ public class Displayer implements JHVEventHighlightListener {
             }
         }
 
-        @NotNull
         public GLSLSolarShader getSolarShader() {
             switch (this) {
             case ORTHO:
@@ -112,16 +109,13 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static final Camera camera = new Camera();
 
-    @NotNull
     public static Camera getCamera() {
         return camera;
     }
 
-    @NotNull
     private static final Viewport[] viewports = { new Viewport(0, 0, 0, 0, 0), new Viewport(1, 0, 0, 0, 0), new Viewport(2, 0, 0, 0, 0), new Viewport(3, 0, 0, 0, 0) };
     private static int activeViewport = 0;
 
-    @NotNull
     public static Viewport fullViewport = new Viewport(-1, 0, 0, 0, 0);
 
     public static void setActiveViewport(int x, int y) {
@@ -136,12 +130,10 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    @NotNull
     public static Viewport getActiveViewport() {
         return viewports[activeViewport];
     }
 
-    @NotNull
     public static Viewport[] getViewports() {
         return viewports;
     }
@@ -271,7 +263,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static final Displayer instance = new Displayer();
 
-    @NotNull
     public static Displayer getSingletonInstance() {
         return instance;
     }

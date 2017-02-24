@@ -5,13 +5,12 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
-import org.jetbrains.annotations.NotNull;
 
 public interface MetaData {
 
     int getFrameNumber();
 
-    @NotNull Region getPhysicalRegion();
+    Region getPhysicalRegion();
 
     int getPixelWidth();
 
@@ -19,7 +18,7 @@ public interface MetaData {
 
     double getResponseFactor();
 
-    @NotNull Position.Q getViewpoint();
+    Position.Q getViewpoint();
 
     double getInnerCutOffRadius();
 
@@ -27,12 +26,12 @@ public interface MetaData {
 
     double getCutOffValue();
 
-    @NotNull Vec3 getCutOffDirection();
+    Vec3 getCutOffDirection();
 
-    @NotNull Position.L getViewpointL();
+    Position.L getViewpointL();
 
-    @NotNull Quat getCenterRotation();
+    Quat getCenterRotation();
 
-    @NotNull Region roiToRegion(SubImage roi, double factorX, double factorY);
+    Region roiToRegion(SubImage roi, double factorX, double factorY);
 
 }

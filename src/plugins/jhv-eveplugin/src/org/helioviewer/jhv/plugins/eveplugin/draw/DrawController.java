@@ -18,19 +18,14 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.jhv.viewmodel.view.View;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {
 
-    @NotNull
     public static final TimeAxis selectedAxis;
-    @NotNull
     public static final TimeAxis availableAxis;
 
     private static final HashSet<DrawControllerListener> listeners = new HashSet<>();
 
-    @NotNull
     private static final DrawControllerOptionsPanel optionsPanel;
 
     private static Rectangle graphSize;
@@ -51,7 +46,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         optionsPanel = new DrawControllerOptionsPanel();
     }
 
-    @NotNull
     public static Component getOptionsPanel() {
         return optionsPanel;
     }
@@ -85,7 +79,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         setAvailableInterval();
     }
 
-    private static void moveAndZoomY(@NotNull Point p, double distanceY, int scrollDistance, boolean zoom, boolean move) {
+    private static void moveAndZoomY(Point p, double distanceY, int scrollDistance, boolean zoom, boolean move) {
         boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
         boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
@@ -112,7 +106,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fireRedrawRequest();
     }
 
-    public static void resetAxis(@NotNull Point p) {
+    public static void resetAxis(Point p) {
         boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
         boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
@@ -131,15 +125,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fireRedrawRequest();
     }
 
-    public static void moveY(@NotNull Point p, double distanceY) {
+    public static void moveY(Point p, double distanceY) {
         moveAndZoomY(p, distanceY, 0, false, true);
     }
 
-    private static void zoomY(@NotNull Point p, int scrollDistance) {
+    private static void zoomY(Point p, int scrollDistance) {
         moveAndZoomY(p, 0, scrollDistance, true, false);
     }
 
-    public static void zoomXY(@NotNull Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
+    public static void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
         boolean inGraphArea = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
         boolean inXAxisOrAboveGraph = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height));
 
@@ -257,7 +251,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return movieLinePosition;
     }
 
-    public static void setMovieFrame(@NotNull Point point) {
+    public static void setMovieFrame(Point point) {
         if (latestMovieTime == Long.MIN_VALUE || !graphArea.contains(point)) {
             return;
         }
@@ -276,7 +270,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void activeLayerChanged(@Nullable View view) {
+    public void activeLayerChanged(View view) {
         if (view == null) {
             timeChanged(Long.MIN_VALUE);
             optionsPanel.lockButton.setEnabled(false);
