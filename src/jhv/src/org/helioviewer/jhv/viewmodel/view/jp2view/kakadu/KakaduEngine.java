@@ -13,12 +13,11 @@ import kdu_jni.Kdu_region_compositor;
 
 public class KakaduEngine {
 
-    private Jp2_threadsafe_family_src familySrc;
+    private final Jp2_threadsafe_family_src familySrc = new Jp2_threadsafe_family_src();
     private Jpx_source jpxSrc;
     private Kdu_region_compositor compositor;
 
     public KakaduEngine(Kdu_cache cache, URI uri) throws KduException, IOException {
-        familySrc = new Jp2_threadsafe_family_src();
         if (cache == null) { // local
             File file = new File(uri);
             familySrc.Open(file.getCanonicalPath(), true);

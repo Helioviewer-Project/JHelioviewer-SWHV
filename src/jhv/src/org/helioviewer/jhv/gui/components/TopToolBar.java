@@ -165,7 +165,7 @@ public class TopToolBar extends JToolBar {
         JPopupMenu projectionPopup = new JPopupMenu();
         ButtonGroup projectionGroup = new ButtonGroup();
         for (Displayer.DisplayMode el : Displayer.DisplayMode.values()) {
-            JRadioButtonMenuItem projectionItem = new JRadioButtonMenuItem(el.getLabel());
+            JRadioButtonMenuItem projectionItem = new JRadioButtonMenuItem(el.toString());
             projectionItem.addActionListener(e -> {
                 Displayer.setMode(el);
                 el.setGridScale();
