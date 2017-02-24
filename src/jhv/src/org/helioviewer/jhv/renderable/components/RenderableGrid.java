@@ -27,18 +27,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableGrid extends AbstractRenderable {
 
     public enum GridChoiceType {
-        VIEWPOINT("Viewpoint grid"), STONYHURST("Stonyhurst grid"), CARRINGTON("Carrington grid"), HCI("HCI grid");
-
-        private final String display;
-
-        GridChoiceType(String s) {
-            display = s;
-        }
-
-        @Override
-        public String toString() {
-            return display;
-        }
+        Viewpoint, Stonyhurst, Carrington, HCI;
     }
 
     // height of text in solar radii
@@ -99,7 +88,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     private int positionBufferID;
     private int colorBufferID;
-    private GridChoiceType gridChoice = GridChoiceType.VIEWPOINT;
+    private GridChoiceType gridChoice = GridChoiceType.Viewpoint;
 
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
         return GridScale.current.mouseToGrid(x, y, vp, camera, gridChoice);
@@ -107,14 +96,14 @@ public class RenderableGrid extends AbstractRenderable {
 
     public static Quat getGridQuat(Camera camera, GridChoiceType gridChoice) {
         switch (gridChoice) {
-        case VIEWPOINT:
+        case Viewpoint:
             return camera.getViewpoint().orientation;
-        case STONYHURST:
+        case Stonyhurst:
             Position.L p = Sun.getEarth(camera.getViewpoint().time);
             return new Quat(0, p.lon);
         case HCI:
             return Sun.getHCI(camera.getViewpoint().time);
-        default: // CARRINGTON
+        default: // Carrington
             return Quat.ZERO;
         }
     }
@@ -472,7 +461,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
         for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
-            String txt = gridChoice == GridChoiceType.CARRINGTON ? formatter1.format(theta + 360) : formatter1.format(theta);
+            String txt = gridChoice == GridChoiceType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
             lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
     }

@@ -192,7 +192,7 @@ public abstract class GridScale {
             if (p == null)
                 return Vec2.NAN_VECTOR;
 
-            if (gridChoice != GridChoiceType.VIEWPOINT) {
+            if (gridChoice != GridChoiceType.Viewpoint) {
                 Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, RenderableGrid.getGridQuat(camera, gridChoice));
                 p = q.rotateInverseVector(p);
             }
@@ -201,7 +201,7 @@ public abstract class GridScale {
             double phi = 90 - MathUtils.radeg * Math.atan2(p.z, p.x);
             phi = MathUtils.mapToMinus180To180(phi);
 
-            if (gridChoice == GridChoiceType.CARRINGTON && phi < 0)
+            if (gridChoice == GridChoiceType.Carrington && phi < 0)
                 phi += 360;
             return new Vec2(phi, theta);
         }
