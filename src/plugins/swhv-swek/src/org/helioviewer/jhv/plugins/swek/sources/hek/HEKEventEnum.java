@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-public enum HEKEventEnum {
+enum HEKEventEnum {
 
     ACTIVE_REGION("ActiveRegion", "Active Region", "AR"), CORONAL_MASS_EJECTION("CME", "Coronal Mass Ejection", "CE"), CORONAL_DIMMING(
             "CoronalDimming", "Coronal Dimming", "CD"), CORONAL_HOLE("CoronalHole", "Coronal Hole", "CH"), CORONAL_WAVE("CoronalWave",
@@ -14,51 +14,18 @@ public enum HEKEventEnum {
     /** The name of the SWEK Event */
     private final String swekEventName;
 
-    /** The HEK event name */
-    private final String hekEventName;
-
-    /**
-     * Private constructor of the HEKEvent enumeration.
-     * 
-     * 
-     * @param _hekEventName
-     *            The hek name of the hek event
-     * @param _swekEventName
-     *            The swek name of the event
-     * @param _eventAbbreviation
-     *            The hek abbreviation of the hek event
-     */
     HEKEventEnum(String _hekEventName, String _swekEventName, String _eventAbbreviation) {
         eventAbbreviation = _eventAbbreviation;
         swekEventName = _swekEventName;
-        hekEventName = _hekEventName;
     }
 
-    /**
-     * Gets the abbreviation of the HEK event type
-     * 
-     * @return the abbreviation
-     */
-    public String getAbbreviation() {
-        return eventAbbreviation;
-    }
-
-    /**
-     * Gets the event name of the SWEK event name.
-     * 
-     * @return the SWEK event name
-     */
-    public String getSWEKEventName() {
-        return swekEventName;
-    }
-
-    /**
-     * Gets the HEK event name.
-     * 
-     * @return the HEK event name
-     */
-    public String getHEKEventName() {
-        return hekEventName;
+    public static String getHEKEventAbbreviation(String eventType) {
+        for (HEKEventEnum event : values()) {
+            if (event.swekEventName.equals(eventType)) {
+                return event.eventAbbreviation;
+            }
+        }
+        return HEKEventEnum.UNKNOWN.eventAbbreviation;
     }
 
 }
