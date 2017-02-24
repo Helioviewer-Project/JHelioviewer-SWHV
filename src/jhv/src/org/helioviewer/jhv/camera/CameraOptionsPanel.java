@@ -4,9 +4,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -66,17 +64,12 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
         ButtonGroup group = new ButtonGroup();
 
         for (CameraMode mode : CameraMode.values()) {
-            JRadioButton item = new JRadioButton(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    changeCamera(mode);
-                }
-            });
-            item.setText(mode.display);
-            group.add(item);
-            radio.add(item);
+            JRadioButton item = new JRadioButton(mode.display);
             if (mode == CameraMode.OBSERVER)
                 item.setSelected(true);
+            item.addActionListener(e -> changeCamera(mode));
+            group.add(item);
+            radio.add(item);
         }
 
         add(radio, c);

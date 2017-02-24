@@ -16,18 +16,13 @@ import com.jogamp.opengl.GL2;
 public class InteractionAnnotate extends Interaction {
 
     public enum AnnotationMode {
-        RECTANGLE, CIRCLE, CROSS;
-        private static final AnnotationMode[] vals = values();
-
-        AnnotationMode next() {
-            return vals[(ordinal() + 1) % vals.length];
-        }
+        Rectangle, Circle, Cross;
 
         public Annotateable generateAnnotateable(Camera camera) {
             switch (this) {
-            case CIRCLE:
+            case Circle:
                 return new AnnotateCircle(camera);
-            case CROSS:
+            case Cross:
                 return new AnnotateCross(camera);
             default:
                 return new AnnotateRectangle(camera);
@@ -37,7 +32,7 @@ public class InteractionAnnotate extends Interaction {
 
     private final ArrayList<Annotateable> annotateables = new ArrayList<>();
     private Annotateable newAnnotateable = null;
-    private AnnotationMode mode = AnnotationMode.RECTANGLE;
+    private AnnotationMode mode = AnnotationMode.Rectangle;
     private int activeIndex = -1;
 
     public InteractionAnnotate(Camera _camera) {
@@ -111,14 +106,14 @@ public class InteractionAnnotate extends Interaction {
 
     public void setMode(AnnotationMode newMode) {
         switch (newMode) {
-        case CIRCLE:
-            mode = AnnotationMode.CIRCLE;
+        case Circle:
+            mode = AnnotationMode.Circle;
             break;
-        case CROSS:
-            mode = AnnotationMode.CROSS;
+        case Cross:
+            mode = AnnotationMode.Cross;
             break;
         default:
-            mode = AnnotationMode.RECTANGLE;
+            mode = AnnotationMode.Rectangle;
         }
     }
 
