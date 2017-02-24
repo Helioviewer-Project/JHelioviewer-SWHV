@@ -686,7 +686,7 @@ public class EventDatabase {
                     StringBuilder and = new StringBuilder();
                     for (SWEKParam p : params) {
                         if (!p.param.equals("provider")) {
-                            and.append("AND tp.").append(p.param).append(p.operand.getStringRepresentation()).append(p.value).append(' ');
+                            and.append("AND tp.").append(p.param).append(p.operand.representation).append(p.value).append(' ');
                         }
                     }
                     String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e " + join + " WHERE e.start BETWEEN ? AND ? and e.type_id=? " + and + " order by e.start, e.end ";
