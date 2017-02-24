@@ -13,7 +13,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.io.DownloadViewTask;
-import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
+import org.helioviewer.jhv.opengl.GLImage;
 
 import com.jidesoft.swing.JideButton;
 
@@ -21,14 +21,14 @@ import com.jidesoft.swing.JideButton;
 public class RunningDifferencePanel {
 
     private enum DifferenceModeChoice {
-        None("No difference images", DifferenceMode.None),
-        Running("Running difference", DifferenceMode.RunningRotation),
-        Base("Base difference", DifferenceMode.BaseRotation);
+        None("No difference images", GLImage.DifferenceMode.None),
+        Running("Running difference", GLImage.DifferenceMode.RunningRotation),
+        Base("Base difference", GLImage.DifferenceMode.BaseRotation);
 
         private final String str;
-        private final DifferenceMode mode;
+        private final GLImage.DifferenceMode mode;
 
-        DifferenceModeChoice(String s, DifferenceMode m) {
+        DifferenceModeChoice(String s, GLImage.DifferenceMode m) {
             str = s;
             mode = m;
         }
@@ -38,9 +38,6 @@ public class RunningDifferencePanel {
             return str;
         }
 
-        public DifferenceMode getDiffMode() {
-            return mode;
-        }
     }
 
     private final JPanel topPanel = new JPanel(new GridBagLayout());
@@ -62,7 +59,7 @@ public class RunningDifferencePanel {
 
         JComboBox<DifferenceModeChoice> comboBox = new JComboBox<>(DifferenceModeChoice.values());
         comboBox.addActionListener(e -> {
-            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(((DifferenceModeChoice) comboBox.getSelectedItem()).getDiffMode());
+            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(((DifferenceModeChoice) comboBox.getSelectedItem()).mode);
             Displayer.display();
         });
 
