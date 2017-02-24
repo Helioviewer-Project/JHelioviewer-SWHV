@@ -22,6 +22,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
+import org.helioviewer.jhv.base.time.TimeUtils;
+
 import com.jidesoft.swing.JideButton;
 
 /**
@@ -53,8 +55,8 @@ class JHVCalendar extends JPanel {
     private final NavigationPanel navigationPanel = new NavigationPanel();
     private final SelectionPanel selectionPanel = new SelectionPanel();
 
-    private DisplayMode displayMode;
-    private CalendarViewController calendarViewController = null;
+    private DisplayMode displayMode = DisplayMode.DAYS;
+    private CalendarViewController calendarViewController = new DayViewController();
 
     /**
      * Constructor where to choose if the current date should be displayed at
@@ -68,9 +70,6 @@ class JHVCalendar extends JPanel {
         // set basic layout
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(250, 200));
-        // load day selection view
-        changeDisplayMode(DisplayMode.DAYS);
-
         // add sub components
         add(navigationPanel, BorderLayout.NORTH);
         add(selectionPanel, BorderLayout.CENTER);
@@ -95,12 +94,8 @@ class JHVCalendar extends JPanel {
      *            Defines which view has to be displayed.
      */
     private void changeDisplayMode(DisplayMode newMode) {
-        // memorize the selected date if a date is available
-        // at the current view controller
-        Date date = null;
-        if (calendarViewController != null)
-            date = calendarViewController.getDate();
-
+        // memorize the selected date
+        Date date = calendarViewController.getDate();
         // change the view controller
         switch (newMode) {
         case DAYS:
@@ -113,18 +108,13 @@ class JHVCalendar extends JPanel {
             calendarViewController = new YearViewController();
             break;
         }
-
-        // set memorized date if available
-        if (date != null)
-            calendarViewController.setDate(date);
-
+        // set memorized date
+        calendarViewController.setDate(date);
         // memorize current view mode
         displayMode = newMode;
     }
 
-    /**
-     * Updates the data which has to be displayed at the visual components.
-     */
+    // Updates the data which has to be displayed at the visual components
     private void updateDateDisplay() {
         // fill grid with data
         selectionPanel.fillGrid(calendarViewController.getGridData(), calendarViewController.getGridColumnHeader(), calendarViewController.getCorrespondingCellOfCurrentDate(), displayMode == DisplayMode.DAYS);
@@ -147,13 +137,9 @@ class JHVCalendar extends JPanel {
         updateDateDisplay();
     }
 
-    /**
-     * Returns the selected date of the calendar component.
-     *
-     * @return selected date.
-     */
-    public Date getDate() {
-        return calendarViewController.getDate();
+    public long getTime() {
+        long time = calendarViewController.getDate().getTime();
+        return time - time % TimeUtils.DAY_IN_MILLIS;
     }
 
     public void addJHVCalendarListener(JHVCalendarListener l) {

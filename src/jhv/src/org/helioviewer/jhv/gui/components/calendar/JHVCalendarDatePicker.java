@@ -130,7 +130,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
     }
 
     private void setDateFromCalendar() {
-        setTime(jhvCalendar.getDate().getTime());
+        setTime(jhvCalendar.getTime());
         informAllJHVCalendarListeners();
     }
 
