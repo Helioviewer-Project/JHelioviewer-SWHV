@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.base.plugin.controller;
 
-import java.net.URI;
-
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 
 // The basic class which manages the interface between JHV and the contained
@@ -9,12 +7,12 @@ import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 public class PluginContainer {
 
     private final Plugin plugin;
-    private final URI pluginLocation;
+    private final String jar;
     private boolean pluginActive;
 
-    public PluginContainer(Plugin _plugin, URI _pluginLocation, boolean _pluginActive) {
+    public PluginContainer(Plugin _plugin, String _jar, boolean _pluginActive) {
         plugin = _plugin;
-        pluginLocation = _pluginLocation;
+        jar = _jar;
         pluginActive = _pluginActive;
     }
 
@@ -35,26 +33,20 @@ public class PluginContainer {
             return;
 
         pluginActive = active;
+        PluginSettings.getSingletonInstance().pluginSettingsToXML(this);
         if (active)
             plugin.installPlugin();
         else
             plugin.uninstallPlugin();
     }
 
-    public void changeSettings() {
-        PluginSettings.getSingletonInstance().pluginSettingsToXML(this);
-    }
-
     public Plugin getPlugin() {
         return plugin;
     }
 
-    public URI getPluginLocation() {
-        return pluginLocation;
-    }
-
+    @Override
     public String toString() {
-        return plugin.getName();
+        return jar;
     }
 
 }

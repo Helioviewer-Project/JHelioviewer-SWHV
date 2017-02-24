@@ -95,7 +95,7 @@ public class PluginManager {
             Object obj = classLoader.loadClass(className).getConstructor().newInstance();
             // Log.info("PluginManager: Load plugin class: " + className);
             if (obj instanceof Plugin) {
-                addPlugin((Plugin) obj, pluginLocation);
+                addPlugin((Plugin) obj, file.getName());
             } else {
                 Log.debug("Load failed, was trying to load something that is not a plugin: " + className);
             }
@@ -114,8 +114,8 @@ public class PluginManager {
      * @param pluginLocation
      *            Location of the corresponding file of the plug-in.
      */
-    public void addPlugin(Plugin plugin, URI pluginLocation) {
-        PluginContainer pluginContainer = new PluginContainer(plugin, pluginLocation, pluginSettings.isPluginActivated(pluginLocation));
+    public void addPlugin(Plugin plugin, String jarName) {
+        PluginContainer pluginContainer = new PluginContainer(plugin, jarName, pluginSettings.isPluginActivated(jarName));
         plugins.put(plugin, pluginContainer);
         if (pluginContainer.isActive()) {
             plugin.installPlugin();

@@ -69,7 +69,6 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
             return;
 
         plugin.setActive(active);
-        plugin.changeSettings();
         PluginManager.getSingletonInstance().saveSettings();
 
         updateEnableLabel();

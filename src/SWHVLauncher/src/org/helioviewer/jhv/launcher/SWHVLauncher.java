@@ -27,9 +27,9 @@ public class SWHVLauncher {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                PluginManager.getSingletonInstance().addPlugin(new EVEPlugin(), null);
-                PluginManager.getSingletonInstance().addPlugin(new SWEKPlugin(), null);
-                PluginManager.getSingletonInstance().addPlugin(new PfssPlugin(), null);
+                PluginManager.getSingletonInstance().addPlugin(new EVEPlugin(), "EVEPlugin.jar");
+                PluginManager.getSingletonInstance().addPlugin(new SWEKPlugin(), "SWEKPlugin.jar");
+                PluginManager.getSingletonInstance().addPlugin(new PfssPlugin(), "PfssPlugin.jar");
             }
         });
     }
