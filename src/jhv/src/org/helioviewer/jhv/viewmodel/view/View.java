@@ -15,24 +15,7 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 public interface View {
 
     enum AnimationMode {
-        LOOP {
-            @Override
-            public String toString() {
-                return "Loop";
-            }
-        },
-        STOP {
-            @Override
-            public String toString() {
-                return "Stop";
-            }
-        },
-        SWING {
-            @Override
-            public String toString() {
-                return "Swing";
-            }
-        }, SWINGDOWN
+        Loop, Stop, Swing, SwingDown
     }
 
     APIRequest getAPIRequest();

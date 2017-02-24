@@ -285,7 +285,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         // Animation mode
         modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
 
-        animationModeComboBox = new JComboBox<>(new AnimationMode[]{AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING});
+        animationModeComboBox = new JComboBox<>(new AnimationMode[]{AnimationMode.Loop, AnimationMode.Stop, AnimationMode.Swing});
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
         animationModeComboBox.addActionListener(e -> Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem()));
         modePanel.add(animationModeComboBox);

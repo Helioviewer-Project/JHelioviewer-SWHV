@@ -342,7 +342,7 @@ public class Layers {
         deltaT = (int) (sec / 20.);
     }
 
-    private static AnimationMode animationMode = AnimationMode.LOOP;
+    private static AnimationMode animationMode = AnimationMode.Loop;
 
     public static void setAnimationMode(AnimationMode mode) {
         animationMode = mode;
