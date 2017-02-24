@@ -5,7 +5,6 @@ import java.awt.Color;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
@@ -54,7 +53,7 @@ abstract class AbstractAnnotateable implements Annotateable {
         if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
             return CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
         } else {
-            return GridScale.current.transformInverse(GridScale.current.mouseToGrid(x, y, Displayer.getActiveViewport(), camera, GridChoiceType.Viewpoint));
+            return Displayer.mode.scale.transformInverse(Displayer.mode.scale.mouseToGrid(x, y, Displayer.getActiveViewport(), camera, GridChoiceType.Viewpoint));
         }
     }
 

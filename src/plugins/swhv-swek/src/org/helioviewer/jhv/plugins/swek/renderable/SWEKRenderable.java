@@ -28,7 +28,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -388,19 +387,19 @@ public class SWEKRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.getName() == "Coronal Mass Ejection" && (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar)) { // interned
-                    drawCactusArcScale(gl, evtr, evt, controller.currentTime, scale, vp);
+                    drawCactusArcScale(gl, evtr, evt, controller.currentTime, Displayer.mode.scale, vp);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
 
                     if (optionsPanel.icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
-                        drawIconScale(gl, evtr, evt, scale, camera, vp);
+                        drawIconScale(gl, evtr, evt, Displayer.mode.scale, camera, vp);
                         gl.glEnable(GL2.GL_DEPTH_TEST);
                     }
                 }

@@ -10,7 +10,6 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
@@ -164,18 +163,16 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
                         double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
                         double distSun = computeDistSun(evt);
 
-                        GridScale scale = GridScale.current;
-                        tf = new Vec2(scale.getXValueInv(principalAngle), scale.getYValueInv(distSun));
-                        mousepos = scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
+                        tf = new Vec2(Displayer.mode.scale.getXValueInv(principalAngle), Displayer.mode.scale.getYValueInv(distSun));
+                        mousepos = Displayer.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
                     }
                 } else {
-                    GridScale scale = GridScale.current;
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
                         pt = camera.getViewpoint().orientation.rotateVector(pt);
-                        tf = scale.transform(pt);
+                        tf = Displayer.mode.scale.transform(pt);
                     }
-                    mousepos = scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
+                    mousepos = Displayer.mode.scale.mouseToGridInv(mouseOverX, mouseOverY, vp, camera);
                 }
 
                 if (tf != null && mousepos != null) {

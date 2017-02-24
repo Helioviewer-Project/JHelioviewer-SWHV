@@ -18,8 +18,6 @@ public abstract class GridScale {
     public static final GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
     public static final GridScale ortho = new GridScaleOrtho(0, 0, 0, 0, Transform.transformlatitudinal);
 
-    public static GridScale current = ortho;
-
     protected abstract double scaleX(double val);
 
     protected abstract double invScaleX(double val);
