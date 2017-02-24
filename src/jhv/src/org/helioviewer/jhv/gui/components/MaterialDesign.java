@@ -1744,19 +1744,11 @@ public enum MaterialDesign {
     MDI_ZIP_BOX("mdi-zip-box", '\uf5c4');
 
     private final String description;
-    private final char code;
+    public final char code;
 
-    MaterialDesign(String description, char code) {
-        this.description = description;
-        this.code = code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public char getCode() {
-        return code;
+    MaterialDesign(String _description, char _code) {
+        description = _description;
+        code = _code;
     }
 
 }

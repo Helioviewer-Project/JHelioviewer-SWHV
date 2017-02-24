@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 public class Buttons {
 
     private static String uc2ent(MaterialDesign uc) {
-        return StringEscapeUtils.escapeHtml4(String.valueOf(uc.getCode()));
+        return StringEscapeUtils.escapeHtml4(String.valueOf(uc.code));
     }
 
     public static final String chevronRight = "<html><font face='Material Design Icons' size=4>" +

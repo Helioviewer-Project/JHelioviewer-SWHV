@@ -9,7 +9,7 @@ import org.helioviewer.jhv.renderable.gui.Renderable;
 @SuppressWarnings("serial")
 public class RemoveCellRenderer extends TableCellRenderer {
 
-    private static final String close = String.valueOf(MaterialDesign.MDI_CLOSE.getCode());
+    private static final String close = String.valueOf(MaterialDesign.MDI_CLOSE.code);
     private final Font font = UIGlobals.UIFontMDI.deriveFont(getFont().getSize2D());
 
     public RemoveCellRenderer() {
