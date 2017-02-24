@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -22,18 +20,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-/**
- * This class handles to write and read the settings made to plug-ins into a
- * specific file.
- *
- * @author Stephan Pagel
- */
+// This class handles to write and read the settings made to plug-ins into a specific file
 public class PluginSettings {
 
-    private static final String NODES_PLUGINS = "Plugins";
+    private static final String NODES_PLUGINS = "JHVPlugins";
     private static final String NODES_PLUGIN = "Plugin";
-    private static final String NODES_PLUGINLOCATION = "PluginLocation";
-    private static final String NODES_PLUGINACTIVATED = "PluginActivated";
+    private static final String NODES_PLUGINLOCATION = "Name";
+    private static final String NODES_PLUGINACTIVATED = "Activated";
 
     private static final String PLUGIN_FILENAME = "PluginProperties.xml";
 
@@ -49,8 +42,7 @@ public class PluginSettings {
      * */
     private PluginSettings() {
         try {
-            DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            xmlDocument = docBuilder.newDocument();
+            xmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
@@ -78,8 +70,7 @@ public class PluginSettings {
         if (new File(settingsFileName).exists()) {
             // load XML from file
             try {
-                DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                xmlDocument = docBuilder.parse(settingsFileName);
+                xmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(settingsFileName);
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 e.printStackTrace();
             }
@@ -89,18 +80,14 @@ public class PluginSettings {
         // the internal XML document
         if (xmlDocument != null) {
             NodeList list = xmlDocument.getElementsByTagName(NODES_PLUGINS);
-
             if (list.getLength() == 1) {
                 pluginsRootNode = list.item(0);
-                cleanUpXMLFile();
-                savePluginSettings();
             } else {
                 xmlDocument = null;
             }
         }
 
-        // if there is no XML document loaded create a new blank one
-        if (xmlDocument == null) {
+        if (xmlDocument == null || pluginsRootNode == null) {
             try {
                 xmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             } catch (ParserConfigurationException e) {
@@ -109,33 +96,6 @@ public class PluginSettings {
             if (xmlDocument != null) {
                 pluginsRootNode = xmlDocument.createElement(NODES_PLUGINS);
                 xmlDocument.appendChild(pluginsRootNode);
-            }
-        }
-    }
-
-    /**
-     * Checks if for every specified plug-in a corresponding object exists. If
-     * there is a XML entry and no corresponding plug-in object exists the XML
-     * entry will be removed.
-     */
-    private void cleanUpXMLFile() {
-        NodeList pluginNodes = ((Element) pluginsRootNode).getElementsByTagName(NODES_PLUGIN);
-
-        for (int i = 0; i < pluginNodes.getLength(); i++) {
-            Node pluginNode = pluginNodes.item(i);
-            NodeList pluginLocationNodes = ((Element) pluginNode).getElementsByTagName(NODES_PLUGINLOCATION);
-
-            if (pluginLocationNodes.getLength() == 1) {
-                Node textNode = pluginLocationNodes.item(0).getFirstChild();
-
-                if (textNode != null) {
-                    if (!(new File(textNode.getNodeValue()).exists()) && !textNode.getNodeValue().equals("internal"))
-                        pluginsRootNode.removeChild(pluginNode);
-                } else {
-                    pluginsRootNode.removeChild(pluginNode);
-                }
-            } else {
-                pluginsRootNode.removeChild(pluginNode);
             }
         }
     }
@@ -151,7 +111,7 @@ public class PluginSettings {
      * @see #savePluginSettings()
      */
     public void pluginSettingsToXML(PluginContainer pluginContainer) {
-        Node pluginNode = findNode(pluginsRootNode, "PluginLocation", pluginContainer.getPluginLocation().getPath());
+        Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginContainer.toString());
         if (pluginNode == null) {
             addPluginToXML(pluginContainer);
         } else {
@@ -174,7 +134,7 @@ public class PluginSettings {
         pluginNode.appendChild(locationNode);
         pluginNode.appendChild(activatedNode);
 
-        locationNode.appendChild(xmlDocument.createTextNode(pluginContainer.getPluginLocation().getPath()));
+        locationNode.appendChild(xmlDocument.createTextNode(pluginContainer.toString()));
         activatedNode.appendChild(xmlDocument.createTextNode(Boolean.toString(pluginContainer.isActive())));
 
         pluginsRootNode.appendChild(pluginNode);
@@ -197,9 +157,7 @@ public class PluginSettings {
         }
     }
 
-    /**
-     * Saves the internal XML document to the settings file.
-     */
+    // Saves the internal XML document to the settings file.
     public void savePluginSettings() {
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -216,20 +174,9 @@ public class PluginSettings {
     /**
      * Checks the activated value of a given plug-in in the XML document. If
      * there is no entry in the XML document the return value is false.
-     *
-     * @param pluginLocation
-     *            location of the file where the plug-in comes from.
-     * @return boolean value as it is in the XML document or false if no entry
-     *         exists.
      */
-    public boolean isPluginActivated(URI pluginLocation) {
-        // This is to activate plugins automatically during the debugging phase
-        // in eclipse
-        if (pluginLocation == null) {
-            return true;
-        }
-
-        Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath());
+    public boolean isPluginActivated(String jarName) {
+        Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, jarName);
         return pluginNode == null || isActivated(pluginNode, NODES_PLUGINACTIVATED);
     }
 
@@ -248,14 +195,12 @@ public class PluginSettings {
      */
     private static Node findNode(Node root, String nodeName, String compareValue) {
         NodeList list = ((Element) root).getElementsByTagName(nodeName);
-
         for (int i = 0; i < list.getLength(); i++) {
             Node child = list.item(i).getFirstChild();
             if (child != null && child.getNodeType() == Node.TEXT_NODE && child.getNodeValue().equals(compareValue)) {
                 return list.item(i).getParentNode();
             }
         }
-
         return null;
     }
 
@@ -272,13 +217,11 @@ public class PluginSettings {
      */
     private static boolean isActivated(Node root, String nodeName) {
         NodeList list = ((Element) root).getElementsByTagName(nodeName);
-
         if (list.getLength() == 1) {
             Node child = list.item(0).getFirstChild();
             if (child != null && child.getNodeType() == Node.TEXT_NODE)
                 return Boolean.parseBoolean(child.getNodeValue());
         }
-
         return false;
     }
 
