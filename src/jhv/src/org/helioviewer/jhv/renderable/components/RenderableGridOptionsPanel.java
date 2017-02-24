@@ -111,7 +111,7 @@ class RenderableGridOptionsPanel extends JPanel {
     private void createGridChoiceBox() {
         gridChoiceBox = new JComboBox<>(RenderableGrid.GridChoiceType.values());
         gridChoiceBox.setToolTipText("Choose grid options");
-        gridChoiceBox.setSelectedItem(RenderableGrid.GridChoiceType.VIEWPOINT);
+        gridChoiceBox.setSelectedItem(RenderableGrid.GridChoiceType.Viewpoint);
         gridChoiceBox.addActionListener(e -> {
             grid.setCoordinates((RenderableGrid.GridChoiceType) gridChoiceBox.getSelectedItem());
             Displayer.display();
