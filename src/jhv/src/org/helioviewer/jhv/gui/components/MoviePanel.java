@@ -51,52 +51,20 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     // different animation speeds
     private enum SpeedUnit {
-        FRAMESPERSECOND {
-            @Override
-            public String toString() {
-                return "Frames/sec";
-            }
+        FRAMESPERSECOND("Frames/sec", 0), MINUTESPERSECOND("Solar minutes/sec", 60), HOURSPERSECOND("Solar hours/sec", 3600), DAYSPERSECOND("Solar days/sec", 86400);
 
-            @Override
-            protected int getSecondsPerSecond() {
-                return 0;
-            }
-        },
-        MINUTESPERSECOND {
-            @Override
-            public String toString() {
-                return "Solar minutes/sec";
-            }
+        private final String str;
+        private final int secPerSecond;
 
-            @Override
-            protected int getSecondsPerSecond() {
-                return 60;
-            }
-        },
-        HOURSPERSECOND {
-            @Override
-            public String toString() {
-                return "Solar hours/sec";
-            }
+        SpeedUnit(String _str, int s) {
+            str = _str;
+            secPerSecond = s;
+        }
 
-            @Override
-            protected int getSecondsPerSecond() {
-                return 3600;
-            }
-        },
-        DAYSPERSECOND {
-            @Override
-            public String toString() {
-                return "Solar days/sec";
-            }
-
-            @Override
-            protected int getSecondsPerSecond() {
-                return 86400;
-            }
-        };
-
-        protected abstract int getSecondsPerSecond();
+        @Override
+        public String toString() {
+            return str;
+        }
     }
 
     public enum RecordMode {
@@ -417,7 +385,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
             Layers.setDesiredRelativeSpeed(speed);
         } else {
-            Layers.setDesiredAbsoluteSpeed(speed * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
+            Layers.setDesiredAbsoluteSpeed(speed * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).secPerSecond);
         }
     }
 
