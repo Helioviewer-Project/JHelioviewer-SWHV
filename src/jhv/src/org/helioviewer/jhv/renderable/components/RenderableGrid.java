@@ -27,7 +27,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableGrid extends AbstractRenderable {
 
     public enum GridChoiceType {
-        Viewpoint, Stonyhurst, Carrington, HCI;
+        Viewpoint, Stonyhurst, Carrington, HCI
     }
 
     // height of text in solar radii
@@ -94,8 +94,8 @@ public class RenderableGrid extends AbstractRenderable {
         return GridScale.current.mouseToGrid(x, y, vp, camera, gridChoice);
     }
 
-    public static Quat getGridQuat(Camera camera, GridChoiceType gridChoice) {
-        switch (gridChoice) {
+    public static Quat getGridQuat(Camera camera, GridChoiceType _gridChoice) { // should be in GridScale
+        switch (_gridChoice) {
         case Viewpoint:
             return camera.getViewpoint().orientation;
         case Stonyhurst:
