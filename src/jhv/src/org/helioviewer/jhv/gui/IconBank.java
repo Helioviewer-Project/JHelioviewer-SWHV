@@ -23,9 +23,6 @@ public class IconBank {
             fname = _fname;
         }
 
-        String getFilename() {
-            return fname;
-        }
     }
 
     /**
@@ -36,7 +33,7 @@ public class IconBank {
      * @return the image icon of the given enum
      * */
     public static ImageIcon getIcon(JHVIcon icon) {
-        return IconsFactory.getImageIcon(IconBank.class, "/images/" + icon.getFilename());
+        return IconsFactory.getImageIcon(IconBank.class, "/images/" + icon.fname);
     }
 
     public static ImageIcon getIcon(JHVIcon icon, int w, int h) {

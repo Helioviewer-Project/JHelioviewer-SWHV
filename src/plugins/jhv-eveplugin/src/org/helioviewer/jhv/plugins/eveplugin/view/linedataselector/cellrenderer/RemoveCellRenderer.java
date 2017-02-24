@@ -12,7 +12,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 @SuppressWarnings("serial")
 public class RemoveCellRenderer extends DefaultTableCellRenderer {
 
-    private static final String close = String.valueOf(MaterialDesign.MDI_CLOSE.getCode());
+    private static final String close = String.valueOf(MaterialDesign.MDI_CLOSE.code);
     private final Font font = UIGlobals.UIFontMDI.deriveFont(getFont().getSize2D());
 
     public RemoveCellRenderer() {
