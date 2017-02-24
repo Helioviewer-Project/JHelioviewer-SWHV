@@ -110,21 +110,14 @@ public class TopToolBar extends JToolBar {
         JPopupMenu annotatePopup = new JPopupMenu();
         ButtonGroup annotateGroup = new ButtonGroup();
 
-        JRadioButtonMenuItem rectangleItem = new JRadioButtonMenuItem("Rectangle");
-        rectangleItem.addActionListener(e -> ImageViewerGui.getAnnotateInteraction().setMode(AnnotationMode.RECTANGLE));
-        annotatePopup.add(rectangleItem);
-        annotateGroup.add(rectangleItem);
-        rectangleItem.setSelected(true);
-
-        JRadioButtonMenuItem circleItem = new JRadioButtonMenuItem("Circle");
-        circleItem.addActionListener(e -> ImageViewerGui.getAnnotateInteraction().setMode(AnnotationMode.CIRCLE));
-        annotatePopup.add(circleItem);
-        annotateGroup.add(circleItem);
-
-        JRadioButtonMenuItem crossItem = new JRadioButtonMenuItem("Cross");
-        crossItem.addActionListener(e -> ImageViewerGui.getAnnotateInteraction().setMode(AnnotationMode.CROSS));
-        annotatePopup.add(crossItem);
-        annotateGroup.add(crossItem);
+        for (AnnotationMode mode : AnnotationMode.values()) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
+            if (mode == AnnotationMode.Rectangle)
+                item.setSelected(true);
+            item.addActionListener(e -> ImageViewerGui.getAnnotateInteraction().setMode(mode));
+            annotateGroup.add(item);
+            annotatePopup.add(item);
+        }
 
         annotatePopup.addSeparator();
         annotatePopup.add(new ClearAnnotationsAction());
