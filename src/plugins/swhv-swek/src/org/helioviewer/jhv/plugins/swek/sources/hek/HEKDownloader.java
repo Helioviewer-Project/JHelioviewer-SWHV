@@ -115,7 +115,7 @@ public class HEKDownloader extends SWEKDownloader {
     protected String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(_baseURL);
         baseURL.append("cmd=search&type=column&");
-        baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()).getAbbreviation()).append('&');
+        baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(eventType.getEventName())).append('&');
         baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
         baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.utcDateFormat.format(end)).append('&');
         baseURL = appendParams(baseURL, params);
