@@ -21,56 +21,24 @@ public class Displayer implements JHVEventHighlightListener {
     public static final double CAMERA_ZOOM_MULTIPLIER_BUTTON = 2.;
 
     public enum DisplayMode {
-        ORTHO("Orthographic"), LATITUDINAL("Latitudinal"), LOGPOLAR("LogPolar"), POLAR("Polar");
+        Orthographic(GLSLSolarShader.ortho, GridScale.ortho), Latitudinal(GLSLSolarShader.lati, GridScale.lati),
+        LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar), Polar(GLSLSolarShader.polar, GridScale.polar);
 
-        private final String display;
+        public final GLSLSolarShader shader;
+        public final GridScale scale;
 
-        DisplayMode(String s) {
-            display = s;
-        }
-
-        @Override
-        public String toString() {
-            return display;
-        }
-
-        public GLSLSolarShader getSolarShader() {
-            switch (this) {
-            case ORTHO:
-                return GLSLSolarShader.ortho;
-            case POLAR:
-                return GLSLSolarShader.polar;
-            case LATITUDINAL:
-                return GLSLSolarShader.lati;
-            case LOGPOLAR:
-                return GLSLSolarShader.logpolar;
-            default:
-                return GLSLSolarShader.ortho;
-            }
+        DisplayMode(GLSLSolarShader _shader, GridScale _scale) {
+            shader = _shader;
+            scale = _scale;
         }
 
         public void setGridScale() {
-            switch (this) {
-            case ORTHO:
-                GridScale.current = GridScale.ortho;
-                break;
-            case POLAR:
-                GridScale.current = GridScale.polar;
-                break;
-            case LATITUDINAL:
-                GridScale.current = GridScale.latitudinal;
-                break;
-            case LOGPOLAR:
-                GridScale.current = GridScale.logpolar;
-                break;
-            default:
-                GridScale.current = GridScale.ortho;
-            }
+            GridScale.current = scale;
         }
 
     }
 
-    public static DisplayMode mode = DisplayMode.ORTHO;
+    public static DisplayMode mode = DisplayMode.Orthographic;
     public static boolean multiview = false;
 
     public static void setMode(DisplayMode newMode) {
@@ -89,7 +57,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static UpdateViewpoint getUpdateViewpoint() {
-        if (mode == DisplayMode.ORTHO)
+        if (mode == DisplayMode.Orthographic)
             return updateViewpoint;
         return UpdateViewpoint.updateEarthFixedDistance;
     }

@@ -57,7 +57,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             double z = (1 - t) * p1s.z + t * p2s.z;
 
             Vec3 pc = toCart(y, z);
-            if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+            if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             } else {
                 pc.y = -pc.y;

@@ -129,7 +129,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
             if (pi == null)
                 continue;
 
-            if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+            if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
                 Vec3 hitpoint, pt;
                 if (evt.getName() == "Coronal Mass Ejection") { // interned
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
@@ -160,7 +160,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
                 Vec2 tf = null;
                 Vec2 mousepos = null;
                 if (evt.getName() == "Coronal Mass Ejection") { // interned
-                    if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR) {
+                    if (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar) {
                         double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
                         double distSun = computeDistSun(evt);
 

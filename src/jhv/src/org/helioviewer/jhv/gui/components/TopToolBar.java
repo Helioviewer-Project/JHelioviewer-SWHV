@@ -136,7 +136,6 @@ public class TopToolBar extends JToolBar {
             Camera camera = Displayer.getCamera();
             camera.setTrackingMode(!camera.getTrackingMode());
         });
-        trackSolarRotationButton.setSelected(false);
         trackSolarRotationButton.setToolTipText("Track solar rotation");
         addButton(trackSolarRotationButton);
 
@@ -145,7 +144,6 @@ public class TopToolBar extends JToolBar {
             Displayer.toggleShowCorona();
             Displayer.display();
         });
-        coronaVisibilityButton.setSelected(false);
         coronaVisibilityButton.setToolTipText("Toggle off-disk corona");
         addButton(coronaVisibilityButton);
 
@@ -159,15 +157,14 @@ public class TopToolBar extends JToolBar {
         ButtonGroup projectionGroup = new ButtonGroup();
         for (Displayer.DisplayMode el : Displayer.DisplayMode.values()) {
             JRadioButtonMenuItem projectionItem = new JRadioButtonMenuItem(el.toString());
+            if (el == Displayer.DisplayMode.Orthographic)
+                projectionItem.setSelected(true);
             projectionItem.addActionListener(e -> {
                 Displayer.setMode(el);
                 el.setGridScale();
             });
             projectionPopup.add(projectionItem);
             projectionGroup.add(projectionItem);
-            if (el == Displayer.DisplayMode.ORTHO) {
-                projectionItem.setSelected(true);
-            }
         }
 
         projectionButton.addMouseListener(new MouseAdapter() {

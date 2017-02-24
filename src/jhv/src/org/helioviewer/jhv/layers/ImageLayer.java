@@ -202,7 +202,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             camera.push(imageData.getViewpoint());
 
             Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp);
-            if (Displayer.mode == Displayer.DisplayMode.ORTHO)
+            if (Displayer.mode == Displayer.DisplayMode.Orthographic)
                 vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
             else
                 vpmi.translate(new Vec3(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.));

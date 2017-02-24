@@ -137,9 +137,9 @@ public class GLListener implements GLEventListener {
     }
 
     public static void renderSceneScale(Camera camera, GL2 gl) {
-        if (Displayer.mode == Displayer.DisplayMode.POLAR) {
+        if (Displayer.mode == Displayer.DisplayMode.Polar) {
             GridScale.polar.set(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize());
-        } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
+        } else if (Displayer.mode == Displayer.DisplayMode.LogPolar) {
             GridScale.logpolar.set(0, 360, 0.05, 0.5 * Layers.getLargestPhysicalSize());
         }
 
@@ -150,7 +150,7 @@ public class GLListener implements GLEventListener {
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
                 gl.glPushMatrix();
                 gl.glTranslatef((float) (camera.getCurrentTranslation().x), (float) (camera.getCurrentTranslation().y), 0f);
-                ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, Displayer.mode.getSolarShader(), GridScale.current);
+                ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, Displayer.mode.shader, GridScale.current);
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
                 gl.glPopMatrix();
             }
@@ -202,7 +202,7 @@ public class GLListener implements GLEventListener {
             exporter.handleMovieExport(camera, gl);
         }
 
-        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+        if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
             renderScene(camera, gl);
             renderMiniview(gl);
         } else {

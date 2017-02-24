@@ -157,13 +157,12 @@ public class PluginSettings {
         }
     }
 
-    // Saves the internal XML document to the settings file.
+    // Saves the internal XML document to the settings file
     public void savePluginSettings() {
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             DOMSource source = new DOMSource(xmlDocument);
-            FileOutputStream fos = new FileOutputStream(new File(settingsFileName));
-            StreamResult result = new StreamResult(fos);
+            StreamResult result = new StreamResult(new FileOutputStream(new File(settingsFileName)));
 
             transformer.transform(source, result);
         } catch (TransformerFactoryConfigurationError | TransformerException | FileNotFoundException e) {
