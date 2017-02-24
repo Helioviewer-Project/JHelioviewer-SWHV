@@ -50,7 +50,6 @@ import com.jogamp.newt.opengl.GLWindow;
 public class ImageViewerGui {
 
     public static final int SIDE_PANEL_WIDTH = 320;
-    public static final int SIDE_PANEL_WIDTH_EXTRA = 20;
 
     private static JFrame mainFrame;
     private static JScrollPane leftScrollPane;
@@ -136,7 +135,7 @@ public class ImageViewerGui {
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);
 
-        StatusPanel statusPanel = new StatusPanel(leftScrollPane.getPreferredSize().width + SIDE_PANEL_WIDTH_EXTRA, 5);
+        StatusPanel statusPanel = new StatusPanel(leftScrollPane.getPreferredSize().width, 5);
         statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(carringtonStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
