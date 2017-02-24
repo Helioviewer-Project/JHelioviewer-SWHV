@@ -22,8 +22,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.jogamp.newt.event.MouseAdapter;
 import com.jogamp.newt.event.MouseEvent;
@@ -35,12 +33,10 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
     private static final int yOffset = 12;
 
     private final Component component;
-    @NotNull
     private final Camera camera;
 
     private static Cursor lastCursor;
 
-    @Nullable
     static JHVRelatedEvents mouseOverJHVEvent = null;
     static int mouseOverX;
     static int mouseOverY;
@@ -56,7 +52,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
         currentTime = milli;
     }
 
-    private Point calcWindowPosition(@NotNull Point p, int hekWidth, int hekHeight) {
+    private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {
         int compWidth = component.getWidth();
         int compHeight = component.getHeight();
         int compLocX = component.getLocationOnScreen().x;
@@ -91,7 +87,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
     }
 
     @Override
-    public void mouseClicked(@NotNull MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
         if (mouseOverJHVEvent != null) {
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(currentTime));
             hekPopUp.pack();
@@ -108,7 +104,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
         JHVEventCache.highlight(null);
     }
 
-    private double computeDistSun(@NotNull JHVEvent evt) {
+    private double computeDistSun(JHVEvent evt) {
         double speed = SWEKData.readCMESpeed(evt);
         double distSun = 2.4;
         distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
@@ -116,7 +112,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
     }
 
     @Override
-    public void mouseMoved(@NotNull MouseEvent e) {
+    public void mouseMoved(MouseEvent e) {
         ArrayList<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(currentTime);
         if (eventsToDraw.isEmpty())
             return;
@@ -204,8 +200,7 @@ public class SWEKPopupController extends MouseAdapter implements TimeListener {
         }
     }
 
-    @Nullable
-    private Vec3 getHitPoint(@NotNull Viewport vp, int x, int y) {
+    private Vec3 getHitPoint(Viewport vp, int x, int y) {
         Vec3 hp = CameraHelper.getVectorFromSphere(camera, vp, x, y, camera.getViewpoint().orientation, true);
         if (hp != null)
             hp.y = -hp.y;

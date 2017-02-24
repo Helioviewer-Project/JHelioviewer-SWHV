@@ -15,8 +15,6 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +30,6 @@ public class PositionLoad {
     private long endTime = TimeUtils.EPOCH.milli;
 
     private boolean isLoaded = false;
-    @NotNull
     private Position.L[] position = new Position.L[0];
     private JHVWorker<Position.L[], Void> worker;
 
@@ -47,7 +44,6 @@ public class PositionLoad {
         private static final String baseURL = "http://swhv.oma.be/position?";
         private static final String target = "SUN";
 
-        @Nullable
         private String report = null;
 
         private final long start;
@@ -86,15 +82,14 @@ public class PositionLoad {
                 Log.debug("Unknown host, network down?", e);
             } catch (IOException e) {
                 report = FAILEDSTATE + ": server error";
-            } catch (@NotNull JSONException | ParseException | NumberFormatException e) {
+            } catch (JSONException | ParseException | NumberFormatException e) {
                 report = FAILEDSTATE + ": JSON parse error";
             }
 
             return null;
         }
 
-        @NotNull
-        private Position.L[] parseData(@NotNull JSONObject jsonResult) throws JSONException, ParseException {
+        private Position.L[] parseData(JSONObject jsonResult) throws JSONException, ParseException {
             JSONArray resArray = jsonResult.getJSONArray("result");
             int resLength = resArray.length();
             Position.L[] ret = new Position.L[resLength];
@@ -200,7 +195,6 @@ public class PositionLoad {
         return -1L;
     }
 
-    @Nullable
     public Position.Q getInterpolatedPosition(long currentCameraTime) {
         if (isLoaded && position.length > 0) {
             double dist, hgln, hglt;

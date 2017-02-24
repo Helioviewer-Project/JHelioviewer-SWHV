@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.base.conversion;
 
-import org.jetbrains.annotations.NotNull;
-
 public class GOESLevel {
 
     public static String getStringValue(double v) {
@@ -17,7 +15,7 @@ public class GOESLevel {
             return String.format("X%.1f", v * 1e4);
     }
 
-    public static double getFloatValue(@NotNull String s) {
+    public static double getFloatValue(String s) {
         if (s.length() >= 2) {
             try {
                 double val = Double.parseDouble(s.substring(1));

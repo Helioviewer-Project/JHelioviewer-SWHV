@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.pfssplugin.data;
 
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import com.jogamp.opengl.GL2;
 
 // Datastructure to cache the Pfss-Data with preload function
@@ -37,7 +35,6 @@ public class PfssCache {
         }
     }
 
-    @Nullable
     public PfssData getData(long timestamp) {
         if (numberOfElementsInCache <= 0)
             return null;
@@ -85,7 +82,7 @@ public class PfssCache {
         }
     }
 
-    public void destroy(@NotNull GL2 gl) {
+    public void destroy(GL2 gl) {
         for (int i = 0; i < numberOfElementsInCache; i++) {
             if (data[i].isInit()) {
                 data[i].setInit(false);

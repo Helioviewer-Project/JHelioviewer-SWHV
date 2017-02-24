@@ -12,16 +12,13 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
-import org.jetbrains.annotations.NotNull;
 
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
 class DrawControllerOptionsPanel extends JPanel {
 
-    @NotNull
     private final JComboBox<ZoomComboboxItem> zoomCombo;
-    @NotNull
     final JideToggleButton lockButton;
 
     private enum ZOOM {
@@ -75,7 +72,6 @@ class DrawControllerOptionsPanel extends JPanel {
             number = _number;
         }
 
-        @NotNull
         @Override
         public String toString() {
             String plural = number > 1 ? "s" : "";
@@ -106,7 +102,7 @@ class DrawControllerOptionsPanel extends JPanel {
         zoomCombo.setSelectedItem(zoomCombo.getItemAt(0));
     }
 
-    private static void zoomTo(@NotNull ZOOM zoom, long value) {
+    private static void zoomTo(ZOOM zoom, long value) {
         TimeAxis selectedInterval = DrawController.selectedAxis;
         TimeAxis availableInterval = DrawController.availableAxis;
 

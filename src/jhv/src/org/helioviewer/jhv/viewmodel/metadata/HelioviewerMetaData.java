@@ -13,7 +13,6 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
-import org.jetbrains.annotations.NotNull;
 
 public class HelioviewerMetaData extends AbstractMetaData {
 
@@ -33,7 +32,6 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
     private final Quat centerRotation;
 
-    @NotNull
     @Override
     public Quat getCenterRotation() {
         return centerRotation;
@@ -309,7 +307,6 @@ public class HelioviewerMetaData extends AbstractMetaData {
         return Sun.RadiusFactor_6562;
     }
 
-    @NotNull
     @Override
     public Region roiToRegion(SubImage roi, double factorX, double factorY) {
         return new Region(roi.x * factorX * unitPerPixelX - sunPositionX, roi.y * factorY * unitPerPixelY - sunPositionY,

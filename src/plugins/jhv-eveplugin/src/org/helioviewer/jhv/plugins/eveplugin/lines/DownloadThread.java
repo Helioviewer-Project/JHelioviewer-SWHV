@@ -9,8 +9,6 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +31,6 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
         return band;
     }
 
-    @Nullable
     @Override
     protected Pair<float[], long[]> backgroundWork() {
         try {
@@ -59,7 +56,7 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
             }
 
             return new Pair<>(values, dates);
-        } catch (@NotNull JSONException | IOException e) {
+        } catch (JSONException | IOException e) {
             Log.error("Error Parsing the EVE Response ", e);
         }
         return null;
@@ -79,7 +76,7 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
         DownloadController.downloadFinished(band, interval);
     }
 
-    private static String buildRequest(@NotNull Interval interval, @NotNull BandType type) {
+    private static String buildRequest(Interval interval, BandType type) {
         String urlf = type.getBaseURL() + "start_date=%s&end_date=%s&timeline=%s&data_format=json";
         return String.format(urlf, TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
     }

@@ -20,16 +20,13 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
-import org.jetbrains.annotations.NotNull;
 
 public class Band extends AbstractLineDataSelectorElement {
 
     private final BandType bandType;
-    @NotNull
     private final LineOptionPanel optionsPanel;
 
     private Color graphColor = Color.BLACK;
-    @NotNull
     private final YAxis yAxis;
     private final ArrayList<BandCache.GraphPolyline> graphPolylines = new ArrayList<>();
     private final RequestCache requestCache = new RequestCache();
@@ -80,7 +77,6 @@ public class Band extends AbstractLineDataSelectorElement {
         LineDataSelectorModel.removeLineData(this);
     }
 
-    @NotNull
     @Override
     public String getName() {
         return bandType.getLabel();
@@ -101,7 +97,6 @@ public class Band extends AbstractLineDataSelectorElement {
         return DownloadController.isDownloadActive(this);
     }
 
-    @NotNull
     @Override
     public Component getOptionsPanel() {
         return optionsPanel;
@@ -123,7 +118,7 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void draw(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }
@@ -137,7 +132,7 @@ public class Band extends AbstractLineDataSelectorElement {
         }
     }
 
-    private void updateWarnLevels(@NotNull Rectangle graphArea) {
+    private void updateWarnLevels(Rectangle graphArea) {
         LinkedList<Integer> _warnLevels = new LinkedList<>();
         LinkedList<String> _warnLabels = new LinkedList<>();
         HashMap<String, Double> unconvertedWarnLevels = bandType.getWarnLevels();
@@ -169,7 +164,7 @@ public class Band extends AbstractLineDataSelectorElement {
             return DrawConstants.valueFormatter.format(yAxis.scale(val));
     }
 
-    private void setWarn(@NotNull LinkedList<Integer> _warnLevels, @NotNull LinkedList<String> _warnLabels) {
+    private void setWarn(LinkedList<Integer> _warnLevels, LinkedList<String> _warnLabels) {
         int numberOfWarnLevels = _warnLevels.size();
         warnLevels = new int[numberOfWarnLevels];
         warnLabels = new String[numberOfWarnLevels];
@@ -185,24 +180,21 @@ public class Band extends AbstractLineDataSelectorElement {
         }
     }
 
-    @NotNull
     @Override
     public YAxis getYAxis() {
         return yAxis;
     }
 
-    @NotNull
     public List<Interval> addRequest(long start, long end) {
         return requestCache.adaptRequestCache(start, end);
     }
 
-    @NotNull
     public List<Interval> getMissingDaysInInterval(long start, long end) {
         return requestCache.getMissingIntervals(start, end);
     }
 
     @Override
-    public void fetchData(@NotNull TimeAxis selectedAxis) {
+    public void fetchData(TimeAxis selectedAxis) {
         DownloadController.updateBand(this, selectedAxis.start, selectedAxis.end);
         updateGraphsData();
     }
@@ -212,7 +204,7 @@ public class Band extends AbstractLineDataSelectorElement {
         updateGraphsData();
     }
 
-    public void addToCache(@NotNull float[] values, @NotNull long[] dates) {
+    public void addToCache(float[] values, long[] dates) {
         bandCache.addToCache(values, dates);
         updateGraphsData();
         DrawController.fireRedrawRequest();
@@ -224,7 +216,7 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void drawHighlighted(@NotNull Graphics2D g, @NotNull Rectangle graphArea, @NotNull TimeAxis timeAxis, Point mousePosition) {
+    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
     }
 
 }

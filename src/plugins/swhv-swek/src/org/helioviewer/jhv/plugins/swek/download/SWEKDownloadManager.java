@@ -25,7 +25,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModelListener;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.threads.JHVThread;
-import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class SWEKDownloadManager implements EventTypePanelModelListener, FilterManagerListener, JHVEventCacheRequestHandler {
@@ -45,7 +44,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private static final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap = new HashMap<>();
     private static final ArrayList<JHVEventType> activeEventTypes = new ArrayList<>();
 
-    private static void stopDownloadingEventType(@NotNull SWEKEventType eventType, boolean keepActive) {
+    private static void stopDownloadingEventType(SWEKEventType eventType, boolean keepActive) {
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
             stopDownloadingEventType(eventType, supplier, keepActive);
         }
@@ -70,12 +69,12 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         JHVEventCache.removeEvents(JHVEventType.getJHVEventType(eventType, supplier), keepActive);
     }
 
-    public static void workerForcedToStop(@NotNull DownloadWorker worker) {
+    public static void workerForcedToStop(DownloadWorker worker) {
         removeFromDownloaderMap(worker);
         JHVEventCache.intervalsNotDownloaded(worker.getJHVEventType(), worker.getRequestInterval());
     }
 
-    public static void workerFinished(@NotNull DownloadWorker worker) {
+    public static void workerFinished(DownloadWorker worker) {
         removeFromDownloaderMap(worker);
     }
 
@@ -93,13 +92,13 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     @Override
-    public void filtersChanged(@NotNull SWEKEventType swekEventType) {
+    public void filtersChanged(SWEKEventType swekEventType) {
         stopDownloadingEventType(swekEventType, true);
         JHVEventCache.reset(swekEventType);
         downloadSelectedSuppliers(swekEventType);
     }
 
-    private static void removeFromDownloaderMap(@NotNull DownloadWorker worker) {
+    private static void removeFromDownloaderMap(DownloadWorker worker) {
         ArrayList<DownloadWorker> dwMapList = dwMap.get(worker.getEventType());
         if (dwMapList != null)
             dwMapList.remove(worker);
@@ -128,8 +127,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         activeEventTypes.remove(jhvType);
     }
 
-    @NotNull
-    private static List<SWEKParam> defineParameters(SWEKEventType eventType, @NotNull SWEKSupplier supplier) {
+    private static List<SWEKParam> defineParameters(SWEKEventType eventType, SWEKSupplier supplier) {
         List<SWEKParam> params = new ArrayList<>();
         params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
         Map<SWEKParameter, List<SWEKParam>> paramsPerEventParameter = FilterManager.getFilterForEventType(eventType);
@@ -146,7 +144,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         }
     }
 
-    private static void downloadForAllDates(@NotNull JHVEventType jhvType) {
+    private static void downloadForAllDates(JHVEventType jhvType) {
         Collection<Interval> allIntervals = JHVEventCache.getAllRequestIntervals(jhvType);
         for (Interval interval : allIntervals) {
             startDownloadEventType(jhvType, interval);
@@ -154,11 +152,11 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     @Override
-    public void handleRequestForInterval(@NotNull JHVEventType jhvType, @NotNull Interval interval) {
+    public void handleRequestForInterval(JHVEventType jhvType, Interval interval) {
         startDownloadEventType(jhvType, interval);
     }
 
-    private static void startDownloadEventType(@NotNull JHVEventType jhvType, @NotNull Interval interval) {
+    private static void startDownloadEventType(JHVEventType jhvType, Interval interval) {
         SWEKSupplier supplier = jhvType.getSupplier();
         SWEKEventType eventType = jhvType.getEventType();
         List<SWEKParam> params = defineParameters(eventType, supplier);
@@ -174,7 +172,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
 
     private static class ComparePriority<T extends DownloadWorker> implements Comparator<T> {
         @Override
-        public int compare(@NotNull T l1, @NotNull T l2) {
+        public int compare(T l1, T l2) {
             long start = Layers.getStartDate().milli;
             long d1 = l1.getRequestInterval().end - start;
             long d2 = l2.getRequestInterval().end - start;

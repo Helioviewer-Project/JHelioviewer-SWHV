@@ -13,7 +13,6 @@ import org.helioviewer.jhv.data.event.SWEKDownloader;
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +23,7 @@ public class ComesepDownloader extends SWEKDownloader {
     private static final String _baseurl = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
-    protected boolean parseEvents(@NotNull JSONObject eventJSON, JHVEventType type) {
+    protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
         JSONArray results = eventJSON.getJSONArray("results");
         try {
             ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
@@ -65,7 +64,7 @@ public class ComesepDownloader extends SWEKDownloader {
     }
 
     @Override
-    protected boolean parseAssociations(@NotNull JSONObject eventJSON) {
+    protected boolean parseAssociations(JSONObject eventJSON) {
         JSONArray associations = eventJSON.getJSONArray("associations");
         int len = associations.length();
         Pair<?,?>[] assocs = new Pair<?,?>[len];
@@ -76,9 +75,8 @@ public class ComesepDownloader extends SWEKDownloader {
         return EventDatabase.dump_association2db((Pair<String,String>[]) assocs) != -1;
     }
 
-    @NotNull
     @Override
-    protected String createURL(SWEKEventType eventType, long start, long end, @NotNull List<SWEKParam> params, int page) {
+    protected String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(_baseurl);
         baseURL = appendModel(baseURL, params).append('&');
         baseURL.append("startdate=").append(TimeUtils.utcDateFormat.format(start)).append('&');
@@ -86,7 +84,7 @@ public class ComesepDownloader extends SWEKDownloader {
         return baseURL.toString();
     }
 
-    private static StringBuilder appendModel(@NotNull StringBuilder baseURL, @NotNull List<SWEKParam> params) {
+    private static StringBuilder appendModel(StringBuilder baseURL, List<SWEKParam> params) {
         String model = "";
         for (SWEKParam p : params) {
             if (p.param.equals("provider")) {

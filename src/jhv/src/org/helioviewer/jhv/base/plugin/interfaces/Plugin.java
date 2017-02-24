@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.base.plugin.interfaces;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 /**
  * This interface holds the basic methods of every JHV plug-in. JHV identifies a
  * plug-in by this interface.
@@ -20,7 +17,7 @@ public interface Plugin {
      * 
      * @return A user friendly name of the plug-in.
      */
-    @NotNull String getName();
+    String getName();
 
     /**
      * This method returns a short description of the plug-in which gives a
@@ -28,7 +25,7 @@ public interface Plugin {
      * 
      * @return Short description of the plug-in.
      */
-    @NotNull String getDescription();
+    String getDescription();
 
     /**
      * This method will be called by the JHV application when the user want's to
@@ -55,7 +52,7 @@ public interface Plugin {
      *            The new filter state
      * @see #getState()
      */
-    void setState(@NotNull String state);
+    void setState(String state);
 
     /**
      * Gets the plug-in state.
@@ -68,12 +65,12 @@ public interface Plugin {
      *            The new filter state
      * @see #setState()
      */
-    @Nullable String getState();
+    String getState();
 
     /**
      * This method is used to display licenses and other information about the
      * plugin in the about dialog of jhv.
      */
-    @NotNull String getAboutLicenseText();
+    String getAboutLicenseText();
 
 }

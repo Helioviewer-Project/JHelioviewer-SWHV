@@ -6,28 +6,22 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.jogamp.opengl.GL2;
 
 public class AnnotateCircle extends AbstractAnnotateable {
 
-    @Nullable
     private Vec3 circleStartPoint;
-    @Nullable
     private Vec3 circleEndPoint;
 
-    @Nullable
     private Vec3 startPoint;
-    @Nullable
     private Vec3 endPoint;
 
     public AnnotateCircle(Camera _camera) {
         super(_camera);
     }
 
-    private void drawCircle(@NotNull Viewport vp, @NotNull GL2 gl, @NotNull Vec3 bp, @NotNull Vec3 ep) {
+    private void drawCircle(Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
         double cosf = bp.dot(ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -68,7 +62,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(@NotNull Viewport vp, @NotNull GL2 gl, boolean active) {
+    public void render(Viewport vp, GL2 gl, boolean active) {
         if ((circleStartPoint == null || circleEndPoint == null) && !beingDragged())
             return;
 

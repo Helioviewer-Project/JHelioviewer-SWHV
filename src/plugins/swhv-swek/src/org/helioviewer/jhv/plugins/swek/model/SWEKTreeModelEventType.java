@@ -5,13 +5,11 @@ import java.util.List;
 
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
-import org.jetbrains.annotations.NotNull;
 
 // The SWEK tree model representation of the SWEK event type
 public class SWEKTreeModelEventType extends SWEKTreeModelElement {
 
     /** The swekEventType for this treemodel event type */
-    @NotNull
     private final SWEKEventType swekEventType;
 
     /** List with SWEKSuppliers for this event type */
@@ -24,7 +22,7 @@ public class SWEKTreeModelEventType extends SWEKTreeModelElement {
      *            The event type for which the SWEK tree model event type is
      *            created
      */
-    public SWEKTreeModelEventType(@NotNull SWEKEventType _swekEventType) {
+    public SWEKTreeModelEventType(SWEKEventType _swekEventType) {
         super(false, _swekEventType.getEventIcon());
         swekEventType = _swekEventType;
         fillSWEKTreeSuppliers();
@@ -35,7 +33,6 @@ public class SWEKTreeModelEventType extends SWEKTreeModelElement {
      * 
      * @return the SWEK event type
      */
-    @NotNull
     public SWEKEventType getSwekEventType() {
         return swekEventType;
     }
@@ -46,7 +43,6 @@ public class SWEKTreeModelEventType extends SWEKTreeModelElement {
      * 
      * @return a list of SWEK tree model suppliers
      */
-    @NotNull
     public List<SWEKTreeModelSupplier> getSwekTreeSuppliers() {
         return swekTreeSuppliers;
     }

@@ -6,28 +6,22 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.jogamp.opengl.GL2;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
-    @Nullable
     private Vec3 rectangleStartPoint;
-    @Nullable
     private Vec3 rectangleEndPoint;
 
-    @Nullable
     private Vec3 startPoint;
-    @Nullable
     private Vec3 endPoint;
 
     public AnnotateRectangle(Camera _camera) {
         super(_camera);
     }
 
-    private void drawRectangle(@NotNull Viewport vp, @NotNull GL2 gl, @NotNull Vec3 bp, @NotNull Vec3 ep) {
+    private void drawRectangle(Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
         if (bp.z * ep.z < 0) {
             if (ep.z < bp.z && bp.z > Math.PI / 2)
                 ep.z += 2 * Math.PI;
@@ -51,7 +45,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         return endPoint != null && startPoint != null;
     }
 
-    private void interpolatedDraw(@NotNull Viewport vp, @NotNull GL2 gl, @NotNull Vec3 p1s, @NotNull Vec3 p2s) {
+    private void interpolatedDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
         double delta = Math.PI * 2.5 / 180;
         int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
         subdivisions = Math.max(1, subdivisions);
@@ -73,7 +67,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(@NotNull Viewport vp, @NotNull GL2 gl, boolean active) {
+    public void render(Viewport vp, GL2 gl, boolean active) {
         if ((rectangleStartPoint == null || rectangleEndPoint == null) && !beingDragged())
             return;
 

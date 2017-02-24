@@ -33,7 +33,6 @@ import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +49,6 @@ public class SWEKConfigurationManager {
     private static final Map<String, SWEKEventType> eventTypes = new HashMap<>();
     private static final List<SWEKEventType> orderedEventTypes = new ArrayList<>();
 
-    @NotNull
     public static List<SWEKEventType> loadConfiguration() {
         if (!configLoaded) {
             SWEKIconBank.init();
@@ -151,11 +149,11 @@ public class SWEKConfigurationManager {
         return false;
     }
 
-    private static boolean parseManuallyChanged(@NotNull JSONObject configJSON) throws JSONException {
+    private static boolean parseManuallyChanged(JSONObject configJSON) throws JSONException {
         return configJSON.getBoolean("manually_changed");
     }
 
-    private static void parseSources(@NotNull JSONObject configJSON) throws JSONException {
+    private static void parseSources(JSONObject configJSON) throws JSONException {
         JSONArray sourcesArray = configJSON.getJSONArray("sources");
         for (int i = 0; i < sourcesArray.length(); i++) {
             SWEKSource source = parseSource(sourcesArray.getJSONObject(i));
@@ -165,7 +163,7 @@ public class SWEKConfigurationManager {
         }
     }
 
-    private static SWEKSource parseSource(@NotNull JSONObject jsonObject) throws JSONException {
+    private static SWEKSource parseSource(JSONObject jsonObject) throws JSONException {
         String name = parseSourceName(jsonObject);
         switch (name) {
             case "HEK":
@@ -177,12 +175,11 @@ public class SWEKConfigurationManager {
         }
     }
 
-    private static String parseSourceName(@NotNull JSONObject jsonObject) throws JSONException {
+    private static String parseSourceName(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("name");
     }
 
-    @NotNull
-    private static List<SWEKParameter> parseGeneralParameters(@NotNull JSONObject jsonObject) throws JSONException {
+    private static List<SWEKParameter> parseGeneralParameters(JSONObject jsonObject) throws JSONException {
         List<SWEKParameter> parameterList = new ArrayList<>();
         JSONArray parameterArray = jsonObject.getJSONArray("general_parameters");
         for (int i = 0; i < parameterArray.length(); i++) {
@@ -191,7 +188,7 @@ public class SWEKConfigurationManager {
         return parameterList;
     }
 
-    private static void parseEventTypes(@NotNull JSONObject configJSON) throws JSONException {
+    private static void parseEventTypes(JSONObject configJSON) throws JSONException {
         JSONArray eventJSONArray = configJSON.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
             SWEKEventType eventType = parseEventType(eventJSONArray.getJSONObject(i));
@@ -200,11 +197,11 @@ public class SWEKConfigurationManager {
         }
     }
 
-    private static SWEKEventType parseEventType(@NotNull JSONObject object) throws JSONException {
+    private static SWEKEventType parseEventType(JSONObject object) throws JSONException {
         return new SWEKEventType(parseEventName(object), parseSuppliers(object), parseParameterList(object), parseEventIcon(object));
     }
 
-    private static ImageIcon parseEventIcon(@NotNull JSONObject object) throws JSONException {
+    private static ImageIcon parseEventIcon(JSONObject object) throws JSONException {
         String eventIconValue = object.getString("icon");
         try {
             URI eventIconURI = new URI(eventIconValue);
@@ -219,12 +216,11 @@ public class SWEKConfigurationManager {
         return null;
     }
 
-    private static String parseEventName(@NotNull JSONObject object) throws JSONException {
+    private static String parseEventName(JSONObject object) throws JSONException {
         return object.getString("event_name");
     }
 
-    @NotNull
-    private static List<SWEKSupplier> parseSuppliers(@NotNull JSONObject object) throws JSONException {
+    private static List<SWEKSupplier> parseSuppliers(JSONObject object) throws JSONException {
         List<SWEKSupplier> suppliers = new ArrayList<>();
         JSONArray suppliersArray = object.getJSONArray("suppliers");
         for (int i = 0; i < suppliersArray.length(); i++) {
@@ -233,28 +229,27 @@ public class SWEKConfigurationManager {
         return suppliers;
     }
 
-    private static SWEKSupplier parseSupplier(@NotNull JSONObject object) throws JSONException {
+    private static SWEKSupplier parseSupplier(JSONObject object) throws JSONException {
         return new SWEKSupplier(parseSupplierName(object), parseSupplierDisplayName(object), parseSupplierSource(object), parseDbName(object));
     }
 
-    private static String parseSupplierName(@NotNull JSONObject object) throws JSONException {
+    private static String parseSupplierName(JSONObject object) throws JSONException {
         return object.getString("supplier_name");
     }
 
-    private static String parseSupplierDisplayName(@NotNull JSONObject object) throws JSONException {
+    private static String parseSupplierDisplayName(JSONObject object) throws JSONException {
         return object.getString("supplier_display_name");
     }
 
-    private static SWEKSource parseSupplierSource(@NotNull JSONObject object) throws JSONException {
+    private static SWEKSource parseSupplierSource(JSONObject object) throws JSONException {
         return sources.get(object.getString("source"));
     }
 
-    private static String parseDbName(@NotNull JSONObject object) throws JSONException {
+    private static String parseDbName(JSONObject object) throws JSONException {
         return object.getString("db");
     }
 
-    @NotNull
-    private static List<SWEKParameter> parseParameterList(@NotNull JSONObject object) throws JSONException {
+    private static List<SWEKParameter> parseParameterList(JSONObject object) throws JSONException {
         List<SWEKParameter> parameterList = new ArrayList<>();
         JSONArray parameterListArray = object.getJSONArray("parameter_list");
         for (int i = 0; i < parameterListArray.length(); i++) {
@@ -263,59 +258,58 @@ public class SWEKConfigurationManager {
         return parameterList;
     }
 
-    private static SWEKParameter parseParameter(@NotNull JSONObject jsonObject) throws JSONException {
+    private static SWEKParameter parseParameter(JSONObject jsonObject) throws JSONException {
         return new SWEKParameter(parseParameterName(jsonObject), parseParameterDisplayName(jsonObject), parseParameterFilter(jsonObject), parseDefaultVisible(jsonObject));
     }
 
-    private static String parseParameterName(@NotNull JSONObject jsonObject) throws JSONException {
+    private static String parseParameterName(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("parameter_name");
     }
 
-    private static String parseParameterDisplayName(@NotNull JSONObject jsonObject) throws JSONException {
+    private static String parseParameterDisplayName(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("parameter_display_name");
     }
 
-    private static SWEKParameterFilter parseParameterFilter(@NotNull JSONObject jsonObject) throws JSONException {
+    private static SWEKParameterFilter parseParameterFilter(JSONObject jsonObject) throws JSONException {
         JSONObject filterobject = jsonObject.optJSONObject("filter");
         if (filterobject == null)
             return null;
         return new SWEKParameterFilter(parseFilterType(filterobject), parseMin(filterobject), parseMax(filterobject), parseStartValue(filterobject), parseStepSize(filterobject), parseUnits(filterobject), parseDbType(filterobject));
     }
 
-    private static String parseDbType(@NotNull JSONObject filterobject) throws JSONException {
+    private static String parseDbType(JSONObject filterobject) throws JSONException {
         return filterobject.getString("dbtype");
     }
 
-    private static String parseUnits(@NotNull JSONObject filterobject) throws JSONException {
+    private static String parseUnits(JSONObject filterobject) throws JSONException {
         return filterobject.getString("units");
     }
 
-    private static String parseFilterType(@NotNull JSONObject object) throws JSONException {
+    private static String parseFilterType(JSONObject object) throws JSONException {
         return object.getString("filter_type");
     }
 
-    private static double parseMin(@NotNull JSONObject object) throws JSONException {
+    private static double parseMin(JSONObject object) throws JSONException {
         return object.getDouble("min");
     }
 
-    private static double parseMax(@NotNull JSONObject object) throws JSONException {
+    private static double parseMax(JSONObject object) throws JSONException {
         return object.getDouble("max");
     }
 
-    private static double parseStepSize(@NotNull JSONObject object) throws JSONException {
+    private static double parseStepSize(JSONObject object) throws JSONException {
         return object.getDouble("step_size");
     }
 
-    private static Double parseStartValue(@NotNull JSONObject object) throws JSONException {
+    private static Double parseStartValue(JSONObject object) throws JSONException {
         return object.getDouble("start_value");
     }
 
-    private static boolean parseDefaultVisible(@NotNull JSONObject jsonObject) throws JSONException {
+    private static boolean parseDefaultVisible(JSONObject jsonObject) throws JSONException {
         return jsonObject.getBoolean("default_visible");
     }
 
-    @NotNull
-    private static List<SWEKRelatedEvents> parseRelatedEvents(@NotNull JSONObject configJSON) throws JSONException {
+    private static List<SWEKRelatedEvents> parseRelatedEvents(JSONObject configJSON) throws JSONException {
         List<SWEKRelatedEvents> relatedEventsList = new ArrayList<>();
         JSONArray relatedEventsArray = configJSON.getJSONArray("related_events");
         for (int i = 0; i < relatedEventsArray.length(); i++) {
@@ -324,20 +318,19 @@ public class SWEKConfigurationManager {
         return relatedEventsList;
     }
 
-    private static SWEKRelatedEvents parseRelatedEvent(@NotNull JSONObject jsonObject) throws JSONException {
+    private static SWEKRelatedEvents parseRelatedEvent(JSONObject jsonObject) throws JSONException {
         return new SWEKRelatedEvents(parseRelatedEventName(jsonObject), parseRelatedWith(jsonObject), parseRelatedOnList(jsonObject));
     }
 
-    private static SWEKEventType parseRelatedEventName(@NotNull JSONObject jsonObject) throws JSONException {
+    private static SWEKEventType parseRelatedEventName(JSONObject jsonObject) throws JSONException {
         return eventTypes.get(jsonObject.getString("event_name"));
     }
 
-    private static SWEKEventType parseRelatedWith(@NotNull JSONObject jsonObject) throws JSONException {
+    private static SWEKEventType parseRelatedWith(JSONObject jsonObject) throws JSONException {
         return eventTypes.get(jsonObject.getString("related_with"));
     }
 
-    @NotNull
-    private static List<SWEKRelatedOn> parseRelatedOnList(@NotNull JSONObject jsonObject) throws JSONException {
+    private static List<SWEKRelatedOn> parseRelatedOnList(JSONObject jsonObject) throws JSONException {
         List<SWEKRelatedOn> relatedOnList = new ArrayList<>();
         JSONArray relatedOnArray = jsonObject.getJSONArray("related_on");
         for (int i = 0; i < relatedOnArray.length(); i++) {
@@ -346,16 +339,16 @@ public class SWEKConfigurationManager {
         return relatedOnList;
     }
 
-    private static SWEKRelatedOn parseRelatedOn(@NotNull JSONObject jsonObject) throws JSONException {
+    private static SWEKRelatedOn parseRelatedOn(JSONObject jsonObject) throws JSONException {
         return new SWEKRelatedOn(parseParameterFrom(jsonObject), parseParameterWith(jsonObject), parseDbType(jsonObject));
     }
 
-    private static SWEKParameter parseParameterFrom(@NotNull JSONObject jsonObject) throws JSONException {
+    private static SWEKParameter parseParameterFrom(JSONObject jsonObject) throws JSONException {
         String parameterName = jsonObject.getString("parameter_from");
         return new SWEKParameter(parameterName, parameterName, null, false);
     }
 
-    private static SWEKParameter parseParameterWith(@NotNull JSONObject jsonObject) throws JSONException {
+    private static SWEKParameter parseParameterWith(JSONObject jsonObject) throws JSONException {
         String parameterName = jsonObject.getString("parameter_with");
         return new SWEKParameter(parameterName, parameterName, null, false);
     }

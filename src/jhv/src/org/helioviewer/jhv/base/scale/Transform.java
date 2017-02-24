@@ -7,20 +7,18 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.layers.Layers;
-import org.jetbrains.annotations.NotNull;
 
 public interface Transform {
 
-    @NotNull Vec2 transform(@NotNull Vec3 pt, @NotNull GridScale scale);
-    @NotNull Vec3 transformInverse(@NotNull Vec2 pt);
+    Vec2 transform(Vec3 pt, GridScale scale);
+    Vec3 transformInverse(Vec2 pt);
 
     Transform transformpolar = new TransformPolar();
     Transform transformlatitudinal = new TransformLatitudinal();
 
     class TransformPolar implements Transform {
-        @NotNull
         @Override
-        public Vec2 transform(@NotNull Vec3 pt, @NotNull GridScale scale) {
+        public Vec2 transform(Vec3 pt, GridScale scale) {
             Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
             Quat q = new Quat(p.lat, 0);
             pt = q.rotateInverseVector(pt);
@@ -33,9 +31,8 @@ public interface Transform {
             return new Vec2(scaledtheta, scaledr);
         }
 
-        @NotNull
         @Override
-        public Vec3 transformInverse(@NotNull Vec2 pt) {
+        public Vec3 transformInverse(Vec2 pt) {
             double r = pt.y;
             double theta = -pt.x / MathUtils.radeg;
             double y = r * Math.cos(theta);
@@ -48,9 +45,8 @@ public interface Transform {
     }
 
     class TransformLatitudinal implements Transform {
-        @NotNull
         @Override
-        public Vec2 transform(@NotNull Vec3 pt, @NotNull GridScale scale) {
+        public Vec2 transform(Vec3 pt, GridScale scale) {
             double theta = Math.PI / 2 - Math.acos(-pt.y);
             double phi = Math.atan2(pt.x, pt.z);
             Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
@@ -62,9 +58,8 @@ public interface Transform {
             return new Vec2(scaledphi, scaledtheta);
         }
 
-        @NotNull
         @Override
-        public Vec3 transformInverse(@NotNull Vec2 pt) {
+        public Vec3 transformInverse(Vec2 pt) {
             double phi = pt.x / MathUtils.radeg;
             double theta = pt.y / MathUtils.radeg;
             phi += Math.PI;

@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.data.cache;
 
-import org.jetbrains.annotations.NotNull;
-
 public class SortedDateInterval implements Comparable<SortedDateInterval> {
 
     public long start;
@@ -27,7 +25,7 @@ public class SortedDateInterval implements Comparable<SortedDateInterval> {
     }
 
     @Override
-    public int compareTo(@NotNull SortedDateInterval o2) {
+    public int compareTo(SortedDateInterval o2) {
         if (start < o2.start) {
             return -1;
         }
