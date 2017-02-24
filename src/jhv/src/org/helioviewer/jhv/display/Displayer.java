@@ -113,16 +113,16 @@ public class Displayer implements JHVEventHighlightListener {
         return camera;
     }
 
-    private static final Viewport[] viewports = { new Viewport(0, 0, 0, 0, 0), new Viewport(1, 0, 0, 0, 0), new Viewport(2, 0, 0, 0, 0), new Viewport(3, 0, 0, 0, 0) };
+    private static final Viewport[] viewports = { new Viewport(0, 0, 0, 100, 100), null, null, null };
     private static int activeViewport = 0;
 
-    public static Viewport fullViewport = new Viewport(-1, 0, 0, 0, 0);
+    public static Viewport fullViewport = new Viewport(-1, 0, 0, 100, 100);
 
     public static void setActiveViewport(int x, int y) {
         if (multiview) {
             for (int i = 0; i < viewports.length; ++i) {
                 Viewport vp = viewports[i];
-                if (vp.contains(x, y)) {
+                if (vp != null && vp.contains(x, y)) {
                     activeViewport = i;
                     break;
                 }
@@ -174,9 +174,9 @@ public class Displayer implements JHVEventHighlightListener {
         int h = glHeight;
 
         viewports[0] = new Viewport(0, 0, 0, w, h);
-        viewports[1] = new Viewport(1, 0, 0, 0, 0);
-        viewports[2] = new Viewport(2, 0, 0, 0, 0);
-        viewports[3] = new Viewport(3, 0, 0, 0, 0);
+        viewports[1] = null;
+        viewports[2] = null;
+        viewports[3] = null;
     }
 
     private static void reshape2() {
@@ -185,8 +185,8 @@ public class Displayer implements JHVEventHighlightListener {
 
         viewports[0] = new Viewport(0, 0, 0, w / 2, h);
         viewports[1] = new Viewport(1, w / 2, 0, w / 2, h);
-        viewports[2] = new Viewport(2, 0, 0, 0, 0);
-        viewports[3] = new Viewport(3, 0, 0, 0, 0);
+        viewports[2] = null;
+        viewports[3] = null;
     }
 
     private static void reshape3() {
@@ -196,7 +196,7 @@ public class Displayer implements JHVEventHighlightListener {
         viewports[0] = new Viewport(0, 0, 0, w / 2, h / 2);
         viewports[1] = new Viewport(1, w / 2, 0, w / 2, h / 2);
         viewports[2] = new Viewport(2, 0, h / 2, w, h / 2);
-        viewports[3] = new Viewport(3, 0, 0, 0, 0);
+        viewports[3] = null;
     }
 
     private static void reshape4() {
