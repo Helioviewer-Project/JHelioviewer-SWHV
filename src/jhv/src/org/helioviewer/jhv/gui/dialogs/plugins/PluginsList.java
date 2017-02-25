@@ -1,86 +1,55 @@
 package org.helioviewer.jhv.gui.dialogs.plugins;
 
 import java.awt.Color;
-import java.util.LinkedList;
 import java.util.TreeMap;
 
 import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+
+import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
+import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 
 @SuppressWarnings("serial")
-class PluginsList extends JScrollPane {
+class PluginsList extends JPanel {
 
     private static final Color selectionBackgroundColor = new JList<JPanel>().getSelectionBackground();
     private static final Color selectionForegroundColor = new JList<JPanel>().getSelectionForeground();
+    private static final Color backgroundColor = new JList<JPanel>().getBackground();
+    private static final Color foregroundColor = new JList<JPanel>().getForeground();
 
-    private final LinkedList<PluginsListEntryChangeListener> listeners = new LinkedList<>();
     private final TreeMap<String, PluginsListEntry> entryMap = new TreeMap<>();
-    private final JPanel contentPane = new JPanel();
-
-    private String selectedEntryName = null;
 
     public PluginsList() {
-        setViewportView(contentPane);
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        contentPane.setBackground(Color.WHITE);
-    }
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    public void addListEntryChangeListener(PluginsListEntryChangeListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListEntryChangeListener(PluginsListEntryChangeListener listener) {
-        listeners.remove(listener);
-    }
-
-    public void updateList() {
-        contentPane.removeAll();
-
-        for (PluginsListEntry entry : entryMap.values()) {
-            contentPane.add(entry);
+        PluginContainer[] pluginArray = PluginManager.getSingletonInstance().getAllPlugins();
+        for (PluginContainer plugin : pluginArray) {
+            PluginsListEntry entry = new PluginsListEntry(plugin, this);
+            entryMap.put(plugin.getName(), entry);
+            add(entry);
         }
-        selectItem(selectedEntryName);
-
-        contentPane.revalidate();
-        contentPane.repaint();
+        if (pluginArray.length != 0) {
+            selectItem(pluginArray[0].getName());
+        }
     }
 
-    public void addEntry(String name, PluginsListEntry entry) {
-        entryMap.put(name, entry);
-    }
-
-    public void removeAllEntries() {
-        entryMap.clear();
-    }
-
-    public void selectItem(String pluginName) {
-        if (entryMap.values().isEmpty())
-            return;
-
+    void selectItem(String name) {
         // deselect all
         for (PluginsListEntry entry : entryMap.values()) {
-            entry.setForeground(Color.BLACK);
-            entry.setBackground(Color.WHITE);
+            entry.setForeground(foregroundColor);
+            entry.setBackground(backgroundColor);
         }
 
-        if (pluginName != null && entryMap.containsKey(pluginName)) {
-            selectedEntryName = pluginName;
-            PluginsListEntry selected = entryMap.get(selectedEntryName);
+        if (entryMap.containsKey(name)) {
+            PluginsListEntry selected = entryMap.get(name);
             selected.setForeground(selectionForegroundColor);
             selected.setBackground(selectionBackgroundColor);
         }
     }
 
-    public int getNumberOfItems() {
-        return entryMap.size();
-    }
-
-    public void fireListChanged() {
-        for (PluginsListEntryChangeListener listener : listeners) {
-            listener.listChanged();
-        }
+    boolean isEmpty() {
+        return entryMap.isEmpty();
     }
 
 }

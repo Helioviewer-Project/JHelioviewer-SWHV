@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.dialogs.plugins;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -18,10 +19,6 @@ import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
-/**
- * Visual list entry for each plug-in. Provides functions to enable/disable
- * a plug-in and to display additional information about the plug-in.
- * */
 @SuppressWarnings("serial")
 class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListener {
 
@@ -29,12 +26,12 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
     private final PluginsList list;
 
     private final JLabel enableLabel = new JLabel();
+    private final JTextPane pane = new JTextPane();
 
     public PluginsListEntry(PluginContainer _plugin, PluginsList _list) {
         plugin = _plugin;
         list = _list;
 
-        JTextPane pane = new JTextPane();
         pane.setContentType("text/html");
         pane.setText("<b>" + plugin.getName() + "</b><br>" + plugin.getDescription() + " <a href=''>More...</a>");
         pane.setEditable(false);
@@ -54,6 +51,24 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
         enableLabel.addMouseListener(this);
     }
 
+    @Override
+    public void setBackground(Color c) {
+        super.setBackground(c);
+        if (pane != null)
+            pane.setBackground(c);
+        if (enableLabel != null)
+            enableLabel.setBackground(c);
+    }
+
+    @Override
+    public void setForeground(Color c) {
+        super.setForeground(c);
+        if (pane != null)
+            pane.setForeground(c);
+        if (enableLabel != null)
+            enableLabel.setForeground(c);
+    }
+
     private void updateEnableLabel() {
         if (plugin.isActive()) {
             enableLabel.setText(Buttons.plugOn);
@@ -69,10 +84,8 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
             return;
 
         plugin.setActive(active);
-        PluginManager.getSingletonInstance().saveSettings();
-
         updateEnableLabel();
-        list.fireListChanged();
+        PluginManager.getSingletonInstance().saveSettings();
     }
 
     @Override
@@ -80,7 +93,8 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
                 Plugin p = plugin.getPlugin();
-                String text = "<center><p><big><b>" + p.getName() + "</b></big></p><p><b>Plug-in description</b><br>" + p.getDescription() + "</p><p><b>Plug-in license information</b><br>" + p.getAboutLicenseText();
+                String text = "<center><p><big><b>" + p.getName() + "</b></big></p><p><b>Plug-in description</b><br>" + p.getDescription() +
+                              "</p><p><b>Plug-in license information</b><br>" + p.getAboutLicenseText();
                 new TextDialog("About", text, false).showDialog();
             } else {
                 JHVGlobals.openURL(e.getURL().toString());

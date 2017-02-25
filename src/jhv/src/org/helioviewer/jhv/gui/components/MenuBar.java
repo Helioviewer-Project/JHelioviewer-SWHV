@@ -63,23 +63,21 @@ public class MenuBar extends JMenuBar {
         movieMenu.add(MoviePanel.getNextFrameAction());
         add(movieMenu);
 
-        JMenu pluginsMenu = new JMenu("Plug-ins");
-        pluginsMenu.setMnemonic(KeyEvent.VK_P);
-        pluginsMenu.add(new ShowDialogAction("Manage Plug-ins...", PluginsDialog.class));
-        add(pluginsMenu);
+        JMenu toolsMenu = new JMenu("Tools");
+        toolsMenu.setMnemonic(KeyEvent.VK_T);
+        toolsMenu.add(new ShowDialogAction("Manage Plug-ins...", PluginsDialog.class));
+        add(toolsMenu);
 
         ShowDialogAction preferencesAction = new ShowDialogAction("Preferences...", PreferencesDialog.class);
         if (System.getProperty("jhv.os").equals("mac")) {
             OSXHandler.preferencesHandler(preferencesAction);
             JMenu windowMenu = new JMenu("Window");
+            windowMenu.setMnemonic(KeyEvent.VK_W);
             windowMenu.add(new WindowMinimizeAction());
             windowMenu.add(new WindowZoomAction());
             add(windowMenu);
         } else {
-            JMenu optionsMenu = new JMenu("Options");
-            optionsMenu.setMnemonic(KeyEvent.VK_O);
-            optionsMenu.add(preferencesAction);
-            add(optionsMenu);
+            toolsMenu.add(preferencesAction);
         }
 
         JMenu helpMenu = new JMenu("Help");
