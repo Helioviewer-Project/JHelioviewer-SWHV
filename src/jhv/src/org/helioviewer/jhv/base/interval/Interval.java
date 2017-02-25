@@ -3,6 +3,7 @@ package org.helioviewer.jhv.base.interval;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class Interval implements Comparable<Interval> {
 
@@ -97,7 +98,7 @@ public class Interval implements Comparable<Interval> {
     }
 
     @Override
-    public int compareTo(Interval o) {
+    public int compareTo(@NotNull Interval o) {
         return start < o.start ? -1 : (start > o.start ? 1 : 0);
     }
 
