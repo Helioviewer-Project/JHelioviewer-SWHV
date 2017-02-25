@@ -15,6 +15,7 @@ import java.util.concurrent.ThreadFactory;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.database.EventDatabase;
+import org.jetbrains.annotations.NotNull;
 
 public class JHVThread {
 
@@ -48,7 +49,7 @@ public class JHVThread {
         }
 
         @Override
-        public Thread newThread(Runnable r) {
+        public Thread newThread(@NotNull Runnable r) {
             Thread thread = new Thread(r, name);
             thread.setDaemon(true);
             return thread;
@@ -152,7 +153,7 @@ public class JHVThread {
         }
 
         @Override
-        public ConnectionThread newThread(Runnable r) {
+        public ConnectionThread newThread(@NotNull Runnable r) {
             JHVThread.ConnectionThread thread = new JHVThread.ConnectionThread(r, name);
             thread.setDaemon(true);
             return thread;
