@@ -118,8 +118,8 @@ public class LineDataSelectorTablePanel extends JPanel {
         grid.setIntercellSpacing(new Dimension(0, 0));
 
         grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new LineDataVisibleCellRenderer());
-        grid.getColumnModel().getColumn(VISIBLE_COL).setPreferredWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(VISIBLE_COL).setPreferredWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 8);
 
         grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new LineDataSelectorElementRenderer());
 
