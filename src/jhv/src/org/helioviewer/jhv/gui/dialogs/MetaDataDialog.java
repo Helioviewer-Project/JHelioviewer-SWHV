@@ -123,50 +123,50 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         MetaData metaData = v.getImageLayer().getMetaData();
         if (!(metaData instanceof HelioviewerMetaData)) {
             basicSB.append("Error: No metadata is available");
-        } else {
-            HelioviewerMetaData m = (HelioviewerMetaData) metaData;
-            basicSB.append("Observatory: ").append(m.getObservatory()).append('\n');
-            basicSB.append("Instrument: ").append(m.getInstrument()).append('\n');
-            basicSB.append("Detector: ").append(m.getDetector()).append('\n');
-            basicSB.append("Measurement: ").append(m.getMeasurement()).append('\n');
-            basicSB.append("Observation Date: ").append(m.getViewpoint().time).append('\n');
+            return;
+        }
 
+        HelioviewerMetaData m = (HelioviewerMetaData) metaData;
+        basicSB.append("Observatory: ").append(m.getObservatory()).append('\n');
+        basicSB.append("Instrument: ").append(m.getInstrument()).append('\n');
+        basicSB.append("Detector: ").append(m.getDetector()).append('\n');
+        basicSB.append("Measurement: ").append(m.getMeasurement()).append('\n');
+        basicSB.append("Observation Date: ").append(m.getViewpoint().time).append('\n');
+
+        try {
             String xmlText = null;
-            if (v instanceof JP2View) {
+            if (v instanceof JP2View)
                 xmlText = ((JP2View) v).getXMLMetaData();
-            } else if (v instanceof FITSView) {
+            else if (v instanceof FITSView)
                 xmlText = ((FITSView) v).getHeaderAsXML();
+            else
+                return;
+
+            InputStream in = new ByteArrayInputStream(xmlText.getBytes(StandardCharsets.UTF_8));
+            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
+
+            // Send xml data to meta data dialog box
+            Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
+            writeXMLData(root);
+            root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
+            if (root != null) {
+                writeXMLData(root);
             }
 
-            if (xmlText != null) {
-                try {
-                    InputStream in = new ByteArrayInputStream(xmlText.getBytes(StandardCharsets.UTF_8));
-                    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
-
-                    // Send xml data to meta data dialog box
-                    Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
-                    writeXMLData(root);
-                    root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
-                    if (root != null) {
-                        writeXMLData(root);
-                    }
-
-                    final String xml = xmlText;
-                    String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.filenameDateFormat.format(m.getViewpoint().time.milli) + ".fits.xml";
-                    exportFitsButton.setEnabled(true);
-                    exportFitsButton.addActionListener(e -> {
-                        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName), StandardCharsets.UTF_8))) {
-                            writer.write(xml, 0, xml.length());
-                        } catch (Exception ex) {
-                            Log.error("Failed to write XML: " + ex);
-                            return; // try with resources
-                        }
-                        JHVGlobals.displayNotification(outFileName);
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
+            final String xml = xmlText;
+            String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.filenameDateFormat.format(m.getViewpoint().time.milli) + ".fits.xml";
+            exportFitsButton.setEnabled(true);
+            exportFitsButton.addActionListener(e -> {
+                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName), StandardCharsets.UTF_8))) {
+                    writer.write(xml, 0, xml.length());
+                } catch (Exception ex) {
+                    Log.error("Failed to write XML: " + ex);
+                    return; // try with resources
                 }
-            }
+                JHVGlobals.displayNotification(outFileName);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

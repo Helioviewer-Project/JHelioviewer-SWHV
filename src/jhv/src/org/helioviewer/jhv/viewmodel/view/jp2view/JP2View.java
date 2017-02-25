@@ -511,15 +511,9 @@ public class JP2View extends AbstractView {
     }
 
     // very slow
-    public String getXMLMetaData() {
-        String xml = null;
-        try {
-            KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri);
-            xml = KakaduMeta.getXml(kduTmp.getFamilySrc(), trueFrame + 1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return xml;
+    public String getXMLMetaData() throws Exception {
+        KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri);
+        return KakaduMeta.getXml(kduTmp.getFamilySrc(), trueFrame + 1);
     }
 
 }
