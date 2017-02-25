@@ -171,7 +171,6 @@ public class KakaduMeta {
             xml = xmlBox2xml(xmlBox);
             xmlBox.Native_destroy();
         }
-
         if (assocBox != null) {
             assocBox.Native_destroy();
         }
@@ -184,7 +183,10 @@ public class KakaduMeta {
         if (findBoxResult[0] != null) {
             findBoxResult[0].Native_destroy();
         }
-        return xml;
+        if (xml != null)
+            return xml;
+        else
+            throw new JHV_KduException("Could not find XML box");
     }
 
     private static String xmlBox2xml(Jp2_input_box xmlBox) throws JHV_KduException {
