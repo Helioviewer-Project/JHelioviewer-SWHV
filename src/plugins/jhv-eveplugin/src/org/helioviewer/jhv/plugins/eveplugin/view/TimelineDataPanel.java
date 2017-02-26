@@ -8,12 +8,12 @@ import java.util.GregorianCalendar;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
@@ -28,7 +28,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
-public class TimelineDataPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener {
+public class TimelineDataPanel extends JPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener {
 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
@@ -141,7 +141,6 @@ public class TimelineDataPanel extends ObservationDialogPanel implements LineDat
         return new Interval(cal.getTimeInMillis(), endTime);
     }
 
-    @Override
     public boolean loadButtonPressed(Object layer) {
         ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true);
         updateBandController();
