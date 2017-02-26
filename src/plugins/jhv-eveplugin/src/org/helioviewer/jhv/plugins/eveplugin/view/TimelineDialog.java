@@ -41,8 +41,8 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         AbstractAction load = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (observationPanel.loadButtonPressed(null))
-                    setVisible(false);
+                observationPanel.loadButtonPressed();
+                setVisible(false);
             }
         };
         setDefaultAction(load);
