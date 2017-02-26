@@ -35,7 +35,7 @@ import org.helioviewer.jhv.io.DataSourcesTree;
  * the {@link ObservationDialog}.
  * */
 @SuppressWarnings("serial")
-public class ImageDataPanel extends ObservationDialogPanel {
+public class ImageDataPanel extends JPanel {
 
     private final TimeSelectionPanel timeSelectionPanel = new TimeSelectionPanel();
     private final CadencePanel cadencePanel = new CadencePanel();
@@ -104,7 +104,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
         }
     }
 
-    @Override
     public boolean loadButtonPressed(Object layer) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
@@ -225,7 +224,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
         private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
         public CadencePanel() {
-            setLayout(new FlowLayout(FlowLayout.RIGHT, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
+            setLayout(new FlowLayout(FlowLayout.RIGHT));
 
             spinnerCadence.setPreferredSize(new Dimension(55, 25));
             comboUnit.setSelectedItem("min");

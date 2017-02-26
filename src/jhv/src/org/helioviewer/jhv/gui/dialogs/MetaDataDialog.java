@@ -134,7 +134,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         basicSB.append("Observation Date: ").append(m.getViewpoint().time).append('\n');
 
         try {
-            String xmlText = null;
+            String xmlText;
             if (v instanceof JP2View)
                 xmlText = ((JP2View) v).getXMLMetaData();
             else if (v instanceof FITSView)

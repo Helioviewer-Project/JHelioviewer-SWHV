@@ -21,7 +21,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
     private final TimelineDataPanel observationPanel = new TimelineDataPanel();
 
     public TimelineDialog() {
-        super(ImageViewerGui.getMainFrame(), true);
+        super(ImageViewerGui.getMainFrame(), "New Layer", true);
         setResizable(false);
     }
 
