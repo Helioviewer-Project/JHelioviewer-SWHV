@@ -44,7 +44,7 @@ public class BusyIndicator extends LayerUI<JComponent> {
     private static final double dangle = Math.PI / 30;
     private static double angle;
 
-    public void incrementAngle() {
+    public static void incrementAngle() {
         angle += dangle;
         if (angle > 2 * Math.PI)
             angle = 0;

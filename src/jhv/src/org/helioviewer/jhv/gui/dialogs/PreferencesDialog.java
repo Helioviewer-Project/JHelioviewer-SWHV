@@ -141,7 +141,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
 
     private static class DefaultsSelectionPanel extends JPanel {
 
-        private final JTable table;
+        private final JTable grid;
         private final TableModel model;
 
         public DefaultsSelectionPanel() {
@@ -173,7 +173,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             JPasswordField passField = new JPasswordField();
             DefaultCellEditor passEditor = new DefaultCellEditor(passField);
 
-            table = new JTable(model) {
+            grid = new JTable(model) {
                 @Override
                 public TableCellEditor getCellEditor(int row, int column) {
                     if (row == 3 && column == 1) {
@@ -184,7 +184,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
                         return super.getCellEditor(row, column);
                 }
             };
-            table.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer () {
+            grid.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer () {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     if (row == 3 && column == 1) {
@@ -196,18 +196,18 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
                 }
             });
 
-            table.setRowHeight(20);
-            JScrollPane scrollPane = new JScrollPane(table);
-            table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            // table.setFillsViewportHeight(true);
+            grid.setRowHeight(20);
+            JScrollPane scrollPane = new JScrollPane(grid);
+            grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            // grid.setFillsViewportHeight(true);
 
-            table.addMouseListener(new MouseAdapter() {
+            grid.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() != 2)
                         return;
 
-                    int row = table.getSelectedRow();
+                    int row = grid.getSelectedRow();
                     if (row >= 2)
                         return;
 
@@ -219,7 +219,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
                 }
             });
 
-            TableColumn col = table.getColumnModel().getColumn(0);
+            TableColumn col = grid.getColumnModel().getColumn(0);
             col.setMaxWidth(150);
             col.setMinWidth(150);
 

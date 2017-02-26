@@ -139,8 +139,8 @@ public class JHVGlobals {
                 if (jarParent != null) {
                     String[] cmd = {
                         jarParent.getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
-                        "-message", "\"" + msg + "\"",
-                        "-execute", "open " + "\"" + openURL + "\"",
+                        "-message", '"' + msg + '"',
+                        "-execute", "open " + '"' + openURL + '"',
                         "-title", "JHelioviewer"
                     };
                     Log.info("JHVGlobals.displayNotification " + Arrays.toString(cmd));

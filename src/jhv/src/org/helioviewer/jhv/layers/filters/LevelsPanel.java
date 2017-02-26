@@ -38,7 +38,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
         return "\u2007" + value + "%";
     }
 
-    private String format(int low, int high) {
+    private static String format(int low, int high) {
         return "<html>" + align3(low) + "<br>" + align3(high);
     }
 

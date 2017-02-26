@@ -132,18 +132,18 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
         }
 
         String msg = "Uncaught Exception detected.\n\nConfiguration:\n";
-        msg += "JHelioviewer - Version: " + JHVGlobals.version + "\n";
-        msg += "JHelioviewer - Revision: " + JHVGlobals.revision + "\n";
-        msg += "Java Virtual Machine - Name: " + System.getProperty("java.vm.name") + "\n";
-        msg += "Java Virtual Machine - Vendor: " + System.getProperty("java.vm.vendor") + "\n";
-        msg += "Java Virtual Machine - Version: " + System.getProperty("java.vm.version") + "\n";
-        msg += "JRE Specification - Version: " + System.getProperty("java.specification.version") + "\n";
-        msg += "Operating System - Name: " + System.getProperty("os.name") + "\n";
-        msg += "Operating System - Architecture: " + System.getProperty("os.arch") + "\n";
+        msg += "JHelioviewer - Version: " + JHVGlobals.version + '\n';
+        msg += "JHelioviewer - Revision: " + JHVGlobals.revision + '\n';
+        msg += "Java Virtual Machine - Name: " + System.getProperty("java.vm.name") + '\n';
+        msg += "Java Virtual Machine - Vendor: " + System.getProperty("java.vm.vendor") + '\n';
+        msg += "Java Virtual Machine - Version: " + System.getProperty("java.vm.version") + '\n';
+        msg += "JRE Specification - Version: " + System.getProperty("java.specification.version") + '\n';
+        msg += "Operating System - Name: " + System.getProperty("os.name") + '\n';
+        msg += "Operating System - Architecture: " + System.getProperty("os.arch") + '\n';
         msg += "Operating System - Version: " + System.getProperty("os.version") + "\n\n";
 
-        msg += "Date: " + new Date() + "\n";
-        msg += "Thread: " + t + "\n";
+        msg += "Date: " + new Date() + '\n';
+        msg += "Thread: " + t + '\n';
         msg += "Message: " + e.getMessage() + "\n\n";
         msg += "Stacktrace:\n";
         msg += stackTrace;
