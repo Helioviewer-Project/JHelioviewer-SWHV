@@ -474,7 +474,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            busyIndicator.incrementAngle();
+            BusyIndicator.incrementAngle();
 
             if (cacheChanged) {
                 cacheChanged = false;

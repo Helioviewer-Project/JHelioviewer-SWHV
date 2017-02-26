@@ -117,7 +117,7 @@ public class YAxis {
         private final String label;
 
         public YAxisLogScale(String _label) {
-            label = "log(" + _label.replace("^2", "\u00B2") + ")";
+            label = "log(" + _label.replace("^2", "\u00B2") + ')';
         }
 
         @Override
