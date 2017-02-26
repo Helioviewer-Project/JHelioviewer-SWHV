@@ -16,7 +16,7 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
 
     public LineDataVisibleCellRenderer() {
         setHorizontalAlignment(CENTER);
-        checkBox.putClientProperty("JComponent.sizeVariant", "mini");
+        checkBox.putClientProperty("JComponent.sizeVariant", "small");
         checkBox.setBorderPainted(true);
         checkBox.setBorder(LineDataSelectorTablePanel.commonBorder);
     }

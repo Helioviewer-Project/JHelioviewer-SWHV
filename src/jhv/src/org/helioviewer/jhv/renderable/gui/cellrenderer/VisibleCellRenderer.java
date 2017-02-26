@@ -14,7 +14,7 @@ public class VisibleCellRenderer extends TableCellRenderer {
 
     public VisibleCellRenderer() {
         setHorizontalAlignment(CENTER);
-        checkBox.putClientProperty("JComponent.sizeVariant", "mini");
+        checkBox.putClientProperty("JComponent.sizeVariant", "small");
         checkBox.setBorderPainted(true);
         checkBox.setBorder(TableCellRenderer.commonBorder);
     }
