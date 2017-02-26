@@ -96,7 +96,7 @@ public class TimelineDataPanel extends JPanel implements LineDataSelectorModelLi
         }
     }
 
-    private void updateBandController() {
+    void loadButtonPressed() {
         BandType bandType = (BandType) comboBoxData.getSelectedItem();
         if (bandType == null) // datasets not downloaded
             return;
@@ -104,11 +104,10 @@ public class TimelineDataPanel extends JPanel implements LineDataSelectorModelLi
         Band band = new Band(bandType);
         band.setDataColor(BandColors.getNextColor());
         DownloadController.updateBand(band, DrawController.availableAxis.start, DrawController.availableAxis.end);
-    }
 
-    private void updateDrawController() {
         Interval interval = defineInterval(calendarStartDate.getTime());
         DrawController.setSelectedInterval(interval.start, interval.end);
+        ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true);
     }
 
     private static Interval defineInterval(long time) {
@@ -139,13 +138,6 @@ public class TimelineDataPanel extends JPanel implements LineDataSelectorModelLi
         cal.add(Calendar.DAY_OF_MONTH, -2);
 
         return new Interval(cal.getTimeInMillis(), endTime);
-    }
-
-    public boolean loadButtonPressed(Object layer) {
-        ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true);
-        updateBandController();
-        updateDrawController();
-        return true;
     }
 
     @Override

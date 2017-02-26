@@ -104,7 +104,7 @@ public class ImageDataPanel extends JPanel {
         }
     }
 
-    public boolean loadButtonPressed(Object layer) {
+    boolean loadButtonPressed(Object layer) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
             Message.err("Data is not selected", "There is no information on what to add", false);
