@@ -137,18 +137,17 @@ class DrawControllerOptionsPanel extends JPanel {
     private static void computeMovieInterval() {
         View view = Layers.getActiveView();
         long now = System.currentTimeMillis();
-        if (view != null) {
+        if (view == null) {
+            DrawController.setSelectedInterval(now - 2 * TimeUtils.DAY_IN_MILLIS, now);
+        } else {
             if (view.isMultiFrame()) {
                 DrawController.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
-            }
-            else {
+            } else {
                 long end = view.getFirstTime().milli + TimeUtils.DAY_IN_MILLIS / 2;
                 if (end > now)
                     end = now;
                 DrawController.setSelectedInterval(view.getFirstTime().milli - TimeUtils.DAY_IN_MILLIS / 2, end);
             }
-        } else {
-            DrawController.setSelectedInterval(now - TimeUtils.DAY_IN_MILLIS, now);
         }
     }
 

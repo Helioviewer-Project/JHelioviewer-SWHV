@@ -2,15 +2,13 @@ package org.helioviewer.jhv.plugins.eveplugin.view;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
@@ -105,39 +103,17 @@ public class TimelineDataPanel extends JPanel implements LineDataSelectorModelLi
         band.setDataColor(BandColors.getNextColor());
         DownloadController.updateBand(band, DrawController.availableAxis.start, DrawController.availableAxis.end);
 
-        Interval interval = defineInterval(calendarStartDate.getTime());
-        DrawController.setSelectedInterval(interval.start, interval.end);
-        ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true);
-    }
+        long time = calendarStartDate.getTime();
+        ObservationDialogDateModel.setStartTime(time, true);
 
-    private static Interval defineInterval(long time) {
-        Interval movieInterval = new Interval(Layers.getStartDate().milli, Layers.getEndDate().milli);
-        if (movieInterval.containsPointInclusive(time)) {
-            return movieInterval;
+        long movieStart = Layers.getStartDate().milli;
+        long movieEnd = Layers.getEndDate().milli;
+        if (time >= movieStart && time <= movieEnd)
+            DrawController.setSelectedInterval(movieStart, movieEnd);
+        else {
+            long now = System.currentTimeMillis();
+            DrawController.setSelectedInterval(now - 2 * TimeUtils.DAY_IN_MILLIS, now);
         }
-
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(time);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-
-        long endTime = cal.getTimeInMillis();
-        long now = System.currentTimeMillis();
-        if (endTime > now) {
-            cal.setTimeInMillis(now);
-            cal.set(Calendar.HOUR, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            endTime = cal.getTimeInMillis();
-        }
-
-        cal.add(Calendar.DAY_OF_MONTH, -2);
-
-        return new Interval(cal.getTimeInMillis(), endTime);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         graphSize = new Rectangle();
 
         long d = System.currentTimeMillis();
-        availableAxis = new TimeAxis(d - TimeUtils.DAY_IN_MILLIS, d);
+        availableAxis = new TimeAxis(d - 2 * TimeUtils.DAY_IN_MILLIS, d);
         selectedAxis = new TimeAxis(availableAxis.start, availableAxis.end);
 
         isLocked = false;
