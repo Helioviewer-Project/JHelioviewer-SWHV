@@ -5,8 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -28,14 +27,7 @@ import com.jidesoft.swing.JideButton;
 public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
 
     private enum CameraMode {
-        OBSERVER("Observer View"), EARTH("Earth View"), EXPERT("Other view");
-
-        private final String display;
-
-        CameraMode(String s) {
-            display = s;
-        }
-
+        Observer, Earth, Other
     }
 
     private static final double FOVAngleDefault = 0.8;
@@ -51,44 +43,44 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
 
     public CameraOptionsPanel() {
         setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
         c.weighty = 1;
         c.gridx = 0;
         c.gridy = 0;
-        c.anchor = GridBagConstraints.CENTER;
-        c.fill = GridBagConstraints.HORIZONTAL;
 
-        JPanel radio = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        JPanel radio = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+        radio.add(new JLabel("View", JLabel.RIGHT));
+
         ButtonGroup group = new ButtonGroup();
-
         for (CameraMode mode : CameraMode.values()) {
-            JRadioButton item = new JRadioButton(mode.display);
-            if (mode == CameraMode.OBSERVER)
+            JRadioButton item = new JRadioButton(mode.toString());
+            if (mode == CameraMode.Observer)
                 item.setSelected(true);
             item.addActionListener(e -> changeCamera(mode));
             group.add(item);
             radio.add(item);
         }
-
         add(radio, c);
-        c.gridx = 1;
-        c.weightx = 0;
 
         JideButton info = new JideButton(Buttons.info);
         info.setToolTipText("Show viewpoint info");
         info.addActionListener(e -> new TextDialog("Viewpoint options information", explanation, false).showDialog());
+
+        c.gridx = 1;
+        c.weightx = 0;
         add(info, c);
 
-        // fov
+        JPanel fovPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+        fovPanel.add(new JLabel("FOV angle", JLabel.RIGHT));
+
         double min = 0, max = 180;
-
-        JPanel fovPanel = new JPanel();
-        fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
-        fovPanel.add(new JLabel("FOV angle"));
-
         JSpinner fovSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(FOVAngleDefault), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
+        fovSpinner.setMaximumSize(new Dimension(6, 22));
         fovSpinner.addChangeListener(e -> {
             FOVAngle = (Double) fovSpinner.getValue() * Math.PI / 180.;
             Displayer.display();
@@ -100,11 +92,7 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
         WheelSupport.installMouseWheelSupport(fovSpinner);
         fovPanel.add(fovSpinner);
 
-        fovSpinner.setMaximumSize(new Dimension(6, 22));
-        fovPanel.add(Box.createHorizontalGlue());
-
         c.weightx = 1;
-        c.gridwidth = 2;
         c.gridx = 0;
         c.gridy = 1;
         add(fovPanel, c);
@@ -151,11 +139,11 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
         CameraOptionPanel panel = null;
 
         switch (mode) {
-            case EXPERT:
+            case Other:
                 update = UpdateViewpoint.updateExpert;
                 panel = expertOptionPanel;
             break;
-            case EARTH:
+            case Earth:
                 update = UpdateViewpoint.updateEarth;
             break;
             default:
