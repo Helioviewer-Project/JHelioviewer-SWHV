@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.components;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -196,23 +197,27 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
         // Control buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 0));
+        int small = 18, big = 26;
 
-        prevFrameButton = new JideButton(Buttons.prev);
+        prevFrameButton = new JideButton(Buttons.backward);
+        prevFrameButton.setFont(Buttons.getMaterialFont(small));
         prevFrameButton.setToolTipText("Step to previous frame");
         prevFrameButton.addActionListener(getPreviousFrameAction());
         buttonPanel.add(prevFrameButton);
 
         playButton = new JideButton(Buttons.play);
+        playButton.setFont(Buttons.getMaterialFont(big));
         playButton.setToolTipText("Play movie");
         playButton.addActionListener(getPlayPauseAction());
         buttonPanel.add(playButton);
 
-        nextFrameButton = new JideButton(Buttons.next);
+        nextFrameButton = new JideButton(Buttons.forward);
+        nextFrameButton.setFont(Buttons.getMaterialFont(small));
         nextFrameButton.setToolTipText("Step to next frame");
         nextFrameButton.addActionListener(getNextFrameAction());
         buttonPanel.add(nextFrameButton);
 
-        recordButton = new RecordButton();
+        recordButton = new RecordButton(small);
         buttonPanel.add(recordButton);
 
         advancedButton = new JideButton(Buttons.optionsDown);
@@ -328,8 +333,10 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         private RecordMode mode = RecordMode.LOOP;
         private RecordSize size = RecordSize.ORIGINAL;
 
-        public RecordButton() {
+        public RecordButton(float size) {
             super(Buttons.record);
+            setFont(Buttons.getMaterialFont(size));
+            setForeground(Color.decode("#800000"));
             setToolTipText("Record movie");
             addActionListener(this);
         }

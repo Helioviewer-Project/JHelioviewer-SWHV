@@ -1,12 +1,26 @@
 package org.helioviewer.jhv.gui.components;
 
+import java.awt.Font;
+
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.helioviewer.jhv.gui.UIGlobals;
 
 public class Buttons {
 
     private static String uc2ent(MaterialDesign uc) {
         return StringEscapeUtils.escapeHtml4(String.valueOf(uc.code));
     }
+
+    public static Font getMaterialFont(float size) {
+        return UIGlobals.UIFontMDI.deriveFont(size);
+    }
+
+    public static final String close = String.valueOf(MaterialDesign.MDI_CLOSE.code);
+    public static final String play = String.valueOf(MaterialDesign.MDI_PLAY.code);
+    public static final String pause = String.valueOf(MaterialDesign.MDI_PAUSE.code);
+    public static final String backward = String.valueOf(MaterialDesign.MDI_STEP_BACKWARD.code);
+    public static final String forward = String.valueOf(MaterialDesign.MDI_STEP_FORWARD.code);
+    public static final String record = String.valueOf(MaterialDesign.MDI_RECORD.code);
 
     public static final String chevronRight = "<html><font face='Material Design Icons' size=4>" +
         uc2ent(MaterialDesign.MDI_CHEVRON_RIGHT) + "</font>&nbsp;";
@@ -17,17 +31,6 @@ public class Buttons {
         uc2ent(MaterialDesign.MDI_CHEVRON_RIGHT);
     public static final String optionsDown = "<html>Options<font face='Material Design Icons' size=4>" +
         uc2ent(MaterialDesign.MDI_CHEVRON_DOWN);
-
-    public static final String play = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_PLAY);
-    public static final String pause = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_PAUSE);
-    public static final String prev = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_CHEVRON_LEFT);
-    public static final String next = "<html><body style='width: 16px'><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_CHEVRON_RIGHT);
-    public static final String record = "<html><body style='width: 16px'><center><font face='Material Design Icons' color=#800000 size=5>" +
-        uc2ent(MaterialDesign.MDI_RECORD);
 
     public static final String newLayer = "<html><font face='Material Design Icons' size=4>" +
         uc2ent(MaterialDesign.MDI_PLUS_CIRCLE) + "</font>&nbsp;New Layer";
