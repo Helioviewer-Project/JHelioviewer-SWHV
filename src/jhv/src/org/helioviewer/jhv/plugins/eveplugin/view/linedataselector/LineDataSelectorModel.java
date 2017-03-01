@@ -8,10 +8,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
-import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
-import org.helioviewer.jhv.plugins.eveplugin.lines.BandType;
+import org.helioviewer.jhv.plugins.eveplugin.Timelines;
 
 public class LineDataSelectorModel implements TableModel {
 
@@ -49,14 +46,12 @@ public class LineDataSelectorModel implements TableModel {
 
     public static void removeLineData(LineDataSelectorElement element) {
         elements.remove(element);
-        BandColors.resetColor(element.getDataColor());
-
         fireLineDataSelectorElementRemoved(element);
         fireListeners();
     }
 
     private static void fireListeners() {
-        TableModelEvent e = new TableModelEvent(EVEPlugin.ldsm);
+        TableModelEvent e = new TableModelEvent(Timelines.ldsm);
         for (TableModelListener listener : tableListeners) {
             listener.tableChanged(e);
         }
@@ -134,8 +129,9 @@ public class LineDataSelectorModel implements TableModel {
         for (LineDataSelectorElement el : elements) {
             if (el instanceof Band) {
                 Band band = (Band) el;
-                if (band.getBandType().equals(bandType))
+                if (band.getBandType().equals(bandType)) {
                     return true;
+                }
             }
 
         }

@@ -21,6 +21,8 @@ public interface LineDataSelectorElement {
 
     Color getDataColor();
 
+    boolean hasDataColor();
+
     boolean isDownloading();
 
     boolean hasData();

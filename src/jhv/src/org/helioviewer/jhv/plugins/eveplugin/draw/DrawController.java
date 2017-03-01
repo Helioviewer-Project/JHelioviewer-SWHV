@@ -13,7 +13,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
-import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
@@ -88,10 +87,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
-                    if (move)
+                    if (move) {
                         el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
-                    if (zoom)
+                    }
+                    if (zoom) {
                         el.getYAxis().zoomSelectedRange(scrollDistance, graphSize.height - p.y - graphArea.y, graphArea.height);
+                    }
                     el.yaxisChanged();
                 } else if ((!inRightYAxes && !inLeftYAxis) && move) {
                     el.getYAxis().shiftDownPixels(distanceY, graphArea.height);

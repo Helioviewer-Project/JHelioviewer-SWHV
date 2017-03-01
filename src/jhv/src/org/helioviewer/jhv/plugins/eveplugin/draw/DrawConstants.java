@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin;
+package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.awt.Color;
 import java.awt.Font;

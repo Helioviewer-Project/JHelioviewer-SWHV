@@ -21,7 +21,7 @@ import javax.swing.border.MatteBorder;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.Timelines;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
@@ -48,7 +48,7 @@ public class LineDataSelectorTablePanel extends JPanel {
     public LineDataSelectorTablePanel() {
         setLayout(new GridBagLayout());
 
-        JTable grid = new JTable(EVEPlugin.ldsm) {
+        JTable grid = new JTable(Timelines.ldsm) {
 
             @Override
             public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
@@ -76,9 +76,10 @@ public class LineDataSelectorTablePanel extends JPanel {
 
             @Override
             public void lineDataRemoved(LineDataSelectorElement element) {
-                int i = EVEPlugin.ldsm.getRowCount() - 1;
-                if (i >= 0)
+                int i = Timelines.ldsm.getRowCount() - 1;
+                if (i >= 0) {
                     grid.getSelectionModel().setSelectionInterval(i, i);
+                }
             }
 
             @Override
@@ -99,7 +100,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         jsp.getViewport().setBackground(grid.getBackground());
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);
-        addLayerButton.addActionListener(e -> EVEPlugin.td.showDialog());
+        addLayerButton.addActionListener(e -> Timelines.td.showDialog());
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.WEST);
@@ -166,8 +167,9 @@ public class LineDataSelectorTablePanel extends JPanel {
                 Point pt = e.getPoint();
                 int row = grid.rowAtPoint(pt);
                 int col = grid.columnAtPoint(pt);
-                if (row < 0 || col < 0)
+                if (row < 0 || col < 0) {
                     return;
+                }
 
                 LineDataSelectorModel model = (LineDataSelectorModel) grid.getModel();
 
