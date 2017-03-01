@@ -87,7 +87,7 @@ public class MainContentPanel extends JPanel {
      * area. An split pane will be provided, if necessary, to readjust the
      * height of the components.
      * */
-    public void updateLayout() {
+    private void updateLayout() {
         splitPane.remove(collapsiblePane);
         remove(collapsiblePane);
         splitPane.setDividerSize(0);
