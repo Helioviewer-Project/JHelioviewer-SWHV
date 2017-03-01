@@ -13,19 +13,10 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
 public class TimelineTableModel implements TableModel {
 
-    private static final HashSet<TimelineTableModelListener> listeners = new HashSet<>();
-    private static final HashSet<TableModelListener> tableListeners = new HashSet<>();
+    private static final HashSet<TableModelListener> listeners = new HashSet<>();
     private static final ArrayList<TimelineRenderable> elements = new ArrayList<>();
 
     private static final int NUMBEROFCOLUMNS = 5;
-
-    public static void addLineDataSelectorModelListener(TimelineTableModelListener listener) {
-        listeners.add(listener);
-    }
-
-    public static void removeLineDataSelectorModelListener(TimelineTableModelListener listener) {
-        listeners.remove(listener);
-    }
 
     public static void downloadStarted(TimelineRenderable element) {
         fireListeners();
@@ -37,8 +28,7 @@ public class TimelineTableModel implements TableModel {
 
     public static void addLineData(TimelineRenderable element) {
         elements.add(element);
-        fireLineDataSelectorElementAdded(element);
-        fireListeners();
+        fireInsert(elements.size() - 1);
     }
 
     public static List<TimelineRenderable> getAllLineDataSelectorElements() {
@@ -47,7 +37,6 @@ public class TimelineTableModel implements TableModel {
 
     public static void removeLineData(TimelineRenderable element) {
         elements.remove(element);
-        fireLineDataSelectorElementRemoved(element);
         fireListeners();
     }
 
@@ -63,20 +52,15 @@ public class TimelineTableModel implements TableModel {
 
     private static void fireListeners() {
         TableModelEvent e = new TableModelEvent(Timelines.ldsm);
-        for (TableModelListener listener : tableListeners) {
+        for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
     }
 
-    private static void fireLineDataSelectorElementRemoved(TimelineRenderable element) {
-        for (TimelineTableModelListener listener : listeners) {
-            listener.lineDataRemoved();
-        }
-    }
-
-    private static void fireLineDataSelectorElementAdded(TimelineRenderable element) {
-        for (TimelineTableModelListener listener : listeners) {
-            listener.lineDataAdded(element);
+    private static void fireInsert(int idx) {
+        TableModelEvent e = new TableModelEvent(Timelines.ldsm, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
+        for (TableModelListener listener : listeners) {
+            listener.tableChanged(e);
         }
     }
 
@@ -112,22 +96,20 @@ public class TimelineTableModel implements TableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        elements.add(rowIndex, (TimelineRenderable) aValue);
     }
 
     @Override
     public void addTableModelListener(TableModelListener l) {
-        tableListeners.add(l);
+        listeners.add(l);
     }
 
     @Override
     public void removeTableModelListener(TableModelListener l) {
-        tableListeners.remove(l);
+        listeners.remove(l);
     }
 
-    public static void removeRow(int row) {
-        TimelineRenderable el = elements.get(row);
-        el.removeLineData();
+    static void removeRow(int row) {
+        elements.get(row).removeLineData();
     }
 
     public static int getNumberOfAxes() {
@@ -138,10 +120,6 @@ public class TimelineTableModel implements TableModel {
             }
         }
         return ct;
-    }
-
-    static int getRowIndex(TimelineRenderable element) {
-        return elements.indexOf(element);
     }
 
 }

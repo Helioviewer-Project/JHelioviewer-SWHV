@@ -170,8 +170,6 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        // renderables.add(rowIndex, (Renderable) aValue);
-        // fireListeners();
     }
 
     @Override

@@ -17,6 +17,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
+import javax.swing.event.TableModelEvent;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -66,22 +67,11 @@ public class TimelinePanel extends JPanel {
 
         };
 
-        TimelineTableModel.addLineDataSelectorModelListener(new TimelineTableModelListener() {
-
-            @Override
-            public void lineDataAdded(TimelineRenderable element) {
-                int i = TimelineTableModel.getRowIndex(element);
-                grid.getSelectionModel().setSelectionInterval(i, i);
+        Timelines.ldsm.addTableModelListener(e -> {
+            if (e.getType() == TableModelEvent.INSERT) {
+                int idx = e.getFirstRow();
+                grid.getSelectionModel().setSelectionInterval(idx, idx);
             }
-
-            @Override
-            public void lineDataRemoved() {
-                int i = Timelines.ldsm.getRowCount() - 1;
-                if (i >= 0) {
-                    grid.getSelectionModel().setSelectionInterval(i, i);
-                }
-            }
-
         });
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -181,10 +171,11 @@ public class TimelinePanel extends JPanel {
                 }
                 if (col == REMOVE_COL) {
                     TimelineTableModel.removeRow(row);
+                    int idx = grid.getSelectedRow();
+                    if (row <= idx)
+                        grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
                     DrawController.fireRedrawRequest();
                 }
-                revalidate();
-                repaint();
             }
         });
 
