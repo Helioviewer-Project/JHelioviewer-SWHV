@@ -15,10 +15,9 @@ import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModelListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-public class DrawController implements TimelineTableModelListener, JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {
+public class DrawController implements JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {
 
     public static final TimeAxis selectedAxis;
     public static final TimeAxis availableAxis;
@@ -215,17 +214,6 @@ public class DrawController implements TimelineTableModelListener, JHVEventHighl
         if (isLocked && latestMovieTime != Long.MIN_VALUE) {
             centraliseSelected(latestMovieTime);
         }
-    }
-
-    @Override
-    public void lineDataRemoved() {
-        createGraphArea();
-        fireRedrawRequest();
-    }
-
-    @Override
-    public void lineDataAdded(TimelineRenderable element) {
-        createGraphArea();
     }
 
     @Override
