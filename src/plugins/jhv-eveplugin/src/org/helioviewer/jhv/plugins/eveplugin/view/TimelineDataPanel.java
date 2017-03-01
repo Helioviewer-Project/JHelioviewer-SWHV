@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -30,7 +31,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
-public class TimelineDataPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener {
+public class TimelineDataPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener, TimelineContentPanel {
 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
@@ -190,6 +191,11 @@ public class TimelineDataPanel extends ObservationDialogPanel implements LineDat
 
     @Override
     public void endTimeChanged(long endTime) {
+    }
+
+    @Override
+    public JComponent getTimelineContentPanel() {
+        return this;
     }
 
 }
