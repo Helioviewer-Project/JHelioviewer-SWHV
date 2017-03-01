@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.events;
+package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.Color;
 import java.awt.Component;

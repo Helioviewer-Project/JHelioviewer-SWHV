@@ -7,7 +7,6 @@ import javax.swing.JComponent;
 
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.events.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
 import org.helioviewer.jhv.plugins.eveplugin.view.TimelineDataPanel;
@@ -22,13 +21,11 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     public static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("EVE", MAX_WORKER_THREADS);
 
     public static final RadioData rd = new RadioData();
-    public static final EventModel em = new EventModel();
 
     private final Timelines tl = new Timelines();
 
     public EVEPlugin() {
         LineDataSelectorModel.addLineData(rd);
-        LineDataSelectorModel.addLineData(em);
     }
 
     @Override
