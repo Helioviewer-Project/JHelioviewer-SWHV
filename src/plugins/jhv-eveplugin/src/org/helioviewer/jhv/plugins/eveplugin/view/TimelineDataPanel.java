@@ -25,12 +25,12 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.lines.DownloadController;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.TimelineContentPanel;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModelListener;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModelListener;
 
 @SuppressWarnings("serial")
-public class TimelineDataPanel extends JPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener, TimelineContentPanel {
+public class TimelineDataPanel extends JPanel implements TimelineTableModelListener, TimespanListener, ObservationDialogDateModelListener, TimelineContentPanel {
 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
@@ -92,7 +92,7 @@ public class TimelineDataPanel extends JPanel implements LineDataSelectorModelLi
         BandType[] values = BandTypeAPI.getBandTypes(selectedGroup);
         Set<BandType> bandTypesInSelectorModel = new HashSet<BandType>();
 
-        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             if (el instanceof Band) {
                 Band band = (Band) el;
 
@@ -133,7 +133,7 @@ public class TimelineDataPanel extends JPanel implements LineDataSelectorModelLi
     }
 
     @Override
-    public void lineDataAdded(LineDataSelectorElement element) {
+    public void lineDataAdded(TimelineRenderable element) {
         updateGroupValues();
     }
 

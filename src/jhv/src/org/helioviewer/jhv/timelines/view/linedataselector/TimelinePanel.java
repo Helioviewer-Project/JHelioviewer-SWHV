@@ -32,7 +32,7 @@ import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RemoveCe
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class LineDataSelectorTablePanel extends JPanel {
+public class TimelinePanel extends JPanel {
 
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
@@ -45,7 +45,7 @@ public class LineDataSelectorTablePanel extends JPanel {
 
     private final JPanel optionsPanelWrapper;
 
-    public LineDataSelectorTablePanel() {
+    public TimelinePanel() {
         setLayout(new GridBagLayout());
 
         JTable grid = new JTable(Timelines.ldsm) {
@@ -66,11 +66,11 @@ public class LineDataSelectorTablePanel extends JPanel {
 
         };
 
-        LineDataSelectorModel.addLineDataSelectorModelListener(new LineDataSelectorModelListener() {
+        TimelineTableModel.addLineDataSelectorModelListener(new TimelineTableModelListener() {
 
             @Override
-            public void lineDataAdded(LineDataSelectorElement element) {
-                int i = LineDataSelectorModel.getRowIndex(element);
+            public void lineDataAdded(TimelineRenderable element) {
+                int i = TimelineTableModel.getRowIndex(element);
                 grid.getSelectionModel().setSelectionInterval(i, i);
             }
 
@@ -171,21 +171,21 @@ public class LineDataSelectorTablePanel extends JPanel {
                     return;
                 }
 
-                LineDataSelectorModel model = (LineDataSelectorModel) grid.getModel();
+                TimelineTableModel model = (TimelineTableModel) grid.getModel();
 
                 if (col == VISIBLE_COL) {
-                    LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
+                    TimelineRenderable lineDataElement = (TimelineRenderable) model.getValueAt(row, col);
                     boolean visible = !lineDataElement.isVisible();
 
                     lineDataElement.setVisibility(visible);
-                    LineDataSelectorModel.fireLineDataSelectorElementVisibility(lineDataElement, visible);
+                    TimelineTableModel.fireLineDataSelectorElementVisibility(lineDataElement, visible);
                 }
                 if (col == TITLE_COL || col == LOADING_COL || col == LINECOLOR_COL) {
-                    LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
+                    TimelineRenderable lineDataElement = (TimelineRenderable) model.getValueAt(row, col);
                     setOptionsPanel(lineDataElement);
                 }
                 if (col == REMOVE_COL) {
-                    LineDataSelectorModel.removeRow(row);
+                    TimelineTableModel.removeRow(row);
                 }
                 revalidate();
                 repaint();
@@ -194,7 +194,7 @@ public class LineDataSelectorTablePanel extends JPanel {
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                setOptionsPanel((LineDataSelectorElement) grid.getValueAt(grid.getSelectedRow(), 0));
+                setOptionsPanel((TimelineRenderable) grid.getValueAt(grid.getSelectedRow(), 0));
             }
         });
 
@@ -217,7 +217,7 @@ public class LineDataSelectorTablePanel extends JPanel {
         return rowHeight;
     }
 
-    private void setOptionsPanel(LineDataSelectorElement lineDataElement) {
+    private void setOptionsPanel(TimelineRenderable lineDataElement) {
         optionsPanelWrapper.removeAll();
         Component optionsPanel = lineDataElement.getOptionsPanel();
         if (optionsPanel != null) {

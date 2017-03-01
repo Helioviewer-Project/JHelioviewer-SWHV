@@ -24,10 +24,10 @@ import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.view.linedataselector.AbstractLineDataSelectorElement;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
-public class EventLineDataSelectorElement extends AbstractLineDataSelectorElement implements JHVEventHandler {
+public class EventLineDataSelectorElement extends AbstractTimelineRenderable implements JHVEventHandler {
 
     private static Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class EventLineDataSelectorElement extends AbstractLineDataSelectorElemen
     @Override
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> _events) {
         events = _events;
-        LineDataSelectorModel.downloadFinished(this);
+        TimelineTableModel.downloadFinished(this);
         if (isVisible) {
             DrawController.fireRedrawRequest();
         }

@@ -13,12 +13,12 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModelListener;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModelListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {
+public class DrawController implements TimelineTableModelListener, JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {
 
     public static final TimeAxis selectedAxis;
     public static final TimeAxis availableAxis;
@@ -84,7 +84,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
         int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         int ct = -1;
-        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
                     if (move) {
@@ -113,7 +113,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
         int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         int ct = -1;
-        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
                     el.resetAxis();
@@ -152,7 +152,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public static void moveAllAxes(double distanceY) {
-        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 el.getYAxis().shiftDownPixels(distanceY, graphArea.height);
             }
@@ -172,7 +172,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
         optionsPanel.updateSelectedInterval();
 
-        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             el.fetchData(selectedAxis);
         }
         fireRedrawRequest();
@@ -183,7 +183,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
             selectedAxis.set(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)), false);
             fireRedrawRequest();
-            for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+            for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
                 el.fetchData(selectedAxis);
             }
         }
@@ -197,7 +197,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     private static void createGraphArea() {
         int height = graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE);
-        int noRightAxes = Math.max(0, (LineDataSelectorModel.getNumberOfAxes() - 1));
+        int noRightAxes = Math.max(0, (TimelineTableModel.getNumberOfAxes() - 1));
         int width = (graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + noRightAxes * DrawConstants.RIGHT_AXIS_WIDTH));
         graphArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, width, height);
     }
@@ -224,7 +224,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void lineDataAdded(LineDataSelectorElement element) {
+    public void lineDataAdded(TimelineRenderable element) {
         createGraphArea();
     }
 

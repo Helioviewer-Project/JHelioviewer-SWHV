@@ -18,10 +18,10 @@ import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.view.linedataselector.AbstractLineDataSelectorElement;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
-public class Band extends AbstractLineDataSelectorElement {
+public class Band extends AbstractTimelineRenderable {
 
     private final BandType bandType;
     private final LineOptionPanel optionsPanel;
@@ -39,7 +39,7 @@ public class Band extends AbstractLineDataSelectorElement {
         optionsPanel = new LineOptionPanel(this);
 
         DrawController.fireRedrawRequest();
-        LineDataSelectorModel.addLineData(this);
+        TimelineTableModel.addLineData(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
     }
 
@@ -69,7 +69,7 @@ public class Band extends AbstractLineDataSelectorElement {
 
     @Override
     public void removeLineData() {
-        LineDataSelectorModel.removeLineData(this);
+        TimelineTableModel.removeLineData(this);
         BandColors.resetColor(getDataColor());
     }
 

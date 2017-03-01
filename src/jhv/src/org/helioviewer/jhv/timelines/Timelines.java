@@ -11,20 +11,20 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.TimelineDialog;
 import org.helioviewer.jhv.timelines.view.chart.PlotPanel;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorTablePanel;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelinePanel;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class Timelines implements MainContentPanelPlugin {
 
-    public static final LineDataSelectorModel ldsm = new LineDataSelectorModel();
+    public static final TimelineTableModel ldsm = new TimelineTableModel();
     private static final DrawController dc = new DrawController();
     public static final TimelineDialog td = new TimelineDialog();
     private final LinkedList<JComponent> pluginPanes = new LinkedList<>();
     private final PlotPanel plotOne = new PlotPanel();
-    private static final LineDataSelectorTablePanel timelinePanel = new LineDataSelectorTablePanel();
+    private static final TimelinePanel timelinePanel = new TimelinePanel();
 
     public Timelines() {
-        LineDataSelectorModel.addLineDataSelectorModelListener(dc);
+        TimelineTableModel.addLineDataSelectorModelListener(dc);
     }
 
     public void installTimelines() {

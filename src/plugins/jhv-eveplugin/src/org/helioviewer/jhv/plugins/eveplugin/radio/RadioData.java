@@ -27,12 +27,12 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.view.linedataselector.AbstractLineDataSelectorElement;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 
-public class RadioData extends AbstractLineDataSelectorElement {
+public class RadioData extends AbstractTimelineRenderable {
 
     private static final YAxis yAxis = new YAxis(400, 20, "Mhz", false);
 
@@ -130,7 +130,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
         public RadioJPXDownload(ArrayList<Long> _toDownload) {
             isDownloading++;
             toDownload = _toDownload;
-            LineDataSelectorModel.downloadStarted(EVEPlugin.rd);
+            TimelineTableModel.downloadStarted(EVEPlugin.rd);
         }
 
         @Override
@@ -169,7 +169,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
                 for (DownloadedJPXData jp2Data : jpList) {
                     cache.put(jp2Data.getStartDate(), jp2Data);
                 }
-                LineDataSelectorModel.downloadFinished(EVEPlugin.rd);
+                TimelineTableModel.downloadFinished(EVEPlugin.rd);
                 DrawController.fireRedrawRequest();
             } catch (InterruptedException | ExecutionException e) {
                 Log.error("RadioData error: " + e.getCause().getMessage());

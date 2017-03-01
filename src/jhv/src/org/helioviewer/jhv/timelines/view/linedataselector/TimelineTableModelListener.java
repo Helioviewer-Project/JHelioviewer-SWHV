@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.timelines.view.linedataselector;
 
-public interface LineDataSelectorModelListener {
+public interface TimelineTableModelListener {
 
-    void lineDataAdded(LineDataSelectorElement element);
+    void lineDataAdded(TimelineRenderable element);
 
     void lineDataRemoved();
 
