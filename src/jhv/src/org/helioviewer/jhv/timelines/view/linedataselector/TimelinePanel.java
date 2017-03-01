@@ -130,7 +130,7 @@ public class TimelinePanel extends JPanel {
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             int row = grid.getSelectedRow();
-            if (row != -1 && !e.getValueIsAdjusting()) {
+            if (row != -1 && row < grid.getRowCount() && !e.getValueIsAdjusting()) {
                 setOptionsPanel((TimelineRenderable) grid.getValueAt(row, 0));
             }
         });
