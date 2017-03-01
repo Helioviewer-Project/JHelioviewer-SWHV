@@ -3,7 +3,7 @@ package org.helioviewer.jhv.renderable.gui.cellrenderer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 @SuppressWarnings("serial")
-public class TimeCellRenderer extends TableCellRenderer {
+public class RendererTime extends TableCellRenderer {
 
     @Override
     public void setValue(Object value) {

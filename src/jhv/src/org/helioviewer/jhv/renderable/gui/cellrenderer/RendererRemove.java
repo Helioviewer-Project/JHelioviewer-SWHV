@@ -6,11 +6,11 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 @SuppressWarnings("serial")
-public class RemoveCellRenderer extends TableCellRenderer {
+public class RendererRemove extends TableCellRenderer {
 
     private final Font font = Buttons.getMaterialFont(getFont().getSize2D());
 
-    public RemoveCellRenderer() {
+    public RendererRemove() {
         setHorizontalAlignment(CENTER);
     }
 

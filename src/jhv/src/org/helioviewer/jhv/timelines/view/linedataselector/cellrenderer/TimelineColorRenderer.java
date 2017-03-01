@@ -12,7 +12,7 @@ import org.helioviewer.jhv.timelines.view.linedataselector.TimelinePanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class LineColorRenderer extends DefaultTableCellRenderer {
+public class TimelineColorRenderer extends DefaultTableCellRenderer {
 
     private final LineColorPanel lineColorPanel = new LineColorPanel();
 

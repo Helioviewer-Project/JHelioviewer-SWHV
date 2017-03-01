@@ -10,11 +10,11 @@ import org.helioviewer.jhv.timelines.view.linedataselector.TimelinePanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
+public class TimelineVisibleRenderer extends DefaultTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
 
-    public LineDataVisibleCellRenderer() {
+    public TimelineVisibleRenderer() {
         setHorizontalAlignment(CENTER);
         checkBox.putClientProperty("JComponent.sizeVariant", "small");
         checkBox.setBorderPainted(true);
