@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.draw;
+package org.helioviewer.jhv.plugins.timelines.draw;
 
 import java.awt.Component;
 import java.awt.Point;
@@ -13,9 +13,9 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {

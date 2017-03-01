@@ -8,9 +8,9 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawConstants;
+import org.helioviewer.jhv.plugins.timelines.draw.TimeAxis;
+import org.helioviewer.jhv.plugins.timelines.draw.YAxis;
 
 class BandCache {
 

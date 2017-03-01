@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer;
+package org.helioviewer.jhv.plugins.timelines.view.linedataselector.cellrenderer;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorTablePanel;
 
 @SuppressWarnings("serial")
 public class LineColorRenderer extends DefaultTableCellRenderer {

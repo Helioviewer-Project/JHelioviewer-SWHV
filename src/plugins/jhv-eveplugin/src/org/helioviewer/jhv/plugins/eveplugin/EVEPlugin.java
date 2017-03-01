@@ -11,7 +11,8 @@ import org.helioviewer.jhv.plugins.eveplugin.events.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
 import org.helioviewer.jhv.plugins.eveplugin.view.TimelineDataPanel;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.plugins.timelines.Timelines;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 

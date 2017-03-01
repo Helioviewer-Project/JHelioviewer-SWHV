@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.view.chart;
+package org.helioviewer.jhv.plugins.timelines.view.chart;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

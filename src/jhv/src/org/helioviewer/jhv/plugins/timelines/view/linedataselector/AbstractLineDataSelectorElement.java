@@ -1,6 +1,6 @@
-package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector;
+package org.helioviewer.jhv.plugins.timelines.view.linedataselector;
 
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawController;
 
 public abstract class AbstractLineDataSelectorElement implements LineDataSelectorElement {
 

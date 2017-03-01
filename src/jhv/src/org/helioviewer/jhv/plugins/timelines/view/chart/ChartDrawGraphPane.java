@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.view.chart;
+package org.helioviewer.jhv.plugins.timelines.view.chart;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -35,14 +35,14 @@ import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.plugins.timelines.draw.ClickableDrawable;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawConstants;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawController;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawControllerListener;
+import org.helioviewer.jhv.plugins.timelines.draw.TimeAxis;
+import org.helioviewer.jhv.plugins.timelines.draw.YAxis;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
 
 @SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {

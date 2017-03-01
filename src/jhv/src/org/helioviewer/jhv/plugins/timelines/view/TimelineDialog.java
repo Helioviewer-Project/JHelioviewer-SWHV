@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.view;
+package org.helioviewer.jhv.plugins.timelines.view;
 
 import java.awt.event.ActionEvent;
 
@@ -10,7 +10,7 @@ import javax.swing.JComponent;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
+import org.helioviewer.jhv.plugins.timelines.TimelineSettings;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -53,7 +53,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         setInitFocusedComponent(okBtn);
 
         JButton availabilityBtn = new JButton("Available data");
-        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(EVESettings.availabilityURL));
+        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.availabilityURL));
 
         ButtonPanel panel = new ButtonPanel();
         panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);

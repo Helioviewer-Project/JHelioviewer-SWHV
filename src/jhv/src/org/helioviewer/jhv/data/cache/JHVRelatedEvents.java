@@ -15,7 +15,7 @@ import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
-import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
+import org.helioviewer.jhv.plugins.timelines.draw.ClickableDrawable;
 
 public class JHVRelatedEvents implements ClickableDrawable {
 

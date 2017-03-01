@@ -19,16 +19,17 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandColors;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandGroup;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.lines.DownloadController;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawController;
+import org.helioviewer.jhv.plugins.timelines.view.TimelineContentPanel;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
 public class TimelineDataPanel extends ObservationDialogPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener, TimelineContentPanel {

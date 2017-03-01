@@ -14,13 +14,13 @@ import java.util.Map;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.AbstractLineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.plugins.timelines.draw.ClickableDrawable;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawConstants;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawController;
+import org.helioviewer.jhv.plugins.timelines.draw.TimeAxis;
+import org.helioviewer.jhv.plugins.timelines.draw.YAxis;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.AbstractLineDataSelectorElement;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
 
 public class Band extends AbstractLineDataSelectorElement {
 
