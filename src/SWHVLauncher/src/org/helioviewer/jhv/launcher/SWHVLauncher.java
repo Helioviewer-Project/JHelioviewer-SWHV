@@ -7,7 +7,7 @@ import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.plugins.timelines.Timelines;
+import org.helioviewer.jhv.timelines.Timelines;
 
 /**
  * Class for launching jhv with several plugins added.

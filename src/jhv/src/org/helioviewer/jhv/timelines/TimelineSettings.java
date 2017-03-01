@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.timelines;
+package org.helioviewer.jhv.timelines;
 
 public class TimelineSettings {
 

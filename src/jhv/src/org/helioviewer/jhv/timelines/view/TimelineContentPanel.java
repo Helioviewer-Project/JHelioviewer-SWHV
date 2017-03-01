@@ -1,8 +1,8 @@
-package org.helioviewer.jhv.plugins.timelines.view;
+package org.helioviewer.jhv.timelines.view;
 
 import javax.swing.JComponent;
 
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModelListener;
+import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModelListener;
 
 public interface TimelineContentPanel extends LineDataSelectorModelListener {
     public abstract void loadButtonPressed();

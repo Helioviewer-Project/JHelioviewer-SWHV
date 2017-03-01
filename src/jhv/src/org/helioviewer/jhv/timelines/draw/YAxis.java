@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.timelines.draw;
+package org.helioviewer.jhv.timelines.draw;
 
 
 public class YAxis {

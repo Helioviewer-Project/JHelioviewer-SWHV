@@ -8,7 +8,7 @@ import java.util.HashMap;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.plugins.timelines.TimelineSettings;
+import org.helioviewer.jhv.timelines.TimelineSettings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

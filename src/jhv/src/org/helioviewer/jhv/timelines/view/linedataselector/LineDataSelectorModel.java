@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.timelines.view.linedataselector;
+package org.helioviewer.jhv.timelines.view.linedataselector;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,8 +8,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.plugins.timelines.Timelines;
-import org.helioviewer.jhv.plugins.timelines.draw.ClickableDrawable;
+import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
 public class LineDataSelectorModel implements TableModel {
 
