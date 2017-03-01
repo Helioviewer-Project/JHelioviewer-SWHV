@@ -26,7 +26,6 @@ public class Timelines implements Plugin, MainContentPanelPlugin {
 
     public Timelines() {
         LineDataSelectorModel.addLineDataSelectorModelListener(dc);
-        LineDataSelectorModel.addLineDataSelectorModelListener(td.getObservationPanel());
     }
 
     @Override
