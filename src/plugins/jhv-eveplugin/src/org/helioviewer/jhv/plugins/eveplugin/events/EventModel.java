@@ -20,6 +20,7 @@ import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
@@ -291,7 +292,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     @Override
-    public Object getElementUnderMouse() {
+    public ClickableDrawable getElementUnderMouse() {
         return getEventUnderMouse();
     }
 

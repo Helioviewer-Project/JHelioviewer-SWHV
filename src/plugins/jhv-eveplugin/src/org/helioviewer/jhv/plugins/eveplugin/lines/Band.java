@@ -14,6 +14,7 @@ import java.util.Map;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
@@ -232,7 +233,7 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public Object getElementUnderMouse() {
+    public ClickableDrawable getElementUnderMouse() {
         return null;
     }
 
