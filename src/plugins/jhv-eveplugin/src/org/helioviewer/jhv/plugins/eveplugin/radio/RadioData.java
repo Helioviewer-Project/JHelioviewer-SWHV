@@ -24,7 +24,6 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.threads.JHVWorker;
-import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -289,10 +288,6 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public void yaxisChanged() {
-    }
-
-    @Override
     public void zoomToFitAxis() {
         yAxis.reset(400, 20);
     }
@@ -300,35 +295,6 @@ public class RadioData extends AbstractLineDataSelectorElement {
     @Override
     public void resetAxis() {
         yAxis.reset(400, 20);
-    }
-
-    @Override
-    public boolean highLightChanged(Point p) {
-        return false;
-    }
-
-    @Override
-    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
-    }
-
-    @Override
-    public boolean hasDataColor() {
-        return false;
-    }
-
-    @Override
-    public boolean hasValueAsString() {
-        return false;
-    }
-
-    @Override
-    public String getStringValue(long ts) {
-        return null;
-    }
-
-    @Override
-    public ClickableDrawable getElementUnderMouse() {
-        return null;
     }
 
 }
