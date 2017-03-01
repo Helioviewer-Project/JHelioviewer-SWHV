@@ -80,12 +80,6 @@ public class TimelineTableModel implements TableModel {
         }
     }
 
-    static void fireLineDataSelectorElementVisibility(TimelineRenderable element, boolean flag) {
-        for (TimelineTableModelListener listener : listeners) {
-            listener.lineDataVisibility();
-        }
-    }
-
     @Override
     public int getRowCount() {
         return elements.size();

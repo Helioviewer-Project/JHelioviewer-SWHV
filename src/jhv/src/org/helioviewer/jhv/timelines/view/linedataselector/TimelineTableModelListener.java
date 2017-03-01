@@ -6,6 +6,4 @@ public interface TimelineTableModelListener {
 
     void lineDataRemoved();
 
-    void lineDataVisibility();
-
 }

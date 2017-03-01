@@ -101,10 +101,6 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         }
 
         @Override
-        public void lineDataVisibility() {
-        }
-
-        @Override
         public void loadButtonPressed() {
         }
 

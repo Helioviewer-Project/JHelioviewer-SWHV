@@ -82,10 +82,6 @@ public class TimelinePanel extends JPanel {
                 }
             }
 
-            @Override
-            public void lineDataVisibility() {
-            }
-
         });
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -176,9 +172,7 @@ public class TimelinePanel extends JPanel {
                 if (col == VISIBLE_COL) {
                     TimelineRenderable lineDataElement = (TimelineRenderable) model.getValueAt(row, col);
                     boolean visible = !lineDataElement.isVisible();
-
                     lineDataElement.setVisibility(visible);
-                    TimelineTableModel.fireLineDataSelectorElementVisibility(lineDataElement, visible);
                 }
                 if (col == TITLE_COL || col == LOADING_COL || col == LINECOLOR_COL) {
                     TimelineRenderable lineDataElement = (TimelineRenderable) model.getValueAt(row, col);
