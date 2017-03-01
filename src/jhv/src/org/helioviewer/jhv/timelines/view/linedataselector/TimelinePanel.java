@@ -38,11 +38,15 @@ public class TimelinePanel extends JPanel {
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
     private static final int ICON_WIDTH = 12;
+
     private static final int VISIBLE_COL = 0;
     private static final int TITLE_COL = 1;
-    private static final int LOADING_COL = 2;
+    static final int LOADING_COL = 2;
     private static final int LINECOLOR_COL = 3;
     private static final int REMOVE_COL = 4;
+
+    static final int NUMBEROFCOLUMNS = 5;
+    private static final int NUMBEROFVISIBLEROWS = 4;
 
     private final JPanel optionsPanelWrapper;
 
@@ -122,6 +126,13 @@ public class TimelinePanel extends JPanel {
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
+        grid.getSelectionModel().addListSelectionListener(e -> {
+            int row = grid.getSelectedRow();
+            if (!e.getValueIsAdjusting() && row != -1 && row < grid.getRowCount()) {
+                setOptionsPanel((TimelineRenderable) grid.getValueAt(row, 0));
+            }
+        });
+
         grid.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -179,14 +190,8 @@ public class TimelinePanel extends JPanel {
             }
         });
 
-        grid.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && grid.getSelectedRow() != -1) {
-                setOptionsPanel((TimelineRenderable) grid.getValueAt(grid.getSelectedRow(), 0));
-            }
-        });
-
         int h = getGridRowHeight(grid);
-        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, h * 4 + 1));
+        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, h * NUMBEROFVISIBLEROWS + 1));
         grid.setRowHeight(h);
 
         optionsPanelWrapper = new JPanel(new BorderLayout());
