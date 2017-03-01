@@ -86,8 +86,9 @@ public class RadioData extends AbstractLineDataSelectorElement {
     private long latest_cache_end = -1;
 
     private void requestAndOpenIntervals(long start, long end) {
-        if (latest_cache_start != -1 && latest_cache_end != -1 && start >= latest_cache_start && end <= latest_cache_end)
+        if (latest_cache_start != -1 && latest_cache_end != -1 && start >= latest_cache_start && end <= latest_cache_end) {
             return;
+        }
         latest_cache_start = start - start % TimeUtils.DAY_IN_MILLIS - 2 * TimeUtils.DAY_IN_MILLIS;
         latest_cache_end = latest_cache_start + DAYS_IN_CACHE * TimeUtils.DAY_IN_MILLIS;
 
@@ -140,16 +141,18 @@ public class RadioData extends AbstractLineDataSelectorElement {
                 try {
                     APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
                     URI uri = APIRequestManager.requestRemoteFile(req);
-                    if (uri == null)
+                    if (uri == null) {
                         continue;
+                    }
 
-                    if (remotes.contains(uri)) // seen before
+                    if (remotes.contains(uri)) {
                         jpList.add(new DownloadedJPXData(null, req.startTime));
-                    else {
+                    } else {
                         remotes.add(uri);
                         View v = APIRequestManager.loadView(uri, req);
-                        if (v instanceof JP2ViewCallisto)
+                        if (v instanceof JP2ViewCallisto) {
                             jpList.add(new DownloadedJPXData((JP2ViewCallisto) v, req.startTime));
+                        }
                     }
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file: " + e.getMessage());
@@ -163,8 +166,9 @@ public class RadioData extends AbstractLineDataSelectorElement {
             try {
                 isDownloading--;
                 ArrayList<DownloadedJPXData> jpList = get();
-                for (DownloadedJPXData jp2Data : jpList)
+                for (DownloadedJPXData jp2Data : jpList) {
                     cache.put(jp2Data.getStartDate(), jp2Data);
+                }
                 LineDataSelectorModel.downloadFinished(EVEPlugin.rd);
                 DrawController.fireRedrawRequest();
             } catch (InterruptedException | ExecutionException e) {
@@ -175,8 +179,9 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     private static void requestForData() {
-        for (DownloadedJPXData jpxData : cache.values())
+        for (DownloadedJPXData jpxData : cache.values()) {
             jpxData.requestData();
+        }
     }
 
     @Override
@@ -191,8 +196,8 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
     @Override
     public void removeLineData() {
-        //clearCache();
-        //EVEPlugin.ldsm.removeLineData(this);
+        // clearCache();
+        // EVEPlugin.ldsm.removeLineData(this);
     }
 
     @Override
@@ -231,8 +236,9 @@ public class RadioData extends AbstractLineDataSelectorElement {
     @Override
     public boolean hasData() {
         for (DownloadedJPXData djpx : cache.values()) {
-            if (djpx.hasData())
+            if (djpx.hasData()) {
                 return true;
+            }
         }
         return false;
     }
@@ -302,6 +308,11 @@ public class RadioData extends AbstractLineDataSelectorElement {
 
     @Override
     public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    }
+
+    @Override
+    public boolean hasDataColor() {
+        return false;
     }
 
 }

@@ -19,8 +19,8 @@ import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.JHVEventType;
-import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -63,8 +63,9 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     }
 
     public static JHVRelatedEvents getEventUnderMouse() {
-        if (eventUnderMouse == null)
+        if (eventUnderMouse == null) {
             return null;
+        }
         return eventUnderMouse.event;
     }
 
@@ -265,11 +266,18 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     @Override
     public boolean highLightChanged(Point p) {
-        if (!isVisible || events.isEmpty())
+        if (!isVisible || events.isEmpty()) {
             return false;
-        if (eventUnderMouse == null)
+        }
+        if (eventUnderMouse == null) {
             return true;
+        }
         return !(eventUnderMouse.x0 <= p.x && p.x <= eventUnderMouse.x1 && eventUnderMouse.yPosition - 4 <= p.y && p.y <= eventUnderMouse.yPosition + 5);
+    }
+
+    @Override
+    public boolean hasDataColor() {
+        return false;
     }
 
 }
