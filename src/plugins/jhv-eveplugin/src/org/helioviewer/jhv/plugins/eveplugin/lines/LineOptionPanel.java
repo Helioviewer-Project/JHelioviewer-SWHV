@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
 
 @SuppressWarnings("serial")
 class LineOptionPanel extends JPanel {
@@ -44,7 +43,7 @@ class LineOptionPanel extends JPanel {
         c.anchor = GridBagConstraints.EAST;
 
         JButton availabilityButton = new JButton("Available data");
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(EVESettings.availabilityURL + '#' + band.getBandType().getName()));
+        availabilityButton.addActionListener(e -> JHVGlobals.openURL(TimelineSettings.availabilityURL + '#' + band.getBandType().getName()));
         add(availabilityButton, c);
 
         ComponentUtils.smallVariant(this);

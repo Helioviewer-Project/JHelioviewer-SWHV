@@ -1,12 +1,12 @@
-package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer;
+package org.helioviewer.jhv.plugins.timelines.view.linedataselector.cellrenderer;
 
 import java.awt.Font;
 
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorTablePanel;
 
 @SuppressWarnings("serial")
 public class RemoveCellRenderer extends DefaultTableCellRenderer {

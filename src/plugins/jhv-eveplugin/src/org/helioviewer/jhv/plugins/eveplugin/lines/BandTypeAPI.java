@@ -8,7 +8,7 @@ import java.util.HashMap;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.plugins.eveplugin.EVESettings;
+import org.helioviewer.jhv.plugins.timelines.TimelineSettings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +20,7 @@ public class BandTypeAPI {
 
     public static void getDatasets() {
         try {
-            JSONObject jsonmain = JSONUtils.getJSONStream(new DownloadStream(EVESettings.baseURL).getInput());
+            JSONObject jsonmain = JSONUtils.getJSONStream(new DownloadStream(TimelineSettings.baseURL).getInput());
             updateBandGroups(jsonmain.getJSONArray("groups"));
             updateBandTypes(jsonmain.getJSONArray("objects"));
         } catch (UnknownHostException e) {

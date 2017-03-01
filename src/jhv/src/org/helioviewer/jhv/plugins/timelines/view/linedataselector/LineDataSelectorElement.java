@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector;
+package org.helioviewer.jhv.plugins.timelines.view.linedataselector;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -6,9 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
+import org.helioviewer.jhv.plugins.timelines.draw.ClickableDrawable;
+import org.helioviewer.jhv.plugins.timelines.draw.TimeAxis;
+import org.helioviewer.jhv.plugins.timelines.draw.YAxis;
 
 public interface LineDataSelectorElement {
 

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.view.chart;
+package org.helioviewer.jhv.plugins.timelines.view.chart;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -19,10 +19,10 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawConstants;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawConstants;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawController;
+import org.helioviewer.jhv.plugins.timelines.draw.DrawControllerListener;
+import org.helioviewer.jhv.plugins.timelines.draw.TimeAxis;
 
 @SuppressWarnings("serial")
 public class ChartDrawIntervalPane extends JComponent implements DrawControllerListener, MouseInputListener {
