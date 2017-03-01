@@ -11,6 +11,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.timelines.TimelineSettings;
+import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -19,7 +20,39 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
-    private TimelineContentPanel observationPanel = null;
+    private TimelineContentPanel observationPanel = new EmptyTimelineContentPanel() {
+
+        @Override
+        public void lineDataAdded(LineDataSelectorElement element) {
+        }
+
+        @Override
+        public void lineDataRemoved() {
+        }
+
+        @Override
+        public void lineDataVisibility() {
+        }
+
+        @Override
+        public void loadButtonPressed() {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public JComponent getTimelineContentPanel() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void setupDatasets() {
+            // TODO Auto-generated method stub
+
+        }
+
+    };
 
     public TimelineDialog() {
         super(ImageViewerGui.getMainFrame(), "New Layer", true);
@@ -89,6 +122,35 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
     public void setObservationPanel(TimelineContentPanel timelineContentPanel) {
         observationPanel = timelineContentPanel;
         LineDataSelectorModel.addLineDataSelectorModelListener(observationPanel);
+
+    }
+
+    private class EmptyTimelineContentPanel implements TimelineContentPanel {
+
+        @Override
+        public void lineDataAdded(LineDataSelectorElement element) {
+        }
+
+        @Override
+        public void lineDataRemoved() {
+        }
+
+        @Override
+        public void lineDataVisibility() {
+        }
+
+        @Override
+        public void loadButtonPressed() {
+        }
+
+        @Override
+        public JComponent getTimelineContentPanel() {
+            return null;
+        }
+
+        @Override
+        public void setupDatasets() {
+        }
 
     }
 }
