@@ -69,9 +69,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private DragMode dragMode = DragMode.NODRAG;
 
     private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener()); // will
-                                                                                  // start
-                                                                                  // on
-                                                                                  // setVisible
+    // start
+    // on
+    // setVisible
 
     public ChartDrawGraphPane() {
         setOpaque(true);
@@ -256,16 +256,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         currWidth += (int) tickTextBounds.getWidth();
 
         for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
-            if (el.isVisible() && el instanceof Band) {
+            if (el.isVisible() && el.hasValueAsString()) {
                 lbl = ", ";
                 g.setColor(Color.BLACK);
                 g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
                 tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
                 currWidth += (int) tickTextBounds.getWidth();
 
-                Band band = (Band) el;
-                lbl = band.getStringValue(ts);
-                g.setColor(band.getDataColor());
+                lbl = el.getStringValue(ts);
+                g.setColor(el.getDataColor());
                 g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
                 tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
                 currWidth += (int) tickTextBounds.getWidth();

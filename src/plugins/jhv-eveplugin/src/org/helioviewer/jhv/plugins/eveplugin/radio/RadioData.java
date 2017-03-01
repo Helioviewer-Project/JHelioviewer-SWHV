@@ -315,4 +315,14 @@ public class RadioData extends AbstractLineDataSelectorElement {
         return false;
     }
 
+    @Override
+    public boolean hasValueAsString() {
+        return false;
+    }
+
+    @Override
+    public String getStringValue(long ts) {
+        return null;
+    }
+
 }

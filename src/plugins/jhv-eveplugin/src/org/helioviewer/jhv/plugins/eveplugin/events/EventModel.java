@@ -280,4 +280,14 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         return false;
     }
 
+    @Override
+    public boolean hasValueAsString() {
+        return false;
+    }
+
+    @Override
+    public String getStringValue(long ts) {
+        return null;
+    }
+
 }

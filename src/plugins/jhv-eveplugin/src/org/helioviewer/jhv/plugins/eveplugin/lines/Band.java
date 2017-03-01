@@ -154,6 +154,7 @@ public class Band extends AbstractLineDataSelectorElement {
         }
     }
 
+    @Override
     public String getStringValue(long ts) {
         float val = bandCache.getValue(ts);
         if (val == Float.MIN_VALUE) {
@@ -222,6 +223,11 @@ public class Band extends AbstractLineDataSelectorElement {
 
     @Override
     public boolean hasDataColor() {
+        return true;
+    }
+
+    @Override
+    public boolean hasValueAsString() {
         return true;
     }
 
