@@ -50,10 +50,13 @@ class TableRowTransferHandler extends TransferHandler {
             return null;
 
         int row = grid.getSelectedRow();
-        Object el = grid.getModel().getValueAt(row, 0);
-        if (!(el instanceof ImageLayer)) {
+        if (row == -1)
             return null;
-        }
+
+        Object el = grid.getModel().getValueAt(row, 0);
+        if (!(el instanceof ImageLayer))
+            return null;
+
         createImageOfRow(row);
         return new StringSelection(Integer.toString(row));
     }
