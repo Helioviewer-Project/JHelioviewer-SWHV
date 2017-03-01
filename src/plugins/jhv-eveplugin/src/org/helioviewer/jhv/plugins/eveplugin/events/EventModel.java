@@ -19,7 +19,6 @@ import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.JHVEventType;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -44,13 +43,13 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        JHVEventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, EVEPlugin.em);
+        JHVEventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, this);
     }
 
     @Override
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> _events) {
         events = _events;
-        LineDataSelectorModel.downloadFinished(EVEPlugin.em);
+        LineDataSelectorModel.downloadFinished(this);
         if (isVisible) {
             DrawController.fireRedrawRequest();
         }
@@ -59,7 +58,7 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
     @Override
     public void cacheUpdated() {
         TimeAxis xAxis = DrawController.selectedAxis;
-        JHVEventCache.requestForInterval(xAxis.start, xAxis.end, EVEPlugin.em);
+        JHVEventCache.requestForInterval(xAxis.start, xAxis.end, this);
         DrawController.fireRedrawRequest();
     }
 
