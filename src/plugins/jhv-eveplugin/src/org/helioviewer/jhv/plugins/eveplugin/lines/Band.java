@@ -231,4 +231,9 @@ public class Band extends AbstractLineDataSelectorElement {
         return true;
     }
 
+    @Override
+    public Object getElementUnderMouse() {
+        return null;
+    }
+
 }
