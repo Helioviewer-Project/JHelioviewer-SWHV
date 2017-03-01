@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.SortedMap;
 
-import org.helioviewer.jhv.data.cache.JHVEventHandler;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.cache.JHVEventCacheResult;
+import org.helioviewer.jhv.data.cache.JHVEventHandler;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEvent;
@@ -16,6 +16,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.timelines.draw.DrawController;
 
 public class SWEKData implements TimespanListener, JHVEventHandler {
 
@@ -41,6 +42,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
         requestEvents(false);
         Displayer.display();
+        DrawController.fireRedrawRequest();
     }
 
     @Override
@@ -55,8 +57,9 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
             for (Map.Entry<SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
                 JHVRelatedEvents evr = v2.getValue();
-                if (evr.getStart() <= timestamp && timestamp <= evr.getEnd())
+                if (evr.getStart() <= timestamp && timestamp <= evr.getEnd()) {
                     activeEvents.add(evr);
+                }
             }
         }
         return activeEvents;
@@ -65,8 +68,9 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
     public static double readCMESpeed(JHVEvent evt) {
         JHVEventParameter p = evt.getParameter("cme_radiallinvel");
         try {
-            if (p != null)
+            if (p != null) {
                 return Double.parseDouble(p.getParameterValue());
+            }
         } catch (Exception ignore) {
         }
         return 500;
@@ -75,8 +79,9 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
     public static double readCMEPrincipalAngleDegree(JHVEvent evt) {
         JHVEventParameter p = evt.getParameter("event_coord1");
         try {
-            if (p != null)
+            if (p != null) {
                 return Double.parseDouble(p.getParameterValue()) + 90;
+            }
         } catch (Exception ignore) {
         }
         return 0;
@@ -85,8 +90,9 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
     public static double readCMEAngularWidthDegree(JHVEvent evt) {
         JHVEventParameter p = evt.getParameter("cme_angularwidth");
         try {
-            if (p != null)
+            if (p != null) {
                 return Double.parseDouble(p.getParameterValue());
+            }
         } catch (Exception ignore) {
         }
         return 0;
