@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.TimelineDialog;
@@ -14,7 +14,7 @@ import org.helioviewer.jhv.timelines.view.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorTablePanel;
 
-public class Timelines {
+public class Timelines implements MainContentPanelPlugin {
 
     public static final LineDataSelectorModel ldsm = new LineDataSelectorModel();
     private static final DrawController dc = new DrawController();
@@ -32,9 +32,9 @@ public class Timelines {
 
         ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
-        ComponentUtils.setVisible(plotOne, true);
-        ImageViewerGui.getMainContentPanel().updateLayout();
         // em.fetchData(DrawController.selectedAxis);
+
+        ImageViewerGui.getMainContentPanel().addPlugin(this);
 
         Layers.addLayersListener(dc);
         Layers.addTimeListener(dc);
@@ -48,11 +48,20 @@ public class Timelines {
         Layers.removeTimeListener(dc);
         Layers.removeLayersListener(dc);
 
-        ComponentUtils.setVisible(plotOne, false);
-        ImageViewerGui.getMainContentPanel().updateLayout();
+        ImageViewerGui.getMainContentPanel().removePlugin(this);
 
         ImageViewerGui.getLeftContentPane().remove(timelinePanel);
         ImageViewerGui.getLeftContentPane().revalidate();
         pluginPanes.remove(plotOne);
+    }
+
+    @Override
+    public String getTabName() {
+        return "Timelines";
+    }
+
+    @Override
+    public LinkedList<JComponent> getVisualInterfaces() {
+        return pluginPanes;
     }
 }
