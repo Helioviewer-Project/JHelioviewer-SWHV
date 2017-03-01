@@ -173,9 +173,9 @@ public class TimelinePanel extends JPanel {
                 TimelineTableModel model = (TimelineTableModel) grid.getModel();
 
                 if (col == VISIBLE_COL) {
-                    TimelineRenderable lineDataElement = (TimelineRenderable) model.getValueAt(row, col);
-                    boolean visible = !lineDataElement.isVisible();
-                    lineDataElement.setVisibility(visible);
+                    TimelineRenderable timeline = (TimelineRenderable) model.getValueAt(row, col);
+                    timeline.setVisibility(!timeline.isVisible());
+                    TimelineTableModel.fireUpdate(timeline, VISIBLE_COL);
                     DrawController.fireRedrawRequest();
                 }
                 if (col == REMOVE_COL) {
@@ -207,11 +207,11 @@ public class TimelinePanel extends JPanel {
         return rowHeight;
     }
 
-    private void setOptionsPanel(TimelineRenderable lineDataElement) {
+    private void setOptionsPanel(TimelineRenderable timeline) {
         optionsPanelWrapper.removeAll();
-        Component optionsPanel = lineDataElement.getOptionsPanel();
+        Component optionsPanel = timeline.getOptionsPanel();
         if (optionsPanel != null) {
-            ComponentUtils.setEnabled(optionsPanel, lineDataElement.isVisible());
+            ComponentUtils.setEnabled(optionsPanel, timeline.isVisible());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         }
         revalidate();
