@@ -18,7 +18,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
-    private final TimelineDataPanel observationPanel = new TimelineDataPanel();
+    private TimelineContentPanel observationPanel = null;
 
     public TimelineDialog() {
         super(ImageViewerGui.getMainFrame(), "New Layer", true);
@@ -41,6 +41,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         AbstractAction load = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 observationPanel.loadButtonPressed();
                 setVisible(false);
             }
@@ -64,8 +65,8 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public JComponent createContentPanel() {
-        observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        return observationPanel;
+        observationPanel.getTimelineContentPanel().setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        return observationPanel.getTimelineContentPanel();
     }
 
     @Override
@@ -80,8 +81,11 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         setVisible(true);
     }
 
-    public TimelineDataPanel getObservationPanel() {
+    public TimelineContentPanel getObservationPanel() {
         return observationPanel;
     }
 
+    public void setObservationPanel(TimelineContentPanel timelineContentPanel) {
+        observationPanel = timelineContentPanel;
+    }
 }

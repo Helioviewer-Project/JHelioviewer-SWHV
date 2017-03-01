@@ -10,6 +10,7 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.events.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
+import org.helioviewer.jhv.plugins.eveplugin.view.TimelineDataPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -29,7 +30,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
-
+        Timelines.td.setObservationPanel(new TimelineDataPanel());
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
             @Override
