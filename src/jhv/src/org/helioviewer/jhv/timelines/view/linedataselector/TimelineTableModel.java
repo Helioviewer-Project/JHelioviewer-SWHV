@@ -17,11 +17,11 @@ public class TimelineTableModel implements TableModel {
     private static final ArrayList<TimelineRenderable> elements = new ArrayList<>();
 
     public static void downloadStarted(TimelineRenderable element) {
-        fireUpdate(elements.indexOf(element));
+        fireUpdate(element, TimelinePanel.LOADING_COL);
     }
 
     public static void downloadFinished(TimelineRenderable element) {
-        fireUpdate(elements.indexOf(element));
+        fireUpdate(element, TimelinePanel.LOADING_COL);
     }
 
     public static void addLineData(TimelineRenderable element) {
@@ -62,8 +62,9 @@ public class TimelineTableModel implements TableModel {
         }
     }
 
-    private static void fireUpdate(int idx) {
-        TableModelEvent e = new TableModelEvent(Timelines.ldsm, idx, idx, TimelinePanel.LOADING_COL, TableModelEvent.UPDATE);
+    static void fireUpdate(TimelineRenderable element, int col) {
+        int row = elements.indexOf(element);
+        TableModelEvent e = new TableModelEvent(Timelines.ldsm, row, row, col, TableModelEvent.UPDATE);
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
