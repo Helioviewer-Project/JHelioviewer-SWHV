@@ -128,7 +128,7 @@ public class TimelineDataPanel extends JPanel implements LineDataSelectorModelLi
             DrawController.setSelectedInterval(movieStart, movieEnd);
         } else {
             long now = System.currentTimeMillis();
-            DrawController.setSelectedInterval(now - 2 * TimeUtils.DAY_IN_MILLIS, now);
+            DrawController.setSelectedInterval(time, Math.min(time + 2 * TimeUtils.DAY_IN_MILLIS, now));
         }
     }
 
