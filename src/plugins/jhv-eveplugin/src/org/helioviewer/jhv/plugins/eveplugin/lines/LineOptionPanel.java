@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.plugins.timelines.TimelineSettings;
 
 @SuppressWarnings("serial")
 class LineOptionPanel extends JPanel {
