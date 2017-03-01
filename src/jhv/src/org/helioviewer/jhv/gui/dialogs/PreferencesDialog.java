@@ -208,7 +208,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
                         return;
 
                     int row = grid.getSelectedRow();
-                    if (row >= 2)
+                    if (row == -1 || row >= 2)
                         return;
 
                     JFileChooser chooser = new JFileChooser((String) model.getValueAt(row, 1));

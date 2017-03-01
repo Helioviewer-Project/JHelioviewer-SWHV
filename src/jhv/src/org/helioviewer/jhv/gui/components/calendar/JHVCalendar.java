@@ -311,7 +311,12 @@ class JHVCalendar extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getButton() == MouseEvent.BUTTON1 && isValidCellSelected(e.getPoint())) {
-                        calendarViewController.setDateOfCellValue(table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()));
+                        int row = table.getSelectedRow();
+                        int col = table.getSelectedColumn();
+                        if (row == -1 || col == -1)
+                            return;
+
+                        calendarViewController.setDateOfCellValue(table.getValueAt(row, col));
 
                         switch (displayMode) {
                         case YEARS:
@@ -393,7 +398,12 @@ class JHVCalendar extends JPanel {
          *         a cell.
          */
         private boolean isValidCellSelected(Point point) {
-            return table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()) != null && table.rowAtPoint(point) >= 0;
+            int row = table.getSelectedRow();
+            int col = table.getSelectedColumn();
+            if (row == -1 || col == -1)
+                return false;
+
+            return table.getModel().getValueAt(row, col) != null && table.rowAtPoint(point) >= 0;
         }
 
         /**

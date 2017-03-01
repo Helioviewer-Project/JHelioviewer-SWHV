@@ -188,7 +188,7 @@ public class RenderableContainerPanel extends JPanel {
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
+            if (!e.getValueIsAdjusting() && grid.getSelectedRow() != -1) {
                 setOptionsPanel((Renderable) grid.getValueAt(grid.getSelectedRow(), 0));
             }
         });
