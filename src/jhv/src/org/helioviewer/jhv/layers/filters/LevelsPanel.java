@@ -39,7 +39,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
     }
 
     private static String format(int low, int high) {
-        return "<html>" + align3(low) + "<br>" + align3(high);
+        return "<html>" + align3(low) + "<br/>" + align3(high);
     }
 
     public LevelsPanel() {

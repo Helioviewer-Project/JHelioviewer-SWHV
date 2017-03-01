@@ -62,13 +62,6 @@ public class EventLineDataSelectorElement extends AbstractTimelineRenderable imp
         DrawController.fireRedrawRequest();
     }
 
-    public static JHVRelatedEvents getEventUnderMouse() {
-        if (eventUnderMouse == null) {
-            return null;
-        }
-        return eventUnderMouse.event;
-    }
-
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
         if (!isVisible) {
@@ -273,7 +266,10 @@ public class EventLineDataSelectorElement extends AbstractTimelineRenderable imp
 
     @Override
     public ClickableDrawable getElementUnderMouse() {
-        return getEventUnderMouse();
+        if (eventUnderMouse == null) {
+            return null;
+        }
+        return eventUnderMouse.event;
     }
 
 }

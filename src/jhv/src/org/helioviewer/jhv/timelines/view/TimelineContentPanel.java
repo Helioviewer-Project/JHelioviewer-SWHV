@@ -5,9 +5,11 @@ import javax.swing.JComponent;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModelListener;
 
 public interface TimelineContentPanel extends TimelineTableModelListener {
-    public abstract void loadButtonPressed();
 
-    public abstract JComponent getTimelineContentPanel();
+    void loadButtonPressed();
 
-    public abstract void setupDatasets();
+    JComponent getTimelineContentPanel();
+
+    void setupDatasets();
+
 }

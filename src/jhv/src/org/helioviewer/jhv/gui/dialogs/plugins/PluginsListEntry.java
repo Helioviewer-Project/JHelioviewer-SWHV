@@ -33,7 +33,7 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
         list = _list;
 
         pane.setContentType("text/html");
-        pane.setText("<b>" + plugin.getName() + "</b><br>" + plugin.getDescription() + " <a href=''>More...</a>");
+        pane.setText("<b>" + plugin.getName() + "</b><br/>" + plugin.getDescription() + " <a href=''>More...</a>");
         pane.setEditable(false);
         pane.setOpaque(false);
         pane.addHyperlinkListener(this);
@@ -93,8 +93,8 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
                 Plugin p = plugin.getPlugin();
-                String text = "<center><p><big><b>" + p.getName() + "</b></big></p><p><b>Plug-in description</b><br>" + p.getDescription() +
-                              "</p><p><b>Plug-in license information</b><br>" + p.getAboutLicenseText();
+                String text = "<center><p><big><b>" + p.getName() + "</b></big></p><p><b>Plug-in description</b><br/>" + p.getDescription() +
+                              "</p><p><b>Plug-in license information</b><br/>" + p.getAboutLicenseText();
                 new TextDialog("About", text, false).showDialog();
             } else {
                 JHVGlobals.openURL(e.getURL().toString());

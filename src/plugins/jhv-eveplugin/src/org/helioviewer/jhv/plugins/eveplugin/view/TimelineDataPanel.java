@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.eveplugin.view;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -37,7 +36,6 @@ public class TimelineDataPanel extends JPanel implements TimelineTableModelListe
     private final JComboBox<BandType> comboBoxData = new JComboBox<>();
 
     public TimelineDataPanel() {
-
         setLayout(new GridBagLayout());
 
         comboBoxGroup.addActionListener(e -> updateGroupValues());
@@ -89,17 +87,15 @@ public class TimelineDataPanel extends JPanel implements TimelineTableModelListe
         DefaultComboBoxModel<BandType> model = (DefaultComboBoxModel<BandType>) comboBoxData.getModel();
         model.removeAllElements();
 
-        BandType[] values = BandTypeAPI.getBandTypes(selectedGroup);
-        Set<BandType> bandTypesInSelectorModel = new HashSet<BandType>();
-
+        HashSet<BandType> bandTypesInSelectorModel = new HashSet<>();
         for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             if (el instanceof Band) {
                 Band band = (Band) el;
-
                 bandTypesInSelectorModel.add(band.getBandType());
             }
         }
 
+        BandType[] values = BandTypeAPI.getBandTypes(selectedGroup);
         for (BandType value : values) {
             if (!bandTypesInSelectorModel.contains(value)) {
                 model.addElement(value);
