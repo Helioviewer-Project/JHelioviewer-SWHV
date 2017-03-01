@@ -3,15 +3,15 @@ package org.helioviewer.jhv.timelines.view;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.timelines.TimelineSettings;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -65,7 +65,9 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public JComponent createContentPanel() {
-        return observationPanel.getTimelineContentPanel();
+        JComponent panel = observationPanel.getTimelineContentPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        return panel;
     }
 
     @Override
@@ -75,6 +77,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public void showDialog() {
+        observationPanel.updateGroupValues();
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         setVisible(true);
@@ -86,19 +89,9 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     public void setObservationPanel(TimelineContentPanel timelineContentPanel) {
         observationPanel = timelineContentPanel;
-        TimelineTableModel.addLineDataSelectorModelListener(observationPanel);
-
     }
 
     private class EmptyTimelineContentPanel implements TimelineContentPanel {
-
-        @Override
-        public void lineDataAdded(TimelineRenderable element) {
-        }
-
-        @Override
-        public void lineDataRemoved() {
-        }
 
         @Override
         public void loadButtonPressed() {
@@ -106,11 +99,15 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
         @Override
         public JComponent getTimelineContentPanel() {
-            return null;
+            return new JPanel();
         }
 
         @Override
         public void setupDatasets() {
+        }
+
+        @Override
+        public void updateGroupValues() {
         }
 
     }

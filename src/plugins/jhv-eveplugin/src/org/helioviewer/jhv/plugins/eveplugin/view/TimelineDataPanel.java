@@ -5,7 +5,6 @@ import java.awt.GridBagLayout;
 import java.util.HashSet;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -27,10 +26,9 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.TimelineContentPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModelListener;
 
 @SuppressWarnings("serial")
-public class TimelineDataPanel extends JPanel implements TimelineTableModelListener, TimespanListener, ObservationDialogDateModelListener, TimelineContentPanel {
+public class TimelineDataPanel extends JPanel implements TimespanListener, ObservationDialogDateModelListener, TimelineContentPanel {
 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
@@ -38,7 +36,6 @@ public class TimelineDataPanel extends JPanel implements TimelineTableModelListe
 
     public TimelineDataPanel() {
         setLayout(new GridBagLayout());
-        setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
         comboBoxGroup.addActionListener(e -> updateGroupValues());
         calendarStartDate.addJHVCalendarListener(e -> ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true));
@@ -80,7 +77,8 @@ public class TimelineDataPanel extends JPanel implements TimelineTableModelListe
         }
     }
 
-    private void updateGroupValues() {
+    @Override
+    public void updateGroupValues() {
         BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
         if (selectedGroup == null) {
             return;
@@ -128,16 +126,6 @@ public class TimelineDataPanel extends JPanel implements TimelineTableModelListe
             long now = System.currentTimeMillis();
             DrawController.setSelectedInterval(time, Math.min(time + 2 * TimeUtils.DAY_IN_MILLIS, now));
         }
-    }
-
-    @Override
-    public void lineDataAdded(TimelineRenderable element) {
-        updateGroupValues();
-    }
-
-    @Override
-    public void lineDataRemoved() {
-        updateGroupValues();
     }
 
     @Override
