@@ -8,7 +8,7 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
-public abstract class AbstractLineDataSelectorElement implements LineDataSelectorElement {
+public abstract class AbstractTimelineRenderable implements TimelineRenderable {
 
     protected boolean isVisible = true;
 

@@ -11,48 +11,48 @@ import javax.swing.table.TableModel;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
-public class LineDataSelectorModel implements TableModel {
+public class TimelineTableModel implements TableModel {
 
-    private static final HashSet<LineDataSelectorModelListener> listeners = new HashSet<>();
+    private static final HashSet<TimelineTableModelListener> listeners = new HashSet<>();
     private static final HashSet<TableModelListener> tableListeners = new HashSet<>();
-    private static final ArrayList<LineDataSelectorElement> elements = new ArrayList<>();
+    private static final ArrayList<TimelineRenderable> elements = new ArrayList<>();
 
     private static final int NUMBEROFCOLUMNS = 5;
 
-    public static void addLineDataSelectorModelListener(LineDataSelectorModelListener listener) {
+    public static void addLineDataSelectorModelListener(TimelineTableModelListener listener) {
         listeners.add(listener);
     }
 
-    public static void removeLineDataSelectorModelListener(LineDataSelectorModelListener listener) {
+    public static void removeLineDataSelectorModelListener(TimelineTableModelListener listener) {
         listeners.remove(listener);
     }
 
-    public static void downloadStarted(LineDataSelectorElement element) {
+    public static void downloadStarted(TimelineRenderable element) {
         fireListeners();
     }
 
-    public static void downloadFinished(LineDataSelectorElement element) {
+    public static void downloadFinished(TimelineRenderable element) {
         fireListeners();
     }
 
-    public static void addLineData(LineDataSelectorElement element) {
+    public static void addLineData(TimelineRenderable element) {
         elements.add(element);
         fireLineDataSelectorElementAdded(element);
         fireListeners();
     }
 
-    public static List<LineDataSelectorElement> getAllLineDataSelectorElements() {
+    public static List<TimelineRenderable> getAllLineDataSelectorElements() {
         return elements;
     }
 
-    public static void removeLineData(LineDataSelectorElement element) {
+    public static void removeLineData(TimelineRenderable element) {
         elements.remove(element);
         fireLineDataSelectorElementRemoved(element);
         fireListeners();
     }
 
     public static ClickableDrawable getElementUnderMouse() {
-        for (LineDataSelectorElement el : elements) {
+        for (TimelineRenderable el : elements) {
             ClickableDrawable elUnderMouse = el.getElementUnderMouse();
             if (elUnderMouse != null) {
                 return elUnderMouse;
@@ -68,20 +68,20 @@ public class LineDataSelectorModel implements TableModel {
         }
     }
 
-    private static void fireLineDataSelectorElementRemoved(LineDataSelectorElement element) {
-        for (LineDataSelectorModelListener listener : listeners) {
+    private static void fireLineDataSelectorElementRemoved(TimelineRenderable element) {
+        for (TimelineTableModelListener listener : listeners) {
             listener.lineDataRemoved();
         }
     }
 
-    private static void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
-        for (LineDataSelectorModelListener listener : listeners) {
+    private static void fireLineDataSelectorElementAdded(TimelineRenderable element) {
+        for (TimelineTableModelListener listener : listeners) {
             listener.lineDataAdded(element);
         }
     }
 
-    static void fireLineDataSelectorElementVisibility(LineDataSelectorElement element, boolean flag) {
-        for (LineDataSelectorModelListener listener : listeners) {
+    static void fireLineDataSelectorElementVisibility(TimelineRenderable element, boolean flag) {
+        for (TimelineTableModelListener listener : listeners) {
             listener.lineDataVisibility();
         }
     }
@@ -103,7 +103,7 @@ public class LineDataSelectorModel implements TableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        return LineDataSelectorElement.class;
+        return TimelineRenderable.class;
     }
 
     @Override
@@ -118,7 +118,7 @@ public class LineDataSelectorModel implements TableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        elements.add(rowIndex, (LineDataSelectorElement) aValue);
+        elements.add(rowIndex, (TimelineRenderable) aValue);
     }
 
     @Override
@@ -132,13 +132,13 @@ public class LineDataSelectorModel implements TableModel {
     }
 
     public static void removeRow(int row) {
-        LineDataSelectorElement el = elements.get(row);
+        TimelineRenderable el = elements.get(row);
         el.removeLineData();
     }
 
     public static int getNumberOfAxes() {
         int ct = 0;
-        for (LineDataSelectorElement el : elements) {
+        for (TimelineRenderable el : elements) {
             if (el.showYAxis()) {
                 ct++;
             }
@@ -146,7 +146,7 @@ public class LineDataSelectorModel implements TableModel {
         return ct;
     }
 
-    static int getRowIndex(LineDataSelectorElement element) {
+    static int getRowIndex(TimelineRenderable element) {
         return elements.indexOf(element);
     }
 

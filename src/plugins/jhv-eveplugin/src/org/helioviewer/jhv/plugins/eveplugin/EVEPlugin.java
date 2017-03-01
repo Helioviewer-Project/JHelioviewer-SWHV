@@ -13,7 +13,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.TimelineDataPanel;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
@@ -25,7 +25,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     private final Timelines tl = new Timelines();
 
     public EVEPlugin() {
-        LineDataSelectorModel.addLineData(rd);
+        TimelineTableModel.addLineData(rd);
     }
 
     @Override

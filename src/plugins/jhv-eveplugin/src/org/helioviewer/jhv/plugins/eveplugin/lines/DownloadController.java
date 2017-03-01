@@ -8,7 +8,7 @@ import java.util.concurrent.Future;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class DownloadController {
 
@@ -91,11 +91,11 @@ public class DownloadController {
     }
 
     private static void fireDownloadStarted(Band band) {
-        LineDataSelectorModel.downloadStarted(band);
+        TimelineTableModel.downloadStarted(band);
     }
 
     private static void fireDownloadFinished(Band band) {
-        LineDataSelectorModel.downloadFinished(band);
+        TimelineTableModel.downloadFinished(band);
     }
 
     private static List<Future<?>> addDownloads(DownloadThread[] jobs) {

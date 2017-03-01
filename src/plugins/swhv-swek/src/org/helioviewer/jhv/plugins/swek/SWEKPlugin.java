@@ -14,7 +14,7 @@ import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
 import org.helioviewer.jhv.plugins.swek.view.EventLineDataSelectorElement;
 import org.helioviewer.jhv.plugins.swek.view.EventPanel;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class SWEKPlugin implements Plugin {
 
@@ -36,7 +36,7 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
-        LineDataSelectorModel.addLineData(em);
+        TimelineTableModel.addLineData(em);
         ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
 
@@ -47,7 +47,7 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
-        LineDataSelectorModel.removeLineData(em);
+        TimelineTableModel.removeLineData(em);
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         Layers.removeTimespanListener(swekData);
 

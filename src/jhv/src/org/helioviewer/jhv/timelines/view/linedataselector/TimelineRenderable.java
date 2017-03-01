@@ -10,7 +10,7 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
-public interface LineDataSelectorElement {
+public interface TimelineRenderable {
 
     void removeLineData();
 

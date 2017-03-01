@@ -11,8 +11,8 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.timelines.TimelineSettings;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -23,7 +23,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
     private TimelineContentPanel observationPanel = new EmptyTimelineContentPanel() {
 
         @Override
-        public void lineDataAdded(LineDataSelectorElement element) {
+        public void lineDataAdded(TimelineRenderable element) {
         }
 
         @Override
@@ -121,14 +121,14 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     public void setObservationPanel(TimelineContentPanel timelineContentPanel) {
         observationPanel = timelineContentPanel;
-        LineDataSelectorModel.addLineDataSelectorModelListener(observationPanel);
+        TimelineTableModel.addLineDataSelectorModelListener(observationPanel);
 
     }
 
     private class EmptyTimelineContentPanel implements TimelineContentPanel {
 
         @Override
-        public void lineDataAdded(LineDataSelectorElement element) {
+        public void lineDataAdded(TimelineRenderable element) {
         }
 
         @Override

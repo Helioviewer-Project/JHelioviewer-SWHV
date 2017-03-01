@@ -41,8 +41,8 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.DrawControllerListener;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 @SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
@@ -123,7 +123,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         boolean toggled = false;
         int ct = -1;
-        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             if (el.showYAxis()) {
                 if ((inRightYAxes && rightYAxisNumber == ct) || (inLeftYAxis && ct == -1)) {
                     toggled = toggled || !el.getYAxis().isHighlighted();
@@ -205,14 +205,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
-        List<LineDataSelectorElement> els = LineDataSelectorModel.getAllLineDataSelectorElements();
+        List<TimelineRenderable> els = TimelineTableModel.getAllLineDataSelectorElements();
         boolean isEmpty = true;
-        for (LineDataSelectorElement el : els) {
+        for (TimelineRenderable el : els) {
             el.draw(plotG, graphArea, DrawController.selectedAxis, mousePosition);
             isEmpty = isEmpty && el.isEmpty();
         }
         drawLabels(fullG, graphArea, DrawController.selectedAxis, isEmpty);
-        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             el.drawHighlighted(plotG, graphArea, DrawController.selectedAxis, mousePosition);
         }
     }
@@ -229,7 +229,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawHorizontalLabels(g, graphArea, timeAxis);
 
             int ct = -1;
-            for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+            for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
                 if (el.showYAxis()) {
                     drawVerticalLabels(g, graphArea, el, ct, el.getYAxis().isHighlighted());
                     ct++;
@@ -255,7 +255,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
         currWidth += (int) tickTextBounds.getWidth();
 
-        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             if (el.isVisible() && el.hasValueAsString()) {
                 lbl = ", ";
                 g.setColor(Color.BLACK);
@@ -331,7 +331,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.drawString(text, x, y);
     }
 
-    private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, LineDataSelectorElement el, int leftSide, boolean highlight) {
+    private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, TimelineRenderable el, int leftSide, boolean highlight) {
         int axis_x_offset = graphArea.x;
         if (leftSide != -1) {
             axis_x_offset += graphArea.width + leftSide * DrawConstants.RIGHT_AXIS_WIDTH;
@@ -431,7 +431,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
 
-        ClickableDrawable element = LineDataSelectorModel.getElementUnderMouse();
+        ClickableDrawable element = TimelineTableModel.getElementUnderMouse();
         if (element != null) {
             Rectangle graphArea = DrawController.getGraphArea();
             element.clicked(e.getLocationOnScreen(), DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x));
@@ -523,7 +523,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (mousePosition == null) {
             return false;
         }
-        for (LineDataSelectorElement el : LineDataSelectorModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
             if (el.highLightChanged(mousePosition)) {
                 return true;
             }
@@ -537,7 +537,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePosition = e.getPoint();
         if (overMovieLine(mousePosition/* , graphArea */)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-        } else if (LineDataSelectorModel.getElementUnderMouse() != null) {
+        } else if (TimelineTableModel.getElementUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         } else if (mousePosition.x >= graphArea.x && mousePosition.x <= graphArea.x + graphArea.width && mousePosition.y >= graphArea.y && mousePosition.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
