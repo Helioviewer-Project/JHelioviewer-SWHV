@@ -37,10 +37,10 @@ public class Band extends AbstractTimelineRenderable {
     public Band(BandType _bandType) {
         bandType = _bandType;
         optionsPanel = new LineOptionPanel(this);
-
-        DrawController.fireRedrawRequest();
-        TimelineTableModel.addLineData(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
+
+        TimelineTableModel.addLineData(this);
+        DrawController.fireRedrawRequest();
     }
 
     @Override

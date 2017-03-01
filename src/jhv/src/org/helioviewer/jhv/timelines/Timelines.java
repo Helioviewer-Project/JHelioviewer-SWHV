@@ -23,16 +23,11 @@ public class Timelines implements MainContentPanelPlugin {
     private final PlotPanel plotOne = new PlotPanel();
     private static final TimelinePanel timelinePanel = new TimelinePanel();
 
-    public Timelines() {
-        TimelineTableModel.addLineDataSelectorModelListener(dc);
-    }
-
     public void installTimelines() {
         pluginPanes.add(plotOne);
 
         ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
-        // em.fetchData(DrawController.selectedAxis);
 
         ImageViewerGui.getMainContentPanel().addPlugin(this);
 

@@ -173,6 +173,7 @@ public class TimelinePanel extends JPanel {
                     TimelineRenderable lineDataElement = (TimelineRenderable) model.getValueAt(row, col);
                     boolean visible = !lineDataElement.isVisible();
                     lineDataElement.setVisibility(visible);
+                    DrawController.fireRedrawRequest();
                 }
                 if (col == TITLE_COL || col == LOADING_COL || col == LINECOLOR_COL) {
                     TimelineRenderable lineDataElement = (TimelineRenderable) model.getValueAt(row, col);
@@ -180,6 +181,7 @@ public class TimelinePanel extends JPanel {
                 }
                 if (col == REMOVE_COL) {
                     TimelineTableModel.removeRow(row);
+                    DrawController.fireRedrawRequest();
                 }
                 revalidate();
                 repaint();

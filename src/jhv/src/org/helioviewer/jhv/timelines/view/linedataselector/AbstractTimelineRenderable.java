@@ -5,7 +5,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
-import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 public abstract class AbstractTimelineRenderable implements TimelineRenderable {
@@ -20,7 +19,6 @@ public abstract class AbstractTimelineRenderable implements TimelineRenderable {
     @Override
     public void setVisibility(boolean visible) {
         isVisible = visible;
-        DrawController.fireRedrawRequest();
     }
 
     @Override
