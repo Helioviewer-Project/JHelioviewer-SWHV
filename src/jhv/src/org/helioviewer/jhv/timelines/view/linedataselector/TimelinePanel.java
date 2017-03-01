@@ -69,14 +69,16 @@ public class TimelinePanel extends JPanel {
                 // prevent losing selection
             }
 
-        };
-
-        Timelines.ldsm.addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.INSERT) {
-                int idx = e.getFirstRow();
-                grid.getSelectionModel().setSelectionInterval(idx, idx);
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                super.tableChanged(e);
+                if (e.getType() == TableModelEvent.INSERT) {
+                    int row = e.getLastRow();
+                    setRowSelectionInterval(row, row);
+                }
             }
-        });
+
+        };
 
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
@@ -128,7 +130,7 @@ public class TimelinePanel extends JPanel {
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             int row = grid.getSelectedRow();
-            if (!e.getValueIsAdjusting() && row != -1 && row < grid.getRowCount()) {
+            if (row != -1 && !e.getValueIsAdjusting()) {
                 setOptionsPanel((TimelineRenderable) grid.getValueAt(row, 0));
             }
         });
@@ -175,10 +177,6 @@ public class TimelinePanel extends JPanel {
                     boolean visible = !lineDataElement.isVisible();
                     lineDataElement.setVisibility(visible);
                     DrawController.fireRedrawRequest();
-                }
-                if (col == TITLE_COL || col == LOADING_COL || col == LINECOLOR_COL) {
-                    TimelineRenderable lineDataElement = (TimelineRenderable) model.getValueAt(row, col);
-                    setOptionsPanel(lineDataElement);
                 }
                 if (col == REMOVE_COL) {
                     TimelineTableModel.removeRow(row);
