@@ -23,6 +23,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -326,7 +327,7 @@ public class RadioData extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public Object getElementUnderMouse() {
+    public ClickableDrawable getElementUnderMouse() {
         return null;
     }
 

@@ -9,6 +9,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.plugins.eveplugin.Timelines;
+import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
 
 public class LineDataSelectorModel implements TableModel {
 
@@ -50,9 +51,9 @@ public class LineDataSelectorModel implements TableModel {
         fireListeners();
     }
 
-    public static Object getElementUnderMouse() {
+    public static ClickableDrawable getElementUnderMouse() {
         for (LineDataSelectorElement el : elements) {
-            Object elUnderMouse = el.getElementUnderMouse();
+            ClickableDrawable elUnderMouse = el.getElementUnderMouse();
             if (elUnderMouse != null) {
                 return elUnderMouse;
             }

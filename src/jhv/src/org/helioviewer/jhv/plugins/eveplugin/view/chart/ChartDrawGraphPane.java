@@ -32,11 +32,10 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
-import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
-import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
@@ -432,13 +431,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
 
-        JHVRelatedEvents event = EventModel.getEventUnderMouse();
-        if (event != null) {
+        ClickableDrawable element = LineDataSelectorModel.getElementUnderMouse();
+        if (element != null) {
             Rectangle graphArea = DrawController.getGraphArea();
-            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x)));
-            dialog.pack();
-            dialog.setLocation(e.getLocationOnScreen());
-            dialog.setVisible(true);
+            element.clicked(e.getLocationOnScreen(), DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x));
         } else {
             DrawController.setMovieFrame(p);
         }

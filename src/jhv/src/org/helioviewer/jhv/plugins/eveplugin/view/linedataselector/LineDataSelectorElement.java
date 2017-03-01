@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import org.helioviewer.jhv.plugins.eveplugin.draw.ClickableDrawable;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
 
@@ -55,6 +56,6 @@ public interface LineDataSelectorElement {
 
     String getStringValue(long ts);
 
-    Object getElementUnderMouse();
+    ClickableDrawable getElementUnderMouse();
 
 }
