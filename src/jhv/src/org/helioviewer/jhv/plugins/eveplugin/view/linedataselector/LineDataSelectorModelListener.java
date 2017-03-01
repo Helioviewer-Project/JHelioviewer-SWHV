@@ -4,8 +4,8 @@ public interface LineDataSelectorModelListener {
 
     void lineDataAdded(LineDataSelectorElement element);
 
-    void lineDataRemoved(LineDataSelectorElement element);
+    void lineDataRemoved();
 
-    void lineDataVisibility(LineDataSelectorElement element, boolean flag);
+    void lineDataVisibility();
 
 }
