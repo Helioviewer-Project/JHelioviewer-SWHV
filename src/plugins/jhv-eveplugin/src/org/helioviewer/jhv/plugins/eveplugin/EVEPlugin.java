@@ -19,11 +19,14 @@ public class EVEPlugin implements Plugin {
 
     private final Timelines tl = new Timelines();
 
+    public EVEPlugin() {
+        TimelineTableModel.addLineData(rd);
+    }
+
     @Override
     public void installPlugin() {
-        tl.installTimelines(); // SWEK depends on this
+        tl.installTimelines();
 
-        TimelineTableModel.addLineData(rd);
         Timelines.td.setObservationPanel(new TimelineDataPanel());
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
