@@ -14,7 +14,7 @@ import java.util.Map;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeAxis;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxis;
@@ -75,6 +75,7 @@ public class Band extends AbstractLineDataSelectorElement {
     @Override
     public void removeLineData() {
         LineDataSelectorModel.removeLineData(this);
+        BandColors.resetColor(getDataColor());
     }
 
     @Override
@@ -155,13 +156,13 @@ public class Band extends AbstractLineDataSelectorElement {
 
     public String getStringValue(long ts) {
         float val = bandCache.getValue(ts);
-        if (val == Float.MIN_VALUE)
+        if (val == Float.MIN_VALUE) {
             return "--";
-
-        else if (bandType.getName().contains("XRSB"))
+        } else if (bandType.getName().contains("XRSB")) {
             return GOESLevel.getStringValue(val);
-        else
+        } else {
             return DrawConstants.valueFormatter.format(yAxis.scale(val));
+        }
     }
 
     private void setWarn(LinkedList<Integer> _warnLevels, LinkedList<String> _warnLabels) {
@@ -217,6 +218,11 @@ public class Band extends AbstractLineDataSelectorElement {
 
     @Override
     public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    }
+
+    @Override
+    public boolean hasDataColor() {
+        return true;
     }
 
 }
