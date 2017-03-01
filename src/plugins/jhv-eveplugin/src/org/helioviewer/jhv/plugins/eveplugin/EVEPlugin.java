@@ -24,6 +24,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     public static final RadioData rd = new RadioData();
     public static final EventModel em = new EventModel();
 
+    private final Timelines tl = new Timelines();
+
     public EVEPlugin() {
         LineDataSelectorModel.addLineData(rd);
         LineDataSelectorModel.addLineData(em);
@@ -31,6 +33,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
+        tl.installTimelines();
+
         Timelines.td.setObservationPanel(new TimelineDataPanel());
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
@@ -53,6 +57,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void uninstallPlugin() {
+        tl.uninstallTimelines();
     }
 
     @Override

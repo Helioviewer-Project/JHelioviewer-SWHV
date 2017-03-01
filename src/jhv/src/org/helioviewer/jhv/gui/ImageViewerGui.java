@@ -43,7 +43,6 @@ import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
 import org.helioviewer.jhv.renderable.components.RenderableViewpoint;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
-import org.helioviewer.jhv.timelines.Timelines;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
@@ -146,8 +145,6 @@ public class ImageViewerGui {
         mainFrame.add(midSplitPane, BorderLayout.CENTER);
         mainFrame.add(statusPanel, BorderLayout.PAGE_END);
 
-        Timelines tl = new Timelines();
-        tl.installTimelines();
         return mainFrame;
     }
 
