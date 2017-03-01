@@ -4,10 +4,9 @@ import java.util.LinkedList;
 
 import javax.swing.JComponent;
 
-import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.TimelineDialog;
@@ -15,48 +14,26 @@ import org.helioviewer.jhv.timelines.view.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorTablePanel;
 
-public class Timelines implements Plugin, MainContentPanelPlugin {
+public class Timelines {
 
     public static final LineDataSelectorModel ldsm = new LineDataSelectorModel();
     private static final DrawController dc = new DrawController();
     public static final TimelineDialog td = new TimelineDialog();
     private final LinkedList<JComponent> pluginPanes = new LinkedList<>();
     private final PlotPanel plotOne = new PlotPanel();
-    private static final LineDataSelectorTablePanel timelinePluginPanel = new LineDataSelectorTablePanel();
+    private static final LineDataSelectorTablePanel timelinePanel = new LineDataSelectorTablePanel();
 
     public Timelines() {
         LineDataSelectorModel.addLineDataSelectorModelListener(dc);
     }
 
-    @Override
-    public String getTabName() {
-        return "Timelines";
-    }
-
-    @Override
-    public LinkedList<JComponent> getVisualInterfaces() {
-        return pluginPanes;
-    }
-
-    @Override
-    public String getName() {
-        return "Timelines Plugin";
-    }
-
-    @Override
-    public String getDescription() {
-        return "This plugin visualizes 1D and 2D time series";
-    }
-
-    @Override
-    public void installPlugin() {
+    public void installTimelines() {
         pluginPanes.add(plotOne);
 
-        ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
+        ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
-
-        ImageViewerGui.getMainContentPanel().addPlugin(this);
-
+        ComponentUtils.setVisible(plotOne, true);
+        ImageViewerGui.getMainContentPanel().updateLayout();
         // em.fetchData(DrawController.selectedAxis);
 
         Layers.addLayersListener(dc);
@@ -65,32 +42,17 @@ public class Timelines implements Plugin, MainContentPanelPlugin {
         JHVRelatedEvents.addHighlightListener(dc);
     }
 
-    @Override
-    public void uninstallPlugin() {
+    public void uninstallTimelines() {
         JHVRelatedEvents.removeHighlightListener(dc);
         Layers.removeTimespanListener(dc);
         Layers.removeTimeListener(dc);
         Layers.removeLayersListener(dc);
 
-        ImageViewerGui.getMainContentPanel().removePlugin(this);
+        ComponentUtils.setVisible(plotOne, false);
+        ImageViewerGui.getMainContentPanel().updateLayout();
 
-        ImageViewerGui.getLeftContentPane().remove(timelinePluginPanel);
+        ImageViewerGui.getLeftContentPane().remove(timelinePanel);
         ImageViewerGui.getLeftContentPane().revalidate();
         pluginPanes.remove(plotOne);
     }
-
-    @Override
-    public void setState(String state) {
-    }
-
-    @Override
-    public String getState() {
-        return null;
-    }
-
-    @Override
-    public String getAboutLicenseText() {
-        return "Mozilla Public License Version 2.0";
-    }
-
 }
