@@ -1,12 +1,8 @@
 package org.helioviewer.jhv.plugins.eveplugin;
 
-import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 
-import javax.swing.JComponent;
-
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
-import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.radio.RadioData;
 import org.helioviewer.jhv.plugins.eveplugin.view.TimelineDataPanel;
@@ -15,7 +11,7 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
-public class EVEPlugin implements Plugin, MainContentPanelPlugin {
+public class EVEPlugin implements Plugin {
 
     private static final int MAX_WORKER_THREADS = 12;
     public static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("EVE", MAX_WORKER_THREADS);
@@ -59,7 +55,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public String getName() {
-        return "Timelines, callisto and event displayer Plugin";
+        return "Timeline Plugin";
     }
 
     @Override
@@ -70,16 +66,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     @Override
     public String getAboutLicenseText() {
         return "Mozilla Public License Version 2.0";
-    }
-
-    @Override
-    public LinkedList<JComponent> getVisualInterfaces() {
-        return null;
-    }
-
-    @Override
-    public String getTabName() {
-        return "Timelines, callisto and event displayer";
     }
 
     @Override
