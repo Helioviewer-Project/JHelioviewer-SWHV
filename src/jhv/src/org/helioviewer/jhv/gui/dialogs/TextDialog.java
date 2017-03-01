@@ -20,7 +20,7 @@ public class TextDialog extends StandardDialog implements ShowableDialog {
     public TextDialog(String title, String _text, boolean resizable) {
         super(ImageViewerGui.getMainFrame(), title, true);
         setResizable(resizable);
-        text = _text.replace("\n", "<br>");
+        text = _text.replace("\n", "<br/>");
     }
 
     @Override

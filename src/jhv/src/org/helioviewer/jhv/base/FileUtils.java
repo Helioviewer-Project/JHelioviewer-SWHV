@@ -69,10 +69,9 @@ public class FileUtils {
 
     /**
      * Returns an input stream to a resource. This function can be used even if
-     * the whole program and resources are within a JAR file.\n The path must
-     * begin with a slash and contain all subfolders, e.g.:\n
-     * /images/sample_image.png <br>
-     * The class loader used is the same which was used to load FileUtils
+     * the whole program and resources are within a JAR file. The path must
+     * begin with a slash and contain all subfolders, e.g.: /images/sample_image.png
+     * The class loader used is the same which was used to load FileUtils.
      *
      * @param resourcePath
      *            The path to the resource
@@ -91,9 +90,9 @@ public class FileUtils {
 
     /**
      * Returns an URL to a resource. This function can be used even if the whole
-     * program and resources are within a JAR file.\n The path must begin with a
-     * slash and contain all subfolders, e.g.:\n /images/sample_image.png <br>
-     * The class loader used is the same which was used to load FileUtils .
+     * program and resources are within a JAR file. The path must begin with a
+     * slash and contain all subfolders, e.g.: /images/sample_image.png
+     * The class loader used is the same which was used to load FileUtils.
      *
      * @param resourcePath
      *            The path to the resource
