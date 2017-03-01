@@ -141,10 +141,6 @@ public class TimelineDataPanel extends JPanel implements TimelineTableModelListe
     }
 
     @Override
-    public void lineDataVisibility() {
-    }
-
-    @Override
     public void timespanChanged(long start, long end) {
         calendarStartDate.setTime(start);
         ObservationDialogDateModel.setStartTime(start, false);

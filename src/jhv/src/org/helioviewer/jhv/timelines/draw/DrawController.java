@@ -229,11 +229,6 @@ public class DrawController implements TimelineTableModelListener, JHVEventHighl
     }
 
     @Override
-    public void lineDataVisibility() {
-        createGraphArea();
-    }
-
-    @Override
     public void timeChanged(long milli) {
         latestMovieTime = milli;
         centraliseSelected(latestMovieTime);
