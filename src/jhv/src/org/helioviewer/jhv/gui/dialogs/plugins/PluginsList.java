@@ -24,14 +24,12 @@ class PluginsList extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         PluginContainer[] pluginArray = PluginManager.getSingletonInstance().getAllPlugins();
-        for (PluginContainer plugin : pluginArray) {
-            PluginsListEntry entry = new PluginsListEntry(plugin, this);
-            entryMap.put(plugin.getName(), entry);
+        for (PluginContainer plugin : pluginArray)
+            entryMap.put(plugin.getName(), new PluginsListEntry(plugin, this));
+        for (PluginsListEntry entry : entryMap.values())
             add(entry);
-        }
-        if (pluginArray.length != 0) {
+        if (pluginArray.length != 0)
             selectItem(pluginArray[0].getName());
-        }
     }
 
     void selectItem(String name) {
