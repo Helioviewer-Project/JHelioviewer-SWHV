@@ -17,13 +17,14 @@ public class TimelineTableModel implements TableModel {
     private static final ArrayList<TimelineRenderable> elements = new ArrayList<>();
 
     private static final int NUMBEROFCOLUMNS = 5;
+    private static final int LOADING_COL = 2; // tbd
 
     public static void downloadStarted(TimelineRenderable element) {
-        fireListeners();
+        fireUpdate(elements.indexOf(element));
     }
 
     public static void downloadFinished(TimelineRenderable element) {
-        fireListeners();
+        fireUpdate(elements.indexOf(element));
     }
 
     public static void addLineData(TimelineRenderable element) {
@@ -36,8 +37,9 @@ public class TimelineTableModel implements TableModel {
     }
 
     public static void removeLineData(TimelineRenderable element) {
+        int idx = elements.indexOf(element);
         elements.remove(element);
-        fireListeners();
+        fireDelete(idx);
     }
 
     public static ClickableDrawable getElementUnderMouse() {
@@ -50,8 +52,8 @@ public class TimelineTableModel implements TableModel {
         return null;
     }
 
-    private static void fireListeners() {
-        TableModelEvent e = new TableModelEvent(Timelines.ldsm);
+    private static void fireDelete(int idx) {
+        TableModelEvent e = new TableModelEvent(Timelines.ldsm, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
@@ -59,6 +61,13 @@ public class TimelineTableModel implements TableModel {
 
     private static void fireInsert(int idx) {
         TableModelEvent e = new TableModelEvent(Timelines.ldsm, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
+        for (TableModelListener listener : listeners) {
+            listener.tableChanged(e);
+        }
+    }
+
+    private static void fireUpdate(int idx) {
+        TableModelEvent e = new TableModelEvent(Timelines.ldsm, idx, idx, LOADING_COL, TableModelEvent.UPDATE);
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
