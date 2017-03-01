@@ -11,6 +11,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.plugins.timelines.TimelineSettings;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -87,5 +88,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     public void setObservationPanel(TimelineContentPanel timelineContentPanel) {
         observationPanel = timelineContentPanel;
+        LineDataSelectorModel.addLineDataSelectorModelListener(observationPanel);
+
     }
 }

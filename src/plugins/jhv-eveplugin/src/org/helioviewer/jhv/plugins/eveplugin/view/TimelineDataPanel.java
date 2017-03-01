@@ -39,6 +39,7 @@ public class TimelineDataPanel extends ObservationDialogPanel implements LineDat
     private final JComboBox<BandType> comboBoxData = new JComboBox<>();
 
     public TimelineDataPanel() {
+
         setLayout(new GridBagLayout());
 
         comboBoxGroup.addActionListener(e -> updateGroupValues());
@@ -72,6 +73,7 @@ public class TimelineDataPanel extends ObservationDialogPanel implements LineDat
         ObservationDialogDateModel.addListener(this);
     }
 
+    @Override
     public void setupDatasets() {
         DefaultComboBoxModel<BandGroup> model = new DefaultComboBoxModel<>(BandTypeAPI.getGroups());
         if (model.getSize() > 0) {

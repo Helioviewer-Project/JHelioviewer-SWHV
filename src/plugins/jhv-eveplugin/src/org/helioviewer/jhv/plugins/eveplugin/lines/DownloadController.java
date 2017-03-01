@@ -8,7 +8,7 @@ import java.util.concurrent.Future;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
 
 public class DownloadController {
 
