@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.helioviewer.jhv.plugins.eveplugin.lines.Band;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 
@@ -26,7 +25,7 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof LineDataSelectorElement) {
             LineDataSelectorElement ldse = (LineDataSelectorElement) value;
-            if (ldse instanceof Band) {
+            if (ldse.hasDataColor()) {
                 lineColorPanel.setLineColor(ldse.getDataColor());
             }
         }

@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 
 public class YAxis {
 
@@ -122,10 +121,12 @@ public class YAxis {
 
         @Override
         public double scale(double val) {
-            if (val < DrawConstants.DISCARD_LEVEL_LOW)
+            if (val < DrawConstants.DISCARD_LEVEL_LOW) {
                 return Math.log10(DrawConstants.DISCARD_LEVEL_LOW);
-            if (val > DrawConstants.DISCARD_LEVEL_HIGH)
+            }
+            if (val > DrawConstants.DISCARD_LEVEL_HIGH) {
                 return Math.log10(DrawConstants.DISCARD_LEVEL_HIGH);
+            }
             return Math.log10(val);
         }
 
@@ -150,10 +151,12 @@ public class YAxis {
 
         @Override
         public double scale(double val) {
-            if (val < 0)
+            if (val < 0) {
                 return 0;
-            if (val > DrawConstants.DISCARD_LEVEL_HIGH)
+            }
+            if (val > DrawConstants.DISCARD_LEVEL_HIGH) {
                 return DrawConstants.DISCARD_LEVEL_HIGH;
+            }
             return val;
         }
 
