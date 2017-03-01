@@ -64,4 +64,5 @@ public class Timelines implements MainContentPanelPlugin {
     public LinkedList<JComponent> getVisualInterfaces() {
         return pluginPanes;
     }
+
 }
