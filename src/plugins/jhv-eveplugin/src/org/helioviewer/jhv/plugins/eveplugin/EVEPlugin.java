@@ -15,19 +15,15 @@ public class EVEPlugin implements Plugin {
 
     private static final int MAX_WORKER_THREADS = 12;
     public static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("EVE", MAX_WORKER_THREADS);
-
     public static final RadioData rd = new RadioData();
 
     private final Timelines tl = new Timelines();
 
-    public EVEPlugin() {
-        TimelineTableModel.addLineData(rd);
-    }
-
     @Override
     public void installPlugin() {
-        tl.installTimelines();
+        tl.installTimelines(); // SWEK depends on this
 
+        TimelineTableModel.addLineData(rd);
         Timelines.td.setObservationPanel(new TimelineDataPanel());
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
