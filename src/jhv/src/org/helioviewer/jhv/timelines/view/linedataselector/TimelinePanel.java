@@ -24,11 +24,11 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.LineColorRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.LoadingCellRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RemoveCellRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineColorRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineLoadingRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineNameRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineRemoveRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineVisibleRenderer;
 
 import com.jidesoft.swing.JideButton;
 
@@ -110,21 +110,21 @@ public class TimelinePanel extends JPanel {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new LineDataVisibleCellRenderer());
+        grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new TimelineVisibleRenderer());
         grid.getColumnModel().getColumn(VISIBLE_COL).setPreferredWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 8);
 
-        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new LineDataSelectorElementRenderer());
+        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new TimelineNameRenderer());
 
-        grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new LineColorRenderer());
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new TimelineColorRenderer());
         grid.getColumnModel().getColumn(LINECOLOR_COL).setPreferredWidth(20);
         grid.getColumnModel().getColumn(LINECOLOR_COL).setMaxWidth(20);
 
-        grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new LoadingCellRenderer());
+        grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new TimelineLoadingRenderer());
         grid.getColumnModel().getColumn(LOADING_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(LOADING_COL).setMaxWidth(ICON_WIDTH + 2);
 
-        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RemoveCellRenderer());
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new TimelineRemoveRenderer());
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 

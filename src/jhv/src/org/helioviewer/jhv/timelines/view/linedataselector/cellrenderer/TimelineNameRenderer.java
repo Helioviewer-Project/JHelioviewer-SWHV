@@ -6,7 +6,7 @@ import org.helioviewer.jhv.timelines.view.linedataselector.TimelinePanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class LineDataSelectorElementRenderer extends DefaultTableCellRenderer {
+public class TimelineNameRenderer extends DefaultTableCellRenderer {
 
     @Override
     public void setValue(Object value) {
