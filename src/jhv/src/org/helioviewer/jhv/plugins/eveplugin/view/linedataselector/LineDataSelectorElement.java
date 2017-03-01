@@ -55,4 +55,6 @@ public interface LineDataSelectorElement {
 
     String getStringValue(long ts);
 
+    Object getElementUnderMouse();
+
 }

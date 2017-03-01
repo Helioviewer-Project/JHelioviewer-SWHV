@@ -325,4 +325,9 @@ public class RadioData extends AbstractLineDataSelectorElement {
         return null;
     }
 
+    @Override
+    public Object getElementUnderMouse() {
+        return null;
+    }
+
 }

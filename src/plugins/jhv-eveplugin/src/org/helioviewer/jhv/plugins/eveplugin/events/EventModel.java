@@ -290,4 +290,9 @@ public class EventModel extends AbstractLineDataSelectorElement implements JHVEv
         return null;
     }
 
+    @Override
+    public Object getElementUnderMouse() {
+        return getEventUnderMouse();
+    }
+
 }

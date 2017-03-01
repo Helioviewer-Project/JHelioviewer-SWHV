@@ -50,6 +50,16 @@ public class LineDataSelectorModel implements TableModel {
         fireListeners();
     }
 
+    public static Object getElementUnderMouse() {
+        for (LineDataSelectorElement el : elements) {
+            Object elUnderMouse = el.getElementUnderMouse();
+            if (elUnderMouse != null) {
+                return elUnderMouse;
+            }
+        }
+        return null;
+    }
+
     private static void fireListeners() {
         TableModelEvent e = new TableModelEvent(Timelines.ldsm);
         for (TableModelListener listener : tableListeners) {

@@ -69,6 +69,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private DragMode dragMode = DragMode.NODRAG;
 
     private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener()); // will
+
     // start
     // on
     // setVisible
@@ -540,7 +541,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePosition = e.getPoint();
         if (overMovieLine(mousePosition/* , graphArea */)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-        } else if (EventModel.getEventUnderMouse() != null) {
+        } else if (LineDataSelectorModel.getElementUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         } else if (mousePosition.x >= graphArea.x && mousePosition.x <= graphArea.x + graphArea.width && mousePosition.y >= graphArea.y && mousePosition.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
