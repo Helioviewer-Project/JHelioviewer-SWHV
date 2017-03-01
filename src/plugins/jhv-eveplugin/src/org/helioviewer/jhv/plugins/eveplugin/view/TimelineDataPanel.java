@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.util.HashSet;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -37,6 +38,7 @@ public class TimelineDataPanel extends JPanel implements TimelineTableModelListe
 
     public TimelineDataPanel() {
         setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
         comboBoxGroup.addActionListener(e -> updateGroupValues());
         calendarStartDate.addJHVCalendarListener(e -> ObservationDialogDateModel.setStartTime(calendarStartDate.getTime(), true));

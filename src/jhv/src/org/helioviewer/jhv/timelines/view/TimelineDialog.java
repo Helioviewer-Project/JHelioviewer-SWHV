@@ -3,7 +3,6 @@ package org.helioviewer.jhv.timelines.view;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 
@@ -20,39 +19,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
-    private TimelineContentPanel observationPanel = new EmptyTimelineContentPanel() {
-
-        @Override
-        public void lineDataAdded(TimelineRenderable element) {
-        }
-
-        @Override
-        public void lineDataRemoved() {
-        }
-
-        @Override
-        public void lineDataVisibility() {
-        }
-
-        @Override
-        public void loadButtonPressed() {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public JComponent getTimelineContentPanel() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public void setupDatasets() {
-            // TODO Auto-generated method stub
-
-        }
-
-    };
+    private TimelineContentPanel observationPanel = new EmptyTimelineContentPanel();
 
     public TimelineDialog() {
         super(ImageViewerGui.getMainFrame(), "New Layer", true);
@@ -75,7 +42,6 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         AbstractAction load = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 observationPanel.loadButtonPressed();
                 setVisible(false);
             }
@@ -99,7 +65,6 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public JComponent createContentPanel() {
-        observationPanel.getTimelineContentPanel().setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return observationPanel.getTimelineContentPanel();
     }
 
@@ -153,4 +118,5 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         }
 
     }
+
 }
