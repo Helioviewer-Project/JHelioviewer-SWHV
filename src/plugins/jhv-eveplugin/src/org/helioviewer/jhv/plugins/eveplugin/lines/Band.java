@@ -14,7 +14,6 @@ import java.util.Map;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
@@ -42,11 +41,6 @@ public class Band extends AbstractLineDataSelectorElement {
         DrawController.fireRedrawRequest();
         LineDataSelectorModel.addLineData(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
     }
 
     @Override
@@ -214,27 +208,12 @@ public class Band extends AbstractLineDataSelectorElement {
     }
 
     @Override
-    public boolean highLightChanged(Point p) {
-        return false;
-    }
-
-    @Override
-    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public boolean hasValueAsString() {
+        return true;
     }
 
     @Override
     public boolean hasDataColor() {
         return true;
     }
-
-    @Override
-    public boolean hasValueAsString() {
-        return true;
-    }
-
-    @Override
-    public ClickableDrawable getElementUnderMouse() {
-        return null;
-    }
-
 }

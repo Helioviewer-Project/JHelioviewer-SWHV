@@ -171,10 +171,6 @@ public class EventLineDataSelectorElement extends AbstractLineDataSelectorElemen
         return false;
     }
 
-    @Override
-    public void yaxisChanged() {
-    }
-
     private static class EventPlotConfiguration {
         private final JHVRelatedEvents event;
 
@@ -273,21 +269,6 @@ public class EventLineDataSelectorElement extends AbstractLineDataSelectorElemen
             return true;
         }
         return !(eventUnderMouse.x0 <= p.x && p.x <= eventUnderMouse.x1 && eventUnderMouse.yPosition - 4 <= p.y && p.y <= eventUnderMouse.yPosition + 5);
-    }
-
-    @Override
-    public boolean hasDataColor() {
-        return false;
-    }
-
-    @Override
-    public boolean hasValueAsString() {
-        return false;
-    }
-
-    @Override
-    public String getStringValue(long ts) {
-        return null;
     }
 
     @Override
