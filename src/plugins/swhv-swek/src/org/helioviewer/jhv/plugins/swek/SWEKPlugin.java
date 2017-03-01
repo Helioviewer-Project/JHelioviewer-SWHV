@@ -24,10 +24,9 @@ public class SWEKPlugin implements Plugin {
     public static final SWEKDownloadManager downloadManager = new SWEKDownloadManager();
     public static final SWEKData swekData = new SWEKData();
 
-    public static final EventLineDataSelectorElement em = new EventLineDataSelectorElement();
+    private static final EventLineDataSelectorElement em = new EventLineDataSelectorElement();
 
     public SWEKPlugin() {
-        LineDataSelectorModel.addLineData(em);
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
         for (SWEKEventType eventType : SWEKConfigurationManager.loadConfiguration()) {
             swekPanel.add(new EventPanel(eventType));
@@ -37,6 +36,7 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
+        LineDataSelectorModel.addLineData(em);
         ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
 
@@ -47,6 +47,7 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
+        LineDataSelectorModel.removeLineData(em);
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         Layers.removeTimespanListener(swekData);
 
