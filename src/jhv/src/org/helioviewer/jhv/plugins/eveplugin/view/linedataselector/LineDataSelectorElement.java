@@ -51,4 +51,8 @@ public interface LineDataSelectorElement {
 
     boolean isEmpty();
 
+    boolean hasValueAsString();
+
+    String getStringValue(long ts);
+
 }
