@@ -7,7 +7,6 @@ import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.timelines.Timelines;
 
 /**
  * Class for launching jhv with several plugins added.
@@ -28,7 +27,6 @@ public class SWHVLauncher {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                PluginManager.getSingletonInstance().addPlugin(new Timelines(), "Timelines.jar");
                 PluginManager.getSingletonInstance().addPlugin(new EVEPlugin(), "EVEPlugin.jar");
                 PluginManager.getSingletonInstance().addPlugin(new SWEKPlugin(), "SWEKPlugin.jar");
                 PluginManager.getSingletonInstance().addPlugin(new PfssPlugin(), "PfssPlugin.jar");
