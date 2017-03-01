@@ -64,7 +64,7 @@ public class RenderableContainerPanel extends JPanel {
         grid.lazyRepaint();
     }
 
-    private static class RenderableContainerTable extends JTable implements LazyComponent {
+    private class RenderableContainerTable extends JTable implements LazyComponent {
 
         public RenderableContainerTable(TableModel tm) {
             super(tm);
@@ -80,6 +80,16 @@ public class RenderableContainerPanel extends JPanel {
         @Override
         public void clearSelection() {
             // prevent losing selection
+        }
+
+        @Override
+        public void tableChanged(TableModelEvent e) {
+            super.tableChanged(e);
+            if (e.getType() == TableModelEvent.INSERT) {
+                int row = e.getLastRow();
+                if (getValueAt(row, 0) instanceof ImageLayer)
+                    setRowSelectionInterval(row, row);
+            }
         }
 
         @Override
@@ -115,14 +125,6 @@ public class RenderableContainerPanel extends JPanel {
         gc.fill = GridBagConstraints.BOTH;
 
         grid = new RenderableContainerTable(renderableContainer);
-
-        renderableContainer.addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.INSERT) {
-                int idx = e.getFirstRow();
-                if (grid.getValueAt(idx, 0) instanceof ImageLayer)
-                    grid.getSelectionModel().setSelectionInterval(idx, idx);
-            }
-        });
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
@@ -189,7 +191,7 @@ public class RenderableContainerPanel extends JPanel {
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             int row = grid.getSelectedRow();
-            if (!e.getValueIsAdjusting() && row != -1 && row < grid.getRowCount()) {
+            if (row != -1 && !e.getValueIsAdjusting()) {
                 setOptionsPanel((Renderable) grid.getValueAt(row, 0));
             }
         });
