@@ -75,7 +75,7 @@ public class LineDataSelectorTablePanel extends JPanel {
             }
 
             @Override
-            public void lineDataRemoved(LineDataSelectorElement element) {
+            public void lineDataRemoved() {
                 int i = Timelines.ldsm.getRowCount() - 1;
                 if (i >= 0) {
                     grid.getSelectionModel().setSelectionInterval(i, i);
@@ -83,7 +83,7 @@ public class LineDataSelectorTablePanel extends JPanel {
             }
 
             @Override
-            public void lineDataVisibility(LineDataSelectorElement element, boolean flag) {
+            public void lineDataVisibility() {
             }
 
         });

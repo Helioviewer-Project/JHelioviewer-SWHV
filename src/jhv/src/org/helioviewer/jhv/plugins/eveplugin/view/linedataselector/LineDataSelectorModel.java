@@ -59,7 +59,7 @@ public class LineDataSelectorModel implements TableModel {
 
     private static void fireLineDataSelectorElementRemoved(LineDataSelectorElement element) {
         for (LineDataSelectorModelListener listener : listeners) {
-            listener.lineDataRemoved(element);
+            listener.lineDataRemoved();
         }
     }
 
@@ -71,7 +71,7 @@ public class LineDataSelectorModel implements TableModel {
 
     static void fireLineDataSelectorElementVisibility(LineDataSelectorElement element, boolean flag) {
         for (LineDataSelectorModelListener listener : listeners) {
-            listener.lineDataVisibility(element, flag);
+            listener.lineDataVisibility();
         }
     }
 
@@ -123,19 +123,6 @@ public class LineDataSelectorModel implements TableModel {
     public static void removeRow(int row) {
         LineDataSelectorElement el = elements.get(row);
         el.removeLineData();
-    }
-
-    public static boolean containsBandType(BandType bandType) {
-        for (LineDataSelectorElement el : elements) {
-            if (el instanceof Band) {
-                Band band = (Band) el;
-                if (band.getBandType().equals(bandType)) {
-                    return true;
-                }
-            }
-
-        }
-        return false;
     }
 
     public static int getNumberOfAxes() {
