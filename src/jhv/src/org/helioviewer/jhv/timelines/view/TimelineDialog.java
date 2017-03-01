@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.timelines.view;
+package org.helioviewer.jhv.timelines.view;
 
 import java.awt.event.ActionEvent;
 
@@ -10,8 +10,8 @@ import javax.swing.JComponent;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.plugins.timelines.TimelineSettings;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.TimelineSettings;
+import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;

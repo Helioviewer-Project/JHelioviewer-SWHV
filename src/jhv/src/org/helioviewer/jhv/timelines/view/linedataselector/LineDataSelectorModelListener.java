@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.timelines.view.linedataselector;
+package org.helioviewer.jhv.timelines.view.linedataselector;
 
 public interface LineDataSelectorModelListener {
 

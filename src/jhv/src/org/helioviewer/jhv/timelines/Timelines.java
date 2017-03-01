@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.timelines;
+package org.helioviewer.jhv.timelines;
 
 import java.util.LinkedList;
 
@@ -9,11 +9,11 @@ import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugins.timelines.draw.DrawController;
-import org.helioviewer.jhv.plugins.timelines.view.TimelineDialog;
-import org.helioviewer.jhv.plugins.timelines.view.chart.PlotPanel;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorTablePanel;
+import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.view.TimelineDialog;
+import org.helioviewer.jhv.timelines.view.chart.PlotPanel;
+import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorTablePanel;
 
 public class Timelines implements Plugin, MainContentPanelPlugin {
 

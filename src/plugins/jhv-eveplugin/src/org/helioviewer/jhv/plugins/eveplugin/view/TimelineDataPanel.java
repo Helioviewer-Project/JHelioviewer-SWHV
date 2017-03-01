@@ -23,11 +23,11 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.BandGroup;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.lines.DownloadController;
-import org.helioviewer.jhv.plugins.timelines.draw.DrawController;
-import org.helioviewer.jhv.plugins.timelines.view.TimelineContentPanel;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.LineDataSelectorModelListener;
+import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.view.TimelineContentPanel;
+import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.timelines.view.linedataselector.LineDataSelectorModelListener;
 
 @SuppressWarnings("serial")
 public class TimelineDataPanel extends JPanel implements LineDataSelectorModelListener, TimespanListener, ObservationDialogDateModelListener, TimelineContentPanel {

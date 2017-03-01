@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.timelines.view.linedataselector;
+package org.helioviewer.jhv.timelines.view.linedataselector;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,13 +21,13 @@ import javax.swing.border.MatteBorder;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.plugins.timelines.Timelines;
-import org.helioviewer.jhv.plugins.timelines.draw.DrawController;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.cellrenderer.LineColorRenderer;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.cellrenderer.LoadingCellRenderer;
-import org.helioviewer.jhv.plugins.timelines.view.linedataselector.cellrenderer.RemoveCellRenderer;
+import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.LineColorRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.LoadingCellRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RemoveCellRenderer;
 
 import com.jidesoft.swing.JideButton;
 
