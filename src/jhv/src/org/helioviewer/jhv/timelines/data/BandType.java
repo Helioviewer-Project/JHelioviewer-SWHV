@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 public class BandType {
 
-    private String baseURL;
     private String label;
     private String name;
     private String unitLabel;
@@ -12,18 +11,11 @@ public class BandType {
     private double min;
     private double max;
     private boolean isLog = false;
+    private DataProvider dataprovider;
 
     @Override
     public String toString() {
         return label;
-    }
-
-    public String getBaseURL() {
-        return baseURL;
-    }
-
-    public void setBaseURL(String _baseURL) {
-        baseURL = _baseURL;
     }
 
     public String getLabel() {
@@ -76,6 +68,14 @@ public class BandType {
 
     public boolean isLogScale() {
         return isLog;
+    }
+
+    public DataProvider getDataprovider() {
+        return dataprovider;
+    }
+
+    public void setDataprovider(DataProvider dataprovider) {
+        this.dataprovider = dataprovider;
     }
 
 }
