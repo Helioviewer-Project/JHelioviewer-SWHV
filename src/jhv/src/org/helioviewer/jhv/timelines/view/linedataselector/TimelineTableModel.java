@@ -63,6 +63,7 @@ public class TimelineTableModel implements TableModel {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
+        DrawController.fireRedrawRequest();
     }
 
     static void fireUpdate(TimelineRenderable element, int col) {

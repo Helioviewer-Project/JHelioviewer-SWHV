@@ -125,6 +125,8 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
             long now = System.currentTimeMillis();
             DrawController.setSelectedInterval(Math.min(time, now), Math.min(time + 2 * TimeUtils.DAY_IN_MILLIS, now));
         }
+
+        TimelineTableModel.addLineData(band);
     }
 
     @Override
