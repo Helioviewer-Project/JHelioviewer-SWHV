@@ -12,7 +12,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
 
-import org.apache.commons.lang3.StringUtils;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.Camera;
@@ -34,32 +33,67 @@ import com.jidesoft.swing.JideToggleButton;
 @SuppressWarnings("serial")
 public class TopToolBar extends JToolBar {
 
-    private enum InteractionMode {
-        Pan(ImageViewerGui.getPanInteraction(), Buttons.pan),
-        Rotate(ImageViewerGui.getRotateInteraction(), Buttons.rotate),
-        Annotate(ImageViewerGui.getAnnotateInteraction(), Buttons.annotate);
+    private static ButtonMode buttonMode = ButtonMode.ICONANDTEXT;
 
-        private final Interaction interaction;
-        private final JideToggleButton button;
-
-        InteractionMode(Interaction _interaction, String s) {
-            interaction = _interaction;
-            button = new JideToggleButton(s);
-            button.addActionListener(e -> setActiveInteractionMode(this));
-            button.setToolTipText(toString());
-        }
-
+    private enum ButtonMode {
+        ICONANDTEXT, ICONONLY
     }
 
-    private static InteractionMode interactionMode = InteractionMode.Rotate;
+    private enum ButtonText {
+        CUTOUT(Buttons.cutOut, "SDO Cut-out", "SDO cut-out service"),
+        PROJECTION(Buttons.projection, "Projection", "Projection"),
+        OFFDISK(Buttons.offDisk, "Corona", "Toggle off-disk corona"), TRACK(Buttons.track, "Track", "Track solar rotation"),
+        ANNOTATE(Buttons.annotate, "Annotate", "Annotate"), ROTATE(Buttons.rotate, "Rotate", "Rotate"), PAN(Buttons.pan, "Pan", "Pan"),
+        RESETCAMERA(Buttons.resetCamera, "Reset Camera", "Reset camera position to default"),
+        ZOOMONE(Buttons.zoomOne, "Actual Size", "Zoom to native resolution"), ZOOMFIT(Buttons.zoomFit, "Zoom to Fit", "Zoom to fit"),
+        ZOOMOUT(Buttons.zoomOut, "Zoom Out", "Zoom out"), ZOOMIN(Buttons.zoomIn, "Zoom In", "Zoom in");
+
+        private final String icon;
+        private final String text;
+        private final String tip;
+
+        ButtonText(String _icon, String _text, String _tip) {
+            icon = _icon;
+            text = _text;
+            tip = _tip;
+        }
+
+        @Override
+        public String toString() {
+            return buttonMode == ButtonMode.ICONONLY ? icon : icon + "<br/>" + text;
+        }
+    }
+
+    private enum InteractionMode {
+        PAN(ImageViewerGui.getPanInteraction()), ROTATE(ImageViewerGui.getRotateInteraction()), ANNOTATE(ImageViewerGui.getAnnotateInteraction());
+
+        private final Interaction interaction;
+
+        InteractionMode(Interaction _interaction) {
+            interaction = _interaction;
+        }
+    }
+
+    private JideButton toolButton(ButtonText text) {
+        JideButton b = new JideButton(text.toString());
+        b.setToolTipText(text.tip);
+        return b;
+    }
+
+    private JideToggleButton toolToggleButton(ButtonText text) {
+        JideToggleButton b = new JideToggleButton(text.toString());
+        b.setToolTipText(text.tip);
+        return b;
+    }
 
     public TopToolBar() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         setRollover(true);
 
+        InteractionMode interactionMode = InteractionMode.ROTATE;
         try {
-            interactionMode = InteractionMode.valueOf(StringUtils.capitalize(Settings.getSingletonInstance().getProperty("display.interaction").toLowerCase()));
+            interactionMode = InteractionMode.valueOf(Settings.getSingletonInstance().getProperty("display.interaction").toUpperCase());
         } catch (Exception e) {
             Log.error("Error when reading the interaction mode", e);
         }
@@ -67,29 +101,21 @@ public class TopToolBar extends JToolBar {
         Dimension dim = new Dimension(32, 32);
 
         // Zoom
-        JideButton zoomIn = new JideButton(Buttons.zoomIn);
+        JideButton zoomIn = toolButton(ButtonText.ZOOMIN);
         zoomIn.addActionListener(new ZoomInAction());
-        zoomIn.setToolTipText("Zoom in");
-        addButton(zoomIn);
-
-        JideButton zoomOut = new JideButton(Buttons.zoomOut);
+        JideButton zoomOut = toolButton(ButtonText.ZOOMOUT);
         zoomOut.addActionListener(new ZoomOutAction());
-        zoomOut.setToolTipText("Zoom out");
-        addButton(zoomOut);
-
-        JideButton zoomFit = new JideButton(Buttons.zoomFit);
+        JideButton zoomFit = toolButton(ButtonText.ZOOMFIT);
         zoomFit.addActionListener(new ZoomFitAction());
-        zoomFit.setToolTipText("Zoom to fit");
-        addButton(zoomFit);
-
-        JideButton zoomOne = new JideButton(Buttons.zoomOne);
+        JideButton zoomOne = toolButton(ButtonText.ZOOMONE);
         zoomOne.addActionListener(new ZoomOneToOneAction());
-        zoomOne.setToolTipText("Zoom to native resolution");
-        addButton(zoomOne);
-
-        JideButton resetCamera = new JideButton(Buttons.resetCamera);
+        JideButton resetCamera = toolButton(ButtonText.RESETCAMERA);
         resetCamera.addActionListener(new ResetCameraAction());
-        resetCamera.setToolTipText("Reset camera position to default");
+
+        addButton(zoomIn);
+        addButton(zoomOut);
+        addButton(zoomFit);
+        addButton(zoomOne);
         addButton(resetCamera);
 
         add(new JToolBar.Separator(dim));
@@ -97,9 +123,29 @@ public class TopToolBar extends JToolBar {
         // Interaction
         ButtonGroup group = new ButtonGroup();
 
-        for (InteractionMode mode : InteractionMode.values()) {
-            group.add(mode.button);
-            addButton(mode.button);
+        JideToggleButton pan = toolToggleButton(ButtonText.PAN);
+        pan.addActionListener(e -> setActiveInteractionMode(InteractionMode.PAN));
+        JideToggleButton rotate = toolToggleButton(ButtonText.ROTATE);
+        rotate.addActionListener(e -> setActiveInteractionMode(InteractionMode.ROTATE));
+        JideToggleButton annotate = toolToggleButton(ButtonText.ANNOTATE);
+        annotate.addActionListener(e -> setActiveInteractionMode(InteractionMode.ANNOTATE));
+
+        group.add(pan);
+        group.add(rotate);
+        group.add(annotate);
+        addButton(pan);
+        addButton(rotate);
+        addButton(annotate);
+
+        switch (interactionMode) {
+            case PAN:
+                pan.setSelected(true);
+                break;
+            case ANNOTATE:
+                annotate.setSelected(true);
+                break;
+            default:
+                rotate.setSelected(true);
         }
         setActiveInteractionMode(interactionMode);
 
@@ -118,7 +164,7 @@ public class TopToolBar extends JToolBar {
         annotatePopup.addSeparator();
         annotatePopup.add(new ClearAnnotationsAction());
 
-        InteractionMode.Annotate.button.addMouseListener(new MouseAdapter() {
+        annotate.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 annotatePopup.show(e.getComponent(), 0, e.getComponent().getHeight());
@@ -127,26 +173,23 @@ public class TopToolBar extends JToolBar {
 
         add(new JToolBar.Separator(dim));
 
-        JideToggleButton trackSolarRotationButton = new JideToggleButton(Buttons.track);
-        trackSolarRotationButton.addActionListener(e -> {
+        JideToggleButton trackButton = toolToggleButton(ButtonText.TRACK);
+        trackButton.addActionListener(e -> {
             Camera camera = Displayer.getCamera();
             camera.setTrackingMode(!camera.getTrackingMode());
         });
-        trackSolarRotationButton.setToolTipText("Track solar rotation");
-        addButton(trackSolarRotationButton);
+        addButton(trackButton);
 
-        JideToggleButton coronaVisibilityButton = new JideToggleButton(Buttons.offDisk);
-        coronaVisibilityButton.addActionListener(e -> {
+        JideToggleButton coronaButton = toolToggleButton(ButtonText.OFFDISK);
+        coronaButton.addActionListener(e -> {
             Displayer.toggleShowCorona();
             Displayer.display();
         });
-        coronaVisibilityButton.setToolTipText("Toggle off-disk corona");
-        addButton(coronaVisibilityButton);
+        addButton(coronaButton);
 
         add(new JToolBar.Separator(dim));
 
-        JideButton projectionButton = new JideButton(Buttons.projection);
-        projectionButton.setToolTipText("Projection");
+        JideButton projectionButton = toolButton(ButtonText.PROJECTION);
         addButton(projectionButton);
 
         JPopupMenu projectionPopup = new JPopupMenu();
@@ -169,18 +212,15 @@ public class TopToolBar extends JToolBar {
 
         add(new JToolBar.Separator(dim));
 
-        JideButton cutOut = new JideButton(Buttons.cutOut);
+        JideButton cutOut = toolButton(ButtonText.CUTOUT);
         cutOut.addActionListener(new SDOCutOutAction());
-        cutOut.setToolTipText("SDO cut-out service");
         addButton(cutOut);
     }
 
     private static void setActiveInteractionMode(InteractionMode mode) {
-        interactionMode = mode;
-        Settings.getSingletonInstance().setProperty("display.interaction", mode.toString().toLowerCase());
+        Settings.getSingletonInstance().setProperty("display.interaction", mode.toString());
         Settings.getSingletonInstance().save("display.interaction");
         ImageViewerGui.setCurrentInteraction(mode.interaction);
-        mode.button.setSelected(true);
     }
 
     private void addButton(JideButton b) {
