@@ -16,15 +16,15 @@ import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class Timelines implements MainContentPanelPlugin {
 
-    public static final TimelineTableModel ldsm = new TimelineTableModel();
+    private static final TimelineTableModel tableModel = new TimelineTableModel();
     private static final DrawController dc = new DrawController();
     public static final TimelineDialog td = new TimelineDialog();
     private final LinkedList<JComponent> pluginPanes = new LinkedList<>();
     private final PlotPanel plotOne = new PlotPanel();
-    private static final TimelinePanel timelinePanel = new TimelinePanel(ldsm);
+    private static final TimelinePanel timelinePanel = new TimelinePanel(tableModel);
 
     public static TimelineTableModel getModel() {
-        return ldsm;
+        return tableModel;
     }
 
     public void installTimelines() {
