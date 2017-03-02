@@ -20,7 +20,6 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.LineOptionPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class Band extends AbstractTimelineRenderable {
 
@@ -39,9 +38,7 @@ public class Band extends AbstractTimelineRenderable {
         bandType = _bandType;
         optionsPanel = new LineOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
-
-        TimelineTableModel.addLineData(this);
-        DrawController.fireRedrawRequest();
+        updateGraphsData();
     }
 
     @Override
