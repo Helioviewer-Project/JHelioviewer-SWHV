@@ -13,8 +13,8 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 
 public class TimelineTableModel implements TableModel {
 
-    private static final HashSet<TableModelListener> listeners = new HashSet<>();
-    private static final ArrayList<TimelineRenderable> elements = new ArrayList<>();
+    private final HashSet<TableModelListener> listeners = new HashSet<>();
+    private final ArrayList<TimelineRenderable> elements = new ArrayList<>();
 
     public void downloadStarted(TimelineRenderable element) {
         fireUpdate(element, TimelinePanel.LOADING_COL);
@@ -30,13 +30,12 @@ public class TimelineTableModel implements TableModel {
     }
 
     public void removeLineData(TimelineRenderable element) {
-        elements.remove(element);
         element.remove();
-//        fireListeners();
-        DrawController.fireRedrawRequest();
+        elements.remove(element);
+        fireListeners();
     }
 
-    public static List<TimelineRenderable> getAllLineDataSelectorElements() {
+    public List<TimelineRenderable> getAllLineDataSelectorElements() {
         return elements;
     }
 
@@ -55,6 +54,7 @@ public class TimelineTableModel implements TableModel {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
+        DrawController.fireRedrawRequest();
     }
 
     private void fireInsert(int idx) {
