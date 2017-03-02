@@ -72,6 +72,7 @@ public class Band extends AbstractTimelineRenderable {
     public void removeLineData() {
         TimelineTableModel.removeLineData(this);
         BandColors.resetColor(getDataColor());
+        // bandType.getDataprovider().stopDownloads(this);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public boolean isDownloading() {
-        return DownloadController.isDownloadActive(this);
+        return bandType.getDataprovider().isDownloadActive(this);
     }
 
     @Override
@@ -193,7 +194,7 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        DownloadController.updateBand(this, selectedAxis.start, selectedAxis.end);
+        bandType.getDataprovider().updateBand(this, selectedAxis.start, selectedAxis.end);
         updateGraphsData();
     }
 
