@@ -193,9 +193,9 @@ public class ImageDataPanel extends JPanel {
         private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
         public CadencePanel() {
-            setLayout(new FlowLayout(FlowLayout.RIGHT));
+            setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 0));
 
-            spinnerCadence.setPreferredSize(new Dimension(55, 25));
+            spinnerCadence.setPreferredSize(new Dimension(50, spinnerCadence.getPreferredSize().height));
             comboUnit.setSelectedItem("min");
             comboUnit.addActionListener(e -> spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4));
 
