@@ -21,8 +21,6 @@ import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
-import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
-import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
@@ -64,8 +62,8 @@ public class ImageDataPanel extends JPanel {
         } else if (first) {
             first = false;
 
-            timeSelectionPanel.setStartTime(item.end - 2 * TimeUtils.DAY_IN_MILLIS, false);
-            timeSelectionPanel.setEndTime(item.end, false);
+            timeSelectionPanel.setStartTime(item.end - 2 * TimeUtils.DAY_IN_MILLIS);
+            timeSelectionPanel.setEndTime(item.end);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
                 loadRemote(ImageLayer.createImageLayer(), item);
@@ -78,11 +76,11 @@ public class ImageDataPanel extends JPanel {
         return item == null ? null : DataSources.getServerSetting(item.server, "availability.images") + "#IID" + item.sourceId;
     }
 
-    public long getStartTime() {
+    private long getStartTime() {
         return timeSelectionPanel.getStartTime();
     }
 
-    public long getEndTime() {
+    private long getEndTime() {
         return timeSelectionPanel.getEndTime();
     }
 
@@ -98,8 +96,8 @@ public class ImageDataPanel extends JPanel {
         APIRequest req = layer.getAPIRequest();
         if (req != null) {
             sourcesTree.setSelectedItem(req.server, req.sourceId);
-            timeSelectionPanel.setStartTime(req.startTime, false);
-            timeSelectionPanel.setEndTime(req.endTime, false);
+            timeSelectionPanel.setStartTime(req.startTime);
+            timeSelectionPanel.setEndTime(req.endTime);
             cadencePanel.setCadence(req.cadence);
         }
     }
@@ -110,9 +108,6 @@ public class ImageDataPanel extends JPanel {
             Message.err("Data is not selected", "There is no information on what to add", false);
             return false;
         }
-
-        ObservationDialogDateModel.setStartTime(getStartTime(), true);
-        ObservationDialogDateModel.setEndTime(getEndTime(), true);
 
         // show message if end date before start date
         if (getStartTime() > getEndTime()) {
@@ -130,22 +125,18 @@ public class ImageDataPanel extends JPanel {
     }
 
     // Time Selection Panel
-    private static class TimeSelectionPanel extends JPanel implements ObservationDialogDateModelListener {
+    private static class TimeSelectionPanel extends JPanel {
 
         private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
         private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
         private final JHVCarringtonPicker startCarrington = new JHVCarringtonPicker();
         private final JHVCarringtonPicker endCarrington = new JHVCarringtonPicker();
 
-        private boolean setFromOutside = false;
-
         public TimeSelectionPanel() {
-            ObservationDialogDateModel.addListener(this);
-
-            startDateTimePanel.addListener(e -> setStartTime(startDateTimePanel.getTime(), true));
-            endDateTimePanel.addListener(e -> setEndTime(endDateTimePanel.getTime(), true));
-            startCarrington.addJHVCalendarListener(e -> setStartTime(startCarrington.getTime(), true));
-            endCarrington.addJHVCalendarListener(e -> setEndTime(endCarrington.getTime(), true));
+            startDateTimePanel.addListener(e -> setStartTime(startDateTimePanel.getTime()));
+            endDateTimePanel.addListener(e -> setEndTime(endDateTimePanel.getTime()));
+            startCarrington.addJHVCalendarListener(e -> setStartTime(startCarrington.getTime()));
+            endCarrington.addJHVCalendarListener(e -> setEndTime(endCarrington.getTime()));
 
             startDateTimePanel.add(startCarrington);
             endDateTimePanel.add(endCarrington);
@@ -173,24 +164,14 @@ public class ImageDataPanel extends JPanel {
             add(endCarrington, c);
         }
 
-        public void setStartTime(long time, boolean byUser) {
+        private void setStartTime(long time) {
             startDateTimePanel.setTime(time);
             startCarrington.setTime(time);
-
-            if (setFromOutside)
-                setFromOutside = false;
-            else
-                ObservationDialogDateModel.setStartTime(time, byUser);
         }
 
-        public void setEndTime(long time, boolean byUser) {
+        private void setEndTime(long time) {
             endDateTimePanel.setTime(time);
             endCarrington.setTime(time);
-
-            if (setFromOutside)
-                setFromOutside = false;
-            else
-                ObservationDialogDateModel.setEndTime(time, byUser);
         }
 
         private long getStartTime() {
@@ -199,18 +180,6 @@ public class ImageDataPanel extends JPanel {
 
         private long getEndTime() {
             return endDateTimePanel.getTime();
-        }
-
-        @Override
-        public void startTimeChanged(long startTime) {
-            setFromOutside = true;
-            setStartTime(startTime, false);
-        }
-
-        @Override
-        public void endTimeChanged(long endTime) {
-            setFromOutside = true;
-            setEndTime(endTime, false);
         }
 
     }

@@ -7,13 +7,9 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
 public class NewLayerAction extends AbstractAction {
@@ -28,25 +24,6 @@ public class NewLayerAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Check the dates if possible
-        View view = Layers.getActiveView();
-        if (view != null && view.isMultiFrame()) {
-            JHVDate start = view.getFirstTime();
-            JHVDate end = view.getLastTime();
-
-            long obsStartDate = ObservationDialog.getInstance().getObservationPanel().getStartTime();
-            long obsEndDate = ObservationDialog.getInstance().getObservationPanel().getEndTime();
-            // only updates if it's really necessary with a tolerance of an hour
-            int tolerance = 60 * 60 * 1000;
-            if (Math.abs(start.milli - obsStartDate) > tolerance || Math.abs(end.milli - obsEndDate) > tolerance) {
-                if (!ObservationDialogDateModel.isStartTimeSetByUser()) {
-                    ObservationDialogDateModel.setStartTime(start.milli, false);
-                }
-                if (!ObservationDialogDateModel.isEndTimeSetByUser()) {
-                    ObservationDialogDateModel.setEndTime(end.milli, false);
-                }
-            }
-        }
         ObservationDialog.getInstance().showDialog(true, ImageLayer.createImageLayer());
     }
 
