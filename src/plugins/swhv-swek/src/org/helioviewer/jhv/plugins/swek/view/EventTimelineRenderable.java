@@ -27,7 +27,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
-public class EventLineDataSelectorElement extends AbstractTimelineRenderable implements JHVEventHandler {
+public class EventTimelineRenderable extends AbstractTimelineRenderable implements JHVEventHandler {
 
     private static Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
 

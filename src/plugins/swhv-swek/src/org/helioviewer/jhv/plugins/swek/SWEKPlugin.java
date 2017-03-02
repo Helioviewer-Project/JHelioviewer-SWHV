@@ -12,7 +12,7 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
-import org.helioviewer.jhv.plugins.swek.view.EventLineDataSelectorElement;
+import org.helioviewer.jhv.plugins.swek.view.EventTimelineRenderable;
 import org.helioviewer.jhv.plugins.swek.view.EventPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
@@ -24,7 +24,7 @@ public class SWEKPlugin implements Plugin {
     public static final SWEKDownloadManager downloadManager = new SWEKDownloadManager();
     public static final SWEKData swekData = new SWEKData();
 
-    private static final EventLineDataSelectorElement em = new EventLineDataSelectorElement();
+    private static final EventTimelineRenderable em = new EventTimelineRenderable();
 
     public SWEKPlugin() {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
