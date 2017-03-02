@@ -126,7 +126,6 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
 
     @Override
     public void remove() {
-        isVisible = false;
     }
 
     @Override
