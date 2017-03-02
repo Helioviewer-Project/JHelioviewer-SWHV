@@ -13,7 +13,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
@@ -33,9 +32,9 @@ import com.jidesoft.swing.JideToggleButton;
 @SuppressWarnings("serial")
 public class TopToolBar extends JToolBar {
 
-    private static ButtonMode buttonMode = ButtonMode.ICONANDTEXT;
+    private static DisplayMode displayMode = DisplayMode.ICONANDTEXT;
 
-    private enum ButtonMode {
+    private enum DisplayMode {
         ICONANDTEXT, ICONONLY
     }
 
@@ -60,7 +59,7 @@ public class TopToolBar extends JToolBar {
 
         @Override
         public String toString() {
-            return buttonMode == ButtonMode.ICONONLY ? icon : icon + "<br/>" + text;
+            return displayMode == DisplayMode.ICONONLY ? icon : icon + "<br/>" + text;
         }
     }
 
@@ -91,11 +90,30 @@ public class TopToolBar extends JToolBar {
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         setRollover(true);
 
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+        });
+
+        try {
+            displayMode = DisplayMode.valueOf(Settings.getSingletonInstance().getProperty("display.toolbar").toUpperCase());
+        } catch (Exception ignore) {
+        }
+        setDisplayMode(displayMode);
+    }
+
+    private void createNewToolBar() {
         InteractionMode interactionMode = InteractionMode.ROTATE;
         try {
             interactionMode = InteractionMode.valueOf(Settings.getSingletonInstance().getProperty("display.interaction").toUpperCase());
-        } catch (Exception e) {
-            Log.error("Error when reading the interaction mode", e);
+        } catch (Exception ignore) {
         }
 
         Dimension dim = new Dimension(32, 32);
@@ -228,4 +246,34 @@ public class TopToolBar extends JToolBar {
         add(b);
     }
 
+    private void setDisplayMode(DisplayMode mode) {
+        displayMode = mode;
+        Settings.getSingletonInstance().setProperty("display.toolbar", mode.toString().toLowerCase());
+        Settings.getSingletonInstance().save("display.toolbar");
+
+        removeAll();
+        createNewToolBar();
+        revalidate();
+    }
+
+    private void maybeShowPopup(MouseEvent me) {
+        if (me.isPopupTrigger() || me.getButton() == MouseEvent.BUTTON3) {
+            JPopupMenu popUpMenu = new JPopupMenu();
+            ButtonGroup group = new ButtonGroup();
+
+            JRadioButtonMenuItem iconAndText = new JRadioButtonMenuItem("Icon and Text", displayMode == DisplayMode.ICONANDTEXT);
+            iconAndText.addActionListener(e -> setDisplayMode(DisplayMode.ICONANDTEXT));
+            group.add(iconAndText);
+            popUpMenu.add(iconAndText);
+
+            JRadioButtonMenuItem iconOnly = new JRadioButtonMenuItem("Icon Only", displayMode == DisplayMode.ICONONLY);
+            iconOnly.addActionListener(e -> setDisplayMode(DisplayMode.ICONONLY));
+            group.add(iconOnly);
+            popUpMenu.add(iconOnly);
+
+            popUpMenu.show(me.getComponent(), me.getX(), me.getY());
+        }
+    }
+
 }
+
