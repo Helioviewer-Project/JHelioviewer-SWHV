@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.lines;
+package org.helioviewer.jhv.timelines.data;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -18,6 +18,7 @@ import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.timelines.view.LineOptionPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 

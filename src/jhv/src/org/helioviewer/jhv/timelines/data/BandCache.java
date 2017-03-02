@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.lines;
+package org.helioviewer.jhv.timelines.data;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
-class BandCache {
+public class BandCache {
 
     private static final long DAYS_PER_CHUNK = 8;
     private static final long MILLIS_PER_TICK = 60000;
@@ -58,8 +58,9 @@ class BandCache {
         while (key <= keyEnd) {
             DataChunk cache = cacheMap.get(key);
             key++;
-            if (cache == null)
+            if (cache == null) {
                 continue;
+            }
             float[] values = cache.getValues(0);
             long[] dates = cache.getDates(0);
 
@@ -94,8 +95,9 @@ class BandCache {
         while (key <= keyEnd) {
             DataChunk cache = cacheMap.get(key);
             key++;
-            if (cache == null)
+            if (cache == null) {
                 continue;
+            }
             float[] values = cache.getValues(level);
             long[] dates = cache.getDates(level);
             int i = 0;
