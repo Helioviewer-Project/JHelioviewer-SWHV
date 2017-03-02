@@ -217,4 +217,5 @@ public class Band extends AbstractTimelineRenderable {
     public boolean hasDataColor() {
         return true;
     }
+
 }

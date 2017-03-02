@@ -21,9 +21,6 @@ public class EVEDataProvider implements DataProvider {
 
     private String baseURL;
 
-    public EVEDataProvider() {
-    }
-
     @Override
     public void updateBand(Band band, long start, long end) {
         List<Interval> missingIntervalsNoExtend = band.getMissingDaysInInterval(start, end);
@@ -50,9 +47,7 @@ public class EVEDataProvider implements DataProvider {
                 ++i;
             }
             addFutureJobs(addDownloads(jobs), band);
-
         }
-
     }
 
     private static void addFutureJobs(List<Future<?>> newFutureJobs, Band band) {
@@ -74,7 +69,6 @@ public class EVEDataProvider implements DataProvider {
         for (Interval i : missingIntervals) {
             intervals.addAll(Interval.splitInterval(i, DOWNLOADER_MAX_DAYS_PER_BLOCK));
         }
-
         return intervals;
     }
 
@@ -134,7 +128,8 @@ public class EVEDataProvider implements DataProvider {
         return baseURL;
     }
 
-    public void setBaseURL(String baseURL) {
-        this.baseURL = baseURL;
+    public void setBaseURL(String _baseURL) {
+        baseURL = _baseURL;
     }
+
 }

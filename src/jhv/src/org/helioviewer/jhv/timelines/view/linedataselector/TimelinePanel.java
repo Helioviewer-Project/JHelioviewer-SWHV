@@ -56,12 +56,12 @@ public class TimelinePanel extends JPanel {
         JTable grid = new JTable(Timelines.ldsm) {
 
             @Override
-            public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                if (columnIndex == VISIBLE_COL || columnIndex == REMOVE_COL) {
+            public void changeSelection(int row, int col, boolean toggle, boolean extend) {
+                if (col == VISIBLE_COL || col == REMOVE_COL) {
                     // prevent changing selection
                     return;
                 }
-                super.changeSelection(rowIndex, columnIndex, toggle, extend);
+                super.changeSelection(row, col, toggle, extend);
             }
 
             @Override
