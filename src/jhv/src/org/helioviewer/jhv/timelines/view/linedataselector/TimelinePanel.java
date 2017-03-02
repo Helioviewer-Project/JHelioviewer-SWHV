@@ -178,8 +178,7 @@ public class TimelinePanel extends JPanel {
                     TimelineTableModel.fireUpdate(timeline, VISIBLE_COL);
                     DrawController.fireRedrawRequest();
                 } else if (col == REMOVE_COL) {
-                    ((TimelineRenderable) model.getValueAt(row, col)).remove();
-
+                    TimelineTableModel.removeRow(row);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);

@@ -47,7 +47,7 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
-        TimelineTableModel.removeLineData(em);
+        // TimelineTableModel.removeLineData(em);
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         Layers.removeTimespanListener(swekData);
 
