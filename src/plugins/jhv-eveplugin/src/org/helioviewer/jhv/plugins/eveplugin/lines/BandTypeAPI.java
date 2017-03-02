@@ -20,6 +20,8 @@ public class BandTypeAPI {
     private static final HashMap<String, BandGroup> groups = new HashMap<>();
     private static final ArrayList<BandGroup> orderedGroups = new ArrayList<>();
 
+    private static final EVEDataProvider eveDataprovider = new EVEDataProvider();
+
     public static void getDatasets() {
         try {
             JSONObject jsonmain = JSONUtils.getJSONStream(new DownloadStream(TimelineSettings.baseURL).getInput());
@@ -39,8 +41,8 @@ public class BandTypeAPI {
         try {
             for (int i = 0; i < jsonObjectArray.length(); i++) {
                 bandtypes[i] = new BandType();
-                EVEDataProvider eveDataprovider = new EVEDataProvider();
                 bandtypes[i].setDataprovider(eveDataprovider);
+
                 JSONObject job = jsonObjectArray.getJSONObject(i);
                 if (job.has("label")) {
                     bandtypes[i].setLabel(job.getString("label"));
