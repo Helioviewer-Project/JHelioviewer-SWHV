@@ -39,7 +39,8 @@ public class BandTypeAPI {
         try {
             for (int i = 0; i < jsonObjectArray.length(); i++) {
                 bandtypes[i] = new BandType();
-
+                EVEDataProvider eveDataprovider = new EVEDataProvider();
+                bandtypes[i].setDataprovider(eveDataprovider);
                 JSONObject job = jsonObjectArray.getJSONObject(i);
                 if (job.has("label")) {
                     bandtypes[i].setLabel(job.getString("label"));
@@ -56,7 +57,7 @@ public class BandTypeAPI {
                     bandtypes[i].setUnitLabel(job.getString("unitLabel"));
                 }
                 if (job.has("baseUrl")) {
-                    bandtypes[i].setBaseURL(job.getString("baseUrl"));
+                    eveDataprovider.setBaseURL(job.getString("baseUrl"));
                 }
                 if (job.has("scale")) {
                     bandtypes[i].setScale(job.getString("scale"));
