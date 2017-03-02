@@ -19,6 +19,7 @@ import org.helioviewer.jhv.timelines.data.BandColors;
 import org.helioviewer.jhv.timelines.data.BandGroup;
 import org.helioviewer.jhv.timelines.data.BandType;
 import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.TimelineContentPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
@@ -113,7 +114,7 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
         }
 
         Band band = new Band(bandType);
-        TimelineTableModel.addLineData(band); // updateBand does stuff with TimelineTableModel
+        Timelines.getModel().addLineData(band); // updateBand does stuff with TimelineTableModel
 
         band.setDataColor(BandColors.getNextColor());
         bandType.getDataprovider().updateBand(band, DrawController.availableAxis.start, DrawController.availableAxis.end);
