@@ -19,8 +19,6 @@ public class EVEDataProvider implements DataProvider {
     private static final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<>();
 
-    private String baseURL;
-
     @Override
     public void updateBand(Band band, long start, long end) {
         List<Interval> missingIntervalsNoExtend = band.getMissingDaysInInterval(start, end);
@@ -122,14 +120,6 @@ public class EVEDataProvider implements DataProvider {
     public boolean isDownloadActive(Band band) {
         ArrayList<Interval> list = downloadMap.get(band);
         return list != null && !list.isEmpty();
-    }
-
-    public String getBaseURL() {
-        return baseURL;
-    }
-
-    public void setBaseURL(String _baseURL) {
-        baseURL = _baseURL;
     }
 
 }
