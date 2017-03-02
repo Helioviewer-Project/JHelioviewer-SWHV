@@ -29,7 +29,9 @@ public class TimelineTableModel implements TableModel {
         fireInsert(elements.size() - 1);
     }
 
-    public static void removeLineData(TimelineRenderable element) {
+    static void removeRow(int row) {
+        TimelineRenderable element = elements.get(row);
+        element.remove();
         elements.remove(element);
         fireListeners();
     }
