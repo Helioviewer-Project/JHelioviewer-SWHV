@@ -181,7 +181,6 @@ public class TimelinePanel extends JPanel {
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
-                    DrawController.fireRedrawRequest();
                 }
             }
         });

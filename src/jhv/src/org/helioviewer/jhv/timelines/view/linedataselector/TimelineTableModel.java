@@ -10,6 +10,7 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
+import org.helioviewer.jhv.timelines.draw.DrawController;
 
 public class TimelineTableModel implements TableModel {
 
@@ -32,7 +33,8 @@ public class TimelineTableModel implements TableModel {
     public static void removeLineData(TimelineRenderable element) {
         elements.remove(element);
         element.remove();
-        fireListeners();
+//        fireListeners();
+        DrawController.fireRedrawRequest();
     }
 
     public static List<TimelineRenderable> getAllLineDataSelectorElements() {
