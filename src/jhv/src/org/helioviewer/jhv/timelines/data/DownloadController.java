@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.lines;
+package org.helioviewer.jhv.timelines.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import java.util.concurrent.Future;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eveplugin.lines.DownloadThread;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class DownloadController {

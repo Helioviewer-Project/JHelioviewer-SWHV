@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.lines;
+package org.helioviewer.jhv.timelines.view;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -13,9 +13,10 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.timelines.TimelineSettings;
+import org.helioviewer.jhv.timelines.data.Band;
 
 @SuppressWarnings("serial")
-class LineOptionPanel extends JPanel {
+public class LineOptionPanel extends JPanel {
 
     public LineOptionPanel(Band band) {
         setLayout(new GridBagLayout());

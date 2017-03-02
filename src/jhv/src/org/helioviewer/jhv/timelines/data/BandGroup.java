@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.lines;
+package org.helioviewer.jhv.timelines.data;
 
 import java.util.ArrayList;
 import java.util.List;
