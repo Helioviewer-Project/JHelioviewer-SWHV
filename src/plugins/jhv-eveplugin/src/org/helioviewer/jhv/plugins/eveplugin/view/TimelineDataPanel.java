@@ -18,7 +18,6 @@ import org.helioviewer.jhv.timelines.data.Band;
 import org.helioviewer.jhv.timelines.data.BandColors;
 import org.helioviewer.jhv.timelines.data.BandGroup;
 import org.helioviewer.jhv.timelines.data.BandType;
-import org.helioviewer.jhv.timelines.data.DownloadController;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.TimelineContentPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
@@ -74,8 +73,9 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
 
     @Override
     public void updateGroupValues() {
-        if (!userSet)
+        if (!userSet) {
             calendarStartDate.setTime(Layers.getStartDate().milli);
+        }
 
         BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
         if (selectedGroup == null) {
@@ -114,7 +114,7 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
 
         Band band = new Band(bandType);
         band.setDataColor(BandColors.getNextColor());
-        DownloadController.updateBand(band, DrawController.availableAxis.start, DrawController.availableAxis.end);
+        bandType.getDataprovider().updateBand(band, DrawController.availableAxis.start, DrawController.availableAxis.end);
 
         long time = calendarStartDate.getTime();
         long movieStart = Layers.getStartDate().milli;
