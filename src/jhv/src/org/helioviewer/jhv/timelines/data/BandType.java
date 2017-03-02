@@ -10,7 +10,8 @@ public class BandType {
     private final HashMap<String, Double> warnLevels = new HashMap<>();
     private double min;
     private double max;
-    private boolean isLog = false;
+    private boolean isLog;
+    private String baseURL;
     private DataProvider dataprovider;
 
     @Override
@@ -68,6 +69,14 @@ public class BandType {
 
     public boolean isLogScale() {
         return isLog;
+    }
+
+    public void setBaseURL(String _baseURL) {
+        baseURL = _baseURL;
+    }
+
+    public String getBaseURL() {
+        return baseURL;
     }
 
     public DataProvider getDataprovider() {

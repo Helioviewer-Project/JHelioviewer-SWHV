@@ -80,12 +80,8 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
     }
 
     private static String buildRequest(Interval interval, BandType type) {
-        if (type.getDataprovider() instanceof EVEDataProvider) {
-            String urlf = ((EVEDataProvider) type.getDataprovider()).getBaseURL() + "start_date=%s&end_date=%s&timeline=%s&data_format=json";
-            return String.format(urlf, TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
-        } else {
-            return "";
-        }
+        return String.format(type.getBaseURL() + "start_date=%s&end_date=%s&timeline=%s&data_format=json",
+                             TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
     }
 
 }

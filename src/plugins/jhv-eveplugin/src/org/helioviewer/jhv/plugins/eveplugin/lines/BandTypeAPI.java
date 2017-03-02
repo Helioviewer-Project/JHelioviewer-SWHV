@@ -57,7 +57,7 @@ public class BandTypeAPI {
                     bandtypes[i].setUnitLabel(job.getString("unitLabel"));
                 }
                 if (job.has("baseUrl")) {
-                    eveDataprovider.setBaseURL(job.getString("baseUrl"));
+                    bandtypes[i].setBaseURL(job.getString("baseUrl"));
                 }
                 if (job.has("scale")) {
                     bandtypes[i].setScale(job.getString("scale"));
