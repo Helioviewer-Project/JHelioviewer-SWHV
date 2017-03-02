@@ -71,9 +71,9 @@ public class RenderableContainerPanel extends JPanel {
         }
 
         @Override
-        public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-            if (columnIndex != VISIBLE_COL && columnIndex != REMOVE_COL)
-                super.changeSelection(rowIndex, columnIndex, toggle, extend);
+        public void changeSelection(int row, int col, boolean toggle, boolean extend) {
+            if (col != VISIBLE_COL && col != REMOVE_COL)
+                super.changeSelection(row, col, toggle, extend);
             // otherwise prevent changing selection
         }
 

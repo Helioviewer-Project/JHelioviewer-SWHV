@@ -74,8 +74,8 @@ public class BandType {
         return dataprovider;
     }
 
-    public void setDataprovider(DataProvider dataprovider) {
-        this.dataprovider = dataprovider;
+    public void setDataprovider(DataProvider _dataprovider) {
+        dataprovider = _dataprovider;
     }
 
 }
