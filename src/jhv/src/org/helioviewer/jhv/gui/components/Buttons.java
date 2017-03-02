@@ -62,29 +62,19 @@ public class Buttons {
 
     // toolbar
 
-    public static final String cutOut = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_VECTOR_CIRCLE_VARIANT) + "</font>";
-    public static final String projection = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_CUBE_OUTLINE) + "</font>";
-    public static final String offDisk = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_WEATHER_SUNNY) + "</font>";
-    public static final String track = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_CROSSHAIRS_GPS) + "</font>";
-    public static final String annotate = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_SHAPE_POLYGON_PLUS) + "</font>";
-    public static final String rotate = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_ROTATE_3D) + "</font>";
-    public static final String pan = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_CURSOR_MOVE) + "</font>";
-    public static final String resetCamera = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_CROSSHAIRS) + "</font>";
-    public static final String zoomOne = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_PLUS_ONE) + "</font>";
-    public static final String zoomFit = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_CROP_LANDSCAPE) + "</font>";
-    public static final String zoomOut = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_MAGNIFY_MINUS) + "</font>";
-    public static final String zoomIn = "<html><center><font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_MAGNIFY_PLUS) + "</font>";
+    private static final String TB_PRE = "<html><center><font face='Material Design Icons' size=5>";
+
+    public static final String cutOut = TB_PRE + uc2ent(MaterialDesign.MDI_VECTOR_CIRCLE_VARIANT) + "</font>";
+    public static final String projection = TB_PRE + uc2ent(MaterialDesign.MDI_CUBE_OUTLINE) + "</font>";
+    public static final String offDisk = TB_PRE + uc2ent(MaterialDesign.MDI_WEATHER_SUNNY) + "</font>";
+    public static final String track = TB_PRE +  uc2ent(MaterialDesign.MDI_CROSSHAIRS_GPS) + "</font>";
+    public static final String annotate = TB_PRE +  uc2ent(MaterialDesign.MDI_SHAPE_POLYGON_PLUS) + "</font>";
+    public static final String rotate = TB_PRE + uc2ent(MaterialDesign.MDI_ROTATE_3D) + "</font>";
+    public static final String pan = TB_PRE + uc2ent(MaterialDesign.MDI_CURSOR_MOVE) + "</font>";
+    public static final String resetCamera = TB_PRE + uc2ent(MaterialDesign.MDI_CROSSHAIRS) + "</font>";
+    public static final String zoomOne = TB_PRE + uc2ent(MaterialDesign.MDI_PLUS_ONE) + "</font>";
+    public static final String zoomFit = TB_PRE + uc2ent(MaterialDesign.MDI_CROP_LANDSCAPE) + "</font>";
+    public static final String zoomOut = TB_PRE + uc2ent(MaterialDesign.MDI_MAGNIFY_MINUS) + "</font>";
+    public static final String zoomIn = TB_PRE + uc2ent(MaterialDesign.MDI_MAGNIFY_PLUS) + "</font>";
 
 }

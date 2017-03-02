@@ -125,7 +125,7 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
     }
 
     @Override
-    public void removeLineData() {
+    public void remove() {
         isVisible = false;
     }
 
