@@ -22,7 +22,6 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.TimelineContentPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 @SuppressWarnings("serial")
 public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
@@ -87,7 +86,7 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
         model.removeAllElements();
 
         HashSet<BandType> bandTypesInSelectorModel = new HashSet<>();
-        for (TimelineRenderable el : TimelineTableModel.getAllLineDataSelectorElements()) {
+        for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
             if (el instanceof Band) {
                 Band band = (Band) el;
                 bandTypesInSelectorModel.add(band.getBandType());
