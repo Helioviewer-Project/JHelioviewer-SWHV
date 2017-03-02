@@ -113,18 +113,21 @@ public class TimelineDataPanel extends JPanel implements TimespanListener, Obser
         if (bandType == null) {
             return;
         }
+
         Band band = new Band(bandType);
         band.setDataColor(BandColors.getNextColor());
         DownloadController.updateBand(band, DrawController.availableAxis.start, DrawController.availableAxis.end);
+
         long time = calendarStartDate.getTime();
         ObservationDialogDateModel.setStartTime(time, true);
+
         long movieStart = Layers.getStartDate().milli;
         long movieEnd = Layers.getEndDate().milli;
         if (time >= movieStart && time <= movieEnd) {
             DrawController.setSelectedInterval(movieStart, movieEnd);
         } else {
             long now = System.currentTimeMillis();
-            DrawController.setSelectedInterval(time, Math.min(time + 2 * TimeUtils.DAY_IN_MILLIS, now));
+            DrawController.setSelectedInterval(Math.min(time, now), Math.min(time + 2 * TimeUtils.DAY_IN_MILLIS, now));
         }
     }
 
