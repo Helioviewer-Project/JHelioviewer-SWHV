@@ -11,7 +11,6 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.data.Band;
 import org.helioviewer.jhv.timelines.data.BandType;
-import org.helioviewer.jhv.timelines.data.DownloadController;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,18 +69,23 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
         if (!isCancelled()) {
             try {
                 Pair<float[], long[]> p = get();
-                if (p != null)
+                if (p != null) {
                     band.addToCache(p.a, p.b);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        DownloadController.downloadFinished(band, interval);
+        EVEDataProvider.downloadFinished(band, interval);
     }
 
     private static String buildRequest(Interval interval, BandType type) {
-        String urlf = type.getBaseURL() + "start_date=%s&end_date=%s&timeline=%s&data_format=json";
-        return String.format(urlf, TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
+        if (type.getDataprovider() instanceof EVEDataProvider) {
+            String urlf = ((EVEDataProvider) type.getDataprovider()).getBaseURL() + "start_date=%s&end_date=%s&timeline=%s&data_format=json";
+            return String.format(urlf, TimeUtils.dateFormat.format(interval.start), TimeUtils.dateFormat.format(interval.end), type.getName());
+        } else {
+            return "";
+        }
     }
 
 }
