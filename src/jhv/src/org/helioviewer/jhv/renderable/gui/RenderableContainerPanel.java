@@ -247,7 +247,7 @@ public class RenderableContainerPanel extends JPanel {
                     renderableContainer.fireListeners();
                 }
                 if (col == REMOVE_COL && renderable.isDeletable()) {
-                    ((RenderableContainer) grid.getModel()).removeRow(row);
+                    renderableContainer.removeRenderable(renderable);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);

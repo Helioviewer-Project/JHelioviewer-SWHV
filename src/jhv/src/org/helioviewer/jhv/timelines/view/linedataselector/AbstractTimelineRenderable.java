@@ -58,4 +58,5 @@ public abstract class AbstractTimelineRenderable implements TimelineRenderable {
     public ClickableDrawable getElementUnderMouse() {
         return null;
     }
+
 }

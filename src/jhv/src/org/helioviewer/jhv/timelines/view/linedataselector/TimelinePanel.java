@@ -170,15 +170,14 @@ public class TimelinePanel extends JPanel {
                     return;
                 }
 
-                TimelineTableModel model = (TimelineTableModel) grid.getModel();
+                TimelineRenderable timeline = (TimelineRenderable) grid.getValueAt(row, col);
 
                 if (col == VISIBLE_COL) {
-                    TimelineRenderable timeline = (TimelineRenderable) model.getValueAt(row, col);
                     timeline.setVisibility(!timeline.isVisible());
                     TimelineTableModel.fireUpdate(timeline, VISIBLE_COL);
                     DrawController.fireRedrawRequest();
-                } else if (col == REMOVE_COL) {
-                    TimelineTableModel.removeRow(row);
+                } else if (col == REMOVE_COL && timeline.isDeletable()) {
+                    TimelineTableModel.removeLineData(timeline);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);

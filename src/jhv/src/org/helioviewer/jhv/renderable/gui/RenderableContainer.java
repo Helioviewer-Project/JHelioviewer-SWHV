@@ -182,10 +182,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         listeners.remove(l);
     }
 
-    public void removeRow(int row) {
-        removeRenderable(renderables.get(row));
-    }
-
     private void fireInsert(int idx) {
         TableModelEvent e = new TableModelEvent(this, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
         for (TableModelListener listener : listeners) {
