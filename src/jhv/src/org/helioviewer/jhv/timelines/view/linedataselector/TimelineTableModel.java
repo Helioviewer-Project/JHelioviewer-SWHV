@@ -71,6 +71,7 @@ public class TimelineTableModel implements TableModel {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
+        DrawController.fireRedrawRequest();
     }
 
     @Override
