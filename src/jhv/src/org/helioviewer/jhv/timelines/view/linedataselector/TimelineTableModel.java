@@ -8,7 +8,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
@@ -41,7 +40,7 @@ public class TimelineTableModel implements TableModel {
         return elements;
     }
 
-    public static ClickableDrawable getElementUnderMouse() {
+    public ClickableDrawable getElementUnderMouse() {
         for (TimelineRenderable el : elements) {
             ClickableDrawable elUnderMouse = el.getElementUnderMouse();
             if (elUnderMouse != null) {
@@ -52,14 +51,14 @@ public class TimelineTableModel implements TableModel {
     }
 
     private void fireListeners() {
-        TableModelEvent e = new TableModelEvent(Timelines.ldsm);
+        TableModelEvent e = new TableModelEvent(this);
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
     }
 
     private void fireInsert(int idx) {
-        TableModelEvent e = new TableModelEvent(Timelines.ldsm, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
+        TableModelEvent e = new TableModelEvent(this, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
@@ -68,7 +67,7 @@ public class TimelineTableModel implements TableModel {
 
     void fireUpdate(TimelineRenderable element, int col) {
         int row = elements.indexOf(element);
-        TableModelEvent e = new TableModelEvent(Timelines.ldsm, row, row, col, TableModelEvent.UPDATE);
+        TableModelEvent e = new TableModelEvent(this, row, row, col, TableModelEvent.UPDATE);
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
@@ -118,7 +117,7 @@ public class TimelineTableModel implements TableModel {
         listeners.remove(l);
     }
 
-    public static int getNumberOfAxes() {
+    public int getNumberOfAxes() {
         int ct = 0;
         for (TimelineRenderable el : elements) {
             if (el.showYAxis()) {

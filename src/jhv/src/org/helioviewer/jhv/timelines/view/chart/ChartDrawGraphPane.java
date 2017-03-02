@@ -35,6 +35,7 @@ import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -431,7 +432,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
 
-        ClickableDrawable element = TimelineTableModel.getElementUnderMouse();
+        ClickableDrawable element = Timelines.getModel().getElementUnderMouse();
         if (element != null) {
             Rectangle graphArea = DrawController.getGraphArea();
             element.clicked(e.getLocationOnScreen(), DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x));
@@ -537,7 +538,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePosition = e.getPoint();
         if (overMovieLine(mousePosition/* , graphArea */)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-        } else if (TimelineTableModel.getElementUnderMouse() != null) {
+        } else if (Timelines.getModel().getElementUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         } else if (mousePosition.x >= graphArea.x && mousePosition.x <= graphArea.x + graphArea.width && mousePosition.y >= graphArea.y && mousePosition.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
