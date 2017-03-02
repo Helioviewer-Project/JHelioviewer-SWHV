@@ -19,13 +19,13 @@ import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.JHVEventType;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class EventTimelineRenderable extends AbstractTimelineRenderable implements JHVEventHandler {
 
@@ -43,13 +43,14 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
+        // ?? Timelines.getModel().downloadStarted(this);
         JHVEventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, this);
     }
 
     @Override
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> _events) {
         events = _events;
-        TimelineTableModel.downloadFinished(this);
+        Timelines.getModel().downloadFinished(this);
         if (isVisible) {
             DrawController.fireRedrawRequest();
         }

@@ -17,15 +17,15 @@ public class TimelineTableModel implements TableModel {
     private static final HashSet<TableModelListener> listeners = new HashSet<>();
     private static final ArrayList<TimelineRenderable> elements = new ArrayList<>();
 
-    public static void downloadStarted(TimelineRenderable element) {
+    public void downloadStarted(TimelineRenderable element) {
         fireUpdate(element, TimelinePanel.LOADING_COL);
     }
 
-    public static void downloadFinished(TimelineRenderable element) {
+    public void downloadFinished(TimelineRenderable element) {
         fireUpdate(element, TimelinePanel.LOADING_COL);
     }
 
-    public static void addLineData(TimelineRenderable element) {
+    public void addLineData(TimelineRenderable element) {
         elements.add(element);
         fireInsert(elements.size() - 1);
     }
@@ -51,14 +51,14 @@ public class TimelineTableModel implements TableModel {
         return null;
     }
 
-    private static void fireListeners() {
+    private void fireListeners() {
         TableModelEvent e = new TableModelEvent(Timelines.ldsm);
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
     }
 
-    private static void fireInsert(int idx) {
+    private void fireInsert(int idx) {
         TableModelEvent e = new TableModelEvent(Timelines.ldsm, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
@@ -66,7 +66,7 @@ public class TimelineTableModel implements TableModel {
         DrawController.fireRedrawRequest();
     }
 
-    static void fireUpdate(TimelineRenderable element, int col) {
+    void fireUpdate(TimelineRenderable element, int col) {
         int row = elements.indexOf(element);
         TableModelEvent e = new TableModelEvent(Timelines.ldsm, row, row, col, TableModelEvent.UPDATE);
         for (TableModelListener listener : listeners) {

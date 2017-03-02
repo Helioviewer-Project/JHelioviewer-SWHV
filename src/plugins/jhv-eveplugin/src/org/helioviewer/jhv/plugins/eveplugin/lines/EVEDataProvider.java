@@ -8,9 +8,9 @@ import java.util.concurrent.Future;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.data.Band;
 import org.helioviewer.jhv.timelines.data.DataProvider;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class EVEDataProvider implements DataProvider {
 
@@ -34,7 +34,7 @@ public class EVEDataProvider implements DataProvider {
 
             int n = intervals.size();
             if (n == 0) {
-                TimelineTableModel.downloadStarted(band);
+                Timelines.getModel().downloadStarted(band);
                 return;
             }
 
@@ -96,7 +96,7 @@ public class EVEDataProvider implements DataProvider {
                 downloadMap.remove(band);
             }
         }
-        TimelineTableModel.downloadFinished(band);
+        Timelines.getModel().downloadFinished(band);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class EVEDataProvider implements DataProvider {
             fj.cancel(true);
         }
         futureJobs.remove(band);
-        TimelineTableModel.downloadFinished(band);
+        Timelines.getModel().downloadFinished(band);
     }
 
     @Override

@@ -23,6 +23,10 @@ public class Timelines implements MainContentPanelPlugin {
     private final PlotPanel plotOne = new PlotPanel();
     private static final TimelinePanel timelinePanel = new TimelinePanel(ldsm);
 
+    public static TimelineTableModel getModel() {
+        return ldsm;
+    }
+
     public void installTimelines() {
         pluginPanes.add(plotOne);
 
