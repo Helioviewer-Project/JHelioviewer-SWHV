@@ -9,7 +9,6 @@ import org.helioviewer.jhv.plugins.eveplugin.view.TimelineDataPanel;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 public class EVEPlugin implements Plugin {
 
@@ -20,7 +19,7 @@ public class EVEPlugin implements Plugin {
     private final Timelines tl = new Timelines();
 
     public EVEPlugin() {
-        TimelineTableModel.addLineData(rd);
+//        TimelineTableModel.addLineData(rd);
     }
 
     @Override
