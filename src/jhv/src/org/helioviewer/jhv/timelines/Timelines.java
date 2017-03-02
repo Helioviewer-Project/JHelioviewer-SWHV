@@ -21,7 +21,7 @@ public class Timelines implements MainContentPanelPlugin {
     public static final TimelineDialog td = new TimelineDialog();
     private final LinkedList<JComponent> pluginPanes = new LinkedList<>();
     private final PlotPanel plotOne = new PlotPanel();
-    private static final TimelinePanel timelinePanel = new TimelinePanel();
+    private static final TimelinePanel timelinePanel = new TimelinePanel(ldsm);
 
     public void installTimelines() {
         pluginPanes.add(plotOne);

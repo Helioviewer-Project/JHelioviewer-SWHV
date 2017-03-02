@@ -50,10 +50,10 @@ public class TimelinePanel extends JPanel {
 
     private final JPanel optionsPanelWrapper;
 
-    public TimelinePanel() {
+    public TimelinePanel(TimelineTableModel model) {
         setLayout(new GridBagLayout());
 
-        JTable grid = new JTable(Timelines.ldsm) {
+        JTable grid = new JTable(model) {
 
             @Override
             public void changeSelection(int row, int col, boolean toggle, boolean extend) {
@@ -174,10 +174,10 @@ public class TimelinePanel extends JPanel {
 
                 if (col == VISIBLE_COL) {
                     timeline.setVisibility(!timeline.isVisible());
-                    TimelineTableModel.fireUpdate(timeline, VISIBLE_COL);
+                    model.fireUpdate(timeline, VISIBLE_COL);
                     DrawController.fireRedrawRequest();
                 } else if (col == REMOVE_COL && timeline.isDeletable()) {
-                    TimelineTableModel.removeLineData(timeline);
+                    model.removeLineData(timeline);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);

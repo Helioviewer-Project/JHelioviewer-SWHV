@@ -30,7 +30,7 @@ public class TimelineTableModel implements TableModel {
         fireInsert(elements.size() - 1);
     }
 
-    public static void removeLineData(TimelineRenderable element) {
+    public void removeLineData(TimelineRenderable element) {
         elements.remove(element);
         element.remove();
 //        fireListeners();

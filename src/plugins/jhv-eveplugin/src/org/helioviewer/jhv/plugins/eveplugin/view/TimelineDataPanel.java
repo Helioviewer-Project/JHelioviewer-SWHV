@@ -113,6 +113,8 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
         }
 
         Band band = new Band(bandType);
+        TimelineTableModel.addLineData(band); // updateBand does stuff with TimelineTableModel
+
         band.setDataColor(BandColors.getNextColor());
         bandType.getDataprovider().updateBand(band, DrawController.availableAxis.start, DrawController.availableAxis.end);
 
@@ -125,8 +127,6 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
             long now = System.currentTimeMillis();
             DrawController.setSelectedInterval(Math.min(time, now), Math.min(time + 2 * TimeUtils.DAY_IN_MILLIS, now));
         }
-
-        TimelineTableModel.addLineData(band);
     }
 
     @Override
