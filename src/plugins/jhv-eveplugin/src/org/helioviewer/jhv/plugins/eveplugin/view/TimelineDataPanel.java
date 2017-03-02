@@ -15,7 +15,6 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
 import org.helioviewer.jhv.timelines.data.Band;
 import org.helioviewer.jhv.timelines.data.BandColors;
@@ -28,7 +27,7 @@ import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
 
 @SuppressWarnings("serial")
-public class TimelineDataPanel extends JPanel implements TimespanListener, ObservationDialogDateModelListener, TimelineContentPanel {
+public class TimelineDataPanel extends JPanel implements ObservationDialogDateModelListener, TimelineContentPanel {
 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
@@ -64,7 +63,6 @@ public class TimelineDataPanel extends JPanel implements TimespanListener, Obser
         c.gridx = 1;
         add(comboBoxData, c);
 
-        Layers.addTimespanListener(this);
         ObservationDialogDateModel.addListener(this);
     }
 
@@ -129,12 +127,6 @@ public class TimelineDataPanel extends JPanel implements TimespanListener, Obser
             long now = System.currentTimeMillis();
             DrawController.setSelectedInterval(Math.min(time, now), Math.min(time + 2 * TimeUtils.DAY_IN_MILLIS, now));
         }
-    }
-
-    @Override
-    public void timespanChanged(long start, long end) {
-        calendarStartDate.setTime(start);
-        ObservationDialogDateModel.setStartTime(start, false);
     }
 
     @Override
