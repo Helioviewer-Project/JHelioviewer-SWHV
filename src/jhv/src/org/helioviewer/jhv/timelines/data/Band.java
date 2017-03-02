@@ -69,10 +69,10 @@ public class Band extends AbstractTimelineRenderable {
     }
 
     @Override
-    public void removeLineData() {
+    public void remove() {
+        bandType.getDataprovider().stopDownloads(this);
         TimelineTableModel.removeLineData(this);
         BandColors.resetColor(getDataColor());
-        // bandType.getDataprovider().stopDownloads(this);
     }
 
     @Override

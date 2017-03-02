@@ -29,13 +29,13 @@ public class TimelineTableModel implements TableModel {
         fireInsert(elements.size() - 1);
     }
 
-    public static List<TimelineRenderable> getAllLineDataSelectorElements() {
-        return elements;
-    }
-
     public static void removeLineData(TimelineRenderable element) {
         elements.remove(element);
         fireListeners();
+    }
+
+    public static List<TimelineRenderable> getAllLineDataSelectorElements() {
+        return elements;
     }
 
     public static ClickableDrawable getElementUnderMouse() {
@@ -112,10 +112,6 @@ public class TimelineTableModel implements TableModel {
     @Override
     public void removeTableModelListener(TableModelListener l) {
         listeners.remove(l);
-    }
-
-    static void removeRow(int row) {
-        elements.get(row).removeLineData();
     }
 
     public static int getNumberOfAxes() {

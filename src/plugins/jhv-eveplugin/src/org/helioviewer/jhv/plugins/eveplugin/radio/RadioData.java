@@ -195,7 +195,7 @@ public class RadioData extends AbstractTimelineRenderable {
     }
 
     @Override
-    public void removeLineData() {
+    public void remove() {
         // clearCache();
         // EVEPlugin.ldsm.removeLineData(this);
     }

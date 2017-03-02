@@ -12,7 +12,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 
 public interface TimelineRenderable {
 
-    void removeLineData();
+    void remove();
 
     void setVisibility(boolean visible);
 
