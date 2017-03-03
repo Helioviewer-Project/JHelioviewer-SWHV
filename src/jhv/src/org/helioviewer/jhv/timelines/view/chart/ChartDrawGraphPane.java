@@ -574,6 +574,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void componentResized(ComponentEvent e) {
         DrawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
+        DrawController.graphAreaChanged();
     }
 
     @Override

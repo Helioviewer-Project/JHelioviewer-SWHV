@@ -166,7 +166,7 @@ public class TimelinePanel extends JPanel {
                 if (col == VISIBLE_COL) {
                     timeline.setVisibility(!timeline.isVisible());
                     model.fireUpdate(timeline, VISIBLE_COL);
-                    DrawController.visibleTimelinesChanged();
+                    DrawController.graphAreaChanged();
                 } else if (col == REMOVE_COL && timeline.isDeletable()) {
                     model.removeLineData(timeline);
                     int idx = grid.getSelectedRow();
