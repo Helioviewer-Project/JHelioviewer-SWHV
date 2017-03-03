@@ -1,11 +1,12 @@
 package org.helioviewer.jhv.renderable.gui.cellrenderer;
 
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 @SuppressWarnings("serial")
-public class RendererName extends TableCellRenderer {
+public class RendererName extends JHVTableCellRenderer {
 
     @Override
     public void setValue(Object value) {
@@ -21,7 +22,7 @@ public class RendererName extends TableCellRenderer {
                 setFont(UIGlobals.UIFont);
             }
         }
-        setBorder(TableCellRenderer.commonBorder);
+        setBorder(cellBorder);
     }
 
 }

@@ -1,12 +1,10 @@
 package org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer;
 
-import javax.swing.table.DefaultTableCellRenderer;
-
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelinePanel;
+import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class TimelineNameRenderer extends DefaultTableCellRenderer {
+public class TimelineNameRenderer extends JHVTableCellRenderer {
 
     @Override
     public void setValue(Object value) {
@@ -21,7 +19,7 @@ public class TimelineNameRenderer extends DefaultTableCellRenderer {
                 setToolTipText(layerName + ": No data for selected interval");
             }
         }
-        setBorder(TimelinePanel.commonBorder);
+        setBorder(cellBorder);
     }
 
 }

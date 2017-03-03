@@ -5,10 +5,11 @@ import java.awt.Component;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 
+import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 @SuppressWarnings("serial")
-public class RendererVisible extends TableCellRenderer {
+public class RendererVisible extends JHVTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
 
@@ -16,7 +17,7 @@ public class RendererVisible extends TableCellRenderer {
         setHorizontalAlignment(CENTER);
         checkBox.putClientProperty("JComponent.sizeVariant", "small");
         checkBox.setBorderPainted(true);
-        checkBox.setBorder(TableCellRenderer.commonBorder);
+        checkBox.setBorder(cellBorder);
     }
 
     @Override
