@@ -18,11 +18,11 @@ public class TimelineTableModel extends AbstractTableModel {
     }
 
     public void downloadStarted(TimelineRenderable element) {
-        fireTableDataChanged(); // JTable possible bug, not specific
+        fireTableDataChanged(); // possible JTable bug; don't update a specific cell
     }
 
     public void downloadFinished(TimelineRenderable element) {
-        fireTableDataChanged(); // JTable possible bug, not specific
+        fireTableDataChanged(); // possible JTable bug; don't update a specific cell
     }
 
     public void addLineData(TimelineRenderable element) {
