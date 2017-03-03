@@ -54,7 +54,7 @@ public class TimelineTableModel implements TableModel {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
-        DrawController.fireRedrawRequest();
+        DrawController.visibleTimelinesChanged();
     }
 
     private void fireInsert(int idx) {
@@ -62,7 +62,7 @@ public class TimelineTableModel implements TableModel {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
-        DrawController.fireRedrawRequest();
+        DrawController.visibleTimelinesChanged();
     }
 
     void fireUpdate(TimelineRenderable element, int col) {
