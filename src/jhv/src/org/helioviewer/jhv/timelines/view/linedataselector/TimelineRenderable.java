@@ -56,6 +56,6 @@ public interface TimelineRenderable {
 
     String getStringValue(long ts);
 
-    ClickableDrawable getElementUnderMouse();
+    ClickableDrawable getDrawableUnderMouse();
 
 }

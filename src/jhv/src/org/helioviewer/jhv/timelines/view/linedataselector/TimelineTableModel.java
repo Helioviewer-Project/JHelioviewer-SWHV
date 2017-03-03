@@ -39,9 +39,9 @@ public class TimelineTableModel implements TableModel {
         return elements;
     }
 
-    public ClickableDrawable getElementUnderMouse() {
+    public ClickableDrawable getDrawableUnderMouse() {
         for (TimelineRenderable el : elements) {
-            ClickableDrawable elUnderMouse = el.getElementUnderMouse();
+            ClickableDrawable elUnderMouse = el.getDrawableUnderMouse();
             if (elUnderMouse != null) {
                 return elUnderMouse;
             }

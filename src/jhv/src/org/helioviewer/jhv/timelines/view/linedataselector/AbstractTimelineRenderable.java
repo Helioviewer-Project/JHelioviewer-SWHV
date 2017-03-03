@@ -55,7 +55,7 @@ public abstract class AbstractTimelineRenderable implements TimelineRenderable {
     }
 
     @Override
-    public ClickableDrawable getElementUnderMouse() {
+    public ClickableDrawable getDrawableUnderMouse() {
         return null;
     }
 
