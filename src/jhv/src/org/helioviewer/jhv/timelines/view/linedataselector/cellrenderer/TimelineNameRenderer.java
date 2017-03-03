@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer;
 
+import java.awt.Color;
+
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
@@ -12,12 +14,12 @@ public class TimelineNameRenderer extends JHVTableCellRenderer {
             TimelineRenderable ldse = (TimelineRenderable) value;
             String layerName = ldse.getName();
             if (ldse.hasData()) {
-                setText(layerName);
                 setToolTipText(layerName);
             } else {
-                setText("<html><font color='gray'>" + layerName);
+                setForeground(Color.GRAY);
                 setToolTipText(layerName + ": No data for selected interval");
             }
+            setText(layerName);
         }
         setBorder(cellBorder);
     }
