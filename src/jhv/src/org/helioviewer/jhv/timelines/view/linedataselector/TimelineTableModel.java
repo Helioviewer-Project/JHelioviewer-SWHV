@@ -18,11 +18,11 @@ public class TimelineTableModel extends AbstractTableModel {
     }
 
     public void downloadStarted(TimelineRenderable element) {
-        fireTableDataChanged(); // possible JTable bug; don't update a specific cell
+        updateCell(elements.indexOf(element), TimelinePanel.LOADING_COL);
     }
 
     public void downloadFinished(TimelineRenderable element) {
-        fireTableDataChanged(); // possible JTable bug; don't update a specific cell
+        updateCell(elements.indexOf(element), TimelinePanel.LOADING_COL);
     }
 
     public void addLineData(TimelineRenderable element) {
@@ -43,7 +43,8 @@ public class TimelineTableModel extends AbstractTableModel {
     }
 
     void updateCell(int row, int col) {
-        fireTableCellUpdated(row, col);
+        if (row >= 0) // negative row breaks model
+            fireTableCellUpdated(row, col);
     }
 
     @Override

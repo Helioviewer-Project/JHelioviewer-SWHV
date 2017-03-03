@@ -38,7 +38,7 @@ public class TimelinePanel extends JPanel {
 
     private static final int VISIBLE_COL = 0;
     private static final int TITLE_COL = 1;
-    private static final int LOADING_COL = 2;
+    static final int LOADING_COL = 2;
     private static final int LINECOLOR_COL = 3;
     private static final int REMOVE_COL = 4;
 
