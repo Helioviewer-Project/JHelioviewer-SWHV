@@ -39,15 +39,15 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables.add(renderable);
         newRenderables.add(renderable);
 
-        int row = renderables.size() - 1;
-        fireTableRowsInserted(row, row);
+        //int row = renderables.size() - 1;
+        //fireTableRowsInserted(row, row); display() will take care
         Displayer.display(); // e.g., PFSS renderable
     }
 
     public void removeRenderable(Renderable renderable) {
         renderables.remove(renderable);
         removedRenderables.add(renderable);
-        // fireListeners();
+        // refreshTable(); display() will take care
         Displayer.display();
     }
 
@@ -161,13 +161,11 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public void updateCell(int row, int col) {
-        fireTableCellUpdated(row, col);
+        if (row >= 0) // negative row breaks model
+            fireTableCellUpdated(row, col);
     }
 
     public void fireTimeUpdated(Renderable renderable) {
-//        int idx = renderables.indexOf(renderable);
-//        if (idx < 0 || idx >= renderables.size())
-//            return;
         updateCell(renderables.indexOf(renderable), RenderableContainerPanel.TIME_COL);
     }
 
