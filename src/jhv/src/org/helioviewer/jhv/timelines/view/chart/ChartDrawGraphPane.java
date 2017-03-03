@@ -67,11 +67,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private DragMode dragMode = DragMode.NODRAG;
 
-    private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener()); // will
-
-    // start
-    // on
-    // setVisible
+    // will start on setVisible
+    private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
 
     public ChartDrawGraphPane() {
         setOpaque(true);
@@ -574,7 +571,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void componentResized(ComponentEvent e) {
         DrawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
-        DrawController.graphAreaChanged();
     }
 
     @Override

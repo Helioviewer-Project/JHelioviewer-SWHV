@@ -180,7 +180,7 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
     private static void centraliseSelected(long time) {
         if (time != Long.MIN_VALUE && isLocked && availableAxis.start <= time && availableAxis.end >= time) {
             long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
-            selectedAxis.set(time - ((long) (0.5 * selectedIntervalDiff)), time + ((long) (0.5 * selectedIntervalDiff)), false);
+            selectedAxis.set(time - (long) (0.5 * selectedIntervalDiff), time + (long) (0.5 * selectedIntervalDiff), false);
             fireRedrawRequest();
             for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
                 el.fetchData(selectedAxis);
@@ -190,8 +190,7 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
 
     public static void setGraphInformation(Rectangle _graphSize) {
         graphSize = _graphSize;
-        createGraphArea();
-        fireRedrawRequest();
+        graphAreaChanged();
     }
 
     private static void createGraphArea() {
