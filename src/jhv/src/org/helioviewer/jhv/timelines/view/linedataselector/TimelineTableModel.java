@@ -27,14 +27,12 @@ public class TimelineTableModel implements TableModel {
     public void addLineData(TimelineRenderable element) {
         elements.add(element);
         fireInsert(elements.size() - 1);
-        fireYAxisChanged();
     }
 
     public void removeLineData(TimelineRenderable element) {
         element.remove();
         elements.remove(element);
         fireListeners();
-        fireYAxisChanged();
     }
 
     public List<TimelineRenderable> getAllLineDataSelectorElements() {
@@ -56,7 +54,7 @@ public class TimelineTableModel implements TableModel {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
-        DrawController.visibleTimelinesChanged();
+        DrawController.graphAreaChanged();
     }
 
     private void fireInsert(int idx) {
@@ -64,13 +62,7 @@ public class TimelineTableModel implements TableModel {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(e);
         }
-        DrawController.visibleTimelinesChanged();
-    }
-
-    private void fireYAxisChanged() {
-        for (TimelineRenderable tlr : elements) {
-            tlr.yaxisChanged();
-        }
+        DrawController.graphAreaChanged();
     }
 
     void fireUpdate(TimelineRenderable element, int col) {

@@ -266,8 +266,9 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
         }
     }
 
-    public static void visibleTimelinesChanged() {
+    public static void graphAreaChanged() {
         createGraphArea();
+        moveX(0); // force recalculation of polylines
         fireRedrawRequest();
     }
 
