@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
+import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -46,35 +47,37 @@ public class TimelinePanel extends JPanel {
 
     private final JPanel optionsPanelWrapper;
 
+    private static class TimelineTable extends JTable {
+
+        public TimelineTable(TableModel tm) {
+            super(tm);
+        }
+
+        @Override
+        public void changeSelection(int row, int col, boolean toggle, boolean extend) {
+            if (col != VISIBLE_COL && col != REMOVE_COL)
+                super.changeSelection(row, col, toggle, extend);
+            // otherwise prevent changing selection
+        }
+
+        @Override
+        public void clearSelection() {
+            // prevent losing selection
+        }
+
+        @Override
+        public void tableChanged(TableModelEvent e) {
+            super.tableChanged(e);
+            if (e.getType() == TableModelEvent.INSERT) {
+                int row = e.getLastRow();
+                setRowSelectionInterval(row, row);
+            }
+        }
+
+    }
+
     public TimelinePanel(TimelineTableModel model) {
         setLayout(new GridBagLayout());
-
-        JTable grid = new JTable(model) {
-
-            @Override
-            public void changeSelection(int row, int col, boolean toggle, boolean extend) {
-                if (col == VISIBLE_COL || col == REMOVE_COL) {
-                    // prevent changing selection
-                    return;
-                }
-                super.changeSelection(row, col, toggle, extend);
-            }
-
-            @Override
-            public void clearSelection() {
-                // prevent losing selection
-            }
-
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                super.tableChanged(e);
-                if (e.getType() == TableModelEvent.INSERT) {
-                    int row = e.getLastRow();
-                    setRowSelectionInterval(row, row);
-                }
-            }
-
-        };
 
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
@@ -82,6 +85,8 @@ public class TimelinePanel extends JPanel {
         gc.weightx = 1;
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
+
+        TimelineTable grid = new TimelineTable(model);
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));

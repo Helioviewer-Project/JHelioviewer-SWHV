@@ -91,7 +91,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         observationPanel = timelineContentPanel;
     }
 
-    private class EmptyTimelineContentPanel implements TimelineContentPanel {
+    private static class EmptyTimelineContentPanel implements TimelineContentPanel {
 
         @Override
         public void loadButtonPressed() {
