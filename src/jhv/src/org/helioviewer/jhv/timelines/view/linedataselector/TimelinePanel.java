@@ -16,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
-import javax.swing.table.TableCellRenderer;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -38,7 +37,7 @@ public class TimelinePanel extends JPanel {
 
     private static final int VISIBLE_COL = 0;
     private static final int TITLE_COL = 1;
-    static final int LOADING_COL = 2;
+    private static final int LOADING_COL = 2;
     private static final int LINECOLOR_COL = 3;
     private static final int REMOVE_COL = 4;
 
@@ -49,9 +48,6 @@ public class TimelinePanel extends JPanel {
 
     public TimelinePanel(TimelineTableModel model) {
         setLayout(new GridBagLayout());
-
-        int[] cellWidth = new int[] { ICON_WIDTH + 8, -1, ICON_WIDTH + 2, 20, ICON_WIDTH + 2 };
-        TableCellRenderer[] cellRenderer = new TableCellRenderer[] { new TimelineVisibleRenderer(), new TimelineNameRenderer(), new TimelineLoadingRenderer(), new TimelineColorRenderer(), new TimelineRemoveRenderer() };
 
         JTable grid = new JTable(model) {
 
@@ -76,15 +72,6 @@ public class TimelinePanel extends JPanel {
                     int row = e.getLastRow();
                     setRowSelectionInterval(row, row);
                 }
-            }
-
-            @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
-                if (cellWidth[col] != -1) {
-                    getColumnModel().getColumn(col).setPreferredWidth(cellWidth[col]);
-                    getColumnModel().getColumn(col).setMaxWidth(cellWidth[col]);
-                }
-                return super.prepareRenderer(cellRenderer[col], row, col);
             }
 
         };
@@ -119,9 +106,27 @@ public class TimelinePanel extends JPanel {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
+        grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new TimelineVisibleRenderer());
+        grid.getColumnModel().getColumn(VISIBLE_COL).setPreferredWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 8);
+
+        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new TimelineNameRenderer());
+
+        grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new TimelineLoadingRenderer());
+        grid.getColumnModel().getColumn(LOADING_COL).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(LOADING_COL).setMaxWidth(ICON_WIDTH + 2);
+
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new TimelineColorRenderer());
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setPreferredWidth(20);
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setMaxWidth(20);
+
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new TimelineRemoveRenderer());
+        grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
+
         grid.getSelectionModel().addListSelectionListener(e -> {
             int row = grid.getSelectedRow();
-            if (row != -1 && row < grid.getRowCount() && !e.getValueIsAdjusting()) {
+            if (row != -1 && !e.getValueIsAdjusting()) {
                 setOptionsPanel((TimelineRenderable) grid.getValueAt(row, 0));
             }
         });
@@ -165,7 +170,7 @@ public class TimelinePanel extends JPanel {
 
                 if (col == VISIBLE_COL) {
                     timeline.setVisibility(!timeline.isVisible());
-                    model.fireUpdate(timeline, VISIBLE_COL);
+                    model.updateCell(timeline, VISIBLE_COL);
                     DrawController.graphAreaChanged();
                 } else if (col == REMOVE_COL && timeline.isDeletable()) {
                     model.removeLineData(timeline);

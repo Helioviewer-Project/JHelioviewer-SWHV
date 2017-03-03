@@ -18,11 +18,11 @@ public class TimelineTableModel extends AbstractTableModel {
     }
 
     public void downloadStarted(TimelineRenderable element) {
-        fireUpdate(element, TimelinePanel.LOADING_COL);
+        fireTableDataChanged(); // JTable possible bug, not specific
     }
 
     public void downloadFinished(TimelineRenderable element) {
-        fireUpdate(element, TimelinePanel.LOADING_COL);
+        fireTableDataChanged(); // JTable possible bug, not specific
     }
 
     public void addLineData(TimelineRenderable element) {
@@ -42,7 +42,7 @@ public class TimelineTableModel extends AbstractTableModel {
         DrawController.graphAreaChanged();
     }
 
-    void fireUpdate(TimelineRenderable element, int col) {
+    void updateCell(TimelineRenderable element, int col) {
         fireTableCellUpdated(elements.indexOf(element), col);
     }
 
