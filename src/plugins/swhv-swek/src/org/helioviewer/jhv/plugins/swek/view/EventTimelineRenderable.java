@@ -19,6 +19,7 @@ import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.JHVEventType;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -49,7 +50,7 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
     @Override
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> _events) {
         events = _events;
-        // Timelines.getModel().downloadFinished(this);
+        Timelines.getModel().downloadFinished(this); // will ungray table label
         if (isVisible) {
             DrawController.fireRedrawRequest();
         }
