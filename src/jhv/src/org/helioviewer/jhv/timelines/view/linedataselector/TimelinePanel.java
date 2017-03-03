@@ -170,7 +170,7 @@ public class TimelinePanel extends JPanel {
 
                 if (col == VISIBLE_COL) {
                     timeline.setVisibility(!timeline.isVisible());
-                    model.updateCell(timeline, VISIBLE_COL);
+                    model.updateCell(row, col);
                     DrawController.graphAreaChanged();
                 } else if (col == REMOVE_COL && timeline.isDeletable()) {
                     model.removeLineData(timeline);

@@ -42,8 +42,8 @@ public class TimelineTableModel extends AbstractTableModel {
         DrawController.graphAreaChanged();
     }
 
-    void updateCell(TimelineRenderable element, int col) {
-        fireTableCellUpdated(elements.indexOf(element), col);
+    void updateCell(int row, int col) {
+        fireTableCellUpdated(row, col);
     }
 
     @Override

@@ -2,9 +2,7 @@ package org.helioviewer.jhv.renderable.gui;
 
 import java.util.ArrayList;
 
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
+import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
@@ -15,12 +13,12 @@ import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 
 import com.jogamp.opengl.GL2;
 
-public class RenderableContainer implements TableModel, Reorderable {
+@SuppressWarnings("serial")
+public class RenderableContainer extends AbstractTableModel implements Reorderable {
 
     private final ArrayList<Renderable> renderables = new ArrayList<>();
     private final ArrayList<Renderable> newRenderables = new ArrayList<>();
     private final ArrayList<Renderable> removedRenderables = new ArrayList<>();
-    private final ArrayList<TableModelListener> listeners = new ArrayList<>();
 
     public void addBeforeRenderable(Renderable renderable) {
         int lastImagelayerIndex = -1;
@@ -32,13 +30,18 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
         renderables.add(lastImagelayerIndex + 1, renderable);
         newRenderables.add(renderable);
-        fireInsert(lastImagelayerIndex + 1);
+
+        int row = lastImagelayerIndex + 1;
+        fireTableRowsInserted(row, row);
     }
 
     public void addRenderable(Renderable renderable) {
         renderables.add(renderable);
         newRenderables.add(renderable);
-        fireInsert(renderables.size() - 1);
+
+        int row = renderables.size() - 1;
+        fireTableRowsInserted(row, row);
+        Displayer.display(); // e.g., PFSS renderable
     }
 
     public void removeRenderable(Renderable renderable) {
@@ -52,7 +55,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         int count = removeRenderables(gl);
         initRenderables(gl);
         if (count > 0)
-            fireListeners();
+            refreshTable();
 
         for (Renderable renderable : renderables) {
             renderable.prerender(gl);
@@ -131,7 +134,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         } else {
             insertRow(toIndex, toMove);
         }
-        fireListeners();
+        refreshTable();
 
         if (Displayer.multiview) {
             Layers.arrangeMultiView(true);
@@ -149,63 +152,23 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     @Override
-    public String getColumnName(int columnIndex) {
-        return Integer.toString(columnIndex);
+    public Object getValueAt(int row, int col) {
+        return renderables.get(row);
     }
 
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return Renderable.class;
+    public void refreshTable() {
+        fireTableDataChanged();
     }
 
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return false;
-    }
-
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        return renderables.get(rowIndex);
-    }
-
-    @Override
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-    }
-
-    @Override
-    public void addTableModelListener(TableModelListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void removeTableModelListener(TableModelListener l) {
-        listeners.remove(l);
-    }
-
-    private void fireInsert(int idx) {
-        TableModelEvent e = new TableModelEvent(this, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
-        for (TableModelListener listener : listeners) {
-            listener.tableChanged(e);
-        }
-        Displayer.display(); // e.g., PFSS renderable
-    }
-
-    public void fireListeners() {
-        TableModelEvent e = new TableModelEvent(this);
-        for (TableModelListener listener : listeners) {
-            listener.tableChanged(e);
-        }
+    public void updateCell(int row, int col) {
+        fireTableCellUpdated(row, col);
     }
 
     public void fireTimeUpdated(Renderable renderable) {
-        int idx = renderables.indexOf(renderable);
-        if (idx < 0 || idx >= renderables.size())
-            return;
-
-        TableModelEvent e = new TableModelEvent(this, idx, idx, RenderableContainerPanel.TIME_COL, TableModelEvent.UPDATE);
-        for (TableModelListener listener : listeners) {
-            listener.tableChanged(e);
-        }
+//        int idx = renderables.indexOf(renderable);
+//        if (idx < 0 || idx >= renderables.size())
+//            return;
+        updateCell(renderables.indexOf(renderable), RenderableContainerPanel.TIME_COL);
     }
 
     public void init(GL2 gl) {
