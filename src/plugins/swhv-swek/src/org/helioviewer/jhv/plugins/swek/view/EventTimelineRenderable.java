@@ -264,7 +264,7 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
     }
 
     @Override
-    public ClickableDrawable getElementUnderMouse() {
+    public ClickableDrawable getDrawableUnderMouse() {
         if (eventUnderMouse == null) {
             return null;
         }
