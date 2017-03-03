@@ -6,21 +6,20 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayer;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelinePanel;
+import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class TimelineLoadingRenderer extends DefaultTableCellRenderer {
+public class TimelineLoadingRenderer extends JHVTableCellRenderer {
 
     private final JLayer<JComponent> layer = new JLayer<>(null, MoviePanel.busyIndicator);
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        label.setBorder(TimelinePanel.commonBorder);
+        label.setBorder(cellBorder);
         label.setText(null);
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point

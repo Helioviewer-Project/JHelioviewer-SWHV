@@ -4,13 +4,12 @@ import java.awt.Component;
 
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
 
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelinePanel;
+import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class TimelineVisibleRenderer extends DefaultTableCellRenderer {
+public class TimelineVisibleRenderer extends JHVTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
 
@@ -18,7 +17,7 @@ public class TimelineVisibleRenderer extends DefaultTableCellRenderer {
         setHorizontalAlignment(CENTER);
         checkBox.putClientProperty("JComponent.sizeVariant", "small");
         checkBox.setBorderPainted(true);
-        checkBox.setBorder(TimelinePanel.commonBorder);
+        checkBox.setBorder(cellBorder);
     }
 
     @Override
