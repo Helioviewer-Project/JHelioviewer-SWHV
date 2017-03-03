@@ -19,7 +19,7 @@ public class EVEPlugin implements Plugin {
     private final Timelines tl = new Timelines();
 
     public EVEPlugin() {
-//        TimelineTableModel.addLineData(rd);
+        Timelines.getModel().addLineData(rd);
     }
 
     @Override
