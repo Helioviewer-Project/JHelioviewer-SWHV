@@ -266,6 +266,11 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
         }
     }
 
+    public static void visibleTimelinesChanged() {
+        createGraphArea();
+        fireRedrawRequest();
+    }
+
     public static void fireRedrawRequest() {
         for (DrawControllerListener l : listeners) {
             l.drawRequest();
@@ -285,3 +290,4 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
     }
 
 }
+
