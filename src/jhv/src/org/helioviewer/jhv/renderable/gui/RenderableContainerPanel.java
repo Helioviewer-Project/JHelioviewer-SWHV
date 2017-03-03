@@ -64,7 +64,7 @@ public class RenderableContainerPanel extends JPanel {
         grid.lazyRepaint();
     }
 
-    private class RenderableContainerTable extends JTable implements LazyComponent {
+    private static class RenderableContainerTable extends JTable implements LazyComponent {
 
         public RenderableContainerTable(TableModel tm) {
             super(tm);

@@ -241,7 +241,7 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     boolean isDownloading() {
-        return !hasData() && !downloadJPXFailed;
+        return !downloadJPXFailed && !hasData();
     }
 
     void changeColormap(ColorModel cm) {

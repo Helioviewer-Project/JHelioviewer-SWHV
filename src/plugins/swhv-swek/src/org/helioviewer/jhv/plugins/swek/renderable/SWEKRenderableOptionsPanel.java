@@ -16,8 +16,7 @@ class SWEKRenderableOptionsPanel extends JPanel {
     boolean icons = true;
 
     public SWEKRenderableOptionsPanel() {
-        GridBagLayout gridBagLayout = new GridBagLayout();
-        setLayout(gridBagLayout);
+        setLayout(new GridBagLayout());
 
         GridBagConstraints c0 = new GridBagConstraints();
         c0.anchor = GridBagConstraints.CENTER;
