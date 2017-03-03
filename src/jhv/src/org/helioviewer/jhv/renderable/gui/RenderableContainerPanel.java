@@ -140,7 +140,7 @@ public class RenderableContainerPanel extends JPanel {
         syncSpanButton.setToolTipText("Synchronize layers time span");
         syncSpanButton.addActionListener(e -> {
             Layers.syncLayersSpan();
-            renderableContainer.fireListeners();
+            renderableContainer.refreshTable();
         });
 
         JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
@@ -239,14 +239,12 @@ public class RenderableContainerPanel extends JPanel {
 
                 if (col == VISIBLE_COL) {
                     renderable.setVisible(!renderable.isVisible());
-                    renderableContainer.fireListeners();
+                    renderableContainer.updateCell(row, col);
                     Displayer.render(1);
-                }
-                if (col == TITLE_COL && renderable instanceof ImageLayer) {
+                } else if (col == TITLE_COL && renderable instanceof ImageLayer) {
                     ((ImageLayer) renderable).setActiveImageLayer();
-                    renderableContainer.fireListeners();
-                }
-                if (col == REMOVE_COL && renderable.isDeletable()) {
+                    renderableContainer.refreshTable();
+                } else if (col == REMOVE_COL && renderable.isDeletable()) {
                     renderableContainer.removeRenderable(renderable);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
