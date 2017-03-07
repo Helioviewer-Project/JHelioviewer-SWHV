@@ -7,15 +7,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.swing.JComponent;
-import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -25,14 +25,12 @@ import org.helioviewer.jhv.timelines.draw.DrawControllerListener;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 @SuppressWarnings("serial")
-public class ChartDrawIntervalPane extends JComponent implements DrawControllerListener, MouseInputListener {
+public class ChartDrawIntervalPane extends JComponent implements DrawControllerListener, MouseListener, MouseMotionListener {
 
     private long movieStart = System.currentTimeMillis();
     private long movieEnd = System.currentTimeMillis();
 
     private boolean mouseOverInterval = true;
-    // private boolean mouseOverLeftGraspPoint = false;
-    // private boolean mouseOverRightGraspPoint = false;
     private Point mousePressed;
 
     private int leftIntervalBorderPosition = -10;
@@ -95,9 +93,6 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     }
 
     private void drawInterval(Graphics2D g) {
-        // int availableIntervalSpace = getWidth() -
-        // (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE +
-        // DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         g.setColor(Color.black);
         g.fillRect(leftIntervalBorderPosition, getHeight() - 2, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
         g.setColor(DrawConstants.BORDER_COLOR);
@@ -345,13 +340,13 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
     @Override
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
-        if ((e.getModifiers() & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
             if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
                 mousePressed = new Point(leftIntervalBorderPosition + (rightIntervalBorderPosition - leftIntervalBorderPosition) / 2, 0);
                 moveSelectedInterval(p);
                 mousePressed = null;
             }
-        } else if ((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK) {
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
             jumpSelectedInterval(p);
         }
     }
@@ -393,8 +388,7 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
             setCursor(UIGlobals.openHandCursor);
         }
         mousePressed = null;
-
-        repaint();
+        // repaint();
     }
 
     // Mouse Motion Listener
@@ -411,13 +405,11 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         Point p = e.getPoint();
 
         mouseOverInterval = false;
-
         // is mouse cursor above selected interval?
         if (p.x >= leftIntervalBorderPosition && p.x <= rightIntervalBorderPosition) {
             mouseOverInterval = true;
             setCursor(UIGlobals.openHandCursor);
         }
-
         // reset cursor if it does not point to the interval area
         if (!mouseOverInterval) {
             if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
