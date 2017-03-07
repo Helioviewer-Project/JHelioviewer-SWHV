@@ -276,4 +276,3 @@ public class TopToolBar extends JToolBar {
     }
 
 }
-
