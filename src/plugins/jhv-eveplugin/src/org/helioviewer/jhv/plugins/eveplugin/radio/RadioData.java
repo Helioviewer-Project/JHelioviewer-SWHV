@@ -202,10 +202,9 @@ public class RadioData extends AbstractTimelineRenderable {
 
     @Override
     public void setVisibility(boolean visible) {
-        isVisible = visible;
+        super.setVisibility(visible);
         clearCache();
         fetchData(DrawController.selectedAxis);
-        DrawController.fireRedrawRequest();
     }
 
     @Override
