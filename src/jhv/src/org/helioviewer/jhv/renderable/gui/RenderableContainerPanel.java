@@ -240,6 +240,8 @@ public class RenderableContainerPanel extends JPanel {
                 if (col == VISIBLE_COL) {
                     renderable.setVisible(!renderable.isVisible());
                     renderableContainer.updateCell(row, col);
+                    if (grid.getSelectedRow() == row)
+                        setOptionsPanel(renderable);
                     Displayer.render(1);
                 } else if (col == TITLE_COL && renderable instanceof ImageLayer) {
                     ((ImageLayer) renderable).setActiveImageLayer();
