@@ -333,9 +333,9 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         private RecordMode mode = RecordMode.LOOP;
         private RecordSize size = RecordSize.ORIGINAL;
 
-        public RecordButton(float size) {
+        public RecordButton(float fontSize) {
             super(Buttons.record);
-            setFont(Buttons.getMaterialFont(size));
+            setFont(Buttons.getMaterialFont(fontSize));
             setForeground(Color.decode("#800000"));
             setToolTipText("Record movie");
             addActionListener(this);

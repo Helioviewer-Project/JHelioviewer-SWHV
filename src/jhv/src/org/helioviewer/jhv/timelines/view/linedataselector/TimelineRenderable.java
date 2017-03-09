@@ -14,7 +14,7 @@ public interface TimelineRenderable {
 
     void remove();
 
-    void setVisibility(boolean visible);
+    void setVisible(boolean visible);
 
     boolean isVisible();
 
