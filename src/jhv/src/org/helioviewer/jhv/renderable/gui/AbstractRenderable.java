@@ -16,8 +16,8 @@ public abstract class AbstractRenderable implements Renderable {
 
     @Override
     public boolean isVisible() {
-        for (int i = 0; i < isVisible.length; i++) {
-            if (isVisible[i])
+        for (boolean visible : isVisible) {
+            if (visible)
                 return true;
         }
         return false;

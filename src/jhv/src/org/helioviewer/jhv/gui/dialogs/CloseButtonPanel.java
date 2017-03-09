@@ -12,12 +12,7 @@ import com.jidesoft.dialog.StandardDialog;
 public class CloseButtonPanel extends ButtonPanel {
 
     public CloseButtonPanel(StandardDialog dialog) {
-        AbstractAction close = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.setVisible(false);
-            }
-        };
+        AbstractAction close = new CloseAction(dialog);
         dialog.setDefaultAction(close);
         dialog.setDefaultCancelAction(close);
 
@@ -25,6 +20,21 @@ public class CloseButtonPanel extends ButtonPanel {
         button.setText("Close");
         dialog.setInitFocusedComponent(button);
         add(button, ButtonPanel.AFFIRMATIVE_BUTTON);
+    }
+
+    private static class CloseAction extends AbstractAction {
+
+        private final StandardDialog dialog;
+
+        CloseAction(StandardDialog _dialog) {
+            dialog = _dialog;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dialog.setVisible(false);
+        }
+
     }
 
 }
