@@ -138,7 +138,7 @@ public class BandCache {
         private final float[][] values = new float[MAX_LEVEL][];
         private final long[][] dates = new long[MAX_LEVEL][];
 
-        private DataChunk(long key) {
+        DataChunk(long key) {
             int factor = 1;
             for (int i = 0; i < MAX_LEVEL; i++) {
                 values[i] = new float[(int) CHUNKED_SIZE / factor];
@@ -157,7 +157,7 @@ public class BandCache {
             }
         }
 
-        private void setValue(int minuteOfDay, float value) {
+        void setValue(int minuteOfDay, float value) {
             int factor = 1;
             for (int i = 0; i < values.length; i++) {
                 int idx = minuteOfDay / factor;
@@ -170,11 +170,11 @@ public class BandCache {
 
         }
 
-        private float[] getValues(int level) {
+        float[] getValues(int level) {
             return values[level];
         }
 
-        private long[] getDates(int level) {
+        long[] getDates(int level) {
             return dates[level];
         }
     }
@@ -184,7 +184,7 @@ public class BandCache {
         public final int[] xPoints;
         public final int[] yPoints;
 
-        private GraphPolyline(List<Integer> dates, List<Integer> values) {
+        GraphPolyline(List<Integer> dates, List<Integer> values) {
             int llen = dates.size();
             xPoints = new int[llen];
             yPoints = new int[llen];

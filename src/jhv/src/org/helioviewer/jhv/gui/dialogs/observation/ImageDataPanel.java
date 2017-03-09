@@ -164,21 +164,21 @@ public class ImageDataPanel extends JPanel {
             add(endCarrington, c);
         }
 
-        private void setStartTime(long time) {
+        void setStartTime(long time) {
             startDateTimePanel.setTime(time);
             startCarrington.setTime(time);
         }
 
-        private void setEndTime(long time) {
+        void setEndTime(long time) {
             endDateTimePanel.setTime(time);
             endCarrington.setTime(time);
         }
 
-        private long getStartTime() {
+        long getStartTime() {
             return startDateTimePanel.getTime();
         }
 
-        private long getEndTime() {
+        long getEndTime() {
             return endDateTimePanel.getTime();
         }
 

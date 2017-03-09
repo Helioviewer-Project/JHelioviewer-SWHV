@@ -26,7 +26,7 @@ public class RunningDifferencePanel {
         Base("Base difference", GLImage.DifferenceMode.BaseRotation);
 
         private final String str;
-        private final GLImage.DifferenceMode mode;
+        final GLImage.DifferenceMode mode;
 
         DifferenceModeChoice(String s, GLImage.DifferenceMode m) {
             str = s;
