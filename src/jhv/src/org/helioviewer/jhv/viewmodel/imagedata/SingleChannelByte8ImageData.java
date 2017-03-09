@@ -13,25 +13,19 @@ import org.helioviewer.jhv.viewmodel.imageformat.SingleChannelImageFormat;
 /**
  * Representation of image data in single channel format, using 8 bits per
  * pixel.
- * 
- * @author Ludwig Schmidt
- * @author Markus Langenberg
- * 
  */
-public class SingleChannelByte8ImageData extends AbstractImageData {
+public class SingleChannelByte8ImageData extends ImageData {
 
     private static final ImageFormat format = new SingleChannelImageFormat(8);
 
     /**
      * Constructor, given an array as data source.
-     * 
-     * <p>
+     *
      * This constructor receives the raw data as a data source. If the caller
      * handles raw data as well, the use of this constructor is recommended.
-     * <p>
      * The pixel data has to be given as a one-dimensional array containing the
      * pixel data line by line. Each array element represents one pixel.
-     * 
+     *
      * @param newWidth
      *            width of the image
      * @param newHeight
@@ -46,12 +40,11 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
 
     /**
      * Constructor, given an BufferedImage as data source.
-     * 
-     * <p>
+     *
      * This constructor receives a BufferedImage as data source. If the caller
      * operates on BufferedImages as well, the use of this constructor is
      * recommended.
-     * 
+     *
      * @param newImage
      *            pixel data
      */
@@ -61,17 +54,11 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
         buffer = ByteBuffer.wrap(((DataBufferByte) newImage.getRaster().getDataBuffer()).getData());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ImageFormat getImageFormat() {
         return format;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected BufferedImage createBufferedImageFromImageTransport() {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
