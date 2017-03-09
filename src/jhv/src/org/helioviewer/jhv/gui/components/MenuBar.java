@@ -65,10 +65,10 @@ public class MenuBar extends JMenuBar {
 
         JMenu toolsMenu = new JMenu("Tools");
         toolsMenu.setMnemonic(KeyEvent.VK_T);
-        toolsMenu.add(new ShowDialogAction("Manage Plug-ins...", PluginsDialog.class));
+        toolsMenu.add(new ShowDialogAction("Manage Plug-ins...", new PluginsDialog()));
         add(toolsMenu);
 
-        ShowDialogAction preferencesAction = new ShowDialogAction("Preferences...", PreferencesDialog.class);
+        ShowDialogAction preferencesAction = new ShowDialogAction("Preferences...", new PreferencesDialog());
         if (System.getProperty("jhv.os").equals("mac")) {
             OSXHandler.preferencesHandler(preferencesAction);
             JMenu windowMenu = new JMenu("Window");
@@ -83,7 +83,7 @@ public class MenuBar extends JMenuBar {
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
-        ShowDialogAction aboutAction = new ShowDialogAction("About JHelioviewer...", AboutDialog.class);
+        ShowDialogAction aboutAction = new ShowDialogAction("About JHelioviewer...", new AboutDialog());
         if (System.getProperty("jhv.os").equals("mac")) {
             OSXHandler.aboutHandler(aboutAction);
         } else {
