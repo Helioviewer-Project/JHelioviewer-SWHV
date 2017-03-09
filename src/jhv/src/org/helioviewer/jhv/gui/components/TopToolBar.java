@@ -49,7 +49,7 @@ public class TopToolBar extends JToolBar {
 
         private final String icon;
         private final String text;
-        private final String tip;
+        final String tip;
 
         ButtonText(String _icon, String _text, String _tip) {
             icon = _icon;
@@ -66,7 +66,7 @@ public class TopToolBar extends JToolBar {
     private enum InteractionMode {
         PAN(ImageViewerGui.getPanInteraction()), ROTATE(ImageViewerGui.getRotateInteraction()), ANNOTATE(ImageViewerGui.getAnnotateInteraction());
 
-        private final Interaction interaction;
+        final Interaction interaction;
 
         InteractionMode(Interaction _interaction) {
             interaction = _interaction;

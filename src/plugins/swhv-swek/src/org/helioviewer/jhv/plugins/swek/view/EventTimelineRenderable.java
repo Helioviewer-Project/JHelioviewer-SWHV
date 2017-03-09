@@ -165,21 +165,21 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
     }
 
     private static class EventPlotConfiguration {
-        private final JHVRelatedEvents event;
 
-        private final int x0;
-        private final int x1;
+        final JHVRelatedEvents event;
 
-        private final int yPosition;
+        final int x0;
+        final int x1;
+        final int yPosition;
 
-        public EventPlotConfiguration(JHVRelatedEvents _event, int _x0, int _x1, int _yPosition) {
+        EventPlotConfiguration(JHVRelatedEvents _event, int _x0, int _x1, int _yPosition) {
             event = _event;
             x0 = _x0;
             x1 = _x1;
             yPosition = _yPosition;
         }
 
-        public static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight) {
+        static JHVRelatedEvents draw(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition, boolean highlight) {
             int spacePerLine = 3;
             int y = graphArea.y + spacePerLine * 2 * yPosition + DrawConstants.EVENT_OFFSET;
             int w = Math.max(x1 - x0, 1);

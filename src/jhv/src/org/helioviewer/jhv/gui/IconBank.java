@@ -17,7 +17,7 @@ public class IconBank {
 
         HVLOGO_SMALL("hvImage_160x160.png");
 
-        private final String fname;
+        final String fname;
 
         JHVIcon(String _fname) {
             fname = _fname;

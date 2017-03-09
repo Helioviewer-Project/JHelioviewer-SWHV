@@ -55,7 +55,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         FRAMESPERSECOND("Frames/sec", 0), MINUTESPERSECOND("Solar minutes/sec", 60), HOURSPERSECOND("Solar hours/sec", 3600), DAYSPERSECOND("Solar days/sec", 86400);
 
         private final String str;
-        private final int secPerSecond;
+        final int secPerSecond;
 
         SpeedUnit(String _str, int s) {
             str = _str;
