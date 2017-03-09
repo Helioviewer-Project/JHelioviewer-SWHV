@@ -2,55 +2,138 @@ package org.helioviewer.jhv.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
-public interface ImageData {
+public abstract class ImageData {
+
+    final int width;
+    final int height;
+    private final int bpp;
+    Buffer buffer;
+
+    BufferedImage image = null;
+
+    private Region region;
+    private MetaData metaData;
+    private Position.Q viewpoint;
+    private boolean uploaded = false;
+
+    ImageData(int newWidth, int newHeight, int newBpp) {
+        width = newWidth;
+        height = newHeight;
+        bpp = newBpp;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getBitsPerPixel() {
+        return bpp;
+    }
+
+    public Buffer getBuffer() {
+        return buffer;
+    }
+
+    public BufferedImage getBufferedImage() {
+        if (image == null) {
+            image = createBufferedImageFromImageTransport();
+        }
+        return image;
+    }
+
+    public abstract ImageFormat getImageFormat();
+
     /**
-     * Returns the width of the image
+     * Internal function to create a BufferedImage from the image transport
+     * object.
      *
-     * @return width of the image
-     */
-    int getWidth();
-    /**
-     * Returns the height of the image
+     * This function will be called from {@link #getBufferedImage()} when
+     * necessary.
      *
-     * @return height of the image
+     * @return the created BufferedImage
      */
-    int getHeight();
+    protected abstract BufferedImage createBufferedImageFromImageTransport();
 
-    int getBitsPerPixel();
+    public Region getRegion() {
+        return region;
+    }
 
-    Buffer getBuffer();
+    public void setRegion(Region r) {
+        region = r;
+    }
 
-    /**
-     * Returns an object to get informations about the image format
-     *
-     * @return object containing informations about the image format
-     */
-    ImageFormat getImageFormat();
+    public void setMetaData(MetaData m) {
+        metaData = m;
+    }
 
-    Region getRegion();
+    public MetaData getMetaData() {
+        return metaData;
+    }
 
-    void setRegion(Region r);
+    public void setViewpoint(Position.Q p) {
+        viewpoint = p;
+    }
 
-    BufferedImage getBufferedImage();
+    public Position.Q getViewpoint() {
+        return viewpoint;
+    }
 
-    void setMetaData(MetaData m);
+    public boolean getUploaded() {
+        return uploaded;
+    }
 
-    MetaData getMetaData();
+    public void setUploaded(boolean _uploaded) {
+        uploaded = _uploaded;
+    }
 
-    void setViewpoint(Position.Q p);
+    private static final double BRIGHTNESS_F1 = 0.001;
+    private static final double BRIGHTNESS_F2 = 128 + 64 + 32;
 
-    Position.Q getViewpoint();
+    public double getAutoBrightness() {
+        if (!(buffer instanceof ByteBuffer))
+            return 1;
 
-    boolean getUploaded();
+        byte[] ba = ((ByteBuffer) buffer).array();
+        int len = ba.length;
+        int[] histogram = new int[256];
+        for (int i = 0; i < len; i++) {
+            histogram[getUnsigned(ba[i])]++;
+        }
 
-    void setUploaded(boolean uploaded);
+        long ct = 0;
+        int j;
+        for (j = 255; j >= 0; j--) {
+            ct += histogram[j];
+            if (ct > BRIGHTNESS_F1 * len) {
+                break;
+            }
+        }
+        if (j == 0)
+            return 1;
 
-    double getAutoBrightness();
+        double factor = BRIGHTNESS_F2 / j;
+        // System.out.println(">> " + factor + " " + j);
+        factor /= metaData.getResponseFactor();
+        if (factor > 2)
+            factor = 2;
+        else if (factor < 0.5)
+            factor = 0.5;
+        return factor;
+    }
+
+    private static int getUnsigned(byte b) {
+        return (b + 256) & 0xFF;
+    }
 
 }

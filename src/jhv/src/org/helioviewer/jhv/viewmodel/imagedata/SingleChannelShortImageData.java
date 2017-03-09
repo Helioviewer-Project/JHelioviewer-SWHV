@@ -13,29 +13,22 @@ import org.helioviewer.jhv.viewmodel.imageformat.SingleChannelImageFormat;
 /**
  * Representation of image data in single channel format, using 9 to 16 bits per
  * pixel.
- * 
- * <p>
+ *
  * Note that this is the only implementation of ImageData, which is supposed to
  * handle a variable number of bits per pixel.
- * 
- * @author Ludwig Schmidt
- * @author Markus Langenberg
- * 
  */
-public class SingleChannelShortImageData extends AbstractImageData {
+public class SingleChannelShortImageData extends ImageData {
 
     private final SingleChannelImageFormat format;
 
     /**
      * Constructor, given an array as data source.
-     * 
-     * <p>
+     *
      * This constructor receives the raw data as a data source. If the caller
      * handles raw data as well, the use of this constructor is recommended.
-     * <p>
      * The pixel data has to be given as a one-dimensional array containing the
      * pixel data line by line. Each array element represents one pixel.
-     * 
+     *
      * @param newWidth
      *            width of the image
      * @param newHeight
@@ -53,12 +46,11 @@ public class SingleChannelShortImageData extends AbstractImageData {
 
     /**
      * Constructor, given an BufferedImage as data source.
-     * 
-     * <p>
+     *
      * This constructor receives a BufferedImage as data source. If the caller
      * operates on BufferedImages as well, the use of this constructor is
      * recommended.
-     * 
+     *
      * @param newBitDepth
      *            number of bits per pixel
      * @param newImage
@@ -71,17 +63,11 @@ public class SingleChannelShortImageData extends AbstractImageData {
         buffer = ShortBuffer.wrap(((DataBufferUShort) newImage.getRaster().getDataBuffer()).getData());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ImageFormat getImageFormat() {
         return format;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected BufferedImage createBufferedImageFromImageTransport() {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
