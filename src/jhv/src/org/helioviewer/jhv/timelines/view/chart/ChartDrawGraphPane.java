@@ -245,7 +245,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
         long ts = timeAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
-        String lbl = "(" + TimeUtils.utcDateFormat.format(ts);
+        String lbl = '(' + TimeUtils.utcDateFormat.format(ts);
         int currWidth = 0;
         g.setColor(Color.BLACK);
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
@@ -456,7 +456,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
         mousePressedPosition = p;
-        if (overMovieLine(p/* , drawController.getGraphArea() */)) {
+        if (overMovieLine(p)) {
             // setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
             dragMode = DragMode.MOVIELINE;
         } else {
@@ -509,10 +509,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePressedPosition = p;
     }
 
-    private static boolean overMovieLine(Point p/* , Rectangle graphArea */) {
+    private static boolean overMovieLine(Point p) {
         int movieLinePosition = DrawController.getMovieLinePosition();
-        // Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y,
-        // 7, graphArea.height);
         return movieLinePosition >= 0 && movieLinePosition - 3 <= p.x && p.x <= movieLinePosition + 3;
     }
 
@@ -532,7 +530,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mouseMoved(MouseEvent e) {
         Rectangle graphArea = DrawController.getGraphArea();
         mousePosition = e.getPoint();
-        if (overMovieLine(mousePosition/* , graphArea */)) {
+        if (overMovieLine(mousePosition)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
         } else if (Timelines.getModel().getDrawableUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

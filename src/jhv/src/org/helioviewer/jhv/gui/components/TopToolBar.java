@@ -73,13 +73,13 @@ public class TopToolBar extends JToolBar {
         }
     }
 
-    private JideButton toolButton(ButtonText text) {
+    private static JideButton toolButton(ButtonText text) {
         JideButton b = new JideButton(text.toString());
         b.setToolTipText(text.tip);
         return b;
     }
 
-    private JideToggleButton toolToggleButton(ButtonText text) {
+    private static JideToggleButton toolToggleButton(ButtonText text) {
         JideToggleButton b = new JideToggleButton(text.toString());
         b.setToolTipText(text.tip);
         return b;

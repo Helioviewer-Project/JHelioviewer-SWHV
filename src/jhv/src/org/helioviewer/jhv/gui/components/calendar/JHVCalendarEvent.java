@@ -14,11 +14,11 @@ import java.util.EventObject;
 @SuppressWarnings("serial")
 public class JHVCalendarEvent extends EventObject {
     /**
-     * @param source
+     * @param _source
      *            The object on which the Event initially occurred.
      */
-    public JHVCalendarEvent(Object source) {
-        super(source);
+    public JHVCalendarEvent(Object _source) {
+        super(_source);
     }
 
 }

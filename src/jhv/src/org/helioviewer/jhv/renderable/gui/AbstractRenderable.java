@@ -16,8 +16,8 @@ public abstract class AbstractRenderable implements Renderable {
 
     @Override
     public boolean isVisible() {
-        for (int i = 0; i < this.isVisible.length; i++) {
-            if (this.isVisible[i])
+        for (int i = 0; i < isVisible.length; i++) {
+            if (isVisible[i])
                 return true;
         }
         return false;
@@ -25,27 +25,27 @@ public abstract class AbstractRenderable implements Renderable {
 
     @Override
     public int isVisibleIdx() {
-        for (int i = 0; i < this.isVisible.length; i++) {
-            if (this.isVisible[i])
+        for (int i = 0; i < isVisible.length; i++) {
+            if (isVisible[i])
                 return i;
         }
         return -1;
     }
 
     @Override
-    public void setVisible(boolean isVisible) {
-        for (int i = 0; i < this.isVisible.length; i++) {
-            this.isVisible[i] = isVisible;
+    public void setVisible(boolean visible) {
+        for (int i = 0; i < isVisible.length; i++) {
+            isVisible[i] = visible;
         }
     }
 
     @Override
     public void setVisible(int j) {
         for (int i = 0; i < isVisible.length; i++) {
-            this.isVisible[i] = false;
+            isVisible[i] = false;
         }
-        if (j >= 0 && j < this.isVisible.length)
-            this.isVisible[j] = true;
+        if (j >= 0 && j < isVisible.length)
+            isVisible[j] = true;
     }
 
     @Override

@@ -431,10 +431,10 @@ public class SWEKRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void setVisible(boolean isVisible) {
-        super.setVisible(isVisible);
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
 
-        if (isVisible) {
+        if (visible) {
             controller.timeChanged(Layers.getLastUpdatedTimestamp().milli);
             Layers.addTimeListener(controller);
             ImageViewerGui.getInputController().addPlugin(controller);

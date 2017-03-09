@@ -28,14 +28,14 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
         if (value < -99)
             return value + "%";
         if (value < -9)
-            return "\u2007" + value + "%";
+            return "\u2007" + value + '%';
         if (value < 0)
-            return "\u2007\u2007" + value + "%";
+            return "\u2007\u2007" + value + '%';
         if (value < 10)
-            return "\u2007\u2007\u2007" + value + "%";
+            return "\u2007\u2007\u2007" + value + '%';
         if (value < 100)
-            return "\u2007\u2007" + value + "%";
-        return "\u2007" + value + "%";
+            return "\u2007\u2007" + value + '%';
+        return "\u2007" + value + '%';
     }
 
     private static String format(int low, int high) {

@@ -95,8 +95,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void setVisible(boolean isVisible) {
-        super.setVisible(isVisible);
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
         if (Displayer.multiview) {
             Layers.arrangeMultiView(true);
         }

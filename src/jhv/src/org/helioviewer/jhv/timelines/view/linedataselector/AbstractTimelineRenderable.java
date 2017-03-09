@@ -17,7 +17,7 @@ public abstract class AbstractTimelineRenderable implements TimelineRenderable {
     }
 
     @Override
-    public void setVisibility(boolean visible) {
+    public void setVisible(boolean visible) {
         isVisible = visible;
     }
 

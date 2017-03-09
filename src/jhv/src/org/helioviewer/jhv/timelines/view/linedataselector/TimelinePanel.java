@@ -174,7 +174,7 @@ public class TimelinePanel extends JPanel {
                 TimelineRenderable timeline = (TimelineRenderable) grid.getValueAt(row, col);
 
                 if (col == VISIBLE_COL) {
-                    timeline.setVisibility(!timeline.isVisible());
+                    timeline.setVisible(!timeline.isVisible());
                     model.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
                         setOptionsPanel(timeline);
