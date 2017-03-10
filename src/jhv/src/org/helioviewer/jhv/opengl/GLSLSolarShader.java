@@ -101,7 +101,7 @@ public class GLSLSolarShader extends GLSLShader {
         int unsharpMaskingKernelRef = gl.glGetUniformLocation(progID, "unsharpMaskingKernel");
 
         bind(gl);
-        gl.glUniform1fv(unsharpMaskingKernelRef, 9, new float[] { 1f, 2f, 1f, 2f, 4f, 2f, 1f, 2f, 1f }, 0);
+        gl.glUniform1fv(unsharpMaskingKernelRef, 9, new float[] { 1 / 16f, 2 / 16f, 1 / 16f, 2 / 16f, 4 / 16f, 2 / 16f, 1 / 16f, 2 / 16f, 1 / 16f }, 0);
 
         setTextureUnit(gl, "image", 0);
         setTextureUnit(gl, "lut", 1);
