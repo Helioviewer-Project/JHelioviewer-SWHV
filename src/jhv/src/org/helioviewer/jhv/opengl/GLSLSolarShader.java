@@ -8,6 +8,19 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLSolarShader extends GLSLShader {
 
+    private static final float[] blurKernel;
+
+    static {
+        float[] v = new float[] { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
+        blurKernel = new float[] {
+            v[0] * v[0], v[0] * v[1], v[0] * v[2], v[0] * v[3], v[0] * v[4],
+            v[1] * v[0], v[1] * v[1], v[1] * v[2], v[1] * v[3], v[1] * v[4],
+            v[2] * v[0], v[2] * v[1], v[2] * v[2], v[2] * v[3], v[2] * v[4],
+            v[3] * v[0], v[3] * v[1], v[3] * v[2], v[3] * v[3], v[3] * v[4],
+            v[4] * v[0], v[4] * v[1], v[4] * v[2], v[4] * v[3], v[4] * v[4],
+        };
+    }
+
     public static final GLSLSolarShader ortho = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentortho.glsl");
     public static final GLSLSolarShader lati = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentlati.glsl");
     public static final GLSLSolarShader polar = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentpolar.glsl");
@@ -101,7 +114,7 @@ public class GLSLSolarShader extends GLSLShader {
         int unsharpMaskingKernelRef = gl.glGetUniformLocation(progID, "unsharpMaskingKernel");
 
         bind(gl);
-        gl.glUniform1fv(unsharpMaskingKernelRef, 9, new float[] { 1 / 16f, 2 / 16f, 1 / 16f, 2 / 16f, 4 / 16f, 2 / 16f, 1 / 16f, 2 / 16f, 1 / 16f }, 0);
+        gl.glUniform1fv(unsharpMaskingKernelRef, blurKernel.length, blurKernel, 0);
 
         setTextureUnit(gl, "image", 0);
         setTextureUnit(gl, "lut", 1);
