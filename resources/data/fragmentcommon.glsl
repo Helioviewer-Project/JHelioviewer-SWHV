@@ -60,7 +60,7 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
         }
     }
 
-    color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
+    color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum;
 
     float scale = brightness.y;
     if (enhanced == 1) {
