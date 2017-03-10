@@ -7,7 +7,7 @@
 #define PI 3.1415926535897932384626433832795
 #define TWOPI 2.*3.1415926535897932384626433832795
 
-#define truncationValue 0.2
+#define boost 1. / (0.2 * 2.)
 
 uniform sampler2D image;
 uniform int isdifference;
@@ -40,18 +40,16 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
 
     if (isdifference != NODIFFERENCE) {
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
-        color.r = clamp(color.r, -truncationValue, truncationValue) / truncationValue;
-        color.r = (color.r + 1.0) / 2.0;
         vec4 diffcolor;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 diffcolor.r = texture2D(image, texcoord + vec2(i - 1, j - 1) * pixelSizeWeighting.xy).r
                             - texture2D(differenceImage, difftexcoord + vec2(i - 1, j - 1) * pixelSizeWeighting.xy).r;
-                diffcolor.r = clamp(diffcolor.r, -truncationValue, truncationValue) / truncationValue;
-                diffcolor.r = (diffcolor.r + 1.0) / 2.0;
                 tmpConvolutionSum += diffcolor.r * unsharpMaskingKernel[3 * i + j];
             }
         }
+        color.r = color.r * boost + 0.5;
+        tmpConvolutionSum = tmpConvolutionSum * boost + 0.5;
     } else {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -59,7 +57,6 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
             }
         }
     }
-
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum;
 
     float scale = brightness.y;
