@@ -60,7 +60,10 @@ public class GLImage {
         shader.setBrightness(brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()));
         shader.setAlpha(opacity);
         shader.setEnhanced(gl, enhanced);
+
         shader.setIsDifference(diffMode.ordinal());
+        if (diffMode != DifferenceMode.None)
+            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
 
         int w = imageData.getWidth();
         int h = imageData.getHeight();
