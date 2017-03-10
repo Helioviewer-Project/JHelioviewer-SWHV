@@ -7,7 +7,9 @@
 #define PI 3.1415926535897932384626433832795
 #define TWOPI 2.*3.1415926535897932384626433832795
 
-#define boost 1. / (0.2 * 2.)
+#define BOOST 1. / (0.2 * 2.)
+#define FSIZE 5
+#define FDISP (FSIZE - 1) / 2
 
 uniform sampler2D image;
 uniform int isdifference;
@@ -24,7 +26,7 @@ uniform float cutOffRadius;
 uniform float outerCutOffRadius;
 uniform float hgln;
 uniform float hglt;
-uniform float unsharpMaskingKernel[9];
+uniform float unsharpMaskingKernel[FSIZE * FSIZE];
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifferenceRotationQuat;
 uniform vec4 diffcameraDifferenceRotationQuat;
@@ -35,29 +37,29 @@ uniform float cutOffValue;
 uniform vec2 polarRadii;
 
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
-    float tmpConvolutionSum = 0.;
+    float convolution = 0.;
     vec4 color = texture2D(image, texcoord);
 
     if (isdifference != NODIFFERENCE) {
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
         vec4 diffcolor;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                diffcolor.r = texture2D(image, texcoord + vec2(i - 1, j - 1) * pixelSizeWeighting.xy).r
-                            - texture2D(differenceImage, difftexcoord + vec2(i - 1, j - 1) * pixelSizeWeighting.xy).r;
-                tmpConvolutionSum += diffcolor.r * unsharpMaskingKernel[3 * i + j];
+        for (int i = 0; i < FSIZE; i++) {
+            for (int j = 0; j < FSIZE; j++) {
+                diffcolor.r = texture2D(image, texcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r
+                            - texture2D(differenceImage, difftexcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r;
+                convolution += diffcolor.r * unsharpMaskingKernel[FSIZE * i + j];
             }
         }
-        color.r = color.r * boost + 0.5;
-        tmpConvolutionSum = tmpConvolutionSum * boost + 0.5;
+        color.r = color.r * BOOST + 0.5;
+        convolution = convolution * BOOST + 0.5;
     } else {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                tmpConvolutionSum += texture2D(image, texcoord + vec2(i - 1, j - 1) * pixelSizeWeighting.xy).r * unsharpMaskingKernel[3 * i + j];
+        for (int i = 0; i < FSIZE; i++) {
+            for (int j = 0; j < FSIZE; j++) {
+                convolution += texture2D(image, texcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r * unsharpMaskingKernel[FSIZE * i + j];
             }
         }
     }
-    color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum;
+    color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * convolution;
 
     float scale = brightness.y;
     if (enhanced == 1) {

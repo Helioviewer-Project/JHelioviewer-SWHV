@@ -26,16 +26,16 @@ public class TimeAxis {
     }
 
     void move(double diff) {
-        start = (long) (start + diff);
-        end = (long) (end + diff);
+        start += diff;
+        end += diff;
         adaptBounds();
     }
 
     void zoom(int x0, int w, int x, double factor) {
         double multiplier = (end - start) * factor / w;
         double ratio = (x - x0) / (double) w;
-        start = (long) (start - multiplier * ratio);
-        end = (long) (end + multiplier * (1. - ratio));
+        start -= multiplier * ratio;
+        end += multiplier * (1. - ratio);
         adaptBounds();
     }
 
