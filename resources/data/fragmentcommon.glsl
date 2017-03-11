@@ -37,37 +37,38 @@ uniform float cutOffValue;
 uniform vec2 polarRadii;
 
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
-    float convolution = 0.;
-    vec4 color = texture2D(image, texcoord);
-
+    float v;
+    float conv = 0.;
     if (isdifference != NODIFFERENCE) {
-        color.r = color.r - texture2D(differenceImage, difftexcoord).r;
-        vec4 diffcolor;
+        v = texture2D(image, texcoord).r - texture2D(differenceImage, difftexcoord).r;
+        float diff;
         for (int i = 0; i < FSIZE; i++) {
             for (int j = 0; j < FSIZE; j++) {
-                diffcolor.r = texture2D(image, texcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r
-                            - texture2D(differenceImage, difftexcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r;
-                convolution += diffcolor.r * unsharpMaskingKernel[FSIZE * i + j];
+                diff = texture2D(image, texcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r -
+                       texture2D(differenceImage, difftexcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r;
+                conv += diff * unsharpMaskingKernel[FSIZE * i + j];
             }
         }
-        color.r = color.r * BOOST + 0.5;
-        convolution = convolution * BOOST + 0.5;
+        v = v * BOOST + 0.5;
+        conv = conv * BOOST + 0.5;
     } else {
+        v = texture2D(image, texcoord).r;
         for (int i = 0; i < FSIZE; i++) {
             for (int j = 0; j < FSIZE; j++) {
-                convolution += texture2D(image, texcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r * unsharpMaskingKernel[FSIZE * i + j];
+                conv += texture2D(image, texcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r * unsharpMaskingKernel[FSIZE * i + j];
             }
         }
     }
-    color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * convolution;
+    v = mix(v, conv, pixelSizeWeighting.z);
 
     float scale = brightness.y;
     if (enhanced == 1) {
         scale *= factor;
     }
-    color.r = scale * color.r + brightness.x;
+    v = scale * v + brightness.x;
 
-    color.rgb = texture1D(lut, color.r).rgb;
+    vec4 color;
+    color.rgb = texture1D(lut, v).rgb;
     color.a = alpha;
     return color;
 }
