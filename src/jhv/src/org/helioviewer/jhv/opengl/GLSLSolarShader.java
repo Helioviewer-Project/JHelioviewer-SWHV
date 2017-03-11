@@ -9,6 +9,7 @@ import com.jogamp.opengl.GL2;
 public class GLSLSolarShader extends GLSLShader {
 
     private static final float[] blurKernel;
+    private static final float[] offset = new float[] { -2, -1, 0, 1, 2 };
 
     static {
         float[] v = new float[] { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
@@ -29,7 +30,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int isDifferenceValueRef;
     private int isDiscRef;
 
-    private int pixelSizeWeightingRef;
+    private int sharpenParamRef;
     private int hgltParamRef;
     private int hglnParamRef;
 
@@ -90,11 +91,11 @@ public class GLSLSolarShader extends GLSLShader {
         isDifferenceValueRef = gl.glGetUniformLocation(progID, "isdifference");
         isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
 
-        pixelSizeWeightingRef = gl.glGetUniformLocation(progID, "pixelSizeWeighting");
         hgltParamRef = gl.glGetUniformLocation(progID, "hglt");
         hglnParamRef = gl.glGetUniformLocation(progID, "hgln");
         polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
 
+        sharpenParamRef = gl.glGetUniformLocation(progID, "sharpenParam");
         brightParamRef = gl.glGetUniformLocation(progID, "brightness");
         alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
         cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
@@ -111,10 +112,13 @@ public class GLSLSolarShader extends GLSLShader {
         cameraTransformationInverseRef = gl.glGetUniformLocation(progID, "cameraTransformationInverse");
         cameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "cameraDifferenceRotationQuat");
         diffCameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "diffcameraDifferenceRotationQuat");
-        int unsharpMaskingKernelRef = gl.glGetUniformLocation(progID, "unsharpMaskingKernel");
+
+        int blurKernelRef = gl.glGetUniformLocation(progID, "blurKernel");
+        int offsetRef = gl.glGetUniformLocation(progID, "offset");
 
         bind(gl);
-        gl.glUniform1fv(unsharpMaskingKernelRef, blurKernel.length, blurKernel, 0);
+        gl.glUniform1fv(blurKernelRef, blurKernel.length, blurKernel, 0);
+        gl.glUniform1fv(offsetRef, offset.length, offset, 0);
 
         setTextureUnit(gl, "image", 0);
         setTextureUnit(gl, "lut", 1);
@@ -183,7 +187,7 @@ public class GLSLSolarShader extends GLSLShader {
 
         gl.glUniform2fv(brightParamRef, 1, brightParamFloat, 0);
         gl.glUniform1fv(alphaParamRef, 1, alphaParamFloat, 0);
-        gl.glUniform3fv(pixelSizeWeightingRef, 1, sharpenParamFloat, 0);
+        gl.glUniform3fv(sharpenParamRef, 1, sharpenParamFloat, 0);
         gl.glUniform4fv(rectRef, 1, rectVertex, 0);
         gl.glUniform4fv(differenceRectRef, 1, differencerect, 0);
         gl.glUniform1fv(cutOffRadiusRef, 1, cutOffRadiusFloat, 0);
@@ -217,7 +221,7 @@ public class GLSLSolarShader extends GLSLShader {
         brightParamFloat[1] = scale;
     }
 
-    public void setFactors(float weighting, float pixelWidth, float pixelHeight, float span) {
+    public void setSharpen(float weighting, float pixelWidth, float pixelHeight, float span) {
         sharpenParamFloat[0] = pixelWidth * span;
         sharpenParamFloat[1] = pixelHeight * span;
         sharpenParamFloat[2] = -weighting; // used for mix

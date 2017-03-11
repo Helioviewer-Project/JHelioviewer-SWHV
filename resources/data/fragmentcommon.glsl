@@ -9,13 +9,11 @@
 
 #define BOOST 1. / (0.2 * 2.)
 #define FSIZE 5
-#define FDISP (FSIZE - 1) / 2
 
 uniform sampler2D image;
 uniform int isdifference;
 uniform int enhanced;
 uniform sampler2D differenceImage;
-uniform vec3 pixelSizeWeighting;
 //rect=(llx, lly, 1/w, 1/h)
 uniform vec4 rect;
 uniform vec4 differencerect;
@@ -26,7 +24,11 @@ uniform float cutOffRadius;
 uniform float outerCutOffRadius;
 uniform float hgln;
 uniform float hglt;
-uniform float unsharpMaskingKernel[FSIZE * FSIZE];
+
+uniform float blurKernel[FSIZE * FSIZE];
+uniform float offset[FSIZE];
+uniform vec3 sharpenParam;
+
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifferenceRotationQuat;
 uniform vec4 diffcameraDifferenceRotationQuat;
@@ -44,9 +46,9 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
         float diff;
         for (int i = 0; i < FSIZE; i++) {
             for (int j = 0; j < FSIZE; j++) {
-                diff = texture2D(image, texcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r -
-                       texture2D(differenceImage, difftexcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r;
-                conv += diff * unsharpMaskingKernel[FSIZE * i + j];
+                diff = texture2D(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy).r -
+                       texture2D(differenceImage, difftexcoord + vec2(offset[i], offset[j]) * sharpenParam.xy).r;
+                conv += diff * blurKernel[FSIZE * i + j];
             }
         }
         v = v * BOOST + 0.5;
@@ -55,11 +57,11 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
         v = texture2D(image, texcoord).r;
         for (int i = 0; i < FSIZE; i++) {
             for (int j = 0; j < FSIZE; j++) {
-                conv += texture2D(image, texcoord + vec2(i - FDISP, j - FDISP) * pixelSizeWeighting.xy).r * unsharpMaskingKernel[FSIZE * i + j];
+                conv += texture2D(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy).r * blurKernel[FSIZE * i + j];
             }
         }
     }
-    v = mix(v, conv, pixelSizeWeighting.z);
+    v = mix(v, conv, sharpenParam.z);
 
     float scale = brightness.y;
     if (enhanced == 1) {

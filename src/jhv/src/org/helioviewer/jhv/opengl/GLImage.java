@@ -67,7 +67,7 @@ public class GLImage {
 
         int w = imageData.getWidth();
         int h = imageData.getHeight();
-        shader.setFactors(sharpen, 1f / w, 1f / h, 1f);
+        shader.setSharpen(sharpen, 1f / w, 1f / h, 1f);
 
         applyLUT(gl);
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
