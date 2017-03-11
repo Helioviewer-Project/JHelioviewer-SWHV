@@ -38,36 +38,39 @@ uniform vec3 cutOffDirection;
 uniform float cutOffValue;
 uniform vec2 polarRadii;
 
+float fetch(sampler2D tex, vec2 coord, vec2 bright) {
+    return texture2D(tex, coord).r * bright.y + bright.x;
+}
+
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
+    vec2 b = brightness;
+    if (enhanced == 1) {
+        b.y *= factor;
+    }
+
     float v;
     float conv = 0.;
     if (isdifference != NODIFFERENCE) {
-        v = texture2D(image, texcoord).r - texture2D(differenceImage, difftexcoord).r;
+        v = fetch(image, texcoord, b) - fetch(differenceImage, difftexcoord, b);
         float diff;
         for (int i = 0; i < FSIZE; i++) {
             for (int j = 0; j < FSIZE; j++) {
-                diff = texture2D(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy).r -
-                       texture2D(differenceImage, difftexcoord + vec2(offset[i], offset[j]) * sharpenParam.xy).r;
+                diff = fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b) -
+                       fetch(differenceImage, difftexcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b);
                 conv += diff * blurKernel[FSIZE * i + j];
             }
         }
         v = v * BOOST + 0.5;
         conv = conv * BOOST + 0.5;
     } else {
-        v = texture2D(image, texcoord).r;
+        v = fetch(image, texcoord, b);
         for (int i = 0; i < FSIZE; i++) {
             for (int j = 0; j < FSIZE; j++) {
-                conv += texture2D(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy).r * blurKernel[FSIZE * i + j];
+                conv += fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b) * blurKernel[FSIZE * i + j];
             }
         }
     }
     v = mix(v, conv, sharpenParam.z);
-
-    float scale = brightness.y;
-    if (enhanced == 1) {
-        scale *= factor;
-    }
-    v = scale * v + brightness.x;
 
     return texture1D(lut, v) * colorParam;
 }
