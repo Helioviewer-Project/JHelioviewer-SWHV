@@ -220,7 +220,7 @@ public class GLSLSolarShader extends GLSLShader {
     public void setFactors(float weighting, float pixelWidth, float pixelHeight, float span) {
         sharpenParamFloat[0] = pixelWidth * span;
         sharpenParamFloat[1] = pixelHeight * span;
-        sharpenParamFloat[2] = weighting;
+        sharpenParamFloat[2] = -weighting; // used for mix
     }
 
     public void setIsDifference(int isDifference) {
