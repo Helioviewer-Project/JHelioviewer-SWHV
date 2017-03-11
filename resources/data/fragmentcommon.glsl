@@ -8,13 +8,13 @@
 #define TWOPI 2.*3.1415926535897932384626433832795
 
 #define BOOST 1. / (0.2 * 2.)
-#define FSIZE 5
+#define FSIZE 3
 
 uniform sampler2D image;
 uniform int isdifference;
 uniform int enhanced;
 uniform sampler2D differenceImage;
-//rect=(llx, lly, 1/w, 1/h)
+
 uniform vec4 rect;
 uniform vec4 differencerect;
 uniform sampler1D lut;
