@@ -8,16 +8,17 @@ import com.jogamp.opengl.GL2;
 public class GLSLSolarShader extends GLSLShader {
 
     private static final float[] blurKernel;
-    private static final float[] offset = new float[] { -2, -1, 0, 1, 2 };
+    private static final float[] offset = new float[] { -1.2004377f, 0, 1.2004377f };
 
     static {
-        float[] v = new float[] { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
+        // float[] v = new float[] { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
+        // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+        float[] v = new float[] { .30613f, 0.38774f, .30613f };
+
         blurKernel = new float[] {
-            v[0] * v[0], v[0] * v[1], v[0] * v[2], v[0] * v[3], v[0] * v[4],
-            v[1] * v[0], v[1] * v[1], v[1] * v[2], v[1] * v[3], v[1] * v[4],
-            v[2] * v[0], v[2] * v[1], v[2] * v[2], v[2] * v[3], v[2] * v[4],
-            v[3] * v[0], v[3] * v[1], v[3] * v[2], v[3] * v[3], v[3] * v[4],
-            v[4] * v[0], v[4] * v[1], v[4] * v[2], v[4] * v[3], v[4] * v[4],
+            v[0] * v[0], v[0] * v[1], v[0] * v[2],
+            v[1] * v[0], v[1] * v[1], v[1] * v[2],
+            v[2] * v[0], v[2] * v[1], v[2] * v[2],
         };
     }
 
