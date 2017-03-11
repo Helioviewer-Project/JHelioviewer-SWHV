@@ -19,7 +19,7 @@ uniform vec4 rect;
 uniform vec4 differencerect;
 uniform sampler1D lut;
 uniform vec2 brightness;
-uniform float alpha;
+uniform vec4 colorParam;
 uniform float cutOffRadius;
 uniform float outerCutOffRadius;
 uniform float hgln;
@@ -69,10 +69,7 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     }
     v = scale * v + brightness.x;
 
-    vec4 color;
-    color.rgb = texture1D(lut, v).rgb;
-    color.a = alpha;
-    return color;
+    return texture1D(lut, v) * colorParam;
 }
 
 void clamp_texcoord(vec2 texcoord) {

@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 
 import com.jogamp.opengl.GL2;
 
@@ -35,7 +34,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int hglnParamRef;
 
     private int brightParamRef;
-    private int alphaParamRef;
+    private int colorParamRef;
     private int cutOffRadiusRef;
     private int outerCutOffRadiusRef;
     private int cutOffDirectionRef;
@@ -59,7 +58,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] hgltParamFloat = new float[1];
     private final float[] hglnParamFloat = new float[1];
     private final float[] brightParamFloat = new float[2];
-    private final float[] alphaParamFloat = new float[1];
+    private final float[] colorParamFloat = new float[4];
     private final float[] cutOffRadiusFloat = new float[1];
     private final float[] outerCutOffRadiusFloat = new float[1];
     private final float[] cutOffDirectionFloat = new float[3];
@@ -72,8 +71,6 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] viewport = new float[2];
 
     private final float[] viewportOffset = new float[2];
-
-    public ColorMask colorMask = new ColorMask();
 
     public GLSLSolarShader(String vertex, String fragment) {
         super(vertex, fragment);
@@ -97,7 +94,7 @@ public class GLSLSolarShader extends GLSLShader {
 
         sharpenParamRef = gl.glGetUniformLocation(progID, "sharpenParam");
         brightParamRef = gl.glGetUniformLocation(progID, "brightness");
-        alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
+        colorParamRef = gl.glGetUniformLocation(progID, "colorParam");
         cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
         outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
         cutOffDirectionRef = gl.glGetUniformLocation(progID, "cutOffDirection");
@@ -180,13 +177,12 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void filter(GL2 gl) {
-        gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
         gl.glUniform1iv(isDifferenceValueRef, 1, isDifferenceValue, 0);
         gl.glUniform1fv(hgltParamRef, 1, hgltParamFloat, 0);
         gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
 
         gl.glUniform2fv(brightParamRef, 1, brightParamFloat, 0);
-        gl.glUniform1fv(alphaParamRef, 1, alphaParamFloat, 0);
+        gl.glUniform4fv(colorParamRef, 1, colorParamFloat, 0);
         gl.glUniform3fv(sharpenParamRef, 1, sharpenParamFloat, 0);
         gl.glUniform4fv(rectRef, 1, rectVertex, 0);
         gl.glUniform4fv(differenceRectRef, 1, differencerect, 0);
@@ -212,8 +208,11 @@ public class GLSLSolarShader extends GLSLShader {
         outerCutOffRadiusFloat[0] = (float) cutOffRadius;
     }
 
-    public void setAlpha(float alpha) {
-        alphaParamFloat[0] = alpha;
+    public void setColor(float red, float green, float blue, float alpha) {
+        colorParamFloat[0] = red;
+        colorParamFloat[1] = green;
+        colorParamFloat[2] = blue;
+        colorParamFloat[3] = alpha;
     }
 
     public void setBrightness(float offset, float scale) {

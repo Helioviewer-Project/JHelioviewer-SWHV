@@ -6,7 +6,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
@@ -22,12 +21,15 @@ public class GLImage {
     private GLTexture lutTex;
     private GLTexture diffTex;
 
+    private float red = 1;
+    private float green = 1;
+    private float blue = 1;
+
     private float brightOffset = 0;
     private float brightScale = 1;
     private float opacity = 1;
     private float sharpen = 0;
     private boolean enhanced = false;
-    private ColorMask colorMask = new ColorMask(true, true, true);
     private DifferenceMode diffMode = DifferenceMode.None;
 
     private LUT lut = gray;
@@ -56,9 +58,8 @@ public class GLImage {
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         applyRegion(imageData, prevImageData, baseImageData, shader);
 
-        shader.colorMask = colorMask;
         shader.setBrightness(brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()));
-        shader.setAlpha(opacity);
+        shader.setColor(red, green, blue, opacity);
         shader.setEnhanced(gl, enhanced);
 
         shader.setIsDifference(diffMode.ordinal());
@@ -147,16 +148,18 @@ public class GLImage {
         brightScale = scale;
     }
 
+    public void setColor(float _red, float _green, float _blue) {
+        red = _red;
+        green = _green;
+        blue = _blue;
+    }
+
     public void setOpacity(float _opacity) {
         opacity = _opacity;
     }
 
     public void setSharpen(float _sharpen) {
         sharpen = _sharpen;
-    }
-
-    public void setColorMask(boolean redColormask, boolean greenColormask, boolean blueColormask) {
-        colorMask = new ColorMask(redColormask, greenColormask, blueColormask);
     }
 
     public void setLUT(LUT newLUT, boolean invert) {

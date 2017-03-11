@@ -22,12 +22,8 @@ import com.jogamp.opengl.GL2;
 
 /**
  * Helper class to handle OpenGL textures.
- *
- * <p>
  * This class provides a lot of useful functions to handle textures in OpenGL,
  * including the generation of textures out of image data objects.
- *
- * @author Markus Langenberg
  */
 public class GLTexture {
 
