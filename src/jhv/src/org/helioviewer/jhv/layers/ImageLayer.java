@@ -170,19 +170,23 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         glImage.streamImage(gl, imageData, prevImageData, baseImageData);
     }
 
+    private static final double[] depth = new double[] { 1., 1., 0., 1. };
+    private static final double[] depthMini = new double[] { 0., 0., 0., 0. };
+    private static final double[] depthScale = new double[] { 1., 1., 1., 1. };
+
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. });
+        _render(camera, vp, gl, depth);
     }
 
     @Override
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. });
+        _render(camera, vp, gl, depthMini);
     }
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 1., 1., 1., 1. });
+        _render(camera, vp, gl, depthScale);
     }
 
     private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange) {
