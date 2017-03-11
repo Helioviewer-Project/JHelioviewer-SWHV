@@ -241,8 +241,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             }
             disableIndexVBO(gl);
             disablePositionVBO(gl);
-
-            gl.glColorMask(true, true, true, true);
         }
         GLSLShader.unbind(gl);
     }

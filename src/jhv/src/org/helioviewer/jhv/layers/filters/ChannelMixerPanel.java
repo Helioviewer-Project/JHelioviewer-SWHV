@@ -41,7 +41,9 @@ public class ChannelMixerPanel implements ActionListener, FilterDetails {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setColorMask(redCheckBox.isSelected(), greenCheckBox.isSelected(), blueCheckBox.isSelected());
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setColor(redCheckBox.isSelected() ? 1 : 0,
+                                                                               greenCheckBox.isSelected() ? 1 : 0,
+                                                                               blueCheckBox.isSelected() ? 1 : 0);
         Displayer.display();
     }
 
