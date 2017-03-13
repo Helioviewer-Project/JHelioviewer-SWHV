@@ -52,7 +52,7 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
         events = _events;
         Timelines.getModel().downloadFinished(this); // will ungray table label
         if (isVisible) {
-            DrawController.fireRedrawRequest();
+            DrawController.drawRequest();
         }
     }
 
@@ -60,7 +60,9 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
     public void cacheUpdated() {
         TimeAxis xAxis = DrawController.selectedAxis;
         JHVEventCache.requestForInterval(xAxis.start, xAxis.end, this);
-        DrawController.fireRedrawRequest();
+        if (isVisible) {
+            DrawController.drawRequest();
+        }
     }
 
     @Override

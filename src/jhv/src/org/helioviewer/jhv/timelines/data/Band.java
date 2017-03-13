@@ -82,7 +82,7 @@ public class Band extends AbstractTimelineRenderable {
 
     public void setDataColor(Color c) {
         graphColor = c;
-        DrawController.fireRedrawRequest();
+        DrawController.drawRequest();
     }
 
     @Override
@@ -137,12 +137,11 @@ public class Band extends AbstractTimelineRenderable {
     }
 
     private void updateGraphsData() {
-        Rectangle graphArea = DrawController.getGraphArea();
-        TimeAxis timeAxis = DrawController.selectedAxis;
         if (isVisible) {
+            Rectangle graphArea = DrawController.getGraphArea();
             updateWarnLevels(graphArea);
             graphPolylines.clear();
-            bandCache.createPolyLines(graphArea, timeAxis, yAxis, graphPolylines);
+            bandCache.createPolyLines(graphArea, DrawController.selectedAxis, yAxis, graphPolylines);
         }
     }
 
@@ -201,7 +200,7 @@ public class Band extends AbstractTimelineRenderable {
     public void addToCache(float[] values, long[] dates) {
         bandCache.addToCache(values, dates);
         updateGraphsData();
-        DrawController.fireRedrawRequest();
+        DrawController.drawRequest();
     }
 
     @Override

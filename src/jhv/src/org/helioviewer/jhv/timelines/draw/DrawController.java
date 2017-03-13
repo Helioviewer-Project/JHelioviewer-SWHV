@@ -22,7 +22,8 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
     public static final TimeAxis selectedAxis;
     public static final TimeAxis availableAxis;
 
-    private static final HashSet<DrawControllerListener> listeners = new HashSet<>();
+    private static final HashSet<DrawListener> listeners = new HashSet<>();
+    private static final HashSet<DrawMovieIntervalListener> movieIntervalListeners = new HashSet<>();
 
     private static final DrawControllerOptionsPanel optionsPanel;
 
@@ -48,12 +49,20 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
         return optionsPanel;
     }
 
-    public static void addDrawControllerListener(DrawControllerListener listener) {
+    public static void addDrawListener(DrawListener listener) {
         listeners.add(listener);
     }
 
-    public static void removeDrawControllerListener(DrawControllerListener listener) {
+    public static void removeDrawListener(DrawListener listener) {
         listeners.remove(listener);
+    }
+
+    public static void addDrawMovieIntervalListener(DrawMovieIntervalListener listener) {
+        movieIntervalListeners.add(listener);
+    }
+
+    public static void removeDrawMovieIntervalListener(DrawMovieIntervalListener listener) {
+        movieIntervalListeners.remove(listener);
     }
 
     public static void setSelectedInterval(long start, long end) {
@@ -103,7 +112,7 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
                 ct++;
             }
         }
-        fireRedrawRequest();
+        drawRequest();
     }
 
     public static void resetAxis(Point p) {
@@ -122,7 +131,7 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
                 ct++;
             }
         }
-        fireRedrawRequest();
+        drawRequest();
     }
 
     public static void moveY(Point p, double distanceY) {
@@ -174,14 +183,14 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
         for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
             el.fetchData(selectedAxis);
         }
-        fireRedrawRequest();
+        drawRequest();
     }
 
     private static void centraliseSelected(long time) {
         if (time != Long.MIN_VALUE && isLocked && availableAxis.start <= time && availableAxis.end >= time) {
             long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
             selectedAxis.set(time - (long) (0.5 * selectedIntervalDiff), time + (long) (0.5 * selectedIntervalDiff), false);
-            fireRedrawRequest();
+            drawRequest();
             for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
                 el.fetchData(selectedAxis);
             }
@@ -244,7 +253,7 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
 
     @Override
     public void eventHightChanged() {
-        fireRedrawRequest();
+        drawRequest();
     }
 
     @Override
@@ -268,23 +277,23 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
     public static void graphAreaChanged() {
         createGraphArea();
         moveX(0); // force recalculation of polylines
-        fireRedrawRequest();
+        drawRequest();
     }
 
-    public static void fireRedrawRequest() {
-        for (DrawControllerListener l : listeners) {
+    public static void drawRequest() {
+        for (DrawListener l : listeners) {
             l.drawRequest();
         }
     }
 
     private static void fireRedrawRequestMovieFrameChanged() {
-        for (DrawControllerListener l : listeners) {
+        for (DrawListener l : listeners) {
             l.drawMovieLineRequest();
         }
     }
 
     private static void fireMovieIntervalChanged(long start, long end) {
-        for (DrawControllerListener l : listeners) {
+        for (DrawMovieIntervalListener l : movieIntervalListeners) {
             l.movieIntervalChanged(start, end);
         }
     }

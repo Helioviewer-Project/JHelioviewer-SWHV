@@ -21,11 +21,12 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.draw.DrawControllerListener;
+import org.helioviewer.jhv.timelines.draw.DrawListener;
+import org.helioviewer.jhv.timelines.draw.DrawMovieIntervalListener;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 @SuppressWarnings("serial")
-public class ChartDrawIntervalPane extends JComponent implements DrawControllerListener, MouseListener, MouseMotionListener {
+public class ChartDrawIntervalPane extends JComponent implements DrawListener, DrawMovieIntervalListener, MouseListener, MouseMotionListener {
 
     private long movieStart = System.currentTimeMillis();
     private long movieEnd = System.currentTimeMillis();
@@ -43,7 +44,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawControllerL
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        DrawController.addDrawControllerListener(this);
+        DrawController.addDrawListener(this);
+        DrawController.addDrawMovieIntervalListener(this);
     }
 
     @Override
