@@ -12,7 +12,7 @@ import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
-public class BandCache {
+class BandCache {
 
     private static final long DAYS_PER_CHUNK = 8;
     private static final long MILLIS_PER_TICK = 60000;
