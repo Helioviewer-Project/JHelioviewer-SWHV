@@ -182,6 +182,7 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(hgltParamRef, 1, hgltParamFloat, 0);
         gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
 
+        gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
         gl.glUniform2fv(brightParamRef, 1, brightParamFloat, 0);
         gl.glUniform4fv(colorParamRef, 1, colorParamFloat, 0);
         gl.glUniform3fv(sharpenParamRef, 1, sharpenParamFloat, 0);
@@ -227,6 +228,10 @@ public class GLSLSolarShader extends GLSLShader {
         sharpenParamFloat[2] = -weighting; // used for mix
     }
 
+    public void setEnhanced(int _enhanced) {
+        enhanced[0] = _enhanced;
+    }
+
     public void setIsDifference(int isDifference) {
         isDifferenceValue[0] = isDifference;
     }
@@ -259,16 +264,6 @@ public class GLSLSolarShader extends GLSLShader {
         polarRadii[0] = (float) start;
         polarRadii[1] = (float) stop;
         gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
-    }
-
-    public void setEnhanced(GL2 gl, boolean _enhanced) {
-        if (_enhanced) {
-            enhanced[0] = 1;
-            gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
-        } else {
-            enhanced[0] = 0;
-            gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
-        }
     }
 
 }

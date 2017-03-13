@@ -29,7 +29,7 @@ public class GLImage {
     private float brightScale = 1;
     private float opacity = 1;
     private float sharpen = 0;
-    private boolean enhanced = false;
+    private int enhanced = 0;
     private DifferenceMode diffMode = DifferenceMode.None;
 
     private LUT lut = gray;
@@ -60,7 +60,7 @@ public class GLImage {
 
         shader.setBrightness(brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()));
         shader.setColor(red, green, blue, opacity);
-        shader.setEnhanced(gl, enhanced);
+        shader.setEnhanced(enhanced);
 
         shader.setIsDifference(diffMode.ordinal());
         if (diffMode != DifferenceMode.None)
@@ -174,7 +174,7 @@ public class GLImage {
         lutChanged = true;
     }
 
-    public void setEnhanced(boolean _enhanced) {
+    public void setEnhanced(int _enhanced) {
         enhanced = _enhanced;
     }
 
