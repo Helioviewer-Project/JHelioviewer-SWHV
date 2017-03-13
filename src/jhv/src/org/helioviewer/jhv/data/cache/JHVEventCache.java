@@ -194,13 +194,7 @@ public class JHVEventCache {
         downloadedCache.put(eventType, cache);
         events.remove(eventType);
 
-        Iterator<Map.Entry<Integer, JHVRelatedEvents>> it = relEvents.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Integer, JHVRelatedEvents> pair = it.next();
-            if (pair.getValue().getJHVEventType() == eventType) {
-                it.remove();
-            }
-        }
+        relEvents.entrySet().removeIf(entry -> entry.getValue().getJHVEventType() == eventType);
     }
 
     public static Collection<Interval> getAllRequestIntervals(JHVEventType eventType) {
