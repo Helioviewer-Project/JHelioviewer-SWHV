@@ -39,13 +39,13 @@ import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.draw.DrawControllerListener;
+import org.helioviewer.jhv.timelines.draw.DrawListener;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
+public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawListener, MouseWheelListener {
 
     private enum DragMode {
         MOVIELINE, CHART, NODRAG
@@ -81,7 +81,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         addComponentListener(this);
-        DrawController.addDrawControllerListener(this);
+        DrawController.addDrawListener(this);
         DrawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
     }
 
@@ -585,10 +585,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void drawMovieLineRequest() {
         updateGraph();
-    }
-
-    @Override
-    public void movieIntervalChanged(long start, long end) {
     }
 
 }

@@ -42,7 +42,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
         requestEvents(false);
         Displayer.display();
-        DrawController.fireRedrawRequest();
+        DrawController.drawRequest();
     }
 
     @Override

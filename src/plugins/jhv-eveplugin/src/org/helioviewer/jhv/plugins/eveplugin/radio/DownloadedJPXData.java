@@ -97,7 +97,7 @@ class DownloadedJPXData implements ImageDataHandler {
             byte[] data = (byte[]) imageData.getBuffer().array();
             bufferedImage = createBufferedImage(w, h, data);
 
-            DrawController.fireRedrawRequest();
+            DrawController.drawRequest();
         }
     }
 

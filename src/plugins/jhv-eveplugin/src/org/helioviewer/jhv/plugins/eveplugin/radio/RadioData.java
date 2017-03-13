@@ -66,7 +66,7 @@ public class RadioData extends AbstractTimelineRenderable {
         for (DownloadedJPXData jp2Data : cache.values()) {
             jp2Data.changeColormap(colorModel);
         }
-        DrawController.fireRedrawRequest();
+        DrawController.drawRequest();
     }
 
     static IndexColorModel getColorModel() {

@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.timelines.draw;
 
-public interface DrawControllerListener {
+public interface DrawListener {
 
     void drawRequest();
 
     void drawMovieLineRequest();
-
-    void movieIntervalChanged(long start, long end);
 
 }
