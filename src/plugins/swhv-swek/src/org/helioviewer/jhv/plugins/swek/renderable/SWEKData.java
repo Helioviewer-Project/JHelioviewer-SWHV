@@ -14,26 +14,23 @@ import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
-import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 
 public class SWEKData implements TimespanListener, JHVEventHandler {
 
-    private static long beginTime = Layers.getLastUpdatedTimestamp().milli;
-    private static long endTime = beginTime;
+    private static long startTime = Layers.getLastUpdatedTimestamp().milli;
+    private static long endTime = startTime;
 
-    public void requestEvents(boolean force) {
-        long first = Layers.getStartDate().milli;
-        long last = Layers.getEndDate().milli;
-        if (force || first < beginTime || last > endTime) {
-            beginTime = first;
-            endTime = last;
-            JHVEventCache.requestForInterval(first, last, SWEKPlugin.swekData);
+    private void requestEvents(boolean force, long start, long end) {
+        if (force || start < startTime || end > endTime) {
+            startTime = start;
+            endTime = end;
+            JHVEventCache.requestForInterval(start, end, this);
         }
     }
 
     @Override
     public void timespanChanged(long start, long end) {
-        requestEvents(false);
+        requestEvents(false, start, end);
     }
 
     @Override
@@ -43,13 +40,13 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
 
     @Override
     public void cacheUpdated() {
-        requestEvents(true);
+        requestEvents(true, Layers.getStartDate().milli, Layers.getEndDate().milli);
     }
 
-    public static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
+    static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
 
-        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(beginTime, endTime, beginTime, endTime).getAvailableEvents();
+        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(startTime, endTime, startTime, endTime).getAvailableEvents();
         for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents evr : eventMap.values()) {
                 if (evr.getStart() <= timestamp && timestamp <= evr.getEnd()) {
@@ -60,7 +57,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         return activeEvents;
     }
 
-    public static double readCMESpeed(JHVEvent evt) {
+    static double readCMESpeed(JHVEvent evt) {
         JHVEventParameter p = evt.getParameter("cme_radiallinvel");
         try {
             if (p != null) {
@@ -71,7 +68,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         return 500;
     }
 
-    public static double readCMEPrincipalAngleDegree(JHVEvent evt) {
+    static double readCMEPrincipalAngleDegree(JHVEvent evt) {
         JHVEventParameter p = evt.getParameter("event_coord1");
         try {
             if (p != null) {
@@ -82,7 +79,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
         return 0;
     }
 
-    public static double readCMEAngularWidthDegree(JHVEvent evt) {
+    static double readCMEAngularWidthDegree(JHVEvent evt) {
         JHVEventParameter p = evt.getParameter("cme_angularwidth");
         try {
             if (p != null) {
