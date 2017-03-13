@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.components.calendar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -289,11 +288,11 @@ class JHVCalendar extends JPanel {
      */
     private class SelectionPanel extends JPanel {
 
-        private final JTable table;
+        final JTable table;
         private final JPanel contentPane;
 
         public SelectionPanel() {
-            setLayout(new GridLayout(1, 1));
+            setLayout(new BorderLayout());
             // create table
             table = new JTable();
 
@@ -397,7 +396,7 @@ class JHVCalendar extends JPanel {
          * @return boolean value if cell is unequal null and user clicked inside
          *         a cell.
          */
-        private boolean isValidCellSelected(Point point) {
+        boolean isValidCellSelected(Point point) {
             int row = table.getSelectedRow();
             int col = table.getSelectedColumn();
             if (row == -1 || col == -1)

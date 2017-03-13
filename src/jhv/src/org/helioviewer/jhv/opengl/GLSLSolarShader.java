@@ -217,9 +217,9 @@ public class GLSLSolarShader extends GLSLShader {
         colorParamFloat[3] = alpha;
     }
 
-    public void setBrightness(float offset, float scale) {
-        brightParamFloat[0] = offset;
-        brightParamFloat[1] = scale;
+    public void setBrightness(float bOffset, float bScale) {
+        brightParamFloat[0] = bOffset;
+        brightParamFloat[1] = bScale;
     }
 
     public void setSharpen(float weighting, float pixelWidth, float pixelHeight, float span) {
