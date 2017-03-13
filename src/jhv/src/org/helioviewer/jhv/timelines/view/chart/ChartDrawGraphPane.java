@@ -550,9 +550,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-            Point p = e.getPoint();
             int scrollDistance = e.getWheelRotation() * e.getScrollAmount();
-            DrawController.zoomXY(p, scrollDistance, e.isShiftDown(), e.isAltDown(), e.isControlDown());
+            DrawController.zoomXY(e.getPoint(), scrollDistance, e.isShiftDown(), e.isAltDown(), e.isControlDown());
         }
     }
 

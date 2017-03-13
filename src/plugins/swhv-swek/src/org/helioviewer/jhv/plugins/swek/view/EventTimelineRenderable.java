@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -19,7 +18,6 @@ import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.JHVEventType;
-import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -29,28 +27,18 @@ import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRende
 
 public class EventTimelineRenderable extends AbstractTimelineRenderable implements JHVEventHandler {
 
-    private static Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
-
     private final YAxis yAxis = new YAxis(0, 0, "Events", false);
     private static EventPlotConfiguration eventUnderMouse;
     private static JHVRelatedEvents highlightedEvent = null;
     private static int highlightedEventPosition = -1;
 
     @Override
-    public boolean isEmpty() {
-        return events.isEmpty();
-    }
-
-    @Override
     public void fetchData(TimeAxis selectedAxis) {
-        // ?? Timelines.getModel().downloadStarted(this);
         JHVEventCache.requestForInterval(selectedAxis.start - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end, this);
     }
 
     @Override
-    public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> _events) {
-        events = _events;
-        Timelines.getModel().downloadFinished(this); // will ungray table label
+    public void newEventsReceived() {
         if (isVisible) {
             DrawController.drawRequest();
         }
@@ -66,56 +54,55 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
     }
 
     @Override
-    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Point mousePosition) {
         if (!isVisible) {
             return;
         }
+
         highlightedEvent = null;
         highlightedEventPosition = -1;
-        int nrEventTypes = events.size();
-        if (nrEventTypes > 0) {
-            EventPlotConfiguration shouldRedraw = null;
 
-            ArrayList<Long> endDates = new ArrayList<>();
-            int nrLines = 0;
+        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(xAxis.start, xAxis.end, xAxis.start, xAxis.end).getAvailableEvents();
+        if (events.isEmpty())
+            return;
 
-            for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> entry : events.entrySet()) {
-                SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = entry.getValue();
+        EventPlotConfiguration shouldRedraw = null;
 
-                for (JHVRelatedEvents event : eventMap.values()) {
-                    int i = 0;
-                    while (i < nrLines && endDates.get(i) >= event.getStart()) {
-                        i++;
-                    }
-                    if (i == nrLines) {
-                        endDates.add(event.getEnd());
-                    } else {
-                        endDates.set(i, event.getEnd());
-                    }
-                    int eventPosition = i;
-                    nrLines = Math.max(nrLines, endDates.size());
+        ArrayList<Long> endDates = new ArrayList<>();
+        int nrLines = 0;
+        for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
+            for (JHVRelatedEvents event : eventMap.values()) {
+                int i = 0;
+                while (i < nrLines && endDates.get(i) >= event.getStart()) {
+                    i++;
+                }
+                if (i == nrLines) {
+                    endDates.add(event.getEnd());
+                } else {
+                    endDates.set(i, event.getEnd());
+                }
+                int eventPosition = i;
+                nrLines = Math.max(nrLines, endDates.size());
 
-                    int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
-                    int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
-                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition, event.isHighlighted());
-                    if (rEvent != null) {
-                        shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
-                        highlightedEvent = rEvent;
-                        highlightedEventPosition = eventPosition;
-                    }
+                int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, event.getStart());
+                int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, event.getEnd());
+                JHVRelatedEvents rEvent = EventPlotConfiguration.draw(graphArea, event, x0, x1, eventPosition, g, mousePosition, event.isHighlighted());
+                if (rEvent != null) {
+                    shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
+                    highlightedEvent = rEvent;
+                    highlightedEventPosition = eventPosition;
                 }
             }
-
-            eventUnderMouse = shouldRedraw;
         }
+        eventUnderMouse = shouldRedraw;
     }
 
     @Override
-    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void drawHighlighted(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Point mousePosition) {
         if (mousePosition != null) {
             if (highlightedEvent != null) {
-                int x0 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
-                int x1 = timeAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getEnd());
+                int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getStart());
+                int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, highlightedEvent.getEnd());
                 EventPlotConfiguration.draw(graphArea, highlightedEvent, x0, x1, highlightedEventPosition, g, mousePosition, highlightedEvent.isHighlighted());
             }
             JHVEventCache.highlight(highlightedEvent);
@@ -153,7 +140,7 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
 
     @Override
     public boolean hasData() {
-        return JHVEventCache.hasData();
+        return true;
     }
 
     @Override
@@ -257,7 +244,7 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
 
     @Override
     public boolean highLightChanged(Point p) {
-        if (!isVisible || events.isEmpty()) {
+        if (!isVisible) {
             return false;
         }
         if (eventUnderMouse == null) {

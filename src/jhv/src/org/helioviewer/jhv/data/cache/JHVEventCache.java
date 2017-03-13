@@ -46,14 +46,14 @@ public class JHVEventCache {
         cacheEventHandlers.add(handler);
 
         JHVEventCacheResult result = get(startDate, endDate, newStartDate, newEndDate);
-        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = result.getAvailableEvents();
-        handler.newEventsReceived(events);
         for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
             List<Interval> missingList = result.getMissingIntervals().get(eventType);
             for (Interval missing : missingList) {
                 requestEvents(eventType, missing);
             }
         }
+
+        handler.newEventsReceived();
     }
 
     public static void finishedDownload(boolean partially) {
@@ -221,10 +221,6 @@ public class JHVEventCache {
             downloadedCache.remove(evt);
             downloadedCache.put(evt, new RequestCache());
         }
-    }
-
-    public static boolean hasData() {
-        return !events.isEmpty();
     }
 
 }
