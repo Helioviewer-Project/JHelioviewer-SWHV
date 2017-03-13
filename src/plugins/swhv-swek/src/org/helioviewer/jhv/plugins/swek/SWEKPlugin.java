@@ -19,11 +19,11 @@ import org.helioviewer.jhv.timelines.Timelines;
 public class SWEKPlugin implements Plugin {
 
     private static final JPanel swekPanel = new JPanel();
-    private static final SWEKRenderable renderable = new SWEKRenderable();
 
     public static final SWEKDownloadManager downloadManager = new SWEKDownloadManager();
-    public static final SWEKData swekData = new SWEKData();
 
+    private static final SWEKData swekData = new SWEKData();
+    private static final SWEKRenderable renderable = new SWEKRenderable();
     private static final EventTimelineRenderable em = new EventTimelineRenderable();
 
     public SWEKPlugin() {
@@ -41,7 +41,7 @@ public class SWEKPlugin implements Plugin {
         ImageViewerGui.getLeftContentPane().revalidate();
 
         em.cacheUpdated();
-        swekData.requestEvents(true);
+        swekData.cacheUpdated();
         Layers.addTimespanListener(swekData);
         ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
