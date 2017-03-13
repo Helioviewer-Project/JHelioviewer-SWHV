@@ -194,14 +194,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 gplotPart.setTransform(plottf);
                 gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 gplotPart.setFont(DrawConstants.font);
-                drawData(g, gplotPart, graphArea, mousePosition);
+                drawData(g, gplotPart, graphArea);
                 gplotPart.dispose();
             }
             g.dispose();
         }
     }
 
-    private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, Point mousePosition) {
+    private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea) {
         List<TimelineRenderable> list = Timelines.getModel().getAllLineDataSelectorElements();
         boolean isEmpty = true;
         for (TimelineRenderable el : list) {

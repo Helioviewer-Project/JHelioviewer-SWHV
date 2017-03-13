@@ -66,8 +66,7 @@ public class ResolutionSet {
         public final double factorX;
         public final double factorY;
 
-        // Private constructor
-        private ResolutionLevel(int _level, int _width, int _height, double _factorX, double _factorY) {
+        ResolutionLevel(int _level, int _width, int _height, double _factorX, double _factorY) {
             level = _level;
             width = _width;
             height = _height;
