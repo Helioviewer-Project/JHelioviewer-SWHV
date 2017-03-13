@@ -193,8 +193,6 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
         switch (nodeName) {
             case "fits":
-                lastNodeSeen = nodeName;
-                break;
             case "helioviewer":
                 lastNodeSeen = nodeName;
                 break;

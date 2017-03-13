@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -14,7 +13,6 @@ import java.awt.image.Raster;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -59,7 +57,6 @@ class DownloadedJPXData implements ImageDataHandler {
                 if (startDate == start && endDate <= start + TimeUtils.DAY_IN_MILLIS) {
                     view = _view;
                     view.setDataHandler(this);
-                    EventQueue.invokeLater(this::requestData);
                     return;
                 }
             } catch (Exception e) {
@@ -112,10 +109,9 @@ class DownloadedJPXData implements ImageDataHandler {
         return newImage;
     }
 
-    void requestData() {
+    void requestData(TimeAxis xAxis, YAxis yAxis) {
         if (view != null) {
-            TimeAxis xAxis = DrawController.selectedAxis;
-            Rectangle roi = getROI(xAxis, EVEPlugin.rd.getYAxis());
+            Rectangle roi = getROI(xAxis, yAxis);
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
                 view.setRegion(roi);
                 view.render(null, null, last_resolution);

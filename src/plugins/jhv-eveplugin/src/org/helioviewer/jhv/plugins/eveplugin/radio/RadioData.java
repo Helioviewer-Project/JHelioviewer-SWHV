@@ -123,14 +123,14 @@ public class RadioData extends AbstractTimelineRenderable {
 
     private static int isDownloading;
 
-    private static class RadioJPXDownload extends JHVWorker<ArrayList<DownloadedJPXData>, Void> {
+    private class RadioJPXDownload extends JHVWorker<ArrayList<DownloadedJPXData>, Void> {
 
         private final ArrayList<Long> toDownload;
 
         public RadioJPXDownload(ArrayList<Long> _toDownload) {
             isDownloading++;
             toDownload = _toDownload;
-            Timelines.getModel().downloadStarted(EVEPlugin.rd);
+            Timelines.getModel().downloadStarted(RadioData.this);
         }
 
         @Override
@@ -169,8 +169,9 @@ public class RadioData extends AbstractTimelineRenderable {
                 for (DownloadedJPXData jp2Data : jpList) {
                     cache.put(jp2Data.getStartDate(), jp2Data);
                 }
-                Timelines.getModel().downloadFinished(EVEPlugin.rd);
-                DrawController.fireRedrawRequest();
+                Timelines.getModel().downloadFinished(RadioData.this);
+                // DrawController.fireRedrawRequest();
+                requestForData();
             } catch (InterruptedException | ExecutionException e) {
                 Log.error("RadioData error: " + e.getCause().getMessage());
             }
@@ -180,7 +181,7 @@ public class RadioData extends AbstractTimelineRenderable {
 
     private static void requestForData() {
         for (DownloadedJPXData jpxData : cache.values()) {
-            jpxData.requestData();
+            jpxData.requestData(DrawController.selectedAxis, yAxis);
         }
     }
 
@@ -197,7 +198,6 @@ public class RadioData extends AbstractTimelineRenderable {
     @Override
     public void remove() {
         // clearCache();
-        // EVEPlugin.ldsm.removeLineData(this);
     }
 
     @Override
