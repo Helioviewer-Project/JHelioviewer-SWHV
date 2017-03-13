@@ -15,14 +15,13 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.timelines.draw.DrawController;
 
 public class SWEKData implements TimespanListener, JHVEventHandler {
 
     private static long beginTime = Layers.getLastUpdatedTimestamp().milli;
     private static long endTime = beginTime;
 
-    public static void requestEvents(boolean force) {
+    public void requestEvents(boolean force) {
         long first = Layers.getStartDate().milli;
         long last = Layers.getEndDate().milli;
         if (force || first < beginTime || last > endTime) {
@@ -40,7 +39,6 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
     @Override
     public void newEventsReceived() {
         Displayer.display();
-        DrawController.drawRequest();
     }
 
     @Override

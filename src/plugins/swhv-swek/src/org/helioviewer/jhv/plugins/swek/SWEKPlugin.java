@@ -40,7 +40,8 @@ public class SWEKPlugin implements Plugin {
         ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
 
-        SWEKData.requestEvents(true);
+        em.cacheUpdated();
+        swekData.requestEvents(true);
         Layers.addTimespanListener(swekData);
         ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
