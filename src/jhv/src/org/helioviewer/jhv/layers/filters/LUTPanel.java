@@ -42,7 +42,7 @@ public class LUTPanel implements ActionListener, FilterDetails {
     @Override
     public void actionPerformed(ActionEvent e) {
         ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLUT(lutCombo.getLUT(), invertButton.isSelected());
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setEnhanced(enhanceButton.isSelected());
+        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setEnhanced(enhanceButton.isSelected() ? 1 : 0);
         Displayer.display();
     }
 

@@ -53,20 +53,20 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     if (isdifference != NODIFFERENCE) {
         v = fetch(image, texcoord, b) - fetch(differenceImage, difftexcoord, b);
         float diff;
-        for (int i = 0; i < FSIZE; i++) {
-            for (int j = 0; j < FSIZE; j++) {
+        for (int j = 0; j < FSIZE; j++) {
+            for (int i = 0; i < FSIZE; i++) {
                 diff = fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b) -
                        fetch(differenceImage, difftexcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b);
-                conv += diff * blurKernel[FSIZE * i + j];
+                conv += diff * blurKernel[FSIZE * j + i];
             }
         }
         v = v * BOOST + 0.5;
         conv = conv * BOOST + 0.5;
     } else {
         v = fetch(image, texcoord, b);
-        for (int i = 0; i < FSIZE; i++) {
-            for (int j = 0; j < FSIZE; j++) {
-                conv += fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b) * blurKernel[FSIZE * i + j];
+        for (int j = 0; j < FSIZE; j++) {
+            for (int i = 0; i < FSIZE; i++) {
+                conv += fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b) * blurKernel[FSIZE * j + i];
             }
         }
     }
