@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.data.cache.JHVEventCache;
-import org.helioviewer.jhv.data.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.cache.JHVEventHandler;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.cache.SortedDateInterval;
@@ -40,7 +39,6 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
 
     @Override
     public void newEventsReceived() {
-        requestEvents(false);
         Displayer.display();
         DrawController.drawRequest();
     }
@@ -52,11 +50,10 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
 
     public static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
-        JHVEventCacheResult result = JHVEventCache.get(beginTime, endTime, beginTime, endTime);
-        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> data = result.getAvailableEvents();
-        for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
-            for (Map.Entry<SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
-                JHVRelatedEvents evr = v2.getValue();
+
+        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(beginTime, endTime, beginTime, endTime).getAvailableEvents();
+        for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
+            for (JHVRelatedEvents evr : eventMap.values()) {
                 if (evr.getStart() <= timestamp && timestamp <= evr.getEnd()) {
                     activeEvents.add(evr);
                 }
