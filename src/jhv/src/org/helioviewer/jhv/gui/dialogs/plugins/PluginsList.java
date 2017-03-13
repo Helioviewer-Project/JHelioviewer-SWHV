@@ -28,8 +28,8 @@ class PluginsList extends JPanel {
             entryMap.put(plugin.getName(), new PluginsListEntry(plugin, this));
         for (PluginsListEntry entry : entryMap.values())
             add(entry);
-        if (pluginArray.length != 0)
-            selectItem(pluginArray[0].getName());
+        if (!entryMap.isEmpty())
+            selectItem((String) entryMap.keySet().toArray()[0]);
     }
 
     void selectItem(String name) {

@@ -374,8 +374,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         return view != null && view.isDownloading();
     }
 
-    void setOpacity(float opacity) {
-        optionsPanel.setOpacity(opacity);
+    void setOpacity(float _opacity) { // deliberate, for multiview
+        optionsPanel.setOpacity(_opacity);
     }
 
     GLImage getGLImage() {
