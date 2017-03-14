@@ -50,8 +50,6 @@ public interface TimelineRenderable {
 
     boolean highLightChanged(Point p);
 
-    boolean isEmpty();
-
     boolean hasValueAsString();
 
     String getStringValue(long ts);

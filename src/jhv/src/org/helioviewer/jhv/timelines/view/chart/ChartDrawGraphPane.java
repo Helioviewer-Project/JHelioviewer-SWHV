@@ -203,12 +203,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea) {
         List<TimelineRenderable> list = Timelines.getModel().getAllLineDataSelectorElements();
-        boolean isEmpty = true;
         for (TimelineRenderable el : list) {
             el.draw(plotG, graphArea, DrawController.selectedAxis, mousePosition);
-            isEmpty = isEmpty && el.isEmpty();
         }
-        drawLabels(fullG, graphArea, DrawController.selectedAxis, isEmpty);
+        drawLabels(fullG, graphArea, DrawController.selectedAxis);
         for (TimelineRenderable el : list) {
             el.drawHighlighted(plotG, graphArea, DrawController.selectedAxis, mousePosition);
         }
@@ -219,7 +217,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.fillRect(0, 0, width, height);
     }
 
-    private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, boolean isEmpty) {
+    private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
         Stroke stroke = g.getStroke();
         g.setStroke(thinStroke);
         {
@@ -231,10 +229,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     drawVerticalLabels(g, graphArea, el, ct, el.getYAxis().isHighlighted());
                     ct++;
                 }
-            }
-
-            if (isEmpty) {
-                drawNoData(g, graphArea);
             }
         }
         g.setStroke(stroke);

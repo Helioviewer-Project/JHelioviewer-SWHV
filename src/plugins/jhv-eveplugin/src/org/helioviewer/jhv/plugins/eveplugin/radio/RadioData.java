@@ -51,11 +51,6 @@ public class RadioData extends AbstractTimelineRenderable {
         optionsPanel = new RadioOptionsPanel(cm);
     }
 
-    @Override
-    public boolean isEmpty() {
-        return !isVisible();
-    }
-
     private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
         int[] source = lut2.getLut8();
         return new IndexColorModel(8, source.length, source, 0, false, -1, DataBuffer.TYPE_BYTE);
