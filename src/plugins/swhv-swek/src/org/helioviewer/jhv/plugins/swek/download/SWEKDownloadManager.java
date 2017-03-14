@@ -44,6 +44,16 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private static final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap = new HashMap<>();
     private static final ArrayList<JHVEventType> activeEventTypes = new ArrayList<>();
 
+    private static final SWEKDownloadManager instance = new SWEKDownloadManager();
+
+    public static SWEKDownloadManager getSingletonInstance() {
+        return instance;
+    }
+
+    private SWEKDownloadManager() {
+        JHVEventCache.registerHandler(this);
+    }
+
     private static void stopDownloadingEventType(SWEKEventType eventType, boolean keepActive) {
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
             stopDownloadingEventType(eventType, supplier, keepActive);
