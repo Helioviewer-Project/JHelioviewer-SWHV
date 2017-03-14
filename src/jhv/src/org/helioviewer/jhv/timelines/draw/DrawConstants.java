@@ -47,8 +47,6 @@ public class DrawConstants {
     public static final Font font = UIGlobals.UIFontSmall;
     public static final Font fontBold = UIGlobals.UIFontSmallBold;
 
-    public static final String absentText = "No data";
-
     public static final DecimalFormat valueFormatter = MathUtils.numberFormatter("0", 4);
 
     public static final double DISCARD_LEVEL_LOW = 1e-10;

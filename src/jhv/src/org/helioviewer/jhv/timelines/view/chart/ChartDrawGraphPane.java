@@ -312,16 +312,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private static void drawNoData(Graphics2D g, Rectangle graphArea) {
-        String text = DrawConstants.absentText;
-        int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
-        int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
-        int y = graphArea.y + graphArea.height / 2;
-
-        g.setColor(DrawConstants.LABEL_TEXT_COLOR);
-        g.drawString(text, x, y);
-    }
-
     private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, TimelineRenderable el, int leftSide, boolean highlight) {
         int axis_x_offset = graphArea.x;
         if (leftSide != -1) {
