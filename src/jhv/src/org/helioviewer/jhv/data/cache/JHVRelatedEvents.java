@@ -29,7 +29,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
     private final Color color;
     private boolean highlighted;
 
-    public JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         eventType = event.getJHVEventType();
         color = JHVCacheColors.getNextColor();
         highlighted = false;
@@ -65,7 +65,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return eventType.getEventType().getEventIcon();
     }
 
-    public void merge(JHVRelatedEvents found, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    void merge(JHVRelatedEvents found, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         events.addAll(found.events);
         associations.addAll(found.associations);
 
@@ -84,7 +84,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return eventType;
     }
 
-    public void highlight(boolean isHighlighted) {
+    void highlight(boolean isHighlighted) {
         if (isHighlighted != highlighted) {
             highlighted = isHighlighted;
             fireHighlightChanged();
@@ -118,7 +118,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return events.get(0);
     }
 
-    public void addAssociation(JHVAssociation association) {
+    void addAssociation(JHVAssociation association) {
         associations.add(association);
     }
 
@@ -157,7 +157,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return nEvents;
     }
 
-    public void swapEvent(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    void swapEvent(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         int i = 0;
         while (!events.get(i).getUniqueID().equals(event.getUniqueID())) {
             i++;

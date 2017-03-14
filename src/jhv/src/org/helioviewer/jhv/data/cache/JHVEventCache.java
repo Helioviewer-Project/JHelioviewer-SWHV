@@ -81,7 +81,10 @@ public class JHVEventCache {
     }
 
     public static void eventTypeActivated(JHVEventType eventType) {
-        _eventTypeActivated(eventType);
+        activeEventTypes.add(eventType);
+        if (!downloadedCache.containsKey(eventType)) {
+            downloadedCache.put(eventType, new RequestCache());
+        }
         fireEventCacheChanged();
     }
 
@@ -98,7 +101,6 @@ public class JHVEventCache {
         }
         lastHighlighted = event;
     }
-
 
     public static void add(JHVEvent event) {
         Integer id = event.getUniqueID();
@@ -190,23 +192,13 @@ public class JHVEventCache {
     }
 
     private static void deleteFromCache(JHVEventType eventType) {
-        RequestCache cache = new RequestCache();
-        downloadedCache.put(eventType, cache);
+        downloadedCache.put(eventType, new RequestCache());
         events.remove(eventType);
-
         relEvents.entrySet().removeIf(entry -> entry.getValue().getJHVEventType() == eventType);
     }
 
     public static Collection<Interval> getAllRequestIntervals(JHVEventType eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
-    }
-
-    private static void _eventTypeActivated(JHVEventType eventType) {
-        activeEventTypes.add(eventType);
-        if (!downloadedCache.containsKey(eventType)) {
-            RequestCache cache = new RequestCache();
-            downloadedCache.put(eventType, cache);
-        }
     }
 
     public static void reset(SWEKEventType eventType) {
