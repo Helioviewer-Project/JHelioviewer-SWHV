@@ -5,16 +5,12 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.Transparency;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -27,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.JComponent;
-import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -45,7 +40,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawListener, MouseWheelListener {
+public class ChartDrawGraphPane extends JComponent implements MouseInputListener, MouseWheelListener, ComponentListener, DrawListener {
 
     private enum DragMode {
         MOVIELINE, CHART, NODRAG
@@ -62,20 +57,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private int lastWidth = -1;
     private int lastHeight = -1;
 
-    private boolean toRedraw;
-    private boolean forceRedrawGraph;
+    private boolean redrawGraphArea;
 
     private DragMode dragMode = DragMode.NODRAG;
-
-    // will start on setVisible
-    private final Timer redrawTimer = new Timer(1000 / 20, new RedrawListener());
 
     public ChartDrawGraphPane() {
         setOpaque(true);
         setDoubleBuffered(false);
-
-        toRedraw = false;
-        forceRedrawGraph = false;
 
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -85,25 +73,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         DrawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
     }
 
-    private class RedrawListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (toRedraw) {
-                toRedraw = false;
-                repaint();
-            }
-        }
-    }
-
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {
             ExportMovie.EVEImage = screenImage;
-            redrawTimer.start();
+            DrawController.start();
         } else {
             ExportMovie.EVEImage = null;
-            redrawTimer.stop();
+            DrawController.stop();
         }
     }
 
@@ -140,9 +118,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Rectangle graphArea = DrawController.getGraphArea();
 
         boolean axisHighlightChanged = toggleAxisHightlight(graphArea);
-        if (forceRedrawGraph || axisHighlightChanged) {
+        if (redrawGraphArea || axisHighlightChanged) {
+            redrawGraphArea = false;
             redrawGraph(graphArea);
-            forceRedrawGraph = false;
         }
 
         Graphics2D g = (Graphics2D) g1;
@@ -156,10 +134,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private void updateGraph() {
-        toRedraw = true;
-    }
-
     private void redrawGraph(Rectangle graphArea) {
         Rectangle graphSize = DrawController.getGraphSize();
         int sx = GLInfo.pixelScale[0], sy = GLInfo.pixelScale[1];
@@ -168,11 +142,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (width > 0 && height > 0 && sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + 1) < height && sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + 1) < width) {
             if (width != lastWidth || height != lastHeight) {
-                GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                GraphicsDevice device = env.getDefaultScreenDevice();
-                GraphicsConfiguration config = device.getDefaultConfiguration();
-
-                screenImage = config.createCompatibleImage(width, height, Transparency.OPAQUE);
+                screenImage = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.OPAQUE);
                 ExportMovie.EVEImage = screenImage;
 
                 lastWidth = width;
@@ -433,7 +403,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mouseExited(MouseEvent e) {
         JHVEventCache.highlight(null);
         mousePosition = null;
-        updateGraph();
+        repaint();
     }
 
     @Override
@@ -527,7 +497,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (highlightChanged()) {
             drawRequest();
         } else {
-            updateGraph(); // for timeline values
+            repaint(); // for timeline values
         }
     }
 
@@ -561,13 +531,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawRequest() {
-        forceRedrawGraph = true;
-        updateGraph();
+        redrawGraphArea = true;
+        repaint();
     }
 
     @Override
     public void drawMovieLineRequest() {
-        updateGraph();
+        repaint();
     }
 
 }
