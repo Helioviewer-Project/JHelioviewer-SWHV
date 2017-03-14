@@ -96,10 +96,8 @@ public class CommandLineProcessor {
         LinkedList<String> values = new LinkedList<>();
         if (arguments != null) {
             for (int i = 0; i < arguments.length; i++) {
-                if (param.equals(arguments[i])) {
-                    if (arguments.length > (i + 1)) {
-                        values.add(arguments[i + 1]);
-                    }
+                if (param.equals(arguments[i]) && arguments.length > i + 1) {
+                    values.add(arguments[i + 1]);
                 }
             }
         }

@@ -17,8 +17,8 @@ public class HTTPSocket extends Socket {
     private static final int TIMEOUT_READ = 20000;
     private static final int PORT = 80;
 
-    private int lastUsedPort = 0;
-    private String lastUsedHost = null;
+    private final int lastUsedPort;
+    private final String lastUsedHost;
 
     protected InputStream inputStream;
 

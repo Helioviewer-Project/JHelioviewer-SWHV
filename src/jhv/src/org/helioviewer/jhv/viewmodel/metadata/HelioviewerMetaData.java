@@ -180,9 +180,8 @@ public class HelioviewerMetaData extends AbstractMetaData {
             observedDate = m.get("DATE-OBS");
             if (observedDate == null) {
                 observedDate = m.get("DATE_OBS");
-                if (observedDate != null) {
-                    if (instrument.equals("LASCO"))
-                        observedDate = observedDate.replace('/', '-') + 'T' + m.get("TIME_OBS");
+                if (observedDate != null && instrument.equals("LASCO")) {
+                    observedDate = observedDate.replace('/', '-') + 'T' + m.get("TIME_OBS");
                 }
             }
         }

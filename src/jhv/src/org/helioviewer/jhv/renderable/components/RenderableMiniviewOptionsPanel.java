@@ -22,10 +22,7 @@ class RenderableMiniviewOptionsPanel extends JPanel {
     private static final int MAX = 15;
     int scale = DEFAULT;
 
-    private final RenderableMiniview miniview;
-
-    public RenderableMiniviewOptionsPanel(RenderableMiniview _miniview) {
-        miniview = _miniview;
+    public RenderableMiniviewOptionsPanel(RenderableMiniview miniview) {
         setLayout(new GridBagLayout());
 
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(DEFAULT), Double.valueOf(MIN), Double.valueOf(MAX), Double.valueOf(1)));
