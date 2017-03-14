@@ -95,12 +95,10 @@ public class InteractionAnnotate extends Interaction {
             }
             activeIndex = annotateables.size() - 1;
             Displayer.display();
-        } else if (code == KeyEvent.VK_N) {
-            if (activeIndex >= 0) {
-                activeIndex++;
-                activeIndex %= annotateables.size();
-                Displayer.display();
-            }
+        } else if (code == KeyEvent.VK_N && activeIndex >= 0) {
+            activeIndex++;
+            activeIndex %= annotateables.size();
+            Displayer.display();
         }
     }
 

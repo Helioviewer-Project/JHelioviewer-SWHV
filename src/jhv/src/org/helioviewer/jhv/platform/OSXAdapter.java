@@ -9,7 +9,7 @@ import org.helioviewer.jhv.base.logging.Log;
 
 class OSXAdapter implements InvocationHandler {
 
-    static final boolean JAVA9 = !(Double.parseDouble(System.getProperty("java.specification.version")) < 1.9);
+    static final boolean JAVA9 = Double.parseDouble(System.getProperty("java.specification.version")) >= 1.9;
 
     protected final Object targetObject;
     protected final Method targetMethod;

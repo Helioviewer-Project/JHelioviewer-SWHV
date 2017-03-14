@@ -20,7 +20,8 @@ class BandCache {
     private static final long MILLIS_PER_CHUNK = TimeUtils.DAY_IN_MILLIS * DAYS_PER_CHUNK;
     private static final int MAX_LEVEL = 12;
     private static final int FACTOR_STEP = 2;
-    private boolean hasData = false;
+
+    private boolean hasData;
 
     private final HashMap<Long, DataChunk> cacheMap = new HashMap<>();
 
