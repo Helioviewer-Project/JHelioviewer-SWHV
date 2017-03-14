@@ -164,21 +164,21 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 gplotPart.setTransform(plottf);
                 gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 gplotPart.setFont(DrawConstants.font);
-                drawData(g, gplotPart, graphArea);
+                drawData(g, gplotPart, graphArea, DrawController.selectedAxis);
                 gplotPart.dispose();
             }
             g.dispose();
         }
     }
 
-    private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea) {
+    private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, TimeAxis xAxis) {
         List<TimelineRenderable> list = Timelines.getModel().getAllLineDataSelectorElements();
         for (TimelineRenderable el : list) {
-            el.draw(plotG, graphArea, DrawController.selectedAxis, mousePosition);
+            el.draw(plotG, graphArea, xAxis, mousePosition);
         }
-        drawLabels(fullG, graphArea, DrawController.selectedAxis);
+        drawLabels(fullG, graphArea, xAxis);
         for (TimelineRenderable el : list) {
-            el.drawHighlighted(plotG, graphArea, DrawController.selectedAxis, mousePosition);
+            el.drawHighlighted(plotG, graphArea, xAxis, mousePosition);
         }
     }
 
@@ -187,11 +187,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.fillRect(0, 0, width, height);
     }
 
-    private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
+    private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis) {
         Stroke stroke = g.getStroke();
         g.setStroke(thinStroke);
         {
-            drawHorizontalLabels(g, graphArea, timeAxis);
+            drawHorizontalLabels(g, graphArea, xAxis);
 
             int ct = -1;
             for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
@@ -204,11 +204,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.setStroke(stroke);
     }
 
-    private void drawTimelineValues(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis) {
+    private void drawTimelineValues(Graphics2D g, Rectangle graphArea, TimeAxis xAxis) {
         if (mousePosition == null || !graphArea.contains(mousePosition)) {
             return;
         }
-        long ts = timeAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
+        long ts = xAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
         String lbl = '(' + TimeUtils.utcDateFormat.format(ts);
         int currWidth = 0;
         g.setColor(Color.BLACK);
@@ -246,7 +246,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         long previousDate = Long.MIN_VALUE;
         for (int i = 0; i < horizontalTickCount; ++i) {
             long tickValue = xAxis.start + i * tickDifferenceHorizontal;
-            int x = DrawController.selectedAxis.value2pixel(graphArea.x, graphArea.width, tickValue);
+            int x = xAxis.value2pixel(graphArea.x, graphArea.width, tickValue);
             String tickText;
             if (previousDate == Long.MIN_VALUE) {
                 tickText = DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
