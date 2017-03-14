@@ -4,12 +4,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
-import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
-import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
 import org.helioviewer.jhv.plugins.swek.view.EventTimelineRenderable;
@@ -20,8 +18,6 @@ public class SWEKPlugin implements Plugin {
 
     private static final JPanel swekPanel = new JPanel();
 
-    public static final SWEKDownloadManager downloadManager = new SWEKDownloadManager();
-
     private static final SWEKData swekData = new SWEKData();
     private static final SWEKRenderable renderable = new SWEKRenderable();
     private static final EventTimelineRenderable em = new EventTimelineRenderable();
@@ -31,7 +27,6 @@ public class SWEKPlugin implements Plugin {
         for (SWEKEventType eventType : SWEKConfigurationManager.loadConfiguration()) {
             swekPanel.add(new EventPanel(eventType));
         }
-        JHVEventCache.registerHandler(downloadManager);
     }
 
     @Override
