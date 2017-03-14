@@ -56,7 +56,7 @@ public class JHVEventCache {
         handler.newEventsReceived();
     }
 
-    public static void finishedDownload(boolean partially) {
+    public static void finishedDownload() {
         fireEventCacheChanged();
     }
 
