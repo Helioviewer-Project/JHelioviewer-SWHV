@@ -26,11 +26,6 @@ public abstract class AbstractTimelineRenderable implements TimelineRenderable {
     }
 
     @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
     public boolean highLightChanged(Point p) {
         return false;
     }
