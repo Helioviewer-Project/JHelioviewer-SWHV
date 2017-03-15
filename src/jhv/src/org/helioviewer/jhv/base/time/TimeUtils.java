@@ -18,7 +18,6 @@ public class TimeUtils {
 
     public static final FastDateFormat utcDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss", UTC);
     public static final FastDateFormat sqlDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss", UTC);
-    public static final FastDateFormat apiDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'", UTC);
 
     public static final FastDateFormat filenameDateFormat = FastDateFormat.getInstance("yyyy-MM-dd_HH.mm.ss");
     public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
@@ -30,6 +29,10 @@ public class TimeUtils {
 
     public static String format(long milli) {
         return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+    }
+
+    public static String formatUTC(long milli) {
+        return DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(milli));
     }
 
     public static long parse(String date) {

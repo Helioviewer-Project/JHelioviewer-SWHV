@@ -32,11 +32,11 @@ public class APIRequest {
         String jpipReq, fileReq;
         if (startTime == endTime) {
             fileReq = DataSources.getServerSetting(server, "API.getJP2Image") + "sourceId=" + Integer.toString(sourceId) +
-                                                   "&date=" + TimeUtils.apiDateFormat.format(startTime) + "&json=true";
+                                                   "&date=" + TimeUtils.formatUTC(startTime) + "&json=true";
             jpipReq = fileReq + "&jpip=true";
         } else {
             fileReq = DataSources.getServerSetting(server, "API.getJPX") + "sourceId=" + Integer.toString(sourceId) +
-                                                   "&startTime=" + TimeUtils.apiDateFormat.format(startTime) + "&endTime=" + TimeUtils.apiDateFormat.format(endTime);
+                                                   "&startTime=" + TimeUtils.formatUTC(startTime) + "&endTime=" + TimeUtils.formatUTC(endTime);
             if (cadence != CADENCE_ANY) {
                 fileReq += "&cadence=" + Integer.toString(cadence);
             }
