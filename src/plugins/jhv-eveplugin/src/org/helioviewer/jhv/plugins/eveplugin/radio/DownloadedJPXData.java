@@ -60,7 +60,7 @@ class DownloadedJPXData implements ImageDataHandler {
                     return;
                 }
             } catch (Exception e) {
-                Log.error("Some of the metadata could not be read: " + _view.getURI());
+                Log.error("Some of the metadata could not be read: " + _view.getURI() + " " + e);
             }
             _view.abolish();
         }
