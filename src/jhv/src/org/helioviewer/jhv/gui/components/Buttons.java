@@ -2,13 +2,12 @@ package org.helioviewer.jhv.gui.components;
 
 import java.awt.Font;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 public class Buttons {
 
     private static String uc2ent(MaterialDesign uc) {
-        return StringEscapeUtils.escapeHtml4(String.valueOf(uc.code));
+        return String.valueOf(uc.code);
     }
 
     public static Font getMaterialFont(float size) {
