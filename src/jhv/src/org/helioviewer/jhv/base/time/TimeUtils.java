@@ -1,7 +1,8 @@
 package org.helioviewer.jhv.base.time;
 
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
@@ -17,8 +18,8 @@ public class TimeUtils {
 
     public static final FastDateFormat utcDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss", UTC);
     public static final FastDateFormat sqlDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss", UTC);
-    public static final FastDateFormat utcFullDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS", UTC);
     public static final FastDateFormat apiDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'", UTC);
+
     public static final FastDateFormat filenameDateFormat = FastDateFormat.getInstance("yyyy-MM-dd_HH.mm.ss");
     public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
     public static final FastDateFormat dateFormat = FastDateFormat.getInstance("yyyy-MM-dd");
@@ -26,6 +27,10 @@ public class TimeUtils {
     public static final JHVDate EPOCH = new JHVDate("2000-01-01T00:00:00");
     public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = new JHVDate("2050-01-01T00:00:00");
+
+    public static String format(long milli) {
+        return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+    }
 
     public static long parse(String date) {
         return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();

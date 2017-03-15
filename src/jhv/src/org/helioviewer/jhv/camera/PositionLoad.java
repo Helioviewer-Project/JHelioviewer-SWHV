@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.text.ParseException;
 import java.util.Iterator;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -16,7 +15,6 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class PositionLoad {
@@ -57,9 +55,8 @@ public class PositionLoad {
         }
 
         private String buildURL(long deltat) {
-            return baseURL + "abcorr=LT%2BS&utc=" + TimeUtils.utcFullDateFormat.format(start) +
-                   "&utc_end=" + TimeUtils.utcFullDateFormat.format(end) + "&deltat=" + deltat +
-                   "&observer=" + obs + "&target=" + target + "&ref=HEEQ&kind=latitudinal";
+            return baseURL + "abcorr=LT%2BS&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) +
+                   "&deltat=" + deltat + "&observer=" + obs + "&target=" + target + "&ref=HEEQ&kind=latitudinal";
         }
 
         @Override
@@ -82,23 +79,23 @@ public class PositionLoad {
                 Log.debug("Unknown host, network down?", e);
             } catch (IOException e) {
                 report = FAILEDSTATE + ": server error";
-            } catch (JSONException | ParseException | NumberFormatException e) {
-                report = FAILEDSTATE + ": JSON parse error";
+            } catch (Exception e) {
+                report = FAILEDSTATE + ": JSON parse error: " + e;
             }
 
             return null;
         }
 
-        private Position.L[] parseData(JSONObject jsonResult) throws JSONException, ParseException {
+        private Position.L[] parseData(JSONObject jsonResult) throws Exception {
             JSONArray resArray = jsonResult.getJSONArray("result");
-            int resLength = resArray.length();
-            Position.L[] ret = new Position.L[resLength];
+            int len = resArray.length();
+            Position.L[] ret = new Position.L[len];
 
-            for (int j = 0; j < resLength; j++) {
+            for (int j = 0; j < len; j++) {
                 JSONObject posObject = resArray.getJSONObject(j);
                 Iterator<String> iterKeys = posObject.keys();
                 if (!iterKeys.hasNext())
-                    throw new JSONException("unexpected format");
+                    throw new Exception("unexpected format");
 
                 String dateString = iterKeys.next();
                 JSONArray posArray = posObject.getJSONArray(dateString);
@@ -108,7 +105,7 @@ public class PositionLoad {
                 double lon = jlon + (jlon > 0 ? -Math.PI : Math.PI);
                 double lat = -posArray.getDouble(2);
 
-                JHVDate time = new JHVDate(TimeUtils.utcFullDateFormat.parse(dateString).getTime());
+                JHVDate time = new JHVDate(dateString);
                 Position.L p = Sun.getEarth(time);
 
                 ret[j] = new Position.L(time, rad, -lon + p.lon, lat);
