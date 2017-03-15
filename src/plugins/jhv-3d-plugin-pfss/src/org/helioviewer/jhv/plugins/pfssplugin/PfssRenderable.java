@@ -35,7 +35,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
                 pfssData.init(gl);
             if (pfssData.isInit()) {
                 pfssData.display(gl);
-                datetime = pfssData.getDateString();
+                datetime = pfssData.getDateObs();
                 ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
             }
             previousPfssData = pfssData;

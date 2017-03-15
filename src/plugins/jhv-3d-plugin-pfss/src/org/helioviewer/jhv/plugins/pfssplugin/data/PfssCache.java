@@ -25,7 +25,7 @@ public class PfssCache {
             swapped = false;
             j++;
             for (int i = 0; i < numberOfElementsInCache - j; i++) {
-                if (data[i].getTime() > data[i + 1].getTime()) {
+                if (data[i].time > data[i + 1].time) {
                     PfssData tmp = data[i];
                     data[i] = data[i + 1];
                     data[i + 1] = tmp;
@@ -38,23 +38,22 @@ public class PfssCache {
     public PfssData getData(long timestamp) {
         if (numberOfElementsInCache <= 0)
             return null;
+
         int found = binarySearch(timestamp);
-        if (found < 0) {
-            if (-found < numberOfElementsInCache) {
-                if (-found - 1 >= 0) {
-                    long diff1 = Math.abs(data[-found - 1].getTime() - timestamp);
-                    long diff2 = Math.abs(data[-found].getTime() - timestamp);
-                    if (diff1 < diff2) {
-                        return data[-found - 1];
-                    }
-                }
-                return data[-found];
-            } else {
-                return data[numberOfElementsInCache - 1];
-            }
-        } else {
+        if (found >= 0)
             return data[found];
+
+        if (-found >= numberOfElementsInCache)
+            return data[numberOfElementsInCache - 1];
+
+        if (-found - 1 >= 0) {
+            long diff1 = Math.abs(data[-found - 1].time - timestamp);
+            long diff2 = Math.abs(data[-found].time - timestamp);
+            if (diff1 < diff2) {
+                return data[-found - 1];
+            }
         }
+        return data[-found];
     }
 
     private int binarySearch(long timestamp) {
@@ -63,7 +62,7 @@ public class PfssCache {
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
-            long midVal = data[mid].getTime();
+            long midVal = data[mid].time;
 
             if (midVal < timestamp)
                 low = mid + 1;

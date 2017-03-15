@@ -7,12 +7,10 @@ import java.nio.FloatBuffer;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
-import nom.tam.fits.Header;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
@@ -36,16 +34,12 @@ public class PfssData {
 
     private boolean lastFixedColor;
 
-    private String dateString;
-    private final long time;
+    private String dateObs;
+    final long time;
 
     public PfssData(byte[] _gzipFitsFile, long _time) {
         gzipFitsFile = _gzipFitsFile;
         time = _time;
-    }
-
-    public long getTime() {
-        return time;
     }
 
     private void readFitsFile() {
@@ -60,10 +54,10 @@ public class PfssData {
     }
 
     private int addColor(Color color, int counter) {
-        vertices.put(color.getRed() / 255.f);
-        vertices.put(color.getGreen() / 255.f);
-        vertices.put(color.getBlue() / 255.f);
-        vertices.put(color.getAlpha() / 255.f);
+        vertices.put(color.getRed() / 255f);
+        vertices.put(color.getGreen() / 255f);
+        vertices.put(color.getBlue() / 255f);
+        vertices.put(color.getAlpha() / 255f);
         return ++counter;
     }
 
@@ -76,9 +70,9 @@ public class PfssData {
 
     private int addColor(double bright, float opacity, int countercolor) {
         if (bright > 0) {
-            return addColor(new Color(1.f, (float) (1. - bright), (float) (1. - bright), opacity), countercolor);
+            return addColor(new Color(1f, (float) (1. - bright), (float) (1. - bright), opacity), countercolor);
         } else {
-            return addColor(new Color((float) (1. + bright), (float) (1. + bright), 1.f, opacity), countercolor);
+            return addColor(new Color((float) (1. + bright), (float) (1. + bright), 1f, opacity), countercolor);
         }
     }
 
@@ -97,15 +91,13 @@ public class PfssData {
             short[] fieldlinez = (short[]) bhdu.getColumn("FIELDLINEz");
             short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
 
-            Header header = bhdu.getHeader();
-            String date = header.findKey("DATE-OBS");
-            if (date == null)
+            dateObs = bhdu.getHeader().getStringValue("DATE-OBS");
+            if (dateObs == null)
                 throw new Exception("DATE-OBS not found");
-            dateString = date.substring(11, 30);
 
             createBuffer(fieldlinex.length);
 
-            Position.L p = Sun.getEarth(new JHVDate(TimeUtils.utcDateFormat.parse(dateString).getTime()));
+            Position.L p = Sun.getEarth(new JHVDate(dateObs));
             double sphi = Math.sin(p.lon), cphi = Math.cos(p.lon);
 
             int counter = 0;
@@ -157,7 +149,7 @@ public class PfssData {
                     } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
                         counter = addVertex((float) x, (float) z, (float) -y, counter);
                         if (!PfssSettings.fixedColor) {
-                            counter = addColor(bright, 1.f, counter);
+                            counter = addColor(bright, 1, counter);
                         } else {
                             if (type == 0) {
                                 counter = addColor(LOOPCOLOR, counter);
@@ -251,8 +243,8 @@ public class PfssData {
         init = _init;
     }
 
-    public String getDateString() {
-        return dateString;
+    public String getDateObs() {
+        return dateObs;
     }
 
 }
