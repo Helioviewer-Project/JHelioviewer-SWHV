@@ -3,11 +3,7 @@ package org.helioviewer.jhv.timelines.draw;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashSet;
-
-import javax.swing.Timer;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -294,34 +290,34 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
         }
     }
 
+    private static boolean stopped;
     private static boolean toDraw;
     private static boolean drawMovieLine;
-    private static final Timer drawTimer = new Timer(1000 / 20, new RedrawListener());
 
-    private static class RedrawListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (toDraw) {
-                toDraw = false;
-                for (DrawListener l : listeners) {
-                    l.drawRequest();
-                }
+    public static void draw() {
+        if (stopped)
+            return;
+
+        if (toDraw) {
+            toDraw = false;
+            for (DrawListener l : listeners) {
+                l.drawRequest();
             }
-            if (drawMovieLine) {
-                drawMovieLine = false;
-                for (DrawListener l : listeners) {
-                    l.drawMovieLineRequest();
-                }
+        }
+        if (drawMovieLine) {
+            drawMovieLine = false;
+            for (DrawListener l : listeners) {
+                l.drawMovieLineRequest();
             }
         }
     }
 
     public static void start() {
-        drawTimer.start();
+        stopped = false;
     }
 
     public static void stop() {
-        drawTimer.stop();
+        stopped = true;
     }
 
 }
