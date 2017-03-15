@@ -41,5 +41,4 @@ local.properties
 hs_err_pid*
 .location
 *.new
-availability/
 build/builds
