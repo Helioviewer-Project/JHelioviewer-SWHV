@@ -41,6 +41,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
 
@@ -499,6 +500,9 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
                 frameRate = f;
                 ImageViewerGui.getFramerateStatusPanel().update(f);
             }
+
+            //EventQueue.invokeLater(DrawController::draw);
+            DrawController.draw();
         }
 
     }
