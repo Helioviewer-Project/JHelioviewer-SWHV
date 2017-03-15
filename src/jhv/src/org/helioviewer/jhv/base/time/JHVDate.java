@@ -15,7 +15,7 @@ public class JHVDate implements Comparable<JHVDate> {
         if (_milli < 0)
             throw new IllegalArgumentException("Argument cannot be negative");
         milli = _milli;
-        string = TimeUtils.utcDateFormat.format(milli);
+        string = TimeUtils.format(milli);
     }
 
     @Override
