@@ -1,13 +1,10 @@
 package org.helioviewer.jhv.plugins.pfssplugin.data;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -57,20 +54,17 @@ public class PfssNewDataLoader implements Runnable {
 
             if (urls == null || urls.isEmpty()) {
                 urls = new ArrayList<>();
-                String m = (startMonth) < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
+                String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
                 String url = PfssSettings.baseURL + startYear + '/' + m + "/list.txt";
 
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(url).getInput(), StandardCharsets.UTF_8))) {
                     String inputLine;
                     while ((inputLine = in.readLine()) != null) {
                         String[] splitted = inputLine.split(" ");
-                        Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
-                        urls.add(new Pair<>(splitted[1], dd.getTime()));
+                        urls.add(new Pair<>(splitted[1], TimeUtils.parse(splitted[0])));
                     }
-                } catch (IOException e) {
-                    Log.warn("Could not read PFSS entries: " + url);
-                } catch (ParseException e) {
-                    Log.warn("Could not parse date time during PFSS loading");
+                } catch (Exception e) {
+                    Log.warn("Could not read PFSS entries: " + url + " " + e);
                 }
             }
 
