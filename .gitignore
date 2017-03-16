@@ -1,0 +1,45 @@
+# eclipse files
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+.project
+.externalToolBuilders/
+*.launch
+.classpath
+.factorypath
+.buildpath
+.target
+.tern-project
+.texlipse
+.springBeans
+.recommenders/
+.cache-main
+.scala_dependencies
+.worksheet
+
+# common java files
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.snap
+*.index
+
+# other files
+hs_err_pid*
+.location
+*.new
+availability/
+build/builds
