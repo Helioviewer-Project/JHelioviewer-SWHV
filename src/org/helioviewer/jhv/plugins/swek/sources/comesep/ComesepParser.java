@@ -37,7 +37,7 @@ public class ComesepParser implements SWEKParser {
                 if (!value.isEmpty()) {
                     if (lowKey.equals("atstrongest")) {
                         try {
-                            value = TimeUtils.apiDateFormat.format(Long.parseLong(value) * 1000L);
+                            value = TimeUtils.format(Long.parseLong(value) * 1000L);
                         } catch (Exception ignore) {
                         }
                     }

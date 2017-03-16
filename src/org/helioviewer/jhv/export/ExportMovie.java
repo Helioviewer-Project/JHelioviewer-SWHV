@@ -112,7 +112,7 @@ public class ExportMovie implements FrameListener {
         grabber = new GLGrab(canvasWidth, canvasHeight);
         ImageViewerGui.getGLListener().attachExport(instance);
 
-        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(System.currentTimeMillis());
+        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {
             try {
                 exporter = new PNGExporter();
