@@ -17,8 +17,6 @@ public class TimeUtils {
     public static final long DAY_IN_MILLIS = 86400000;
     public static final long MINUTE_IN_MILLIS = 60000;
 
-    public static final FastDateFormat sqlDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss", UTC);
-
     public static final FastDateFormat filenameDateFormat = FastDateFormat.getInstance("yyyy-MM-dd_HH.mm.ss");
     public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
     public static final FastDateFormat dateFormat = FastDateFormat.getInstance("yyyy-MM-dd");

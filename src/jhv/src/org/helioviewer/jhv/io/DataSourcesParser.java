@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.text.ParseException;
 import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -21,7 +20,7 @@ public class DataSourcesParser {
         rootNode = new DefaultMutableTreeNode(server);
     }
 
-    void parse(JSONObject json) throws ParseException {
+    void parse(JSONObject json) throws Exception {
         parse(rootNode, json, null);
     }
 
@@ -33,7 +32,7 @@ public class DataSourcesParser {
         return str1 + ' ' + str2;
     }
 
-    private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) throws ParseException {
+    private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) throws Exception {
         TreeSet<String> sorted = new TreeSet<>(JHVGlobals.alphanumComparator);
         sorted.addAll(root.keySet());
 
@@ -44,8 +43,20 @@ public class DataSourcesParser {
                 continue;
 
             if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
-                long start = TimeUtils.sqlDateFormat.parse(json.getString("start")).getTime();
-                long end = TimeUtils.sqlDateFormat.parse(json.getString("end")).getTime();
+                long start = TimeUtils.MINIMAL_DATE.milli;
+                try {
+                    start = TimeUtils.parseSQL(json.getString("start"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                long end = TimeUtils.MAXIMAL_DATE.milli;
+                try {
+                    end = TimeUtils.parseSQL(json.getString("end"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 String description = json.getString("description") + " [" + TimeUtils.dateFormat.format(start) + " : " + TimeUtils.dateFormat.format(end) + ']';
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
                                                                                  description, json.getInt("sourceId"), start, end,
