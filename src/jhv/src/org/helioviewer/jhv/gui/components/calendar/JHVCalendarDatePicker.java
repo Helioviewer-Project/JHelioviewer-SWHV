@@ -8,9 +8,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 
@@ -48,7 +46,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
         setLayout(new BorderLayout());
 
         // set up text field
-        textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));
+        textField.setText(TimeUtils.formatDate(calendar.getTime().getTime()));
         textField.addFocusListener(this);
         textField.addKeyListener(new KeyAdapter() {
             @Override
@@ -121,10 +119,9 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
 
     private void setDateFromTextField() {
         try {
-            Date date = TimeUtils.dateFormat.parse(textField.getText());
-            setTime(date.getTime());
-        } catch (ParseException e) {
-            textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));
+            setTime(TimeUtils.parseDate(textField.getText()));
+        } catch (Exception e) {
+            textField.setText(TimeUtils.formatDate(calendar.getTime().getTime()));
         }
         informAllJHVCalendarListeners();
     }
@@ -195,7 +192,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
     public void setTime(long time) {
         if (time > TimeUtils.MINIMAL_DATE.milli && time < TimeUtils.MAXIMAL_DATE.milli)
             calendar.setTimeInMillis(time);
-        textField.setText(TimeUtils.dateFormat.format(calendar.getTime()));
+        textField.setText(TimeUtils.formatDate(calendar.getTime().getTime()));
     }
 
     /**

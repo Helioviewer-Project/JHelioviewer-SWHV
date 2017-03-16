@@ -57,7 +57,7 @@ public class DataSourcesParser {
                     e.printStackTrace();
                 }
 
-                String description = json.getString("description") + " [" + TimeUtils.dateFormat.format(start) + " : " + TimeUtils.dateFormat.format(end) + ']';
+                String description = json.getString("description") + " [" + TimeUtils.formatDate(start) + " : " + TimeUtils.formatDate(end) + ']';
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
                                                                                  description, json.getInt("sourceId"), start, end,
                                                                                  json.optBoolean("default", false));
