@@ -43,16 +43,18 @@ public class DataSourcesParser {
                 continue;
 
             if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
+                String iso = json.getString("start").replace(' ', 'T');
                 long start = TimeUtils.MINIMAL_DATE.milli;
                 try {
-                    start = TimeUtils.parseSQL(json.getString("start"));
+                    start = TimeUtils.parse(iso);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
+                iso = json.getString("end").replace(' ', 'T');
                 long end = TimeUtils.MAXIMAL_DATE.milli;
                 try {
-                    end = TimeUtils.parseSQL(json.getString("end"));
+                    end = TimeUtils.parse(iso);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -48,10 +48,6 @@ public class TimeUtils {
         return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
     }
 
-    public static long parseSQL(String date) {
-        return LocalDateTime.parse(date, sqlFormatter).toInstant(ZERO).toEpochMilli();
-    }
-
     public static long parseDate(String date) {
         return LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE).toEpochDay() * DAY_IN_MILLIS;
     }
