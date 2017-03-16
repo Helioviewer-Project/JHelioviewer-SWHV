@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.components.base;
 
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.text.ParseException;
 
 import javax.swing.JTextField;
 
@@ -18,7 +17,7 @@ public class TimeTextField extends JTextField {
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                setText(TimeUtils.timeDateFormat.format(getTime()));
+                setText(TimeUtils.formatTime(getTime()));
             }
         });
     }
@@ -26,17 +25,17 @@ public class TimeTextField extends JTextField {
     public long getTime() {
         String time = getText();
         try {
-            return TimeUtils.timeDateFormat.parse(time).getTime();
-        } catch (ParseException e) {
+            return TimeUtils.parseTime(time);
+        } catch (Exception e1) {
             try {
-                return TimeUtils.timeDateFormat.parse(time + ":00").getTime();
-            } catch (ParseException e2) {
+                return TimeUtils.parseTime(time + ":00");
+            } catch (Exception e2) {
                 try {
-                    return TimeUtils.timeDateFormat.parse(time + ":00:00").getTime();
-                } catch (ParseException e3) {
+                    return TimeUtils.parseTime(time + ":00:00");
+                } catch (Exception e3) {
                     try {
-                        return TimeUtils.timeDateFormat.parse(defaultTime).getTime();
-                    } catch (ParseException e4) {
+                        return TimeUtils.parseTime(defaultTime);
+                    } catch (Exception e4) {
                         return 0;
                     }
                 }
