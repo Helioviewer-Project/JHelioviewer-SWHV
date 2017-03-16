@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +22,6 @@ import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 @SuppressWarnings("unchecked")
@@ -61,9 +59,9 @@ public class HEKDownloader extends SWEKDownloader {
             long archiv;
             ArrayList<JHVDatabaseParam> paramList = new ArrayList<>();
             try {
-                start = TimeUtils.utcDateFormat.parse(result.getString("event_starttime")).getTime();
-                end = TimeUtils.utcDateFormat.parse(result.getString("event_endtime")).getTime();
-                archiv = TimeUtils.utcDateFormat.parse(result.getString("kb_archivdate")).getTime();
+                start = TimeUtils.parse(result.getString("event_starttime"));
+                end = TimeUtils.parse(result.getString("event_endtime"));
+                archiv = TimeUtils.parse(result.getString("kb_archivdate"));
                 uid = result.getString("kb_archivid");
 
                 HashMap<String, String> dbFields = type.getEventType().getAllDatabaseFields();
@@ -87,7 +85,7 @@ public class HEKDownloader extends SWEKDownloader {
                         }
                     }
                 }
-            } catch (JSONException | ParseException e) {
+            } catch (Exception e) {
                 return false;
             }
 
@@ -117,11 +115,11 @@ public class HEKDownloader extends SWEKDownloader {
         baseURL.append("cmd=search&type=column&");
         baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(eventType.getEventName())).append('&');
         baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
-        baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.utcDateFormat.format(end)).append('&');
+        baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.format(end)).append('&');
         baseURL = appendParams(baseURL, params);
-        baseURL.append("event_starttime=").append(TimeUtils.utcDateFormat.format(start)).append('&');
+        baseURL.append("event_starttime=").append(TimeUtils.format(start)).append('&');
         long max = Math.max(System.currentTimeMillis(), end);
-        baseURL.append("event_endtime=").append(TimeUtils.utcDateFormat.format(max)).append('&');
+        baseURL.append("event_endtime=").append(TimeUtils.format(max)).append('&');
         baseURL.append("page=").append(page);
         return baseURL.toString();
     }
