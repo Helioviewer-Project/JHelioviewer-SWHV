@@ -26,10 +26,10 @@ class EventDescriptionPanel extends JPanel implements MouseListener {
 
         JLabel labelIcon = new JLabel(revent.getIcon());
 
-        JTextArea textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.start));
+        JTextArea textStartTime = new JTextArea(TimeUtils.format(event.start));
         textStartTime.setOpaque(false);
 
-        JTextArea textEndTime = new JTextArea(TimeUtils.utcDateFormat.format(event.end));
+        JTextArea textEndTime = new JTextArea(TimeUtils.format(event.end));
         textEndTime.setOpaque(false);
 
         addMouseListener(this);
