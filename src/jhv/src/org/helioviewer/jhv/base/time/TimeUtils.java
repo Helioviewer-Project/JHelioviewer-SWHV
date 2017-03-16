@@ -19,7 +19,6 @@ public class TimeUtils {
 
     public static final FastDateFormat filenameDateFormat = FastDateFormat.getInstance("yyyy-MM-dd_HH.mm.ss");
     public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
-    public static final FastDateFormat dateFormat = FastDateFormat.getInstance("yyyy-MM-dd");
 
     public static final JHVDate EPOCH = new JHVDate("2000-01-01T00:00:00");
     public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
@@ -37,12 +36,20 @@ public class TimeUtils {
         return sqlFormatter.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
     }
 
+    public static String formatDate(long milli) {
+        return DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+    }
+
     public static long parse(String date) {
         return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
     }
 
     public static long parseSQL(String date) {
         return LocalDateTime.parse(date, sqlFormatter).toInstant(ZERO).toEpochMilli();
+    }
+
+    public static long parseDate(String date) {
+        return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE).toInstant(ZERO).toEpochMilli();
     }
 
 }
