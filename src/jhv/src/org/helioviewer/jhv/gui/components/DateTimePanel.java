@@ -41,10 +41,8 @@ public class DateTimePanel extends JPanel implements ActionListener, JHVCalendar
 
     public void setTime(long time) {
         long timeDate = time - time % TimeUtils.DAY_IN_MILLIS;
-        String timeText = TimeUtils.timeDateFormat.format(time);
-
         datePicker.setTime(timeDate);
-        timePicker.setText(timeText);
+        timePicker.setText(TimeUtils.formatTime(time));
     }
 
     public void addListener(ActionListener l) {

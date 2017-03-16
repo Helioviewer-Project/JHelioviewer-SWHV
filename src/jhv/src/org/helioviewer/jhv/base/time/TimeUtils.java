@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.base.time;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
@@ -18,7 +20,6 @@ public class TimeUtils {
     public static final long MINUTE_IN_MILLIS = 60000;
 
     public static final FastDateFormat filenameDateFormat = FastDateFormat.getInstance("yyyy-MM-dd_HH.mm.ss");
-    public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
 
     public static final JHVDate EPOCH = new JHVDate("2000-01-01T00:00:00");
     public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
@@ -40,6 +41,10 @@ public class TimeUtils {
         return DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
     }
 
+    public static String formatTime(long milli) {
+        return DateTimeFormatter.ISO_LOCAL_TIME.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+    }
+
     public static long parse(String date) {
         return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
     }
@@ -49,7 +54,11 @@ public class TimeUtils {
     }
 
     public static long parseDate(String date) {
-        return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE).toInstant(ZERO).toEpochMilli();
+        return LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE).toEpochDay() * DAY_IN_MILLIS;
+    }
+
+    public static long parseTime(String date) {
+        return LocalTime.parse(date, DateTimeFormatter.ISO_LOCAL_TIME).toSecondOfDay() * 1000L;
     }
 
 }
