@@ -79,9 +79,8 @@ public class DataSources {
         }
     };
 
-    public static String[] getServers() {
-        Set<String> set = serverSettings.keySet();
-        return set.toArray(new String[set.size()]);
+    public static Set<String> getServers() {
+        return serverSettings.keySet();
     }
 
     public static String getServerSetting(String server, String setting) {
