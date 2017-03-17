@@ -71,7 +71,7 @@ public class DataSourcesTree extends JTree {
             String serverName = entry.getKey();
             HashMap<String, String> serverProperties = entry.getValue();
 
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Item(serverName, serverProperties.get("default.label")));
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Item(serverName, serverProperties.get("label")));
             nodes.put(serverName, node);
             nodeRoot.add(node);
         }
