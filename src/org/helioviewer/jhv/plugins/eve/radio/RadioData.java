@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.radio;
+package org.helioviewer.jhv.plugins.eve.radio;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -22,7 +22,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIRequestManager;
-import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
