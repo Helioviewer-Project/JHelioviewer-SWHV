@@ -26,7 +26,7 @@ local.properties
 # common java files
 *.class
 *.log
-*.jar
+JHelioviewer.jar
 *.war
 *.ear
 *.zip
