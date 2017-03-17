@@ -20,6 +20,9 @@ import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.LoadStartup;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.plugins.eve.EVEPlugin;
+import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
+import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.viewmodel.metadata.AIAResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
@@ -100,9 +103,9 @@ public class JHelioviewer {
                     Log.info("Do not load plugins");
                 } else {
                     Log.info("Load bundled plugins");
-                    JHVLoader.loadBundledPlugin("EVEPlugin.jar");
-                    JHVLoader.loadBundledPlugin("SWEKPlugin.jar");
-                    JHVLoader.loadBundledPlugin("PfssPlugin.jar");
+                      PluginManager.getSingletonInstance().addPlugin(new EVEPlugin() , "Eve");
+                      PluginManager.getSingletonInstance().addPlugin(new SWEKPlugin() , "SWEK");
+                      PluginManager.getSingletonInstance().addPlugin(new PfssPlugin() , "Pfss");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
