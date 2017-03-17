@@ -43,3 +43,4 @@ hs_err_pid*
 *.new
 availability/
 build/builds
+*.DS_Store
