@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,15 +7,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.SchemaLoader;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.TimeUtils;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 @SuppressWarnings("serial")
 public class DataSources {
@@ -108,18 +99,8 @@ public class DataSources {
             server = "ROB";
         Settings.getSingletonInstance().setProperty("default.server", server);
 
-        for (String serverName : serverSettings.keySet()) {
-            try (InputStream is = FileUtils.getResourceInputStream(getServerSetting(serverName, "schema"))) {
-                JSONObject rawSchema = new JSONObject(new JSONTokener(is));
-                SchemaLoader schemaLoader = SchemaLoader.builder().schemaJson(rawSchema).addFormatValidator(new TimeUtils.SQLDateTimeFormatValidator()).build();
-                Schema schema = schemaLoader.load().build();
-
-                DataSourcesTask loadTask = new DataSourcesTask(serverName, schema);
-                JHVGlobals.getExecutorService().execute(loadTask);
-            } catch (IOException e) {
-                Log.error("Could not load the JSON schema: ", e);
-            }
-        }
+        for (String serverName : serverSettings.keySet())
+            JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName));
     }
 
 }
