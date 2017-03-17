@@ -29,7 +29,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
     }
 
     @Override
-    protected Void backgroundWork() throws Exception {
+    protected Void backgroundWork() {
         while (true) {
             Schema schema = null;
             try (InputStream is = FileUtils.getResourceInputStream(schemaName)) {

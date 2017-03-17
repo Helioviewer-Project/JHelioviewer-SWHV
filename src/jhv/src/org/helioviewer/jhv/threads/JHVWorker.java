@@ -15,7 +15,7 @@ public abstract class JHVWorker<T, V> extends SwingWorker<T, V> {
     }
 
     @Override
-    protected T doInBackground() throws Exception {
+    protected T doInBackground() {
         String currentName = Thread.currentThread().getName();
         if (name != null)
             Thread.currentThread().setName("JHVWorker-" + name);
@@ -28,6 +28,6 @@ public abstract class JHVWorker<T, V> extends SwingWorker<T, V> {
         return ret;
     }
 
-    protected abstract T backgroundWork() throws Exception;
+    protected abstract T backgroundWork();
 
 }
