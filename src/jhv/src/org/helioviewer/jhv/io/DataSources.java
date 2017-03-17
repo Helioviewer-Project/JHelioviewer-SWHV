@@ -15,6 +15,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -110,7 +111,8 @@ public class DataSources {
         for (String serverName : serverSettings.keySet()) {
             try (InputStream is = FileUtils.getResourceInputStream(getServerSetting(serverName, "schema"))) {
                 JSONObject rawSchema = new JSONObject(new JSONTokener(is));
-                Schema schema = SchemaLoader.load(rawSchema);
+                SchemaLoader schemaLoader = SchemaLoader.builder().schemaJson(rawSchema).addFormatValidator(new TimeUtils.SQLDateTimeFormatValidator()).build();
+                Schema schema = schemaLoader.load().build();
 
                 DataSourcesTask loadTask = new DataSourcesTask(serverName, schema);
                 JHVGlobals.getExecutorService().execute(loadTask);

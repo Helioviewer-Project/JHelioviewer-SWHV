@@ -24,8 +24,8 @@
                 "nickname": { "type":  "string" },
                 "sourceId": { "type":  "integer" },
                 "layeringOrder": { "type":  "integer" },
-                "start": { "type":  "string" },
-                "end": { "type":  "string" },
+                "start": { "format":  "sql-date-time" },
+                "end": { "format":  "sql-date-time" },
                 "children": {
                     "$ref": "#/definitions/root_part"
                 },

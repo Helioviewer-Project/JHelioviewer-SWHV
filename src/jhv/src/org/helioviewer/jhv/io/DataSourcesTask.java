@@ -28,6 +28,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
         while (true) {
             try {
                 JSONObject json = JSONUtils.getJSONStream(new DownloadStream(url).getInput());
+                // json.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").getJSONObject("174").put("start", "1968-06-01 00:06:32");
                 schema.validate(json);
                 parser.parse(json);
                 return null;
