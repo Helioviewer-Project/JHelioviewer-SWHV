@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.pfssplugin;
+package org.helioviewer.jhv.plugins.pfss;
 
 public class PfssSettings {
 

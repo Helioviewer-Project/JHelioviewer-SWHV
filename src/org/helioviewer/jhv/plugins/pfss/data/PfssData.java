@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.pfssplugin.data;
+package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
@@ -11,7 +11,7 @@ import nom.tam.fits.Fits;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
+import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;

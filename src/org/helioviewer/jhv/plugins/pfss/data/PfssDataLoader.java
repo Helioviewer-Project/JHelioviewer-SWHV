@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.pfssplugin.data;
+package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.awt.EventQueue;
 import java.io.BufferedInputStream;
@@ -12,8 +12,8 @@ import java.io.OutputStream;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.DownloadStream;
-import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
-import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
+import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
+import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
 class PfssDataLoader implements Runnable {
 

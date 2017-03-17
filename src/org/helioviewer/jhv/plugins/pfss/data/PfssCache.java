@@ -1,6 +1,6 @@
-package org.helioviewer.jhv.plugins.pfssplugin.data;
+package org.helioviewer.jhv.plugins.pfss.data;
 
-import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
+import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
 import com.jogamp.opengl.GL2;
 

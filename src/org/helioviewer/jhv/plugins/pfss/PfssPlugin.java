@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.pfssplugin;
+package org.helioviewer.jhv.plugins.pfss;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugins.pfssplugin.data.PfssCache;
+import org.helioviewer.jhv.plugins.pfss.data.PfssCache;
 import org.helioviewer.jhv.threads.JHVThread;
 
 public class PfssPlugin implements Plugin {

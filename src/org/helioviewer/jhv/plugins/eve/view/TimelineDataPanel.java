@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.view;
+package org.helioviewer.jhv.plugins.eve.view;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugins.eveplugin.lines.BandTypeAPI;
+import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
 import org.helioviewer.jhv.timelines.data.Band;
 import org.helioviewer.jhv.timelines.data.BandColors;
 import org.helioviewer.jhv.timelines.data.BandGroup;

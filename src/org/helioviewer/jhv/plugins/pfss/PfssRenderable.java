@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.pfssplugin;
+package org.helioviewer.jhv.plugins.pfss;
 
 import java.awt.Component;
 import java.util.concurrent.FutureTask;
@@ -9,8 +9,8 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
-import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
-import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
+import org.helioviewer.jhv.plugins.pfss.data.PfssData;
+import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.CancelTask;
 
