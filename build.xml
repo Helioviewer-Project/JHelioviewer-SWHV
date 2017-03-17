@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project default="all">
 
+    <!-- set path to install4j installation depending on os-->
+    <condition property="install4jpath" value="C:/Program Files/install4j6/bin/ant.jar">
+        <os family="windows" />
+    </condition>
+
+    <condition property="install4jpath" value="/Applications/install4j.app/Contents/Resources/app/bin/ant.jar">
+        <os family="mac" />
+    </condition>
+
+    <condition property="install4jpath" value="/opt/install4j6/bin/ant.jar">
+        <os family="unix" />
+    </condition>
+
     <taskdef name="install4j"
         classname="com.install4j.Install4JTask"
-        classpath="/opt/install4j6/bin/ant.jar"/>
+        classpath="${install4jpath}"/>
 
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
