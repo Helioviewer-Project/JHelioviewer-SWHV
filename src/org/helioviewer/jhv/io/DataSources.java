@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,14 +7,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.SchemaLoader;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.logging.Log;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 @SuppressWarnings("serial")
 public class DataSources {
@@ -32,7 +24,8 @@ public class DataSources {
                     put("API.getDataSources", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                     put("API.getJP2Image", "http://swhv.oma.be/hv/api/index.php?action=getJP2Image&");
                     put("API.getJPX", "http://swhv.oma.be/hv/api/index.php?action=getJPX&");
-                    put("default.label", "Royal Observatory of Belgium");
+                    put("label", "Royal Observatory of Belgium");
+                    put("schema", "/data/sources_v1.0.json");
                     put("availability.images", "http://swhv.oma.be/availability/images/availability/availability.html");
                 }
             });
@@ -41,7 +34,8 @@ public class DataSources {
                     put("API.getDataSources", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.getJP2Image", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.getJPX", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
-                    put("default.label", "Institut d'Astrophysique Spatiale");
+                    put("label", "Institut d'Astrophysique Spatiale");
+                    put("schema", "/data/sources_v1.0.json");
                 }
             });
             put("GSFC", new HashMap<String, String>() {
@@ -49,7 +43,8 @@ public class DataSources {
                     put("API.getDataSources", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.getJP2Image", "https://api.helioviewer.org/v2/getJP2Image/?");
                     put("API.getJPX", "https://api.helioviewer.org/v2/getJPX/?");
-                    put("default.label", "Goddard Space Flight Center");
+                    put("label", "Goddard Space Flight Center");
+                    put("schema", "/data/sources_v1.0.json");
                 }
             });
             /*
@@ -58,7 +53,8 @@ public class DataSources {
                     put("API.getDataSources", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.getJP2Image", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJP2Image&");
                     put("API.getJPX", "http://helioviewer.sci.gsfc.nasa.gov/api.php?action=getJPX&");
-                    put("default.label", "Goddard Space Flight Center SCI Test");
+                    put("label", "Goddard Space Flight Center SCI Test");
+                    put("schema", "/data/sources_v1.0.json");
                 }
             });
             put("GSFC NDC Test", new HashMap<String, String>() {
@@ -66,7 +62,8 @@ public class DataSources {
                     put("API.getDataSources", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
                     put("API.getJP2Image", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJP2Image&");
                     put("API.getJPX", "http://gs671-heliovw7.ndc.nasa.gov/api.php?action=getJPX&");
-                    put("default.label", "Goddard Space Flight Center NDC Test");
+                    put("label", "Goddard Space Flight Center NDC Test");
+                    put("schema", "/data/sources_v1.0.json");
                 }
             });
             put("LOCALHOST", new HashMap<String, String>() {
@@ -74,16 +71,13 @@ public class DataSources {
                     put("API.getDataSources", "http://localhost:8080/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
                     put("API.getJP2Image", "http://localhost:8080/helioviewer/api/index.php?action=getJP2Image&");
                     put("API.getJPX", "http://localhost:8080/helioviewer/api/index.php?action=getJPX&");
-                    put("default.label", "Localhost");
+                    put("schema", "/data/sources_v1.0.json");
+                    put("label", "Localhost");
                 }
             });
              */
         }
     };
-
-    public static HashMap<String, HashMap<String, String>> getConfiguration() {
-        return serverSettings;
-    }
 
     public static String[] getServers() {
         Set<String> set = serverSettings.keySet();
@@ -101,17 +95,8 @@ public class DataSources {
             server = "ROB";
         Settings.getSingletonInstance().setProperty("default.server", server);
 
-        try (InputStream is = FileUtils.getResourceInputStream("/data/sources_v1.0.json")) {
-            JSONObject rawSchema = new JSONObject(new JSONTokener(is));
-            Schema schema = SchemaLoader.load(rawSchema);
-
-            for (String serverName : serverSettings.keySet()) {
-                DataSourcesTask loadTask = new DataSourcesTask(serverName, schema);
-                JHVGlobals.getExecutorService().execute(loadTask);
-            }
-        } catch (IOException e) {
-            Log.error("Could not load the JSON schema: ", e);
-        }
+        for (String serverName : serverSettings.keySet())
+            JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName));
     }
 
 }

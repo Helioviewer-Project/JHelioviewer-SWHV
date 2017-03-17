@@ -2,5 +2,36 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "DataSources",
     "description": "Helioviewer DataSources API response",
-    "type": "object"
+    "type": "object",
+    "patternProperties": {
+        "^.*$": {
+            "$ref": "#/definitions/tree_part"
+        }
+    },
+    "definitions": {
+        "root_part": {
+            "patternProperties": {
+                "^.*$": {
+                    "$ref": "#/definitions/tree_part"
+                }
+            }
+        },
+        "tree_part": {
+            "properties": {
+                "name": { "type":  "string" },
+                "description": { "type":  "string" },
+                "label": { "type":  "string" },
+                "nickname": { "type":  "string" },
+                "sourceId": { "type":  "integer" },
+                "layeringOrder": { "type":  "integer" },
+                "start": { "format":  "sql-date-time" },
+                "end": { "format":  "sql-date-time" },
+                "children": {
+                    "$ref": "#/definitions/root_part"
+                },
+                "default" : { "type" : "boolean"}
+            },
+            "additionalProperties": false
+        }
+    }
 }

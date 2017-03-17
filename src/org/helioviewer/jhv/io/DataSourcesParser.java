@@ -43,20 +43,8 @@ public class DataSourcesParser {
                 continue;
 
             if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
-                long start = TimeUtils.MINIMAL_DATE.milli;
-                try {
-                    start = TimeUtils.parseSQL(json.getString("start"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                long end = TimeUtils.MAXIMAL_DATE.milli;
-                try {
-                    end = TimeUtils.parseSQL(json.getString("end"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+                long start = TimeUtils.parseSQL(json.getString("start"));
+                long end = TimeUtils.parseSQL(json.getString("end"));
                 String description = json.getString("description") + " [" + TimeUtils.formatDate(start) + " : " + TimeUtils.formatDate(end) + ']';
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
                                                                                  description, json.getInt("sourceId"), start, end,

@@ -6,6 +6,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Optional;
+
+import org.everit.json.schema.FormatValidator;
 
 public class TimeUtils {
 
@@ -58,6 +62,30 @@ public class TimeUtils {
 
     public static long parseTime(String date) {
         return LocalTime.parse(date, DateTimeFormatter.ISO_LOCAL_TIME).toSecondOfDay() * 1000L;
+    }
+
+    public static class SQLDateTimeFormatValidator implements FormatValidator {
+
+        @Override
+        public Optional<String> validate(final String subject) {
+            try {
+                long time = parseSQL(subject);
+                if (time < MINIMAL_DATE.milli || time > MAXIMAL_DATE.milli)
+                    throw new Exception();
+
+                return Optional.empty();
+            } catch (DateTimeParseException e) {
+                return Optional.of(String.format("[%s] is not a valid sql-date-time.", subject));
+            } catch (Exception e) {
+                return Optional.of(String.format("[%s] is outside date range of [%s,%s].", subject, MINIMAL_DATE, MAXIMAL_DATE));
+            }
+        }
+
+        @Override
+        public String formatName() {
+            return "sql-date-time";
+        }
+
     }
 
 }
