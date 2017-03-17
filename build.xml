@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project default="all">
+    <!--
+        To run the deploy target you need install4j installed
+        and download the following files to $HOME_DIR/.install4j/jres/
+        https://files.jabref.org/jres/macosx-amd64-1.8.0_102_unpacked.tar.gz
+        https://files.jabref.org/jres/windows-amd64-1.8.0_102.tar.gz
+    -->
 
     <!-- set path to install4j installation depending on os-->
     <condition property="install4jpath" value="C:/Program Files/install4j6/bin/ant.jar">
