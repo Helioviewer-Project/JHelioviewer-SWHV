@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.pfssplugin.data;
+package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -15,8 +15,8 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
-import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
+import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
+import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 import org.helioviewer.jhv.threads.CancelTask;
 
 public class PfssNewDataLoader implements Runnable {

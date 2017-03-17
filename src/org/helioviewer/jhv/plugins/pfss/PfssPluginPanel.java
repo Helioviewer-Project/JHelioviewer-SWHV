@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.pfssplugin;
+package org.helioviewer.jhv.plugins.pfss;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

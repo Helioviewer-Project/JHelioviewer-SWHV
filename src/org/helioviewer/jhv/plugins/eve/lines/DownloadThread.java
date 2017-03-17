@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.lines;
+package org.helioviewer.jhv.plugins.eve.lines;
 
 import java.io.IOException;
 
