@@ -4,7 +4,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
@@ -66,12 +65,8 @@ public class DataSourcesTree extends JTree {
     public DataSourcesTree() {
         nodeRoot = new DefaultMutableTreeNode("Datasets");
 
-        HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
-        for (Map.Entry<String, HashMap<String, String>> entry : datasourceNode.entrySet()) {
-            String serverName = entry.getKey();
-            HashMap<String, String> serverProperties = entry.getValue();
-
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Item(serverName, serverProperties.get("label")));
+        for (String serverName : DataSources.getServers()) {
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Item(serverName, DataSources.getServerSetting(serverName, "label")));
             nodes.put(serverName, node);
             nodeRoot.add(node);
         }
@@ -114,9 +109,7 @@ public class DataSourcesTree extends JTree {
 
     public boolean setParsedData(DataSourcesParser parser) {
         String server = parser.rootNode.toString();
-
-        HashMap<String, HashMap<String, String>> datasourceNode = DataSources.getConfiguration();
-        for (String serverName : datasourceNode.keySet()) {
+        for (String serverName : DataSources.getServers()) {
             if (serverName.equals(server)) {
                 reattach(nodes.get(serverName), parser.rootNode);
                 break;

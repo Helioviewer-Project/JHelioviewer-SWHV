@@ -79,10 +79,6 @@ public class DataSources {
         }
     };
 
-    public static HashMap<String, HashMap<String, String>> getConfiguration() {
-        return serverSettings;
-    }
-
     public static String[] getServers() {
         Set<String> set = serverSettings.keySet();
         return set.toArray(new String[set.size()]);
