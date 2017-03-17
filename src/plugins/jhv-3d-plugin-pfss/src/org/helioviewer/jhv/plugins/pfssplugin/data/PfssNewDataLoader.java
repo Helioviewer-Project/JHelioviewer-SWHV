@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +24,7 @@ public class PfssNewDataLoader implements Runnable {
 
     private final long start;
     private final long end;
-    private static final SortedMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<>();
+    private static final TreeMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<>();
 
     public PfssNewDataLoader(long _start, long _end) {
         start = _start;
