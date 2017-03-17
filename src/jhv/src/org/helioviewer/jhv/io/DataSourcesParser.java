@@ -20,7 +20,7 @@ public class DataSourcesParser {
         rootNode = new DefaultMutableTreeNode(server);
     }
 
-    void parse(JSONObject json) throws Exception {
+    void parse(JSONObject json) {
         parse(rootNode, json, null);
     }
 
@@ -32,7 +32,7 @@ public class DataSourcesParser {
         return str1 + ' ' + str2;
     }
 
-    private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) throws Exception {
+    private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) {
         TreeSet<String> sorted = new TreeSet<>(JHVGlobals.alphanumComparator);
         sorted.addAll(root.keySet());
 

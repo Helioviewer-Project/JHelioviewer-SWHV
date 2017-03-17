@@ -20,7 +20,7 @@ public class JHVEvent {
 
     private final JHVEventType eventType;
     private JHVPositionInformation positionInformation = null;
-    private final Integer id;
+    private final int id;
 
     public JHVEvent(JHVEventType _eventType, int _id, long _start, long _end) {
         eventType = _eventType;
@@ -69,7 +69,7 @@ public class JHVEvent {
         positionInformation = _positionInformation;
     }
 
-    public Integer getUniqueID() {
+    public int getUniqueID() {
         return id;
     }
 
