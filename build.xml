@@ -28,15 +28,11 @@
     <property name="bin" location="bin"/>
     <property name="resources" location="resources"/>
     <property name="lib" location="lib"/>
-    <property name="jarfile" location="build/builds/JHelioviewer.jar"/>
-    <fileset id="libfiles" dir="">
+    <property name="standalonebuild" location="build/builds/standalone"/>
+    <property name="jarfile" location="${standalonebuild}/JHelioviewer.jar"/>
+    <fileset id="libfiles" dir="./">
         <include name="**/*.jar"/>
     </fileset>
-    <manifestclasspath property="manifest_cp" jarfile="${jarfile}">
-        <classpath>
-            <fileset refid="libfiles"/>
-        </classpath>
-    </manifestclasspath>
     <loadfile property="version" srcFile="VERSION"/>
 
     <target name="clean">
@@ -56,6 +52,17 @@
     </target>
 
     <target name="jar" depends="compile">
+        <mkdir dir="${standalonebuild}"/>
+        <copy todir="${standalonebuild}/lib">
+            <fileset refid="libfiles"/>
+        </copy>
+        <manifestclasspath property="manifest_cp" jarfile="${jarfile}">
+            <classpath>
+                <fileset dir="${standalonebuild}/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </manifestclasspath>
         <jar destfile="${jarfile}">
             <fileset dir="${bin}"/>
             <fileset dir="${resources}"/>
