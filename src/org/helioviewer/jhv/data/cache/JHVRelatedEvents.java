@@ -122,9 +122,9 @@ public class JHVRelatedEvents implements ClickableDrawable {
         associations.add(association);
     }
 
-    private JHVEvent findEvent(Integer id) {
+    private JHVEvent findEvent(int id) {
         for (JHVEvent evt : events) {
-            if (evt.getUniqueID().equals(id)) {
+            if (evt.getUniqueID() == id) {
                 return evt;
             }
         }
@@ -159,7 +159,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
 
     void swapEvent(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         int i = 0;
-        while (!events.get(i).getUniqueID().equals(event.getUniqueID())) {
+        while (events.get(i).getUniqueID() != event.getUniqueID()) {
             i++;
         }
         events.remove(i);
