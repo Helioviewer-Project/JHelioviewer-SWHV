@@ -28,7 +28,7 @@
     <property name="bin" location="bin"/>
     <property name="resources" location="resources"/>
     <property name="lib" location="lib"/>
-    <property name="jarfile" location="JHelioviewer.jar"/>
+    <property name="jarfile" location="build/builds/JHelioviewer.jar"/>
     <fileset id="libfiles" dir="">
         <include name="**/*.jar"/>
     </fileset>
@@ -42,6 +42,7 @@
     <target name="clean">
         <delete dir="${bin}"/>
         <delete file="${jarfile}"/>
+        <delete dir="build/builds"/>
     </target>
 
     <target name="compile">
