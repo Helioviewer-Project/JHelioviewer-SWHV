@@ -68,7 +68,7 @@ public class HTTPSocket extends Socket {
             while (true) {
                 line = LineRead.readAsciiLine(inputStream);
                 if (line.isEmpty())
-                    break;
+                    return res;
 
                 parts = line.split(": ", 2);
                 if (parts.length != 2)
@@ -76,7 +76,6 @@ public class HTTPSocket extends Socket {
 
                 res.setHeader(parts[0], parts[1]);
             }
-            return res;
         } else {
             throw new ProtocolException("Requests received not supported");
         }

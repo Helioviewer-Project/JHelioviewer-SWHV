@@ -126,9 +126,9 @@ public abstract class ImageData {
         // System.out.println(">> " + factor + " " + j);
         factor /= metaData.getResponseFactor();
         if (factor > 2)
-            factor = 2;
+            return 2;
         else if (factor < 0.5)
-            factor = 0.5;
+            return 0.5;
         return factor;
     }
 
