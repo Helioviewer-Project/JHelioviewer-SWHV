@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="6.1.3" transformSequenceNumber="5">
+<install4j version="6.1.5" transformSequenceNumber="5">
   <directoryPresets config="./resources" />
-  <application name="JHelioviewer" distributionSourceDir="" applicationId="7791-5722-0682-7193" mediaDir="./builds" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="9" lzmaCompression="true" pack200Compression="true" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="3.0.12" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="7ed177551bd348bc" javaMinVersion="1.8.0_101" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
+  <application name="JHelioviewer-SWHV" distributionSourceDir="" applicationId="7364-2793-9526-4272" mediaDir="./builds" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="9" lzmaCompression="true" pack200Compression="true" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="JHelioviewer-SWHV" publisher="ESA JHelioviewer Team" publisherWeb="http://www.jhelioviewer.org" version="2.-1.-1" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="7ed177551bd348bc" javaMinVersion="1.8.0_101" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -13,7 +13,7 @@
       <variable name="mode" value="beta" description="&quot;release&quot; or &quot;beta&quot;" category="" />
     </variables>
     <mergedProjects />
-    <!-- <codeSigning macEnabled="true" macPkcs12File="../../cer/Apple Dev Certificate Stefan Meier.p12" windowsEnabled="true" windowsKeySource="pkcs12" windowsPvkFile="" windowsSpcFile="" windowsPkcs12File="../../Cer/Open Source Developer, Simon Felix.pfx" /> -->
+    <codeSigning macEnabled="false" macPkcs12File="" windowsEnabled="false" windowsKeySource="pkcs12" windowsPvkFile="" windowsSpcFile="" windowsPkcs12File="" />
   </application>
   <files keepModificationTimes="false" missingFilesStrategy="error" globalExcludeSuffixes=".DS_Store" defaultOverwriteMode="4" defaultUninstallMode="0" launcherOverwriteMode="3" defaultFileMode="644" defaultDirMode="755">
     <filesets />
@@ -31,16 +31,6 @@
           <entry location="helioviewer/jhv/.project" fileType="regular" />
         </exclude>
       </dirEntry>
-      <!-- <dirEntry mountPoint="559" file="../lib/native" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="bin" excludeSuffixes="" dirMode="755" overrideDirMode="false">
-        <exclude>
-          <entry location="kdu_a77D.dll" fileType="regular" />
-          <entry location="kdu_jniD.dll" fileType="regular" />
-          <entry location="kdu_v77D.dll" fileType="regular" />
-          <entry location="msvcp120d.dll" fileType="regular" />
-          <entry location="msvcr120d.dll" fileType="regular" />
-          <entry location="vccorlib120d.dll" fileType="regular" />
-        </exclude>
-      </dirEntry> -->
       <dirEntry mountPoint="80" file="../lib" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="subdir" subDirectory="lib" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude>
           <entry location=".DS_Store" fileType="regular" />
@@ -631,7 +621,7 @@
           </screen>
         </screens>
       </application>
-      <application name="Updater with silent version check" id="366" customizedId="" beanClass="com.install4j.runtime.beans.applications.CustomApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="./resources/Update_Icon.icns" customIcoFile="./resources/Update_Icon.ico" macEntitlementsFile="" automaticLauncherIntegration="true" launchMode="startupSync" launchInNewProcess="false" launchSchedule="always" allLaunchers="true">
+      <application name="Updater with silent version check" id="366" customizedId="" beanClass="com.install4j.runtime.beans.applications.CustomApplication" enabled="false" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="./resources/Update_Icon.icns" customIcoFile="./resources/Update_Icon.ico" macEntitlementsFile="" automaticLauncherIntegration="true" launchMode="startupSync" launchInNewProcess="false" launchSchedule="always" allLaunchers="true">
         <serializedBean>
           <java class="java.beans.XMLDecoder">
             <object class="com.install4j.runtime.beans.applications.CustomApplication" id="CustomApplication0">
