@@ -24,12 +24,18 @@
                 "nickname": { "type":  "string" },
                 "sourceId": { "type":  "integer" },
                 "layeringOrder": { "type":  "integer" },
-                "start": { "format":  "sql-date-time" },
-                "end": { "format":  "sql-date-time" },
+                "start": {
+                    "type": "string",
+                    "format": "sql-date-time"
+                },
+                "end": {
+                    "type": "string",
+                    "format": "sql-date-time"
+                },
                 "children": {
                     "$ref": "#/definitions/root_part"
                 },
-                "default" : { "type" : "boolean"}
+                "default": { "type" : "boolean" }
             },
             "additionalProperties": false
         }

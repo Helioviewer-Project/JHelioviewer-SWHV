@@ -210,22 +210,16 @@ public class ImageDataPanel extends JPanel {
 
             switch (comboUnit.getSelectedIndex()) {
             case 1: // min
-                value *= 60;
-                break;
+                return value * 60;
             case 2: // hour
-                value *= 3600;
-                break;
+                return value * 3600;
             case 3: // day
-                value *= 86400;
-                break;
+                return value * 86400;
             case 4:
-                value = APIRequest.CADENCE_ANY;
-                break;
+                return APIRequest.CADENCE_ANY;
             default:
-                break;
+                return value;
             }
-
-            return value;
         }
 
         public void setCadence(int value) {
