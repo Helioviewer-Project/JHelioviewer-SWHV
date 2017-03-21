@@ -76,7 +76,10 @@
     </target>
 
     <target name="deploy" depends="compile">
-        <install4j projectfile="build/JHelioviewer-build.install4j"/> 
+        <install4j
+            projectfile="build/JHelioviewer-build.install4j"
+            release="${version}"
+        /> 
     </target>
 
     <target name="run" depends="jar">
