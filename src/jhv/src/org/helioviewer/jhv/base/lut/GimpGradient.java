@@ -38,8 +38,6 @@ class GimpGradient {
      * @param x
      *            point along the gradient scaled as [0,1)
      * @return rgb integer for that point
-     * @throws GradientEvaluationError
-     *             Error for evaluating the color
      */
     public int getGradientColor(double x) throws Exception {
         for (GimpGradientSegment s : segments) {

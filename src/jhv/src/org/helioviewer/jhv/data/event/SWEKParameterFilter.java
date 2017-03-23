@@ -23,16 +23,16 @@ public class SWEKParameterFilter {
      * type, the minimum value, the maximum value, the start value and step
      * size.
      *
-     * @param filterType
+     * @param _filterType
      *            the filter
-     * @param min
+     * @param _min
      *            the minimum value
-     * @param max
+     * @param _max
      *            the maximum value
-     * @param startValue
+     * @param _startValue
      *            the start value
-     * @param dbtype
-     * @param stepSize
+     * @param _dbType
+     * @param _stepSize
      *            the stepsize
      */
     public SWEKParameterFilter(String _filterType, double _min, double _max, double _startValue, Double _stepSize, String _units, String _dbType) {

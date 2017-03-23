@@ -19,11 +19,11 @@ public class SWEKSupplier {
     /**
      * Creates a SWEK supplier with an supplier name and a source.
      *
-     * @param supplierName
+     * @param _supplierName
      *            The name of the supplier
-     * @param supplierDisplayName
+     * @param _supplierDisplayName
      *            The display name of the supplier
-     * @param source
+     * @param _source
      *            The source on which the supplier supplies its events
      */
     public SWEKSupplier(String _supplierName, String _supplierDisplayName, SWEKSource _source, String _db) {

@@ -10,7 +10,7 @@ public class SWEKTreeModelSupplier extends SWEKTreeModelElement {
     /**
      * Creates a SWEK tree supplier for the given SWEkSupplier.
      * 
-     * @param swekSupplier
+     * @param _swekSupplier
      *            The SWEK supplier for this SWEK tree supplier
      */
     public SWEKTreeModelSupplier(SWEKSupplier _swekSupplier) {

@@ -31,13 +31,6 @@ import com.jidesoft.swing.JideButton;
  * 2. All month of a year are displayed,
  * 3. A period of 12 years is displayed.
  *
- * To use this component create an instance of the class, set the default date
- * format by calling the method {@link #setDateFormat(String)} to display the
- * date at the bottom like the user prefers and set the date which should be
- * selected by calling the method {@link #setDate(Date)}. When the user has
- * selected a date a {@link JHVCalendarEvent} will be fired. To get the selected
- * date call {@link #getDate()}.
- *
  * This component acts as a subcomponent of the {@link JHVCalendarDatePicker}
  * too. It represents the content of the popup window of the
  * JHVCalendarDatePicker.

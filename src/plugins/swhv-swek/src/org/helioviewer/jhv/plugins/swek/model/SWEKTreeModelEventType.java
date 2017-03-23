@@ -18,7 +18,7 @@ public class SWEKTreeModelEventType extends SWEKTreeModelElement {
     /**
      * Creates a SWEK tree model event type for the given SWEK event type.
      * 
-     * @param swekEventType
+     * @param _swekEventType
      *            The event type for which the SWEK tree model event type is
      *            created
      */

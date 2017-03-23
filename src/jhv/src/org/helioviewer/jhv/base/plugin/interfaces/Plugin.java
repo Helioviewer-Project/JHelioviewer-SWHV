@@ -60,10 +60,6 @@ public interface Plugin {
      * The format of the state is determined by the plug-in itself. It should
      * encode all necessary values to restore the behavior of the plug-in from
      * earlier sessions.
-     * 
-     * @param state
-     *            The new filter state
-     * @see #setState()
      */
     String getState();
 

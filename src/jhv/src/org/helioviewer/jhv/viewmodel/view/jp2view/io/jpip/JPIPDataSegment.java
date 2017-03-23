@@ -8,7 +8,6 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
  * field and the EOR message body is stored in the <code>data</code> field.
  * 
  * @author Juan Pablo Garcia Ortiz
- * @see JPIPDataInputStream
  * @version 0.1
  * 
  */

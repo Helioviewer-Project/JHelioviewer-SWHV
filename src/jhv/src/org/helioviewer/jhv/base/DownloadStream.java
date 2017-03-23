@@ -196,7 +196,7 @@ public class DownloadStream {
     /**
      * Set the output to send to the server (in HTTP as POST)
      *
-     * @param output
+     * @param _output
      *            Send output to the server, null if nothing (GET in HTTP)
      */
     public void setOutput(String _output) {

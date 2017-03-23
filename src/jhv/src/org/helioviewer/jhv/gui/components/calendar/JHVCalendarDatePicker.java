@@ -87,12 +87,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
         listeners.remove(l);
     }
 
-    /**
-     * Informs all listener of this class by passing the corresponding event.
-     *
-     * @param e
-     *            event
-     */
     private void informAllJHVCalendarListeners() {
         JHVCalendarEvent e = new JHVCalendarEvent(this);
         for (JHVCalendarListener l : listeners) {

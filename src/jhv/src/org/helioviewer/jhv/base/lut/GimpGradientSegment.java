@@ -55,10 +55,6 @@ class GimpGradientSegment {
      *            Blending function type
      * @param blendingColor
      *            Blending function color
-     * @param blendingColorLeft
-     *            Blending function left-color-type
-     * @param blendingColorRight
-     *            Blending function right-color-type
      */
     public GimpGradientSegment(double leftStop, double midStop, double rightStop, double rl, double gl, double bl, double al, double rr, double gr, double br, double ar, int blendingType, int blendingColor/*, int blendingColorLeft, int blendingColorRight*/) {
         this.leftStop = leftStop;
@@ -84,8 +80,6 @@ class GimpGradientSegment {
      * @param x
      *            Point in segment
      * @return Color according to gradient
-     * @throws GradientEvaluationError
-     *             Error when format is wrong
      */
     public int getGradientColor(double x) throws Exception {
         // Normalize the segment geometry.
