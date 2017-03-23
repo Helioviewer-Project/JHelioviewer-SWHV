@@ -30,8 +30,6 @@ public class SingleChannelByte8ImageData extends ImageData {
      *            width of the image
      * @param newHeight
      *            height of the image
-     * @param newPixelData
-     *            pixel data
      */
     public SingleChannelByte8ImageData(int newWidth, int newHeight, Buffer _buffer) {
         super(newWidth, newHeight, 8);

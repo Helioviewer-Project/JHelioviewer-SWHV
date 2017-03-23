@@ -30,8 +30,6 @@ public class RGBInt24ImageData extends ImageData {
      *            width of the image
      * @param newHeight
      *            height of the image
-     * @param newPixelData
-     *            pixel data
      */
     public RGBInt24ImageData(int newWidth, int newHeight, Buffer _buffer) {
         super(newWidth, newHeight, 32);

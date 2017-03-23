@@ -17,10 +17,8 @@ public class FITSView extends AbstractView {
     /**
      * Constructor which loads a fits image from a given URI.
      *
-     * @param uri
+     * @param _uri
      *            Specifies the location of the FITS file.
-     * @throws IOException
-     *             when an error occurred during reading the fits file.
      * */
     public FITSView(URI _uri) throws Exception {
         uri = _uri;

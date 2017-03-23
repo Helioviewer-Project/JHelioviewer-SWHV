@@ -35,8 +35,6 @@ public class SingleChannelShortImageData extends ImageData {
      *            height of the image
      * @param newBitDepth
      *            number of bits per pixel
-     * @param newPixelData
-     *            pixel data
      */
     public SingleChannelShortImageData(int newWidth, int newHeight, int newBitDepth, Buffer _buffer) {
         super(newWidth, newHeight, 16);
