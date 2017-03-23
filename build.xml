@@ -1,290 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="build" default="all">
+<project default="all">
+    <!--
+        To run the deploy target you need install4j installed
+        and download the following files to $HOME_DIR/.install4j/jres/
+        https://files.jabref.org/jres/macosx-amd64-1.8.0_102_unpacked.tar.gz
+        https://files.jabref.org/jres/windows-amd64-1.8.0_102.tar.gz
+    -->
 
-    <property name="src.base" value="${basedir}/src/"/>
-    <property name="src.path" value="${src.base}/jhv/src/"/>
-    <property name="bin.eclipse" value="${src.base}/jhv/bin/"/>
-    <property name="bin" value="${basedir}/bin/"/>
-    <property name="bin.jhv" value="${bin}/jhv"/>
-    <property name="resources" value="${basedir}/resources/"/>
-    <property name="lib" value="${basedir}/lib/"/>
-    <property name="build" value="${basedir}/build/"/>
-    <property name="build.resources" value="${basedir}/build-resources/"/>
-    <property name="temp" value="${basedir}/temp/"/>
-    <property environment="env"/>
-    <path id="lib.path.ref">
-        <fileset dir="${env.RT_PATH}" includes="classes.jar"/>
-    </path>
+    <!-- set path to install4j installation depending on os-->
+    <condition property="install4jpath" value="C:/Program Files/install4j6/bin/ant.jar">
+        <os family="windows" />
+    </condition>
 
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
-        <classpath>
-            <pathelement location="${build.resources}/shared/ant-contrib-1.0b3.jar"/>
-        </classpath>
-    </taskdef>
+    <condition property="install4jpath" value="/Applications/install4j.app/Contents/Resources/app/bin/ant.jar">
+        <os family="mac" />
+    </condition>
 
-    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask">
-        <classpath path="${build.resources}/mac/lib/appbundler-1.0.jar"/>
-    </taskdef>
+    <condition property="install4jpath" value="/opt/install4j6/bin/ant.jar">
+        <os family="unix" />
+    </condition>
 
-    <target name="mkdir">
+    <taskdef name="install4j"
+        classname="com.install4j.Install4JTask"
+        classpath="${install4jpath}"/>
+
+    <property name="src" location="src"/>
+    <property name="bin" location="bin"/>
+    <property name="resources" location="resources"/>
+    <property name="lib" location="lib"/>
+    <property name="standalonebuild" location="build/builds/standalone"/>
+    <property name="jarfile" location="${standalonebuild}/JHelioviewer.jar"/>
+    <fileset id="libfiles" dir="./">
+        <include name="**/*.jar"/>
+    </fileset>
+    <loadfile property="version" srcFile="VERSION"/>
+
+    <target name="clean">
+        <delete dir="${bin}"/>
+        <delete file="${jarfile}"/>
+        <delete dir="build/builds"/>
+    </target>
+
+    <target name="compile">
         <mkdir dir="${bin}"/>
-        <mkdir dir="${bin.jhv}"/>
-        <mkdir dir="${build}"/>
-        <mkdir dir="${temp}"/>
-    </target>
-
-    <target name="clean" depends="mkdir">
-        <delete file="JHelioviewer.jar"/>
-        <delete includeemptydirs="true" verbose="true">
-            <fileset dir="${bin}" followsymlinks="false" defaultexcludes="no"/>
-        </delete>
-        <delete includeemptydirs="true" verbose="true">
-            <fileset dir="${build}" followsymlinks="false" defaultexcludes="no"/>
-        </delete>
-        <delete includeemptydirs="true" verbose="true">
-            <fileset dir="${temp}" followsymlinks="false" defaultexcludes="no"/>
-        </delete>
-        <delete includeemptydirs="true" verbose="true">
-            <fileset dir="${src.base}" includes="${bin.eclipse}" followsymlinks="false" defaultexcludes="no"/>
-        </delete>
-        <antcall target="mkdir"/>
-    </target>
-    <target name="all" depends="sign"/>
-
-    <!-- JAR file generation -->
-    <target name="init" depends="mkdir">
-        <echo message="Trying to determine revision"/>
-        <exec executable="svnversion" outputproperty="jhv.revision.tmp" resolveexecutable="true" searchpath="true" resultproperty="jhv.revision.retcode" failifexecutionfails="false">
-            <arg value="."/>
-        </exec>
-        <loadfile property="jhv.version" srcFile="VERSION"/>
-        <property name="jhv.version" value="2.0.0"/>
-        <if>
-            <equals arg1="${jhv.revision.retcode}" arg2="0"/>
-            <then>
-                <property name="jhv.revision" value="${jhv.revision.tmp}"/>
-            </then>
-            <else>
-                <property name="jhv.revision" value="0"/>
-            </else>
-        </if>
-    </target>
-
-    <target name="build-init" depends="init">
-        <property name="jhv.pkg.name" value="jhv-${jhv.version}.${jhv.revision}"/>
-    </target>
-
-    <target name="compile" depends="init, bootclasspath.check" if="bootclasspath.exists">
-        <echo message="compile with bootclasspath"/>
-        <javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.8" source="1.8" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
-            <compilerarg value="-Xlint:all"/>
-            <compilerarg value="-Xbootclasspath/p:${toString:lib.path.ref}"/>
-            <!-- <compilerarg value="-XDignore.symbol.file"/> -->
+        <javac srcdir="${src}" destdir="${bin}">
             <classpath>
-                <fileset dir="${lib}">
-                    <include name="**/*.jar"/>
-                </fileset>
+                <fileset dir="${src}"/>
+                <fileset refid="libfiles"/>
             </classpath>
         </javac>
     </target>
 
-    <target name="compile_without" depends="init, bootclasspath.check" unless="bootclasspath.exists">
-        <echo message="compile without bootclasspath"/>
-        <javac srcdir="${src.path}" destdir="${bin.jhv}" target="1.8" source="1.8" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
-            <compilerarg value="-Xlint:all"/>
-            <!-- <compilerarg value="-XDignore.symbol.file"/> -->
+    <target name="jar" depends="compile">
+        <mkdir dir="${standalonebuild}"/>
+        <copy todir="${standalonebuild}/lib">
+            <fileset refid="libfiles"/>
+        </copy>
+        <manifestclasspath property="manifest_cp" jarfile="${jarfile}">
             <classpath>
-                <fileset dir="${lib}">
+                <fileset dir="${standalonebuild}/lib">
                     <include name="**/*.jar"/>
                 </fileset>
             </classpath>
-        </javac>
-    </target>
-
-    <target name="bootclasspath.check">
-        <condition property="bootclasspath.exists">
-            <available file="${env.RT_PATH}" type="dir" />
-        </condition>
-    </target>
-
-
-    <target name="jar-bundle" depends="compile, compile_without">
-        <!-- JAR File -->
-        <jar destfile="JHelioviewer.jar">
+        </manifestclasspath>
+        <jar destfile="${jarfile}">
+            <fileset dir="${bin}"/>
+            <fileset dir="${resources}"/>
             <manifest>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
-                <attribute name="Class-Path" value="."/>
-                <attribute name="Implementation-Version" value="v${jhv.version}r${jhv.revision}"/>
-                <attribute name="version" value="${jhv.version}"/>
-                <attribute name="revision" value="${jhv.revision}"/>
+                <attribute name="Class-Path" value="${manifest_cp}"/>
+                <attribute name="version" value="${version}"/>
+                <attribute name="revision" value="1"/>
             </manifest>
-            <fileset dir="${bin.jhv}"/>
-            <fileset dir="${resources}"/>
-            <fileset file="README"/>
-            <fileset file="COPYING"/>
-
-            <zipfileset src="${lib}/gluegen-rt-natives-windows-i586.jar"     includes="*/*/*.dll"/>
-            <zipfileset src="${lib}/gluegen-rt-natives-windows-amd64.jar"    includes="*/*/*.dll"/>
-            <zipfileset src="${lib}/gluegen-rt-natives-linux-i586.jar"       includes="*/*/*.so"/>
-            <zipfileset src="${lib}/gluegen-rt-natives-linux-amd64.jar"      includes="*/*/*.so"/>
-            <zipfileset src="${lib}/gluegen-rt-natives-macosx-universal.jar" includes="*/*/*.jnilib"/>
-            <zipfileset src="${lib}/jogl-all-natives-windows-i586.jar"       includes="*/*/*.dll"/>
-            <zipfileset src="${lib}/jogl-all-natives-windows-amd64.jar"      includes="*/*/*.dll"/>
-            <zipfileset src="${lib}/jogl-all-natives-linux-i586.jar"         includes="*/*/*.so"/>
-            <zipfileset src="${lib}/jogl-all-natives-linux-amd64.jar"        includes="*/*/*.so"/>
-            <zipfileset src="${lib}/jogl-all-natives-macosx-universal.jar"   includes="*/*/*.jnilib"/>
-
-            <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="EVEPlugin.jar"/>
-            <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="PfssPlugin.jar"/>
-            <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="SWEKPlugin.jar"/>
-
-            <zipgroupfileset dir="${lib}" excludes="*natives*.jar"/>
         </jar>
     </target>
 
-    <target name="sign" depends="jar-bundle" if="sign.jar">
-        <!-- Use "keytool -genkey -alias signFile -keystore myKeystore"
-            to generate keystore -->
-        <input message="keystore to sign jar file:" addproperty="sign.keystore">
-        </input>
-        <input message="keystore password to sign jar file:" addproperty="sign.storepass">
-            <handler classname="org.apache.tools.ant.input.SecureInputHandler"/>
-        </input>
-        <input message="alias to sign jar file:" addproperty="sign.alias">
-        </input>
-        <input message="private key password to sign jar file:" addproperty="sign.keypass">
-            <handler classname="org.apache.tools.ant.input.SecureInputHandler"/>
-        </input>
-        <signjar jar="JHelioviewer.jar" alias="${sign.alias}" keypass="${sign.keypass}" keystore="${sign.keystore}" storepass="${sign.storepass}"/>
+    <target name="deploy" depends="compile">
+        <install4j
+            projectfile="build/JHelioviewer-build.install4j"
+            release="${version}"
+        /> 
     </target>
 
-    <!-- Mac OS bundle -->
-    <target name="release-mac" depends="sign, bundle-mac"/>
-    <target name="bundle-mac" depends="build-init">
-        <if>
-            <contains string="${os.name}" substring="mac" casesensitive="false"/>
-            <then>
-                <exec executable="chmod" dir="${build.resources}/mac">
-                    <arg value="u+x"/>
-                    <arg value="bundle.sh"/>
-                </exec>
-                <mkdir dir="${temp}/build/mac/"/>
-                <bundleapp outputdirectory="${temp}/build/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JHelioviewer" icon="${build.resources}/mac/JHV_icon.icns" shortversion="${jhv.version}" version="${jhv.version}.${jhv.revision}" copyright="©2017, European Space Agency">
-                    <classpath file="JHelioviewer.jar"/>
-                    <option value="-Xdock:name=JHelioviewer"/>
-                </bundleapp>
-                <exec executable="${build.resources}/mac/bundle.sh">
-                    <env key="TEMP" value="${temp}/build/mac"/>
-                    <env key="RESOURCES" value="${build.resources}/mac"/>
-                    <env key="BUILD" value="${build}"/>
-                    <env key="NAME" value="${jhv.pkg.name}"/>
-                    <env key="README" value="README"/>
-                    <env key="COPYING" value="COPYING"/>
-                    <env key="VERSION" value="VERSION"/>
-                </exec>
-            </then>
-            <else>
-                <echo> Cannot build MacOS dmg file under ${os.name}.</echo>
-            </else>
-        </if>
+    <target name="run" depends="jar">
+        <java jar="${jarfile}" fork="true"/>
     </target>
 
-    <!-- Windows setup -->
-    <taskdef name="nsis" classname="net.sf.nsisant.Task">
-        <classpath location="${build.resources}/windows/nsisant-1.2.jar"/>
-    </taskdef>
-    <property name="nsis.path" value="${temp}/build/windows/nsis-2.46/"/>
-
-    <target name="init-nsis" depends="build-init">
-        <untar src="${build.resources}/windows/nsis-2.46.tar.bz2" dest="${temp}/build/windows" overwrite="false" compression="bzip2"/>
-        <if>
-            <contains string="${os.name}" substring="linux" casesensitive="false"/>
-            <then>
-                <property name="makensis.executable" value="makensis-linux"/>
-                <property name="nsis.argument.prefix" value="-"/>
-            </then>
-            <elseif>
-                <and>
-                    <contains string="${os.name}" substring="mac" casesensitive="false"/>
-                    <contains string="${os.arch}" substring="ppc" casesensitive="false"/>
-                </and>
-                <then>
-                    <property name="makensis.executable" value="makensis-mac-ppc"/>
-                    <property name="nsis.argument.prefix" value="-"/>
-                </then>
-            </elseif>
-            <elseif>
-                <and>
-                    <contains string="${os.name}" substring="mac" casesensitive="false"/>
-                </and>
-                <then>
-                    <property name="makensis.executable" value="makensis-mac-x86"/>
-                    <property name="nsis.argument.prefix" value="-"/>
-                </then>
-            </elseif>
-            <else>
-                <property name="makensis.executable" value="makensis.exe"/>
-                <property name="nsis.argument.prefix" value="/"/>
-            </else>
-        </if>
-        <if>
-            <not>
-                <contains string="${os.name}" substring="windows" casesensitive="false"/>
-            </not>
-            <then>
-                <exec executable="chmod" dir="${nsis.path}">
-                    <arg value="u+x"/>
-                    <arg value="${makensis.executable}"/>
-                </exec>
-            </then>
-        </if>
-    </target>
-
-    <target name="release-windows" depends="sign,bundle-windows"/>
-    <target name="bundle-windows" depends="init-nsis">
-        <copy file="JHelioviewer.jar" tofile="${build}/JHelioviewer.jar"/>
-        <exec executable="${nsis.path}/${makensis.executable}" dir="${nsis.path}">
-            <arg value="${nsis.argument.prefix}DJHV_VERSION=${jhv.version}"/>
-            <arg value="${nsis.argument.prefix}DJHV_REVISION=${jhv.revision}"/>
-            <arg value="${nsis.argument.prefix}DRESOURCE_PATH=${build.resources}/windows"/>
-            <arg value="${nsis.argument.prefix}DBUILD_PATH=${build}"/>
-            <arg value="${nsis.argument.prefix}DFILE_NAME=${jhv.pkg.name}"/>
-            <arg value="${nsis.argument.prefix}DREADME_FILE=${basedir}/README"/>
-            <arg value="${nsis.argument.prefix}DCOPYING_FILE=${basedir}/COPYING"/>
-            <arg value="${nsis.argument.prefix}DVERSION_FILE=${basedir}/VERSION"/>
-            <arg value="${build.resources}/windows/windows-setup.nsi"/>
-        </exec>
-    </target>
-
-    <!-- Linux (just a compressed tarball) -->
-    <target name="release-tar" depends="sign, bundle-tar"/>
-    <target name="bundle-tar" depends="build-init">
-        <tar destfile="${build}/${jhv.pkg.name}.bin.tar.gz" compression="gzip">
-            <zipfileset dir="." includes="JHelioviewer.jar, README, COPYING, VERSION" prefix="${jhv.pkg.name}"/>
-        </tar>
-    </target>
-
-    <target name="version" depends="init">
-        <echo message="${jhv.version}.${jhv.revision}" file="${build}/VERSION"/>
-    </target>
-
-    <!-- all -->
-    <target name="release-all" depends="release-no-src, version"/>
-    <target name="release-no-src" depends="release-mac, release-windows, release-tar"/>
-    <target name="bundle-all" depends="bundle-no-src"/>
-    <target name="bundle-no-src" depends="bundle-mac, bundle-windows, bundle-tar"/>
-
-    <!-- plugins -->
-    <target name="release-plugins">
-        <ant antfile="plugins/build.xml" inheritAll="false" target="all"/>
-    </target>
-
-    <target name="clean-plugins">
-        <ant antfile="src/plugins/build.xml" inheritAll="false" target="clean"/>
-    </target>
-
-    <target name="install-plugins">
-        <ant antfile="src/plugins/build.xml" inheritAll="false" target="install-plugins"/>
-    </target>
+    <target name="all" depends="jar"/>
 
 </project>
