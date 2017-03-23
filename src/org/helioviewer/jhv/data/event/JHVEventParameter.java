@@ -26,11 +26,11 @@ public class JHVEventParameter {
      * Creates a JHVEvent parameter with a parameter name, parameter display
      * name and parameter value.
      *
-     * @param parameterName
+     * @param _parameterName
      *            the parameter name
-     * @param parameterDisplayName
+     * @param _parameterDisplayName
      *            the parameter display name
-     * @param parameterValue
+     * @param _parameterValue
      *            the parameter value
      */
     public JHVEventParameter(String _parameterName, String _parameterDisplayName, String _parameterValue) {

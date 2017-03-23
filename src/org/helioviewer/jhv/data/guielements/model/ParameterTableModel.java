@@ -16,7 +16,7 @@ public class ParameterTableModel extends AbstractTableModel {
     /**
      * Creates a parameter model for the given parameters.
      *
-     * @param parameters
+     * @param _parameters
      *            the parameters
      */
     public ParameterTableModel(JHVEventParameter[] _parameters) {

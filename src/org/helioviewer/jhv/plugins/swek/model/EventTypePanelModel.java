@@ -26,7 +26,7 @@ public class EventTypePanelModel implements TreeModel {
     /**
      * Creates a SWEKTreeModel for the given SWEK event type.
      *
-     * @param eventType
+     * @param _eventType
      *            The event type for which to create the tree model
      */
     public EventTypePanelModel(SWEKTreeModelEventType _eventType) {
@@ -184,7 +184,7 @@ public class EventTypePanelModel implements TreeModel {
     /**
      * Informs the listeners about an event type and source that became active.
      *
-     * @param eventType
+     * @param swekEventType
      *            the event type that became active
      * @param swekSupplier
      *            the supplier that became active
@@ -199,9 +199,9 @@ public class EventTypePanelModel implements TreeModel {
      * Informs the listeners about an event type and source that became
      * inactive.
      *
-     * @param eventType
+     * @param swekEventType
      *            the event type that became inactive
-     * @param swekSource
+     * @param supplier
      *            the source that became inactive
      */
     private void fireNewEventTypeAndSourceInactive(SWEKEventType swekEventType, SWEKSupplier supplier) {

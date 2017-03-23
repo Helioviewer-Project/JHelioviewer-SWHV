@@ -35,8 +35,6 @@ public class ARGBInt32ImageData extends ImageData {
      *            width of the image
      * @param newHeight
      *            height of the image
-     * @param newPixelData
-     *            pixel data
      */
     public ARGBInt32ImageData(boolean singleChannel, int newWidth, int newHeight, Buffer _buffer) {
         super(newWidth, newHeight, 32);

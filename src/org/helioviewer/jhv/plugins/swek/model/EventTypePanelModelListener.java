@@ -9,8 +9,6 @@ public interface EventTypePanelModelListener {
      *
      * @param eventType
      *            the event type that became active
-     * @param swekSource
-     *            the source supplying the event type
      * @param swekSupplier
      *            the supplier that became active
      */
@@ -21,8 +19,6 @@ public interface EventTypePanelModelListener {
      *
      * @param eventType
      *            the event type that became active
-     * @param swekSource
-     *            the source supplying the event type
      * @param supplier
      *            the supplier providing the event
      */

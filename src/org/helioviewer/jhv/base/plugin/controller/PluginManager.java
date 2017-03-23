@@ -111,8 +111,7 @@ public class PluginManager {
      *
      * @param plugin
      *            Plug-in to add to the list.
-     * @param pluginLocation
-     *            Location of the corresponding file of the plug-in.
+     * @param jarName
      */
     public void addPlugin(Plugin plugin, String jarName) {
         PluginContainer pluginContainer = new PluginContainer(plugin, jarName, pluginSettings.isPluginActivated(jarName));

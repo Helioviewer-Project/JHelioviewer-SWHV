@@ -98,7 +98,7 @@ public class KakaduHelper {
         return lut;
     }
 
-    /**
+    /*
      * Deactivates the internal color lookup table for the given composition layer
      *
      * It is not allowed to call this function for a layer which is not loaded yet.

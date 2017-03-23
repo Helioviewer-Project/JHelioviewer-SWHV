@@ -196,7 +196,7 @@ public class HEKParser implements SWEKParser {
      * Parses a string of the format "0.716676950817756 73.6104596659652" to a
      * GL3DVec3
      *
-     * @param coordinateString
+     * @param value
      *            the string to parse
      * @return the GL3DVec3 or null of it could not be parsed
      */
