@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 
 import javax.annotation.Nullable;
 import javax.swing.Box;
@@ -35,10 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
-// import org.helioviewer.jhv.base.Settings.StringKey;
-
 import com.mindscapehq.raygun4java.core.RaygunClient;
-import com.mindscapehq.raygun4java.core.messages.RaygunIdentifier;
 
 /**
  * Routines to catch and handle all runtime exceptions.
@@ -114,11 +112,8 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 
 		if (allowCrashReport.isSelected())
 		{
-			RaygunClient client = new RaygunClient("+rfODAesOh4Col+swQzxYw==");
-			client.SetVersion(JHVGlobals.version);
 			Map<String, String> customData = new HashMap<>();
 			customData.put("Log", log);
-			// Telemetry.initializeOpenGL();
 			if(openGLRenderer!=null)
 				customData.put("OpenGL", openGLRenderer);
 			customData.put("JVM",
@@ -127,14 +122,12 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 							+ System.getProperty("java.specification.version")
 							+ ")");
 
-			// RaygunIdentifier user = new RaygunIdentifier(Settings.getString(StringKey.UUID));
-			// client.SetUser(user);
-			ArrayList<String> tags = new ArrayList<>();
-			tags.add(JHVGlobals.RAYGUN_TAG);
-			client.Send(e, tags, customData);
+            // send to raygun
+            // TODO alternative crash-reporting
+			RaygunClient client = new RaygunClient("+rfODAesOh4Col+swQzxYw==");
+			client.SetVersion(JHVGlobals.version);
+			client.Send(e, Arrays.asList(JHVGlobals.RAYGUN_TAG), customData);
 			
-			// Telemetry.trackException(e);
-			// Telemetry.flushSync();
 		}
 
 		Runtime.getRuntime().halt(0);
@@ -191,11 +184,6 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 			}
 			catch (Exception _e)
 			{
-				// Telemetry.trackException(_e);
-
-				// even that didn't work? let's use our good
-				// luck and try to do the rest of the show
-				// off of the event dispatcher thread
 			}
 		}
 
@@ -248,24 +236,12 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 		}
 		catch (IOException e1)
 		{
-			// Telemetry.trackException(e1);
 		}
 
 		for (Frame f : Frame.getFrames())
 			f.setVisible(false);
 
-		// Telemetry.trackException(e);
-
 		final String finalMsg = msg;
-
-		// DO NOT USE THIS. will kill the repaint manager
-		// try to drain the awt-eventqueue, throwing everything away
-		/*
-		 * try { EventQueue eq =
-		 * Toolkit.getDefaultToolkit().getSystemEventQueue();
-		 * while(eq.peekEvent()!=null) eq.getNextEvent(); }
-		 * catch(InterruptedException e2) { Telemetry.trackException(e2); }
-		 */
 		
 		if(alreadyCaughtException)
 			return;
