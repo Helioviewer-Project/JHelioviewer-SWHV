@@ -39,6 +39,7 @@ JHelioviewer.jar
 hs_err_pid*
 .location
 *.new
+availability/
 build/builds
 *.DS_Store
 tags
