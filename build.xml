@@ -3,12 +3,7 @@
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
     <property name="resources" location="resources"/>
-    <property name="lib" location="lib"/>
     <property name="jarfile" location= "JHelioviewer.jar"/>
-
-    <presetdef name="javac">
-        <javac includeantruntime="false"/>
-    </presetdef>
 
     <fileset id="libfiles" dir="./">
         <include name="lib/*.jar"/>
@@ -19,12 +14,11 @@
     <target name="clean">
         <delete dir="${bin}"/>
         <delete file="${jarfile}"/>
-        <delete dir="build/builds"/>
     </target>
 
     <target name="compile">
         <mkdir dir="${bin}"/>
-        <javac srcdir="${src}" destdir="${bin}">
+        <javac srcdir="${src}" destdir="${bin}" target="1.8" source="1.8" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
             <classpath>
                 <fileset dir="${src}"/>
                 <fileset refid="libfiles"/>
