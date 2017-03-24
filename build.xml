@@ -11,7 +11,7 @@
     </presetdef>
 
     <fileset id="libfiles" dir="./">
-        <include name="**/*.jar"/>
+        <include name="lib/*.jar"/>
     </fileset>
     <loadfile property="version" srcFile="VERSION"/>
     <exec command="git rev-parse --short HEAD" outputproperty="revision"/> <!-- ignore ant warning -->
@@ -35,9 +35,7 @@
     <target name="jar" depends="compile">
         <manifestclasspath property="manifest_cp" jarfile="${jarfile}">
             <classpath>
-                <fileset dir="lib">
-                    <include name="**/*.jar"/>
-                </fileset>
+                <fileset refid="libfiles"/>
             </classpath>
         </manifestclasspath>
         <jar destfile="${jarfile}">
