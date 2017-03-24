@@ -6,6 +6,10 @@
     <property name="lib" location="lib"/>
     <property name="jarfile" location= "JHelioviewer.jar"/>
 
+    <presetdef name="javac">
+        <javac includeantruntime="false"/>
+    </presetdef>
+
     <fileset id="libfiles" dir="./">
         <include name="**/*.jar"/>
     </fileset>
