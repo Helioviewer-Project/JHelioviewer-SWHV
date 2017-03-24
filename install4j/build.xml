@@ -1,9 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project default="all">
+    <!--
+        To run the deploy target you need install4j installed
+        and download the following files to $HOME_DIR/.install4j/jres/
+        https://files.jabref.org/jres/macosx-amd64-1.8.0_102_unpacked.tar.gz
+        https://files.jabref.org/jres/windows-amd64-1.8.0_102.tar.gz
+    -->
+
+    <!-- set path to install4j installation depending on os-->
+    <condition property="install4jpath" value="C:/Program Files/install4j6/bin/ant.jar">
+        <os family="windows" />
+    </condition>
+
+    <condition property="install4jpath" value="/Applications/install4j.app/Contents/Resources/app/bin/ant.jar">
+        <os family="mac" />
+    </condition>
+
+    <condition property="install4jpath" value="/opt/install4j6/bin/ant.jar">
+        <os family="unix" />
+    </condition>
+
+    <taskdef name="install4j"
+        classname="com.install4j.Install4JTask"
+        classpath="${install4jpath}"/>
+
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
     <property name="resources" location="resources"/>
     <property name="lib" location="lib"/>
+<!--<property name="standalonebuild" location="build/builds/standalone"/>
+    <property name="jarfile" location= "${standalonebuild}/JHelioviewer.jar"/>
+-->
     <property name="jarfile" location= "JHelioviewer.jar"/>
 
     <fileset id="libfiles" dir="./">
@@ -28,8 +55,14 @@
     </target>
 
     <target name="jar" depends="compile">
+<!--    <mkdir dir="${standalonebuild}"/>
+        <copy todir="${standalonebuild}/lib">
+            <fileset refid="libfiles"/>
+        </copy>
+-->
         <manifestclasspath property="manifest_cp" jarfile="${jarfile}">
             <classpath>
+<!--            <fileset dir="${standalonebuild}/lib"> -->
                 <fileset dir="lib">
                     <include name="**/*.jar"/>
                 </fileset>
@@ -45,6 +78,13 @@
                 <attribute name="revision" value="1"/>
             </manifest>
         </jar>
+    </target>
+
+    <target name="deploy" depends="compile">
+        <install4j
+            projectfile="build/JHelioviewer-build.install4j"
+            release="${version}"
+        />
     </target>
 
     <target name="run" depends="jar">
