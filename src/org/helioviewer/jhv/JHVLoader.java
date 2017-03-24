@@ -6,17 +6,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 
 class JHVLoader {
-
-    public static void loadBundledPlugin(String name) throws IOException {
-        try (InputStream is = JHVLoader.class.getResourceAsStream("/plugins/" + name)) {
-            File f = new File(JHVDirectory.PLUGINS.getPath() + name);
-            FileUtils.save(is, f);
-            PluginManager.getSingletonInstance().loadPlugin(f.toURI());
-        }
-    }
 
     public static void copyKDULibs() throws IOException {
         String pathlib = "";
