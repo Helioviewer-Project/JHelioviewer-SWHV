@@ -49,9 +49,8 @@ public class JHelioviewer {
         // Per default, the us locale should be used
         Locale.setDefault(Locale.US);
 
-        // init log
-        LogSettings logSettings = new LogSettings("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath());
-
+        // Init log
+        LogSettings logSettings = new LogSettings("/settings/log4j.properties", JHVDirectory.LOGS.getPath());
         // Information log message
         StringBuilder argString = new StringBuilder();
         for (String arg : args) {
@@ -61,8 +60,6 @@ public class JHelioviewer {
 
         // This attempts to create the necessary directories for the application
         JHVGlobals.createDirs();
-        // Save the log settings. Must be done AFTER the directories are created
-        logSettings.update();
         // Read the version and revision from the JAR metafile
         JHVGlobals.determineVersionAndRevision();
         // Load settings from file but do not apply them yet
