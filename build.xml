@@ -10,6 +10,7 @@
         <include name="**/*.jar"/>
     </fileset>
     <loadfile property="version" srcFile="VERSION"/>
+    <exec command="git rev-parse --short HEAD" outputproperty="revision"/> <!-- ignore ant warning -->
 
     <target name="clean">
         <delete dir="${bin}"/>
@@ -42,7 +43,7 @@
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
                 <attribute name="Class-Path" value="${manifest_cp}"/>
                 <attribute name="version" value="${version}"/>
-                <attribute name="revision" value="1"/>
+                <attribute name="revision" value="${revision}"/>
             </manifest>
         </jar>
     </target>
