@@ -29,8 +29,6 @@ public class JHVGlobals {
     public static String version = "2.-1.-1";
     public static String revision = "-1";
     public static String userAgent = "JHV/SWHV-";
-    public static String RAYGUN_TAG = System.getProperty("raygunTag");
-    public static boolean IS_RELEASE_VERSION = RAYGUN_TAG != null;
 
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
