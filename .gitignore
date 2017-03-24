@@ -22,6 +22,9 @@ local.properties
 .cache-main
 .scala_dependencies
 .worksheet
+.gradle
+.idea
+*.iml
 
 # common java files
 *.class
