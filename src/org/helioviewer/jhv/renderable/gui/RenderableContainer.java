@@ -39,8 +39,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables.add(renderable);
         newRenderables.add(renderable);
 
-        //int row = renderables.size() - 1;
-        //fireTableRowsInserted(row, row); display() will take care
+        int row = renderables.size() - 1;
+        fireTableRowsInserted(row, row);
         Displayer.display(); // e.g., PFSS renderable
     }
 
