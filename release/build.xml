@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project default="all">
+    <property name="bin" location="bin"/>
+    <property name="lib" location="../lib"/>
+    <property name="resources" value="release-resources/"/>
+
+    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask">
+        <classpath path="${resources}/mac/lib/appbundler-1.0.jar"/>
+    </taskdef>
+
+    <taskdef name="nsis" classname="net.sf.nsisant.Task">
+        <classpath location="${resources}/windows/nsisant-1.2.jar"/>
+    </taskdef>
+
+    <loadfile property="version" srcFile="../VERSION"/>
+    <exec command="git rev-parse --short HEAD" outputproperty="revision"/> <!-- ignore ant warning -->
+    <property name="pkg.name" value="jhv-${version}.${revision}"/>
+
+    <target name="clean">
+        <delete dir="${bin}"/>
+    </target>
+
+    <target name="jar-bundle">
+        <jar destfile="${bin}/JHelioviewer.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="version" value="${version}"/>
+                <attribute name="revision" value="${revision}"/>
+            </manifest>
+
+            <zipfileset src="${lib}/gluegen-rt-natives-windows-i586.jar"     includes="*/*/*.dll"/>
+            <zipfileset src="${lib}/gluegen-rt-natives-windows-amd64.jar"    includes="*/*/*.dll"/>
+            <zipfileset src="${lib}/gluegen-rt-natives-linux-i586.jar"       includes="*/*/*.so"/>
+            <zipfileset src="${lib}/gluegen-rt-natives-linux-amd64.jar"      includes="*/*/*.so"/>
+            <zipfileset src="${lib}/gluegen-rt-natives-macosx-universal.jar" includes="*/*/*.jnilib"/>
+            <zipfileset src="${lib}/jogl-all-natives-windows-i586.jar"       includes="*/*/*.dll"/>
+            <zipfileset src="${lib}/jogl-all-natives-windows-amd64.jar"      includes="*/*/*.dll"/>
+            <zipfileset src="${lib}/jogl-all-natives-linux-i586.jar"         includes="*/*/*.so"/>
+            <zipfileset src="${lib}/jogl-all-natives-linux-amd64.jar"        includes="*/*/*.so"/>
+            <zipfileset src="${lib}/jogl-all-natives-macosx-universal.jar"   includes="*/*/*.jnilib"/>
+
+            <zipgroupfileset dir="${lib}" excludes="*natives*.jar"/>
+            <zipfileset src="../JHelioviewer.jar"/>
+        </jar>
+    </target>
+
+    <target name="all" depends="jar-bundle">
+        <mkdir dir="${bin}"/>
+        <copy todir="${bin}">
+            <file file="../README.md"/>
+            <file file="../LICENSE"/>
+        </copy>
+
+        <!-- Linux (just a compressed tarball) -->
+        <tar destfile="${bin}/${pkg.name}.bin.tar.gz" compression="gzip">
+            <zipfileset dir="${bin}" includes="JHelioviewer.jar, README.md, LICENSE" prefix="${pkg.name}"/>
+        </tar>
+        <echo message="${version}.${revision}" file="${bin}/VERSION"/>
+    </target>
+
+</project>
