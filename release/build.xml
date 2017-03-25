@@ -31,8 +31,6 @@
     </target>
 
     <target name="init">
-        <delete dir="${bin}"/>
-        <delete dir="${tmp}"/>
         <mkdir dir="${bin}"/>
         <mkdir dir="${tmp}"/>
         <copy todir="${bin}">
@@ -102,7 +100,7 @@
         </if>
     </target>
 
-   <target name="bundle-windows" depends="init,init-nsis,jar-bundle">
+   <target name="release-windows" depends="init,init-nsis,jar-bundle">
         <exec executable="${nsis.path}/${makensis.executable}" dir="${nsis.path}">
             <arg value="${nsis.argument.prefix}DJHV_VERSION=${version}"/>
             <arg value="${nsis.argument.prefix}DJHV_REVISION=${revision}"/>
@@ -116,12 +114,41 @@
         </exec>
     </target>
 
-    <target name="bundle-tar" depends="init,jar-bundle">
+    <target name="release-mac" depends="init,jar-bundle">
+        <if>
+            <contains string="${os.name}" substring="mac" casesensitive="false"/>
+            <then>
+                <exec executable="chmod" dir="${resources}/mac">
+                    <arg value="u+x"/>
+                    <arg value="bundle.sh"/>
+                </exec>
+                <mkdir dir="${tmp}/mac/"/>
+                <bundleapp outputdirectory="${tmp}/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JHelioviewer" icon="${resources}/mac/JHV_icon.icns" shortversion="${version}" version="${version}.${revision}" copyright="©2017, European Space Agency">
+                    <classpath file="${bin}/JHelioviewer.jar"/>
+                    <option value="-Xdock:name=JHelioviewer"/>
+                </bundleapp>
+                <exec executable="${resources}/mac/bundle.sh">
+                    <env key="TEMP" value="${tmp}/mac"/>
+                    <env key="RESOURCES" value="${resources}/mac"/>
+                    <env key="BUILD" value="${bin}"/>
+                    <env key="NAME" value="${pkg.name}"/>
+                    <env key="README" value="${bin}/README.md"/>
+                    <env key="COPYING" value="${bin}/LICENSE"/>
+                    <env key="VERSION" value="${bin}/VERSION"/>
+                </exec>
+            </then>
+            <else>
+                <echo> Cannot build MacOS dmg file under ${os.name}.</echo>
+            </else>
+        </if>
+    </target>
+
+    <target name="release-tar" depends="init,jar-bundle">
         <tar destfile="${bin}/${pkg.name}.bin.tar.gz" compression="gzip">
             <zipfileset dir="${bin}" includes="JHelioviewer.jar, README.md, LICENSE" prefix="${pkg.name}"/>
         </tar>
     </target>
 
-    <target name="all" depends="bundle-tar,bundle-windows"/>
+    <target name="all" depends="release-tar,release-windows,release-mac"/>
 
 </project>
