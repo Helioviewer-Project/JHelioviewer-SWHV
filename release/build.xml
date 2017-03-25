@@ -2,7 +2,15 @@
 <project default="all">
     <property name="bin" location="bin"/>
     <property name="lib" location="../lib"/>
-    <property name="resources" value="release-resources/"/>
+    <property name="tmp" location="tmp"/>
+    <property name="resources" value="release-resources"/>
+    <property name="jarfile" value="${bin}/JHelioviewer.jar"/>
+
+   <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="${resources}/shared/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
 
     <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask">
         <classpath path="${resources}/mac/lib/appbundler-1.0.jar"/>
@@ -11,6 +19,7 @@
     <taskdef name="nsis" classname="net.sf.nsisant.Task">
         <classpath location="${resources}/windows/nsisant-1.2.jar"/>
     </taskdef>
+    <property name="nsis.path" value="${tmp}/windows/nsis-2.46/"/>
 
     <loadfile property="version" srcFile="../VERSION"/>
     <exec command="git rev-parse --short HEAD" outputproperty="revision"/> <!-- ignore ant warning -->
@@ -18,10 +27,23 @@
 
     <target name="clean">
         <delete dir="${bin}"/>
+        <delete dir="${tmp}"/>
+    </target>
+
+    <target name="init">
+        <delete dir="${bin}"/>
+        <delete dir="${tmp}"/>
+        <mkdir dir="${bin}"/>
+        <mkdir dir="${tmp}"/>
+        <copy todir="${bin}">
+            <file file="../README.md"/>
+            <file file="../LICENSE"/>
+        </copy>
+        <echo message="${version}.${revision}" file="${bin}/VERSION"/>
     </target>
 
     <target name="jar-bundle">
-        <jar destfile="${bin}/JHelioviewer.jar">
+        <jar destfile="${jarfile}">
             <manifest>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
                 <attribute name="Class-Path" value="."/>
@@ -45,18 +67,61 @@
         </jar>
     </target>
 
-    <target name="all" depends="jar-bundle">
-        <mkdir dir="${bin}"/>
-        <copy todir="${bin}">
-            <file file="../README.md"/>
-            <file file="../LICENSE"/>
-        </copy>
+    <target name="init-nsis">
+        <untar src="${resources}/windows/nsis-2.46.tar.bz2" dest="${tmp}/windows" overwrite="false" compression="bzip2"/>
+        <if>
+            <contains string="${os.name}" substring="linux" casesensitive="false"/>
+            <then>
+                <property name="makensis.executable" value="makensis-linux"/>
+                <property name="nsis.argument.prefix" value="-"/>
+            </then>
+            <elseif>
+                <and>
+                    <contains string="${os.name}" substring="mac" casesensitive="false"/>
+                </and>
+                <then>
+                    <property name="makensis.executable" value="makensis-mac-x86"/>
+                    <property name="nsis.argument.prefix" value="-"/>
+                </then>
+            </elseif>
+            <else>
+                <property name="makensis.executable" value="makensis.exe"/>
+                <property name="nsis.argument.prefix" value="/"/>
+            </else>
+        </if>
+        <if>
+            <not>
+                <contains string="${os.name}" substring="windows" casesensitive="false"/>
+            </not>
+            <then>
+                <exec executable="chmod" dir="${nsis.path}">
+                    <arg value="u+x"/>
+                    <arg value="${makensis.executable}"/>
+                </exec>
+            </then>
+        </if>
+    </target>
 
-        <!-- Linux (just a compressed tarball) -->
+   <target name="bundle-windows" depends="init,init-nsis,jar-bundle">
+        <exec executable="${nsis.path}/${makensis.executable}" dir="${nsis.path}">
+            <arg value="${nsis.argument.prefix}DJHV_VERSION=${version}"/>
+            <arg value="${nsis.argument.prefix}DJHV_REVISION=${revision}"/>
+            <arg value="${nsis.argument.prefix}DRESOURCE_PATH=${basedir}/${resources}/windows"/>
+            <arg value="${nsis.argument.prefix}DBUILD_PATH=${bin}"/>
+            <arg value="${nsis.argument.prefix}DFILE_NAME=${pkg.name}"/>
+            <arg value="${nsis.argument.prefix}DREADME_FILE=${bin}/README.md"/>
+            <arg value="${nsis.argument.prefix}DCOPYING_FILE=${bin}/LICENSE"/>
+            <arg value="${nsis.argument.prefix}DVERSION_FILE=${bin}/VERSION"/>
+            <arg value="${basedir}/${resources}/windows/windows-setup.nsi"/>
+        </exec>
+    </target>
+
+    <target name="bundle-tar" depends="init,jar-bundle">
         <tar destfile="${bin}/${pkg.name}.bin.tar.gz" compression="gzip">
             <zipfileset dir="${bin}" includes="JHelioviewer.jar, README.md, LICENSE" prefix="${pkg.name}"/>
         </tar>
-        <echo message="${version}.${revision}" file="${bin}/VERSION"/>
     </target>
+
+    <target name="all" depends="bundle-tar,bundle-windows"/>
 
 </project>
