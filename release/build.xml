@@ -22,7 +22,9 @@
     <property name="nsis.path" value="${tmp}/windows/nsis-2.46/"/>
 
     <loadfile property="version" srcFile="../VERSION"/>
-    <exec command="git rev-parse --short HEAD" outputproperty="revision"/> <!-- ignore ant warning -->
+    <exec executable="git" outputproperty="revision">
+        <arg line="rev-list --count HEAD"/>
+    </exec>
     <property name="pkg.name" value="jhv-${version}.${revision}"/>
 
     <target name="clean">

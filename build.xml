@@ -9,7 +9,9 @@
         <include name="lib/*.jar"/>
     </fileset>
     <loadfile property="version" srcFile="VERSION"/>
-    <exec command="git rev-parse --short HEAD" outputproperty="revision"/> <!-- ignore ant warning -->
+    <exec executable="git" outputproperty="revision">
+        <arg line="rev-list --count HEAD"/>
+    </exec>
 
     <target name="clean">
         <delete dir="${bin}"/>
