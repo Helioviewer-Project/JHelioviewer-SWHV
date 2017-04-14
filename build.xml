@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project default="all">
+<project name="JHelioviewer" default="all">
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
     <property name="resources" location="resources"/>
