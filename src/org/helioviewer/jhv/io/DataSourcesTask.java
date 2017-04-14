@@ -13,7 +13,6 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class DataSourcesTask extends JHVWorker<Void, Void> {
 
@@ -33,7 +32,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
         while (true) {
             Schema schema = null;
             try (InputStream is = FileUtils.getResourceInputStream(schemaName)) {
-                JSONObject rawSchema = new JSONObject(new JSONTokener(is));
+                JSONObject rawSchema = JSONUtils.getJSONStream(is);
                 SchemaLoader schemaLoader = SchemaLoader.builder().schemaJson(rawSchema).addFormatValidator(new TimeUtils.SQLDateTimeFormatValidator()).build();
                 schema = schemaLoader.load().build();
             } catch (Exception e) {
