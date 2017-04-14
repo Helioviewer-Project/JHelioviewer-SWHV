@@ -10,7 +10,6 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
-import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
@@ -18,15 +17,8 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableTimeStamp extends AbstractRenderable {
 
     private static final String name = "Timestamp";
-
-    public void deserialize(JSONObject jo) {
-    }
-
-    public static JSONObject serialize() {
-        JSONObject jo = new JSONObject();
-        jo.put("name", name);
-        return jo;
-    }
+    private final RenderableTimeStampOptionsPanel optionsPanel = new RenderableTimeStampOptionsPanel(this);
+    private double size = 1;
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
@@ -46,7 +38,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
         }
 
         int delta = (int) (vp.height * 0.01);
-        TextRenderer renderer = GLText.getRenderer(Math.min(GLText.TEXT_SIZE_LARGE, (int) (vp.height * 0.02)));
+        TextRenderer renderer = GLText.getRenderer(Math.min(GLText.TEXT_SIZE_LARGE, (int) (vp.height * 0.02 * size)));
 
         renderer.beginRendering(vp.width, vp.height, true);
         renderer.setColor(Color.BLACK);
@@ -54,6 +46,10 @@ public class RenderableTimeStamp extends AbstractRenderable {
         renderer.setColor(Color.WHITE);
         renderer.draw(text, delta + 1, delta + 1);
         renderer.endRendering();
+    }
+
+    void setSize(double _size) {
+        size = _size;
     }
 
     @Override
@@ -67,7 +63,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
 
     @Override
     public Component getOptionsPanel() {
-        return null;
+        return optionsPanel;
     }
 
     @Override
