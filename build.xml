@@ -21,8 +21,8 @@
     <target name="compile">
         <mkdir dir="${bin}"/>
         <javac srcdir="${src}" destdir="${bin}" target="1.8" source="1.8" debug="on" debuglevel="source,lines,vars" includeantruntime="false" encoding="utf-8">
+            <compilerarg value="-Xlint:all"/>
             <classpath>
-                <fileset dir="${src}"/>
                 <fileset refid="libfiles"/>
             </classpath>
         </javac>
