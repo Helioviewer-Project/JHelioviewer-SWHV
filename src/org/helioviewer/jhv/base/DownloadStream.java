@@ -91,7 +91,7 @@ public class DownloadStream {
         if (EventQueue.isDispatchThread())
             throw new IOException("Don't do that");
 
-        Log.debug("Connect to " + url);
+        //Log.debug("Connect to " + url);
         URLConnection connection = url.openConnection();
         // Set timeouts
         connection.setConnectTimeout(connectTimeout);

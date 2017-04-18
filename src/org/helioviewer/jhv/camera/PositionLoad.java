@@ -39,7 +39,7 @@ public class PositionLoad {
 
     private class LoadPositionWorker extends JHVWorker<Position.L[], Void> {
 
-        private static final String baseURL = "http://0.0.0.0:7789/position?";
+        private static final String baseURL = "http://swhv.oma.be/position?";
         private static final String target = "SUN";
 
         private String report = null;
