@@ -33,6 +33,8 @@ public class GLSLSolarShader extends GLSLShader {
     private int sharpenParamRef;
     private int hgltParamRef;
     private int hglnParamRef;
+    private int crotaRef;
+
 
     private int brightParamRef;
     private int colorParamRef;
@@ -66,6 +68,8 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] cutOffValueFloat = new float[3];
     private final float[] polarRadii = new float[2];
     private final int[] enhanced = new int[1];
+    private final float[] crotaFloat = new float[1];
+
 
     private final float[] rectVertex = new float[4];
     private final float[] differencerect = new float[4];
@@ -91,6 +95,8 @@ public class GLSLSolarShader extends GLSLShader {
 
         hgltParamRef = gl.glGetUniformLocation(progID, "hglt");
         hglnParamRef = gl.glGetUniformLocation(progID, "hgln");
+        crotaRef = gl.glGetUniformLocation(progID, "crota");
+
         polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
 
         sharpenParamRef = gl.glGetUniformLocation(progID, "sharpenParam");
@@ -194,6 +200,7 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(viewportOffsetRef, 1, viewportOffset, 0);
         gl.glUniform3fv(cutOffDirectionRef, 1, cutOffDirectionFloat, 0);
         gl.glUniform1fv(cutOffValueRef, 1, cutOffValueFloat, 0);
+        gl.glUniform1fv(crotaRef, 1, crotaFloat, 0);
     }
 
     public void bindIsDisc(GL2 gl, int isDisc) {
@@ -265,5 +272,9 @@ public class GLSLSolarShader extends GLSLShader {
         polarRadii[1] = (float) stop;
         gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
     }
+
+	public void setCROTA(float crota) {
+		crotaFloat[0] = crota;
+	}
 
 }

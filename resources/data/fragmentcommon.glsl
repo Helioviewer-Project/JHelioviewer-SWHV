@@ -24,6 +24,7 @@ uniform float cutOffRadius;
 uniform float outerCutOffRadius;
 uniform float hgln;
 uniform float hglt;
+uniform float crota;
 
 uniform float blurKernel[FSIZE * FSIZE];
 uniform float offset[FSIZE];
