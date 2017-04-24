@@ -34,4 +34,5 @@ public interface MetaData {
 
     Region roiToRegion(SubImage roi, double factorX, double factorY);
 
+	float getCROTA();
 }
