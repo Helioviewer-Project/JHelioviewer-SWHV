@@ -74,6 +74,8 @@ public class HelioviewerMetaData extends AbstractMetaData {
             double maskRotation = -Math.toRadians(m.tryGetDouble("SOLAR_EP"));
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation), Math.cos(maskRotation), 0);
+        } else {
+            CROTA = (float) Math.toRadians(m.tryGetDouble("CROTA2"));
         }
     }
 

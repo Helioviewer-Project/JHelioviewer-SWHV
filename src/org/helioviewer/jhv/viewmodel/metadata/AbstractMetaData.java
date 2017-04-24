@@ -9,6 +9,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 public abstract class AbstractMetaData implements MetaData {
 
     int frameNumber = 0;
+    float CROTA = 0;
     Region region;
 
     int pixelWidth;
@@ -83,5 +84,10 @@ public abstract class AbstractMetaData implements MetaData {
     public Quat getCenterRotation() {
         return viewpoint.orientation;
     }
+    
+	@Override
+	public float getCROTA() {
+		return CROTA;
+	}
 
 }
