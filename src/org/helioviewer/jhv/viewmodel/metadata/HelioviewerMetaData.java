@@ -74,8 +74,6 @@ public class HelioviewerMetaData extends AbstractMetaData {
             double maskRotation = -Math.toRadians(m.tryGetDouble("SOLAR_EP"));
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation), Math.cos(maskRotation), 0);
-        } else {
-            CROTA = (float) Math.toRadians(m.tryGetDouble("CROTA2"));
         }
     }
 
@@ -225,14 +223,16 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
         if (instrument.equals("AIA")) {
-            double crota = m.tryGetDouble("CROTA");
-            if (crota == 0) {
-                crota = m.tryGetDouble("CROTA1");
-                if (crota == 0)
-                    crota = m.tryGetDouble("CROTA2");
+            double temp_crota = m.tryGetDouble("CROTA");
+            if (temp_crota == 0) {
+                temp_crota = m.tryGetDouble("CROTA1");
+                if (temp_crota == 0)
+                    temp_crota = m.tryGetDouble("CROTA2");
             }
-            if (!Double.isNaN(crota))
-                return Quat.rotate(Quat.createRotation(-crota / MathUtils.radeg, new Vec3(0, 0, 1)), viewpoint.orientation);
+            if (!Double.isNaN(temp_crota)) {
+                CROTA = (float) Math.toRadians(temp_crota);
+                return Quat.rotate(Quat.createRotation(-temp_crota / MathUtils.radeg, new Vec3(0, 0, 1)), viewpoint.orientation);
+            }
         }
         return viewpoint.orientation;
     }
