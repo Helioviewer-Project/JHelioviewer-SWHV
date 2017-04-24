@@ -226,7 +226,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             }
             shader.bindAngles(gl, imageData.getMetaData().getViewpointL());
             shader.setPolarRadii(gl, scale.getYstart(), scale.getYstop());
-        	shader.setCROTA((float)imageData.getMetaData().getCROTA());	
+            shader.setCROTA(imageData.getMetaData().getCROTA());
             camera.pop();
 
             enablePositionVBO(gl);

@@ -26,16 +26,15 @@ void main(void)
     float hglto = hglt;
     mat3 rot = mat3(
          cos(hglto),  0.,  sin(hglto),
-         0.            ,  1.,  0.           ,
+         0.            ,  1.,  0.    ,
          -sin(hglto),  0.,  cos(hglto)
     );
-    float ccrota = crota;
     mat3 crot = mat3(
          1., 0., 0.,
          0., cos(crota),  sin(crota),
-         0., -sin(crota),  cos(crota) 
+         0., -sin(crota),  cos(crota)
     );
-    xcartrot =  crot * rot  *xcart; 
+    xcartrot = crot * rot * xcart;
     if(xcartrot.x<0.0)
         discard;
     texcoord.x = xcartrot.y + 0.5;

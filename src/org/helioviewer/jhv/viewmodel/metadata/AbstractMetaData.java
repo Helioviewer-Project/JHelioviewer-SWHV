@@ -84,10 +84,10 @@ public abstract class AbstractMetaData implements MetaData {
     public Quat getCenterRotation() {
         return viewpoint.orientation;
     }
-    
-	@Override
-	public float getCROTA() {
-		return CROTA;
-	}
+
+    @Override
+    public float getCROTA() {
+        return CROTA;
+    }
 
 }
