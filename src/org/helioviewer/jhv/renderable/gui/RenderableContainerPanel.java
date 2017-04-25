@@ -291,7 +291,7 @@ public class RenderableContainerPanel extends JPanel {
 
     public void setOptionsPanel(Renderable renderable) {
         optionsPanelWrapper.removeAll();
-        Component optionsPanel = renderable.getOptionsPanel();
+        Component optionsPanel = renderable == null ? null : renderable.getOptionsPanel();
         if (optionsPanel != null) {
             ComponentUtils.setEnabled(optionsPanel, renderable.isVisible());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);

@@ -153,7 +153,11 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     @Override
     public Object getValueAt(int row, int col) {
-        return renderables.get(row);
+        try {
+            return renderables.get(row);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public void refreshTable() {

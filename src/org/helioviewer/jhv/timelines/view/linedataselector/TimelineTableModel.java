@@ -59,7 +59,11 @@ public class TimelineTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        return elements.get(row);
+        try {
+            return elements.get(row);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public ClickableDrawable getDrawableUnderMouse() {
