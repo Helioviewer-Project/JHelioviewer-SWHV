@@ -40,22 +40,22 @@ public class OpenLocalFileAction extends AbstractAction {
         FileDialog fileDialog = new FileDialog(ImageViewerGui.getMainFrame(), "Choose a file", FileDialog.LOAD);
         // does not work on Windows
         fileDialog.setFilenameFilter(new AllSupportedImageTypesFilenameFilter());
+        fileDialog.setMultipleMode(true);
         fileDialog.setDirectory(Settings.getSingletonInstance().getProperty("default.local.path"));
         fileDialog.setVisible(true);
 
         String directory = fileDialog.getDirectory();
-        String fileName = fileDialog.getFile();
-
-        if (fileName != null && directory != null) {
-            File selectedFile = new File(directory + File.separator + fileName).getAbsoluteFile();
-            if (selectedFile.exists() && selectedFile.isFile()) {
-                // remember the current directory for future
-                Settings.getSingletonInstance().setProperty("default.local.path", directory);
-                Settings.getSingletonInstance().save("default.local.path");
-
-                URI uri = selectedFile.toURI();
-                LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), uri);
-                JHVGlobals.getExecutorService().execute(uriTask);
+        File[] fileNames = fileDialog.getFiles();
+        if (fileNames.length > 0 && directory != null) {
+            // remember the current directory for future
+            Settings.getSingletonInstance().setProperty("default.local.path", directory);
+            Settings.getSingletonInstance().save("default.local.path");
+            for (File fileName : fileNames) {
+                if (fileName.isFile()) {
+                    URI uri = fileName.toURI();
+                    LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), uri);
+                    JHVGlobals.getExecutorService().execute(uriTask);
+                }
             }
         }
     }
