@@ -21,8 +21,8 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
     private String instrument = "";
     private String detector = "";
-    private String measurement = " ";
-    private String observatory = " ";
+    private String measurement = "";
+    private String observatory = "";
     private String fullName = "";
 
     private double unitPerPixelX = 1;
@@ -118,26 +118,27 @@ public class HelioviewerMetaData extends AbstractMetaData {
     private void identifyObservation(MetaDataContainer m) {
         instrument = m.get("INSTRUME");
         if (instrument == null)
-            return;
+            instrument = "";
         instrument = instrument.split("_", 2)[0];
 
         detector = m.get("DETECTOR");
-        if (detector == null) {
-            detector = " ";
-        }
+        if (detector == null)
+            detector = "";
 
         measurement = m.get("WAVELNTH");
         if (measurement == null) {
             int wvI = m.tryGetInt("WAVELNTH");
             if (wvI == 0) {
                 double wvD = m.tryGetDouble("WAVELNTH");
-                measurement = wvD == 0 ? " " : String.valueOf(wvD);
+                measurement = wvD == 0 ? "" : String.valueOf(wvD);
             } else {
                 measurement = String.valueOf(wvI);
             }
         }
 
         observatory = m.get("TELESCOP");
+        if (observatory == null)
+            observatory = "";
 
         if (instrument.contains("VSM")) {
             fullName = "NSO-SOLIS " + measurement;

@@ -13,7 +13,7 @@ import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public class AIAResponse {
-
+/*
     // https://github.com/mjpauly/aia/blob/master/mov_img.py
     private static final HashMap<String, Double> STANDARD_INT = new HashMap<String, Double>() {
         {
@@ -38,7 +38,7 @@ public class AIAResponse {
             put("94",  50.);
         }
     };
-
+*/
     // https://github.com/Helioviewer-Project/jp2gen/blob/master/idl/sdo/aia/hvs_version5_aia.pro
     private static final HashMap<String, Double> HV_MAX = new HashMap<String, Double>() {
         {
@@ -52,7 +52,7 @@ public class AIAResponse {
         }
     };
 
-    private static final HashMap<String, Double> LMSAL_MAX = new HashMap<>();
+//    private static final HashMap<String, Double> LMSAL_MAX = new HashMap<>();
 
     private static final String extPath = "https://raw.githubusercontent.com/mjpauly/aia/master/";
     private static final String intPath = "/data/";
@@ -86,8 +86,8 @@ public class AIAResponse {
         responseData = data;
         referenceData = data.getJSONObject("2010-05-01");
 
-        for (String key : STANDARD_INT.keySet())
-            LMSAL_MAX.put(key, MAX.get(key) / STANDARD_INT.get(key));
+//        for (String key : STANDARD_INT.keySet())
+//            LMSAL_MAX.put(key, MAX.get(key) / STANDARD_INT.get(key));
 
         loaded = true;
     }
