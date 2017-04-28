@@ -3,6 +3,7 @@ package org.helioviewer.jhv.viewmodel.metadata;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,7 +39,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         try {
             NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(_keyword);
             Element line = (Element) value.item(0);
-
             if (line == null)
                 return null;
 
@@ -53,9 +53,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String get(String key) {
         try {
@@ -66,9 +63,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double tryGetDouble(String key) {
         String string = get(key);
@@ -83,9 +77,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         return 0.0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int tryGetInt(String key) {
         String string = get(key);
@@ -98,6 +89,36 @@ public class XMLMetaDataContainer implements MetaDataContainer {
             }
         }
         return 0;
+    }
+
+    @Override
+    public Optional<String> getString(String key) {
+        try {
+            return Optional.of(getValueFromXML(key));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Integer> getInteger(String key) {
+        try {
+            return getString(key).map(val -> Integer.parseInt(val));
+        } catch (NumberFormatException e) {
+            Log.warn("NumberFormatException while trying to parse key " + key + ": ", e);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Double> getDouble(String key) {
+        try {
+            return getString(key).map(val -> Double.parseDouble(val));
+        } catch (NumberFormatException e) {
+            Log.warn("NumberFormatException while trying to parse key " + key + ": ", e);
+        }
+        return Optional.empty();
     }
 
 }

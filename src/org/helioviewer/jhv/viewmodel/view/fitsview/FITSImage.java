@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.Optional;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
@@ -221,6 +222,21 @@ public class FITSImage implements MetaDataContainer {
     @Override
     public int tryGetInt(String key) {
         return header.getIntValue(key);
+    }
+
+    @Override
+    public Optional<String> getString(String key) {
+        return header.findKey(key) == null ? Optional.empty() : Optional.of(header.getStringValue(key));
+    }
+
+    @Override
+    public Optional<Integer> getInteger(String key) {
+        return header.findKey(key) == null ? Optional.empty() : Optional.of(header.getIntValue(key));
+    }
+
+    @Override
+    public Optional<Double> getDouble(String key) {
+        return header.findKey(key) == null ? Optional.empty() : Optional.of(header.getDoubleValue(key));
     }
 
 }
