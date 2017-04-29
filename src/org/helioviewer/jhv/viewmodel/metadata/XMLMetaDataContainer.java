@@ -12,31 +12,32 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 
 public class XMLMetaDataContainer implements MetaDataContainer {
 
-    private NodeList nodeList;
+    Element meta;
 
     public void parseXML(String xml) throws Exception {
         try (InputStream in = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))) {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            nodeList = builder.parse(in).getElementsByTagName("meta");
+            meta = (Element) builder.parse(in).getElementsByTagName("meta").item(0);
         } catch (Exception e) {
-            throw new Exception("Failed parsing XML data", e);
+            throw new Exception("XML metadata parse failure: ", e);
         }
+
+        if (meta == null)
+            throw new Exception("XML metadata without meta tag");
     }
 
     public void destroyXML() {
-        nodeList = null;
+        meta = null;
     }
 
     private String getValueFromXML(String key) {
-        NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(key);
-        Element line = (Element) value.item(0);
+        Element line = (Element) meta.getElementsByTagName(key).item(0);
         if (line == null)
             return null;
 
