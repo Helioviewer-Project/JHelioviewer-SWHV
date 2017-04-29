@@ -38,7 +38,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int brightParamRef;
     private int colorParamRef;
     private int cutOffRadiusRef;
-    private int outerCutOffRadiusRef;
     private int cutOffDirectionRef;
     private int cutOffValueRef;
     private int polarRadiiRef;
@@ -61,10 +60,9 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] hglnParamFloat = new float[1];
     private final float[] brightParamFloat = new float[2];
     private final float[] colorParamFloat = new float[4];
-    private final float[] cutOffRadiusFloat = new float[1];
-    private final float[] outerCutOffRadiusFloat = new float[1];
+    private final float[] cutOffRadiusFloat = new float[2];
     private final float[] cutOffDirectionFloat = new float[3];
-    private final float[] cutOffValueFloat = new float[3];
+    private final float[] cutOffValueFloat = new float[1];
     private final float[] polarRadii = new float[2];
     private final int[] enhanced = new int[1];
     private final float[] crotaFloat = new float[1];
@@ -100,7 +98,6 @@ public class GLSLSolarShader extends GLSLShader {
         brightParamRef = gl.glGetUniformLocation(progID, "brightness");
         colorParamRef = gl.glGetUniformLocation(progID, "colorParam");
         cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
-        outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
         cutOffDirectionRef = gl.glGetUniformLocation(progID, "cutOffDirection");
         cutOffValueRef = gl.glGetUniformLocation(progID, "cutOffValue");
         enhancedParamRef = gl.glGetUniformLocation(progID, "enhanced");
@@ -125,7 +122,7 @@ public class GLSLSolarShader extends GLSLShader {
         setTextureUnit(gl, "lut", 1);
         setTextureUnit(gl, "differenceImage", 2);
         unbind(gl);
-        setCutOffValue(-1f);
+        setCutOffValue(-1);
     }
 
     public static void dispose(GL2 gl) {
@@ -191,10 +188,9 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(sharpenParamRef, 1, sharpenParamFloat, 0);
         gl.glUniform4fv(rectRef, 1, rectVertex, 0);
         gl.glUniform4fv(differenceRectRef, 1, differencerect, 0);
-        gl.glUniform1fv(cutOffRadiusRef, 1, cutOffRadiusFloat, 0);
-        gl.glUniform1fv(outerCutOffRadiusRef, 1, outerCutOffRadiusFloat, 0);
         gl.glUniform2fv(viewportRef, 1, viewport, 0);
         gl.glUniform2fv(viewportOffsetRef, 1, viewportOffset, 0);
+        gl.glUniform2fv(cutOffRadiusRef, 1, cutOffRadiusFloat, 0);
         gl.glUniform3fv(cutOffDirectionRef, 1, cutOffDirectionFloat, 0);
         gl.glUniform1fv(cutOffValueRef, 1, cutOffValueFloat, 0);
         gl.glUniform1fv(crotaRef, 1, crotaFloat, 0);
@@ -238,23 +234,19 @@ public class GLSLSolarShader extends GLSLShader {
         viewport[1] = height;
     }
 
-    public void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {
-        cutOffRadiusFloat[0] = (float) cutOffRadius;
-        outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
+    public void setCutOffRadius(double innerCutOffRadius, double outerCutOffRadius) {
+        cutOffRadiusFloat[0] = (float) innerCutOffRadius;
+        cutOffRadiusFloat[1] = (float) outerCutOffRadius;
     }
 
-    public void setOuterCutOffRadius(double cutOffRadius) {
-        outerCutOffRadiusFloat[0] = (float) cutOffRadius;
+    public void setCutOffValue(double val) {
+        cutOffValueFloat[0] = (float) val;
     }
 
-    public void setCutOffValue(float val) {
-        cutOffValueFloat[0] = val;
-    }
-
-    public void setCutOffDirection(float x, float y, float z) {
-        cutOffDirectionFloat[0] = x;
-        cutOffDirectionFloat[1] = y;
-        cutOffDirectionFloat[2] = z;
+    public void setCutOffDirection(double x, double y, double z) {
+        cutOffDirectionFloat[0] = (float) x;
+        cutOffDirectionFloat[1] = (float) y;
+        cutOffDirectionFloat[2] = (float) z;
     }
 
     public void bindAngles(GL2 gl, Position.L viewpointL) {

@@ -20,8 +20,6 @@ uniform vec4 differencerect;
 uniform sampler1D lut;
 uniform vec2 brightness;
 uniform vec4 colorParam;
-uniform float cutOffRadius;
-uniform float outerCutOffRadius;
 uniform float hgln;
 uniform float hglt;
 uniform float crota;
@@ -37,6 +35,7 @@ uniform vec2 viewport;
 uniform vec2 viewportOffset;
 uniform vec3 cutOffDirection;
 uniform float cutOffValue;
+uniform vec2 cutOffRadius;
 uniform vec2 polarRadii;
 
 float fetch(sampler2D tex, vec2 coord, vec2 bright) {
