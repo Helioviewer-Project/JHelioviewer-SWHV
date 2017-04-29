@@ -138,7 +138,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             if (v instanceof JP2View)
                 xmlText = ((JP2View) v).getXMLMetaData();
             else if (v instanceof FITSView)
-                xmlText = ((FITSView) v).getHeaderAsXML();
+                xmlText = ((FITSView) v).getXMLMetaData();
             else
                 return;
 
