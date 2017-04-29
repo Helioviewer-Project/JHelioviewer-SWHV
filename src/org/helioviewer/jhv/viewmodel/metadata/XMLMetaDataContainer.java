@@ -14,15 +14,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Ints;
+
 public class XMLMetaDataContainer implements MetaDataContainer {
 
     private NodeList nodeList;
 
     public void parseXML(String xml) throws Exception {
-        if (!xml.contains("</meta>")) {
-            throw new Exception("XML data incomplete");
-        }
-
         try (InputStream in = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))) {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             nodeList = builder.parse(in).getElementsByTagName("meta");
@@ -35,32 +34,21 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         nodeList = null;
     }
 
-    private String getValueFromXML(String _keyword) throws Exception {
-        try {
-            NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(_keyword);
-            Element line = (Element) value.item(0);
-            if (line == null)
-                return null;
-
-            Node child = line.getFirstChild();
-            if (child instanceof CharacterData) {
-                CharacterData cd = (CharacterData) child;
-                return cd.getData();
-            }
+    private String getValueFromXML(String key) {
+        NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(key);
+        Element line = (Element) value.item(0);
+        if (line == null)
             return null;
-        } catch (Exception e) {
-            throw new Exception("Failed parsing XML data", e);
-        }
+
+        Node child = line.getFirstChild();
+        if (child instanceof CharacterData)
+            return ((CharacterData) child).getData();
+        return null;
     }
 
     @Override
     public String get(String key) {
-        try {
-            return getValueFromXML(key);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return getValueFromXML(key);
     }
 
     @Override
@@ -93,32 +81,17 @@ public class XMLMetaDataContainer implements MetaDataContainer {
 
     @Override
     public Optional<String> getString(String key) {
-        try {
-            return Optional.of(getValueFromXML(key));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+        return Optional.ofNullable(getValueFromXML(key));
     }
 
     @Override
     public Optional<Integer> getInteger(String key) {
-        try {
-            return getString(key).map(val -> Integer.parseInt(val));
-        } catch (NumberFormatException e) {
-            Log.warn("NumberFormatException while trying to parse key " + key + ": ", e);
-        }
-        return Optional.empty();
+        return getString(key).map(Ints::tryParse);
     }
 
     @Override
     public Optional<Double> getDouble(String key) {
-        try {
-            return getString(key).map(val -> Double.parseDouble(val));
-        } catch (NumberFormatException e) {
-            Log.warn("NumberFormatException while trying to parse key " + key + ": ", e);
-        }
-        return Optional.empty();
+        return getString(key).map(Doubles::tryParse);
     }
 
 }
