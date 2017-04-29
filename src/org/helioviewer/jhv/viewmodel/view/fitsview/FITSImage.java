@@ -220,11 +220,6 @@ public class FITSImage implements MetaDataContainer {
     }
 
     @Override
-    public int tryGetInt(String key) {
-        return header.getIntValue(key);
-    }
-
-    @Override
     public Optional<String> getString(String key) {
         return header.findKey(key) == null ? Optional.empty() : Optional.of(header.getStringValue(key));
     }

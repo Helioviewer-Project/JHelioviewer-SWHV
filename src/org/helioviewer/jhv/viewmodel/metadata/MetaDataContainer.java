@@ -6,8 +6,6 @@ public interface MetaDataContainer {
 
     String get(String key);
 
-    int tryGetInt(String key);
-
     double tryGetDouble(String key);
 
     Optional<String> getString(String key);

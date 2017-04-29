@@ -12,8 +12,8 @@ public abstract class AbstractMetaData implements MetaData {
     float CROTA = 0;
     Region region;
 
-    int pixelWidth;
-    int pixelHeight;
+    int pixelW;
+    int pixelH;
     double responseFactor = 1;
 
     Position.L viewpointL = Sun.EpochEarthL;
@@ -37,12 +37,12 @@ public abstract class AbstractMetaData implements MetaData {
 
     @Override
     public int getPixelWidth() {
-        return pixelWidth;
+        return pixelW;
     }
 
     @Override
     public int getPixelHeight() {
-        return pixelHeight;
+        return pixelH;
     }
 
     @Override

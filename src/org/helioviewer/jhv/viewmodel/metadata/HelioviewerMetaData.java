@@ -116,55 +116,35 @@ public class HelioviewerMetaData extends AbstractMetaData {
     }
 
     private void identifyObservation(MetaDataContainer m) {
-        instrument = m.get("INSTRUME");
-        if (instrument == null)
-            instrument = "";
+        observatory = m.getString("TELESCOP").orElse("");
+        instrument = m.getString("INSTRUME").orElse("");
         instrument = instrument.split("_", 2)[0];
-
-        detector = m.get("DETECTOR");
-        if (detector == null)
-            detector = "";
-
-        measurement = m.get("WAVELNTH");
-        if (measurement == null) {
-            int wvI = m.tryGetInt("WAVELNTH");
-            if (wvI == 0) {
-                double wvD = m.tryGetDouble("WAVELNTH");
-                measurement = wvD == 0 ? "" : String.valueOf(wvD);
-            } else {
-                measurement = String.valueOf(wvI);
-            }
-        }
-
-        observatory = m.get("TELESCOP");
-        if (observatory == null)
-            observatory = "";
+        detector = m.getString("DETECTOR").orElse("");
+        measurement = m.getString("WAVELNTH").orElse("");
 
         if (instrument.contains("VSM")) {
             fullName = "NSO-SOLIS " + measurement;
         } else if (instrument.contains("HMI")) {
-            measurement = m.get("CONTENT");
+            measurement = m.getString("CONTENT").orElse("");
             String str[] = measurement.split(" ", 2);
             fullName = "HMI " + str[0].toLowerCase(Locale.ENGLISH);
         } else if (detector.equals("C2") || detector.equals("C3")) {
-            String measurement1 = m.get("FILTER");
-            String measurement2 = m.get("POLAR");
-            measurement = measurement1 + ' ' + measurement2;
+            measurement = m.getString("FILTER").orElse("") + ' ' + m.getString("POLAR").orElse("");
             fullName = "LASCO " + detector;
         } else if (instrument.equals("MDI")) {
-            measurement = m.get("DPC_OBSR");
+            measurement = m.getString("DPC_OBSR").orElse("");
             fullName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase(Locale.ENGLISH);
         } else if (detector.equals("COR1") || detector.equals("COR2")) {
-            observatory = m.get("OBSRVTRY");
+            observatory = m.getString("OBSRVTRY").orElse("");
             fullName = observatory + ' ' + detector;
         } else if (detector.equals("EUVI")) {
-            observatory = m.get("OBSRVTRY");
+            observatory = m.getString("OBSRVTRY").orElse("");
             fullName = observatory + ' ' + detector + ' ' + measurement;
         } else if (instrument.equals("TRACE")) {
-            measurement = m.get("WAVE_LEN");
+            measurement = m.getString("WAVE_LEN").orElse("");
             fullName = instrument + ' ' + measurement;
         } else if (instrument.equals("XRT")) {
-            measurement = m.get("EC_FW1_") + ' ' + m.get("EC_FW2_");
+            measurement = m.getString("EC_FW1_").orElse("") + ' ' + m.getString("EC_FW2_").orElse("");
             fullName = instrument + ' ' + measurement;
         } else {
             fullName = instrument + ' ' + measurement;
@@ -239,42 +219,35 @@ public class HelioviewerMetaData extends AbstractMetaData {
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
-        pixelWidth = m.tryGetInt("NAXIS1");
-        pixelHeight = m.tryGetInt("NAXIS2");
+        pixelW = m.getInteger("NAXIS1").orElseThrow(MetaDataException::new);
+        pixelH = m.getInteger("NAXIS2").orElseThrow(MetaDataException::new);
 
         if (instrument.equals("CALLISTO")) { // pixel based
-            region = new Region(0, 0, pixelWidth, pixelHeight);
+            region = new Region(0, 0, pixelW, pixelH);
         } else {
-            double arcsecPerPixelX = m.tryGetDouble("CDELT1");
-            double arcsecPerPixelY = m.tryGetDouble("CDELT2");
-            if (Double.isNaN(arcsecPerPixelX) || Double.isNaN(arcsecPerPixelY)) {
-                Log.warn("HelioviewerMetaData.retrievePixelParameters() > CDELT1 or CDELT2 are NaN. Use 0.6 as default value.");
-                arcsecPerPixelX = arcsecPerPixelY = 0.6;
-            }
-            if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
-                Log.warn("HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
-            }
-
+            double arcsecPerPixelX = m.getDouble("CDELT1").orElseThrow(MetaDataException::new);
+            double arcsecPerPixelY = m.getDouble("CDELT2").orElseThrow(MetaDataException::new);
             double radiusSunInArcsec = Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance) * MathUtils.radeg * 3600;
             double unitPerArcsec = Sun.Radius / radiusSunInArcsec;
+
             unitPerPixelX = arcsecPerPixelX * unitPerArcsec;
             unitPerPixelY = arcsecPerPixelY * unitPerArcsec;
 
-            double sunX = m.tryGetDouble("CRPIX1") - 0.5;
-            double sunY = m.tryGetDouble("CRPIX2") - 0.5;
+            double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - 0.5;
+            double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - 0.5;
 
             if (instrument.equals("XRT")) { // until CRVALx of all datasets can be tested
-                double crval1 = m.tryGetDouble("CRVAL1") / arcsecPerPixelX;
-                double crval2 = m.tryGetDouble("CRVAL2") / arcsecPerPixelY;
+                double crval1 = m.getDouble("CRVAL1").orElse(0.) / arcsecPerPixelX;
+                double crval2 = m.getDouble("CRVAL2").orElse(0.) / arcsecPerPixelY;
 
                 sunX -= crval1;
                 sunY -= crval2;
             }
 
             sunPositionX = unitPerPixelX * sunX;
-            sunPositionY = unitPerPixelY * (pixelHeight - 1 - sunY);
+            sunPositionY = unitPerPixelY * (pixelH - 1 - sunY);
 
-            region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelWidth * unitPerPixelX, pixelHeight * unitPerPixelY);
+            region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
         }
     }
 

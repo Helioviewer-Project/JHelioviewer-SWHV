@@ -67,20 +67,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
     }
 
     @Override
-    public int tryGetInt(String key) {
-        String string = get(key);
-        if (string != null) {
-            try {
-                return Integer.parseInt(string);
-            } catch (NumberFormatException e) {
-                Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
-                return Integer.MIN_VALUE;
-            }
-        }
-        return 0;
-    }
-
-    @Override
     public Optional<String> getString(String key) {
         return Optional.ofNullable(getValueFromXML(key));
     }
