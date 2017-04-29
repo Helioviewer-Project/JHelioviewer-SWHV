@@ -9,15 +9,15 @@ public class PixelBasedMetaData extends AbstractMetaData {
     private final double unitPerPixelX;
     private final double unitPerPixelY;
 
-    public PixelBasedMetaData(int newWidth, int newHeight, int frame) {
+    public PixelBasedMetaData(int newW, int newH, int frame) {
         frameNumber = frame;
 
         region = new Region(-0.5, -0.5, 1, 1);
-        pixelWidth = newWidth;
-        pixelHeight = newHeight;
+        pixelW = newW;
+        pixelH = newH;
 
-        unitPerPixelX = Sun.Radius / pixelWidth;
-        unitPerPixelY = Sun.Radius / pixelHeight;
+        unitPerPixelX = Sun.Radius / pixelW;
+        unitPerPixelY = Sun.Radius / pixelH;
     }
 
     @Override
