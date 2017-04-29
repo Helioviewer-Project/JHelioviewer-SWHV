@@ -6,7 +6,6 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
@@ -71,15 +70,15 @@ public class HelioviewerMetaData extends AbstractMetaData {
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
         } else if (instrument.equalsIgnoreCase("SWAP")) {
-            double maskRotation = -Math.toRadians(m.tryGetDouble("SOLAR_EP"));
+            double maskRotation = -Math.toRadians(m.getDouble("SOLAR_EP").orElse(0.));
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation), Math.cos(maskRotation), 0);
         }
     }
 
     private void retrieveOcculterRadii(MetaDataContainer m) {
-        innerRadius = m.tryGetDouble("HV_ROCC_INNER") * Sun.Radius;
-        outerRadius = m.tryGetDouble("HV_ROCC_OUTER") * Sun.Radius;
+        innerRadius = m.getDouble("HV_ROCC_INNER").orElse(innerRadius) * Sun.Radius;
+        outerRadius = m.getDouble("HV_ROCC_OUTER").orElse(outerRadius) * Sun.Radius;
 
         if (innerRadius == 0) {
             if (detector.equalsIgnoreCase("C2")) {
@@ -102,10 +101,6 @@ public class HelioviewerMetaData extends AbstractMetaData {
                 outerRadius = 17 * Sun.Radius;
             }
         }
-        if (outerRadius == 0) {
-            outerRadius = Double.MAX_VALUE;
-        }
-
         // magic
         if (detector.equalsIgnoreCase("C3"))
             innerRadius *= 1.07;
@@ -170,15 +165,10 @@ public class HelioviewerMetaData extends AbstractMetaData {
     }
 
     private void retrievePosition(MetaDataContainer m, JHVDate dateObs) {
-        double distanceObs;
         Position.L p = Sun.getEarth(dateObs);
-
-        if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Sun.RadiusMeter) == 0) {
-            distanceObs = p.rad;
-            if (observatory.equals("SOHO")) {
-                distanceObs *= Sun.L1Factor;
-            }
-        }
+        double distanceObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElse(p.rad);
+        if (observatory.equals("SOHO"))
+            distanceObs *= Sun.L1Factor;
 
         double stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
         if (Double.isNaN(stonyhurstLatitude) || stonyhurstLatitude == 0 /* not found */) {
@@ -227,14 +217,14 @@ public class HelioviewerMetaData extends AbstractMetaData {
         } else {
             double arcsecPerPixelX = m.getDouble("CDELT1").orElseThrow(MetaDataException::new);
             double arcsecPerPixelY = m.getDouble("CDELT2").orElseThrow(MetaDataException::new);
-            double radiusSunInArcsec = Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance) * MathUtils.radeg * 3600;
+            double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
             double unitPerArcsec = Sun.Radius / radiusSunInArcsec;
 
             unitPerPixelX = arcsecPerPixelX * unitPerArcsec;
             unitPerPixelY = arcsecPerPixelY * unitPerArcsec;
 
-            double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - 0.5;
-            double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - 0.5;
+            double sunX = m.getDouble("CRPIX1").orElse((pixelW + 1) / 2.) - .5;
+            double sunY = m.getDouble("CRPIX2").orElse((pixelH + 1) / 2.) - .5;
 
             if (instrument.equals("XRT")) { // until CRVALx of all datasets can be tested
                 double crval1 = m.getDouble("CRVAL1").orElse(0.) / arcsecPerPixelX;
