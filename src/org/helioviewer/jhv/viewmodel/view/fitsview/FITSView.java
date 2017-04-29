@@ -7,11 +7,12 @@ import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
 
 public class FITSView extends AbstractView {
 
-    private final FITSImage fits;
+    private final String xml;
     private final URI uri;
 
     /**
@@ -25,8 +26,13 @@ public class FITSView extends AbstractView {
         if (!uri.getScheme().equalsIgnoreCase("file"))
             throw new Exception("FITS does not support the " + uri.getScheme() + " protocol");
 
-        fits = new FITSImage(uri.toURL().toString());
-        HelioviewerMetaData m = new HelioviewerMetaData(fits, 0);
+        FITSImage fits = new FITSImage(uri.toURL().toString());
+        xml = fits.getHeaderAsXML();
+
+        XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
+        hvMetaData.parseXML(xml);
+        HelioviewerMetaData m = new HelioviewerMetaData(hvMetaData, 0);
+        hvMetaData.destroyXML();
 
         BufferedImage bi = fits.getImage(0, 0, m.getPixelHeight(), m.getPixelWidth());
         if (bi == null)
@@ -45,13 +51,8 @@ public class FITSView extends AbstractView {
         imageData.setMetaData(_metaData);
     }
 
-    /**
-     * Returns the header information as XML string.
-     *
-     * @return XML string including all header information.
-     * */
-    public String getHeaderAsXML() {
-        return fits.getHeaderAsXML();
+    public String getXMLMetaData() {
+        return xml;
     }
 
     @Override

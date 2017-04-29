@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Optional;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
@@ -16,7 +15,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
-import org.helioviewer.jhv.viewmodel.metadata.MetaDataContainer;
 
 /**
  * This class provides access to any FITS file and makes the image data
@@ -25,7 +23,7 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaDataContainer;
  * @author Andreas Hoelzl
  * @author Stephan Pagel
  * */
-public class FITSImage implements MetaDataContainer {
+class FITSImage {
 
     private static final float MDI_THRESHOLD = 2000f;
 
@@ -195,43 +193,18 @@ public class FITSImage implements MetaDataContainer {
      * @return XML string including all FITS header information.
      * */
     public String getHeaderAsXML() {
-        String sep = System.getProperty("line.separator");
-        StringBuilder builder = new StringBuilder("<meta>" + sep + "<fits>" + sep);
+        String nl = System.getProperty("line.separator");
+        StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
 
         for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext();) {
             HeaderCard headerCard = iter.next();
             if (headerCard.getValue() != null) {
-                builder.append('<').append(headerCard.getKey()).append('>').append(headerCard.getValue()).append("</").append(headerCard.getKey()).append('>').append(sep);
+                builder.append('<').append(headerCard.getKey()).append('>').append(headerCard.getValue()).append("</").append(headerCard.getKey()).append('>').append(nl);
             }
         }
-        builder.append("</fits>").append(sep).append("</meta>");
+        builder.append("</fits>").append(nl).append("</meta>");
 
         return builder.toString().replace("&", "&amp;");
-    }
-
-    @Override
-    public String get(String key) {
-        return header.getStringValue(key);
-    }
-
-    @Override
-    public double tryGetDouble(String key) {
-        return header.getDoubleValue(key);
-    }
-
-    @Override
-    public Optional<String> getString(String key) {
-        return header.findKey(key) == null ? Optional.empty() : Optional.of(header.getStringValue(key));
-    }
-
-    @Override
-    public Optional<Integer> getInteger(String key) {
-        return header.findKey(key) == null ? Optional.empty() : Optional.of(header.getIntValue(key));
-    }
-
-    @Override
-    public Optional<Double> getDouble(String key) {
-        return header.findKey(key) == null ? Optional.empty() : Optional.of(header.getDoubleValue(key));
     }
 
 }
