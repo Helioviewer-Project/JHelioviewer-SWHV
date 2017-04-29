@@ -98,6 +98,7 @@ public class GLImage {
         }
 
         MetaData metadata = imageData.getMetaData();
+        shader.setCROTA(metadata.getCROTA());
         shader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
         if (!Displayer.getShowCorona())
             shader.setOuterCutOffRadius(1);

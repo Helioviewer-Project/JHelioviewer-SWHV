@@ -9,7 +9,6 @@ import org.helioviewer.jhv.base.math.Vec3;
 public abstract class AbstractMetaData implements MetaData {
 
     int frameNumber = 0;
-    float CROTA = 0;
     Region region;
 
     int pixelW;
@@ -20,6 +19,7 @@ public abstract class AbstractMetaData implements MetaData {
     Position.Q viewpoint = Sun.EpochEarthQ;
     double innerRadius = 0;
     double outerRadius = Double.MAX_VALUE;
+    double crota;
 
     // Serves only for LASCO cutOff edges
     double cutOffValue = -1;
@@ -86,8 +86,8 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public float getCROTA() {
-        return CROTA;
+    public double getCROTA() {
+        return crota;
     }
 
 }
