@@ -99,14 +99,11 @@ public class GLImage {
 
         MetaData metadata = imageData.getMetaData();
         shader.setCROTA(metadata.getCROTA());
-        shader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
-        if (!Displayer.getShowCorona())
-            shader.setOuterCutOffRadius(1);
-
+        shader.setCutOffRadius(metadata.getInnerCutOffRadius(), Displayer.getShowCorona() ? metadata.getOuterCutOffRadius() : 1);
         if (metadata.getCutOffValue() > 0) {
             Vec3 cdir = metadata.getCutOffDirection();
-            shader.setCutOffDirection((float) cdir.x, (float) cdir.y, 0);
-            shader.setCutOffValue((float) metadata.getCutOffValue());
+            shader.setCutOffDirection(cdir.x, cdir.y, 0);
+            shader.setCutOffValue(metadata.getCutOffValue());
         } else {
             shader.setCutOffValue(-1);
         }

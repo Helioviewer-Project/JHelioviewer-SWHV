@@ -1,5 +1,5 @@
 void main(void) {
-    if (cutOffRadius > 1.)
+    if (cutOffRadius.x > 1.)
         discard;
 
     vec2 normalizedScreenpos = (gl_FragCoord.xy - viewportOffset) / viewport - .5;
