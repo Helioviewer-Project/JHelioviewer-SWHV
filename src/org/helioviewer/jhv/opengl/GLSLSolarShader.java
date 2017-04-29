@@ -205,15 +205,6 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1iv(isDiscRef, 1, isDiscValue, 0);
     }
 
-    public void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {
-        cutOffRadiusFloat[0] = (float) cutOffRadius;
-        outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
-    }
-
-    public void setOuterCutOffRadius(double cutOffRadius) {
-        outerCutOffRadiusFloat[0] = (float) cutOffRadius;
-    }
-
     public void setColor(float red, float green, float blue, float alpha) {
         colorParamFloat[0] = red;
         colorParamFloat[1] = green;
@@ -247,6 +238,15 @@ public class GLSLSolarShader extends GLSLShader {
         viewport[1] = height;
     }
 
+    public void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {
+        cutOffRadiusFloat[0] = (float) cutOffRadius;
+        outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
+    }
+
+    public void setOuterCutOffRadius(double cutOffRadius) {
+        outerCutOffRadiusFloat[0] = (float) cutOffRadius;
+    }
+
     public void setCutOffValue(float val) {
         cutOffValueFloat[0] = val;
     }
@@ -270,8 +270,8 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
     }
 
-    public void setCROTA(float crota) {
-        crotaFloat[0] = crota;
+    public void setCROTA(double crota) {
+        crotaFloat[0] = (float) crota;
     }
 
 }

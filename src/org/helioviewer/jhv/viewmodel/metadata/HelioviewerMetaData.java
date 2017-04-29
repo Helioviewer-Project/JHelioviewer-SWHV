@@ -194,15 +194,15 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
         if (instrument.equals("AIA")) {
-            double crota = m.tryGetDouble("CROTA");
+            crota = m.tryGetDouble("CROTA");
             if (crota == 0) {
                 crota = m.tryGetDouble("CROTA1");
                 if (crota == 0)
                     crota = m.tryGetDouble("CROTA2");
             }
             if (!Double.isNaN(crota)) {
-                CROTA = (float) Math.toRadians(crota);
-                return Quat.rotate(Quat.createRotation(-CROTA, new Vec3(0, 0, 1)), viewpoint.orientation);
+                crota = Math.toRadians(crota);
+                return Quat.rotate(Quat.createRotation(-crota, new Vec3(0, 0, 1)), viewpoint.orientation);
             }
         }
         return viewpoint.orientation;

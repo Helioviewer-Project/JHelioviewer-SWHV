@@ -20,6 +20,8 @@ public interface MetaData {
 
     Position.Q getViewpoint();
 
+    double getCROTA();
+
     double getInnerCutOffRadius();
 
     double getOuterCutOffRadius();
@@ -33,7 +35,5 @@ public interface MetaData {
     Quat getCenterRotation();
 
     Region roiToRegion(SubImage roi, double factorX, double factorY);
-
-    float getCROTA();
 
 }
