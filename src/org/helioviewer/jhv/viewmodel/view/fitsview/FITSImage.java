@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view.fitsview;
 
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
@@ -16,19 +15,12 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
 
-/**
- * This class provides access to any FITS file and makes the image data
- * available.
- *
- * @author Andreas Hoelzl
- * @author Stephan Pagel
- * */
 class FITSImage {
 
     private static final float MDI_THRESHOLD = 2000f;
 
-    private Header header;
-    private BufferedImage image = null;
+    final String xml;
+    ImageData imageData;
 
     public FITSImage(String url) throws Exception {
         try (Fits f = new Fits(url)) {
@@ -36,14 +28,12 @@ class FITSImage {
             BasicHDU<?> hdu = f.readHDU();
             if (hdu == null)
                 throw new Exception("Could not read FITS: " + url);
+            xml = getHeaderAsXML(hdu.getHeader());
             readHDU(hdu);
         }
     }
 
     private void readHDU(BasicHDU<?> hdu) throws Exception {
-        header = hdu.getHeader();
-        ImageData imageData = null;
-
         int bitsPerPixel = hdu.getBitPix();
         if (bitsPerPixel == BasicHDU.BITPIX_BYTE) {
             // get image raw data
@@ -114,6 +104,7 @@ class FITSImage {
             short[] data = new short[width * height];
             // if it is an MDI magnetogram image use threshold when converting the data
             // otherwise set minimum value to zero and maximum value to 2^16 and scale values between
+            Header header = hdu.getHeader();
             String instrument = header.getStringValue("INSTRUME");
             String measurement = header.getStringValue("DPC_OBSR");
 
@@ -146,35 +137,6 @@ class FITSImage {
             }
             imageData = new SingleChannelShortImageData(width, height, 16, ShortBuffer.wrap(data));
         }
-        if (imageData != null)
-            image = imageData.getBufferedImage();
-    }
-
-    /**
-     * Returns the image data of the specified area as an image object.
-     *
-     * @param x
-     *            X pixel coordinate of the top left point of the region.
-     * @param y
-     *            Y pixel coordinate of the top left point of the region.
-     * @param height
-     *            Height in pixel of the region.
-     * @param width
-     *            Width in pixel of the region.
-     * @return an BufferedImage which represents the image data of the specified
-     *         area or null of no image data is available or the width or height
-     *         parameter is less than 1 pixel.
-     * */
-    public BufferedImage getImage(int x, int y, int height, int width) {
-        // check parameters and image source
-        if (image == null || width <= 0 || height <= 0) {
-            return null;
-        }
-        // create new buffered image with requested region
-        BufferedImage subImage = new BufferedImage(width, height, image.getType());
-        subImage.getGraphics().drawImage(image.getSubimage(x, y, width, height), 0, 0, null);
-        // return new buffered image
-        return subImage;
     }
 
     /**
@@ -182,7 +144,7 @@ class FITSImage {
      *
      * @return XML string including all FITS header information.
      * */
-    public String getHeaderAsXML() {
+    public String getHeaderAsXML(Header header) {
         String nl = System.getProperty("line.separator");
         StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
 
