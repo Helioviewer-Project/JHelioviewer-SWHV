@@ -2,6 +2,7 @@ package org.helioviewer.jhv.viewmodel.view.fitsview;
 
 import java.net.URI;
 
+import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
@@ -47,6 +48,14 @@ public class FITSView extends AbstractView {
     @Override
     public URI getURI() {
         return uri;
+    }
+
+    @Override
+    public LUT getDefaultLUT() {
+        if (_metaData instanceof HelioviewerMetaData) {
+            return LUT.get((HelioviewerMetaData) _metaData);
+        }
+        return null;
     }
 
 }
