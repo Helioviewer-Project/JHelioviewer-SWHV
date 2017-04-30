@@ -54,11 +54,9 @@ class FITSImage {
             // transform image raw data into 1D image
             byte[] data = new byte[width * height];
 
-            int counter = 0;
             for (int h = 0; h < height; h++) {
                 for (int w = 0; w < width; w++) {
-                    data[counter] = data2D[h][w];
-                    counter++;
+                    data[width * (height - 1 - h) + w] = data2D[h][w];
                 }
             }
             imageData = new SingleChannelByte8ImageData(width, height, ByteBuffer.wrap(data));
@@ -72,15 +70,13 @@ class FITSImage {
             // analyze the highest value when transfering the data
             short[] data = new short[width * height];
             int highestValue = Integer.MIN_VALUE;
-            int counter = 0;
             boolean hasNegativValue = false;
             for (int h = 0; h < height; h++) {
                 for (int w = 0; w < width; w++) {
                     if (!hasNegativValue)
                         hasNegativValue = data2D[h][w] < 0;
                     highestValue = data2D[h][w] > highestValue ? data2D[h][w] : highestValue;
-                    data[counter] = data2D[h][w];
-                    counter++;
+                    data[width * (height - 1 - h) + w] = data2D[h][w];
                 }
             }
 
@@ -102,11 +98,9 @@ class FITSImage {
             int height = data2D.length;
             // transform image raw data into 1D image
             int[] data = new int[width * height];
-            int counter = 0;
             for (int h = 0; h < height; h++) {
                 for (int w = 0; w < width; w++) {
-                    data[counter] = data2D[h][w];
-                    counter++;
+                    data[width * (height - 1 - h) + w] = data2D[h][w];
                 }
             }
             imageData = new ARGBInt32ImageData(false, width, height, IntBuffer.wrap(data));
@@ -124,14 +118,12 @@ class FITSImage {
             String measurement = header.getStringValue("DPC_OBSR");
 
             if (instrument != null && measurement != null && instrument.equals("MDI") && measurement.equals("FD_Magnetogram_Sum")) {
-                int counter = 0;
                 float doubleThreshold = MDI_THRESHOLD * 2.0f;
                 for (int h = 0; h < height; h++) {
                     for (int w = 0; w < width; w++) {
                         float value = data2D[h][w] + MDI_THRESHOLD;
                         value = value < 0.0f ? 0.0f : (value > doubleThreshold ? doubleThreshold : value);
-                        data[counter] = (short) ((value * 65535) / doubleThreshold);
-                        counter++;
+                        data[width * (height - 1 - h) + w] = (short) ((value * 65535) / doubleThreshold);
                     }
                 }
             } else {
@@ -145,12 +137,10 @@ class FITSImage {
                     }
                 }
                 // transform image raw data into 1D image
-                int counter = 0;
                 float difference = maxValue - minValue;
                 for (int h = 0; h < height; h++) {
                     for (int w = 0; w < width; w++) {
-                        data[counter] = (short) (((data2D[h][w] - minValue) / difference) * 65536.0f);
-                        counter++;
+                        data[width * (height - 1 - h) + w] = (short) (((data2D[h][w] - minValue) / difference) * 65536.0f);
                     }
                 }
             }
