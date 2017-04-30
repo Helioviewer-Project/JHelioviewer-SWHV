@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.fitsview;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import nom.tam.fits.BasicHDU;
@@ -10,7 +9,6 @@ import nom.tam.fits.Header;
 import nom.tam.fits.HeaderCard;
 import nom.tam.util.Cursor;
 
-import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
@@ -87,13 +85,24 @@ class FITSImage {
             int width = data2D[0].length;
             int height = data2D.length;
             // transform image raw data into 1D image
-            int[] data = new int[width * height];
+            short[] data = new short[width * height];
+            // get the minimum and maximum value from current data
+            int minValue = Integer.MAX_VALUE;
+            int maxValue = Integer.MIN_VALUE;
             for (int h = 0; h < height; h++) {
                 for (int w = 0; w < width; w++) {
-                    data[width * (height - 1 - h) + w] = data2D[h][w];
+                    minValue = data2D[h][w] < minValue ? data2D[h][w] : minValue;
+                    maxValue = data2D[h][w] > maxValue ? data2D[h][w] : maxValue;
                 }
             }
-            imageData = new ARGBInt32ImageData(false, width, height, IntBuffer.wrap(data));
+            // transform image raw data into 1D image
+            float difference = maxValue - minValue;
+            for (int h = 0; h < height; h++) {
+                for (int w = 0; w < width; w++) {
+                    data[width * (height - 1 - h) + w] = (short) (((data2D[h][w] - minValue) / difference) * 65535f);
+                }
+            }
+            imageData = new SingleChannelShortImageData(width, height, 16, ShortBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
             // get image raw data
             float[][] data2D = (float[][]) hdu.getKernel();
@@ -131,7 +140,7 @@ class FITSImage {
                 float difference = maxValue - minValue;
                 for (int h = 0; h < height; h++) {
                     for (int w = 0; w < width; w++) {
-                        data[width * (height - 1 - h) + w] = (short) (((data2D[h][w] - minValue) / difference) * 65536.0f);
+                        data[width * (height - 1 - h) + w] = (short) (((data2D[h][w] - minValue) / difference) * 65535f);
                     }
                 }
             }
@@ -139,12 +148,7 @@ class FITSImage {
         }
     }
 
-    /**
-     * Returns the FITS header information as XML string.
-     *
-     * @return XML string including all FITS header information.
-     * */
-    public String getHeaderAsXML(Header header) {
+    private String getHeaderAsXML(Header header) {
         String nl = System.getProperty("line.separator");
         StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
 
@@ -155,7 +159,6 @@ class FITSImage {
             }
         }
         builder.append("</fits>").append(nl).append("</meta>");
-
         return builder.toString().replace("&", "&amp;");
     }
 
