@@ -18,7 +18,7 @@ uniform sampler2D differenceImage;
 uniform vec4 rect;
 uniform vec4 differencerect;
 uniform sampler1D lut;
-uniform vec2 brightness;
+uniform vec3 brightness;
 uniform vec4 colorParam;
 uniform float hgln;
 uniform float hglt;
@@ -38,12 +38,12 @@ uniform float cutOffValue;
 uniform vec2 cutOffRadius;
 uniform vec2 polarRadii;
 
-float fetch(sampler2D tex, vec2 coord, vec2 bright) {
-    return texture2D(tex, coord).r * bright.y + bright.x;
+float fetch(sampler2D tex, vec2 coord, vec3 bright) {
+    return pow(texture2D(tex, coord).r, bright.z) * bright.y + bright.x;
 }
 
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
-    vec2 b = brightness;
+    vec3 b = brightness;
     if (enhanced == 1) {
         b.y *= factor;
     }
