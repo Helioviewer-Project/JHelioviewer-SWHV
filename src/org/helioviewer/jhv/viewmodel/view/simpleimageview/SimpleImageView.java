@@ -33,7 +33,7 @@ public class SimpleImageView extends AbstractView {
         if (image.getColorModel().getPixelSize() <= 8) {
             imageData = new SingleChannelByte8ImageData(image);
         } else if (image.getColorModel().getPixelSize() <= 16) {
-            imageData = new SingleChannelShortImageData(image.getColorModel().getPixelSize(), image);
+            imageData = new SingleChannelShortImageData(image.getColorModel().getPixelSize(), 1, image);
         } else {
             imageData = new ARGBInt32ImageData(image);
         }

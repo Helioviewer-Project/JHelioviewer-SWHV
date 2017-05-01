@@ -14,6 +14,7 @@ public abstract class ImageData {
     final int width;
     final int height;
     private final int bpp;
+    private final double gamma;
     Buffer buffer;
 
     BufferedImage image = null;
@@ -23,10 +24,11 @@ public abstract class ImageData {
     private Position.Q viewpoint;
     private boolean uploaded = false;
 
-    ImageData(int newWidth, int newHeight, int newBpp) {
-        width = newWidth;
-        height = newHeight;
-        bpp = newBpp;
+    ImageData(int _width, int _height, int _bpp, double _gamma) {
+        width = _width;
+        height = _height;
+        bpp = _bpp;
+        gamma = _gamma;
     }
 
     public int getHeight() {
@@ -39,6 +41,10 @@ public abstract class ImageData {
 
     public int getBitsPerPixel() {
         return bpp;
+    }
+
+    public double getGamma() {
+        return gamma;
     }
 
     public Buffer getBuffer() {

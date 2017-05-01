@@ -16,6 +16,7 @@ import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
 class FITSImage {
 
     private static final float MDI_THRESHOLD = 2000f;
+    private static final double GAMMA = 1 / 2.2;
 
     final String xml;
     ImageData imageData;
@@ -77,7 +78,7 @@ class FITSImage {
                     data[i] <<= shiftBits;
                 }
             }
-            imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, ShortBuffer.wrap(data));
+            imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, GAMMA, ShortBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
             // get image raw data
             int[][] data2D = (int[][]) hdu.getKernel();
@@ -102,7 +103,7 @@ class FITSImage {
                     data[width * (height - 1 - h) + w] = (short) (((data2D[h][w] - minValue) / difference) * 65535f);
                 }
             }
-            imageData = new SingleChannelShortImageData(width, height, 16, ShortBuffer.wrap(data));
+            imageData = new SingleChannelShortImageData(width, height, 16, GAMMA, ShortBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
             // get image raw data
             float[][] data2D = (float[][]) hdu.getKernel();
@@ -144,7 +145,7 @@ class FITSImage {
                     }
                 }
             }
-            imageData = new SingleChannelShortImageData(width, height, 16, ShortBuffer.wrap(data));
+            imageData = new SingleChannelShortImageData(width, height, 16, GAMMA, ShortBuffer.wrap(data));
         }
     }
 

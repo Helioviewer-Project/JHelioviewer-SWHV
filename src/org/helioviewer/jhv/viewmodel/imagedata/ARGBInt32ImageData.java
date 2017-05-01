@@ -21,50 +21,18 @@ public class ARGBInt32ImageData extends ImageData {
 
     private final ARGB32ImageFormat format = new ARGB32ImageFormat();
 
-    /**
-     * Constructor, given an array as data source.
-     *
-     * This constructor receives the raw data as a data source. If the caller
-     * handles raw data as well, the use of this constructor is recommended.
-     * The pixel data has to be given as a one-dimensional array containing the
-     * pixel data line by line. Each array element represents one pixel.
-     *
-     * @param singleChannel
-     *
-     * @param newWidth
-     *            width of the image
-     * @param newHeight
-     *            height of the image
-     */
-    public ARGBInt32ImageData(boolean singleChannel, int newWidth, int newHeight, Buffer _buffer) {
-        super(newWidth, newHeight, 32);
-        format.setSingleChannel(true);
+    public ARGBInt32ImageData(boolean singleChannel, int _width, int _height, Buffer _buffer) {
+        super(_width, _height, 32, 1);
+        format.setSingleChannel(singleChannel);
         buffer = _buffer;
     }
 
-    /**
-     * Constructor, given an BufferedImage as data source.
-     *
-     * This constructor receives a BufferedImage as data source. If the caller
-     * operates on BufferedImages as well, the use of this constructor is
-     * recommended.
-     *
-     * @param newImage
-     *            pixel data
-     */
     public ARGBInt32ImageData(BufferedImage newImage) {
-        super(newImage.getWidth(), newImage.getHeight(), 32);
+        super(newImage.getWidth(), newImage.getHeight(), 32, 1);
         image = newImage;
         readImageTransportFromBufferedImage(newImage);
     }
 
-    /**
-     * Internal function to extract the ImageTransport-Object from the given
-     * BufferedImage.
-     *
-     * @param newImage
-     *            source image
-     */
     private void readImageTransportFromBufferedImage(BufferedImage newImage) {
         int[] outputData = new int[1];
 

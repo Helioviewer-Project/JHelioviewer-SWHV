@@ -18,36 +18,13 @@ public class RGBInt24ImageData extends ImageData {
 
     private static final ImageFormat format = new RGB24ImageFormat();
 
-    /**
-     * Constructor, given an array as data source.
-     *
-     * This constructor receives the raw data as a data source. If the caller
-     * handles raw data as well, the use of this constructor is recommended.
-     * The pixel data has to be given as a one-dimensional array containing the
-     * pixel data line by line. Each array element represents one pixel.
-     *
-     * @param newWidth
-     *            width of the image
-     * @param newHeight
-     *            height of the image
-     */
-    public RGBInt24ImageData(int newWidth, int newHeight, Buffer _buffer) {
-        super(newWidth, newHeight, 32);
+    public RGBInt24ImageData(int _width, int _height, Buffer _buffer) {
+        super(_width, _height, 32, 1);
         buffer = _buffer;
     }
 
-    /**
-     * Constructor, given an BufferedImage as data source.
-     *
-     * This constructor receives a BufferedImage as data source. If the caller
-     * operates on BufferedImages as well, the use of this constructor is
-     * recommended.
-     *
-     * @param newImage
-     *            pixel data
-     */
     public RGBInt24ImageData(BufferedImage newImage) {
-        super(newImage.getWidth(), newImage.getHeight(), 32);
+        super(newImage.getWidth(), newImage.getHeight(), 32, 1);
         image = newImage;
         buffer = IntBuffer.wrap(((DataBufferInt) newImage.getRaster().getDataBuffer()).getData());
     }
