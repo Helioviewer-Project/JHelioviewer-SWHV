@@ -5,7 +5,7 @@
     <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
     <classpathentry kind="lib" path="lib/annotations-3.0.1u2.jar"/>
     <classpathentry kind="lib" path="lib/annotations-java8.jar"/>
-    <classpathentry kind="lib" path="lib/commons-compress-1.13.jar"/>
+    <classpathentry kind="lib" path="lib/commons-compress-1.12.jar"/>
     <classpathentry kind="lib" path="lib/gluegen-rt.jar"/>
     <classpathentry kind="lib" path="lib/gluegen-rt-natives-linux-amd64.jar"/>
     <classpathentry kind="lib" path="lib/gluegen-rt-natives-linux-i586.jar"/>
