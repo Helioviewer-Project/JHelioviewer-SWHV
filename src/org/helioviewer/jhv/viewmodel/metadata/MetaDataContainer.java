@@ -2,7 +2,7 @@ package org.helioviewer.jhv.viewmodel.metadata;
 
 import java.util.Optional;
 
-public interface MetaDataContainer {
+interface MetaDataContainer {
 
     String get(String key);
 
