@@ -58,7 +58,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] sharpenParamFloat = new float[3];
     private final float[] hgltParamFloat = new float[1];
     private final float[] hglnParamFloat = new float[1];
-    private final float[] brightParamFloat = new float[2];
+    private final float[] brightParamFloat = new float[3];
     private final float[] colorParamFloat = new float[4];
     private final float[] cutOffRadiusFloat = new float[2];
     private final float[] cutOffDirectionFloat = new float[3];
@@ -183,7 +183,7 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
 
         gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
-        gl.glUniform2fv(brightParamRef, 1, brightParamFloat, 0);
+        gl.glUniform3fv(brightParamRef, 1, brightParamFloat, 0);
         gl.glUniform4fv(colorParamRef, 1, colorParamFloat, 0);
         gl.glUniform3fv(sharpenParamRef, 1, sharpenParamFloat, 0);
         gl.glUniform4fv(rectRef, 1, rectVertex, 0);
@@ -208,9 +208,10 @@ public class GLSLSolarShader extends GLSLShader {
         colorParamFloat[3] = alpha;
     }
 
-    public void setBrightness(float bOffset, float bScale) {
-        brightParamFloat[0] = bOffset;
-        brightParamFloat[1] = bScale;
+    public void setBrightness(float offset, float scale, float gamma) {
+        brightParamFloat[0] = offset;
+        brightParamFloat[1] = scale;
+        brightParamFloat[2] = gamma;
     }
 
     public void setSharpen(float weighting, float pixelWidth, float pixelHeight, float span) {

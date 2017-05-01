@@ -58,7 +58,7 @@ public class GLImage {
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         applyRegion(imageData, prevImageData, baseImageData, shader);
 
-        shader.setBrightness(brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()));
+        shader.setBrightness(brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()), (float) imageData.getGamma());
         shader.setColor(red, green, blue, opacity);
         shader.setEnhanced(enhanced);
 
