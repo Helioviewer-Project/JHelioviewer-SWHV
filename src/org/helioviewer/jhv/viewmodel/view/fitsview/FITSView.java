@@ -3,6 +3,7 @@ package org.helioviewer.jhv.viewmodel.view.fitsview;
 import java.net.URI;
 
 import org.helioviewer.jhv.base.lut.LUT;
+import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
@@ -27,8 +28,11 @@ public class FITSView extends AbstractView {
 
         _metaData = m;
         imageData = fits.imageData;
-        imageData.setRegion(_metaData.getPhysicalRegion());
-        imageData.setMetaData(_metaData);
+
+        int w = m.getPixelWidth();
+        int h = m.getPixelHeight();
+        imageData.setRegion(m.roiToRegion(new SubImage(0, 0, w, h, w, h), 1, 1));
+        imageData.setMetaData(m);
     }
 
     public String getXMLMetaData() {

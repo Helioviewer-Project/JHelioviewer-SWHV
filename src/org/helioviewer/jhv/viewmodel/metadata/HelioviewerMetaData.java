@@ -105,8 +105,8 @@ public class HelioviewerMetaData extends AbstractMetaData {
         if (detector.equalsIgnoreCase("C3"))
             innerRadius *= 1.07;
         if (instrument.equals("MDI") || instrument.equals("HMI") ||
-                observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
-                observatory.equals("NSO-GONG") || observatory.equals("NSO-SOLIS"))
+            observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
+            observatory.equals("NSO-GONG") || observatory.equals("NSO-SOLIS"))
             outerRadius = 1;
     }
 
