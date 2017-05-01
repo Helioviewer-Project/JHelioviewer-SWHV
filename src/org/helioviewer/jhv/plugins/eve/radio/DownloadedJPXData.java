@@ -49,10 +49,10 @@ class DownloadedJPXData implements ImageDataHandler {
                 XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
 
                 hvMetaData.parseXML(_view.getXMLMetaData());
-                endFreq = hvMetaData.getDouble("STARTFRQ").orElseThrow(MetaDataException::new);
-                startFreq = hvMetaData.getDouble("END-FREQ").orElseThrow(MetaDataException::new);
-                startDate = TimeUtils.parse(hvMetaData.getString("DATE-OBS").orElseThrow(MetaDataException::new));
-                endDate = TimeUtils.parse(hvMetaData.getString("DATE-END").orElseThrow(MetaDataException::new));
+                endFreq = hvMetaData.getDouble("STARTFRQ").orElseThrow(() -> new MetaDataException("STARTFRQ"));
+                startFreq = hvMetaData.getDouble("END-FREQ").orElseThrow(() -> new MetaDataException("END-FREQ"));
+                startDate = TimeUtils.parse(hvMetaData.getString("DATE-OBS").orElseThrow(() -> new MetaDataException("DATE-OBS")));
+                endDate = TimeUtils.parse(hvMetaData.getString("DATE-END").orElseThrow(() -> new MetaDataException(("DATE-END"))));
                 hvMetaData.destroyXML();
 
                 if (startDate == start && endDate <= start + TimeUtils.DAY_IN_MILLIS) {

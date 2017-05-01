@@ -69,11 +69,11 @@ public class HelioviewerMetaData extends AbstractMetaData {
             double maskRotation = -Math.toRadians(m.tryGetDouble("CROTA"));
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
-        } else if (instrument.equalsIgnoreCase("SWAP")) {
+        }/* else if (instrument.equalsIgnoreCase("SWAP")) {
             double maskRotation = -Math.toRadians(m.getDouble("SOLAR_EP").orElse(0.));
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation), Math.cos(maskRotation), 0);
-        }
+        }*/
     }
 
     private void retrieveOcculterRadii(MetaDataContainer m) {
@@ -209,14 +209,19 @@ public class HelioviewerMetaData extends AbstractMetaData {
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
-        pixelW = m.getInteger("NAXIS1").orElseThrow(MetaDataException::new);
-        pixelH = m.getInteger("NAXIS2").orElseThrow(MetaDataException::new);
+        if (m.getInteger("ZNAXIS").isPresent()) {
+            pixelW = m.getInteger("ZNAXIS1").orElseThrow(() -> new MetaDataException("ZNAXIS1"));
+            pixelH = m.getInteger("ZNAXIS2").orElseThrow(() -> new MetaDataException("ZNAXIS2"));
+        } else {
+            pixelW = m.getInteger("NAXIS1").orElseThrow(() -> new MetaDataException("NAXIS1"));
+            pixelH = m.getInteger("NAXIS2").orElseThrow(() -> new MetaDataException("NAXIS2"));
+        }
 
         if (instrument.equals("CALLISTO")) { // pixel based
             region = new Region(0, 0, pixelW, pixelH);
         } else {
-            double arcsecPerPixelX = m.getDouble("CDELT1").orElseThrow(MetaDataException::new);
-            double arcsecPerPixelY = m.getDouble("CDELT2").orElseThrow(MetaDataException::new);
+            double arcsecPerPixelX = m.getDouble("CDELT1").orElseThrow(() -> new MetaDataException("CDELT1"));
+            double arcsecPerPixelY = m.getDouble("CDELT2").orElseThrow(() -> new MetaDataException("CDELT2"));
             double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
             double unitPerArcsec = Sun.Radius / radiusSunInArcsec;
 

@@ -7,6 +7,8 @@ import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 import nom.tam.fits.HeaderCard;
+import nom.tam.fits.ImageHDU;
+import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
@@ -18,17 +20,30 @@ class FITSImage {
     private static final float MDI_THRESHOLD = 2000f;
     private static final double GAMMA = 1 / 2.2;
 
-    final String xml;
+    String xml;
     ImageData imageData;
 
     public FITSImage(String url) throws Exception {
         try (Fits f = new Fits(url)) {
-            // get basic information from file
-            BasicHDU<?> hdu = f.readHDU();
-            if (hdu == null)
+            BasicHDU<?>[] hdus = f.read();
+            // this is cumbersome
+            for (BasicHDU<?> hdu : hdus) {
+                if (hdu instanceof CompressedImageHDU) {
+                    xml = getHeaderAsXML(hdu.getHeader());
+                    readHDU(((CompressedImageHDU) hdu).asImageHDU());
+                    return;
+                }
+            }
+            for (BasicHDU<?> hdu : hdus) {
+                if (hdu instanceof ImageHDU) {
+                    xml = getHeaderAsXML(hdu.getHeader());
+                    readHDU(hdu);
+                    return;
+                }
+            }
+        } finally {
+            if (imageData == null)
                 throw new Exception("Could not read FITS: " + url);
-            xml = getHeaderAsXML(hdu.getHeader());
-            readHDU(hdu);
         }
     }
 
