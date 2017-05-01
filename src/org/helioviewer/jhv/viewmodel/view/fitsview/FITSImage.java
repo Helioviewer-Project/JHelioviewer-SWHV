@@ -40,9 +40,8 @@ class FITSImage {
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-            // transform image raw data into 1D image
-            byte[] data = new byte[width * height];
 
+            byte[] data = new byte[width * height];
             for (int h = 0; h < height; h++) {
                 for (int w = 0; w < width; w++) {
                     data[width * (height - 1 - h) + w] = data2D[h][w];
@@ -55,52 +54,45 @@ class FITSImage {
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-            // transform image raw data into 1D image and
-            // analyze the highest value when transfering the data
-            short[] data = new short[width * height];
-            int highestValue = Integer.MIN_VALUE;
-            boolean hasNegativValue = false;
-            for (int h = 0; h < height; h++) {
-                for (int w = 0; w < width; w++) {
-                    if (!hasNegativValue)
-                        hasNegativValue = data2D[h][w] < 0;
-                    highestValue = data2D[h][w] > highestValue ? data2D[h][w] : highestValue;
-                    data[width * (height - 1 - h) + w] = data2D[h][w];
-                }
-            }
-
-            // if first bit is not set, shift bits
-            if (!hasNegativValue) {
-                // compute number of bits to shift
-                int shiftBits = BasicHDU.BITPIX_SHORT - ((int) Math.ceil(Math.log(highestValue) / Math.log(2)));
-                // shift bits of all values
-                for (int i = 0; i < data.length; i++) {
-                    data[i] <<= shiftBits;
-                }
-            }
-            imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, GAMMA, ShortBuffer.wrap(data));
-        } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
-            // get image raw data
-            int[][] data2D = (int[][]) hdu.getKernel();
-            // get width and height of image
-            int width = data2D[0].length;
-            int height = data2D.length;
-            // transform image raw data into 1D image
-            short[] data = new short[width * height];
             // get the minimum and maximum value from current data
-            int minValue = Integer.MAX_VALUE;
-            int maxValue = Integer.MIN_VALUE;
+            double minValue = Double.MAX_VALUE;
+            double maxValue = Double.MIN_VALUE;
             for (int h = 0; h < height; h++) {
                 for (int w = 0; w < width; w++) {
                     minValue = data2D[h][w] < minValue ? data2D[h][w] : minValue;
                     maxValue = data2D[h][w] > maxValue ? data2D[h][w] : maxValue;
                 }
             }
-            // transform image raw data into 1D image
-            float difference = maxValue - minValue;
+
+            double scale = 65535. / (maxValue == minValue ? 1 : maxValue - minValue);
+            short[] data = new short[width * height];
             for (int h = 0; h < height; h++) {
                 for (int w = 0; w < width; w++) {
-                    data[width * (height - 1 - h) + w] = (short) (((data2D[h][w] - minValue) / difference) * 65535f);
+                    data[width * (height - 1 - h) + w] = (short) (scale * (data2D[h][w] - minValue));
+                }
+            }
+            imageData = new SingleChannelShortImageData(width, height, 16, GAMMA, ShortBuffer.wrap(data));
+        } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
+            // get image raw data
+            int[][] data2D = (int[][]) hdu.getKernel();
+            // get width and height of image
+            int width = data2D[0].length;
+            int height = data2D.length;
+            // get the minimum and maximum value from current data
+            double minValue = Double.MAX_VALUE;
+            double maxValue = Double.MIN_VALUE;
+            for (int h = 0; h < height; h++) {
+                for (int w = 0; w < width; w++) {
+                    minValue = data2D[h][w] < minValue ? data2D[h][w] : minValue;
+                    maxValue = data2D[h][w] > maxValue ? data2D[h][w] : maxValue;
+                }
+            }
+
+            double scale = 65535. / (maxValue == minValue ? 1 : maxValue - minValue);
+            short[] data = new short[width * height];
+            for (int h = 0; h < height; h++) {
+                for (int w = 0; w < width; w++) {
+                    data[width * (height - 1 - h) + w] = (short) (scale * (data2D[h][w] - minValue));
                 }
             }
             imageData = new SingleChannelShortImageData(width, height, 16, GAMMA, ShortBuffer.wrap(data));
@@ -110,14 +102,13 @@ class FITSImage {
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-            // transform image raw data into 1D image
-            short[] data = new short[width * height];
             // if it is an MDI magnetogram image use threshold when converting the data
             // otherwise set minimum value to zero and maximum value to 2^16 and scale values between
             Header header = hdu.getHeader();
             String instrument = header.getStringValue("INSTRUME");
             String measurement = header.getStringValue("DPC_OBSR");
 
+            short[] data = new short[width * height];
             if (instrument != null && measurement != null && instrument.equals("MDI") && measurement.equals("FD_Magnetogram_Sum")) {
                 float doubleThreshold = MDI_THRESHOLD * 2.0f;
                 for (int h = 0; h < height; h++) {
@@ -129,19 +120,19 @@ class FITSImage {
                 }
             } else {
                 // get the minimum and maximum value from current data
-                float minValue = Float.MAX_VALUE;
-                float maxValue = Float.MIN_VALUE;
+                double minValue = Double.MAX_VALUE;
+                double maxValue = Double.MIN_VALUE;
                 for (int h = 0; h < height; h++) {
                     for (int w = 0; w < width; w++) {
                         minValue = data2D[h][w] < minValue ? data2D[h][w] : minValue;
                         maxValue = data2D[h][w] > maxValue ? data2D[h][w] : maxValue;
                     }
                 }
-                // transform image raw data into 1D image
-                float difference = maxValue - minValue;
+
+                double scale = 65535. / (maxValue == minValue ? 1 : maxValue - minValue);
                 for (int h = 0; h < height; h++) {
                     for (int w = 0; w < width; w++) {
-                        data[width * (height - 1 - h) + w] = (short) (((data2D[h][w] - minValue) / difference) * 65535f);
+                        data[width * (height - 1 - h) + w] = (short) (scale * (data2D[h][w] - minValue));
                     }
                 }
             }
