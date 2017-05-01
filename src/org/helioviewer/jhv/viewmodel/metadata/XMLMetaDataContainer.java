@@ -18,7 +18,7 @@ import com.google.common.primitives.Ints;
 
 public class XMLMetaDataContainer implements MetaDataContainer {
 
-    Element meta;
+    private Element meta;
 
     public void parseXML(String xml) throws Exception {
         try (InputStream in = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))) {

@@ -21,9 +21,8 @@ public class ARGBInt32ImageData extends ImageData {
 
     private final ARGB32ImageFormat format = new ARGB32ImageFormat();
 
-    public ARGBInt32ImageData(boolean singleChannel, int _width, int _height, Buffer _buffer) {
+    public ARGBInt32ImageData(int _width, int _height, Buffer _buffer) {
         super(_width, _height, 32, 1);
-        format.setSingleChannel(singleChannel);
         buffer = _buffer;
     }
 

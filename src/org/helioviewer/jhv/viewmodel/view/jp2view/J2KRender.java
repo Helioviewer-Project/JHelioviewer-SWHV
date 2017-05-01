@@ -128,7 +128,7 @@ class J2KRender implements Runnable {
         if (numComponents < 3) {
             data = new SingleChannelByte8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
         } else {
-            data = new ARGBInt32ImageData(false, aWidth, aHeight, IntBuffer.wrap(intBuffer));
+            data = new ARGBInt32ImageData(aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
         viewRef.setDataFromRender(params, data);
     }
