@@ -8,7 +8,6 @@ import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -50,20 +49,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
     @Override
     public String get(String key) {
         return getValueFromXML(key);
-    }
-
-    @Override
-    public double tryGetDouble(String key) {
-        String string = get(key);
-        if (string != null) {
-            try {
-                return Double.parseDouble(string);
-            } catch (NumberFormatException e) {
-                Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
-                return Double.NaN;
-            }
-        }
-        return 0.0;
     }
 
     @Override
