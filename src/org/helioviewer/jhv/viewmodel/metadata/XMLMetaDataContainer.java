@@ -47,11 +47,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
     }
 
     @Override
-    public String get(String key) {
-        return getValueFromXML(key);
-    }
-
-    @Override
     public Optional<String> getString(String key) {
         return Optional.ofNullable(getValueFromXML(key));
     }
