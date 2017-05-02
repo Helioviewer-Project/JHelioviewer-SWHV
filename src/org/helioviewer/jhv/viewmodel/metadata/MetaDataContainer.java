@@ -4,8 +4,6 @@ import java.util.Optional;
 
 interface MetaDataContainer {
 
-    String get(String key);
-
     Optional<String> getString(String key);
     Optional<Integer> getInteger(String key);
     Optional<Double> getDouble(String key);

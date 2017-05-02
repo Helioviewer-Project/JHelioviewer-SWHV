@@ -9,7 +9,6 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 
 public class HelioviewerMetaData extends AbstractMetaData {
@@ -147,20 +146,19 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
     private JHVDate retrieveDateTime(MetaDataContainer m) {
         String observedDate;
-
         // DATE-OBS unusable for MDI and early EIT
         if (instrument.equals("MDI") || instrument.equals("EIT")) {
-            observedDate = m.get("DATE_OBS");
+            observedDate = m.getRequiredString("DATE_OBS");
         } else {
-            observedDate = m.get("DATE-OBS");
+            observedDate = m.getString("DATE-OBS").orElse(null);
             if (observedDate == null) {
-                observedDate = m.get("DATE_OBS");
-                if (observedDate != null && instrument.equals("LASCO")) {
-                    observedDate = observedDate.replace('/', '-') + 'T' + m.get("TIME_OBS");
+                observedDate = m.getRequiredString("DATE_OBS");
+                if (instrument.equals("LASCO")) {
+                    observedDate = observedDate.replace('/', '-') + 'T' + m.getRequiredString("TIME_OBS");
                 }
             }
         }
-        return observedDate == null ? TimeUtils.EPOCH : new JHVDate(observedDate.substring(0, 19)); // truncate
+        return new JHVDate(observedDate.substring(0, 19)); // truncate
     }
 
     private void retrievePosition(MetaDataContainer m, JHVDate dateObs) {
