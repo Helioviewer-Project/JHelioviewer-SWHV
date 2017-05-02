@@ -6,7 +6,6 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -66,7 +65,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
     // magic
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equalsIgnoreCase("C2")) {
-            double maskRotation = -Math.toRadians(m.tryGetDouble("CROTA"));
+            double maskRotation = -Math.toRadians(m.getDouble("CROTA").orElse(0.));
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
         }/* else if (instrument.equalsIgnoreCase("SWAP")) {
@@ -170,23 +169,19 @@ public class HelioviewerMetaData extends AbstractMetaData {
         if (observatory.equals("SOHO"))
             distanceObs *= Sun.L1Factor;
 
-        double stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
-        if (Double.isNaN(stonyhurstLatitude) || stonyhurstLatitude == 0 /* not found */) {
-            if ((stonyhurstLatitude = m.tryGetDouble("CRLT_OBS")) == 0 && (stonyhurstLatitude = m.tryGetDouble("REF_B0")) == 0) {
-                // presumably not found
-                stonyhurstLatitude = p.lat * MathUtils.radeg;
-            }
-        }
-        double theta = stonyhurstLatitude / MathUtils.radeg;
+        double stonyhurstLatitude = m.getDouble("HGLT_OBS").map(Math::toRadians).orElse(Double.NaN);
+        if (Double.isNaN(stonyhurstLatitude))
+            stonyhurstLatitude = m.getDouble("CRLT_OBS").map(Math::toRadians).orElse(Double.NaN);
+        if (Double.isNaN(stonyhurstLatitude))
+            stonyhurstLatitude = m.getDouble("REF_B0").map(Math::toRadians).orElse(Double.NaN);
+        double theta = Double.isNaN(stonyhurstLatitude) ? p.lat : stonyhurstLatitude;
 
-        double stonyhurstLongitude = m.tryGetDouble("HGLN_OBS");
-        if (Double.isNaN(stonyhurstLongitude) /* HMI */ || stonyhurstLongitude == 0 /* not found */) {
-            stonyhurstLongitude = m.tryGetDouble("REF_L0");
-            if (stonyhurstLongitude != 0) {
-                stonyhurstLongitude += p.lon * MathUtils.radeg;
-            }
-        }
-        double phi = p.lon - stonyhurstLongitude / MathUtils.radeg;
+        double stonyhurstLongitude = m.getDouble("HGLN_OBS").map(Math::toRadians).orElse(Double.NaN);
+        if (Double.isNaN(stonyhurstLongitude))
+            stonyhurstLongitude = m.getDouble("CRLN_OBS").map(v -> Math.toRadians(v) + p.lon).orElse(Double.NaN);
+        if (Double.isNaN(stonyhurstLongitude))
+            stonyhurstLongitude = m.getDouble("REF_L0").map(v -> Math.toRadians(v) + p.lon).orElse(Double.NaN);
+        double phi = Double.isNaN(stonyhurstLongitude) ? p.lon : p.lon - stonyhurstLongitude;
 
         viewpoint = new Position.Q(dateObs, distanceObs, new Quat(theta, phi));
         viewpointL = new Position.L(dateObs, distanceObs, phi, theta);
@@ -194,16 +189,12 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
     private Quat retrieveCenterRotation(MetaDataContainer m) {
         if (instrument.equals("AIA") || instrument.equals("SWAP")) {
-            crota = m.tryGetDouble("CROTA");
-            if (crota == 0) {
-                crota = m.tryGetDouble("CROTA1");
-                if (crota == 0)
-                    crota = m.tryGetDouble("CROTA2");
-            }
-            if (!Double.isNaN(crota)) {
-                crota = Math.toRadians(crota);
-                return Quat.rotate(Quat.createRotation(-crota, new Vec3(0, 0, 1)), viewpoint.orientation);
-            }
+            crota = m.getDouble("CROTA").map(Math::toRadians).orElse(Double.NaN);
+            if (Double.isNaN(crota))
+                crota = m.getDouble("CROTA1").map(Math::toRadians).orElse(Double.NaN);
+            if (Double.isNaN(crota))
+                crota = m.getDouble("CROTA2").map(Math::toRadians).orElse(0.);
+            return Quat.rotate(Quat.createRotation(-crota, new Vec3(0, 0, 1)), viewpoint.orientation);
         }
         return viewpoint.orientation;
     }
