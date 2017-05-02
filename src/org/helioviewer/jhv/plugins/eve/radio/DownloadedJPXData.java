@@ -19,7 +19,6 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.jhv.viewmodel.metadata.MetaDataException;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
@@ -49,10 +48,10 @@ class DownloadedJPXData implements ImageDataHandler {
                 XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
 
                 hvMetaData.parseXML(_view.getXMLMetaData());
-                endFreq = hvMetaData.getDouble("STARTFRQ").orElseThrow(() -> new MetaDataException("STARTFRQ"));
-                startFreq = hvMetaData.getDouble("END-FREQ").orElseThrow(() -> new MetaDataException("END-FREQ"));
-                startDate = TimeUtils.parse(hvMetaData.getString("DATE-OBS").orElseThrow(() -> new MetaDataException("DATE-OBS")));
-                endDate = TimeUtils.parse(hvMetaData.getString("DATE-END").orElseThrow(() -> new MetaDataException(("DATE-END"))));
+                endFreq = hvMetaData.getRequiredDouble("STARTFRQ");
+                startFreq = hvMetaData.getRequiredDouble("END-FREQ");
+                startDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-OBS"));
+                endDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-END"));
                 hvMetaData.destroyXML();
 
                 if (startDate == start && endDate <= start + TimeUtils.DAY_IN_MILLIS) {
