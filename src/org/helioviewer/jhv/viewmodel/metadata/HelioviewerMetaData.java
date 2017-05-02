@@ -210,18 +210,18 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
     private void retrievePixelParameters(MetaDataContainer m) {
         if (m.getInteger("ZNAXIS").isPresent()) {
-            pixelW = m.getInteger("ZNAXIS1").orElseThrow(() -> new MetaDataException("ZNAXIS1"));
-            pixelH = m.getInteger("ZNAXIS2").orElseThrow(() -> new MetaDataException("ZNAXIS2"));
+            pixelW = m.getRequiredInteger("ZNAXIS1");
+            pixelH = m.getRequiredInteger("ZNAXIS2");
         } else {
-            pixelW = m.getInteger("NAXIS1").orElseThrow(() -> new MetaDataException("NAXIS1"));
-            pixelH = m.getInteger("NAXIS2").orElseThrow(() -> new MetaDataException("NAXIS2"));
+            pixelW = m.getRequiredInteger("NAXIS1");
+            pixelH = m.getRequiredInteger("NAXIS2");
         }
 
         if (instrument.equals("CALLISTO")) { // pixel based
             region = new Region(0, 0, pixelW, pixelH);
         } else {
-            double arcsecPerPixelX = m.getDouble("CDELT1").orElseThrow(() -> new MetaDataException("CDELT1"));
-            double arcsecPerPixelY = m.getDouble("CDELT2").orElseThrow(() -> new MetaDataException("CDELT2"));
+            double arcsecPerPixelX = m.getRequiredDouble("CDELT1");
+            double arcsecPerPixelY = m.getRequiredDouble("CDELT2");
             double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
             double unitPerArcsec = Sun.Radius / radiusSunInArcsec;
 

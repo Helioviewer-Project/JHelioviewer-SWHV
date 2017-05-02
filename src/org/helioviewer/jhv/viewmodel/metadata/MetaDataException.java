@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
 @SuppressWarnings("serial")
-public class MetaDataException extends RuntimeException {
+class MetaDataException extends RuntimeException {
 
     // public MetaDataException() { super(); }
 

@@ -81,4 +81,19 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         return getString(key).map(Doubles::tryParse);
     }
 
+    @Override
+    public String getRequiredString(String key) {
+        return getString(key).orElseThrow(() -> new MetaDataException(key));
+    }
+
+    @Override
+    public int getRequiredInteger(String key) {
+        return getInteger(key).orElseThrow(() -> new MetaDataException(key));
+    }
+
+    @Override
+    public double getRequiredDouble(String key) {
+        return getDouble(key).orElseThrow(() -> new MetaDataException(key));
+    }
+
 }
