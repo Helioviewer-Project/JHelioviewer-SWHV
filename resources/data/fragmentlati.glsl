@@ -18,8 +18,8 @@ void main(void) {
     */
 
     vec3 xcart;
-    xcart.x = sin(theta) * cos(phi) ;
-    xcart.y = sin(theta) * sin(phi) ;
+    xcart.x = sin(theta) * cos(phi);
+    xcart.y = sin(theta) * sin(phi);
     xcart.z = cos(theta);
     mat3 rot = mat3(
           cos(hglt), 0., sin(hglt),
@@ -35,7 +35,7 @@ void main(void) {
     if (xcartrot.x < 0.)
         discard;
 
-    vec2 texcoord = vec2(rect.w*(xcartrot.y - rect.x), rect.w*(xcartrot.z - rect.y) );
+    vec2 texcoord = vec2(rect.w * (xcartrot.y - rect.x), rect.w * (xcartrot.z - rect.y));
     clamp_texcoord(texcoord);
     gl_FragColor = getColor(texcoord, texcoord, 1.);
 }

@@ -17,7 +17,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
 
 class FITSImage {
 
-    private static final float MDI_THRESHOLD = 2000f;
     private static final double GAMMA = 1 / 2.2;
 
     String xml;
@@ -41,114 +40,89 @@ class FITSImage {
                     return;
                 }
             }
-        } finally {
-            if (imageData == null)
-                throw new Exception("Could not read FITS: " + url);
         }
     }
 
     private void readHDU(BasicHDU<?> hdu) throws Exception {
         int bitsPerPixel = hdu.getBitPix();
         if (bitsPerPixel == BasicHDU.BITPIX_BYTE) {
-            // get image raw data
             byte[][] data2D = (byte[][]) hdu.getKernel();
-            // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
 
             byte[] data = new byte[width * height];
-            for (int h = 0; h < height; h++) {
-                for (int w = 0; w < width; w++) {
-                    data[width * (height - 1 - h) + w] = data2D[h][w];
+            for (int j = 0; j < height; j++) {
+                for (int i = 0; i < width; i++) {
+                    data[width * (height - 1 - j) + i] = data2D[j][i];
                 }
             }
             imageData = new SingleChannelByte8ImageData(width, height, ByteBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_SHORT) {
-            // get image raw data
             short[][] data2D = (short[][]) hdu.getKernel();
-            // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-            // get the minimum and maximum value from current data
-            double minValue = Double.MAX_VALUE;
-            double maxValue = Double.MIN_VALUE;
-            for (int h = 0; h < height; h++) {
-                for (int w = 0; w < width; w++) {
-                    minValue = data2D[h][w] < minValue ? data2D[h][w] : minValue;
-                    maxValue = data2D[h][w] > maxValue ? data2D[h][w] : maxValue;
+
+            double min = Double.MAX_VALUE;
+            double max = Double.MIN_VALUE;
+            for (int j = 0; j < height; j++) {
+                for (int i = 0; i < width; i++) {
+                    double d = data2D[j][i];
+                    min = d < min ? d : min;
+                    max = d > max ? d : max;
                 }
             }
 
-            double scale = 65535. / (maxValue == minValue ? 1 : maxValue - minValue);
+            double scale = 65535. / (max == min ? 1 : max - min);
             short[] data = new short[width * height];
-            for (int h = 0; h < height; h++) {
-                for (int w = 0; w < width; w++) {
-                    data[width * (height - 1 - h) + w] = (short) (scale * (data2D[h][w] - minValue));
+            for (int j = 0; j < height; j++) {
+                for (int i = 0; i < width; i++) {
+                    data[width * (height - 1 - j) + i] = (short) (scale * (data2D[j][i] - min));
                 }
             }
             imageData = new SingleChannelShortImageData(width, height, 16, GAMMA, ShortBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
-            // get image raw data
             int[][] data2D = (int[][]) hdu.getKernel();
-            // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-            // get the minimum and maximum value from current data
-            double minValue = Double.MAX_VALUE;
-            double maxValue = Double.MIN_VALUE;
-            for (int h = 0; h < height; h++) {
-                for (int w = 0; w < width; w++) {
-                    minValue = data2D[h][w] < minValue ? data2D[h][w] : minValue;
-                    maxValue = data2D[h][w] > maxValue ? data2D[h][w] : maxValue;
+
+            double min = Double.MAX_VALUE;
+            double max = Double.MIN_VALUE;
+            for (int j = 0; j < height; j++) {
+                for (int i = 0; i < width; i++) {
+                    double d = data2D[j][i];
+                    min = d < min ? d : min;
+                    max = d > max ? d : max;
                 }
             }
 
-            double scale = 65535. / (maxValue == minValue ? 1 : maxValue - minValue);
+            double scale = 65535. / (max == min ? 1 : max - min);
             short[] data = new short[width * height];
-            for (int h = 0; h < height; h++) {
-                for (int w = 0; w < width; w++) {
-                    data[width * (height - 1 - h) + w] = (short) (scale * (data2D[h][w] - minValue));
+            for (int j = 0; j < height; j++) {
+                for (int i = 0; i < width; i++) {
+                    data[width * (height - 1 - j) + i] = (short) (scale * (data2D[j][i] - min));
                 }
             }
             imageData = new SingleChannelShortImageData(width, height, 16, GAMMA, ShortBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
-            // get image raw data
             float[][] data2D = (float[][]) hdu.getKernel();
-            // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-            // if it is an MDI magnetogram image use threshold when converting the data
-            // otherwise set minimum value to zero and maximum value to 2^16 and scale values between
-            Header header = hdu.getHeader();
-            String instrument = header.getStringValue("INSTRUME");
-            String measurement = header.getStringValue("DPC_OBSR");
 
+            double min = Double.MAX_VALUE;
+            double max = Double.MIN_VALUE;
+            for (int j = 0; j < height; j++) {
+                for (int i = 0; i < width; i++) {
+                    double d = data2D[j][i];
+                    min = d < min ? d : min;
+                    max = d > max ? d : max;
+                }
+            }
+
+            double scale = 65535. / (max == min ? 1 : max - min);
             short[] data = new short[width * height];
-            if (instrument != null && measurement != null && instrument.equals("MDI") && measurement.equals("FD_Magnetogram_Sum")) {
-                float doubleThreshold = MDI_THRESHOLD * 2.0f;
-                for (int h = 0; h < height; h++) {
-                    for (int w = 0; w < width; w++) {
-                        float value = data2D[h][w] + MDI_THRESHOLD;
-                        value = value < 0.0f ? 0.0f : (value > doubleThreshold ? doubleThreshold : value);
-                        data[width * (height - 1 - h) + w] = (short) ((value * 65535) / doubleThreshold);
-                    }
-                }
-            } else {
-                // get the minimum and maximum value from current data
-                double minValue = Double.MAX_VALUE;
-                double maxValue = Double.MIN_VALUE;
-                for (int h = 0; h < height; h++) {
-                    for (int w = 0; w < width; w++) {
-                        minValue = data2D[h][w] < minValue ? data2D[h][w] : minValue;
-                        maxValue = data2D[h][w] > maxValue ? data2D[h][w] : maxValue;
-                    }
-                }
-
-                double scale = 65535. / (maxValue == minValue ? 1 : maxValue - minValue);
-                for (int h = 0; h < height; h++) {
-                    for (int w = 0; w < width; w++) {
-                        data[width * (height - 1 - h) + w] = (short) (scale * (data2D[h][w] - minValue));
-                    }
+            for (int j = 0; j < height; j++) {
+                for (int i = 0; i < width; i++) {
+                    data[width * (height - 1 - j) + i] = (short) (scale * (data2D[j][i] - min));
                 }
             }
             imageData = new SingleChannelShortImageData(width, height, 16, GAMMA, ShortBuffer.wrap(data));
