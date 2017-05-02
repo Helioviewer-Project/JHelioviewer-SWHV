@@ -205,6 +205,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
             shader.setViewport(vp.x, vp.yGL, vp.width, vp.height);
             shader.filter(gl);
+            
 
             camera.push(imageData.getViewpoint());
 

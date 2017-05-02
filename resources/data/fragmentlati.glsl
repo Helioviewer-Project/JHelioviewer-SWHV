@@ -7,7 +7,6 @@ void main(void) {
     vec4 scrpos = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) + .5;
     clamp_texcoord(scrpos.xy);
 
-    float scale = 2. * (rect.y + 1. / rect.w);
     float theta = scrpos.y * PI;
     float phi = PI + hgln + scrpos.x * TWOPI;
     while (phi > TWOPI)
@@ -19,9 +18,9 @@ void main(void) {
     */
 
     vec3 xcart;
-    xcart.x = sin(theta) * cos(phi) / scale;
-    xcart.y = sin(theta) * sin(phi) / scale;
-    xcart.z = cos(theta) / scale;
+    xcart.x = sin(theta) * cos(phi) ;
+    xcart.y = sin(theta) * sin(phi) ;
+    xcart.z = cos(theta);
     mat3 rot = mat3(
           cos(hglt), 0., sin(hglt),
           0.,        1., 0.,
@@ -36,7 +35,7 @@ void main(void) {
     if (xcartrot.x < 0.)
         discard;
 
-    vec2 texcoord = vec2(xcartrot.y + .5, xcartrot.z + .5);
+    vec2 texcoord = vec2(rect.w*(xcartrot.y - rect.x), rect.w*(xcartrot.z - rect.y) );
     clamp_texcoord(texcoord);
     gl_FragColor = getColor(texcoord, texcoord, 1.);
 }
