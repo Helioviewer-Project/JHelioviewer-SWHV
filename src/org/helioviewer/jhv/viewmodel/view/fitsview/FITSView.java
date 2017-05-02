@@ -19,8 +19,10 @@ public class FITSView extends AbstractView {
             throw new Exception("FITS does not support the " + uri.getScheme() + " protocol");
 
         FITSImage fits = new FITSImage(uri.toURL().toString());
-        xml = fits.xml;
+        if (fits.imageData == null)
+            throw new Exception("Could not read FITS: " + uri);
 
+        xml = fits.xml;
         XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
         hvMetaData.parseXML(xml);
         HelioviewerMetaData m = new HelioviewerMetaData(hvMetaData, 0);
