@@ -1,4 +1,4 @@
-void get_lati_texcoord(in vec4 rect, out vec2 texcoord, out float radius) {
+void get_lati_texcoord(const in vec4 rect, out vec2 texcoord, out float radius) {
     vec2 normalizedScreenpos = (gl_FragCoord.xy - viewportOffset) / viewport - .5;
     normalizedScreenpos *= 2. * vec2(viewport.y / viewport.x, 1.);
     vec4 scrpos = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) + .5;
