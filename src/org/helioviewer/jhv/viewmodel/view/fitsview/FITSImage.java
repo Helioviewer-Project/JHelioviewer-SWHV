@@ -73,11 +73,11 @@ class FITSImage {
                 }
             }
 
-            LinScale scale = new LinScale(min, max);
+            PixScale scale = new LinScale(min, max);
             short[] data = new short[width * height];
             for (int j = 0; j < height; j++) {
                 for (int i = 0; i < width; i++) {
-                    data[width * (height - 1 - j) + i] = scale.get(data2D[j][i]);
+                    data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
                 }
             }
             imageData = new SingleChannelShortImageData(width, height, 16, scale.getGamma(), ShortBuffer.wrap(data));
@@ -96,11 +96,11 @@ class FITSImage {
                 }
             }
 
-            LinScale scale = new LinScale(min, max);
+            PixScale scale = new LinScale(min, max);
             short[] data = new short[width * height];
             for (int j = 0; j < height; j++) {
                 for (int i = 0; i < width; i++) {
-                    data[width * (height - 1 - j) + i] = scale.get(data2D[j][i]);
+                    data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
                 }
             }
             imageData = new SingleChannelShortImageData(width, height, 16, scale.getGamma(), ShortBuffer.wrap(data));
