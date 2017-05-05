@@ -53,9 +53,7 @@ class FITSImage {
 
             byte[] data = new byte[width * height];
             for (int j = 0; j < height; j++) {
-                for (int i = 0; i < width; i++) {
-                    data[width * (height - 1 - j) + i] = data2D[j][i];
-                }
+                System.arraycopy(data2D[j], 0, data, width * (height - 1 - j), width);
             }
             imageData = new SingleChannelByte8ImageData(width, height, ByteBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_SHORT) {

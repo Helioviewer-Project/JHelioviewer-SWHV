@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
+import org.apache.log4j.NDC;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
 
@@ -131,44 +132,33 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             stackTrace.append("at ").append(el).append('\n');
         }
 
-        String msg = "Uncaught Exception detected.\n\nConfiguration:\n";
-        msg += "JHelioviewer - Version: " + JHVGlobals.version + '\n';
-        msg += "JHelioviewer - Revision: " + JHVGlobals.revision + '\n';
-        msg += "Java Virtual Machine - Name: " + System.getProperty("java.vm.name") + '\n';
-        msg += "Java Virtual Machine - Vendor: " + System.getProperty("java.vm.vendor") + '\n';
-        msg += "Java Virtual Machine - Version: " + System.getProperty("java.vm.version") + '\n';
-        msg += "JRE Specification - Version: " + System.getProperty("java.specification.version") + '\n';
-        msg += "Operating System - Name: " + System.getProperty("os.name") + '\n';
-        msg += "Operating System - Architecture: " + System.getProperty("os.arch") + '\n';
-        msg += "Operating System - Version: " + System.getProperty("os.version") + "\n\n";
-
-        msg += "Date: " + new Date() + '\n';
-        msg += "Thread: " + t + '\n';
-        msg += "Message: " + e.getMessage() + "\n\n";
-        msg += "Stacktrace:\n";
-        msg += stackTrace;
-
+        String msg = "";
+        StringBuilder sb = new StringBuilder();
         String logName = Log.getCurrentLogFile();
         if (logName != null) {
-            Log.fatal("Runtime exception", e);
-
-            msg += "\nLog:\n";
+            Log.error("Runtime exception", e);
             try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(logName), StandardCharsets.UTF_8))) {
                 String line;
-                StringBuilder sb = new StringBuilder();
                 while ((line = input.readLine()) != null) {
                     sb.append(line).append('\n');
                 }
-                msg += sb;
+                NDC.push(sb.toString());
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         } else {
             System.err.println("Runtime exception");
             System.err.println(stackTrace);
+            msg += "Uncaught Exception in " + JHVGlobals.userAgent;
+            msg += "\nDate: " + new Date();
+            msg += "\nThread: " + t;
+            msg += "\nMessage: " + e.getMessage();
+            msg += "\nStacktrace:\n";
+            msg += stackTrace + "\n";
         }
 
-        showErrorDialog("JHelioviewer: Fatal Error", msg);
+        Log.fatal(null, e);
+        showErrorDialog("JHelioviewer: Fatal Error", msg + "Log:\n" + sb.toString());
     }
 
 }
