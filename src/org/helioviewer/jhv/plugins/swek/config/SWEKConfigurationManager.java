@@ -53,7 +53,6 @@ public class SWEKConfigurationManager {
         if (!configLoaded) {
             SWEKIconBank.init();
 
-            Log.debug("search and open the configuration file");
             boolean isConfigParsed;
             if (checkAndOpenUserSetFile()) {
                 isConfigParsed = parseConfigFile();
@@ -110,10 +109,8 @@ public class SWEKConfigurationManager {
     }
 
     private static boolean checkAndOpenUserSetFile() {
-        Log.debug("Search for a user defined configuration file in the JHelioviewer setting file");
         String fileName = Settings.getSingletonInstance().getProperty("plugin.swek.configfile");
         if (fileName == null) {
-            Log.debug("No configured filename found");
             return false;
         } else {
             try {
