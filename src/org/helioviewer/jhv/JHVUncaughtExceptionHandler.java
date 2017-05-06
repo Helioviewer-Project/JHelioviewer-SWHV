@@ -9,10 +9,12 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -28,7 +30,7 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
 
 // Catch and handle all runtime exceptions
-public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String BUG_URL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
     private static final String MAIL_URL = "swhv@sidc.be";
@@ -39,6 +41,14 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
     private static final JHVUncaughtExceptionHandler instance = new JHVUncaughtExceptionHandler();
 
     private JHVUncaughtExceptionHandler() {
+        try (InputStream is = JHVUncaughtExceptionHandler.class.getResourceAsStream("/sentry.properties")) {
+            Properties p = new Properties();
+            p.load(is);
+            for (String key : p.stringPropertyNames())
+                System.setProperty(key, p.getProperty(key));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
