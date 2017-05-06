@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="JHelioviewer" default="all">
+    <property environment="env"/>
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
     <property name="resources" location="resources"/>
     <property name="jarfile" location= "JHelioviewer.jar"/>
+
+    <condition property="DSN" value="${env.SENTRY_DSN}" else="">
+        <not>
+            <equals arg1="${env.SENTRY_DSN}" arg2="$${env.SENTRY_DSN}"/>
+        </not>
+    </condition>
 
     <fileset id="libfiles" dir="./">
         <include name="lib/*.jar"/>
@@ -29,6 +36,9 @@
     </target>
 
     <target name="jar" depends="compile">
+        <copy file="sentry.properties" tofile="${bin}/sentry.properties"/>
+        <replace file="${bin}/sentry.properties" token="@@DSN" value="${DSN}"/>
+        <replace file="${bin}/sentry.properties" token="@@VERSION" value="${version}"/>
         <manifestclasspath property="manifest_cp" jarfile="${jarfile}">
             <classpath>
                 <fileset refid="libfiles"/>
@@ -51,5 +61,4 @@
     </target>
 
     <target name="all" depends="jar"/>
-
 </project>
