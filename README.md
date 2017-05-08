@@ -5,6 +5,7 @@ JHelioviewer
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.572577.svg)](https://doi.org/10.5281/zenodo.572577)
 
 Website: http://www.jhelioviewer.org/
+
 User manual: http://swhv.oma.be/user_manual/
 
 About
