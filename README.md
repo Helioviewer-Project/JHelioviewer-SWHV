@@ -2,8 +2,10 @@ JHelioviewer
 ============
 
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/9940/badge.svg)](https://scan.coverity.com/projects/9940)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.572577.svg)](https://doi.org/10.5281/zenodo.572577)
 
 Website: http://www.jhelioviewer.org/
+User manual: http://swhv.oma.be/user_manual/
 
 About
 -----
@@ -53,13 +55,6 @@ occured. The log files can be found in the Logs/ directory of your JHelioviewer
 home folder. You can find the correct log file by searching for the correct
 start date. The files have the form:
 jhv.'year'-'month'-'day'T'hours'-'minutes'-'seconds'.log
-
-User Manual
------------
-
-A detailed user manual for JHelioviewer can be found at:
-
-http://swhv.oma.be/user_manual/
 
 
 Development Information
