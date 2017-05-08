@@ -5,12 +5,12 @@ import java.awt.FlowLayout;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -90,7 +90,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
                 });
             }
 
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(dstFile), BUFSIZ)) {
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(dstFile.toPath()), BUFSIZ)) {
                 byte[] buffer = new byte[BUFSIZ];
                 int numTotalRead = 0, numCurrentRead;
                 while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
