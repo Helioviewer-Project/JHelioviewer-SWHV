@@ -50,7 +50,7 @@ public class JHelioviewer {
         Locale.setDefault(Locale.US);
 
         // Init log
-        LogSettings logSettings = new LogSettings("/settings/log4j.properties", JHVDirectory.LOGS.getPath());
+        LogSettings.init("/settings/log4j.properties", JHVDirectory.LOGS.getPath());
         // Information log message
         StringBuilder argString = new StringBuilder();
         for (String arg : args) {

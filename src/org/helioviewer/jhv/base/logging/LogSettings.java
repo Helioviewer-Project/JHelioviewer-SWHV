@@ -19,7 +19,7 @@ public class LogSettings {
      * @param logsDirectory
      *            Path to the directory where the log files are stored
      */
-    public LogSettings(String defaultLogSettingsPath, String logsDirectory) {
+    public static void init(String defaultLogSettingsPath, String logsDirectory) {
         Properties settings = new Properties();
         try (InputStream is = FileUtils.getResourceInputStream(defaultLogSettingsPath)) {
             settings.load(is);
