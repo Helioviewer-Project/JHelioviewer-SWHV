@@ -23,9 +23,12 @@ public class GLSLShader {
         fragment = _fragment;
     }
 
-    protected final void _init(GL2 gl) {
+    protected void _init(GL2 gl,boolean common) {
+    	String fragmentCommonText = "";
+    	if(common){
         InputStream fragmentCommonStream = FileUtils.getResourceInputStream("/data/fragmentcommon.glsl");
-        String fragmentCommonText = FileUtils.convertStreamToString(fragmentCommonStream);
+         fragmentCommonText = FileUtils.convertStreamToString(fragmentCommonStream);
+    	}
         InputStream fragmentStream = FileUtils.getResourceInputStream(fragment);
         String fragmentText = FileUtils.convertStreamToString(fragmentStream);
         fragmentText = fragmentCommonText + fragmentText;
@@ -39,12 +42,14 @@ public class GLSLShader {
     }
 
     protected void _after_init(GL2 gl) {
+
     }
 
-    protected final void _dispose(GL2 gl) {
+    protected void _dispose(GL2 gl) {
         gl.glDeleteShader(vertexID);
         gl.glDeleteShader(fragmentID);
         gl.glDeleteProgram(progID);
+
     }
 
     public final void bind(GL2 gl) {
@@ -132,8 +137,7 @@ public class GLSLShader {
         gl.glAttachShader(progID, vertexID);
         gl.glAttachShader(progID, fragmentID);
 
-        gl.glBindAttribLocation(progID, 0, "position");
-        gl.glBindAttribLocation(progID, 1, "vertexUV");
+        this.bindAttribs(gl);
         gl.glLinkProgram(progID);
 
         int[] params = { 0 };
@@ -159,5 +163,9 @@ public class GLSLShader {
             gl.glDeleteShader(fragmentID);
         }
     }
+
+	protected void bindAttribs(GL2 gl) {
+		
+	}
 
 }

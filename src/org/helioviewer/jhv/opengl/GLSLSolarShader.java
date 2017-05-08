@@ -78,10 +78,10 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void init(GL2 gl) {
-        ortho._init(gl);
-        lati._init(gl);
-        polar._init(gl);
-        logpolar._init(gl);
+        ortho._init(gl, true);
+        lati._init(gl, true);
+        polar._init(gl, true);
+        logpolar._init(gl, true);
     }
 
     @Override
