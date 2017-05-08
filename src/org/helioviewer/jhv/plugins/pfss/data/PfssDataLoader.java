@@ -5,10 +5,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.DownloadStream;
@@ -54,7 +54,7 @@ class PfssDataLoader implements Runnable {
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
 
             if (!loadFromFile)
-                try (OutputStream out = new BufferedOutputStream(new FileOutputStream(f), BUFSIZ)) {
+                try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(f.toPath()), BUFSIZ)) {
                     buffer.writeTo(out);
                 }
         } catch (IOException e) {
