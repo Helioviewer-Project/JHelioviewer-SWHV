@@ -3,8 +3,9 @@ package org.helioviewer.jhv.export;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.export.jcodec.JHVSequenceEncoder;
+import org.jcodec.common.NIOUtils;
+import org.jcodec.common.SeekableByteChannel;
 import org.jcodec.containers.mp4.MP4Util;
 import org.jcodec.containers.mp4.boxes.MovieBox;
 import org.jcodec.movtool.Flattern;
@@ -35,12 +36,13 @@ public class JCodecExporter implements MovieExporter {
 
     private void prepareStream() throws Exception {
         File orig = new File(path);
-        MovieBox movie = MP4Util.createRefMovie(orig);
+        SeekableByteChannel input = NIOUtils.readableFileChannel(orig);
+        MovieBox movie = MP4Util.createRefMovie(input, "file://" + orig.getCanonicalPath());
 
         File optim = new File(path + "_optim");
         new Flattern().flattern(movie, optim);
-        FileUtils.copy(optim, orig); // renameTo doesn't work on Windows
-        optim.delete();
+        input.close();
+        optim.renameTo(orig);
     }
 
     @Override
