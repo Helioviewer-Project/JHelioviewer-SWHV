@@ -98,7 +98,7 @@ public class JHVThread {
                 try {
                     String filepath = JHVDirectory.EVENTS.getPath() + "events.db";
                     File f = new File(filepath);
-                    boolean fexist = f.exists() && !f.isDirectory();
+                    boolean fexist = f.canRead() && !f.isDirectory();
                     connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
 
                     if (!fexist) {

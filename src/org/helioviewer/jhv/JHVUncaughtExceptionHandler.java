@@ -5,11 +5,11 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
@@ -114,10 +114,12 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
         String msg = "";
         StringBuilder sb = new StringBuilder();
+
+        File logFile;
         String logName = Log.getCurrentLogFile();
-        if (logName != null) {
+        if (logName != null && (logFile = new File(logName)).canRead()) {
             Log.error("Runtime exception", e);
-            try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(logName), StandardCharsets.UTF_8))) {
+            try (BufferedReader input = Files.newBufferedReader(logFile.toPath(), StandardCharsets.UTF_8)) {
                 String line;
                 while ((line = input.readLine()) != null) {
                     sb.append(line).append('\n');
