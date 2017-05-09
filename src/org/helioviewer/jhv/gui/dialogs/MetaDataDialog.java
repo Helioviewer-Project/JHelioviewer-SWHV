@@ -147,11 +147,11 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
 
             // Send xml data to meta data dialog box
             Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
-            writeXMLData(root);
+            if (root != null)
+                readXMLData(root);
             root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
-            if (root != null) {
-                writeXMLData(root);
-            }
+            if (root != null)
+                readXMLData(root);
 
             final String xml = xmlText;
             String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
@@ -177,16 +177,9 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             hvSB.append(nodeName).append(": ").append(nodeValue).append('\n');
     }
 
-    /**
-     * A method that writes the xml box specified by its root node to the list
-     * box in image info dialog box.
-     *
-     * @param node
-     *            Node to write
-     */
     private String lastNodeSeen = null;
 
-    private void writeXMLData(Node node) {
+    private void readXMLData(Node node) {
         // get element name and value
         String nodeName = node.getNodeName();
         String nodeValue = getElementValue(node);
@@ -206,7 +199,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                writeXMLData(child);
+                readXMLData(child);
             }
         }
     }

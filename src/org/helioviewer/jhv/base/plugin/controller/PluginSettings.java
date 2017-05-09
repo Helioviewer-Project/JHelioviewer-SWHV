@@ -1,19 +1,17 @@
 package org.helioviewer.jhv.base.plugin.controller;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.helioviewer.jhv.base.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -160,12 +158,10 @@ public class PluginSettings {
     // Saves the internal XML document to the settings file
     public void savePluginSettings() {
         try {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
             DOMSource source = new DOMSource(xmlDocument);
-            StreamResult result = new StreamResult(new FileOutputStream(new File(settingsFileName)));
-
-            transformer.transform(source, result);
-        } catch (TransformerFactoryConfigurationError | TransformerException | FileNotFoundException e) {
+            StreamResult result = new StreamResult(FileUtils.newBufferedOutputStream(new File(settingsFileName)));
+            TransformerFactory.newInstance().newTransformer().transform(source, result);
+        } catch (TransformerFactoryConfigurationError | TransformerException | IOException e) {
             e.printStackTrace();
         }
     }
