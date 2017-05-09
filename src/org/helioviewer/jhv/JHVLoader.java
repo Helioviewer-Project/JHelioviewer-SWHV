@@ -4,11 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.FileUtils;
@@ -40,35 +36,12 @@ class JHVLoader {
         final String prefix = "kdulibs";
         final String suffix = ".lock";
         // delete all kdulibs directories without a lock file
-        SimpleFileVisitor<Path> nuke = new SimpleFileVisitor<Path>() {
-
-                private FileVisitResult delete(Path file) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    return delete(file);
-                }
-
-                @Override
-                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                    return delete(file);
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    return delete(dir);
-                }
-
-        };
         FileFilter filter = p -> p.getName().startsWith(prefix) && !p.getName().endsWith(suffix);
         File[] dirs = JHVDirectory.LIBS.getFile().listFiles(filter);
         for (File dir : dirs) {
             if (new File(dir + suffix).exists())
                 continue;
-            Files.walkFileTree(dir.toPath(), nuke);
+            FileUtils.deleteDir(dir);
         }
 
         String tempDir = Files.createTempDirectory(JHVDirectory.LIBS.getFile().toPath(), prefix).toString();
@@ -77,7 +50,7 @@ class JHVLoader {
         lock.deleteOnExit();
 
         for (String kduLib : kduLibs) {
-            try (InputStream is = JHVLoader.class.getResourceAsStream("/natives/" + pathlib + kduLib)) {
+            try (InputStream is = FileUtils.getResourceInputStream("/natives/" + pathlib + kduLib)) {
                 File f = new File(tempDir, kduLib);
                 FileUtils.save(is, f);
                 System.load(f.getAbsolutePath());

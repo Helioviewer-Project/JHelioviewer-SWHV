@@ -24,7 +24,7 @@ public class Settings {
     private final Properties userProperties = new Properties();
     private final File propFile = new File(JHVDirectory.SETTINGS.getPath() + "user.properties");
 
-    public void load(boolean verbose) {
+    public void load() {
         try {
             defaultProperties.clear();
             userProperties.clear();
@@ -33,9 +33,6 @@ public class Settings {
                 defaultProperties.load(is);
             }
 
-            if (verbose) {
-                Log.debug("Settings.load() > Load default system settings: " + defaultProperties);
-            }
             if (propFile.exists()) {
                 try (InputStream is = FileUtils.newBufferedInputStream(propFile)) {
                     userProperties.load(is);
@@ -49,11 +46,7 @@ public class Settings {
                 setProperty("default.local.path", JHVDirectory.HOME.getPath());
             }
         } catch (Exception e) {
-            if (verbose) {
-                Log.error("Settings.load() > Could not load settings", e);
-            } else {
-                e.printStackTrace();
-            }
+            Log.error("Settings.load() > Could not load settings", e);
         }
     }
 
