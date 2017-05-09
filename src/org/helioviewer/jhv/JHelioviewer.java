@@ -70,7 +70,7 @@ public class JHelioviewer {
         System.setProperty("newt.window.icons", "null,null");
 
         try {
-            JHVLoader.copyKDULibs();
+            JHVLoader.loadKDULibs();
             KakaduMessageSystem.startKduMessageSystem();
         } catch (Exception e) {
             Message.err("Failed to setup Kakadu", e.getMessage(), true);
