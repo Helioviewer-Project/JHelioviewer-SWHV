@@ -37,29 +37,29 @@ public class RunningDifferencePanel {
         public String toString() {
             return str;
         }
-
     }
 
     private final JPanel topPanel = new JPanel(new GridBagLayout());
 
-    public RunningDifferencePanel() {
+    public RunningDifferencePanel(ImageLayerOptions parent) {
         JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
         metaButton.addActionListener(e -> {
-            MetaDataDialog dialog = new MetaDataDialog(((ImageLayerOptions) getComponent().getParent()).getView());
+            MetaDataDialog dialog = new MetaDataDialog(parent.getView());
             dialog.showDialog();
         });
 
         JideButton downloadButton = new JideButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
-            DownloadViewTask downloadTask = new DownloadViewTask(((ImageLayerOptions) getComponent().getParent()).getView());
+            DownloadViewTask downloadTask = new DownloadViewTask(parent.getView());
             JHVGlobals.getExecutorService().execute(downloadTask);
         });
 
         JComboBox<DifferenceModeChoice> comboBox = new JComboBox<>(DifferenceModeChoice.values());
+        comboBox.setSelectedItem(DifferenceModeChoice.None);
         comboBox.addActionListener(e -> {
-            ((ImageLayerOptions) getComponent().getParent()).getGLImage().setDifferenceMode(((DifferenceModeChoice) comboBox.getSelectedItem()).mode);
+            parent.getGLImage().setDifferenceMode(((DifferenceModeChoice) comboBox.getSelectedItem()).mode);
             Displayer.display();
         });
 

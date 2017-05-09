@@ -22,12 +22,12 @@ public class ImageLayerOptions extends JPanel {
     public ImageLayerOptions(ImageLayer _imageLayer) {
         imageLayer = _imageLayer;
 
-        RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
-        opacityPanel = new OpacityPanel();
-        ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel();
-        lutPanel = new LUTPanel();
-        LevelsPanel levelsPanel = new LevelsPanel();
-        SharpenPanel sharpenPanel = new SharpenPanel();
+        RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel(this);
+        opacityPanel = new OpacityPanel(this);
+        ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel(this);
+        lutPanel = new LUTPanel(this);
+        LevelsPanel levelsPanel = new LevelsPanel(this);
+        SharpenPanel sharpenPanel = new SharpenPanel(this);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));

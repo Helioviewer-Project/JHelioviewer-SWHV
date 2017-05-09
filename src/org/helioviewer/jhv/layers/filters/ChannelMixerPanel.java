@@ -13,38 +13,34 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 
-public class ChannelMixerPanel implements ActionListener, FilterDetails {
+public class ChannelMixerPanel implements FilterDetails {
 
-    private final JCheckBox redCheckBox;
-    private final JCheckBox greenCheckBox;
-    private final JCheckBox blueCheckBox;
     private final JPanel boxPanel;
 
-    public ChannelMixerPanel() {
+    public ChannelMixerPanel(ImageLayerOptions parent) {
         boxPanel = new JPanel(new GridLayout(1, 3));
 
-        redCheckBox = new JCheckBox("Red", true);
+        JCheckBox redCheckBox = new JCheckBox("Red", true);
         redCheckBox.setToolTipText("Toggle red channel");
-        redCheckBox.addActionListener(this);
         boxPanel.add(redCheckBox, BorderLayout.WEST);
 
-        greenCheckBox = new JCheckBox("Green", true);
+        JCheckBox greenCheckBox = new JCheckBox("Green", true);
         greenCheckBox.setToolTipText("Toggle green channel");
-        greenCheckBox.addActionListener(this);
         boxPanel.add(greenCheckBox, BorderLayout.CENTER);
 
-        blueCheckBox = new JCheckBox("Blue", true);
+        JCheckBox blueCheckBox = new JCheckBox("Blue", true);
         blueCheckBox.setToolTipText("Toggle blue channel");
-        blueCheckBox.addActionListener(this);
         boxPanel.add(blueCheckBox, BorderLayout.EAST);
-    }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setColor(redCheckBox.isSelected() ? 1 : 0,
-                                                                               greenCheckBox.isSelected() ? 1 : 0,
-                                                                               blueCheckBox.isSelected() ? 1 : 0);
-        Displayer.display();
+        ActionListener listener = e -> {
+            parent.getGLImage().setColor(redCheckBox.isSelected() ? 1 : 0,
+                                         greenCheckBox.isSelected() ? 1 : 0,
+                                         blueCheckBox.isSelected() ? 1 : 0);
+            Displayer.display();
+        };
+        redCheckBox.addActionListener(listener);
+        greenCheckBox.addActionListener(listener);
+        blueCheckBox.addActionListener(listener);
     }
 
     @Override

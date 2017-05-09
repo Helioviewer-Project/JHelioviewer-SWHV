@@ -7,8 +7,6 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
@@ -17,7 +15,7 @@ import org.helioviewer.jhv.layers.ImageLayerOptions;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.RangeSlider;
 
-public class LevelsPanel implements ChangeListener, FilterDetails {
+public class LevelsPanel implements FilterDetails {
 
     private final RangeSlider slider;
     private final JLabel label;
@@ -42,7 +40,7 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
         return "<html>" + align3(low) + "<br/>" + align3(high);
     }
 
-    public LevelsPanel() {
+    public LevelsPanel(ImageLayerOptions parent) {
         slider = new RangeSlider(-101, 201, 0, 100);
         slider.addMouseListener(new MouseAdapter() {
             @Override
@@ -54,32 +52,26 @@ public class LevelsPanel implements ChangeListener, FilterDetails {
             }
         });
         slider.setRangeDraggable(true);
-        slider.addChangeListener(this);
-        WheelSupport.installMouseWheelSupport(slider);
-
         label = new JLabel(format(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
-        // label.setMinimumSize(new JLabel(format(-100, -100)).getPreferredSize());
+        slider.addChangeListener(e -> {
+            int lo = slider.getLowValue();
+            int hi = slider.getHighValue();
+            parent.getGLImage().setBrightness(lo / 100f, (hi - lo) / 100f);
+            label.setText(format(lo, hi));
+            Displayer.display();
+        });
+        WheelSupport.installMouseWheelSupport(slider);
 
         autoButton = new JideButton("Auto");
         autoButton.setToolTipText("Auto brightness");
         autoButton.addActionListener(e -> {
-            double auto = ((ImageLayerOptions) getComponent().getParent()).getAutoBrightness();
             slider.setLowValue(0);
-            slider.setHighValue((int) (auto * 100));
+            slider.setHighValue((int) (parent.getAutoBrightness() * 100));
         });
 
         buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.add(label, BorderLayout.LINE_START);
         buttonPanel.add(autoButton, BorderLayout.LINE_END);
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        int lo = slider.getLowValue();
-        int hi = slider.getHighValue();
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setBrightness(lo / 100f, (hi - lo) / 100f);
-        label.setText(format(lo, hi));
-        Displayer.display();
     }
 
     @Override
