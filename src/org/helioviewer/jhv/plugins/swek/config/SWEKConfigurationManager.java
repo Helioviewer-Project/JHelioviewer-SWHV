@@ -95,11 +95,11 @@ public class SWEKConfigurationManager {
         String configFile = JHVDirectory.SETTINGS.getPath() + configFileName;
         try {
             File f = new File(configFile);
-            if (f.exists()) {
+            if (f.canRead()) {
                 configFileURL = f.toURI().toURL();
                 return true;
             } else {
-                Log.debug("File created from the settings: " + configFile + " does not exists on this system");
+                Log.debug("File created from the settings: " + configFile + " does not exist on this system");
             }
         } catch (MalformedURLException e) {
             Log.debug("File " + configFile + " could not be parsed into an URL");

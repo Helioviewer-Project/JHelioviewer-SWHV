@@ -32,7 +32,7 @@ class PfssDataLoader implements Runnable {
 
         String remote;
         boolean loadFromFile;
-        if (f.exists() && !f.isDirectory() && f.canRead()) {
+        if (f.canRead() && !f.isDirectory()) {
             loadFromFile = true;
             remote = f.toURI().toString();
         } else {

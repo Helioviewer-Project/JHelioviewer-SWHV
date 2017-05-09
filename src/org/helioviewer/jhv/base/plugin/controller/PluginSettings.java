@@ -64,8 +64,7 @@ public class PluginSettings {
      */
     public void loadPluginSettings(String settingsFilePath) {
         settingsFileName = settingsFilePath + PLUGIN_FILENAME;
-
-        if (new File(settingsFileName).exists()) {
+        if (new File(settingsFileName).canRead()) {
             // load XML from file
             try {
                 xmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(settingsFileName);

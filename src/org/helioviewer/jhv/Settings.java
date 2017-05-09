@@ -33,7 +33,7 @@ public class Settings {
                 defaultProperties.load(is);
             }
 
-            if (propFile.exists()) {
+            if (propFile.canRead()) {
                 try (InputStream is = FileUtils.newBufferedInputStream(propFile)) {
                     userProperties.load(is);
                 }
@@ -70,7 +70,7 @@ public class Settings {
 
     private Properties loadCopyUser() {
         Properties props = new Properties();
-        if (propFile.exists()) {
+        if (propFile.canRead()) {
             try (InputStream is = FileUtils.newBufferedInputStream(propFile)) {
                 props.load(is);
             } catch (Exception e) {
