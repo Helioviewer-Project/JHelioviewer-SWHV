@@ -38,6 +38,9 @@ class JHVLoader {
         // delete all kdulibs directories without a lock file
         FileFilter filter = p -> p.getName().startsWith(prefix) && !p.getName().endsWith(suffix);
         File[] dirs = JHVDirectory.LIBS.getFile().listFiles(filter);
+        if (dirs == null)
+            throw new IOException("I/O error or not a directory");
+
         for (File dir : dirs) {
             if (new File(dir + suffix).exists())
                 continue;
