@@ -15,35 +15,33 @@ import org.helioviewer.jhv.layers.ImageLayerOptions;
 
 import com.jidesoft.swing.JideToggleButton;
 
-public class LUTPanel implements ActionListener, FilterDetails {
+public class LUTPanel implements FilterDetails {
 
     private final LUTComboBox lutCombo;
     private final JPanel buttonPanel;
-    private final JideToggleButton invertButton;
-    private final JideToggleButton enhanceButton;
 
-    public LUTPanel() {
+    public LUTPanel(ImageLayerOptions parent) {
         lutCombo = new LUTComboBox();
-        lutCombo.addActionListener(this);
-
-        invertButton = new JideToggleButton(Buttons.invert);
+        JideToggleButton invertButton = new JideToggleButton(Buttons.invert);
         invertButton.setToolTipText("Invert color table");
-        invertButton.addActionListener(this);
 
-        enhanceButton = new JideToggleButton(Buttons.corona);
+        ActionListener listener = e -> {
+            parent.getGLImage().setLUT(lutCombo.getLUT(), invertButton.isSelected());
+            Displayer.display();
+        };
+        lutCombo.addActionListener(listener);
+        invertButton.addActionListener(listener);
+
+        JideToggleButton enhanceButton = new JideToggleButton(Buttons.corona);
         enhanceButton.setToolTipText("Enhance off-disk corona");
-        enhanceButton.addActionListener(this);
+        enhanceButton.addActionListener(e -> {
+            parent.getGLImage().setEnhanced(enhanceButton.isSelected() ? 1 : 0);
+            Displayer.display();
+        });
 
         buttonPanel = new JPanel();
         buttonPanel.add(invertButton);
         buttonPanel.add(enhanceButton);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setLUT(lutCombo.getLUT(), invertButton.isSelected());
-        ((ImageLayerOptions) getComponent().getParent()).getGLImage().setEnhanced(enhanceButton.isSelected() ? 1 : 0);
-        Displayer.display();
     }
 
     public void setLUT(LUT lut) {

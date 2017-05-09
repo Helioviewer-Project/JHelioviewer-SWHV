@@ -210,7 +210,7 @@ class FITSImage {
 
     }
 
-    private String getHeaderAsXML(Header header) {
+    private static String getHeaderAsXML(Header header) {
         String nl = System.getProperty("line.separator");
         StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
 
