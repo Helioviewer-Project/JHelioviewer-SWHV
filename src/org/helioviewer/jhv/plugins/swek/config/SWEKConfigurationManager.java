@@ -28,7 +28,6 @@ import org.helioviewer.jhv.data.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.event.SWEKSource;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader;
@@ -81,7 +80,7 @@ public class SWEKConfigurationManager {
     }
 
     private static boolean checkAndOpenZippedFile() {
-        try (InputStream is = SWEKPlugin.class.getResourceAsStream('/' + configFileName)) {
+        try (InputStream is = FileUtils.getResourceInputStream('/' + configFileName)) {
             File f = new File(JHVDirectory.SETTINGS.getPath() + configFileName);
             FileUtils.save(is, f);
             configFileURL = f.toURI().toURL();

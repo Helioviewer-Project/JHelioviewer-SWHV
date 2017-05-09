@@ -12,7 +12,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Scanner;
 
 // A class which provides functions for accessing and working with files
@@ -114,17 +118,32 @@ public class FileUtils {
         return FileUtils.class.getResource(resourcePath);
     }
 
-    public static boolean deleteDir(File dir) {
-        String[] children;
-        if (dir.isDirectory() && (children = dir.list()) != null) {
-            for (String child : children) {
-                boolean success = deleteDir(new File(dir, child));
-                if (!success) {
-                    return false;
-                }
-            }
+    private static final SimpleFileVisitor<Path> nukeVisitor = new SimpleFileVisitor<Path>() {
+
+        private FileVisitResult delete(Path file) throws IOException {
+            Files.delete(file);
+            return FileVisitResult.CONTINUE;
         }
-        return dir.delete();
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            return delete(file);
+        }
+
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+            return delete(file);
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+            return delete(dir);
+        }
+
+    };
+
+    public static void deleteDir(File dir) throws IOException {
+        Files.walkFileTree(dir.toPath(), nukeVisitor);
     }
 
     public static String URL2String(URL url) {

@@ -64,7 +64,7 @@ public class JHelioviewer {
         JHVGlobals.determineVersionAndRevision();
         // Load settings from file but do not apply them yet
         // The settings must not be applied before the kakadu engine has been initialized
-        Settings.getSingletonInstance().load(false);
+        Settings.getSingletonInstance().load();
         // Set the platform system properties
         SystemProperties.setPlatform();
         System.setProperty("newt.window.icons", "null,null");
@@ -77,8 +77,12 @@ public class JHelioviewer {
             return;
         }
 
-        FileUtils.deleteDir(JHVDirectory.PLUGINSCACHE.getFile());
-        JHVDirectory.PLUGINSCACHE.getFile().mkdirs();
+        try {
+            FileUtils.deleteDir(JHVDirectory.PLUGINSCACHE.getFile()); // clean PFSS cache
+            JHVDirectory.PLUGINSCACHE.getFile().mkdirs();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         ProxySettings.init();
         try {
