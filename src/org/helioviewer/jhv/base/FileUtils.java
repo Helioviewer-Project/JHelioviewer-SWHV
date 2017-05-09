@@ -4,8 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,7 +49,7 @@ public class FileUtils {
      * @throws IOException
      */
     public static void copy(File src, File dst) throws IOException {
-        try (InputStream in = new FileInputStream(src); OutputStream out = new FileOutputStream(dst)) {
+        try (InputStream in = newBufferedInputStream(src); OutputStream out = newBufferedOutputStream(dst)) {
             // Transfer bytes from in to out
             byte[] buf = new byte[BUFSIZ];
             int len;
