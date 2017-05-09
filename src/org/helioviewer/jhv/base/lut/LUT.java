@@ -2,11 +2,11 @@ package org.helioviewer.jhv.base.lut;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -81,7 +81,7 @@ public class LUT {
         String ggrFiles[] = { "AIA94", "AIA131", "AIA171", "AIA193", "AIA211", "AIA304", "AIA335", "AIA1600", "AIA1700", "AIA4500" };
         for (String file : ggrFiles) {
             try (InputStream is = FileUtils.getResourceInputStream("/ggr/" + file + ".ggr")) {
-                LUT l = readGimpGradientStream(is);
+                LUT l = readGimpGradient(is);
                 standardList.put(l.lutName, l);
             } catch (Exception e) {
                 Log.warn("Could not restore gimp gradient file " + file, e);
@@ -92,8 +92,8 @@ public class LUT {
         File[] fileList = addOnDir.listFiles(new GGRFilter());
         if (fileList != null)
             for (File f : fileList) {
-                try {
-                    LUT l = readGimpGradientFile(f);
+                try (InputStream is = Files.newInputStream(f.toPath())) {
+                    LUT l = readGimpGradient(is);
                     standardList.put(l.lutName, l);
                 } catch (Exception e) {
                     Log.warn("Error loading color table plugin dir", e);
@@ -104,17 +104,9 @@ public class LUT {
         readColors();
     }
 
-    private static LUT readGimpGradientFile(File file) throws Exception {
-        try (FileInputStream fr = new FileInputStream(file)) {
-            return readGimpGradientStream(fr);
-        }
-    }
-
-    private static LUT readGimpGradientStream(InputStream is) throws Exception {
-        BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-        GimpGradient gg = new GimpGradient(in);
+    private static LUT readGimpGradient(InputStream is) throws Exception {
+        GimpGradient gg = new GimpGradient(new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)));
         int[] lut8 = new int[256];
-
         for (int i = 0; i < 256; i++) {
             lut8[i] = gg.getGradientColor(i / 255.);
         }

@@ -3,14 +3,12 @@ package org.helioviewer.jhv.io;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -21,6 +19,7 @@ import javax.swing.JWindow;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -90,7 +89,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
                 });
             }
 
-            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(dstFile.toPath()), BUFSIZ)) {
+            try (OutputStream out = FileUtils.newBufferedOutputStream(dstFile)) {
                 byte[] buffer = new byte[BUFSIZ];
                 int numTotalRead = 0, numCurrentRead;
                 while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {

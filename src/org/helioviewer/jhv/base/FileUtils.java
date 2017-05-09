@@ -1,15 +1,18 @@
 package org.helioviewer.jhv.base;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Scanner;
 
 // A class which provides functions for accessing and working with files
@@ -24,6 +27,14 @@ public class FileUtils {
      */
     public static File getWorkingDirectory() {
         return new File(System.getProperty("user.dir"));
+    }
+
+    public static OutputStream newBufferedOutputStream(File dst) throws IOException {
+        return new BufferedOutputStream(Files.newOutputStream(dst.toPath()), BUFSIZ);
+    }
+
+    public static InputStream newBufferedInputStream(File src) throws IOException {
+        return new BufferedInputStream(Files.newInputStream(src.toPath()), BUFSIZ);
     }
 
     /**
@@ -57,14 +68,15 @@ public class FileUtils {
      */
     public static void save(InputStream in, File dst) throws IOException {
         // Transfer bytes from in to out
-        try (OutputStream out = new FileOutputStream(dst)) {
+        try (OutputStream out = newBufferedOutputStream(dst)) {
             byte[] buf = new byte[BUFSIZ];
             int len;
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
+        } finally {
+            in.close();
         }
-        in.close();
     }
 
     /**
