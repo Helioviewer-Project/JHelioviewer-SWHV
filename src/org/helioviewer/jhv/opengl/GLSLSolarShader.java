@@ -268,7 +268,7 @@ public class GLSLSolarShader extends GLSLShader {
         crotaFloat[0] = (float) crota;
     }
 
-    protected void bindAttribs(GL2 gl){
+    protected void bindAttribs(GL2 gl) {
         gl.glBindAttribLocation(progID, positionRef, "position");
     }
 
