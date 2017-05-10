@@ -6,7 +6,7 @@ import org.helioviewer.jhv.base.math.Quat;
 import com.jogamp.opengl.GL2;
 
 public class GLSLSolarShader extends GLSLShader {
-    public static int positionRef = 0;
+    public static final int positionRef = 0;
 
     private static final float[] blurKernel;
     private static final float[] offset = new float[] { -1.2004377f, 0, 1.2004377f };

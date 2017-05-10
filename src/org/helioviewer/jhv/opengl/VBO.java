@@ -7,7 +7,7 @@ public class VBO {
 
     private int bufferID = -1;
     private int attribRef = -1;
-    private int buffer_type;
+    private final int buffer_type;
     private int vec_len = 1;
     public int bufferSize = -1;
 
@@ -48,7 +48,7 @@ public class VBO {
         gl.glBindBuffer(buffer_type, 0);
     }
 
-    public static int generate(GL2 gl) {
+    private static int generate(GL2 gl) {
         int[] tmpId = new int[1];
         gl.glGenBuffers(1, tmpId, 0);
         return tmpId[0];

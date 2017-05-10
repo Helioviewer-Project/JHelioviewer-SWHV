@@ -87,7 +87,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
         previousPfssData = null;
     }
 
-    public void renderData(GL2 gl, PfssData data) {
+    private void renderData(GL2 gl, PfssData data) {
         if (previousPfssData == null || data != previousPfssData ||
             PfssSettings.qualityReduction != data.lastQuality || PfssSettings.fixedColor != data.lastFixedColor) {
             data.calculatePositions(PfssSettings.qualityReduction, PfssSettings.fixedColor);

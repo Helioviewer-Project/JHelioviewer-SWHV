@@ -4,20 +4,20 @@ import com.jogamp.opengl.GL2;
 
 public class GLSLLineShader extends GLSLShader {
 
-    public static final GLSLLineShader line = new GLSLLineShader("/data/vertexline.glsl", "/data/fragmentline.glsl");
-    public static  int previousLineRef = 0;
-    public static int lineRef = 1;
-    public static int nextLineRef = 2;
-    public static int directionRef = 3;
+    private static final GLSLLineShader line = new GLSLLineShader("/data/vertexline.glsl", "/data/fragmentline.glsl");
+    private static  int previousLineRef = 0;
+    private static int lineRef = 1;
+    private static int nextLineRef = 2;
+    private static int directionRef = 3;
 
-    public int miterRef;
+    private int miterRef;
     private int thicknessRef;
     private int aspectRef;
 
-    private int[] miter = { 1 };
-    private float[] thickness = { 0.005f };
-    private float[] aspect = { 1 };
-    public boolean inited = false;
+    private final int[] miter = { 1 };
+    private final float[] thickness = { 0.005f };
+    private final float[] aspect = { 1 };
+    private boolean inited = false;
 
     public GLSLLineShader(String vertex, String fragment) {
         super(vertex, fragment);

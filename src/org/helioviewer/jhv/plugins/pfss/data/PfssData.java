@@ -19,7 +19,7 @@ public class PfssData {
     private enum FieldLineColor {
         OPENFIELDCOLOR(Color.RED), LOOPCOLOR(Color.WHITE), INSIDEFIELDCOLOR(Color.BLUE);
 
-        public Color color;
+        public final Color color;
 
         FieldLineColor(Color _color) {
             color = _color;
@@ -32,7 +32,7 @@ public class PfssData {
 
     public int lastQuality;
     public boolean lastFixedColor;
-    public boolean read;
+    private boolean read;
 
     private String dateObs;
     final long time;
