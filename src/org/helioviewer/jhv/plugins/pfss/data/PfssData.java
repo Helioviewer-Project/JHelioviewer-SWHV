@@ -11,6 +11,7 @@ import nom.tam.fits.Fits;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
@@ -24,10 +25,9 @@ public class PfssData {
 
     private final byte[] gzipFitsFile;
 
-    private int[] buffer;
     private FloatBuffer vertices;
 
-    private int VBOVertices;
+    private VBO vertexVBO;
     private int lastQuality;
     private boolean read = false;
     private boolean init = false;
@@ -189,14 +189,9 @@ public class PfssData {
             if (!read)
                 readFitsFile();
             if (!init && read) {
-                buffer = new int[1];
-                gl.glGenBuffers(1, buffer, 0);
-
-                VBOVertices = buffer[0];
-                gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, VBOVertices);
-                gl.glBufferData(GL2.GL_ARRAY_BUFFER, vertices.limit() * Buffers.SIZEOF_FLOAT, vertices, GL2.GL_STATIC_DRAW);
-                gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
-
+                vertexVBO = new VBO(GL2.GL_ARRAY_BUFFER, -1, 3);
+                vertexVBO.init(gl);          
+                vertexVBO.bindBufferData(gl, vertices, Buffers.SIZEOF_FLOAT);
                 init = true;
             }
         }
@@ -204,7 +199,7 @@ public class PfssData {
 
     public void clear(GL2 gl) {
         if (init) {
-            gl.glDeleteBuffers(1, buffer, 0);
+        	vertexVBO.dispose(gl);
             init = false;
         }
     }
@@ -221,14 +216,15 @@ public class PfssData {
 
         gl.glDepthMask(false);
 
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, VBOVertices);
+        vertexVBO.bindArray(gl);
+
         gl.glColorPointer(4, GL2.GL_FLOAT, 7 * 4, 3 * 4);
         gl.glVertexPointer(3, GL2.GL_FLOAT, 7 * 4, 0);
 
         gl.glLineWidth(PfssSettings.LINE_WIDTH);
-        gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, vertices.limit() / 7);
+        gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, vertexVBO.bufferSize);
 
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+        vertexVBO.unbindArray(gl);
         gl.glDepthMask(true);
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
