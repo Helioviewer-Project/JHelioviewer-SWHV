@@ -32,9 +32,6 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
         PfssData pfssData = PfssPlugin.getPfsscache().getData(Layers.getLastUpdatedTimestamp().milli);
         if (pfssData != null) {
             renderData(gl, pfssData);
-            datetime = pfssData.getDateObs();
-            ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
-
             previousPfssData = pfssData;
         }
     }
@@ -54,11 +51,18 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
         return "PFSS Model";
     }
 
-    private String datetime = null;
+    private String timeString = null;
 
     @Override
     public String getTimeString() {
-        return datetime;
+        return timeString;
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (!visible)
+            timeString = null;
     }
 
     @Override
@@ -92,6 +96,9 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
             PfssSettings.qualityReduction != data.lastQuality || PfssSettings.fixedColor != data.lastFixedColor) {
             data.calculatePositions(PfssSettings.qualityReduction, PfssSettings.fixedColor);
             vertexVBO.bindBufferData(gl, data.vertices, Buffers.SIZEOF_FLOAT);
+
+            timeString = data.getDateObs().toString();
+            ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
         }
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
