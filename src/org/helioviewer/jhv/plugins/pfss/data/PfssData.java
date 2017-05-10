@@ -16,6 +16,7 @@ import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 import com.jogamp.common.nio.Buffers;
 
 public class PfssData {
+
     private enum FieldLineColor {
         OPENFIELDCOLOR(Color.RED), LOOPCOLOR(Color.WHITE), INSIDEFIELDCOLOR(Color.BLUE);
 
@@ -34,7 +35,7 @@ public class PfssData {
     public boolean lastFixedColor;
     private boolean read;
 
-    private String dateObs;
+    private JHVDate dateObs;
     final long time;
 
     public PfssData(byte[] _gzipFitsFile, long _time) {
@@ -93,13 +94,14 @@ public class PfssData {
             short[] fieldlinez = (short[]) bhdu.getColumn("FIELDLINEz");
             short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
 
-            dateObs = bhdu.getHeader().getStringValue("DATE-OBS");
-            if (dateObs == null)
+            String dateFits = bhdu.getHeader().getStringValue("DATE-OBS");
+            if (dateFits == null)
                 throw new Exception("DATE-OBS not found");
+            dateObs = new JHVDate(dateFits);
 
             createBuffer(fieldlinex.length);
 
-            Position.L p = Sun.getEarth(new JHVDate(dateObs));
+            Position.L p = Sun.getEarth(dateObs);
             double sphi = Math.sin(p.lon), cphi = Math.cos(p.lon);
 
             FieldLineColor type = FieldLineColor.LOOPCOLOR;
@@ -171,7 +173,7 @@ public class PfssData {
         }
     }
 
-    public String getDateObs() {
+    public JHVDate getDateObs() {
         return dateObs;
     }
 

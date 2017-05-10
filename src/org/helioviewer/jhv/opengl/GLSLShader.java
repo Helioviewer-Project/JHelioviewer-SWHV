@@ -23,7 +23,7 @@ public class GLSLShader {
         fragment = _fragment;
     }
 
-    protected void _init(GL2 gl,boolean common) {
+    protected void _init(GL2 gl, boolean common) {
         String fragmentCommonText = "";
         if (common) {
             InputStream fragmentCommonStream = FileUtils.getResourceInputStream("/data/fragmentcommon.glsl");
