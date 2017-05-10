@@ -38,13 +38,12 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private final GLImage glImage = new GLImage();
+    private final VBO positionVBO = new VBO(GL2.GL_ARRAY_BUFFER, GLSLSolarShader.positionRef, 3);
+    private final VBO indexVBO = new VBO(GL2.GL_ELEMENT_ARRAY_BUFFER, -1, -1);
     private final ImageLayerOptions optionsPanel;
-    private VBO positionVBO;
-    private VBO indexVBO;
 
     private LoadRemoteTask worker;
     private View view;
-
 
     private static final String loading = "Loading...";
 
@@ -83,11 +82,9 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         FloatBuffer positionBuffer = IcoSphere.IcoSphere.a;
         IntBuffer indexBuffer = IcoSphere.IcoSphere.b;
 
-        positionVBO = new VBO(GL2.GL_ARRAY_BUFFER, GLSLSolarShader.positionRef, 3);
         positionVBO.init(gl);
         positionVBO.bindBufferData(gl, positionBuffer, Buffers.SIZEOF_FLOAT);
 
-        indexVBO = new VBO(GL2.GL_ELEMENT_ARRAY_BUFFER, -1, -1);
         indexVBO.init(gl);
         indexVBO.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
     }
