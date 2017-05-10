@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.pfss.data;
 
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
-import com.jogamp.opengl.GL2;
-
 // Datastructure to cache the Pfss-Data with preload function
 public class PfssCache {
 
