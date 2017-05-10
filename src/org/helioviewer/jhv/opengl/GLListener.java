@@ -78,13 +78,16 @@ public class GLListener implements GLEventListener {
         gl.glClearColor(0, 0, 0, 0);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
-        GLSLSolarShader.init(gl);
+        GLSLSolarShader.init(gl);        
+        GLSLLineShader.init(gl);
+
         ImageViewerGui.getRenderableContainer().init(gl);
     }
 
     private static void disposeImpl(GL2 gl) {
         ImageViewerGui.getRenderableContainer().dispose(gl);
-        GLSLSolarShader.dispose(gl);
+        GLSLSolarShader.dispose(gl);        
+        GLSLLineShader.dispose(gl);
     }
 
     private ExportMovie exporter;
