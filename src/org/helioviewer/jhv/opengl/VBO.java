@@ -42,8 +42,8 @@ public class VBO {
 
 	public void bindBufferData(GL2 gl, Buffer buffer, int buf_sizeof) {
 		gl.glBindBuffer(buffer_type, bufferID);
-		bufferSize = buffer.capacity();
-		gl.glBufferData(buffer_type, buffer.capacity() * buf_sizeof, buffer, GL2.GL_STATIC_DRAW);
+		bufferSize = buffer.limit();
+		gl.glBufferData(buffer_type, bufferSize * buf_sizeof, buffer, GL2.GL_STATIC_DRAW);
 		gl.glBindBuffer(buffer_type, 0);
 	}
 
