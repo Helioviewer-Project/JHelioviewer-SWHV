@@ -4,52 +4,54 @@ import java.nio.Buffer;
 import com.jogamp.opengl.GL2;
 
 public class VBO {
-	private int bufferID = -1;
-	private int attribRef = -1;
-	private int buffer_type;
-	private int vec_len = 1;
-	public int bufferSize = -1;
 
-	public VBO(int _buffer_type, int _attribRef,  int _vec_len) {
-		attribRef = _attribRef;
-		buffer_type = _buffer_type;
-		vec_len = _vec_len;
-	}
+    private int bufferID = -1;
+    private int attribRef = -1;
+    private int buffer_type;
+    private int vec_len = 1;
+    public int bufferSize = -1;
 
-	public void bindArray(GL2 gl) {
-		gl.glBindBuffer(buffer_type, bufferID);
-		if (attribRef != -1) {
-			gl.glVertexAttribPointer(attribRef, vec_len, GL2.GL_FLOAT, false, 0, 0);
-			gl.glEnableVertexAttribArray(attribRef);
-		}
-	}
+    public VBO(int _buffer_type, int _attribRef,  int _vec_len) {
+        attribRef = _attribRef;
+        buffer_type = _buffer_type;
+        vec_len = _vec_len;
+    }
 
-	public void unbindArray(GL2 gl) {
-		if (attribRef != -1)
-			gl.glDisableVertexAttribArray(attribRef);
-		gl.glBindBuffer(buffer_type, 0);
-	}
+    public void bindArray(GL2 gl) {
+        gl.glBindBuffer(buffer_type, bufferID);
+        if (attribRef != -1) {
+            gl.glVertexAttribPointer(attribRef, vec_len, GL2.GL_FLOAT, false, 0, 0);
+            gl.glEnableVertexAttribArray(attribRef);
+        }
+    }
 
-	public void init(GL2 gl) {
-		bufferID = generate(gl);
-	}
+    public void unbindArray(GL2 gl) {
+        if (attribRef != -1)
+            gl.glDisableVertexAttribArray(attribRef);
+        gl.glBindBuffer(buffer_type, 0);
+    }
 
-	public void dispose(GL2 gl) {
-		gl.glDeleteBuffers(1, new int[] { bufferID }, 0);
-		bufferID = -1;
-		bufferSize = -1;
-	}
+    public void init(GL2 gl) {
+        bufferID = generate(gl);
+    }
 
-	public void bindBufferData(GL2 gl, Buffer buffer, int buf_sizeof) {
-		gl.glBindBuffer(buffer_type, bufferID);
-		bufferSize = buffer.limit();
-		gl.glBufferData(buffer_type, bufferSize * buf_sizeof, buffer, GL2.GL_STATIC_DRAW);
-		gl.glBindBuffer(buffer_type, 0);
-	}
+    public void dispose(GL2 gl) {
+        gl.glDeleteBuffers(1, new int[] { bufferID }, 0);
+        bufferID = -1;
+        bufferSize = -1;
+    }
 
-	public static int generate(GL2 gl) {
-		int[] tmpId = new int[1];
-		gl.glGenBuffers(1, tmpId, 0);
-		return tmpId[0];
-	}
+    public void bindBufferData(GL2 gl, Buffer buffer, int buf_sizeof) {
+        gl.glBindBuffer(buffer_type, bufferID);
+        bufferSize = buffer.limit();
+        gl.glBufferData(buffer_type, bufferSize * buf_sizeof, buffer, GL2.GL_STATIC_DRAW);
+        gl.glBindBuffer(buffer_type, 0);
+    }
+
+    public static int generate(GL2 gl) {
+        int[] tmpId = new int[1];
+        gl.glGenBuffers(1, tmpId, 0);
+        return tmpId[0];
+    }
+
 }

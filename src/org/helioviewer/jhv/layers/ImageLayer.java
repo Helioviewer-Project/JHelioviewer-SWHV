@@ -39,8 +39,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private final GLImage glImage = new GLImage();
     private final ImageLayerOptions optionsPanel;
-	private VBO positionVBO;
-	private VBO indexVBO;
+    private VBO positionVBO;
+    private VBO indexVBO;
 
     private LoadRemoteTask worker;
     private View view;
