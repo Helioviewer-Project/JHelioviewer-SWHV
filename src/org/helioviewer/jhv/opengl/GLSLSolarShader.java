@@ -269,6 +269,6 @@ public class GLSLSolarShader extends GLSLShader {
     }
     
     protected void bindAttribs(GL2 gl){
-        //gl.glBindAttribLocation(progID, positionRef, "position");
+        gl.glBindAttribLocation(progID, positionRef, "position");
     }
 }
