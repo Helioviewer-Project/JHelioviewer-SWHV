@@ -26,8 +26,8 @@ public class PfssData {
     private final byte[] gzipFitsFile;
 
     private FloatBuffer vertices;
+    private static VBO vertexVBO;
 
-    private VBO vertexVBO;
     private int lastQuality;
     private boolean read = false;
     private boolean init = false;
@@ -50,29 +50,27 @@ public class PfssData {
 
     private void createBuffer(int len) {
         int numberOfLines = len / PfssSettings.POINTS_PER_LINE;
-        vertices = Buffers.newDirectFloatBuffer(len * (3 + 4) + 2 * numberOfLines * (3 + 4));
+        vertices = Buffers.newDirectFloatBuffer((3 + 4) * (len + 2 * numberOfLines));
     }
 
-    private int addColor(Color color, int counter) {
-        vertices.put(color.getRed() / 255f);
-        vertices.put(color.getGreen() / 255f);
-        vertices.put(color.getBlue() / 255f);
-        vertices.put(color.getAlpha() / 255f);
-        return ++counter;
+    private void addColor(Color color) {
+    	vertices.put(color.getRed() / 255f);
+    	vertices.put(color.getGreen() / 255f);
+    	vertices.put(color.getBlue() / 255f);
+    	vertices.put(color.getAlpha() / 255f);
     }
 
-    private int addVertex(float x, float y, float z, int counter) {
+    private void addVertex(float x, float y, float z) {
         vertices.put(x);
         vertices.put(y);
         vertices.put(z);
-        return ++counter;
     }
 
-    private int addColor(double bright, float opacity, int countercolor) {
+    private void addColor(double bright, float opacity) {
         if (bright > 0) {
-            return addColor(new Color(1f, (float) (1. - bright), (float) (1. - bright), opacity), countercolor);
+            addColor(new Color(1f, (float) (1. - bright), (float) (1. - bright), opacity));
         } else {
-            return addColor(new Color((float) (1. + bright), (float) (1. + bright), 1f, opacity), countercolor);
+            addColor(new Color((float) (1. + bright), (float) (1. + bright), 1f, opacity));
         }
     }
 
@@ -100,7 +98,6 @@ public class PfssData {
             Position.L p = Sun.getEarth(new JHVDate(dateObs));
             double sphi = Math.sin(p.lon), cphi = Math.cos(p.lon);
 
-            int counter = 0;
             int type = 0;
             for (int i = 0; i < fieldlinex.length; i++) {
                 if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {
@@ -120,11 +117,11 @@ public class PfssData {
                     int col = fieldlines[i] + 32768;
                     double bright = (col * 2. / 65535.) - 1.;
                     if (i % PfssSettings.POINTS_PER_LINE == 0) {
-                        counter = addVertex((float) x, (float) z, (float) -y, counter);
-                        counter = addColor(bright, 0, counter);
-                        counter = addVertex((float) x, (float) z, (float) -y, counter);
+                        addVertex((float) x, (float) z, (float) -y);
+                        addColor(bright, 0);
+                        addVertex((float) x, (float) z, (float) -y);
                         if (!PfssSettings.fixedColor) {
-                            counter = addColor(bright, 1, counter);
+                            addColor(bright, 1);
                         } else {
                             int rox = fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
                             int roy = fieldliney[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
@@ -137,41 +134,41 @@ public class PfssData {
 
                             if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
                                 type = 0;
-                                counter = addColor(LOOPCOLOR, counter);
+                                addColor(LOOPCOLOR);
                             } else if (bright < 0) {
                                 type = 1;
-                                counter = addColor(INSIDEFIELDCOLOR, counter);
+                                addColor(INSIDEFIELDCOLOR);
                             } else {
                                 type = 2;
-                                counter = addColor(OPENFIELDCOLOR, counter);
+                                addColor(OPENFIELDCOLOR);
                             }
                         }
                     } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
-                        counter = addVertex((float) x, (float) z, (float) -y, counter);
+                        addVertex((float) x, (float) z, (float) -y);
                         if (!PfssSettings.fixedColor) {
-                            counter = addColor(bright, 1, counter);
+                            addColor(bright, 1);
                         } else {
                             if (type == 0) {
-                                counter = addColor(LOOPCOLOR, counter);
+                                addColor(LOOPCOLOR);
                             } else if (type == 1) {
-                                counter = addColor(INSIDEFIELDCOLOR, counter);
+                                addColor(INSIDEFIELDCOLOR);
                             } else {
-                                counter = addColor(OPENFIELDCOLOR, counter);
+                                addColor(OPENFIELDCOLOR);
                             }
                         }
-                        counter = addVertex((float) x, (float) z, (float) -y, counter);
-                        counter = addColor(bright, 0, counter);
+                        addVertex((float) x, (float) z, (float) -y);
+                        addColor(bright, 0);
                     } else {
-                        counter = addVertex((float) x, (float) z, (float) -y, counter);
+                        addVertex((float) x, (float) z, (float) -y);
                         if (!PfssSettings.fixedColor) {
-                            counter = addColor(bright, 1, counter);
+                            addColor(bright, 1);
                         } else {
                             if (type == 0) {
-                                counter = addColor(LOOPCOLOR, counter);
+                                addColor(LOOPCOLOR);
                             } else if (type == 1) {
-                                counter = addColor(INSIDEFIELDCOLOR, counter);
+                                addColor(INSIDEFIELDCOLOR);
                             } else {
-                                counter = addColor(OPENFIELDCOLOR, counter);
+                                addColor(OPENFIELDCOLOR);
                             }
                         }
                     }
@@ -189,8 +186,10 @@ public class PfssData {
             if (!read)
                 readFitsFile();
             if (!init && read) {
-                vertexVBO = new VBO(GL2.GL_ARRAY_BUFFER, -1, 3);
-                vertexVBO.init(gl);          
+            	if(vertexVBO == null) {
+                    vertexVBO = new VBO(GL2.GL_ARRAY_BUFFER, -1, 3);
+                    vertexVBO.init(gl);    
+            	}
                 vertexVBO.bindBufferData(gl, vertices, Buffers.SIZEOF_FLOAT);
                 init = true;
             }
@@ -199,7 +198,8 @@ public class PfssData {
 
     public void clear(GL2 gl) {
         if (init) {
-        	vertexVBO.dispose(gl);
+        	//vertexVBO.dispose(gl);
+        	//vertexVBO = null;
             init = false;
         }
     }
