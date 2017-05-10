@@ -24,6 +24,7 @@ import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
@@ -36,11 +37,11 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
-    private int positionBufferID;
-    private int indexBufferID;
-    private int indexBufferSize;
     private final GLImage glImage = new GLImage();
     private final ImageLayerOptions optionsPanel;
+    private VBO positionVBO;
+    private VBO indexVBO;
+    private boolean inited = false;
 
     private LoadRemoteTask worker;
     private View view;
@@ -81,17 +82,13 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
         FloatBuffer positionBuffer = IcoSphere.IcoSphere.a;
         IntBuffer indexBuffer = IcoSphere.IcoSphere.b;
-
-        positionBufferID = generate(gl);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
-
-        indexBufferID = generate(gl);
-        indexBufferSize = indexBuffer.capacity();
-        gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-        gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferSize * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
-        gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+		positionVBO = new VBO(GL2.GL_ARRAY_BUFFER, GLSLSolarShader.positionRef, 4);
+		positionVBO.init(gl);
+		positionVBO.bindBufferData(gl, positionBuffer, Buffers.SIZEOF_FLOAT);
+		indexVBO = new VBO(GL2.GL_ELEMENT_ARRAY_BUFFER, -1, -1);
+		indexVBO.init(gl);
+		indexVBO.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
+		inited = true;
     }
 
     @Override
@@ -190,7 +187,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange) {
-        if (imageData == null) {
+        if (imageData == null||inited == false) {
             return;
         }
         if (!isVisible[vp.idx])
@@ -227,24 +224,23 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             shader.bindAngles(gl, imageData.getMetaData().getViewpointL());
             shader.setPolarRadii(gl, scale.getYstart(), scale.getYstop());
             camera.pop();
-
-            enablePositionVBO(gl);
-            enableIndexVBO(gl);
+            
+            positionVBO.bindArray(gl);
+            indexVBO.bindArray(gl);
             {
-                gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
                 if (shader == GLSLSolarShader.ortho) {
                     shader.bindIsDisc(gl, 1);
                     gl.glDepthRange(depthrange[2], depthrange[3]);
-                    gl.glDrawElements(GL2.GL_TRIANGLES, indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+                    gl.glDrawElements(GL2.GL_TRIANGLES, indexVBO.bufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
                     shader.bindIsDisc(gl, 0);
                 }
                 gl.glDepthRange(depthrange[0], depthrange[1]);
-                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexBufferSize - 6) * Buffers.SIZEOF_INT);
+                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexVBO.bufferSize - 6) * Buffers.SIZEOF_INT);
 
                 gl.glDepthRange(0, 1);
             }
-            disableIndexVBO(gl);
-            disablePositionVBO(gl);
+            indexVBO.unbindArray(gl);
+            positionVBO.unbindArray(gl);
         }
         GLSLShader.unbind(gl);
     }
@@ -260,38 +256,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             renderer.draw(loading, (int) (vp.width - rect.getWidth() - delta), (int) (vp.height - rect.getHeight() - delta));
             renderer.endRendering();
         }
-    }
-
-    private static int generate(GL2 gl) {
-        int[] tmpId = new int[1];
-        gl.glGenBuffers(1, tmpId, 0);
-        return tmpId[0];
-    }
-
-    private void enableIndexVBO(GL2 gl) {
-        gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-    }
-
-    private static void disableIndexVBO(GL2 gl) {
-        gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
-    }
-
-    private void enablePositionVBO(GL2 gl) {
-        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-    }
-
-    private static void disablePositionVBO(GL2 gl) {
-        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
-    }
-
-    private void deletePositionVBO(GL2 gl) {
-        gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
-    }
-
-    private void deleteIndexVBO(GL2 gl) {
-        gl.glDeleteBuffers(1, new int[] { indexBufferID }, 0);
     }
 
     @Override
@@ -319,11 +283,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public void dispose(GL2 gl) {
-        disablePositionVBO(gl);
-        disableIndexVBO(gl);
-        deletePositionVBO(gl);
-        deleteIndexVBO(gl);
         glImage.dispose(gl);
+        inited = false;
     }
 
     public boolean isActiveImageLayer() {
