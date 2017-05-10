@@ -259,15 +259,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
     }
 
-
-    private void enablePositionVBO(GL2 gl) {
-        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-    }
-
-    private static void disablePositionVBO(GL2 gl) {
-        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-    }
-
     @Override
     public Component getOptionsPanel() {
         return optionsPanel;
@@ -293,7 +284,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public void dispose(GL2 gl) {
-        disablePositionVBO(gl);
         positionVBO.dispose(gl);
         indexVBO.dispose(gl);
         glImage.dispose(gl);
