@@ -54,7 +54,7 @@ public class RenderableLine extends AbstractRenderable {
             return;
 
         GLSLLineShader.line.bind(gl);
-        GLSLLineShader.line.setAspect((float) vp.aspect * 2);
+        GLSLLineShader.line.setAspect((float) vp.aspect);
         GLSLLineShader.line.bindParams(gl);
 
         bindVBOs(gl);

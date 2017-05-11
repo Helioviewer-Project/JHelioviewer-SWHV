@@ -12,7 +12,7 @@ varying vec4 frag_linecolor;
 
 
 void main() {
-  vec2 aspectVec = vec2(aspect/2., 1.);
+  vec2 aspectVec = vec2(aspect, 1.);
   mat4 m = gl_ModelViewProjectionMatrix;
   vec4 previousProjected = m * vec4(previousLine, 1.0);
   vec4 currentProjected = m * vec4(line, 1.0);
@@ -49,7 +49,7 @@ void main() {
 
   vec2 normal =  vec2(-dir.y, dir.x);
   normal *= len/2.;
-  normal.y *= aspect/2.;
+  normal.y *= aspect;
 
   vec4 offset = vec4(-normal*direction, 0.0, 0.0);
   gl_Position = currentProjected + offset;
