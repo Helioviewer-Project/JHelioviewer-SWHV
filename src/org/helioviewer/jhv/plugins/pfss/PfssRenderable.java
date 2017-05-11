@@ -94,8 +94,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     private void renderData(GL2 gl, PfssData data) {
         if (previousPfssData == null || data != previousPfssData ||
             PfssSettings.qualityReduction != data.lastQuality || PfssSettings.fixedColor != data.lastFixedColor) {
-            data.calculatePositions(PfssSettings.qualityReduction, PfssSettings.fixedColor);
-            vertexVBO.bindBufferData(gl, data.vertices, Buffers.SIZEOF_FLOAT);
+            vertexVBO.bindBufferData(gl, data.calculatePositions(PfssSettings.qualityReduction, PfssSettings.fixedColor), Buffers.SIZEOF_FLOAT);
 
             timeString = data.getDateObs().toString();
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);

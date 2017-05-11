@@ -28,7 +28,10 @@ public class PfssData {
     private final short[] fieldlinez;
     private final short[] fieldlines;
 
-    public FloatBuffer vertices;
+    private final double cphi;
+    private final double sphi;
+    private final FloatBuffer vertices;
+
     public int lastQuality;
     public boolean lastFixedColor;
 
@@ -41,11 +44,13 @@ public class PfssData {
         fieldlinez = _fieldlinez;
         fieldlines = _fieldlines;
         time = _time;
-    }
 
-    private void createBuffer(int len) {
-        int numberOfLines = len / PfssSettings.POINTS_PER_LINE;
-        vertices = Buffers.newDirectFloatBuffer((3 + 4) * (len + 2 * numberOfLines));
+        Position.L p = Sun.getEarth(dateObs);
+        cphi = Math.cos(p.lon);
+        sphi = Math.sin(p.lon);
+
+        int numberOfLines = fieldlinex.length / PfssSettings.POINTS_PER_LINE;
+        vertices = Buffers.newDirectFloatBuffer((3 + 4) * (fieldlinex.length + 2 * numberOfLines));
     }
 
     private void addColor(Color color) {
@@ -69,17 +74,12 @@ public class PfssData {
         }
     }
 
-    public void calculatePositions(int qualityReduction, boolean fixedColor) {
+    public FloatBuffer calculatePositions(int qualityReduction, boolean fixedColor) {
         if (lastQuality == qualityReduction && lastFixedColor == fixedColor)
-            return;
+            return vertices;
 
         lastQuality = PfssSettings.qualityReduction;
         lastFixedColor = PfssSettings.fixedColor;
-
-        createBuffer(fieldlinex.length);
-
-        Position.L p = Sun.getEarth(dateObs);
-        double sphi = Math.sin(p.lon), cphi = Math.cos(p.lon);
 
         FieldLineColor type = FieldLineColor.LOOPCOLOR;
         for (int i = 0; i < fieldlinex.length; i++) {
@@ -144,6 +144,7 @@ public class PfssData {
             }
         }
         vertices.flip();
+        return vertices;
     }
 
     public JHVDate getDateObs() {
