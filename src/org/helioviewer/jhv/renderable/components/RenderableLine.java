@@ -27,13 +27,10 @@ public class RenderableLine extends AbstractRenderable {
 
     private boolean inited = false;
 
-    public RenderableLine(float[][] _points) {
-        points = _points;
-    }
-
-    public RenderableLine(FloatBuffer vertices, FloatBuffer _colors) {
+    public void setData(GL2 gl, FloatBuffer vertices, FloatBuffer _colors) {
         points = monoToBidi(vertices, vertices.limit() / 3, 3);
         colors = monoToBidi(_colors, _colors.limit() / 4, 4);
+        setBufferData(gl);
     }
 
     public float[][] monoToBidi(final FloatBuffer array, final int rows, final int cols) {
@@ -144,6 +141,10 @@ public class RenderableLine extends AbstractRenderable {
 
     @Override
     public void init(GL2 gl) {
+        initVBOs(gl);
+    }
+
+    private void setBufferData(GL2 gl) {
         if (points.length < 2)
             return;
 
@@ -180,7 +181,6 @@ public class RenderableLine extends AbstractRenderable {
         directionBuffer.flip();
         colorBuffer.flip();
 
-        initVBOs(gl);
         vbos[0].bindBufferData(gl, previousLineBuffer, Buffers.SIZEOF_FLOAT);
         vbos[1].bindBufferData(gl, lineBuffer, Buffers.SIZEOF_FLOAT);
         vbos[2].bindBufferData(gl, nextLineBuffer, Buffers.SIZEOF_FLOAT);

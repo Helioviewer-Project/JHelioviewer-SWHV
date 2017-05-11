@@ -20,6 +20,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
 
     private final PfssPluginPanel optionsPanel = new PfssPluginPanel();
     private PfssData previousPfssData = null;
+    private final RenderableLine line = new RenderableLine();;
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
@@ -78,6 +79,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
 
     @Override
     public void init(GL2 gl) {
+        line.init(gl);
     }
 
     @Override
@@ -86,16 +88,12 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
         line.dispose(gl);
     }
 
-    private RenderableLine line;
-
     public void renderData(Camera camera, Viewport vp, GL2 gl, PfssData data) {
         if (data != previousPfssData || data.needsUpdate(PfssSettings.qualityReduction, PfssSettings.fixedColor)) {
             data.calculatePositions(PfssSettings.qualityReduction, PfssSettings.fixedColor);
-            line = new RenderableLine(data.vertices, data.colors);
-            line.init(gl);
+            line.setData(gl, data.vertices, data.colors);
         }
-        if (line != null)
-            line.render(camera, vp, gl);
+        line.render(camera, vp, gl);
     }
 
 }
