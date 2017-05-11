@@ -24,7 +24,7 @@ public class SWEKPlugin implements Plugin {
 
     public SWEKPlugin() {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
-        for (SWEKEventType eventType : SWEKConfigurationManager.loadConfiguration()) {
+        for (SWEKEventType eventType : SWEKConfigurationManager.loadConfig()) {
             swekPanel.add(new EventPanel(eventType));
         }
     }

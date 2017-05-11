@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 
@@ -37,13 +36,12 @@ public class SWEKConfigurationManager {
     private static final String configName = "SWEKSettings.json";
     private static final String configFile = JHVDirectory.SETTINGS.getPath() + configName;
 
-    private static final Map<String, SWEKSource> sources = new HashMap<>();
-    private static final Map<String, SWEKEventType> eventTypes = new HashMap<>();
+    private static final HashMap<String, SWEKSource> sources = new HashMap<>();
+    private static final HashMap<String, SWEKEventType> eventTypes = new HashMap<>();
     private static final List<SWEKEventType> orderedEventTypes = new ArrayList<>();
 
-    public static List<SWEKEventType> loadConfiguration() {
+    public static List<SWEKEventType> loadConfig() {
         SWEKIconBank.init();
-
         try {
             readConfig();
         } catch (Exception e) {
