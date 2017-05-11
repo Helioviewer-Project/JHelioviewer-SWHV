@@ -18,8 +18,7 @@ public class RenderableLine extends AbstractRenderable {
     private float[][] points;
     private float[][] colors;
 
-    private int[] vboAttribRefs = { GLSLLineShader.previousLineRef, GLSLLineShader.lineRef, GLSLLineShader.nextLineRef,
-            GLSLLineShader.directionRef, GLSLLineShader.linecolorRef };
+    private int[] vboAttribRefs;
     private int[] vboAttribLens = { 3, 3, 3, 1, 4 };
 
     private VBO[] vbos = new VBO[5];
@@ -141,6 +140,8 @@ public class RenderableLine extends AbstractRenderable {
 
     @Override
     public void init(GL2 gl) {
+        vboAttribRefs = new int[] { GLSLLineShader.previousLineRef, GLSLLineShader.lineRef, GLSLLineShader.nextLineRef,
+                GLSLLineShader.directionRef, GLSLLineShader.linecolorRef };
         initVBOs(gl);
     }
 

@@ -66,11 +66,6 @@ public class GLSLLineShader extends GLSLShader {
 
     @Override
     protected void bindAttribs(GL2 gl) {
-        gl.glBindAttribLocation(progID, previousLineRef, "previousLine");
-        gl.glBindAttribLocation(progID, lineRef, "line");
-        gl.glBindAttribLocation(progID, nextLineRef, "nextLine");
-        gl.glBindAttribLocation(progID, directionRef, "direction");
-        gl.glBindAttribLocation(progID, linecolorRef, "linecolor");
     }
 
 }

@@ -1,4 +1,4 @@
-#version 110
+#version 120
 varying vec4 frag_linecolor;
 
 void main() {

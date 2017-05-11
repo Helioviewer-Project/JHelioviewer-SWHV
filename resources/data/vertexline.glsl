@@ -1,4 +1,4 @@
-#version 110
+#version 120
 attribute vec3 previousLine;
 attribute vec3 line;
 attribute vec3 nextLine;
