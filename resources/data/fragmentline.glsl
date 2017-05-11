@@ -1,6 +1,8 @@
 #version 110
-uniform vec3 color;
+varying vec4 frag_linecolor;
 
 void main() {
-  gl_FragColor = vec4(1.0,0.0,0.0, 1.0);
+  if(frag_linecolor.w == 0.)
+      discard;
+  gl_FragColor = frag_linecolor;
 }

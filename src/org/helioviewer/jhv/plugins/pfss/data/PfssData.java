@@ -30,14 +30,16 @@ public class PfssData {
 
     private final double cphi;
     private final double sphi;
-    private final FloatBuffer vertices;
+    public FloatBuffer vertices;
+    public FloatBuffer colors;
 
     public int lastQuality;
     public boolean lastFixedColor;
 
     final long time;
 
-    public PfssData(JHVDate _dateObs, short[] _fieldlinex, short[] _fieldliney, short[] _fieldlinez, short[] _fieldlines, long _time) {
+    public PfssData(JHVDate _dateObs, short[] _fieldlinex, short[] _fieldliney, short[] _fieldlinez,
+            short[] _fieldlines, long _time) {
         dateObs = _dateObs;
         fieldlinex = _fieldlinex;
         fieldliney = _fieldliney;
@@ -50,14 +52,15 @@ public class PfssData {
         sphi = Math.sin(p.lon);
 
         int numberOfLines = fieldlinex.length / PfssSettings.POINTS_PER_LINE;
-        vertices = Buffers.newDirectFloatBuffer((3 + 4) * (fieldlinex.length + 2 * numberOfLines));
+        vertices = Buffers.newDirectFloatBuffer(3 * (fieldlinex.length + 2 * numberOfLines));
+        colors = Buffers.newDirectFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
     }
 
     private void addColor(Color color) {
-        vertices.put(color.getRed() / 255f);
-        vertices.put(color.getGreen() / 255f);
-        vertices.put(color.getBlue() / 255f);
-        vertices.put(color.getAlpha() / 255f);
+        colors.put(color.getRed() / 255f);
+        colors.put(color.getGreen() / 255f);
+        colors.put(color.getBlue() / 255f);
+        colors.put(color.getAlpha() / 255f);
     }
 
     private void addVertex(float x, float y, float z) {
@@ -74,12 +77,15 @@ public class PfssData {
         }
     }
 
-    public FloatBuffer calculatePositions(int qualityReduction, boolean fixedColor) {
-        if (lastQuality == qualityReduction && lastFixedColor == fixedColor)
-            return vertices;
+    public boolean needsUpdate(int qualityReduction, boolean fixedColor) {
+        return (lastQuality != qualityReduction || lastFixedColor != fixedColor);
+    }
 
+    public void calculatePositions(int qualityReduction, boolean fixedColor) {
         lastQuality = PfssSettings.qualityReduction;
         lastFixedColor = PfssSettings.fixedColor;
+        vertices.clear();
+        colors.clear();
 
         FieldLineColor type = FieldLineColor.LOOPCOLOR;
         for (int i = 0; i < fieldlinex.length; i++) {
@@ -144,11 +150,6 @@ public class PfssData {
             }
         }
         vertices.flip();
-        return vertices;
+        colors.flip();
     }
-
-    public JHVDate getDateObs() {
-        return dateObs;
-    }
-
 }
