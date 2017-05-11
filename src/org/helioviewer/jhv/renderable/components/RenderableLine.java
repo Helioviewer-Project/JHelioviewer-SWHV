@@ -119,15 +119,13 @@ public class RenderableLine extends AbstractRenderable {
 
     public IntBuffer gen_indices(int length) {
         IntBuffer indicesBuffer = IntBuffer.allocate(6 * points.length);
-        int i = 0;
-        for (int j = 0; j < length; j++) {
-            indicesBuffer.put(i + 0);
-            indicesBuffer.put(i + 1);
-            indicesBuffer.put(i + 2);
-            indicesBuffer.put(i + 2);
-            indicesBuffer.put(i + 1);
-            indicesBuffer.put(i + 3);
-            i = i + 2;
+        for (int j = 0; j < 2 * length; j = j + 2) {
+            indicesBuffer.put(j + 0);
+            indicesBuffer.put(j + 1);
+            indicesBuffer.put(j + 2);
+            indicesBuffer.put(j + 2);
+            indicesBuffer.put(j + 1);
+            indicesBuffer.put(j + 3);
         }
         indicesBuffer.flip();
         return indicesBuffer;
@@ -149,10 +147,10 @@ public class RenderableLine extends AbstractRenderable {
         if (points.length < 2)
             return;
 
-        FloatBuffer previousLineBuffer = FloatBuffer.allocate(6 * points.length);
-        FloatBuffer lineBuffer = FloatBuffer.allocate(6 * points.length);
-        FloatBuffer nextLineBuffer = FloatBuffer.allocate(6 * points.length);
-        FloatBuffer directionBuffer = FloatBuffer.allocate(4 * points.length);
+        FloatBuffer previousLineBuffer = FloatBuffer.allocate(3 * 2 * points.length);
+        FloatBuffer lineBuffer = FloatBuffer.allocate(3 * 2 * points.length);
+        FloatBuffer nextLineBuffer = FloatBuffer.allocate(3 * 2 * points.length);
+        FloatBuffer directionBuffer = FloatBuffer.allocate(2 * 2 * points.length);
         FloatBuffer colorBuffer = FloatBuffer.allocate(2 * 4 * points.length);
 
         int dir = -1;
