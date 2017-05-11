@@ -69,7 +69,6 @@ public class RenderableLine extends AbstractRenderable {
 
     @Override
     public void remove(GL2 gl) {
-        GLSLLineShader.dispose(gl);
     }
 
     @Override
@@ -143,7 +142,6 @@ public class RenderableLine extends AbstractRenderable {
     public void init(GL2 gl) {
         if (points.length < 2)
             return;
-        GLSLLineShader.init(gl);
 
         FloatBuffer previousLineBuffer = FloatBuffer.allocate(6 * points.length);
         FloatBuffer lineBuffer = FloatBuffer.allocate(6 * points.length);
