@@ -636,7 +636,7 @@ public class EventDatabase {
         try {
             return ft.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.getCause().getStackTrace();
+            e.getCause().printStackTrace();
         }
         return new ArrayList<>();
     }
