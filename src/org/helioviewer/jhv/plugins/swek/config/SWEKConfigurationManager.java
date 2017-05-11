@@ -45,33 +45,37 @@ public class SWEKConfigurationManager {
         SWEKIconBank.init();
 
         try {
-            parseConfig(getConfig());
+            readConfig();
         } catch (Exception e) {
-            Log.debug("Configuration file could not be parsed: " + e);
+            Log.error("Configuration file could not be parsed: " + e);
         }
 
         return orderedEventTypes;
     }
 
-    private static JSONObject getConfig() throws Exception {
+    private static void readConfig() throws Exception {
         File f = new File(configFile);
         try {
-            JSONObject configJSON = JSONUtils.getJSONStream(Files.newInputStream(f.toPath()));
-            if (configJSON.getBoolean("manually_changed"))
-                return configJSON;
-        } catch (Exception e) {
-            try (InputStream is = FileUtils.getResourceInputStream('/' + configName)) {
-                FileUtils.save(is, f);
+            JSONObject json = JSONUtils.getJSONStream(Files.newInputStream(f.toPath()));
+            if (json.getBoolean("manually_changed")) {
+                parseConfig(json);
+                return;
             }
+        } catch (Exception e) {
+            Log.error("Local configuration file could not be parsed: " + e);
         }
-        return JSONUtils.getJSONStream(Files.newInputStream(f.toPath()));
+
+        try (InputStream is = FileUtils.getResourceInputStream('/' + configName)) {
+            FileUtils.save(is, f);
+        }
+        parseConfig(JSONUtils.getJSONStream(Files.newInputStream(f.toPath())));
     }
 
-    private static void parseConfig(JSONObject configJSON) {
-        EventDatabase.config_hash = Arrays.hashCode(configJSON.toString().toCharArray());
-        parseSources(configJSON);
-        parseEventTypes(configJSON);
-        SWEKEventType.setSwekRelatedEvents(parseRelatedEvents(configJSON));
+    private static void parseConfig(JSONObject obj) {
+        EventDatabase.config_hash = Arrays.hashCode(obj.toString().toCharArray());
+        parseSources(obj);
+        parseEventTypes(obj);
+        SWEKEventType.setSwekRelatedEvents(parseRelatedEvents(obj));
     }
 
     private static void parseSources(JSONObject obj) {
