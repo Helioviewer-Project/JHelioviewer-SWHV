@@ -17,6 +17,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.json.JSONObject;
 
@@ -88,8 +89,9 @@ public class RenderableGrid extends AbstractRenderable {
         makeRadialLabels();
     }
 
-    private int positionBufferID;
-    private int colorBufferID;
+    private final VBO positionVBO = new VBO(GL2.GL_ARRAY_BUFFER, -1, 2);
+    private final VBO colorVBO = new VBO(GL2.GL_ARRAY_BUFFER, -1, 3);
+
     private GridChoiceType gridChoice = GridChoiceType.Viewpoint;
 
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
@@ -194,7 +196,7 @@ public class RenderableGrid extends AbstractRenderable {
             drawAxis(gl);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        positionVBO.bindArray(gl);
         gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
 
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
@@ -226,7 +228,7 @@ public class RenderableGrid extends AbstractRenderable {
         drawEarthCircles(gl, Sun.getEarth(camera.getViewpoint().time));
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+        positionVBO.unbindArray(gl);
     }
 
     private static final float AXIS_START = (float) (1. * Sun.Radius);
@@ -323,7 +325,7 @@ public class RenderableGrid extends AbstractRenderable {
         {
             gl.glLineWidth(1);
             gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
-            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
+            colorVBO.bindArray(gl);
             gl.glColorPointer(3, GL2.GL_FLOAT, 0, 0);
 
             gl.glRotatef(90, 0, 1, 0);
@@ -387,7 +389,7 @@ public class RenderableGrid extends AbstractRenderable {
             }
             gl.glPopMatrix();
             gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+            colorVBO.unbindArray(gl);
         }
         gl.glPopMatrix();
     }
@@ -520,22 +522,11 @@ public class RenderableGrid extends AbstractRenderable {
         }
         positionBuffer.flip();
         colorBuffer.flip();
+        positionVBO.init(gl);
+        colorVBO.init(gl);
 
-        positionBufferID = generate(gl);
-        colorBufferID = generate(gl);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBuffer.capacity() * Buffers.SIZEOF_FLOAT, positionBuffer,
-                GL2.GL_STATIC_DRAW);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER, colorBuffer.capacity() * Buffers.SIZEOF_FLOAT, colorBuffer,
-                GL2.GL_STATIC_DRAW);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
-    }
-
-    private static int generate(GL2 gl) {
-        int[] tmpId = new int[1];
-        gl.glGenBuffers(1, tmpId, 0);
-        return tmpId[0];
+        positionVBO.bindBufferData(gl, positionBuffer, Buffers.SIZEOF_FLOAT);
+        colorVBO.bindBufferData(gl, colorBuffer, Buffers.SIZEOF_FLOAT);
     }
 
     @Override
@@ -607,8 +598,8 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public void dispose(GL2 gl) {
-        gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
-        gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
+        positionVBO.dispose(gl);
+        colorVBO.dispose(gl);
     }
 
     public void setCoordinates(GridChoiceType _gridChoice) {
