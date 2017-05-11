@@ -17,7 +17,7 @@ public class GLSLLineShader extends GLSLShader {
     private final int[] miter = { 1 };
     private final float[] thickness = { 0.005f };
     private final float[] aspect = { 1 };
-    private boolean inited = false;
+//    private boolean inited = false;
 
     public GLSLLineShader(String vertex, String fragment) {
         super(vertex, fragment);
@@ -33,12 +33,12 @@ public class GLSLLineShader extends GLSLShader {
 
     protected  void _dispose(GL2 gl) {
         super._dispose(gl);
-        inited = false;
+//        inited = false;
     }
 
     protected  void _init(GL2 gl, boolean f) {
         super._init(gl, f);
-        inited = true;
+//        inited = true;
     }
 
     @Override
