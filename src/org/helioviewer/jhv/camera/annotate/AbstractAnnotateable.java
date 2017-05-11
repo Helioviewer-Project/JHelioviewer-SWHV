@@ -35,12 +35,8 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     static Vec3 toSpherical(Vec3 p) {
-        Vec3 pt = new Vec3();
-        pt.x = p.length();
-        pt.y = Math.acos(p.y / pt.x);
-        pt.z = Math.atan2(p.x, p.z);
-
-        return pt;
+        double len = p.length();
+        return new Vec3(len, Math.acos(p.y / len), Math.atan2(p.x, p.z));
     }
 
     static Vec3 toCart(double y, double z) {

@@ -212,7 +212,7 @@ class FITSImage {
 
     private static String getHeaderAsXML(Header header) {
         String nl = System.getProperty("line.separator");
-        StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
+        StringBuilder builder = new StringBuilder("<meta>").append(nl).append("<fits>").append(nl);
 
         for (Cursor<String, HeaderCard> iter = header.iterator(); iter.hasNext();) {
             HeaderCard headerCard = iter.next();
