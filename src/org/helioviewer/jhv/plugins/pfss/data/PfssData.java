@@ -33,7 +33,6 @@ public class PfssData {
 
     public int lastQuality;
     public boolean lastFixedColor;
-    private boolean read;
 
     private JHVDate dateObs;
     final long time;
@@ -167,7 +166,6 @@ public class PfssData {
                 }
             }
             vertices.flip();
-            read = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
