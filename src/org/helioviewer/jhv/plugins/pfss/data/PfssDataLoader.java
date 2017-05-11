@@ -8,16 +8,16 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import nom.tam.fits.BasicHDU;
-import nom.tam.fits.BinaryTableHDU;
-import nom.tam.fits.Fits;
-
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
+
+import nom.tam.fits.BasicHDU;
+import nom.tam.fits.BinaryTableHDU;
+import nom.tam.fits.Fits;
 
 class PfssDataLoader implements Runnable {
 
@@ -84,5 +84,4 @@ class PfssDataLoader implements Runnable {
             return new PfssData(new JHVDate(dateFits), fieldlinex, fieldliney, fieldlinez, fieldlines, time);
         }
     }
-
 }
