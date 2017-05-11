@@ -138,6 +138,11 @@ public class RenderableLine extends AbstractRenderable {
         return indicesBuffer;
     }
 
+    private void addPoint(FloatBuffer buffer, float[] point) {
+        buffer.put(point);
+        buffer.put(point);
+    }
+
     @Override
     public void init(GL2 gl) {
         if (points.length < 2)
@@ -155,32 +160,20 @@ public class RenderableLine extends AbstractRenderable {
             directionBuffer.put(-dir);
         }
 
-        previousLineBuffer.put(points[0]);
-        previousLineBuffer.put(points[0]);
-        lineBuffer.put(points[0]);
-        lineBuffer.put(points[0]);
-        colorBuffer.put(colors[0]);
-        colorBuffer.put(colors[0]);
-        nextLineBuffer.put(points[1]);
-        nextLineBuffer.put(points[1]);
+        addPoint(previousLineBuffer, points[0]);
+        addPoint(lineBuffer, points[0]);
+        addPoint(nextLineBuffer, points[1]);
+        addPoint(colorBuffer, colors[0]);
         for (int i = 1; i < points.length - 1; i++) {
-            previousLineBuffer.put(points[i - 1]);
-            previousLineBuffer.put(points[i - 1]);
-            lineBuffer.put(points[i]);
-            lineBuffer.put(points[i]);
-            colorBuffer.put(colors[i]);
-            colorBuffer.put(colors[i]);
-            nextLineBuffer.put(points[i + 1]);
-            nextLineBuffer.put(points[i + 1]);
+            addPoint(previousLineBuffer, points[i - 1]);
+            addPoint(lineBuffer, points[i]);
+            addPoint(nextLineBuffer, points[i + 1]);
+            addPoint(colorBuffer, colors[i]);
         }
-        previousLineBuffer.put(points[points.length - 2]);
-        previousLineBuffer.put(points[points.length - 2]);
-        lineBuffer.put(points[points.length - 1]);
-        lineBuffer.put(points[points.length - 1]);
-        colorBuffer.put(colors[points.length - 1]);
-        colorBuffer.put(colors[points.length - 1]);
-        nextLineBuffer.put(points[points.length - 1]);
-        nextLineBuffer.put(points[points.length - 1]);
+        addPoint(previousLineBuffer, points[points.length - 2]);
+        addPoint(lineBuffer, points[points.length - 1]);
+        addPoint(nextLineBuffer, points[points.length - 1]);
+        addPoint(colorBuffer, colors[points.length - 1]);
 
         previousLineBuffer.flip();
         lineBuffer.flip();
