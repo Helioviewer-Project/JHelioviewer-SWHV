@@ -1,12 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.awt.Color;
-import java.io.ByteArrayInputStream;
 import java.nio.FloatBuffer;
-
-import nom.tam.fits.BasicHDU;
-import nom.tam.fits.BinaryTableHDU;
-import nom.tam.fits.Fits;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
@@ -27,17 +22,24 @@ public class PfssData {
         }
     }
 
-    private final byte[] gzipFitsFile;
+    private final JHVDate dateObs;
+    private final short[] fieldlinex;
+    private final short[] fieldliney;
+    private final short[] fieldlinez;
+    private final short[] fieldlines;
 
     public FloatBuffer vertices;
     public int lastQuality;
     public boolean lastFixedColor;
 
-    private JHVDate dateObs;
     final long time;
 
-    public PfssData(byte[] _gzipFitsFile, long _time) {
-        gzipFitsFile = _gzipFitsFile;
+    public PfssData(JHVDate _dateObs, short[] _fieldlinex, short[] _fieldliney, short[] _fieldlinez, short[] _fieldlines, long _time) {
+        dateObs = _dateObs;
+        fieldlinex = _fieldlinex;
+        fieldliney = _fieldliney;
+        fieldlinez = _fieldlinez;
+        fieldlines = _fieldlines;
         time = _time;
     }
 
@@ -74,93 +76,74 @@ public class PfssData {
         lastQuality = PfssSettings.qualityReduction;
         lastFixedColor = PfssSettings.fixedColor;
 
-        try (Fits fits = new Fits(new ByteArrayInputStream(gzipFitsFile))) {
-            BasicHDU<?> hdus[] = fits.read();
-            if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))
-                throw new Exception("Could not read FITS");
+        createBuffer(fieldlinex.length);
 
-            BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
-            short[] fieldlinex = (short[]) bhdu.getColumn("FIELDLINEx");
-            short[] fieldliney = (short[]) bhdu.getColumn("FIELDLINEy");
-            short[] fieldlinez = (short[]) bhdu.getColumn("FIELDLINEz");
-            short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
+        Position.L p = Sun.getEarth(dateObs);
+        double sphi = Math.sin(p.lon), cphi = Math.cos(p.lon);
 
-            String dateFits = bhdu.getHeader().getStringValue("DATE-OBS");
-            if (dateFits == null)
-                throw new Exception("DATE-OBS not found");
-            dateObs = new JHVDate(dateFits);
+        FieldLineColor type = FieldLineColor.LOOPCOLOR;
+        for (int i = 0; i < fieldlinex.length; i++) {
+            if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {
+                int rx = fieldlinex[i] + 32768;
+                int ry = fieldliney[i] + 32768;
+                int rz = fieldlinez[i] + 32768;
 
-            createBuffer(fieldlinex.length);
+                double x = 3. * (rx * 2. / 65535 - 1.);
+                double y = 3. * (ry * 2. / 65535 - 1.);
+                double z = 3. * (rz * 2. / 65535 - 1.);
 
-            Position.L p = Sun.getEarth(dateObs);
-            double sphi = Math.sin(p.lon), cphi = Math.cos(p.lon);
+                double helpx = cphi * x + sphi * y;
+                double helpy = -sphi * x + cphi * y;
+                x = helpx;
+                y = helpy;
 
-            FieldLineColor type = FieldLineColor.LOOPCOLOR;
-            for (int i = 0; i < fieldlinex.length; i++) {
-                if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {
-                    int rx = fieldlinex[i] + 32768;
-                    int ry = fieldliney[i] + 32768;
-                    int rz = fieldlinez[i] + 32768;
-
-                    double x = 3. * (rx * 2. / 65535 - 1.);
-                    double y = 3. * (ry * 2. / 65535 - 1.);
-                    double z = 3. * (rz * 2. / 65535 - 1.);
-
-                    double helpx = cphi * x + sphi * y;
-                    double helpy = -sphi * x + cphi * y;
-                    x = helpx;
-                    y = helpy;
-
-                    int col = fieldlines[i] + 32768;
-                    double bright = (col * 2. / 65535.) - 1.;
-                    if (i % PfssSettings.POINTS_PER_LINE == 0) {
-                        addVertex((float) x, (float) z, (float) -y);
-                        addColor(bright, 0);
-                        addVertex((float) x, (float) z, (float) -y);
-                        if (!PfssSettings.fixedColor) {
-                            addColor(bright, 1);
-                        } else {
-                            int rox = fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
-                            int roy = fieldliney[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
-                            int roz = fieldlinez[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
-                            double xo = 3. * (rox * 2. / 65535 - 1.);
-                            double yo = 3. * (roy * 2. / 65535 - 1.);
-                            double zo = 3. * (roz * 2. / 65535 - 1.);
-                            double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
-                            double r = Math.sqrt(x * x + y * y + z * z);
-
-                            if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
-                                type = FieldLineColor.LOOPCOLOR;
-                            } else if (bright < 0) {
-                                type = FieldLineColor.INSIDEFIELDCOLOR;
-                            } else {
-                                type = FieldLineColor.OPENFIELDCOLOR;
-                            }
-                            addColor(type.color);
-                        }
-                    } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
-                        addVertex((float) x, (float) z, (float) -y);
-                        if (!PfssSettings.fixedColor) {
-                            addColor(bright, 1);
-                        } else {
-                            addColor(type.color);
-                        }
-                        addVertex((float) x, (float) z, (float) -y);
-                        addColor(bright, 0);
+                int col = fieldlines[i] + 32768;
+                double bright = (col * 2. / 65535.) - 1.;
+                if (i % PfssSettings.POINTS_PER_LINE == 0) {
+                    addVertex((float) x, (float) z, (float) -y);
+                    addColor(bright, 0);
+                    addVertex((float) x, (float) z, (float) -y);
+                    if (!PfssSettings.fixedColor) {
+                        addColor(bright, 1);
                     } else {
-                        addVertex((float) x, (float) z, (float) -y);
-                        if (!PfssSettings.fixedColor) {
-                            addColor(bright, 1);
+                        int rox = fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
+                        int roy = fieldliney[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
+                        int roz = fieldlinez[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
+                        double xo = 3. * (rox * 2. / 65535 - 1.);
+                        double yo = 3. * (roy * 2. / 65535 - 1.);
+                        double zo = 3. * (roz * 2. / 65535 - 1.);
+                        double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
+                        double r = Math.sqrt(x * x + y * y + z * z);
+
+                        if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
+                            type = FieldLineColor.LOOPCOLOR;
+                        } else if (bright < 0) {
+                            type = FieldLineColor.INSIDEFIELDCOLOR;
                         } else {
-                            addColor(type.color);
+                            type = FieldLineColor.OPENFIELDCOLOR;
                         }
+                        addColor(type.color);
+                    }
+                } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
+                    addVertex((float) x, (float) z, (float) -y);
+                    if (!PfssSettings.fixedColor) {
+                        addColor(bright, 1);
+                    } else {
+                        addColor(type.color);
+                    }
+                    addVertex((float) x, (float) z, (float) -y);
+                    addColor(bright, 0);
+                } else {
+                    addVertex((float) x, (float) z, (float) -y);
+                    if (!PfssSettings.fixedColor) {
+                        addColor(bright, 1);
+                    } else {
+                        addColor(type.color);
                     }
                 }
             }
-            vertices.flip();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        vertices.flip();
     }
 
     public JHVDate getDateObs() {

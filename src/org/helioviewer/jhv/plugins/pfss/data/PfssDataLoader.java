@@ -2,15 +2,20 @@ package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.awt.EventQueue;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import nom.tam.fits.BasicHDU;
+import nom.tam.fits.BinaryTableHDU;
+import nom.tam.fits.Fits;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
@@ -49,15 +54,34 @@ class PfssDataLoader implements Runnable {
             }
             buffer.flush();
 
-            PfssData pfssData = new PfssData(buffer.toByteArray(), time);
+            PfssData pfssData = getPfssData(buffer.toByteArray(), time);
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
 
             if (!loadFromFile)
                 try (OutputStream out = FileUtils.newBufferedOutputStream(f)) {
                     buffer.writeTo(out);
                 }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private PfssData getPfssData(byte[] fitsFile, long time) throws Exception {
+        try (Fits fits = new Fits(new ByteArrayInputStream(fitsFile))) {
+            BasicHDU<?> hdus[] = fits.read();
+            if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))
+                throw new Exception("Could not read FITS");
+
+            BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
+            short[] fieldlinex = (short[]) bhdu.getColumn("FIELDLINEx");
+            short[] fieldliney = (short[]) bhdu.getColumn("FIELDLINEy");
+            short[] fieldlinez = (short[]) bhdu.getColumn("FIELDLINEz");
+            short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
+
+            String dateFits = bhdu.getHeader().getStringValue("DATE-OBS");
+            if (dateFits == null)
+                throw new Exception("DATE-OBS not found");
+            return new PfssData(new JHVDate(dateFits), fieldlinex, fieldliney, fieldlinez, fieldlines, time);
         }
     }
 
