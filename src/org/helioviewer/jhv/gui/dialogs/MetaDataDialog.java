@@ -28,8 +28,6 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.viewmodel.view.fitsview.FITSView;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2View;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -122,7 +120,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private void setMetaData(View v) {
         MetaData metaData = v.getImageLayer().getMetaData();
         if (!(metaData instanceof HelioviewerMetaData)) {
-            basicSB.append("Error: No metadata is available");
+            basicSB.append("No Helioviewer metadata available");
             return;
         }
 
@@ -134,15 +132,8 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         basicSB.append("Observation Date: ").append(m.getViewpoint().time).append('\n');
 
         try {
-            String xmlText;
-            if (v instanceof JP2View)
-                xmlText = ((JP2View) v).getXMLMetaData();
-            else if (v instanceof FITSView)
-                xmlText = ((FITSView) v).getXMLMetaData();
-            else
-                return;
-
-            InputStream in = new ByteArrayInputStream(xmlText.getBytes(StandardCharsets.UTF_8));
+            String xml = v.getXMLMetaData();
+            InputStream in = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
 
             // Send xml data to meta data dialog box
@@ -153,7 +144,6 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
             if (root != null)
                 readXMLData(root);
 
-            final String xml = xmlText;
             String outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
             exportFitsButton.setEnabled(true);
             exportFitsButton.addActionListener(e -> {

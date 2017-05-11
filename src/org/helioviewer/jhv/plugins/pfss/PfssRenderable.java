@@ -22,7 +22,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
 
     private final PfssPluginPanel optionsPanel = new PfssPluginPanel();
     private PfssData previousPfssData = null;
-    private static VBO vertexVBO;
+    private VBO vertexVBO;
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {

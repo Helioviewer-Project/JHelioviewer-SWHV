@@ -54,4 +54,9 @@ public class SimpleImageView extends AbstractView {
         return uri;
     }
 
+    @Override
+    public String getXMLMetaData() {
+        return "<meta/>";
+    }
+
 }

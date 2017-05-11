@@ -37,6 +37,7 @@ public class FITSView extends AbstractView {
         imageData.setMetaData(m);
     }
 
+    @Override
     public String getXMLMetaData() {
         return xml;
     }
