@@ -92,4 +92,6 @@ public interface View {
     MetaData getMetaData(JHVDate time);
     // -->
 
+    String getXMLMetaData() throws Exception;
+
 }

@@ -511,6 +511,7 @@ public class JP2View extends AbstractView {
     }
 
     // very slow
+    @Override
     public String getXMLMetaData() throws Exception {
         KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri);
         return KakaduMeta.getXml(kduTmp.getFamilySrc(), trueFrame + 1);
