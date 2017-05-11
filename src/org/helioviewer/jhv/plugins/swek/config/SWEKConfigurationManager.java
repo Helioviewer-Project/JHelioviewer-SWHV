@@ -16,7 +16,6 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
@@ -40,8 +39,6 @@ public class SWEKConfigurationManager {
 
     private static final String configFileName = "SWEKSettings.json";
 
-    private static boolean configLoaded = false;
-
     private static URL configFileURL;
 
     private static final Map<String, SWEKSource> sources = new HashMap<>();
@@ -49,20 +46,13 @@ public class SWEKConfigurationManager {
     private static final List<SWEKEventType> orderedEventTypes = new ArrayList<>();
 
     public static List<SWEKEventType> loadConfiguration() {
-        if (!configLoaded) {
-            SWEKIconBank.init();
+        SWEKIconBank.init();
 
-            boolean isConfigParsed;
-            if (checkAndOpenUserSetFile()) {
-                isConfigParsed = parseConfigFile();
-            } else if (checkAndOpenHomeDirectoryFile()) {
-                // check if the file is manually changed; if not, we download the latest version anyway
-                isConfigParsed = isManuallyChanged() ? parseConfigFile() : checkAndOpenZippedFile() && parseConfigFile();
-            } else {
-                isConfigParsed = checkAndOpenZippedFile() && parseConfigFile();
-            }
-            configLoaded = isConfigParsed;
+        // check if the file is manually changed; if not, get the latest version anyway
+        if (!checkHomeDirectoryFile() || !isManuallyChanged()) {
+            getZippedFile();
         }
+        parseConfigFile();
         return orderedEventTypes;
     }
 
@@ -79,19 +69,17 @@ public class SWEKConfigurationManager {
         return false;
     }
 
-    private static boolean checkAndOpenZippedFile() {
+    private static void getZippedFile() {
         try (InputStream is = FileUtils.getResourceInputStream('/' + configFileName)) {
             File f = new File(JHVDirectory.SETTINGS.getPath() + configFileName);
             FileUtils.save(is, f);
             configFileURL = f.toURI().toURL();
-            return true;
         } catch (IOException e) {
             Log.debug("Something went wrong extracting the configuration file from the jar bundle or saving it: " + e);
         }
-        return false;
     }
 
-    private static boolean checkAndOpenHomeDirectoryFile() {
+    private static boolean checkHomeDirectoryFile() {
         String configFile = JHVDirectory.SETTINGS.getPath() + configFileName;
         try {
             File f = new File(configFile);
@@ -107,26 +95,7 @@ public class SWEKConfigurationManager {
         return false;
     }
 
-    private static boolean checkAndOpenUserSetFile() {
-        String fileName = Settings.getSingletonInstance().getProperty("plugin.swek.configfile");
-        if (fileName == null) {
-            return false;
-        } else {
-            try {
-                URI fileLocation = new URI(fileName);
-                configFileURL = fileLocation.toURL();
-                Log.debug("Config file: " + configFileURL);
-                return true;
-            } catch (URISyntaxException e) {
-                Log.debug("Wrong URI syntax for the found file name: " + fileName);
-            } catch (MalformedURLException e) {
-                Log.debug("Could not convert the URI in a correct URL. The found file name: " + fileName);
-            }
-            return false;
-        }
-    }
-
-    private static boolean parseConfigFile() {
+    private static void parseConfigFile() {
         try {
             JSONObject configJSON = JSONUtils.getJSONStream(configFileURL.openStream());
             EventDatabase.config_hash = Arrays.hashCode(configJSON.toString().toCharArray());
@@ -135,13 +104,11 @@ public class SWEKConfigurationManager {
             parseEventTypes(configJSON);
 
             SWEKEventType.setSwekRelatedEvents(parseRelatedEvents(configJSON));
-            return true;
         } catch (IOException e) {
             Log.debug("Configuration file could not be parsed: " + e);
         } catch (JSONException e) {
             Log.debug("Could not parse config JSON: " + e);
         }
-        return false;
     }
 
     private static boolean parseManuallyChanged(JSONObject configJSON) throws JSONException {
