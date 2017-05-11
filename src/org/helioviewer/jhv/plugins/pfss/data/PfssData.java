@@ -30,7 +30,6 @@ public class PfssData {
     private final byte[] gzipFitsFile;
 
     public FloatBuffer vertices;
-
     public int lastQuality;
     public boolean lastFixedColor;
 
@@ -40,13 +39,6 @@ public class PfssData {
     public PfssData(byte[] _gzipFitsFile, long _time) {
         gzipFitsFile = _gzipFitsFile;
         time = _time;
-        readFitsFile();
-    }
-
-    private void readFitsFile() {
-        if (gzipFitsFile != null) {
-            calculatePositions(PfssSettings.qualityReduction, PfssSettings.fixedColor);
-        }
     }
 
     private void createBuffer(int len) {
