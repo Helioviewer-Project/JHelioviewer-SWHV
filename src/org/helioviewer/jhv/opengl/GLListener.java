@@ -22,13 +22,14 @@ import com.jogamp.opengl.GLEventListener;
 public class GLListener implements GLEventListener {
 
     private final ScalableSurface surface;
+    private boolean reshaped;
 
     public GLListener(ScalableSurface _surface) {
         surface = _surface;
     }
 
     @Override
-    public void init(GLAutoDrawable drawable) {
+    public void init(GLAutoDrawable drawable) { // NEDT
         GLContext ctx = drawable.getContext();
         GL2 gl = ctx.getGL().getGL2();
         GLInfo.update(gl);
@@ -62,7 +63,7 @@ public class GLListener implements GLEventListener {
     }
 
     @Override
-    public void dispose(GLAutoDrawable drawable) {
+    public void dispose(GLAutoDrawable drawable) { // NEDT
         GLText.dispose();
         GL2 gl = drawable.getGL().getGL2();
 
@@ -93,8 +94,9 @@ public class GLListener implements GLEventListener {
     }
 
     @Override
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) { // NEDT
         EventQueue.invokeLater(() -> {
+            reshaped = true;
             Displayer.setGLSize(x, y, width, height);
             Displayer.reshapeAll();
             ImageViewerGui.getRenderableMiniview().reshapeViewport();
@@ -176,8 +178,8 @@ public class GLListener implements GLEventListener {
     }
 
     @Override
-    public void display(GLAutoDrawable drawable) {
-        if (!EventQueue.isDispatchThread()) { // seldom
+    public void display(GLAutoDrawable drawable) { // NEDT
+        if (!reshaped || !EventQueue.isDispatchThread()) { // seldom
             EventQueue.invokeLater(Displayer::display);
             return;
         }
