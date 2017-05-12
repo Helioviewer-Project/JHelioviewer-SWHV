@@ -38,8 +38,8 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private final GLImage glImage = new GLImage();
-    private final VBO positionVBO = new VBO(GL2.GL_ARRAY_BUFFER, GLSLSolarShader.positionRef, 3);
-    private final VBO indexVBO = new VBO(GL2.GL_ELEMENT_ARRAY_BUFFER, -1, -1);
+    private final VBO positionVBO = VBO.gen_float_VBO(GLSLSolarShader.positionRef, 3);
+    private final VBO indexVBO = VBO.gen_index_VBO();
     private final ImageLayerOptions optionsPanel;
 
     private LoadRemoteTask worker;

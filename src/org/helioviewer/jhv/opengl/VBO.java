@@ -11,10 +11,22 @@ public class VBO {
     private int vec_len = 1;
     public int bufferSize = -1;
 
-    public VBO(int _buffer_type, int _attribRef, int _vec_len) {
+    private VBO(int _buffer_type, int _attribRef, int _vec_len) {
         attribRef = _attribRef;
         buffer_type = _buffer_type;
         vec_len = _vec_len;
+    }
+
+    public static VBO gen_index_VBO() {
+        return new VBO(GL2.GL_ELEMENT_ARRAY_BUFFER, -1, -1);
+    }
+
+    public static VBO gen_float_VBO(int _attribRef, int _vec_len) {
+        return new VBO(GL2.GL_ARRAY_BUFFER, _attribRef, _vec_len);
+    }
+
+    public static VBO gen_float_no_attrib_VBO() {
+        return new VBO(GL2.GL_ARRAY_BUFFER, -1, -1);
     }
 
     public void bindArray(GL2 gl) {

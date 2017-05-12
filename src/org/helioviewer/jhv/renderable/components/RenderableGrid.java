@@ -89,8 +89,8 @@ public class RenderableGrid extends AbstractRenderable {
         makeRadialLabels();
     }
 
-    private final VBO positionVBO = new VBO(GL2.GL_ARRAY_BUFFER, -1, 2);
-    private final VBO colorVBO = new VBO(GL2.GL_ARRAY_BUFFER, -1, 3);
+    private final VBO positionVBO = VBO.gen_float_no_attrib_VBO();
+    private final VBO colorVBO = VBO.gen_float_no_attrib_VBO();
 
     private GridChoiceType gridChoice = GridChoiceType.Viewpoint;
 
