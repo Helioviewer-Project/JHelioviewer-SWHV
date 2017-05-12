@@ -5,18 +5,9 @@ import java.awt.image.DataBufferInt;
 import java.nio.Buffer;
 import java.nio.IntBuffer;
 
-import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
-import org.helioviewer.jhv.viewmodel.imageformat.RGB24ImageFormat;
-
-/**
- * Representation of image data in RGB24 format.
- *
- * The image data contains three channels (red, green, blue), each channel has
- * eight bits per pixel.
- */
 public class RGBInt24ImageData extends ImageData {
 
-    private static final ImageFormat format = new RGB24ImageFormat();
+    private final ImageFormat format = ImageFormat.RGB24;
 
     public RGBInt24ImageData(int _width, int _height, Buffer _buffer) {
         super(_width, _height, 32, 1);

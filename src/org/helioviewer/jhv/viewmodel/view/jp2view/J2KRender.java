@@ -14,7 +14,7 @@ import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.Single8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ImageParams;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduConstants;
@@ -126,7 +126,7 @@ class J2KRender implements Runnable {
 
         ImageData data;
         if (numComponents < 3) {
-            data = new SingleChannelByte8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
+            data = new Single8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
         } else {
             data = new ARGBInt32ImageData(aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }

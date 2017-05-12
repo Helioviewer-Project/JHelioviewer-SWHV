@@ -8,18 +8,10 @@ import java.nio.Buffer;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.viewmodel.imageformat.ARGB32ImageFormat;
-import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
 
-/**
- * Representation of image data in ARGB32 format.
- *
- * The image data contains four channels (alpha, red, green, blue), each channel
- * has eight bits per pixel.
- */
 public class ARGBInt32ImageData extends ImageData {
 
-    private final ARGB32ImageFormat format = new ARGB32ImageFormat();
+    private final ImageFormat format = ImageFormat.ARGB32;
 
     public ARGBInt32ImageData(int _width, int _height, Buffer _buffer) {
         super(_width, _height, 32, 1);
