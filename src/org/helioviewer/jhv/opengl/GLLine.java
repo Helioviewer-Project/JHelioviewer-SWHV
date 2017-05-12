@@ -29,7 +29,7 @@ public class GLLine {
         setBufferData(gl);
     }
 
-    public float[][] monoToBidi(final FloatBuffer array, final int rows, final int cols) {
+    private float[][] monoToBidi(final FloatBuffer array, final int rows, final int cols) {
         if (array.limit() != (rows * cols))
             throw new IllegalArgumentException("Invalid array length");
 

@@ -17,19 +17,9 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Scanner;
 
-// A class which provides functions for accessing and working with files
 public class FileUtils {
 
     private static final int BUFSIZ = 65536;
-
-    /**
-     * Return the current working directory
-     *
-     * @return the current working directory
-     */
-    public static File getWorkingDirectory() {
-        return new File(System.getProperty("user.dir"));
-    }
 
     public static OutputStream newBufferedOutputStream(File dst) throws IOException {
         return new BufferedOutputStream(Files.newOutputStream(dst.toPath()), BUFSIZ);
