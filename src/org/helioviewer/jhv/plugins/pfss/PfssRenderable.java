@@ -30,7 +30,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
 
         PfssData pfssData = PfssPlugin.getPfsscache().getData(Layers.getLastUpdatedTimestamp().milli);
         if (pfssData != null) {
-            renderData(camera, vp, gl, pfssData);
+            renderData(gl, pfssData, vp.aspect);
             previousPfssData = pfssData;
         }
     }
@@ -89,7 +89,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
         line.dispose(gl);
     }
 
-    private void renderData(Camera camera, Viewport vp, GL2 gl, PfssData data) {
+    private void renderData(GL2 gl, PfssData data, double aspect) {
         int qualityReduction = optionsPanel.getQualityReduction();
         boolean fixedColor = optionsPanel.getFixedColor();
 
@@ -100,7 +100,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
             timeString = data.getDateObs().toString();
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
         }
-        line.render(camera, vp, gl);
+        line.render(gl, aspect);
     }
 
 }

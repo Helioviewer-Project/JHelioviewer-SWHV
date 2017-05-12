@@ -1,17 +1,15 @@
 package org.helioviewer.jhv.opengl;
 
-import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
 public class GLLine {
+
     private float[][] points;
     private float[][] colors;
 
@@ -43,27 +41,19 @@ public class GLLine {
         return bidi;
     }
 
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(GL2 gl, double aspect) {
         if (points == null)
             return;
+
         GLSLLineShader.line.bind(gl);
-        GLSLLineShader.line.setAspect((float) vp.aspect);
+        GLSLLineShader.line.setAspect((float) aspect);
         GLSLLineShader.line.bindParams(gl);
 
         bindVBOs(gl);
-
         gl.glDrawElements(GL2.GL_TRIANGLES, vbos[4].bufferSize, GL2.GL_UNSIGNED_INT, 0);
-
         unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
-    }
-
-    public void remove(GL2 gl) {
-    }
-
-    public Component getOptionsPanel() {
-        return null;
     }
 
     private void bindVBOs(GL2 gl) {
@@ -97,7 +87,7 @@ public class GLLine {
         ivbo = null;
     }
 
-    public IntBuffer gen_indices(int length) {
+    private IntBuffer gen_indices(int length) {
         IntBuffer indicesBuffer = IntBuffer.allocate(6 * points.length);
         for (int j = 0; j < 2 * length - 4; j = j + 2) {
             indicesBuffer.put(j);
@@ -161,12 +151,12 @@ public class GLLine {
         vbos[3].bindBufferData(gl, directionBuffer, Buffers.SIZEOF_FLOAT);
         vbos[4].bindBufferData(gl, colorBuffer, Buffers.SIZEOF_FLOAT);
 
-        IntBuffer indexBuffer = this.gen_indices(points.length);
+        IntBuffer indexBuffer = gen_indices(points.length);
         ivbo.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
     }
 
     public void dispose(GL2 gl) {
-        this.disposeVBOs(gl);
+        disposeVBOs(gl);
     }
 
 }

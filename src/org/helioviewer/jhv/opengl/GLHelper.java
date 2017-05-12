@@ -15,7 +15,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLCanvas;
+//import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLHelper {
 
@@ -95,7 +95,7 @@ public class GLHelper {
         }
         return tf;
     }
-
+/*
     public static GLCanvas createGLCanvas() {
         GLProfile profile = GLProfile.getDefault();
         GLCapabilities capabilities = getGLCapabilities(profile);
@@ -106,7 +106,7 @@ public class GLHelper {
 
         return canvas;
     }
-
+*/
     public static GLWindow createGLWindow() {
         GLProfile profile = GLProfile.getDefault();
         GLCapabilities capabilities = getGLCapabilities(profile);
