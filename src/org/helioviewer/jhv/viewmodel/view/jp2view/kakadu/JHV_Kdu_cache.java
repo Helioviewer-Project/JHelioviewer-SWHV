@@ -15,8 +15,8 @@ public class JHV_Kdu_cache extends Kdu_cache implements JPIPCache {
         boolean complete[] = new boolean[1];
         try {
             Get_databin_length(binClass.kakaduClassID, streamID, binID, complete);
-        } catch (KduException ex) {
-            throw new JHV_KduException("Internal Kakadu error: " + ex.getMessage());
+        } catch (KduException e) {
+            throw new JHV_KduException("Internal Kakadu error: " + e.getMessage(), e);
         }
         return complete[0];
     }
@@ -26,7 +26,7 @@ public class JHV_Kdu_cache extends Kdu_cache implements JPIPCache {
         try {
             Add_to_databin(data.classID.kakaduClassID, data.codestreamID, data.binID, data.data, data.offset, data.length, data.isFinal, true, false);
         } catch (KduException e) {
-            throw new IOException("Internal Kakadu error: " + e.getMessage());
+            throw new IOException("Internal Kakadu error: " + e.getMessage(), e);
         }
     }
 

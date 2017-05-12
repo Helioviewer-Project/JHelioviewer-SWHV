@@ -39,8 +39,8 @@ public class KakaduMessageSystem {
             errorsFormatter = new Kdu_message_formatter(errors, 80);
             Kdu_global.Kdu_customize_warnings(warningsFormatter);
             Kdu_global.Kdu_customize_errors(errorsFormatter);
-        } catch (KduException ex) {
-            throw new Exception("Error initializing Kakadu error handler:\n" + ex.getMessage());
+        } catch (KduException e) {
+            throw new Exception("Error initializing Kakadu error handler: " + e.getMessage(), e);
         }
     }
 
