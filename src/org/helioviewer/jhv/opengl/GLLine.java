@@ -20,8 +20,6 @@ public class GLLine {
     private VBO[] vbos = new VBO[5];
     private VBO ivbo;
 
-    private boolean inited = false;
-
     public void setData(GL2 gl, FloatBuffer vertices, FloatBuffer _colors) {
         points = monoToBidi(vertices, vertices.limit() / 3, 3);
         colors = monoToBidi(_colors, _colors.limit() / 4, 4);
@@ -41,9 +39,6 @@ public class GLLine {
     }
 
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        if (!inited)
-            return;
-
         GLSLLineShader.line.bind(gl);
         GLSLLineShader.line.setAspect((float) vp.aspect);
         GLSLLineShader.line.bindParams(gl);
@@ -165,13 +160,10 @@ public class GLLine {
 
         ShortBuffer indexBuffer = this.gen_indices(points.length);
         ivbo.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_SHORT);
-        inited = true;
-
     }
 
     public void dispose(GL2 gl) {
         this.disposeVBOs(gl);
-        inited = false;
     }
 
 }
