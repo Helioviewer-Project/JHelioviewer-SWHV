@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components;
+package org.helioviewer.jhv.opengl;
 
 import java.awt.Component;
 import java.nio.FloatBuffer;
@@ -6,14 +6,11 @@ import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.GLSLLineShader;
-import org.helioviewer.jhv.opengl.GLSLShader;
-import org.helioviewer.jhv.opengl.VBO;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-public class RenderableLine {
+public class GLLine {
     private float[][] points;
     private float[][] colors;
 
