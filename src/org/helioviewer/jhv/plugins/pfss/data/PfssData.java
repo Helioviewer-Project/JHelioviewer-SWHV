@@ -152,4 +152,9 @@ public class PfssData {
         vertices.flip();
         colors.flip();
     }
+
+    public JHVDate getDateObs() {
+        return dateObs;
+    }
+
 }
