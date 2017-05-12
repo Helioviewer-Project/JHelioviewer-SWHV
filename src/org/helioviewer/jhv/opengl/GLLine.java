@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 
@@ -21,6 +22,10 @@ public class GLLine {
     private VBO ivbo;
 
     public void setData(GL2 gl, FloatBuffer vertices, FloatBuffer _colors) {
+        if (vertices.limit() / 3 != _colors.limit() / 4 || vertices.limit() / 3 < 2) {
+            Log.error("Something is wrong with the vertices or colors from this line.");
+            return;
+        }
         points = monoToBidi(vertices, vertices.limit() / 3, 3);
         colors = monoToBidi(_colors, _colors.limit() / 4, 4);
         setBufferData(gl);
@@ -39,6 +44,8 @@ public class GLLine {
     }
 
     public void render(Camera camera, Viewport vp, GL2 gl) {
+        if (points == null)
+            return;
         GLSLLineShader.line.bind(gl);
         GLSLLineShader.line.setAspect((float) vp.aspect);
         GLSLLineShader.line.bindParams(gl);
@@ -116,9 +123,6 @@ public class GLLine {
     }
 
     private void setBufferData(GL2 gl) {
-        if (points.length < 2)
-            return;
-
         FloatBuffer previousLineBuffer = FloatBuffer.allocate(3 * 2 * points.length);
         FloatBuffer lineBuffer = FloatBuffer.allocate(3 * 2 * points.length);
         FloatBuffer nextLineBuffer = FloatBuffer.allocate(3 * 2 * points.length);
