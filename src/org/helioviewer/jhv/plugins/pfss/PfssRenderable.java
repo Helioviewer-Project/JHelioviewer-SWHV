@@ -19,7 +19,7 @@ import com.jogamp.opengl.GL2;
 
 public class PfssRenderable extends AbstractRenderable implements TimespanListener {
 
-    private final PfssPluginPanel optionsPanel = new PfssPluginPanel();
+    private final PfssOptionsPanel optionsPanel = new PfssOptionsPanel();
     private PfssData previousPfssData = null;
     private final GLLine line = new GLLine();
 
@@ -90,8 +90,11 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     private void renderData(Camera camera, Viewport vp, GL2 gl, PfssData data) {
-        if (data != previousPfssData || data.needsUpdate(PfssSettings.qualityReduction, PfssSettings.fixedColor)) {
-            data.calculatePositions(PfssSettings.qualityReduction, PfssSettings.fixedColor);
+        int qualityReduction = optionsPanel.getQualityReduction();
+        boolean fixedColor = optionsPanel.getFixedColor();
+
+        if (data != previousPfssData || data.needsUpdate(qualityReduction, fixedColor)) {
+            data.calculatePositions(qualityReduction, fixedColor);
             line.setData(gl, data.vertices, data.colors);
 
             timeString = data.getDateObs().toString();

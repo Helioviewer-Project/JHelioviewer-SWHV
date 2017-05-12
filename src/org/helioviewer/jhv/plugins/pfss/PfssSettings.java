@@ -10,7 +10,4 @@ public class PfssSettings {
     public static final String baseURL = "http://swhv.oma.be/magtest/pfss/";
     public static final String availabilityURL = "http://swhv.oma.be/availability/pfss/availability/availability.html";
 
-    public static int qualityReduction = 8;
-    public static boolean fixedColor = false;
-
 }

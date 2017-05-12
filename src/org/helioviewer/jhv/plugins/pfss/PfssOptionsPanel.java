@@ -16,14 +16,17 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-class PfssPluginPanel extends JPanel {
+class PfssOptionsPanel extends JPanel {
 
-    public PfssPluginPanel() {
+    private int qualityReduction = 8;
+    private boolean fixedColor;
+
+    public PfssOptionsPanel() {
         setLayout(new GridBagLayout());
 
         JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 8, 1));
         levelSpinner.addChangeListener(e -> {
-            PfssSettings.qualityReduction = 8 - (Integer) levelSpinner.getValue();
+            qualityReduction = 8 - (Integer) levelSpinner.getValue();
             Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(levelSpinner);
@@ -41,9 +44,9 @@ class PfssPluginPanel extends JPanel {
         c0.anchor = GridBagConstraints.WEST;
         add(levelSpinner, c0);
 
-        JCheckBox fixedColors = new JCheckBox("Fixed colors", false);
+        JCheckBox fixedColors = new JCheckBox("Fixed colors", fixedColor);
         fixedColors.addActionListener(e -> {
-            PfssSettings.fixedColor = fixedColors.isSelected();
+            fixedColor = fixedColors.isSelected();
             Displayer.display();
         });
 
@@ -61,9 +64,17 @@ class PfssPluginPanel extends JPanel {
 
         ComponentUtils.smallVariant(this);
     }
-
+/*
     @Override
     public void setEnabled(boolean b) {
+    }
+*/
+    int getQualityReduction() {
+        return qualityReduction;
+    }
+
+    boolean getFixedColor() {
+        return fixedColor;
     }
 
 }
