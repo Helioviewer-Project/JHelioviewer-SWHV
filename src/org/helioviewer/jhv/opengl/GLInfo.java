@@ -11,7 +11,7 @@ import com.jogamp.opengl.glu.GLU;
 
 public class GLInfo {
 
-    public static final int GLSAMPLES = 4;
+    public static final int GLSAMPLES = 8;
     private static final String[] crashOptions = { "OK", "Crash" };
 
     public static int[] pixelScale = { 1, 1 };
