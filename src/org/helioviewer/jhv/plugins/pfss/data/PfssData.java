@@ -30,11 +30,11 @@ public class PfssData {
 
     private final double cphi;
     private final double sphi;
-    public FloatBuffer vertices;
-    public FloatBuffer colors;
+    public final FloatBuffer vertices;
+    public final FloatBuffer colors;
 
-    public int lastQuality;
-    public boolean lastFixedColor;
+    private int lastQuality;
+    private boolean lastFixedColor;
 
     final long time;
 
@@ -82,14 +82,14 @@ public class PfssData {
     }
 
     public void calculatePositions(int qualityReduction, boolean fixedColor) {
-        lastQuality = PfssSettings.qualityReduction;
-        lastFixedColor = PfssSettings.fixedColor;
+        lastQuality = qualityReduction;
+        lastFixedColor = fixedColor;
         vertices.clear();
         colors.clear();
 
         FieldLineColor type = FieldLineColor.LOOPCOLOR;
         for (int i = 0; i < fieldlinex.length; i++) {
-            if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {
+            if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - qualityReduction) {
                 int rx = fieldlinex[i] + 32768;
                 int ry = fieldliney[i] + 32768;
                 int rz = fieldlinez[i] + 32768;
@@ -109,7 +109,7 @@ public class PfssData {
                     addVertex((float) x, (float) z, (float) -y);
                     addColor(bright, 0);
                     addVertex((float) x, (float) z, (float) -y);
-                    if (!PfssSettings.fixedColor) {
+                    if (!fixedColor) {
                         addColor(bright, 1);
                     } else {
                         int rox = fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
@@ -132,7 +132,7 @@ public class PfssData {
                     }
                 } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
                     addVertex((float) x, (float) z, (float) -y);
-                    if (!PfssSettings.fixedColor) {
+                    if (!fixedColor) {
                         addColor(bright, 1);
                     } else {
                         addColor(type.color);
@@ -141,7 +141,7 @@ public class PfssData {
                     addColor(bright, 0);
                 } else {
                     addVertex((float) x, (float) z, (float) -y);
-                    if (!PfssSettings.fixedColor) {
+                    if (!fixedColor) {
                         addColor(bright, 1);
                     } else {
                         addColor(type.color);

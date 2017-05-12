@@ -67,8 +67,8 @@ public class GLLine {
     }
 
     private void bindVBOs(GL2 gl) {
-        for (int i = 0; i < vbos.length; i++) {
-            vbos[i].bindArray(gl);
+        for (VBO vbo : vbos) {
+            vbo.bindArray(gl);
         }
         ivbo.bindArray(gl);
     }
@@ -100,7 +100,7 @@ public class GLLine {
     public IntBuffer gen_indices(int length) {
         IntBuffer indicesBuffer = IntBuffer.allocate(6 * points.length);
         for (int j = 0; j < 2 * length - 4; j = j + 2) {
-            indicesBuffer.put(j + 0);
+            indicesBuffer.put(j);
             indicesBuffer.put(j + 1);
             indicesBuffer.put(j + 2);
             indicesBuffer.put(j + 2);
