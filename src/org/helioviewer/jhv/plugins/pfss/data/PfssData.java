@@ -78,7 +78,11 @@ public class PfssData {
     }
 
     public boolean needsUpdate(int qualityReduction, boolean fixedColor) {
-        return (lastQuality != qualityReduction || lastFixedColor != fixedColor);
+        return lastQuality != qualityReduction || lastFixedColor != fixedColor;
+    }
+
+    private double decode(short f) {
+        return (f + 32768.) * (2. / 65535.) - 1.;
     }
 
     public void calculatePositions(int qualityReduction, boolean fixedColor) {
@@ -90,21 +94,16 @@ public class PfssData {
         FieldLineColor type = FieldLineColor.LOOPCOLOR;
         for (int i = 0; i < fieldlinex.length; i++) {
             if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - qualityReduction) {
-                int rx = fieldlinex[i] + 32768;
-                int ry = fieldliney[i] + 32768;
-                int rz = fieldlinez[i] + 32768;
-
-                double x = 3. * (rx * 2. / 65535 - 1.);
-                double y = 3. * (ry * 2. / 65535 - 1.);
-                double z = 3. * (rz * 2. / 65535 - 1.);
+                double x = 3. * decode(fieldlinex[i]);
+                double y = 3. * decode(fieldliney[i]);
+                double z = 3. * decode(fieldlinez[i]);
+                double bright = decode(fieldlines[i]);
 
                 double helpx = cphi * x + sphi * y;
                 double helpy = -sphi * x + cphi * y;
                 x = helpx;
                 y = helpy;
 
-                int col = fieldlines[i] + 32768;
-                double bright = (col * 2. / 65535.) - 1.;
                 if (i % PfssSettings.POINTS_PER_LINE == 0) {
                     addVertex((float) x, (float) z, (float) -y);
                     addColor(bright, 0);
@@ -112,12 +111,9 @@ public class PfssData {
                     if (!fixedColor) {
                         addColor(bright, 1);
                     } else {
-                        int rox = fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
-                        int roy = fieldliney[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
-                        int roz = fieldlinez[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
-                        double xo = 3. * (rox * 2. / 65535 - 1.);
-                        double yo = 3. * (roy * 2. / 65535 - 1.);
-                        double zo = 3. * (roz * 2. / 65535 - 1.);
+                        double xo = 3. * decode(fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1]);
+                        double yo = 3. * decode(fieldliney[i + PfssSettings.POINTS_PER_LINE - 1]);
+                        double zo = 3. * decode(fieldlinez[i + PfssSettings.POINTS_PER_LINE - 1]);
                         double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
                         double r = Math.sqrt(x * x + y * y + z * z);
 
