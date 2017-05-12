@@ -173,14 +173,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         updateCell(renderables.indexOf(renderable), RenderableContainerPanel.TIME_COL);
     }
 
-    public void init(GL2 gl) {
-        /*
-        for (Renderable renderable : renderables) {
-            renderable.init(gl);
-        }
-        */
-    }
-
     public void dispose(GL2 gl) {
         for (Renderable renderable : renderables) {
             renderable.dispose(gl);
