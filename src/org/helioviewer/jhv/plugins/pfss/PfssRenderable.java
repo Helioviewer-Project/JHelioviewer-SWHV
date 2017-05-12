@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.opengl.GLLine;
@@ -92,6 +93,9 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
         if (data != previousPfssData || data.needsUpdate(PfssSettings.qualityReduction, PfssSettings.fixedColor)) {
             data.calculatePositions(PfssSettings.qualityReduction, PfssSettings.fixedColor);
             line.setData(gl, data.vertices, data.colors);
+
+            timeString = data.getDateObs().toString();
+            ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
         }
         line.render(camera, vp, gl);
     }
