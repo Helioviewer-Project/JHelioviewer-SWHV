@@ -80,8 +80,6 @@ public class GLListener implements GLEventListener {
 
         GLSLSolarShader.init(gl);
         GLSLLineShader.init(gl);
-
-        ImageViewerGui.getRenderableContainer().init(gl);
     }
 
     private static void disposeImpl(GL2 gl) {
