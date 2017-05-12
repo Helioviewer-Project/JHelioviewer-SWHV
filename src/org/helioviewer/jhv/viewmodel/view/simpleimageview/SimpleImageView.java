@@ -6,8 +6,8 @@ import java.net.URI;
 import javax.imageio.ImageIO;
 
 import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
-import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.Single8ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.Single16ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
 
@@ -31,9 +31,9 @@ public class SimpleImageView extends AbstractView {
             throw new Exception("Could not read image: " + uri);
 
         if (image.getColorModel().getPixelSize() <= 8) {
-            imageData = new SingleChannelByte8ImageData(image);
+            imageData = new Single8ImageData(image);
         } else if (image.getColorModel().getPixelSize() <= 16) {
-            imageData = new SingleChannelShortImageData(image.getColorModel().getPixelSize(), 1, image);
+            imageData = new Single16ImageData(1, image);
         } else {
             imageData = new ARGBInt32ImageData(image);
         }

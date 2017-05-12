@@ -13,21 +13,11 @@ import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.imageformat.ARGB32ImageFormat;
-import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
-import org.helioviewer.jhv.viewmodel.imageformat.RGB24ImageFormat;
-import org.helioviewer.jhv.viewmodel.imageformat.SingleChannelImageFormat;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageData.ImageFormat;
 
 import com.jogamp.opengl.GL2;
 
-/**
- * Helper class to handle OpenGL textures.
- * This class provides a lot of useful functions to handle textures in OpenGL,
- * including the generation of textures out of image data objects.
- */
 public class GLTexture {
-
-    private static final int[] formatMap = { GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16 };
 
     private int texID = -1;
 
@@ -139,9 +129,11 @@ public class GLTexture {
      * @return OpenGL memory image format
      */
     private static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
-        if (imageFormat instanceof SingleChannelImageFormat)
-            return formatMap[((SingleChannelImageFormat) imageFormat).getBitDepth() - 1];
-        else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
+        if (imageFormat == ImageFormat.Single8)
+            return GL2.GL_LUMINANCE8;
+        else if (imageFormat == ImageFormat.Single16)
+            return GL2.GL_LUMINANCE16;
+        else if (imageFormat == ImageFormat.ARGB32 || imageFormat == ImageFormat.RGB24)
             return GL2.GL_RGBA;
         else
             throw new IllegalArgumentException("Format is not supported");
@@ -156,9 +148,9 @@ public class GLTexture {
      * @return OpenGL input image format
      */
     private static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
-        if (imageFormat instanceof SingleChannelImageFormat)
+        if (imageFormat == ImageFormat.Single8 || imageFormat == ImageFormat.Single16)
             return GL2.GL_LUMINANCE;
-        else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
+        else if (imageFormat == ImageFormat.ARGB32 || imageFormat == ImageFormat.RGB24)
             return GL2.GL_BGRA;
         else
             throw new IllegalArgumentException("Format is not supported");

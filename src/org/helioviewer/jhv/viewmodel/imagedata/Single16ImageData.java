@@ -7,30 +7,18 @@ import java.awt.image.Raster;
 import java.nio.Buffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
-import org.helioviewer.jhv.viewmodel.imageformat.SingleChannelImageFormat;
+public class Single16ImageData extends ImageData {
 
-/**
- * Representation of image data in single channel format, using 9 to 16 bits per
- * pixel.
- *
- * Note that this is the only implementation of ImageData, which is supposed to
- * handle a variable number of bits per pixel.
- */
-public class SingleChannelShortImageData extends ImageData {
+    private final ImageFormat format = ImageFormat.Single16;
 
-    private final SingleChannelImageFormat format;
-
-    public SingleChannelShortImageData(int _width, int _height, int _bpp, double _gamma, Buffer _buffer) {
+    public Single16ImageData(int _width, int _height, double _gamma, Buffer _buffer) {
         super(_width, _height, 16, _gamma);
-        format = new SingleChannelImageFormat(_bpp);
         buffer = _buffer;
     }
 
-    public SingleChannelShortImageData(int _bpp, double _gamma, BufferedImage _image) {
+    public Single16ImageData(double _gamma, BufferedImage _image) {
         super(_image.getWidth(), _image.getHeight(), 16, _gamma);
         image = _image;
-        format = new SingleChannelImageFormat(_bpp);
         buffer = ShortBuffer.wrap(((DataBufferUShort) _image.getRaster().getDataBuffer()).getData());
     }
 

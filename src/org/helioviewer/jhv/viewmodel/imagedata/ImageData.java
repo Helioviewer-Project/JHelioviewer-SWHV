@@ -6,10 +6,13 @@ import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public abstract class ImageData {
+
+    public enum ImageFormat {
+        Single8, Single16, RGB24, ARGB32
+    }
 
     final int width;
     final int height;

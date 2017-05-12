@@ -7,23 +7,16 @@ import java.awt.image.Raster;
 import java.nio.ByteBuffer;
 import java.nio.Buffer;
 
-import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
-import org.helioviewer.jhv.viewmodel.imageformat.SingleChannelImageFormat;
+public class Single8ImageData extends ImageData {
 
-/**
- * Representation of image data in single channel format, using 8 bits per
- * pixel.
- */
-public class SingleChannelByte8ImageData extends ImageData {
+    private final ImageFormat format = ImageFormat.Single8;
 
-    private static final ImageFormat format = new SingleChannelImageFormat(8);
-
-    public SingleChannelByte8ImageData(int _width, int _height, Buffer _buffer) {
+    public Single8ImageData(int _width, int _height, Buffer _buffer) {
         super(_width, _height, 8, 1);
         buffer = _buffer;
     }
 
-    public SingleChannelByte8ImageData(BufferedImage newImage) {
+    public Single8ImageData(BufferedImage newImage) {
         super(newImage.getWidth(), newImage.getHeight(), 8, 1);
         image = newImage;
         buffer = ByteBuffer.wrap(((DataBufferByte) newImage.getRaster().getDataBuffer()).getData());

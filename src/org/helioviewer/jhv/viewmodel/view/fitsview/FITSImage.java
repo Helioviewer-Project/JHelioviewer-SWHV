@@ -13,8 +13,8 @@ import nom.tam.util.Cursor;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.Single8ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.Single16ImageData;
 
 class FITSImage {
 
@@ -55,7 +55,7 @@ class FITSImage {
             for (int j = 0; j < height; j++) {
                 System.arraycopy(data2D[j], 0, data, width * (height - 1 - j), width);
             }
-            imageData = new SingleChannelByte8ImageData(width, height, ByteBuffer.wrap(data));
+            imageData = new Single8ImageData(width, height, ByteBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_SHORT) {
             short[][] data2D = (short[][]) hdu.getKernel();
             int width = data2D[0].length;
@@ -78,7 +78,7 @@ class FITSImage {
                     data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
                 }
             }
-            imageData = new SingleChannelShortImageData(width, height, 16, scale.getGamma(), ShortBuffer.wrap(data));
+            imageData = new Single16ImageData(width, height, scale.getGamma(), ShortBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
             int[][] data2D = (int[][]) hdu.getKernel();
             int width = data2D[0].length;
@@ -101,7 +101,7 @@ class FITSImage {
                     data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
                 }
             }
-            imageData = new SingleChannelShortImageData(width, height, 16, scale.getGamma(), ShortBuffer.wrap(data));
+            imageData = new Single16ImageData(width, height, scale.getGamma(), ShortBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
             float[][] data2D = (float[][]) hdu.getKernel();
             int width = data2D[0].length;
@@ -124,7 +124,7 @@ class FITSImage {
                     data[width * (height - 1 - j) + i] = (short) (scale * (data2D[j][i] - min));
                 }
             }
-            imageData = new SingleChannelShortImageData(width, height, 16, GAMMA, ShortBuffer.wrap(data));
+            imageData = new Single16ImageData(width, height, GAMMA, ShortBuffer.wrap(data));
         }
     }
 

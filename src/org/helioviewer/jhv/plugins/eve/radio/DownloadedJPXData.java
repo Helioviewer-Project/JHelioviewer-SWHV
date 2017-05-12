@@ -18,7 +18,7 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
-import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.Single8ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
@@ -85,7 +85,7 @@ class DownloadedJPXData implements ImageDataHandler {
 
     @Override
     public void handleData(ImageData imageData) {
-        if (imageData instanceof SingleChannelByte8ImageData) {
+        if (imageData instanceof Single8ImageData) {
             int w = imageData.getWidth();
             int h = imageData.getHeight();
             if (w < 1 || h < 1) {
