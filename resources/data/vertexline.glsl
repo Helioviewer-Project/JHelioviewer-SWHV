@@ -10,14 +10,13 @@ uniform float thickness;
 uniform int miter;
 varying vec4 frag_linecolor;
 
-
 void main() {
   vec2 aspectVec = vec2(aspect, 1.);
   mat4 m = gl_ModelViewProjectionMatrix;
   vec4 previousProjected = m * vec4(previousLine, 1.0);
   vec4 currentProjected = m * vec4(line, 1.0);
   vec4 nextProjected = m * vec4(nextLine, 1.0);
-  
+
   vec2 currentScreen = (currentProjected.xy / currentProjected.w) * aspectVec;
   vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;
   vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;
@@ -37,14 +36,13 @@ void main() {
       vec2 perp = vec2(-dirA.y, dirA.x);
       vec2 miter = vec2(-tangent.y, tangent.x);
       dir = tangent;
-      len = thickness / dot(miter, perp);
+
+        float scalar = dot(miter, perp);
+        if (scalar == 0.)
+            len = thickness;
     } else {
       dir = dirA;
     }
-  }
-
-  if(len>5.*thickness) { 
-    len = thickness;
   }
 
   vec2 normal =  vec2(-dir.y, dir.x);
