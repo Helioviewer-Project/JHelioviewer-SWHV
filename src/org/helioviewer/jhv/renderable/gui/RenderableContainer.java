@@ -16,8 +16,8 @@ import com.jogamp.opengl.GL2;
 @SuppressWarnings("serial")
 public class RenderableContainer extends AbstractTableModel implements Reorderable {
 
-    private final ArrayList<Renderable> renderables = new ArrayList<>();
-    private final ArrayList<Renderable> newRenderables = new ArrayList<>();
+    private ArrayList<Renderable> renderables = new ArrayList<>();
+    private ArrayList<Renderable> newRenderables = new ArrayList<>();
     private final ArrayList<Renderable> removedRenderables = new ArrayList<>();
 
     public void addBeforeRenderable(Renderable renderable) {
@@ -174,15 +174,19 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public void init(GL2 gl) {
+        /*
         for (Renderable renderable : renderables) {
             renderable.init(gl);
         }
+        */
     }
 
     public void dispose(GL2 gl) {
         for (Renderable renderable : renderables) {
             renderable.dispose(gl);
         }
+        newRenderables = renderables;
+        renderables = new ArrayList<>();
     }
 
 }
