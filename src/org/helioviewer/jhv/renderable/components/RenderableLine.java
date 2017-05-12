@@ -9,12 +9,11 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLSLLineShader;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.VBO;
-import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-public class RenderableLine extends AbstractRenderable {
+public class RenderableLine {
     private float[][] points;
     private float[][] colors;
 
@@ -44,7 +43,6 @@ public class RenderableLine extends AbstractRenderable {
         return bidi;
     }
 
-    @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!inited)
             return;
@@ -62,28 +60,11 @@ public class RenderableLine extends AbstractRenderable {
         GLSLShader.unbind(gl);
     }
 
-    @Override
     public void remove(GL2 gl) {
     }
 
-    @Override
     public Component getOptionsPanel() {
         return null;
-    }
-
-    @Override
-    public String getName() {
-        return "line";
-    }
-
-    @Override
-    public String getTimeString() {
-        return null;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
     }
 
     private void bindVBOs(GL2 gl) {
@@ -136,7 +117,6 @@ public class RenderableLine extends AbstractRenderable {
         buffer.put(point);
     }
 
-    @Override
     public void init(GL2 gl) {
         vboAttribRefs = new int[] { GLSLLineShader.previousLineRef, GLSLLineShader.lineRef, GLSLLineShader.nextLineRef,
                 GLSLLineShader.directionRef, GLSLLineShader.linecolorRef };
@@ -192,7 +172,6 @@ public class RenderableLine extends AbstractRenderable {
 
     }
 
-    @Override
     public void dispose(GL2 gl) {
         this.disposeVBOs(gl);
         inited = false;
