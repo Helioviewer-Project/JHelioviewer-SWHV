@@ -31,34 +31,13 @@ public class GLListener implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
         GLContext ctx = drawable.getContext();
         GL2 gl = ctx.getGL().getGL2();
-        boolean multi = drawable.getChosenGLCapabilities().getNumSamples() != 0;
-
-        EventQueue.invokeLater(() -> {
-            ctx.makeCurrent();
-            initImpl(gl, multi);
-            ctx.release();
-        });
-    }
-
-    @Override
-    public void dispose(GLAutoDrawable drawable) {
-        GLText.dispose();
-        GL2 gl = drawable.getGL().getGL2();
-
-        EventQueue.invokeLater(() -> {
-            disposeImpl(gl);
-            GLInfo.checkGLErrors(gl, "GLListener.dispose()");
-        });
-    }
-
-    private void initImpl(GL2 gl, boolean multi) {
         GLInfo.update(gl);
         GLInfo.updatePixelScale(surface);
 
         gl.glDisable(GL2.GL_TEXTURE_1D);
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
-        if (multi)
+        if (drawable.getChosenGLCapabilities().getNumSamples() != 0)
             gl.glEnable(GL2.GL_MULTISAMPLE);
         else {
             gl.glEnable(GL2.GL_LINE_SMOOTH);
@@ -80,6 +59,17 @@ public class GLListener implements GLEventListener {
 
         GLSLSolarShader.init(gl);
         GLSLLineShader.init(gl);
+    }
+
+    @Override
+    public void dispose(GLAutoDrawable drawable) {
+        GLText.dispose();
+        GL2 gl = drawable.getGL().getGL2();
+
+        EventQueue.invokeLater(() -> {
+            disposeImpl(gl);
+            GLInfo.checkGLErrors(gl, "GLListener.dispose()");
+        });
     }
 
     private static void disposeImpl(GL2 gl) {
