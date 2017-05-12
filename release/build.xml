@@ -56,11 +56,11 @@
             <zipfileset src="${lib}/gluegen-rt-natives-linux-i586.jar"       includes="*/*/*.so"/>
             <zipfileset src="${lib}/gluegen-rt-natives-linux-amd64.jar"      includes="*/*/*.so"/>
             <zipfileset src="${lib}/gluegen-rt-natives-macosx-universal.jar" includes="*/*/*.jnilib"/>
-            <zipfileset src="${lib}/jogl-all-natives-windows-i586.jar"       includes="*/*/*.dll"/>
-            <zipfileset src="${lib}/jogl-all-natives-windows-amd64.jar"      includes="*/*/*.dll"/>
-            <zipfileset src="${lib}/jogl-all-natives-linux-i586.jar"         includes="*/*/*.so"/>
-            <zipfileset src="${lib}/jogl-all-natives-linux-amd64.jar"        includes="*/*/*.so"/>
-            <zipfileset src="${lib}/jogl-all-natives-macosx-universal.jar"   includes="*/*/*.jnilib"/>
+            <zipfileset src="${lib}/jogl-all-natives-windows-i586.jar"       includes="*/*/*.dll" excludes="*/*/*mobile.dll"/>
+            <zipfileset src="${lib}/jogl-all-natives-windows-amd64.jar"      includes="*/*/*.dll" excludes="*/*/*mobile.dll"/>
+            <zipfileset src="${lib}/jogl-all-natives-linux-i586.jar"         includes="*/*/*.so" excludes="*/*/*mobile.so"/>
+            <zipfileset src="${lib}/jogl-all-natives-linux-amd64.jar"        includes="*/*/*.so" excludes="*/*/*mobile.so"/>
+            <zipfileset src="${lib}/jogl-all-natives-macosx-universal.jar"   includes="*/*/*.jnilib" excludes="*/*/*mobile.jnilib"/>
 
             <zipgroupfileset dir="${lib}" excludes="*natives*.jar"/>
             <zipfileset src="../JHelioviewer.jar"/>
