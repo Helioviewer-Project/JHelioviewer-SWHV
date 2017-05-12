@@ -75,10 +75,10 @@ public class GLLine {
 
     private void initVBOs(GL2 gl) {
         for (int i = 0; i < vboAttribRefs.length; i++) {
-            vbos[i] = new VBO(GL2.GL_ARRAY_BUFFER, vboAttribRefs[i], vboAttribLens[i]);
+            vbos[i] = VBO.gen_float_VBO(vboAttribRefs[i], vboAttribLens[i]);
             vbos[i].init(gl);
         }
-        ivbo = new VBO(GL2.GL_ELEMENT_ARRAY_BUFFER, -1, -1);
+        ivbo = VBO.gen_index_VBO();
     }
 
     private void disposeVBOs(GL2 gl) {
