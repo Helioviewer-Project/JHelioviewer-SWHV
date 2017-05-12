@@ -38,8 +38,10 @@ void main() {
       dir = tangent;
 
         float scalar = dot(miter, perp);
-        if (scalar == 0.)
+        if (scalar < 0.2) // 1/5
             len = thickness;
+        else
+            len = thickness / scalar;
     } else {
       dir = dirA;
     }
