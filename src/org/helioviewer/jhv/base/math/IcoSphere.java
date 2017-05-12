@@ -1,16 +1,16 @@
 package org.helioviewer.jhv.base.math;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.Pair;
 
 public class IcoSphere {
 
-    public static final Pair<FloatBuffer, IntBuffer> IcoSphere = makeIcoSphere(2);
+    public static final Pair<FloatBuffer, ShortBuffer> IcoSphere = makeIcoSphere(2);
 
-    private static Pair<FloatBuffer, IntBuffer> makeIcoSphere(int level) {
+    private static Pair<FloatBuffer, ShortBuffer> makeIcoSphere(int level) {
         float t = (float) ((Math.sqrt(5) - 1) / 2);
         float[][] icosahedronVertexList = { { -1, -t, 0 }, { 0, 1, t }, { 0, 1, -t }, { 1, t, 0 }, { 1, -t, 0 }, { 0, -1, -t }, { 0, -1, t }, { t, 0, 1 }, { -t, 0, 1 }, { t, 0, -1 }, { -t, 0, -1 }, { -1, t, 0 }, };
         for (float[] v : icosahedronVertexList) {
@@ -64,9 +64,9 @@ public class IcoSphere {
         }
         positionBuffer.flip();
 
-        IntBuffer indexBuffer = IntBuffer.allocate(faceIndices.size());
+        ShortBuffer indexBuffer = ShortBuffer.allocate(faceIndices.size());
         for (int i : faceIndices) {
-            indexBuffer.put(i);
+            indexBuffer.put((short) i);
         }
         indexBuffer.flip();
 

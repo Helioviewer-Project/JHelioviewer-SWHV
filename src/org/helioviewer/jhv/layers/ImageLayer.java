@@ -3,7 +3,7 @@ package org.helioviewer.jhv.layers;
 import java.awt.Component;
 import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.math.IcoSphere;
@@ -80,13 +80,13 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         glImage.init(gl);
 
         FloatBuffer positionBuffer = IcoSphere.IcoSphere.a;
-        IntBuffer indexBuffer = IcoSphere.IcoSphere.b;
+        ShortBuffer indexBuffer = IcoSphere.IcoSphere.b;
 
         positionVBO.init(gl);
         positionVBO.bindBufferData(gl, positionBuffer, Buffers.SIZEOF_FLOAT);
 
         indexVBO.init(gl);
-        indexVBO.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
+        indexVBO.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_SHORT);
     }
 
     @Override
@@ -229,11 +229,12 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
                 if (shader == GLSLSolarShader.ortho) {
                     shader.bindIsDisc(gl, 1);
                     gl.glDepthRange(depthrange[2], depthrange[3]);
-                    gl.glDrawElements(GL2.GL_TRIANGLES, indexVBO.bufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+                    gl.glDrawElements(GL2.GL_TRIANGLES, indexVBO.bufferSize - 6, GL2.GL_UNSIGNED_SHORT, 0);
                     shader.bindIsDisc(gl, 0);
                 }
                 gl.glDepthRange(depthrange[0], depthrange[1]);
-                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexVBO.bufferSize - 6) * Buffers.SIZEOF_INT);
+                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_SHORT,
+                        (indexVBO.bufferSize - 6) * Buffers.SIZEOF_SHORT);
 
                 gl.glDepthRange(0, 1);
             }
