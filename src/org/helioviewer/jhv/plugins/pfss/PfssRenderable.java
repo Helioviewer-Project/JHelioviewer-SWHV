@@ -8,9 +8,9 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
+import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
-import org.helioviewer.jhv.renderable.components.RenderableLine;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.CancelTask;
 
@@ -20,7 +20,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
 
     private final PfssPluginPanel optionsPanel = new PfssPluginPanel();
     private PfssData previousPfssData = null;
-    private final RenderableLine line = new RenderableLine();;
+    private final GLLine line = new GLLine();;
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
