@@ -146,25 +146,6 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
     }
 
-    public static void setUniform(GL2 gl, int id, float[] val, int count) {
-        switch (count) {
-        case 1:
-            gl.glUniform1fv(id, 1, val, 0);
-            break;
-        case 2:
-            gl.glUniform2fv(id, 1, val, 0);
-            break;
-        case 3:
-            gl.glUniform3fv(id, 1, val, 0);
-            break;
-        case 4:
-            gl.glUniform4fv(id, 1, val, 0);
-            break;
-        default:
-            break;
-        }
-    }
-
     public void changeRect(double xOffset, double yOffset, double xScale, double yScale) {
         rectVertex[0] = (float) xOffset;
         rectVertex[1] = (float) yOffset;
@@ -269,6 +250,7 @@ public class GLSLSolarShader extends GLSLShader {
         crotaFloat[0] = (float) crota;
     }
 
+    @Override
     protected void bindAttribs(GL2 gl) {
         gl.glBindAttribLocation(progID, positionRef, "position");
     }
