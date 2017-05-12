@@ -1,4 +1,4 @@
-#version 110
+#version 120
 #define NODIFFERENCE 0
 #define RUNNINGDIFFERENCE_NO_ROT 1
 #define RUNNINGDIFFERENCE_ROT 2
