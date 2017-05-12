@@ -91,7 +91,7 @@ public class APIRequestManager {
             // nothing
         } catch (Exception e) {
             Log.debug("APIRequestManager.loadView(\"" + uri + "\") ", e);
-            throw new IOException(e.getMessage());
+            throw new IOException(e);
         }
         return null;
     }
