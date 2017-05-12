@@ -55,7 +55,7 @@ public class RenderableLine extends AbstractRenderable {
 
         bindVBOs(gl);
 
-        gl.glDrawElements(GL2.GL_TRIANGLES, vbos[4].bufferSize, GL2.GL_UNSIGNED_INT, 3);
+        gl.glDrawElements(GL2.GL_TRIANGLES, vbos[4].bufferSize, GL2.GL_UNSIGNED_INT, 0);
 
         unbindVBOs(gl);
 
