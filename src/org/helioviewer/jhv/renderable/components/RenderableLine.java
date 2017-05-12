@@ -2,7 +2,7 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -55,7 +55,7 @@ public class RenderableLine extends AbstractRenderable {
 
         bindVBOs(gl);
 
-        gl.glDrawElements(GL2.GL_TRIANGLES, vbos[4].bufferSize, GL2.GL_UNSIGNED_INT, 0);
+        gl.glDrawElements(GL2.GL_TRIANGLES, vbos[4].bufferSize, GL2.GL_UNSIGNED_SHORT, 0);
 
         unbindVBOs(gl);
 
@@ -117,15 +117,15 @@ public class RenderableLine extends AbstractRenderable {
         ivbo = null;
     }
 
-    public IntBuffer gen_indices(int length) {
-        IntBuffer indicesBuffer = IntBuffer.allocate(6 * points.length);
+    public ShortBuffer gen_indices(int length) {
+        ShortBuffer indicesBuffer = ShortBuffer.allocate(6 * points.length);
         for (int j = 0; j < 2 * length - 4; j = j + 2) {
-            indicesBuffer.put(j + 0);
-            indicesBuffer.put(j + 1);
-            indicesBuffer.put(j + 2);
-            indicesBuffer.put(j + 2);
-            indicesBuffer.put(j + 1);
-            indicesBuffer.put(j + 3);
+            indicesBuffer.put((short) (j + 0));
+            indicesBuffer.put((short) (j + 1));
+            indicesBuffer.put((short) (j + 2));
+            indicesBuffer.put((short) (j + 2));
+            indicesBuffer.put((short) (j + 1));
+            indicesBuffer.put((short) (j + 3));
         }
         indicesBuffer.flip();
         return indicesBuffer;
@@ -186,8 +186,8 @@ public class RenderableLine extends AbstractRenderable {
         vbos[3].bindBufferData(gl, directionBuffer, Buffers.SIZEOF_FLOAT);
         vbos[4].bindBufferData(gl, colorBuffer, Buffers.SIZEOF_FLOAT);
 
-        IntBuffer indexBuffer = this.gen_indices(points.length);
-        ivbo.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
+        ShortBuffer indexBuffer = this.gen_indices(points.length);
+        ivbo.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_SHORT);
         inited = true;
 
     }
