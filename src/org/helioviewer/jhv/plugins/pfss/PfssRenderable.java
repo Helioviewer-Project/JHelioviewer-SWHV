@@ -19,6 +19,7 @@ import com.jogamp.opengl.GL2;
 
 public class PfssRenderable extends AbstractRenderable implements TimespanListener {
 
+    private static final double thickness = 0.0025;
     private final PfssOptionsPanel optionsPanel = new PfssOptionsPanel();
     private PfssData previousPfssData = null;
     private final GLLine line = new GLLine();
@@ -102,7 +103,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
             timeString = data.getDateObs().toString();
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
         }
-        line.render(gl, aspect);
+        line.render(gl, aspect, thickness);
     }
 
 }
