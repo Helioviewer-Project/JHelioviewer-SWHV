@@ -90,8 +90,8 @@ public class GLLine {
 
     private IntBuffer gen_indices(int length) {
         IntBuffer indicesBuffer = IntBuffer.allocate(6 * points.length);
-        for (int j = 0; j < 2 * length - 4; j = j + 2) {
-            indicesBuffer.put(j);
+        for (int j = 0; j < 2 * length - 3; j = j + 2) {
+            indicesBuffer.put(j + 0);
             indicesBuffer.put(j + 1);
             indicesBuffer.put(j + 2);
             indicesBuffer.put(j + 2);
