@@ -60,8 +60,12 @@ public class GLSLLineShader extends GLSLShader {
         gl.glUniform1iv(miterRef, 1, miter, 0);
     }
 
-    public void setAspect(float _aspect) {
-        aspect[0] = _aspect;
+    public void setAspect(double _aspect) {
+        aspect[0] = (float) _aspect;
+    }
+
+    public void setThickness(double _thickness) {
+        thickness[0] = (float) _thickness;
     }
 
     @Override

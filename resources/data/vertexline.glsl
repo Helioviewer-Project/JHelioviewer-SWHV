@@ -29,9 +29,9 @@ void main() {
   } else if (currentScreen == nextScreen) {
     dir = normalize(currentScreen - previousScreen);
   } else {
-    vec2 dirA = normalize((currentScreen - previousScreen));
+    vec2 dirA = normalize(currentScreen - previousScreen);
     if (miter == 1) {
-      vec2 dirB = normalize((nextScreen - currentScreen));
+      vec2 dirB = normalize(nextScreen - currentScreen);
       vec2 tangent = normalize(dirA + dirB);
       vec2 perp = vec2(-dirA.y, dirA.x);
       vec2 miter = vec2(-tangent.y, tangent.x);

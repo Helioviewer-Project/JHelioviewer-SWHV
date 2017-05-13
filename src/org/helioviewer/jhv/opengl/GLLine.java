@@ -30,7 +30,7 @@ public class GLLine {
     }
 
     private float[][] monoToBidi(final FloatBuffer array, final int rows, final int cols) {
-        if (array.limit() != (rows * cols))
+        if (array.limit() != rows * cols)
             throw new IllegalArgumentException("Invalid array length");
 
         float[][] bidi = new float[rows][cols];
@@ -41,12 +41,13 @@ public class GLLine {
         return bidi;
     }
 
-    public void render(GL2 gl, double aspect) {
+    public void render(GL2 gl, double aspect, double thickness) {
         if (points == null)
             return;
 
         GLSLLineShader.line.bind(gl);
-        GLSLLineShader.line.setAspect((float) aspect);
+        GLSLLineShader.line.setAspect(aspect);
+        GLSLLineShader.line.setThickness(thickness);
         GLSLLineShader.line.bindParams(gl);
 
         bindVBOs(gl);
