@@ -9,6 +9,8 @@ uniform float aspect;
 uniform float thickness;
 uniform int miter;
 varying vec4 frag_linecolor;
+varying float frag_direction;
+
 
 void main() {
   vec2 aspectVec = vec2(aspect, 1.);
@@ -54,4 +56,5 @@ void main() {
   vec4 offset = vec4(-normal*direction, 0.0, 0.0);
   gl_Position = currentProjected + offset;
   frag_linecolor = linecolor;
+  frag_direction = direction;
 }

@@ -16,7 +16,7 @@ public class GLSLLineShader extends GLSLShader {
     private int aspectRef;
 
     private int[] miter = { 1 };
-    private float[] thickness = { 0.0025f };
+    private float[] thickness = { 0.005f };
     private float[] aspect = { 1 };
 
     public GLSLLineShader(String vertex, String fragment) {
