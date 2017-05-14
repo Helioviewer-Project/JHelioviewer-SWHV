@@ -2,7 +2,7 @@ JHelioviewer
 ============
 
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/9940/badge.svg)](https://scan.coverity.com/projects/9940)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.572577.svg)](https://doi.org/10.5281/zenodo.572577)
+[![DOI](https://zenodo.org/badge/50179170.svg)](https://zenodo.org/badge/latestdoi/50179170)
 
 Website: http://www.jhelioviewer.org/
 
