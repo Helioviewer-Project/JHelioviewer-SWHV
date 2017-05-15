@@ -40,6 +40,8 @@ public class RenderableGrid extends AbstractRenderable {
             Color.RED.getBlue() / 255f, 1 };
     private static final float[] color2 = { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f,
             Color.GREEN.getBlue() / 255f, 1 };
+    private static final float[] earthLineColor = { Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f,
+            Color.YELLOW.getBlue() / 255f, 1 };
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
@@ -54,6 +56,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     private GLLine gridline = new GLLine();
     private GLLine axesline = new GLLine();
+    private GLLine earthCircleLine = new GLLine();
 
     private final Component optionsPanel;
     private static final String name = "Grid";
@@ -116,6 +119,30 @@ public class RenderableGrid extends AbstractRenderable {
 
     private static final int FLAT_STEPS_THETA = 24;
     private static final int FLAT_STEPS_RADIAL = 10;
+
+    @Override
+    public void render(Camera camera, Viewport vp, GL2 gl) {
+        if (!isVisible[vp.idx])
+            return;
+        if (needsInit) {
+            initGrid(gl);
+        }
+
+        if (showAxis)
+            axesline.render(gl, vp.aspect, thickness);
+
+        Mat4 cameraMatrix = getGridQuat(camera, gridChoice).toMatrix();
+        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+        gl.glPushMatrix();
+        gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
+        {
+            gridline.render(gl, vp.aspect, 0.0025);
+            if (showLabels) {
+                drawGridText(gl, pixelsPerSolarRadius);
+            }
+        }
+        gl.glPopMatrix();
+    }
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
@@ -187,31 +214,6 @@ public class RenderableGrid extends AbstractRenderable {
             }
         }
         renderer.end3DRendering();
-    }
-
-
-    @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
-        if (!isVisible[vp.idx])
-            return;
-        if (needsInit) {
-            initGrid(gl);
-        }
-        /*
-        if (showAxis)
-            axesline.render(gl, vp.aspect, thickness);
-        */
-        Mat4 cameraMatrix = getGridQuat(camera, gridChoice).toMatrix();
-        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
-        gl.glPushMatrix();
-        gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
-        {
-            gridline.render(gl, vp.aspect, 0.0025);
-            if (showLabels) {
-                drawGridText(gl, pixelsPerSolarRadius);
-            }
-        }
-        gl.glPopMatrix();
     }
 
     private static void drawEarthCircles(GL2 gl, Position.L p) {
@@ -403,6 +405,8 @@ public class RenderableGrid extends AbstractRenderable {
         initGrid(gl);
         axesline.init(gl);
         initAxes(gl);
+        earthCircleLine.init(gl);
+        initEarthCircles(gl);
     }
 
     private void addToBuffer(FloatBuffer positionBuffer, Vec3 v) {
@@ -449,6 +453,23 @@ public class RenderableGrid extends AbstractRenderable {
         positionBuffer.flip();
         colorBuffer.flip();
         axesline.setData(gl, positionBuffer, colorBuffer);
+    }
+
+    private void initEarthCircles(GL2 gl) {
+        FloatBuffer positionBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 3);
+        FloatBuffer colorBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 4);
+        Vec3 v = new Vec3();
+
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
+            v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
+            v.z = 0.;
+            addToBuffer(positionBuffer, v);
+            colorBuffer.put(earthLineColor);
+        }
+        positionBuffer.flip();
+        colorBuffer.flip();
+        earthCircleLine.setData(gl, positionBuffer, colorBuffer);
     }
 
     private void initGrid(GL2 gl) {
