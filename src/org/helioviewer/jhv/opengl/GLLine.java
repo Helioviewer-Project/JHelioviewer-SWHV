@@ -10,39 +10,27 @@ import com.jogamp.opengl.GL2;
 
 public class GLLine {
 
-    private float[][] points;
-    private float[][] colors;
 
     private int[] vboAttribRefs;
     private int[] vboAttribLens = { 3, 3, 3, 1, 4 };
 
     private VBO[] vbos = new VBO[5];
     private VBO ivbo;
+    private boolean hasPoints = false;
 
-    public void setData(GL2 gl, FloatBuffer vertices, FloatBuffer _colors) {
-        if (vertices.limit() / 3 != _colors.limit() / 4 || vertices.limit() / 3 < 2) {
+    public void setData(GL2 gl, FloatBuffer points, FloatBuffer colors) {
+        hasPoints = false;
+        int plen = points.limit() / 3;
+        if (plen != colors.limit() / 4 || plen < 2) {
             Log.error("Something is wrong with the vertices or colors from this line.");
             return;
         }
-        points = monoToBidi(vertices, vertices.limit() / 3, 3);
-        colors = monoToBidi(_colors, _colors.limit() / 4, 4);
-        setBufferData(gl);
-    }
-
-    private float[][] monoToBidi(final FloatBuffer array, final int rows, final int cols) {
-        if (array.limit() != rows * cols)
-            throw new IllegalArgumentException("Invalid array length");
-
-        float[][] bidi = new float[rows][cols];
-        int c = 0;
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
-                bidi[i][j] = array.get(c++);
-        return bidi;
+        setBufferData(gl, points, colors, plen);
+        hasPoints = true;
     }
 
     public void render(GL2 gl, double aspect, double thickness) {
-        if (points == null)
+        if (!hasPoints)
             return;
 
         GLSLLineShader.line.bind(gl);
@@ -89,9 +77,9 @@ public class GLLine {
         ivbo = null;
     }
 
-    private IntBuffer gen_indices(int length) {
-        IntBuffer indicesBuffer = IntBuffer.allocate(6 * points.length);
-        for (int j = 0; j < 2 * length - 3; j = j + 2) {
+    private IntBuffer gen_indices(int plen) {
+        IntBuffer indicesBuffer = IntBuffer.allocate(6 * plen);
+        for (int j = 0; j < 2 * plen - 3; j = j + 2) {
             indicesBuffer.put(j + 0);
             indicesBuffer.put(j + 1);
             indicesBuffer.put(j + 2);
@@ -103,9 +91,13 @@ public class GLLine {
         return indicesBuffer;
     }
 
-    private void addPoint(FloatBuffer buffer, float[] point) {
-        buffer.put(point);
-        buffer.put(point);
+    private void addPoint(FloatBuffer to, FloatBuffer from, int start, int n) {
+        for (int i = start; i < start + n; i++) {
+            to.put(from.get(i));
+        }
+        for (int i = start; i < start + n; i++) {
+            to.put(from.get(i));
+        }
     }
 
     public void init(GL2 gl) {
@@ -114,32 +106,34 @@ public class GLLine {
         initVBOs(gl);
     }
 
-    private void setBufferData(GL2 gl) {
-        FloatBuffer previousLineBuffer = FloatBuffer.allocate(3 * 2 * points.length);
-        FloatBuffer lineBuffer = FloatBuffer.allocate(3 * 2 * points.length);
-        FloatBuffer nextLineBuffer = FloatBuffer.allocate(3 * 2 * points.length);
-        FloatBuffer directionBuffer = FloatBuffer.allocate(2 * 2 * points.length);
-        FloatBuffer colorBuffer = FloatBuffer.allocate(2 * 4 * points.length);
+    private void setBufferData(GL2 gl, FloatBuffer points, FloatBuffer colors, int plen) {
+
+        FloatBuffer previousLineBuffer = FloatBuffer.allocate(3 * 2 * plen);
+        FloatBuffer lineBuffer = FloatBuffer.allocate(3 * 2 * plen);
+        FloatBuffer nextLineBuffer = FloatBuffer.allocate(3 * 2 * plen);
+        FloatBuffer directionBuffer = FloatBuffer.allocate(2 * 2 * plen);
+        FloatBuffer colorBuffer = FloatBuffer.allocate(4 * 2 * plen);
+
         int dir = -1;
-        for (int i = 0; i < 2 * points.length; i++) {
+        for (int i = 0; i < 2 * plen; i++) {
             directionBuffer.put(dir);
             directionBuffer.put(-dir);
         }
 
-        addPoint(previousLineBuffer, points[0]);
-        addPoint(lineBuffer, points[0]);
-        addPoint(nextLineBuffer, points[1]);
-        addPoint(colorBuffer, colors[0]);
-        for (int i = 1; i < points.length - 1; i++) {
-            addPoint(previousLineBuffer, points[i - 1]);
-            addPoint(lineBuffer, points[i]);
-            addPoint(nextLineBuffer, points[i + 1]);
-            addPoint(colorBuffer, colors[i]);
+        addPoint(previousLineBuffer, points, 0, 3);
+        addPoint(lineBuffer, points, 0, 3);
+        addPoint(nextLineBuffer, points, 3, 3);
+        addPoint(colorBuffer, colors, 0, 4);
+        for (int i = 1; i < plen - 1; i++) {
+            addPoint(previousLineBuffer, points, 3 * (i - 1), 3);
+            addPoint(lineBuffer, points, 3 * i, 3);
+            addPoint(nextLineBuffer, points, 3 * (i + 1), 3);
+            addPoint(colorBuffer, colors, 4 * i, 4);
         }
-        addPoint(previousLineBuffer, points[points.length - 2]);
-        addPoint(lineBuffer, points[points.length - 1]);
-        addPoint(nextLineBuffer, points[points.length - 1]);
-        addPoint(colorBuffer, colors[points.length - 1]);
+        addPoint(previousLineBuffer, points, 3 * (plen - 2), 3);
+        addPoint(lineBuffer, points, 3 * (plen - 1), 3);
+        addPoint(nextLineBuffer, points, 3 * (plen - 1), 3);
+        addPoint(colorBuffer, colors, 4 * (plen - 1), 4);
 
         previousLineBuffer.flip();
         lineBuffer.flip();
@@ -153,7 +147,7 @@ public class GLLine {
         vbos[3].bindBufferData(gl, directionBuffer, Buffers.SIZEOF_FLOAT);
         vbos[4].bindBufferData(gl, colorBuffer, Buffers.SIZEOF_FLOAT);
 
-        IntBuffer indexBuffer = gen_indices(points.length);
+        IntBuffer indexBuffer = gen_indices(plen);
         ivbo.bindBufferData(gl, indexBuffer, Buffers.SIZEOF_INT);
     }
 
