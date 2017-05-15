@@ -45,6 +45,14 @@ public class RenderableGrid extends AbstractRenderable {
     private static final float[] radialLineColor = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f,
             Color.WHITE.getBlue() / 255f, 1 };
 
+    private static final int END_RADIUS = 30;
+    private static final int START_RADIUS = 2;
+    private static final float[] R_LABEL_POS = { 2, 8, 24 };
+    private static final float STEP_DEGREES = 15;
+
+    private static final int FLAT_STEPS_THETA = 24;
+    private static final int FLAT_STEPS_RADIAL = 10;
+
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
@@ -120,9 +128,6 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private static final int FLAT_STEPS_THETA = 24;
-    private static final int FLAT_STEPS_RADIAL = 10;
-
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
@@ -150,7 +155,7 @@ public class RenderableGrid extends AbstractRenderable {
             gl.glPushMatrix();
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
             {
-                drawRadialGrid(gl, vp.aspect);
+                radialCircleLine.render(gl, vp.aspect, thickness);
                 if (showLabels) {
                     drawRadialGridText(gl, pixelsPerSolarRadius);
                 }
@@ -243,47 +248,6 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glPopMatrix();
     }
 
-    private static final float END_RADIUS = 30;
-    private static final float START_RADIUS = 2;
-    private static final float[] R_LABEL_POS = { 2, 8, 24 };
-    private static final float STEP_DEGREES = 15;
-
-    private void drawRadialGrid(GL2 gl, double aspect) {
-        gl.glPushMatrix();
-        {
-            gl.glColor3f(1, 1, 1);
-            gl.glRotatef(90, 0, 0, 1);
-            {
-                gl.glPushMatrix();
-                gl.glScalef(1, 1, 1);
-                double tn;
-                for (float i = START_RADIUS; i <= END_RADIUS; i++) {
-                    if (i % 10 == 0) {
-                        tn = thickness;
-                    } else {
-                        tn = thickness / 2;
-                    }
-                    gl.glScalef(i / (i - 1), i / (i - 1), i / (i - 1));
-                    radialCircleLine.render(gl, aspect, tn);
-                    gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-                }
-                gl.glPopMatrix();
-            }
-            gl.glLineWidth(1);
-            {
-                gl.glPushMatrix();
-                for (float i = 0; i < 360; i += STEP_DEGREES) {
-                    gl.glBegin(GL2.GL_LINES);
-                    gl.glVertex3f(START_RADIUS, 0, 0);
-                    gl.glVertex3f(END_RADIUS, 0, 0);
-                    gl.glEnd();
-                    gl.glRotatef(STEP_DEGREES, 0, 0, 1);
-                }
-                gl.glPopMatrix();
-            }
-        }
-        gl.glPopMatrix();
-    }
 
     private void drawRadialGridText(GL2 gl, int size) {
         gl.glDisable(GL2.GL_CULL_FACE);
@@ -473,15 +437,46 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void initRadialCircles(GL2 gl) {
-        FloatBuffer positionBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 3);
-        FloatBuffer colorBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 4);
+        int nolines = (int) Math.ceil(360 / STEP_DEGREES);
+
+        FloatBuffer positionBuffer = FloatBuffer
+                .allocate(((END_RADIUS - START_RADIUS + 1) * (SUBDIVISIONS + 1) + 4 * nolines) * 3);
+        FloatBuffer colorBuffer = FloatBuffer
+                .allocate(((END_RADIUS - START_RADIUS + 1) * (SUBDIVISIONS + 1) + 4 * nolines) * 4);
+        double tn;
         Vec3 v = new Vec3();
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
-            v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
-            v.z = 0.;
-            addToBuffer(positionBuffer, v);
+
+        for (double i = START_RADIUS; i <= END_RADIUS; i++) {
+            if (i % 10 == 0) {
+                tn = thickness;
+            } else {
+                tn = thickness / 2;
+            }
+            for (int j = 0; j <= SUBDIVISIONS; j++) {
+                v.x = i * Sun.Radius * Math.cos(2 * Math.PI * j / SUBDIVISIONS);
+                v.y = i * Sun.Radius * Math.sin(2 * Math.PI * j / SUBDIVISIONS);
+                v.z = 0.;
+                addToBuffer(positionBuffer, v);
+                colorBuffer.put(radialLineColor);
+            }
+        }
+
+        for (float i = 0; i < 360; i += STEP_DEGREES) {
+            Quat q = Quat.createRotation(2 * Math.PI * i / 360., new Vec3(0, 0, 1));
+
+            v.set(START_RADIUS, 0, 0);
+            Vec3 rotv1 = q.rotateVector(v);
+            addToBuffer(positionBuffer, rotv1);
+            addToBuffer(colorBuffer, 0, 0, 0, 0);
+            addToBuffer(positionBuffer, rotv1);
             colorBuffer.put(radialLineColor);
+
+            v.set(END_RADIUS, 0, 0);
+            Vec3 rotv2 = q.rotateVector(v);
+            addToBuffer(positionBuffer, rotv2);
+            colorBuffer.put(radialLineColor);
+            addToBuffer(positionBuffer, rotv2);
+            addToBuffer(colorBuffer, 0, 0, 0, 0);
         }
         positionBuffer.flip();
         colorBuffer.flip();
