@@ -8,19 +8,19 @@ float smoothstep(float edge0, float edge1, float x) {
   return t * t * (3.0 - 2.0 * t);
 }
 
-float smoothdoublestep(float edge0, float edge1, float x) {
-  float halfway = edge0 + (edge1-edge0)/2.;
-  if ( x < halfway) {
-     return smoothstep(edge0, halfway, 2 * (x-edge0));
-  }
-  return smoothstep(halfway, edge1, 2 * (edge1 - x) );
+float smoothpulse(float x) {
+  float steppos = 0.1;
+  if(x<steppos)
+    return smoothstep(0, steppos, x);
+  if (x>1.-steppos)
+      return smoothstep(0, steppos, 1.-x);
+  return 1.;
 }
 
 void main() {
   if(frag_linecolor.a == 0.)
       discard;
-      
   
   gl_FragColor = frag_linecolor;
-  gl_FragColor.w = smoothdoublestep(0., 1., (frag_direction + 1.)/2.);
+  gl_FragColor.a = smoothpulse((frag_direction + 1.)/2.);
 }
