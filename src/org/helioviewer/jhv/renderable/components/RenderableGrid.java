@@ -12,16 +12,16 @@ import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.json.JSONObject;
 
-import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
@@ -34,17 +34,19 @@ public class RenderableGrid extends AbstractRenderable {
     // height of text in solar radii
     private static final float textScale = (float) (0.08 * Sun.Radius);
     private static final int SUBDIVISIONS = 360;
+    private static final double thickness = 0.0025;
 
     private static final float[] color1 = { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f,
-            Color.RED.getBlue() / 255f };
+            Color.RED.getBlue() / 255f, 1 };
     private static final float[] color2 = { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f,
-            Color.GREEN.getBlue() / 255f };
+            Color.GREEN.getBlue() / 255f, 1 };
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
     private float lonstepDegrees = 15f;
     private float latstepDegrees = 20f;
+    private boolean needsInit = true;
 
     private boolean showAxis = true;
     private boolean showLabels = true;
@@ -88,9 +90,6 @@ public class RenderableGrid extends AbstractRenderable {
         makeLonLabels();
         makeRadialLabels();
     }
-
-    private final VBO positionVBO = VBO.gen_float_no_attrib_VBO();
-    private final VBO colorVBO = VBO.gen_float_no_attrib_VBO();
 
     private GridChoiceType gridChoice = GridChoiceType.Viewpoint;
 
@@ -187,48 +186,30 @@ public class RenderableGrid extends AbstractRenderable {
         renderer.end3DRendering();
     }
 
+    private GLLine gridline = new GLLine();
+
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-
+        if (needsInit) {
+            initGrid(gl);
+        }
+        /*
         if (showAxis)
             drawAxis(gl);
-
-        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        positionVBO.bindArray(gl);
-        gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
-
-        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+        */
         Mat4 cameraMatrix = getGridQuat(camera, gridChoice).toMatrix();
-
+        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
-            drawGrid(gl);
+            gridline.render(gl, vp.aspect, 0.0025);
             if (showLabels) {
                 drawGridText(gl, pixelsPerSolarRadius);
             }
         }
         gl.glPopMatrix();
-
-        if (showRadial) {
-            cameraMatrix = camera.getViewpoint().orientation.toMatrix();
-            gl.glPushMatrix();
-            gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
-            {
-                drawRadialGrid(gl);
-                if (showLabels) {
-                    drawRadialGridText(gl, pixelsPerSolarRadius);
-                }
-            }
-            gl.glPopMatrix();
-        }
-
-        drawEarthCircles(gl, Sun.getEarth(camera.getViewpoint().time));
-
-        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        positionVBO.unbindArray(gl);
     }
 
     private static final float AXIS_START = (float) (1. * Sun.Radius);
@@ -318,80 +299,6 @@ public class RenderableGrid extends AbstractRenderable {
         }
 
         gl.glEnable(GL2.GL_CULL_FACE);
-    }
-
-    private void drawGrid(GL2 gl) {
-        gl.glPushMatrix();
-        {
-            gl.glLineWidth(1);
-            gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
-            colorVBO.bindArray(gl);
-            gl.glColorPointer(3, GL2.GL_FLOAT, 0, 0);
-
-            gl.glRotatef(90, 0, 1, 0);
-
-            gl.glPushMatrix();
-            {
-                float rotation = 0;
-                while (rotation <= 180) {
-                    gl.glDrawArrays(GL2.GL_LINE_STRIP, SUBDIVISIONS / 4, SUBDIVISIONS / 2 + 1);
-                    gl.glRotatef(lonstepDegrees, 0, 1, 0);
-                    rotation += lonstepDegrees;
-                }
-            }
-            gl.glPopMatrix();
-
-            gl.glPushMatrix();
-            {
-                float rotation = 0;
-                rotation -= lonstepDegrees;
-                gl.glRotatef(-lonstepDegrees, 0, 1, 0);
-
-                while (rotation >= -180) {
-                    gl.glDrawArrays(GL2.GL_LINE_STRIP, SUBDIVISIONS / 4, SUBDIVISIONS / 2 + 1);
-                    gl.glRotatef(-lonstepDegrees, 0, 1, 0);
-                    rotation -= lonstepDegrees;
-                }
-            }
-            gl.glPopMatrix();
-
-            gl.glPushMatrix();
-            {
-                float scale, rotation = 0;
-                gl.glRotatef(90, 1, 0, 0);
-
-                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-                while (rotation < 90) {
-                    gl.glPushMatrix();
-                    {
-                        gl.glTranslatef(0, 0, (float) (Sun.Radius * Math.sin(Math.PI / 180. * rotation)));
-                        scale = (float) Math.cos(Math.PI / 180. * rotation);
-                        gl.glScalef(scale, scale, scale);
-                        gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-                    }
-                    gl.glPopMatrix();
-                    rotation += latstepDegrees;
-                }
-
-                rotation = latstepDegrees;
-                while (rotation < 90) {
-                    gl.glPushMatrix();
-                    {
-                        gl.glTranslatef(0, 0, -(float) (Sun.Radius * Math.sin(Math.PI / 180. * rotation)));
-                        scale = (float) Math.cos(Math.PI / 180. * rotation);
-                        gl.glScalef(scale, scale, scale);
-                        gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-                    }
-                    gl.glPopMatrix();
-                    rotation += latstepDegrees;
-                }
-                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-            }
-            gl.glPopMatrix();
-            gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-            colorVBO.unbindArray(gl);
-        }
-        gl.glPopMatrix();
     }
 
     private static class GridLabel {
@@ -508,25 +415,93 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public void init(GL2 gl) {
-        FloatBuffer positionBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 2);
-        FloatBuffer colorBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 3);
+        initGrid(gl);
+    }
 
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            positionBuffer.put((float) (Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS)));
-            positionBuffer.put((float) (Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS)));
-            if (i % 2 == 0) {
-                colorBuffer.put(color1);
-            } else {
-                colorBuffer.put(color2);
+    private void addToBuffer(FloatBuffer positionBuffer, Vec3 v) {
+        positionBuffer.put((float) v.x);
+        positionBuffer.put((float) v.y);
+        positionBuffer.put((float) v.z);
+    }
+
+    private void addToBuffer(FloatBuffer colorBuffer, float r, float g, float b, float a) {
+        colorBuffer.put(r);
+        colorBuffer.put(g);
+        colorBuffer.put(b);
+        colorBuffer.put(a);
+    }
+
+    public void initGrid(GL2 gl) {
+        int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
+        int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
+
+        FloatBuffer positionBuffer = FloatBuffer.allocate(2 * (no_lon_steps + no_lat_steps) * (SUBDIVISIONS + 3) * 3);
+        FloatBuffer colorBuffer = FloatBuffer.allocate(2 * (no_lon_steps + no_lat_steps) * (SUBDIVISIONS + 3) * 4);
+        
+        Vec3 v = new Vec3();
+        double rotation;
+        double HALFDIVISIONS = SUBDIVISIONS / 2;
+        for (int j = 0; j < no_lon_steps; j++) {
+            for (int k = -1; k <= 1; k = k + 2) {
+                rotation = lonstepDegrees * j * k;
+                Quat q = Quat.createRotation(Math.PI / 2 + Math.PI + 2 * Math.PI * rotation / 360., new Vec3(0, 1, 0));
+                for (int i = 0; i <= HALFDIVISIONS; i++) {
+                    v.x = Sun.Radius * Math.cos(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
+                    v.y = Sun.Radius * Math.sin(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
+                    v.z = 0.;
+                    Vec3 rotv = q.rotateVector(v);
+                    if (i == 0) {
+                        addToBuffer(positionBuffer, rotv);
+                        addToBuffer(colorBuffer, 0, 0, 0, 0);
+                    }
+                    addToBuffer(positionBuffer, rotv);
+                    if (i % 2 == 0) {
+                        colorBuffer.put(color1);
+                    } else {
+                        colorBuffer.put(color2);
+                    }
+
+                    if (i == HALFDIVISIONS) {
+                        addToBuffer(positionBuffer, rotv);
+                        addToBuffer(colorBuffer, 0, 0, 0, 0);
+                    }
+                }
             }
         }
+
+        for (int j = 0; j < no_lat_steps; j++) {
+            for (int k = -1; k <= 1; k = k + 2) {
+                rotation = latstepDegrees * j * k;
+                for (int i = 0; i <= HALFDIVISIONS; i++) {
+
+                    double scale = Math.cos(Math.PI / 180. * (90 - rotation));
+                    v.y = scale;
+                    v.x = Math.sqrt(1. - scale * scale) * Math.sin(2 * Math.PI * i / HALFDIVISIONS);
+                    v.z = Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
+
+                    if (i == 0) {
+                        addToBuffer(positionBuffer, v);
+                        addToBuffer(colorBuffer, 0, 0, 0, 0);
+                    }
+                    addToBuffer(positionBuffer, v);
+                    if (i % 2 == 0) {
+                        colorBuffer.put(color1);
+                    } else {
+                        colorBuffer.put(color2);
+                    }
+                    if (i == HALFDIVISIONS) {
+                        addToBuffer(positionBuffer, v);
+                        addToBuffer(colorBuffer, 0, 0, 0, 0);
+                    }
+                }
+            }
+        }
+
         positionBuffer.flip();
         colorBuffer.flip();
-        positionVBO.init(gl);
-        colorVBO.init(gl);
-
-        positionVBO.bindBufferData(gl, positionBuffer, Buffers.SIZEOF_FLOAT);
-        colorVBO.bindBufferData(gl, colorBuffer, Buffers.SIZEOF_FLOAT);
+        gridline.init(gl);
+        gridline.setData(gl, positionBuffer, colorBuffer);
+        needsInit = false;
     }
 
     @Override
@@ -551,6 +526,7 @@ public class RenderableGrid extends AbstractRenderable {
     public void setLonstepDegrees(double _lonstepDegrees) {
         lonstepDegrees = (float) _lonstepDegrees;
         makeLonLabels();
+        needsInit = true;
     }
 
     public double getLatstepDegrees() {
@@ -560,6 +536,7 @@ public class RenderableGrid extends AbstractRenderable {
     public void setLatstepDegrees(double _latstepDegrees) {
         latstepDegrees = (float) _latstepDegrees;
         makeLatLabels();
+        needsInit = true;
     }
 
     public boolean getShowLabels() {
@@ -598,8 +575,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public void dispose(GL2 gl) {
-        positionVBO.dispose(gl);
-        colorVBO.dispose(gl);
+        gridline.dispose(gl);
     }
 
     public void setCoordinates(GridChoiceType _gridChoice) {
