@@ -42,6 +42,8 @@ public class RenderableGrid extends AbstractRenderable {
             Color.GREEN.getBlue() / 255f, 1 };
     private static final float[] earthLineColor = { Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f,
             Color.YELLOW.getBlue() / 255f, 1 };
+    private static final float[] radialLineColor = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f,
+            Color.WHITE.getBlue() / 255f, 1 };
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
@@ -57,6 +59,7 @@ public class RenderableGrid extends AbstractRenderable {
     private GLLine gridline = new GLLine();
     private GLLine axesline = new GLLine();
     private GLLine earthCircleLine = new GLLine();
+    private GLLine radialCircleLine = new GLLine();
 
     private final Component optionsPanel;
     private static final String name = "Grid";
@@ -142,6 +145,19 @@ public class RenderableGrid extends AbstractRenderable {
             }
         }
         gl.glPopMatrix();
+        if (showRadial) {
+            cameraMatrix = camera.getViewpoint().orientation.toMatrix();
+            gl.glPushMatrix();
+            gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
+            {
+                drawRadialGrid(gl, vp.aspect);
+                if (showLabels) {
+                    drawRadialGridText(gl, pixelsPerSolarRadius);
+                }
+            }
+            gl.glPopMatrix();
+        }
+        drawEarthCircles(gl, vp.aspect, Sun.getEarth(camera.getViewpoint().time));
     }
 
     @Override
@@ -216,17 +232,14 @@ public class RenderableGrid extends AbstractRenderable {
         renderer.end3DRendering();
     }
 
-    private static void drawEarthCircles(GL2 gl, Position.L p) {
-        gl.glLineWidth(1);
-        gl.glColor3f(1, 1, 0);
+    private void drawEarthCircles(GL2 gl, double aspect, Position.L p) {
 
         gl.glPushMatrix();
         gl.glRotatef((float) (90 - 180 / Math.PI * p.lon), 0, 1, 0);
-        gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-
+        earthCircleLine.render(gl, aspect, thickness);
         gl.glRotatef(-90, 0, 1, 0);
         gl.glRotatef((float) (90 - 180 / Math.PI * p.lat), 1, 0, 0);
-        gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
+        earthCircleLine.render(gl, aspect, thickness);
         gl.glPopMatrix();
     }
 
@@ -235,7 +248,7 @@ public class RenderableGrid extends AbstractRenderable {
     private static final float[] R_LABEL_POS = { 2, 8, 24 };
     private static final float STEP_DEGREES = 15;
 
-    private static void drawRadialGrid(GL2 gl) {
+    private void drawRadialGrid(GL2 gl, double aspect) {
         gl.glPushMatrix();
         {
             gl.glColor3f(1, 1, 1);
@@ -243,13 +256,15 @@ public class RenderableGrid extends AbstractRenderable {
             {
                 gl.glPushMatrix();
                 gl.glScalef(1, 1, 1);
+                double tn;
                 for (float i = START_RADIUS; i <= END_RADIUS; i++) {
                     if (i % 10 == 0) {
-                        gl.glLineWidth(2);
+                        tn = thickness;
                     } else {
-                        gl.glLineWidth(1);
+                        tn = thickness / 2;
                     }
                     gl.glScalef(i / (i - 1), i / (i - 1), i / (i - 1));
+                    radialCircleLine.render(gl, aspect, tn);
                     gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                 }
                 gl.glPopMatrix();
@@ -407,6 +422,8 @@ public class RenderableGrid extends AbstractRenderable {
         initAxes(gl);
         earthCircleLine.init(gl);
         initEarthCircles(gl);
+        radialCircleLine.init(gl);
+        initRadialCircles(gl);
     }
 
     private void addToBuffer(FloatBuffer positionBuffer, Vec3 v) {
@@ -455,11 +472,26 @@ public class RenderableGrid extends AbstractRenderable {
         axesline.setData(gl, positionBuffer, colorBuffer);
     }
 
+    private void initRadialCircles(GL2 gl) {
+        FloatBuffer positionBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 3);
+        FloatBuffer colorBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 4);
+        Vec3 v = new Vec3();
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
+            v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
+            v.z = 0.;
+            addToBuffer(positionBuffer, v);
+            colorBuffer.put(radialLineColor);
+        }
+        positionBuffer.flip();
+        colorBuffer.flip();
+        radialCircleLine.setData(gl, positionBuffer, colorBuffer);
+    }
+
     private void initEarthCircles(GL2 gl) {
         FloatBuffer positionBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 3);
         FloatBuffer colorBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 4);
         Vec3 v = new Vec3();
-
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
             v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
@@ -616,6 +648,8 @@ public class RenderableGrid extends AbstractRenderable {
     @Override
     public void dispose(GL2 gl) {
         gridline.dispose(gl);
+        earthCircleLine.dispose(gl);
+        radialCircleLine.dispose(gl);
     }
 
     public void setCoordinates(GridChoiceType _gridChoice) {
