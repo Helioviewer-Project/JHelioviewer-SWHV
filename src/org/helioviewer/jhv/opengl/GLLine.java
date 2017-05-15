@@ -10,7 +10,6 @@ import com.jogamp.opengl.GL2;
 
 public class GLLine {
 
-
     private int[] vboAttribRefs;
     private int[] vboAttribLens = { 3, 3, 3, 1, 4 };
 
@@ -107,7 +106,6 @@ public class GLLine {
     }
 
     private void setBufferData(GL2 gl, FloatBuffer points, FloatBuffer colors, int plen) {
-
         FloatBuffer previousLineBuffer = FloatBuffer.allocate(3 * 2 * plen);
         FloatBuffer lineBuffer = FloatBuffer.allocate(3 * 2 * plen);
         FloatBuffer nextLineBuffer = FloatBuffer.allocate(3 * 2 * plen);
