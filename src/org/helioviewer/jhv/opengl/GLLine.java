@@ -77,6 +77,7 @@ public class GLLine {
             vbos[i].init(gl);
         }
         ivbo = VBO.gen_index_VBO();
+        ivbo.init(gl);
     }
 
     private void disposeVBOs(GL2 gl) {
