@@ -52,6 +52,9 @@ public class RenderableGrid extends AbstractRenderable {
     private boolean showLabels = true;
     private boolean showRadial = false;
 
+    private GLLine gridline = new GLLine();
+    private GLLine axesline = new GLLine();
+
     private final Component optionsPanel;
     private static final String name = "Grid";
 
@@ -186,7 +189,6 @@ public class RenderableGrid extends AbstractRenderable {
         renderer.end3DRendering();
     }
 
-    private GLLine gridline = new GLLine();
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
@@ -197,7 +199,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
         /*
         if (showAxis)
-            drawAxis(gl);
+            axesline.render(gl, vp.aspect, thickness);
         */
         Mat4 cameraMatrix = getGridQuat(camera, gridChoice).toMatrix();
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
@@ -210,24 +212,6 @@ public class RenderableGrid extends AbstractRenderable {
             }
         }
         gl.glPopMatrix();
-    }
-
-    private static final float AXIS_START = (float) (1. * Sun.Radius);
-    private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
-
-    private static void drawAxis(GL2 gl) {
-        gl.glLineWidth(2);
-
-        gl.glBegin(GL2.GL_LINES);
-        {
-            gl.glColor3f(0, 0, 1);
-            gl.glVertex3f(0, -AXIS_STOP, 0);
-            gl.glVertex3f(0, -AXIS_START, 0);
-            gl.glColor3f(1, 0, 0);
-            gl.glVertex3f(0, AXIS_STOP, 0);
-            gl.glVertex3f(0, AXIS_START, 0);
-        }
-        gl.glEnd();
     }
 
     private static void drawEarthCircles(GL2 gl, Position.L p) {
@@ -415,13 +399,22 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public void init(GL2 gl) {
+        gridline.init(gl);
         initGrid(gl);
+        axesline.init(gl);
+        initAxes(gl);
     }
 
     private void addToBuffer(FloatBuffer positionBuffer, Vec3 v) {
         positionBuffer.put((float) v.x);
         positionBuffer.put((float) v.y);
         positionBuffer.put((float) v.z);
+    }
+
+    private void addToBuffer(FloatBuffer positionBuffer, float x, float y, float z) {
+        positionBuffer.put(x);
+        positionBuffer.put(y);
+        positionBuffer.put(z);
     }
 
     private void addToBuffer(FloatBuffer colorBuffer, float r, float g, float b, float a) {
@@ -431,7 +424,34 @@ public class RenderableGrid extends AbstractRenderable {
         colorBuffer.put(a);
     }
 
-    public void initGrid(GL2 gl) {
+    private static final float AXIS_START = (float) (1. * Sun.Radius);
+    private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
+
+    private void initAxes(GL2 gl) {
+        int plen = 6;
+        FloatBuffer positionBuffer = FloatBuffer.allocate(plen*3);
+        FloatBuffer colorBuffer = FloatBuffer.allocate(plen*4);
+
+        addToBuffer(positionBuffer, 0,-AXIS_STOP,0);
+        addToBuffer(colorBuffer, 0, 0, 1, 1);
+        addToBuffer(positionBuffer, 0, -AXIS_START, 0);
+        addToBuffer(colorBuffer, 0, 0, 1, 1);
+
+        addToBuffer(positionBuffer, 0, -AXIS_START, 0);
+        addToBuffer(colorBuffer, 0, 0, 0, 0);
+        addToBuffer(positionBuffer, 0, AXIS_STOP, 0);
+        addToBuffer(colorBuffer, 0, 0, 0, 0);
+
+        addToBuffer(positionBuffer, 0, AXIS_STOP, 0);
+        addToBuffer(colorBuffer, 1, 0, 0, 1);
+        addToBuffer(positionBuffer, 0, AXIS_START, 0);
+        addToBuffer(colorBuffer, 1, 0, 0, 1);
+        positionBuffer.flip();
+        colorBuffer.flip();
+        axesline.setData(gl, positionBuffer, colorBuffer);
+    }
+
+    private void initGrid(GL2 gl) {
         int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
         int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
 
@@ -499,7 +519,6 @@ public class RenderableGrid extends AbstractRenderable {
 
         positionBuffer.flip();
         colorBuffer.flip();
-        gridline.init(gl);
         gridline.setData(gl, positionBuffer, colorBuffer);
         needsInit = false;
     }
