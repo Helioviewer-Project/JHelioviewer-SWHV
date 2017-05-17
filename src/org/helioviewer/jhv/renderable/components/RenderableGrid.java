@@ -72,15 +72,14 @@ public class RenderableGrid extends AbstractRenderable {
     private final Component optionsPanel;
     private static final String name = "Grid";
 
-    public JSONObject serialize() {
-        JSONObject jo = new JSONObject();
+    @Override
+    public void serialize(JSONObject jo) {
         jo.put("lonstepDegrees", lonstepDegrees);
         jo.put("latstepDegrees", latstepDegrees);
         jo.put("showAxis", showAxis);
         jo.put("showLabels", showLabels);
         jo.put("showRadial", showRadial);
         jo.put("name", name);
-        return jo;
     }
 
     private void deserialize(JSONObject jo) {

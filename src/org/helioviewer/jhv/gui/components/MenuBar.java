@@ -12,6 +12,7 @@ import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
 import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
+import org.helioviewer.jhv.gui.actions.SaveStateAction;
 import org.helioviewer.jhv.gui.actions.ShowDialogAction;
 import org.helioviewer.jhv.gui.actions.ToggleFullscreenAction;
 import org.helioviewer.jhv.gui.actions.WindowMinimizeAction;
@@ -95,6 +96,7 @@ public class MenuBar extends JMenuBar {
         helpMenu.add(new CheckUpdateAction());
         helpMenu.addSeparator();
         helpMenu.add(new OpenURLinBrowserAction("Report a Bug/Feature Request", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
+        helpMenu.add(new SaveStateAction());
         add(helpMenu);
     }
 

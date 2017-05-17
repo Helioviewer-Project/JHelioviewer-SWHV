@@ -31,6 +31,7 @@ import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -47,6 +48,12 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
+
+    public SWEKRenderable() {
+    }
+
+    public SWEKRenderable(JSONObject o) {
+    }
 
     private static void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
@@ -465,6 +472,10 @@ public class SWEKRenderable extends AbstractRenderable {
             el.delete(gl);
         }
         iconCacheId.clear();
+    }
+
+    @Override
+    public void serialize(JSONObject jo) {
     }
 
 }

@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -46,5 +47,7 @@ public interface Renderable {
     void dispose(GL2 gl);
 
     void setVisible(int ctImages);
+
+    void serialize(JSONObject jo);
 
 }

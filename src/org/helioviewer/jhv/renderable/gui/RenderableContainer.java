@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.renderable.gui;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
@@ -10,6 +12,9 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -181,4 +186,39 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables = new ArrayList<>();
     }
 
+    public void saveCurrentScene() {
+        JSONArray ja = new JSONArray();
+        for (Renderable renderable : renderables) {
+            JSONObject jo = new JSONObject();
+            JSONObject dataObject = new JSONObject();
+            jo.put("data", dataObject);
+            jo.put("className", renderable.getClass().getName());
+            renderable.serialize(dataObject);
+            ja.put(jo);
+        }
+        System.out.println(ja);
+    }
+
+    public void loadScene(JSONArray ja) {
+        for (Renderable renderable : renderables) {
+            removeRenderable(renderable);
+        }
+        for (Object o : ja) {
+            if (o instanceof JSONObject) {
+                JSONObject jo = (JSONObject) o;
+                try {
+                    Class<?> c = Class.forName(jo.getString("className"));
+                    Constructor<?> cons = c.getConstructor(JSONObject.class);
+                    Object object = cons.newInstance(jo);
+                    if(object instanceof Renderable )
+                        addRenderable((Renderable) object);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
+                        | ClassNotFoundException
+                        | NoSuchMethodException
+                        | SecurityException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

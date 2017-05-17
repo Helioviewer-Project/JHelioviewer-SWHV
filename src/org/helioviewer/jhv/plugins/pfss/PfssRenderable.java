@@ -14,6 +14,7 @@ import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.CancelTask;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -23,6 +24,16 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     private final PfssOptionsPanel optionsPanel = new PfssOptionsPanel();
     private PfssData previousPfssData = null;
     private final GLLine line = new GLLine();
+
+    public PfssRenderable() {
+    }
+
+    public PfssRenderable(JSONObject jo) {
+    }
+
+    @Override
+    public void serialize(JSONObject jo) {
+    }
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {

@@ -22,21 +22,22 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private final Camera miniCamera = new Camera();
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
-    private static final String name = "miniview";
+    private static final String name = "Miniview";
 
-    public void deserialize(JSONObject jo) {
+    public void deserialize() {
     }
 
-    public static JSONObject serialize() {
-        JSONObject jo = new JSONObject();
-        jo.put("name", name);
-        return jo;
+    @Override
+    public void serialize(JSONObject jo) {
+    }
+
+    public RenderableMiniview(JSONObject jo) {
+        this();
     }
 
     public RenderableMiniview() {
         optionsPanel = new RenderableMiniviewOptionsPanel(this);
         setVisible(true);
-        Layers.addLayersListener(this);
     }
 
     public void reshapeViewport() {
@@ -80,7 +81,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     @Override
     public String getName() {
-        return "Miniview";
+        return name;
     }
 
     @Override
@@ -95,10 +96,12 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     @Override
     public void init(GL2 gl) {
+        Layers.addLayersListener(this);
     }
 
     @Override
     public void dispose(GL2 gl) {
+        Layers.removeLayersListener(this);
     }
 
     @Override
