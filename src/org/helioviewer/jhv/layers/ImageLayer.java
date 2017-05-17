@@ -30,6 +30,7 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
+import org.json.JSONObject;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -353,6 +354,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     double getAutoBrightness() {
         return imageData.getAutoBrightness();
+    }
+
+    @Override
+    public void serialize(JSONObject jo) {
     }
 
 }
