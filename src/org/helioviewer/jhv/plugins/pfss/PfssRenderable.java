@@ -21,18 +21,24 @@ import com.jogamp.opengl.GL2;
 public class PfssRenderable extends AbstractRenderable implements TimespanListener {
 
     private static final double thickness = 0.0025;
-    private final PfssOptionsPanel optionsPanel = new PfssOptionsPanel();
+    private PfssOptionsPanel optionsPanel;
     private PfssData previousPfssData = null;
     private final GLLine line = new GLLine();
 
     public PfssRenderable() {
+        optionsPanel = new PfssOptionsPanel(0, false);
     }
 
     public PfssRenderable(JSONObject jo) {
+        int qualityReduction = jo.optInt("qualityReduction", 0);
+        boolean fixedColor = jo.optBoolean("fixedColor", false);
+        optionsPanel = new PfssOptionsPanel(qualityReduction, fixedColor);
     }
 
     @Override
     public void serialize(JSONObject jo) {
+        jo.put("qualityReduction", 8 - optionsPanel.getQualityReduction());
+        jo.put("fixedColor", optionsPanel.getFixedColor());
     }
 
     @Override

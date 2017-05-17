@@ -54,6 +54,29 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         return imageLayer;
     }
 
+    @Override
+    public void serialize(JSONObject jo) {
+        JSONObject jare = new JSONObject();
+        APIRequest apireq = this.getAPIRequest();
+        jare.put("server", apireq.server);
+        jare.put("sourceId", apireq.sourceId);
+        jare.put("startTime", apireq.startTime);
+        jare.put("endTime", apireq.endTime);
+        jare.put("cadence", apireq.cadence);
+        jo.put("APIRequest", jare);
+    }
+
+    public ImageLayer(JSONObject jo) {
+        this();
+        JSONObject APIRequest = jo.optJSONObject("APIRequest");
+        String server = APIRequest.optString("server");
+        int sourceId = APIRequest.optInt("sourceId");
+        long startTime = APIRequest.optLong("startTime");
+        long endTime = APIRequest.optLong("endTime");
+        int cadence = APIRequest.optInt("cadence");
+        this.load(new APIRequest(server, sourceId, startTime, endTime, cadence));
+    }
+
     public void load(APIRequest req) {
         if (!req.equals(getAPIRequest())) {
             if (worker != null)
@@ -357,7 +380,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void serialize(JSONObject jo) {
+    public boolean isLoadedForState() {
+        if (view != null)
+            return false;
+        return view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
     }
 
 }

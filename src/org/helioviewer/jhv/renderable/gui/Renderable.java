@@ -55,4 +55,6 @@ public interface Renderable {
 
     void deserializeVisibility(JSONArray va);
 
+    boolean isLoadedForState();
+
 }

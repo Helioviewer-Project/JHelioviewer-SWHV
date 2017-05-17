@@ -87,4 +87,10 @@ public abstract class AbstractRenderable implements Renderable {
             isVisible[i] = v;
         }
     }
+    
+    @Override
+    public boolean isLoadedForState() {
+        return true;
+    }
+
 }
