@@ -64,10 +64,12 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         jare.put("endTime", apireq.endTime);
         jare.put("cadence", apireq.cadence);
         jo.put("APIRequest", jare);
+        JSONObject imageParams = new JSONObject();
+        glImage.serialize(imageParams);
+        jo.put("imageParams", imageParams);
     }
 
     public ImageLayer(JSONObject jo) {
-        this();
         JSONObject APIRequest = jo.optJSONObject("APIRequest");
         String server = APIRequest.optString("server", "ROB");
         int sourceId = APIRequest.optInt("sourceId", 0);
@@ -75,6 +77,11 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         long endTime = APIRequest.optLong("endTime", System.currentTimeMillis());
         int cadence = APIRequest.optInt("cadence", 1800);
         this.load(new APIRequest(server, sourceId, startTime, endTime, cadence));
+        JSONObject imageParams = jo.optJSONObject("imageParams");
+        if (imageParams != null)
+            glImage.deserialize(imageParams);
+
+        optionsPanel = new ImageLayerOptions(this);
     }
 
     public void load(APIRequest req) {
