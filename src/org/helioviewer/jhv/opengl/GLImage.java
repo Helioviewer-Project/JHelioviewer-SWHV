@@ -8,6 +8,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -182,6 +183,35 @@ public class GLImage {
 
     public DifferenceMode getDifferenceMode() {
         return diffMode;
+    }
+
+    public void deserialize(JSONObject imageParams) {
+        sharpen = (float) imageParams.optDouble("sharpen", 0);
+        opacity = (float) imageParams.optDouble("opacity", 1);
+        brightOffset = (float) imageParams.optDouble("brightOffset", 0);
+        brightScale = (float) imageParams.optDouble("brightScale", 1);
+        enhanced = imageParams.optInt("enhanced", 1);
+    }
+
+    public void serialize(JSONObject imageParams) {
+        imageParams.put("sharpen", sharpen);
+        imageParams.put("opacity", opacity);
+        imageParams.put("brightOffset", brightOffset);
+        imageParams.put("brightScale", brightScale);
+        imageParams.put("enhanced", enhanced);
+
+    }
+
+    public float getSharpen() {
+        return sharpen;
+    }
+
+    public int getEnhanced() {
+        return enhanced;
+    }
+
+    public float getOpacity() {
+        return opacity;
     }
 
 }
