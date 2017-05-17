@@ -9,6 +9,7 @@ import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
@@ -23,6 +24,12 @@ public class RenderableViewpoint extends AbstractRenderable {
     private static final float[] color2 = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f };
 
     private String timeString = null;
+
+    public RenderableViewpoint() {
+    }
+
+    public RenderableViewpoint(JSONObject o) {
+    }
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
@@ -146,6 +153,10 @@ public class RenderableViewpoint extends AbstractRenderable {
 
     @Override
     public void dispose(GL2 gl) {
+    }
+
+    @Override
+    public void serialize(JSONObject jo) {
     }
 
 }
