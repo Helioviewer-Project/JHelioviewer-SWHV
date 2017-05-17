@@ -8,6 +8,7 @@ import javax.swing.JMenuBar;
 import org.helioviewer.jhv.gui.actions.CheckUpdateAction;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
+import org.helioviewer.jhv.gui.actions.LoadStateAction;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
 import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
@@ -97,6 +98,8 @@ public class MenuBar extends JMenuBar {
         helpMenu.addSeparator();
         helpMenu.add(new OpenURLinBrowserAction("Report a Bug/Feature Request", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
         helpMenu.add(new SaveStateAction());
+        helpMenu.add(new LoadStateAction());
+
         add(helpMenu);
     }
 
