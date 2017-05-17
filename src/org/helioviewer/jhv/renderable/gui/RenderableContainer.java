@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.camera.Camera;
@@ -19,6 +20,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
+import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -249,25 +251,43 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     }
                 }
             }
+            removedRenderables.addAll(renderables);
+            renderables = new ArrayList<>();
+            LoadState loadStateTask = new LoadState(newlist);
+            JHVGlobals.getExecutorService().execute(loadStateTask);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
 
-            for (Renderable renderable : renderables) {
+    public class LoadState extends JHVWorker<Integer, Void> {
+        ArrayList<Renderable> newlist;
+
+        public LoadState(ArrayList<Renderable> _newlist) {
+            newlist = _newlist;
+        }
+
+        @Override
+        protected Integer backgroundWork() {
+            for (Renderable renderable : newlist) {
                 while (!renderable.isLoadedForState()) {
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
+            return 1;
+        }
 
-            removedRenderables.addAll(renderables);
-            renderables = new ArrayList<>();
-
-            for (Renderable renderable : renderables) {
-                addRenderable(renderable);
+        @Override
+        protected void done() {
+            if (!isCancelled()) {
+                for (Renderable renderable : newlist) {
+                    addRenderable(renderable);
+                }
             }
-        } catch (IOException e1) {
-            e1.printStackTrace();
         }
     }
 }
