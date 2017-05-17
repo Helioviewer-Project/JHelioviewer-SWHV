@@ -18,13 +18,15 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 @SuppressWarnings("serial")
 class PfssOptionsPanel extends JPanel {
 
-    private int qualityReduction = 8;
+    private int qualityReduction;
     private boolean fixedColor;
 
-    public PfssOptionsPanel() {
+    public PfssOptionsPanel(int _qualityReduction, boolean _fixedColor) {
+        qualityReduction = _qualityReduction;
+        fixedColor = _fixedColor;
         setLayout(new GridBagLayout());
 
-        JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 8, 1));
+        JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(qualityReduction, 0, 8, 1));
         levelSpinner.addChangeListener(e -> {
             qualityReduction = 8 - (Integer) levelSpinner.getValue();
             Displayer.display();
