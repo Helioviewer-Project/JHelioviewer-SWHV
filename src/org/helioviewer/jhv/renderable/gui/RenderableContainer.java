@@ -226,11 +226,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
             JSONObject data = JSONUtils.getJSONStream(in);
 
-            removedRenderables.addAll(renderables);
-            renderables = new ArrayList<>();
 
             JSONArray rja = data.getJSONArray("renderables");
-
+            ArrayList<Renderable> newlist = new ArrayList<Renderable>();
             for (Object o : rja) {
                 if (o instanceof JSONObject) {
                     JSONObject jo = (JSONObject) o;
@@ -241,7 +239,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                         Object _renderable = cons.newInstance(jdata);
                         if (_renderable instanceof Renderable) {
                             Renderable renderable = (Renderable) _renderable;
-                            addRenderable(renderable);
+                            newlist.add(renderable);
                             JSONArray va = jo.getJSONArray("visibility");
                             renderable.deserializeVisibility(va);
                         }
@@ -250,6 +248,23 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                         e.printStackTrace();
                     }
                 }
+            }
+
+            for (Renderable renderable : renderables) {
+                while (!renderable.isLoadedForState()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            removedRenderables.addAll(renderables);
+            renderables = new ArrayList<>();
+
+            for (Renderable renderable : renderables) {
+                addRenderable(renderable);
             }
         } catch (IOException e1) {
             e1.printStackTrace();
