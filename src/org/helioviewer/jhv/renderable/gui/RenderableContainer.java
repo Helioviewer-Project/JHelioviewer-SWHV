@@ -1,11 +1,18 @@
 package org.helioviewer.jhv.renderable.gui;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
@@ -187,6 +194,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public void saveCurrentScene() {
+        JSONObject main = new JSONObject();
         JSONArray ja = new JSONArray();
         for (Renderable renderable : renderables) {
             JSONObject jo = new JSONObject();
@@ -195,30 +203,56 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             jo.put("className", renderable.getClass().getName());
             renderable.serialize(dataObject);
             ja.put(jo);
+            JSONArray va = new JSONArray();
+            renderable.serializeVisibility(va);
+            jo.put("visibility", va);
         }
-        System.out.println(ja);
+        main.put("renderables", ja);
+        try {
+            OutputStream os = FileUtils.newBufferedOutputStream(new File("/Users/freekv/JHelioviewer-SWHV/test.json"));
+            final PrintStream printStream = new PrintStream(os);
+            printStream.print(main.toString());
+            printStream.close();
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void loadScene(JSONArray ja) {
-        for (Renderable renderable : renderables) {
-            removeRenderable(renderable);
-        }
-        for (Object o : ja) {
-            if (o instanceof JSONObject) {
-                JSONObject jo = (JSONObject) o;
-                try {
-                    Class<?> c = Class.forName(jo.getString("className"));
-                    Constructor<?> cons = c.getConstructor(JSONObject.class);
-                    Object object = cons.newInstance(jo);
-                    if(object instanceof Renderable )
-                        addRenderable((Renderable) object);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
-                        | ClassNotFoundException
-                        | NoSuchMethodException
-                        | SecurityException e) {
-                    e.printStackTrace();
+    public void loadScene() {
+        InputStream in;
+        try {
+            in = FileUtils.newBufferedInputStream(new File("/Users/freekv/JHelioviewer-SWHV/test.json"));
+
+            JSONObject data = JSONUtils.getJSONStream(in);
+
+            removedRenderables.addAll(renderables);
+            renderables = new ArrayList<>();
+
+            JSONArray rja = data.getJSONArray("renderables");
+
+            for (Object o : rja) {
+                if (o instanceof JSONObject) {
+                    JSONObject jo = (JSONObject) o;
+                    try {
+                        JSONObject jdata = jo.getJSONObject("data");
+                        Class<?> c = Class.forName(jo.getString("className"));
+                        Constructor<?> cons = c.getConstructor(JSONObject.class);
+                        Object _renderable = cons.newInstance(jdata);
+                        if (_renderable instanceof Renderable) {
+                            Renderable renderable = (Renderable) _renderable;
+                            addRenderable(renderable);
+                            JSONArray va = jo.getJSONArray("visibility");
+                            renderable.deserializeVisibility(va);
+                        }
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
+                            | ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
     }
 }

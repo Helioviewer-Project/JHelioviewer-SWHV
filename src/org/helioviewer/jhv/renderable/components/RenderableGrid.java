@@ -612,6 +612,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     public boolean getShowRadial() {
+        System.out.println(showRadial);
         return showRadial;
     }
 

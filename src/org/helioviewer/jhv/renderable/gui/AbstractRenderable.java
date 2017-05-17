@@ -2,6 +2,7 @@ package org.helioviewer.jhv.renderable.gui;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.json.JSONArray;
 
 import com.jogamp.opengl.GL2;
 
@@ -73,4 +74,17 @@ public abstract class AbstractRenderable implements Renderable {
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
     }
 
+    @Override
+    public void serializeVisibility(JSONArray va) {
+        for (int i = 0; i < 4; i++)
+            va.put(i, isVisible[i]);
+    }
+
+    @Override
+    public void deserializeVisibility(JSONArray va) {
+        for (int i = 0; i < 4; i++) {
+            boolean v = va.getBoolean(i);
+            isVisible[i] = v;
+        }
+    }
 }
