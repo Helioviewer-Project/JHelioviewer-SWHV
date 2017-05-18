@@ -230,9 +230,9 @@ public class GLImage {
         }
         JSONObject colorObject = json.optJSONObject("color");
         if (colorObject != null) {
-            red = (float) colorObject.optDouble("red", 1);
-            green = (float) colorObject.optDouble("green", 1);
-            blue = (float) colorObject.optDouble("blue", 1);
+            red = colorObject.optBoolean("red", true) ? 1 : 0;
+            green = colorObject.optBoolean("green", true) ? 1 : 0;
+            blue = colorObject.optBoolean("blue", true) ? 1 : 0;
         }
     }
 
@@ -246,9 +246,9 @@ public class GLImage {
         json.put("differenceMode", diffMode.toString());
         JSONObject colorObject = new JSONObject();
         json.put("color", colorObject);
-        colorObject.put("red", red);
-        colorObject.put("green", green);
-        colorObject.put("blue", blue);
+        colorObject.put("red", getRed());
+        colorObject.put("green", getGreen());
+        colorObject.put("blue", getBlue());
         return json;
     }
 
