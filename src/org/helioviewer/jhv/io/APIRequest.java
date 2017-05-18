@@ -12,6 +12,7 @@ import org.json.JSONObject;
 public class APIRequest {
 
     public static final int CADENCE_ANY = -100;
+    public static final int CADENCE_DEFAULT = 1800;
     public static final int CallistoID = 5000;
 
     public final String server;
@@ -90,7 +91,7 @@ public class APIRequest {
         int _sourceId = json.optInt("sourceId", 10);
         long _startTime = json.optLong("startTime", System.currentTimeMillis());
         long _endTime = json.optLong("endTime", System.currentTimeMillis());
-        int _cadence = json.optInt("cadence", 1800);
+        int _cadence = json.optInt("cadence", CADENCE_DEFAULT);
         return new APIRequest(_server, _sourceId, _startTime, _endTime, _cadence);
     }
 

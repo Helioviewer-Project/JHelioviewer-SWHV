@@ -189,12 +189,13 @@ public class ImageDataPanel extends JPanel {
 
         private static final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
 
-        private final JSpinner spinnerCadence = new JSpinner(new SpinnerNumberModel(30, 1, 1000000, 1));
+        private final JSpinner spinnerCadence = new JSpinner(new SpinnerNumberModel(1, 1, 1000000, 1));
         private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
         public CadencePanel() {
             setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 0));
 
+            setCadence(APIRequest.CADENCE_DEFAULT);
             spinnerCadence.setPreferredSize(new Dimension(50, spinnerCadence.getPreferredSize().height));
             comboUnit.setSelectedItem("min");
             comboUnit.addActionListener(e -> spinnerCadence.setEnabled(comboUnit.getSelectedIndex() != 4));
