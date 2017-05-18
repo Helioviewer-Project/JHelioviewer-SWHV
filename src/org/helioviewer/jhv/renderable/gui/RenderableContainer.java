@@ -209,6 +209,11 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             JSONArray va = new JSONArray();
             renderable.serializeVisibility(va);
             jo.put("visibility", va);
+            if (renderable instanceof ImageLayer) {
+                ImageLayer irenderable = (ImageLayer) renderable;
+                if (irenderable.isActiveImageLayer())
+                    jo.put("master", true);
+            }
         }
         main.put("renderables", ja);
         try {
@@ -224,6 +229,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     public void loadScene() {
         ArrayList<Renderable> newlist = new ArrayList<Renderable>();
+        Renderable masterRenderable = null;
 
         try {
             InputStream in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"));
@@ -247,6 +253,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                             if (va == null)
                                 va = new JSONArray(new double[] { 1, 0, 0, 0 });
                             renderable.deserializeVisibility(va);
+                            boolean master = jo.optBoolean("master", false);
+                            if(master)
+                                masterRenderable = renderable;
                         }
                     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
                             | ClassNotFoundException | NoSuchMethodException | SecurityException e) {
@@ -257,7 +266,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
             removedRenderables.addAll(renderables);
             renderables = new ArrayList<>();
-            LoadState loadStateTask = new LoadState(newlist);
+            LoadState loadStateTask = new LoadState(newlist, masterRenderable);
             JHVGlobals.getExecutorService().execute(loadStateTask);
         } catch (IOException e1) {
             e1.printStackTrace();
@@ -267,9 +276,11 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     public class LoadState extends JHVWorker<Integer, Void> {
         ArrayList<Renderable> newlist;
+        Renderable master;
 
-        public LoadState(ArrayList<Renderable> _newlist) {
+        public LoadState(ArrayList<Renderable> _newlist, Renderable _master) {
             newlist = _newlist;
+            master = _master;
         }
 
         @Override
@@ -291,6 +302,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             if (!isCancelled()) {
                 for (Renderable renderable : newlist) {
                     addRenderable(renderable);
+                    if (renderable instanceof ImageLayer && renderable == master) {
+                        ((ImageLayer) renderable).setActiveImageLayer();
+                    }
                 }
             }
         }
