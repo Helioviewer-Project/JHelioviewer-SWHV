@@ -19,15 +19,15 @@ public class ChannelMixerPanel implements FilterDetails {
     public ChannelMixerPanel(ImageLayerOptions parent) {
         boxPanel = new JPanel(new GridLayout(1, 3));
 
-        JCheckBox redCheckBox = new JCheckBox("Red", true);
+        JCheckBox redCheckBox = new JCheckBox("Red", parent.getGLImage().getRed());
         redCheckBox.setToolTipText("Toggle red channel");
         boxPanel.add(redCheckBox, BorderLayout.WEST);
 
-        JCheckBox greenCheckBox = new JCheckBox("Green", true);
+        JCheckBox greenCheckBox = new JCheckBox("Green", parent.getGLImage().getGreen());
         greenCheckBox.setToolTipText("Toggle green channel");
         boxPanel.add(greenCheckBox, BorderLayout.CENTER);
 
-        JCheckBox blueCheckBox = new JCheckBox("Blue", true);
+        JCheckBox blueCheckBox = new JCheckBox("Blue", parent.getGLImage().getBlue());
         blueCheckBox.setToolTipText("Toggle blue channel");
         boxPanel.add(blueCheckBox, BorderLayout.EAST);
 
