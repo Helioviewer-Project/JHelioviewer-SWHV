@@ -200,6 +200,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void saveCurrentScene() {
         JSONObject main = new JSONObject();
         main.put("displayMode", Displayer.mode.toString());
+        main.put("multiview", Displayer.multiview);
 
         JSONArray ja = new JSONArray();
         for (Renderable renderable : renderables) {
@@ -280,6 +281,10 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 displayMode = Displayer.DisplayMode.Orthographic;
             }
             Displayer.setMode(displayMode);
+
+            Displayer.multiview = data.optBoolean("multiview", false);
+            Layers.arrangeMultiView(Displayer.multiview);
+
         } catch (IOException e1) {
             e1.printStackTrace();
         }
