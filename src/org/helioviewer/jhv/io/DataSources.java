@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.database.DataSourcesDB;
 
 @SuppressWarnings("serial")
 public class DataSources {
@@ -94,6 +95,7 @@ public class DataSources {
             server = "ROB";
         Settings.getSingletonInstance().setProperty("default.server", server);
 
+        DataSourcesDB.getSingletonInstance();
         for (String serverName : serverSettings.keySet())
             JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName));
     }
