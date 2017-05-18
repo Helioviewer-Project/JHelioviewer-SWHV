@@ -21,7 +21,7 @@ import com.jogamp.opengl.GL2;
 public class PfssRenderable extends AbstractRenderable implements TimespanListener {
 
     private static final double thickness = 0.0025;
-    private PfssOptionsPanel optionsPanel;
+    private final PfssOptionsPanel optionsPanel;
     private PfssData previousPfssData = null;
     private final GLLine line = new GLLine();
 
