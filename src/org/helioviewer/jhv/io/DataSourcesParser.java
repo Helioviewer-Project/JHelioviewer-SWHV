@@ -3,9 +3,11 @@ package org.helioviewer.jhv.io;
 import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.database.DataSourcesDB;
 import org.json.JSONObject;
 
 public class DataSourcesParser {
@@ -43,14 +45,20 @@ public class DataSourcesParser {
                 continue;
 
             if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
+                int sourceId = json.getInt("sourceId");
                 long start = TimeUtils.parseSQL(json.getString("start"));
                 long end = TimeUtils.parseSQL(json.getString("end"));
                 String description = json.getString("description") + " [" + TimeUtils.formatDate(start) + " : " + TimeUtils.formatDate(end) + ']';
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
-                                                                                 description, json.getInt("sourceId"), start, end,
+                                                                                 description, sourceId, start, end,
                                                                                  json.optBoolean("default", false));
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);
+
+                TreeNode[] path = treeNode.getPath();
+                if (path.length == 3) {
+                    DataSourcesDB.doInsert(sourceId, path[0].toString(), path[1].toString(), path[2].toString(), start, end);
+                }
                 if (item.defaultItem)
                     defaultNode = treeNode;
             } else {
