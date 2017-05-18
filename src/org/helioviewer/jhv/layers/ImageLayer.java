@@ -56,27 +56,18 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public void serialize(JSONObject jo) {
-        JSONObject jare = new JSONObject();
-        APIRequest apireq = getAPIRequest();
-        jare.put("server", apireq.server);
-        jare.put("sourceId", apireq.sourceId);
-        jare.put("startTime", apireq.startTime);
-        jare.put("endTime", apireq.endTime);
-        jare.put("cadence", apireq.cadence);
-        jo.put("APIRequest", jare);
+        APIRequest apiRequest = getAPIRequest();
+        if (apiRequest != null)
+            jo.put("APIRequest", apiRequest.toJson());
         JSONObject imageParams = new JSONObject();
         glImage.serialize(imageParams);
         jo.put("imageParams", imageParams);
     }
 
     public ImageLayer(JSONObject jo) {
-        JSONObject APIRequest = jo.optJSONObject("APIRequest");
-        String server = APIRequest.optString("server", "ROB");
-        int sourceId = APIRequest.optInt("sourceId", 0);
-        long startTime = APIRequest.optLong("startTime", System.currentTimeMillis());
-        long endTime = APIRequest.optLong("endTime", System.currentTimeMillis());
-        int cadence = APIRequest.optInt("cadence", 1800);
-        this.load(new APIRequest(server, sourceId, startTime, endTime, cadence));
+        JSONObject apiRequest = jo.optJSONObject("APIRequest");
+        if (apiRequest != null)
+            load(APIRequest.fromJson(apiRequest));
         JSONObject imageParams = jo.optJSONObject("imageParams");
         if (imageParams != null)
             glImage.deserialize(imageParams);
