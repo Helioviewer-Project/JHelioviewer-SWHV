@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 public class SaveStateAction extends AbstractAction {
 
     public SaveStateAction() {
-        super("Save state ...");
+        super("Save state");
     }
 
     @Override

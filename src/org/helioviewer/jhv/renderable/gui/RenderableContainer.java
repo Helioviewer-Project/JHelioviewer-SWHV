@@ -268,7 +268,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
     }
 
-    class LoadState extends JHVWorker<Integer, Void> {
+    private class LoadState extends JHVWorker<Void, Void> {
         private ArrayList<Renderable> newlist;
         private Renderable master;
         private JHVDate time;
@@ -280,7 +280,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
 
         @Override
-        protected Integer backgroundWork() {
+        protected Void backgroundWork() {
             for (Renderable renderable : newlist) {
                 while (!renderable.isLoadedForState()) {
                     try {
@@ -290,7 +290,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     }
                 }
             }
-            return 1;
+            return null;
         }
 
         @Override
