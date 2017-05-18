@@ -15,7 +15,7 @@ import com.jogamp.opengl.GL2;
 public class GLImage {
 
     public enum DifferenceMode {
-        None, Running, RunningRotation, Base, BaseRotation
+        None, Running, Base
     }
 
     private GLTexture tex;
@@ -76,11 +76,7 @@ public class GLImage {
     }
 
     private boolean isBaseDiff() {
-        return diffMode == DifferenceMode.Base || diffMode == DifferenceMode.BaseRotation;
-    }
-
-    private boolean isRunningDiff() {
-        return diffMode == DifferenceMode.Running || diffMode == DifferenceMode.RunningRotation;
+        return diffMode == DifferenceMode.Base;
     }
 
     private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {

@@ -20,7 +20,7 @@ float smoothpulse(float x) {
 void main() {
   if(frag_linecolor.a == 0.)
       discard;
-  
+
   gl_FragColor = frag_linecolor;
   gl_FragColor.a = smoothpulse((frag_direction + 1.)/2.);
 }
