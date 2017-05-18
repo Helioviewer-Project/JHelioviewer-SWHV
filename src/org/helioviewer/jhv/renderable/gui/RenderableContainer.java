@@ -211,8 +211,10 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             jo.put("visibility", va);
             if (renderable instanceof ImageLayer) {
                 ImageLayer irenderable = (ImageLayer) renderable;
-                if (irenderable.isActiveImageLayer())
+                if (irenderable.isActiveImageLayer()) {
                     jo.put("master", true);
+                    jo.put("masterFrame", Layers.getActiveView().getCurrentFrameNumber());
+                }
             }
         }
         main.put("renderables", ja);
@@ -230,6 +232,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void loadScene() {
         ArrayList<Renderable> newlist = new ArrayList<Renderable>();
         Renderable masterRenderable = null;
+        int masterFrame = 0;
 
         try {
             InputStream in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"));
@@ -254,8 +257,10 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                                 va = new JSONArray(new double[] { 1, 0, 0, 0 });
                             renderable.deserializeVisibility(va);
                             boolean master = jo.optBoolean("master", false);
-                            if(master)
+                            if (master) {
                                 masterRenderable = renderable;
+                                masterFrame = jo.optInt("masterFrame", 0);
+                            }
                         }
                     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
                             | ClassNotFoundException | NoSuchMethodException | SecurityException e) {
@@ -266,7 +271,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
             removedRenderables.addAll(renderables);
             renderables = new ArrayList<>();
-            LoadState loadStateTask = new LoadState(newlist, masterRenderable);
+            LoadState loadStateTask = new LoadState(newlist, masterRenderable, masterFrame);
             JHVGlobals.getExecutorService().execute(loadStateTask);
         } catch (IOException e1) {
             e1.printStackTrace();
@@ -274,13 +279,15 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     }
 
-    public class LoadState extends JHVWorker<Integer, Void> {
-        ArrayList<Renderable> newlist;
-        Renderable master;
+    class LoadState extends JHVWorker<Integer, Void> {
+        private ArrayList<Renderable> newlist;
+        private Renderable master;
+        private int masterFrame;
 
-        public LoadState(ArrayList<Renderable> _newlist, Renderable _master) {
+        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, int _masterFrame) {
             newlist = _newlist;
             master = _master;
+            masterFrame = _masterFrame;
         }
 
         @Override
@@ -304,6 +311,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     addRenderable(renderable);
                     if (renderable instanceof ImageLayer && renderable == master) {
                         ((ImageLayer) renderable).setActiveImageLayer();
+                        Layers.setFrame(masterFrame);
                     }
                 }
             }
