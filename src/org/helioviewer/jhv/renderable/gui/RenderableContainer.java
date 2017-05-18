@@ -218,12 +218,10 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
         main.put("renderables", ja);
-        try {
-            OutputStream os = FileUtils.newBufferedOutputStream(new File(JHVDirectory.HOME.getPath() + "test.json"));
+        try (OutputStream os = FileUtils.newBufferedOutputStream(new File(JHVDirectory.HOME.getPath() + "test.json"))) {
             final PrintStream printStream = new PrintStream(os);
             printStream.print(main.toString());
             printStream.close();
-            os.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -234,9 +232,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         Renderable masterRenderable = null;
         int masterFrame = 0;
 
-        try {
-            InputStream in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"));
-
+        try (InputStream in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"))) {
             JSONObject data = JSONUtils.getJSONStream(in);
             JSONArray rja = data.getJSONArray("renderables");
             for (Object o : rja) {
@@ -276,7 +272,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-
     }
 
     class LoadState extends JHVWorker<Integer, Void> {
@@ -317,4 +312,5 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
     }
+
 }

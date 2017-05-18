@@ -197,26 +197,29 @@ public class GLImage {
         return opacity;
     }
 
-    public void deserialize(JSONObject imageParams) {
-        sharpen = (float) imageParams.optDouble("sharpen", 0);
-        opacity = (float) imageParams.optDouble("opacity", 1);
-        brightOffset = (float) imageParams.optDouble("brightOffset", 0);
-        brightScale = (float) imageParams.optDouble("brightScale", 1);
-        enhanced = imageParams.optInt("enhanced", 1);
-        String strdiffMode = imageParams.optString("differenceMode", "None");
+    public void fromJson(JSONObject json) {
+        sharpen = (float) json.optDouble("sharpen", 0);
+        opacity = (float) json.optDouble("opacity", 1);
+        brightOffset = (float) json.optDouble("brightOffset", 0);
+        brightScale = (float) json.optDouble("brightScale", 1);
+        enhanced = json.optInt("enhanced", 0);
+        String strdiffMode = json.optString("differenceMode", "None");
         try {
             diffMode = DifferenceMode.valueOf(strdiffMode);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             diffMode = DifferenceMode.None;
         }
     }
 
-    public void serialize(JSONObject imageParams) {
-        imageParams.put("sharpen", sharpen);
-        imageParams.put("opacity", opacity);
-        imageParams.put("brightOffset", brightOffset);
-        imageParams.put("brightScale", brightScale);
-        imageParams.put("enhanced", enhanced);
-        imageParams.put("differenceMode", diffMode.toString());
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("sharpen", sharpen);
+        json.put("opacity", opacity);
+        json.put("brightOffset", brightOffset);
+        json.put("brightScale", brightScale);
+        json.put("enhanced", enhanced);
+        json.put("differenceMode", diffMode.toString());
+        return json;
     }
+
 }
