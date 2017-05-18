@@ -225,7 +225,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public void loadScene() {
-        ArrayList<Renderable> newlist = new ArrayList<Renderable>();
+        ArrayList<Renderable> newlist = new ArrayList<>();
         Renderable masterRenderable = null;
 
         try (InputStream in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"))) {
@@ -269,9 +269,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     private class LoadState extends JHVWorker<Void, Void> {
-        private ArrayList<Renderable> newlist;
-        private Renderable master;
-        private JHVDate time;
+        private final ArrayList<Renderable> newlist;
+        private final Renderable master;
+        private final JHVDate time;
 
         public LoadState(ArrayList<Renderable> _newlist, Renderable _master, JHVDate _time) {
             newlist = _newlist;
