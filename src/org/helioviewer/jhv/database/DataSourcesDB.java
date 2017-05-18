@@ -16,6 +16,10 @@ public class DataSourcesDB {
 
     private static final DataSourcesDB instance = new DataSourcesDB();
 
+    public static DataSourcesDB getSingletonInstance() {
+        return instance;
+    }
+
     private static Connection connection;
     private static PreparedStatement insert;
     private static PreparedStatement select;
