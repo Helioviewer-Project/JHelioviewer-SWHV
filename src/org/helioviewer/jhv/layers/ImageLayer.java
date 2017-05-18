@@ -57,21 +57,22 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     @Override
     public void serialize(JSONObject jo) {
         APIRequest apiRequest = getAPIRequest();
-        if (apiRequest != null)
+        if (apiRequest != null) {
             jo.put("APIRequest", apiRequest.toJson());
-        jo.put("imageParams", glImage.toJson());
+            jo.put("imageParams", glImage.toJson());
+        }
     }
 
     public ImageLayer(JSONObject jo) {
+        this();
         JSONObject apiRequest = jo.optJSONObject("APIRequest");
-        if (apiRequest != null)
+        if (apiRequest != null) {
             load(APIRequest.fromJson(apiRequest));
 
-        JSONObject imageParams = jo.optJSONObject("imageParams");
-        if (imageParams != null)
-            glImage.fromJson(imageParams);
-
-        optionsPanel = new ImageLayerOptions(this);
+            JSONObject imageParams = jo.optJSONObject("imageParams");
+            if (imageParams != null)
+                glImage.fromJson(imageParams);
+        }
     }
 
     public void load(APIRequest req) {
