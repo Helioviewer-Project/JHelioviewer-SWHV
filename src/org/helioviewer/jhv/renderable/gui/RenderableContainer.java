@@ -225,9 +225,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void loadScene() {
         ArrayList<Renderable> newlist = new ArrayList<Renderable>();
 
-        InputStream in;
         try {
-            in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"));
+            InputStream in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"));
 
             JSONObject data = JSONUtils.getJSONStream(in);
             JSONArray rja = data.getJSONArray("renderables");
@@ -235,14 +234,18 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 if (o instanceof JSONObject) {
                     JSONObject jo = (JSONObject) o;
                     try {
-                        JSONObject jdata = jo.getJSONObject("data");
-                        Class<?> c = Class.forName(jo.getString("className"));
+                        JSONObject jdata = jo.optJSONObject("data");
+                        if (jdata == null)
+                            continue;
+                        Class<?> c = Class.forName(jo.optString("className"));
                         Constructor<?> cons = c.getConstructor(JSONObject.class);
                         Object _renderable = cons.newInstance(jdata);
                         if (_renderable instanceof Renderable) {
                             Renderable renderable = (Renderable) _renderable;
                             newlist.add(renderable);
-                            JSONArray va = jo.getJSONArray("visibility");
+                            JSONArray va = jo.optJSONArray("visibility");
+                            if (va == null)
+                                va = new JSONArray(new double[] { 1, 0, 0, 0 });
                             renderable.deserializeVisibility(va);
                         }
                     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
@@ -252,13 +255,14 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 }
             }
 
+            removedRenderables.addAll(renderables);
+            renderables = new ArrayList<>();
+            LoadState loadStateTask = new LoadState(newlist);
+            JHVGlobals.getExecutorService().execute(loadStateTask);
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        removedRenderables.addAll(renderables);
-        renderables = new ArrayList<>();
-        LoadState loadStateTask = new LoadState(newlist);
-        JHVGlobals.getExecutorService().execute(loadStateTask);
+
     }
 
     public class LoadState extends JHVWorker<Integer, Void> {
