@@ -237,9 +237,9 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
 
             DifferenceMode diffMode = glImage.getDifferenceMode();
-            if (diffMode == DifferenceMode.BaseRotation) {
+            if (diffMode == DifferenceMode.Base) {
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getCenterRotation()));
-            } else if (diffMode == DifferenceMode.RunningRotation) {
+            } else if (diffMode == DifferenceMode.Running) {
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getCenterRotation()));
             }
             shader.bindAngles(gl, imageData.getMetaData().getViewpointL());

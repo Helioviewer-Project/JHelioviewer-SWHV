@@ -36,7 +36,7 @@ void main(void)
     vec4 color;
     if (isdifference != NODIFFERENCE) {
         vec2 difftexcoord;
-        float diffradius;  
+        float diffradius;
         get_polar_texcoord(differencerect, difftexcoord, diffradius);
         color = getColor(texcoord, difftexcoord, radius);
     } else {
