@@ -66,11 +66,7 @@ class PfssOptionsPanel extends JPanel {
 
         ComponentUtils.smallVariant(this);
     }
-/*
-    @Override
-    public void setEnabled(boolean b) {
-    }
-*/
+
     int getQualityReduction() {
         return qualityReduction;
     }
