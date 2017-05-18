@@ -22,7 +22,6 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private final Camera miniCamera = new Camera();
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
-    private static final String name = "Miniview";
 
     public void deserialize() {
     }
@@ -81,7 +80,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     @Override
     public String getName() {
-        return name;
+        return "Miniview";
     }
 
     @Override

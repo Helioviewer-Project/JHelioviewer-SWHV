@@ -381,10 +381,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     @Override
     public boolean isLoadedForState() {
         if (view == null) {
-            if (worker == null)
-                return true;
-            else
-                return false;
+            return worker == null;
         }
         return view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
     }
