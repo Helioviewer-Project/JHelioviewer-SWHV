@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 public class LoadStateAction extends AbstractAction {
 
     public LoadStateAction() {
-        super("Load state ...");
+        super("Load state");
     }
 
     @Override
