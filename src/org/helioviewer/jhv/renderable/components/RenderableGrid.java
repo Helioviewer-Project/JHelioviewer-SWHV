@@ -70,7 +70,6 @@ public class RenderableGrid extends AbstractRenderable {
     private final GLLine radialCircleLine = new GLLine();
 
     private final Component optionsPanel;
-    private static final String name = "Grid";
 
     @Override
     public void serialize(JSONObject jo) {
@@ -79,7 +78,6 @@ public class RenderableGrid extends AbstractRenderable {
         jo.put("showAxis", showAxis);
         jo.put("showLabels", showLabels);
         jo.put("showRadial", showRadial);
-        jo.put("name", name);
     }
 
     private void deserialize(JSONObject jo) {
@@ -580,7 +578,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public String getName() {
-        return name;
+        return "Grid";
     }
 
     public double getLonstepDegrees() {
