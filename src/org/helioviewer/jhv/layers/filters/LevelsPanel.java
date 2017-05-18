@@ -41,7 +41,11 @@ public class LevelsPanel implements FilterDetails {
     }
 
     public LevelsPanel(ImageLayerOptions parent) {
-        slider = new RangeSlider(-101, 201, 0, 100);
+        float offset = parent.getGLImage().getBrightOffset();
+        float scale = parent.getGLImage().getBrightScale();
+        int high = (int) (100 * (offset + scale));
+
+        slider = new RangeSlider(-101, 201, (int) (offset * 100), high);
         slider.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
