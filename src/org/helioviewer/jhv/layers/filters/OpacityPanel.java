@@ -15,7 +15,8 @@ public class OpacityPanel implements FilterDetails {
     private final JLabel label;
 
     public OpacityPanel(ImageLayerOptions parent) {
-        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (parent.getGLImage().getOpacity() * 100));
+        System.out.println((int) (parent.getGLImage().getOpacity() * 100));
+        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 44);///(int) (parent.getGLImage().getOpacity() * 100));
         label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             parent.getGLImage().setOpacity(slider.getValue() / 100f);
@@ -27,7 +28,8 @@ public class OpacityPanel implements FilterDetails {
 
     // opacity must be within [0, 1]
     public void setValue(float opacity) {
-        slider.setValue((int) (opacity * 100f));
+        if (slider.getValue() == 100)
+            slider.setValue((int) (opacity * 100f));
     }
 
     @Override
