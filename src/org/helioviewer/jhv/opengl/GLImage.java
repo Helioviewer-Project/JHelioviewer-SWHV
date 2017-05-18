@@ -197,8 +197,8 @@ public class GLImage {
         return sharpen;
     }
 
-    public int getEnhanced() {
-        return enhanced;
+    public boolean getEnhanced() {
+        return enhanced != 0;
     }
 
     public float getOpacity() {
@@ -216,12 +216,13 @@ public class GLImage {
     public boolean getBlue() {
         return blue != 0;
     }
+
     public void fromJson(JSONObject json) {
         sharpen = (float) json.optDouble("sharpen", 0);
         opacity = (float) json.optDouble("opacity", 1);
         brightOffset = (float) json.optDouble("brightOffset", 0);
         brightScale = (float) json.optDouble("brightScale", 1);
-        enhanced = json.optInt("enhanced", 1);
+        enhanced = json.optBoolean("enhanced", false) ? 1 : 0;
         String strdiffMode = json.optString("differenceMode", "None");
         try {
             diffMode = DifferenceMode.valueOf(strdiffMode);
@@ -242,13 +243,15 @@ public class GLImage {
         json.put("opacity", opacity);
         json.put("brightOffset", brightOffset);
         json.put("brightScale", brightScale);
-        json.put("enhanced", enhanced);
+        json.put("enhanced", getEnhanced());
         json.put("differenceMode", diffMode.toString());
+
         JSONObject colorObject = new JSONObject();
-        json.put("color", colorObject);
         colorObject.put("red", getRed());
         colorObject.put("green", getGreen());
         colorObject.put("blue", getBlue());
+        json.put("color", colorObject);
+
         return json;
     }
 
