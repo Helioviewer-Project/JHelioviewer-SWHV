@@ -15,6 +15,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
@@ -198,6 +199,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     public void saveCurrentScene() {
         JSONObject main = new JSONObject();
+        main.put("time", Layers.getLastUpdatedTimestamp());
         JSONArray ja = new JSONArray();
         for (Renderable renderable : renderables) {
             JSONObject jo = new JSONObject();
@@ -209,13 +211,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             JSONArray va = new JSONArray();
             renderable.serializeVisibility(va);
             jo.put("visibility", va);
-            if (renderable instanceof ImageLayer) {
-                ImageLayer irenderable = (ImageLayer) renderable;
-                if (irenderable.isActiveImageLayer()) {
-                    jo.put("master", true);
-                    jo.put("masterFrame", Layers.getActiveView().getCurrentFrameNumber());
-                }
-            }
+            if (renderable instanceof ImageLayer && ((ImageLayer) renderable).isActiveImageLayer())
+                jo.put("master", true);
         }
         main.put("renderables", ja);
         try (OutputStream os = FileUtils.newBufferedOutputStream(new File(JHVDirectory.HOME.getPath() + "test.json"))) {
@@ -230,7 +227,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void loadScene() {
         ArrayList<Renderable> newlist = new ArrayList<Renderable>();
         Renderable masterRenderable = null;
-        int masterFrame = 0;
 
         try (InputStream in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"))) {
             JSONObject data = JSONUtils.getJSONStream(in);
@@ -252,14 +248,11 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                             if (va == null)
                                 va = new JSONArray(new double[] { 1, 0, 0, 0 });
                             renderable.deserializeVisibility(va);
-                            boolean master = jo.optBoolean("master", false);
-                            if (master) {
+                            if (jo.optBoolean("master", false))
                                 masterRenderable = renderable;
-                                masterFrame = jo.optInt("masterFrame", 0);
-                            }
                         }
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
-                            | ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException |
+                             ClassNotFoundException | NoSuchMethodException | SecurityException e) {
                         e.printStackTrace();
                     }
                 }
@@ -267,7 +260,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
             removedRenderables.addAll(renderables);
             renderables = new ArrayList<>();
-            LoadState loadStateTask = new LoadState(newlist, masterRenderable, masterFrame);
+
+            LoadState loadStateTask = new LoadState(newlist, masterRenderable, JHVDate.optional(data.optString("time")));
             JHVGlobals.getExecutorService().execute(loadStateTask);
         } catch (IOException e1) {
             e1.printStackTrace();
@@ -277,12 +271,12 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     class LoadState extends JHVWorker<Integer, Void> {
         private ArrayList<Renderable> newlist;
         private Renderable master;
-        private int masterFrame;
+        private JHVDate time;
 
-        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, int _masterFrame) {
+        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, JHVDate _time) {
             newlist = _newlist;
             master = _master;
-            masterFrame = _masterFrame;
+            time = _time;
         }
 
         @Override
@@ -304,11 +298,10 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             if (!isCancelled()) {
                 for (Renderable renderable : newlist) {
                     addRenderable(renderable);
-                    if (renderable instanceof ImageLayer && renderable == master) {
+                    if (renderable == master && renderable instanceof ImageLayer)
                         ((ImageLayer) renderable).setActiveImageLayer();
-                        Layers.setFrame(masterFrame);
-                    }
                 }
+                Layers.setTime(time);
             }
         }
     }
