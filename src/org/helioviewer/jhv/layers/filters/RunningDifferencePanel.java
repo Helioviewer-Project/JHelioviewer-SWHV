@@ -22,8 +22,8 @@ public class RunningDifferencePanel {
 
     private enum DifferenceModeChoice {
         None("No difference images", GLImage.DifferenceMode.None),
-        RunningRotation("Running difference", GLImage.DifferenceMode.RunningRotation), BaseRotation("Base difference",
-                GLImage.DifferenceMode.BaseRotation);
+        RunningRotation("Running difference", GLImage.DifferenceMode.RunningRotation),
+        BaseRotation("Base difference", GLImage.DifferenceMode.BaseRotation);
 
         private final String str;
         final GLImage.DifferenceMode mode;

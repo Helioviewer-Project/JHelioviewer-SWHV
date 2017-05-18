@@ -27,8 +27,7 @@ public class OpacityPanel implements FilterDetails {
 
     // opacity must be within [0, 1]
     public void setValue(float opacity) {
-        if (slider.getValue() == 100)
-            slider.setValue((int) (opacity * 100f));
+        slider.setValue((int) (opacity * 100));
     }
 
     @Override

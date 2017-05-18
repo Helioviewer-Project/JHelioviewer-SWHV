@@ -15,8 +15,7 @@ public class SharpenPanel implements FilterDetails {
     private final JLabel label;
 
     public SharpenPanel(ImageLayerOptions parent) {
-        int sharpen = (int)(parent.getGLImage().getSharpen() * 10);
-        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, sharpen);
+        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (parent.getGLImage().getSharpen() * 10));
         label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             parent.getGLImage().setSharpen(slider.getValue() / 10f);
