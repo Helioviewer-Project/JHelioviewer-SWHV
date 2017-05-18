@@ -15,8 +15,7 @@ public class OpacityPanel implements FilterDetails {
     private final JLabel label;
 
     public OpacityPanel(ImageLayerOptions parent) {
-        System.out.println((int) (parent.getGLImage().getOpacity() * 100));
-        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 44);///(int) (parent.getGLImage().getOpacity() * 100));
+        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (parent.getGLImage().getOpacity() * 100));
         label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             parent.getGLImage().setOpacity(slider.getValue() / 100f);
