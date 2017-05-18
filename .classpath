@@ -31,6 +31,6 @@
     <classpathentry kind="lib" path="lib/raven-log4j-8.0.2.jar"/>
     <classpathentry kind="lib" path="lib/slf4j-api-1.7.25.jar"/>
     <classpathentry kind="lib" path="lib/slf4j-nop-1.7.25.jar"/>
-    <classpathentry kind="lib" path="lib/sqlite-jdbc-3.16.2.jar"/>
+    <classpathentry kind="lib" path="lib/sqlite-jdbc-3.18.0.jar"/>
     <classpathentry kind="output" path="bin"/>
 </classpath>
