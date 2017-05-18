@@ -7,6 +7,7 @@ import java.net.URL;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.json.JSONObject;
 
 public class APIRequest {
 
@@ -72,6 +73,25 @@ public class APIRequest {
     public int hashCode() {
         assert false : "hashCode not designed";
         return 42;
+    }
+
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("server", server);
+        json.put("sourceId", sourceId);
+        json.put("startTime", startTime);
+        json.put("endTime", endTime);
+        json.put("cadence", cadence);
+        return json;
+    }
+
+    public static APIRequest fromJson(JSONObject json) {
+        String _server = json.optString("server", "ROB");
+        int _sourceId = json.optInt("sourceId", 10);
+        long _startTime = json.optLong("startTime", System.currentTimeMillis());
+        long _endTime = json.optLong("endTime", System.currentTimeMillis());
+        int _cadence = json.optInt("cadence", 1800);
+        return new APIRequest(_server, _sourceId, _startTime, _endTime, _cadence);
     }
 
 }
