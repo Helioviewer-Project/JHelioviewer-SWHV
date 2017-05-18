@@ -36,6 +36,8 @@ public class MenuBar extends JMenuBar {
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(new NewLayerAction());
         fileMenu.add(new OpenLocalFileAction());
+        fileMenu.add(new SaveStateAction());
+        fileMenu.add(new LoadStateAction());
 
         if (System.getProperty("jhv.os").equals("mac")) {
             OSXHandler.quitHandler();
@@ -97,8 +99,6 @@ public class MenuBar extends JMenuBar {
         helpMenu.add(new CheckUpdateAction());
         helpMenu.addSeparator();
         helpMenu.add(new OpenURLinBrowserAction("Report a Bug/Feature Request", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
-        helpMenu.add(new SaveStateAction());
-        helpMenu.add(new LoadStateAction());
 
         add(helpMenu);
     }
