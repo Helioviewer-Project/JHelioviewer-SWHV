@@ -17,7 +17,6 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableTimeStamp extends AbstractRenderable {
 
-    private static final String name = "Timestamp";
     private final RenderableTimeStampOptionsPanel optionsPanel = new RenderableTimeStampOptionsPanel(this);
     private double size = 1;
 
@@ -75,7 +74,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
 
     @Override
     public String getName() {
-        return name;
+        return "Timestamp";
     }
 
     @Override

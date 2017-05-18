@@ -10,4 +10,9 @@ public class Pair<A, B> {
         b = _b;
     }
 
+    @Override
+    public String toString() {
+        return "Pair<" + a + "," + b + ">";
+    }
+
 }
