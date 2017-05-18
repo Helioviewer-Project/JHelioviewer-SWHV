@@ -1,19 +1,19 @@
 package org.helioviewer.jhv.renderable.gui;
 
-import java.io.File;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
@@ -197,6 +197,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables = new ArrayList<>();
     }
 
+    private final String stateFile = JHVDirectory.HOME.getPath() + "test.json";
+
     public void saveCurrentScene() {
         JSONObject main = new JSONObject();
         main.put("time", Layers.getLastUpdatedTimestamp());
@@ -215,10 +217,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 jo.put("master", true);
         }
         main.put("renderables", ja);
-        try (OutputStream os = FileUtils.newBufferedOutputStream(new File(JHVDirectory.HOME.getPath() + "test.json"))) {
-            final PrintStream printStream = new PrintStream(os);
-            printStream.print(main.toString());
-            printStream.close();
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(stateFile), StandardCharsets.UTF_8)) {
+            main.write(writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -228,7 +228,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         ArrayList<Renderable> newlist = new ArrayList<>();
         Renderable masterRenderable = null;
 
-        try (InputStream in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"))) {
+        try (InputStream in = Files.newInputStream(Paths.get(stateFile))) {
             JSONObject data = JSONUtils.getJSONStream(in);
             JSONArray rja = data.getJSONArray("renderables");
             for (Object o : rja) {
