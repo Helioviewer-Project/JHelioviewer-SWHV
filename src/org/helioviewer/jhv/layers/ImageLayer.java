@@ -64,7 +64,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     public ImageLayer(JSONObject jo) {
-        this();
         JSONObject apiRequest = jo.optJSONObject("APIRequest");
         if (apiRequest != null) {
             load(APIRequest.fromJson(apiRequest));
@@ -73,6 +72,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             if (imageParams != null)
                 glImage.fromJson(imageParams);
         }
+        optionsPanel = new ImageLayerOptions(this);
     }
 
     public void load(APIRequest req) {
