@@ -20,8 +20,8 @@ public class APIRequest {
     public final long endTime;
     public final int cadence;
 
-    public final URL jpipRequest;
-    public final URI fileRequest;
+    final URL jpipRequest;
+    final URI fileRequest;
 
     public APIRequest(String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
         server = _server;

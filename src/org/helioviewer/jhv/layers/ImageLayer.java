@@ -66,6 +66,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         JSONObject apiRequest = jo.optJSONObject("APIRequest");
         if (apiRequest != null)
             load(APIRequest.fromJson(apiRequest));
+
         JSONObject imageParams = jo.optJSONObject("imageParams");
         if (imageParams != null)
             glImage.fromJson(imageParams);
@@ -74,12 +75,13 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     public void load(APIRequest req) {
-        if (!req.equals(getAPIRequest())) {
-            if (worker != null)
-                worker.cancel(true);
-            worker = new LoadRemoteTask(this, req, 0);
-            JHVGlobals.getExecutorService().execute(worker);
-        }
+        if (req.equals(getAPIRequest()))
+            return;
+
+        if (worker != null)
+            worker.cancel(true);
+        worker = new LoadRemoteTask(this, req, 0);
+        JHVGlobals.getExecutorService().execute(worker);
     }
 
     public void unload() {
@@ -377,10 +379,12 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public boolean isLoadedForState() {
-        if (worker == null && view == null)
-            return true;
-        if (view == null)
-            return false;
+        if (view == null) {
+            if (worker == null)
+                return true;
+            else
+                return false;
+        }
         return view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
     }
 
