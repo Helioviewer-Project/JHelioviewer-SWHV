@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
@@ -211,7 +212,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
         main.put("renderables", ja);
         try {
-            OutputStream os = FileUtils.newBufferedOutputStream(new File("/Users/freekv/JHelioviewer-SWHV/test.json"));
+            OutputStream os = FileUtils.newBufferedOutputStream(new File(JHVDirectory.HOME.getPath() + "test.json"));
             final PrintStream printStream = new PrintStream(os);
             printStream.print(main.toString());
             printStream.close();
@@ -222,15 +223,14 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public void loadScene() {
+        ArrayList<Renderable> newlist = new ArrayList<Renderable>();
+
         InputStream in;
         try {
-            in = FileUtils.newBufferedInputStream(new File("/Users/freekv/JHelioviewer-SWHV/test.json"));
+            in = FileUtils.newBufferedInputStream(new File(JHVDirectory.HOME.getPath() + "test.json"));
 
             JSONObject data = JSONUtils.getJSONStream(in);
-
-
             JSONArray rja = data.getJSONArray("renderables");
-            ArrayList<Renderable> newlist = new ArrayList<Renderable>();
             for (Object o : rja) {
                 if (o instanceof JSONObject) {
                     JSONObject jo = (JSONObject) o;
@@ -251,13 +251,14 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     }
                 }
             }
-            removedRenderables.addAll(renderables);
-            renderables = new ArrayList<>();
-            LoadState loadStateTask = new LoadState(newlist);
-            JHVGlobals.getExecutorService().execute(loadStateTask);
+
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+        removedRenderables.addAll(renderables);
+        renderables = new ArrayList<>();
+        LoadState loadStateTask = new LoadState(newlist);
+        JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
     public class LoadState extends JHVWorker<Integer, Void> {
