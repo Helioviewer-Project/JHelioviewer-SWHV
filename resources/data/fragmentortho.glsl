@@ -29,11 +29,9 @@ void main(void)
         discard;
     }
 
-    if (isdifference == BASEDIFFERENCE_NO_ROT || isdifference == RUNNINGDIFFERENCE_NO_ROT) {
-        difftexcoord = vec2((rotatedHitPoint.x - differencerect.x) * differencerect.z, (-rotatedHitPoint.y-differencerect.y) * differencerect.w);
-    } else if (isdifference == BASEDIFFERENCE_ROT || isdifference == RUNNINGDIFFERENCE_ROT) {
+    if (isdifference != NODIFFERENCE) {
         vec3 diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
-        if (radius2 >= 1. && dot(diffrotatedHitPoint.xyz, vec3(0.,0.,1.)) <= 0.) {
+        if (radius2 >= 1. && dot(diffrotatedHitPoint.xyz, vec3(0., 0., 1.)) <= 0.) {
             hitPoint = vec3(up1.x, up1.y, intersectPlanediff(up1));
             diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
         }
