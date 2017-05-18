@@ -17,7 +17,6 @@ import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.Displayer.DisplayMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
@@ -199,9 +198,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     public void saveCurrentScene() {
         JSONObject main = new JSONObject();
-        main.put("displayMode", Displayer.mode.toString());
-        main.put("multiview", Displayer.multiview);
-
         JSONArray ja = new JSONArray();
         for (Renderable renderable : renderables) {
             JSONObject jo = new JSONObject();
@@ -273,18 +269,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             renderables = new ArrayList<>();
             LoadState loadStateTask = new LoadState(newlist, masterRenderable, masterFrame);
             JHVGlobals.getExecutorService().execute(loadStateTask);
-            String displayModeString = data.optString("displayMode", "Orthographic");
-            DisplayMode displayMode;
-            try {
-                displayMode = Displayer.DisplayMode.valueOf(displayModeString);
-            } catch (Exception e) {
-                displayMode = Displayer.DisplayMode.Orthographic;
-            }
-            Displayer.setMode(displayMode);
-
-            Displayer.multiview = data.optBoolean("multiview", false);
-            Layers.arrangeMultiView(Displayer.multiview);
-
         } catch (IOException e1) {
             e1.printStackTrace();
         }
