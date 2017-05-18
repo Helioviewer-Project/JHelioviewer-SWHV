@@ -11,8 +11,8 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
-import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.io.DownloadViewTask;
+import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.opengl.GLImage;
 
 import com.jidesoft.swing.JideButton;
@@ -22,8 +22,8 @@ public class RunningDifferencePanel {
 
     private enum DifferenceModeChoice {
         None("No difference images", GLImage.DifferenceMode.None),
-        Running("Running difference", GLImage.DifferenceMode.RunningRotation),
-        Base("Base difference", GLImage.DifferenceMode.BaseRotation);
+        RunningRotation("Running difference", GLImage.DifferenceMode.RunningRotation), BaseRotation("Base difference",
+                GLImage.DifferenceMode.BaseRotation);
 
         private final String str;
         final GLImage.DifferenceMode mode;
@@ -57,7 +57,7 @@ public class RunningDifferencePanel {
         });
 
         JComboBox<DifferenceModeChoice> comboBox = new JComboBox<>(DifferenceModeChoice.values());
-        comboBox.setSelectedItem(DifferenceModeChoice.None);
+        comboBox.setSelectedItem(DifferenceModeChoice.valueOf(parent.getGLImage().getDifferenceMode().toString()));
         comboBox.addActionListener(e -> {
             parent.getGLImage().setDifferenceMode(((DifferenceModeChoice) comboBox.getSelectedItem()).mode);
             Displayer.display();
