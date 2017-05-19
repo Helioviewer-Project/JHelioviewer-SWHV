@@ -38,7 +38,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
 
     @Override
     public void serialize(JSONObject jo) {
-        jo.put("qualityReduction", 8 - optionsPanel.getQualityReduction());
+        jo.put("qualityReduction", optionsPanel.getQualityReduction());
         jo.put("fixedColor", optionsPanel.getFixedColor());
     }
 
@@ -111,7 +111,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     private void renderData(GL2 gl, PfssData data, double aspect) {
-        int qualityReduction = PfssSettings.MAX_QUALITY - optionsPanel.getQualityReduction();
+        int qualityReduction = optionsPanel.getQualityReduction();
         boolean fixedColor = optionsPanel.getFixedColor();
 
         if (data != previousPfssData || data.needsUpdate(qualityReduction, fixedColor)) {
