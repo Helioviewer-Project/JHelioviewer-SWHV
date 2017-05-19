@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.database.DataSourcesDB;
 import org.json.JSONObject;
@@ -84,8 +85,8 @@ public class APIRequest {
         JSONObject json = new JSONObject();
         json.put("server", server);
         json.put("sourceId", sourceId);
-        json.put("startTime", startTime);
-        json.put("endTime", endTime);
+        json.put("startTime", TimeUtils.format(startTime));
+        json.put("endTime", TimeUtils.format(endTime));
         json.put("cadence", cadence);
         return json;
     }
@@ -95,8 +96,8 @@ public class APIRequest {
     public static APIRequest fromJson(JSONObject json) {
         String _server = json.optString("server", Settings.getSingletonInstance().getProperty("default.server"));
         int _sourceId = json.optInt("sourceId", 10);
-        long _startTime = json.optLong("startTime", System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS);
-        long _endTime = json.optLong("endTime", System.currentTimeMillis());
+        long _startTime = TimeUtils.optParse(json.optString("startTime"), System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS);
+        long _endTime = TimeUtils.optParse(json.optString("endTime"), System.currentTimeMillis());
         int _cadence = json.optInt("cadence", (int) Math.max(1, (_endTime - _startTime) / 1000 / MAX_FRAMES));
         return new APIRequest(_server, _sourceId, _startTime, _endTime, _cadence);
     }
