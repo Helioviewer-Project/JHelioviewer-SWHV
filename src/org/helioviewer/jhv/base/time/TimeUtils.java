@@ -48,6 +48,14 @@ public class TimeUtils {
         return fileFormatter.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
     }
 
+    public static long optParse(String date, long milli) {
+        try {
+            return parse(date);
+        } catch (Exception e) {
+            return milli;
+        }
+    }
+
     public static long parse(String date) {
         return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
     }
