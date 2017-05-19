@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.timelines.draw;
 
+import org.json.JSONObject;
 
 public class YAxis {
 
@@ -22,6 +23,15 @@ public class YAxis {
         scale = isLogScale ? new YAxisLogScale(label) : new YAxisPositiveIdentityScale(label);
         scaledMinBound = scale(UNSCALED_MIN_BOUND);
         scaledMaxBound = scale(UNSCALED_MAX_BOUND);
+    }
+
+    public void serialize(JSONObject jo) {
+        JSONObject yaxis = new JSONObject();
+        yaxis.put("start", start);
+        yaxis.put("end", end);
+        yaxis.put("isLogScale", scale instanceof YAxisLogScale);
+        yaxis.put("scaledMinBound", scaledMinBound);
+        yaxis.put("scaledMaxBound", scaledMaxBound);
     }
 
     public void reset(double _start, double _end) {

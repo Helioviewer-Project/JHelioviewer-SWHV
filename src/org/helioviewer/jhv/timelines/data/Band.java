@@ -14,12 +14,14 @@ import java.util.Map;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.LineOptionPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
+import org.json.JSONObject;
 
 public class Band extends AbstractTimelineRenderable {
 
@@ -38,6 +40,19 @@ public class Band extends AbstractTimelineRenderable {
         bandType = _bandType;
         optionsPanel = new LineOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
+    }
+
+    @Override
+    public void serialize(JSONObject jo) {
+        bandType.serialize(jo);
+        BandGroup bandGroup = BandTypeAPI.getGroup(bandType);
+        if (bandGroup != null)
+            bandGroup.serialize(jo);
+        yAxis.serialize(jo);
+        JSONObject jgraphColor = new JSONObject();
+        jgraphColor.put("r", graphColor.getRed());
+        jgraphColor.put("g", graphColor.getGreen());
+        jgraphColor.put("b", graphColor.getBlue());
     }
 
     @Override
@@ -213,4 +228,10 @@ public class Band extends AbstractTimelineRenderable {
         return true;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof Band))
+            return false;
+        return ((Band) o).getName() == this.getName();
+    }
 }

@@ -2,6 +2,8 @@ package org.helioviewer.jhv.timelines.data;
 
 import java.util.HashMap;
 
+import org.json.JSONObject;
+
 public class BandType {
 
     private String label;
@@ -13,6 +15,18 @@ public class BandType {
     private boolean isLog;
     private String baseURL;
     private DataProvider dataprovider;
+
+    public void serialize(JSONObject jo) {
+        JSONObject bandType = new JSONObject();
+        bandType.put("name", name);
+        bandType.put("label", label);
+        bandType.put("unitLabel", unitLabel);
+        bandType.put("min", min);
+        bandType.put("max", max);
+        bandType.put("isLog", isLog);
+        bandType.put("baseURL", baseURL);
+        jo.put("bandType", bandType);
+    }
 
     @Override
     public String toString() {
