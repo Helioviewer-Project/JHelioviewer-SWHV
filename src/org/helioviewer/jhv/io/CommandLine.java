@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 
 public class CommandLine {
@@ -23,20 +24,25 @@ public class CommandLine {
 
     public static void load() {
         // -jpx
-        for (URI uri : getFileOptionValues("jpx")) {
+        for (URI uri : getURIOptionValues("jpx")) {
             JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(), uri));
-        }
-        // -request: works only for default server
-        for (URI uri : getFileOptionValues("request")) {
-            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.createImageLayer(), uri));
         }
         // -jpip
         for (URI uri : getJPIPOptionValues()) {
             JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(), uri));
         }
+        // -request: works only for default server
+        for (URI uri : getURIOptionValues("request")) {
+            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.createImageLayer(), uri));
+        }
+        // -state
+        for (String file : getOptionValues("state")) {
+            ImageViewerGui.getRenderableContainer().loadScene(file);
+            break;
+        }
     }
 
-    private static List<URI> getFileOptionValues(String param) {
+    private static List<URI> getURIOptionValues(String param) {
         List<String> opts = getOptionValues(param);
         LinkedList<URI> uris = new LinkedList<>();
         for (String opt : opts) {
@@ -57,17 +63,15 @@ public class CommandLine {
     }
 
     private static List<URI> getJPIPOptionValues() {
-        List<String> jpipURIs = getOptionValues("jpip");
+        List<String> opts = getOptionValues("jpip");
         LinkedList<URI> uris = new LinkedList<>();
-        for (String jpipURI : jpipURIs) {
-            if (!jpipURI.isEmpty()) {
-                try {
-                    URI uri = new URI(jpipURI);
-                    if ("jpip".equals(uri.getScheme()))
-                        uris.add(uri);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
+        for (String opt : opts) {
+            try {
+                URI uri = new URI(opt);
+                if ("jpip".equals(uri.getScheme()))
+                    uris.add(uri);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
             }
         }
         return uris;
