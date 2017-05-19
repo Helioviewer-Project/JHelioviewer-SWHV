@@ -242,6 +242,39 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         main.put("timelinerenderables", ja);
     }
 
+    private void loadTimelines(JSONObject data) {
+
+        ArrayList<TimelineRenderable> newlist = new ArrayList<TimelineRenderable>();
+        
+        JSONArray rja =  data.getJSONArray("timelinerenderables");
+        for (Object o : rja) {
+            if (o instanceof JSONObject) {
+                JSONObject jo = (JSONObject) o;
+                try {
+                    JSONObject jdata = jo.optJSONObject("data");
+                    if (jdata == null)
+                        continue;
+                    Class<?> c = Class.forName(jo.optString("className"));
+                    Constructor<?> cons = c.getConstructor(JSONObject.class);
+                    Object _renderable = cons.newInstance(jdata);
+                    if (_renderable instanceof TimelineRenderable) {
+                        TimelineRenderable renderable = (TimelineRenderable) _renderable;
+                        newlist.add(renderable);
+                    }
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
+                        | ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        Timelines.getModel().clear();
+        for (TimelineRenderable tr : newlist) {
+            System.out.println(tr);
+            Timelines.getModel().addLineData(tr);
+        }
+
+    }
+
     public void loadScene() {
         ArrayList<Renderable> newlist = new ArrayList<>();
         Renderable masterRenderable = null;
@@ -275,12 +308,14 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     }
                 }
             }
+            loadTimelines(data);
 
             removedRenderables.addAll(renderables);
             renderables = new ArrayList<>();
 
             LoadState loadStateTask = new LoadState(newlist, masterRenderable, JHVDate.optional(data.optString("time")));
             JHVGlobals.getExecutorService().execute(loadStateTask);
+
         } catch (IOException e1) {
             e1.printStackTrace();
         }
