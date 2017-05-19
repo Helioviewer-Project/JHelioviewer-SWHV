@@ -68,7 +68,7 @@ public class APIRequestManager {
 
     public static View loadView(URI uri, APIRequest req) throws IOException {
         if (uri == null || uri.getScheme() == null) {
-            throw new IOException("Invalid URI");
+            throw new IOException("Invalid URI: " + uri);
         }
 
         try {
