@@ -95,6 +95,10 @@ public class MathUtils {
         return val < from ? from : (val > to ? to : val);
     }
 
+    public static float clip(float val, float from, float to) {
+        return val < from ? from : (val > to ? to : val);
+    }
+
     public static int clip(int val, int max) {
         return val < max ? val : max;
     }
