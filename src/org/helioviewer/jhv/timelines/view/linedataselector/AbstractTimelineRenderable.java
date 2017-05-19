@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
+import org.json.JSONObject;
 
 public abstract class AbstractTimelineRenderable implements TimelineRenderable {
 
@@ -52,6 +53,11 @@ public abstract class AbstractTimelineRenderable implements TimelineRenderable {
     @Override
     public ClickableDrawable getDrawableUnderMouse() {
         return null;
+    }
+
+    @Override
+    public void deserializeVisibility(JSONObject jo) {
+        setVisible(jo.optBoolean("visibility", true));
     }
 
 }

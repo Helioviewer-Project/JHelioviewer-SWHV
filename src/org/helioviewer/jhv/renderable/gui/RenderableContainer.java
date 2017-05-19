@@ -237,6 +237,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             jo.put("data", dataObject);
             jo.put("className", renderable.getClass().getName());
             renderable.serialize(dataObject);
+            jo.put("visibility", renderable.isVisible());
             ja.put(jo);
         }
         main.put("timelinerenderables", ja);
@@ -260,7 +261,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     if (_renderable instanceof TimelineRenderable) {
                         TimelineRenderable renderable = (TimelineRenderable) _renderable;
                         newlist.add(renderable);
+                        renderable.deserializeVisibility(jo);
                     }
+
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
                         | ClassNotFoundException | NoSuchMethodException | SecurityException e) {
                     e.printStackTrace();
