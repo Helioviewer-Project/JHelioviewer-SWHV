@@ -42,6 +42,22 @@ public class Band extends AbstractTimelineRenderable {
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
     }
 
+    public Band(JSONObject jo) throws Exception {
+        JSONObject yo = jo.optJSONObject("y-axis");
+        if (yo == null)
+            yo = new JSONObject();
+        yAxis = new YAxis(yo);
+        optionsPanel = new LineOptionPanel(this);
+        JSONObject jbandType = jo.optJSONObject("bandType");
+        if(jbandType == null)
+            throw new Exception("Bandtype not defined");
+
+        String typeName = jbandType.optString("name", "");
+        bandType = BandTypeAPI.getBandType(typeName);
+        if(bandType == null)
+            throw new Exception("Bandtype not defined");
+    }
+
     @Override
     public void serialize(JSONObject jo) {
         bandType.serialize(jo);

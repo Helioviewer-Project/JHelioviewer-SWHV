@@ -219,12 +219,13 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 jo.put("master", true);
         }
         main.put("renderables", ja);
+        saveTimelineScene(main);
+
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(stateFile), StandardCharsets.UTF_8)) {
             main.write(writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        saveTimelineScene(main);
     }
 
     public void saveTimelineScene(JSONObject main) {
