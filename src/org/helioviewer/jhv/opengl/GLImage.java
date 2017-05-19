@@ -217,8 +217,8 @@ public class GLImage {
     public void fromJson(JSONObject json) {
         sharpen = MathUtils.clip((float) json.optDouble("sharpen", 0), 0, 1);
         opacity = MathUtils.clip((float) json.optDouble("opacity", 0), 0, 1);
-        brightOffset = MathUtils.clip((float) json.optDouble("opacity", 0), -1, 2);
-        brightScale = MathUtils.clip((float) json.optDouble("opacity", 0), 0, 3);
+        brightOffset = MathUtils.clip((float) json.optDouble("brightOffset", 0), -1, 2);
+        brightScale = MathUtils.clip((float) json.optDouble("brightScale", 0), 0, 3);
         if (brightScale + brightOffset > 2)
             brightScale = 2 - brightOffset;
         enhanced = json.optBoolean("enhanced", false) ? 1 : 0;
