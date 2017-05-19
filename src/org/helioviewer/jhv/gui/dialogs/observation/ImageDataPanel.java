@@ -23,6 +23,7 @@ import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
@@ -55,6 +56,8 @@ public class ImageDataPanel extends JPanel {
     public void setupSources(DataSourcesParser parser) {
         if (!sourcesTree.setParsedData(parser)) // not preferred
             return;
+
+        CommandLine.load();
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
