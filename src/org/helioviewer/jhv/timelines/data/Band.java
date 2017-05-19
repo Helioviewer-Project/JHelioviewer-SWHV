@@ -14,6 +14,7 @@ import java.util.Map;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -56,6 +57,13 @@ public class Band extends AbstractTimelineRenderable {
         bandType = BandTypeAPI.getBandType(typeName);
         if (bandType == null)
             bandType = new BandType(jbandType);
+        JSONObject jcolor = jo.optJSONObject("color");
+        if(jcolor !=null) {
+            int r = MathUtils.clip(jcolor.optInt("r", 0), 0, 255);
+            int g = MathUtils.clip(jcolor.optInt("g", 0), 0, 255);
+            int b = MathUtils.clip(jcolor.optInt("b", 0), 0, 255);
+            graphColor = new Color(r,g,b);
+        }
     }
 
     @Override
@@ -69,6 +77,7 @@ public class Band extends AbstractTimelineRenderable {
         jgraphColor.put("r", graphColor.getRed());
         jgraphColor.put("g", graphColor.getGreen());
         jgraphColor.put("b", graphColor.getBlue());
+        jo.put("color", jgraphColor);
     }
 
     @Override
