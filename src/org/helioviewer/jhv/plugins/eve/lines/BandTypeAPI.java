@@ -108,6 +108,16 @@ public class BandTypeAPI {
         return orderedGroups.toArray(new BandGroup[orderedGroups.size()]);
     }
 
+    public static BandType getBandType(String name) {
+        for (BandGroup bg : orderedGroups) {
+            for (BandType bt : bg.bandtypes) {
+                if (bt.getName().equals(name))
+                    return bt;
+            }
+        }
+        return null;
+    }
+
     public static BandGroup getGroup(BandType t) {
         for (BandGroup bg : orderedGroups) {
             for (BandType bt : bg.bandtypes) {

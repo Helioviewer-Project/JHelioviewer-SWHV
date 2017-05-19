@@ -33,6 +33,13 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
     private static JHVRelatedEvents highlightedEvent = null;
     private static int highlightedEventPosition = -1;
 
+    public EventTimelineRenderable() {
+
+    }
+
+    public EventTimelineRenderable(JSONObject jo) {
+    }
+
     @Override
     public void serialize(JSONObject jo) {
     }

@@ -52,6 +52,10 @@ public class RadioData extends AbstractTimelineRenderable {
         optionsPanel = new RadioOptionsPanel(cm);
     }
 
+    public RadioData(JSONObject jo) {
+        this();
+    }
+
     @Override
     public void serialize(JSONObject jo) {
     }
