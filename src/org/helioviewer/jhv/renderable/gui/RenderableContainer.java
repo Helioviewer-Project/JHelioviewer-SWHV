@@ -199,7 +199,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables = new ArrayList<>();
     }
 
-    private final String stateFile = JHVDirectory.HOME.getPath() + "test.json";
+    private final String defaultState = JHVDirectory.HOME.getPath() + "test.json";
 
     public void saveCurrentScene() {
         JSONObject main = new JSONObject();
@@ -221,7 +221,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         main.put("renderables", ja);
         saveTimelineScene(main);
 
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(stateFile), StandardCharsets.UTF_8)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(defaultState), StandardCharsets.UTF_8)) {
             main.write(writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -243,28 +243,37 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         main.put("timelinerenderables", ja);
     }
 
+    private Object json2Object(JSONObject json) {
+        JSONObject jdata = json.optJSONObject("data");
+        if (jdata == null)
+            return null;
+
+        try {
+            Class<?> c = Class.forName(json.optString("className"));
+            Constructor<?> cons = c.getConstructor(JSONObject.class);
+            return cons.newInstance(jdata);
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException |
+                 IllegalAccessException | InvocationTargetException | SecurityException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void loadTimelines(JSONObject data) {
         ArrayList<TimelineRenderable> newlist = new ArrayList<>();
 
-        JSONArray rja =  data.getJSONArray("timelinerenderables");
+        JSONArray rja = data.getJSONArray("timelinerenderables");
         for (Object o : rja) {
             if (o instanceof JSONObject) {
                 JSONObject jo = (JSONObject) o;
                 try {
-                    JSONObject jdata = jo.optJSONObject("data");
-                    if (jdata == null)
-                        continue;
-                    Class<?> c = Class.forName(jo.optString("className"));
-                    Constructor<?> cons = c.getConstructor(JSONObject.class);
-                    Object _renderable = cons.newInstance(jdata);
-                    if (_renderable instanceof TimelineRenderable) {
-                        TimelineRenderable renderable = (TimelineRenderable) _renderable;
+                    Object obj = json2Object(jo);
+                    if (obj instanceof TimelineRenderable) {
+                        TimelineRenderable renderable = (TimelineRenderable) obj;
                         newlist.add(renderable);
                         renderable.deserializeVisibility(jo);
                     }
-
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException
-                        | ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -273,10 +282,13 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         for (TimelineRenderable tr : newlist) {
             Timelines.getModel().addLineData(tr);
         }
-
     }
 
     public void loadScene() {
+        loadScene(defaultState);
+    }
+
+    public void loadScene(String stateFile) {
         ArrayList<Renderable> newlist = new ArrayList<>();
         Renderable masterRenderable = null;
 
@@ -287,14 +299,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 if (o instanceof JSONObject) {
                     JSONObject jo = (JSONObject) o;
                     try {
-                        JSONObject jdata = jo.optJSONObject("data");
-                        if (jdata == null)
-                            continue;
-                        Class<?> c = Class.forName(jo.optString("className"));
-                        Constructor<?> cons = c.getConstructor(JSONObject.class);
-                        Object _renderable = cons.newInstance(jdata);
-                        if (_renderable instanceof Renderable) {
-                            Renderable renderable = (Renderable) _renderable;
+                        Object obj = json2Object(jo);
+                        if (obj instanceof Renderable) {
+                            Renderable renderable = (Renderable) obj;
                             newlist.add(renderable);
                             JSONArray va = jo.optJSONArray("visibility");
                             if (va == null)
@@ -303,8 +310,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                             if (jo.optBoolean("master", false))
                                 masterRenderable = renderable;
                         }
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | JSONException |
-                             ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
@@ -316,7 +322,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
             LoadState loadStateTask = new LoadState(newlist, masterRenderable, JHVDate.optional(data.optString("time")));
             JHVGlobals.getExecutorService().execute(loadStateTask);
-
         } catch (IOException e1) {
             e1.printStackTrace();
         }
