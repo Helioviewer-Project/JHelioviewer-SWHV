@@ -244,9 +244,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     private void loadTimelines(JSONObject data) {
+        ArrayList<TimelineRenderable> newlist = new ArrayList<>();
 
-        ArrayList<TimelineRenderable> newlist = new ArrayList<TimelineRenderable>();
-        
         JSONArray rja =  data.getJSONArray("timelinerenderables");
         for (Object o : rja) {
             if (o instanceof JSONObject) {
@@ -353,8 +352,12 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             if (!isCancelled()) {
                 for (Renderable renderable : newlist) {
                     addRenderable(renderable);
-                    if (renderable == master && renderable instanceof ImageLayer)
-                        ((ImageLayer) renderable).setActiveImageLayer();
+                    if (renderable instanceof ImageLayer) {
+                        ImageLayer layer = (ImageLayer) renderable;
+                        layer.unload(); // prune failed layers
+                        if (layer == master)
+                            layer.setActiveImageLayer();
+                    }
                 }
                 Layers.setTime(time);
             }
