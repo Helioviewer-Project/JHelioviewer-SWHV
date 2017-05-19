@@ -52,8 +52,8 @@ public class GLLine {
     }
 
     private void unbindVBOs(GL2 gl) {
-        for (int i = vbos.length - 1; i >= 0; i--) {
-            vbos[i].unbindArray(gl);
+        for (VBO vbo : vbos) {
+            vbo.unbindArray(gl);
         }
         ivbo.unbindArray(gl);
     }
@@ -69,11 +69,15 @@ public class GLLine {
 
     private void disposeVBOs(GL2 gl) {
         for (int i = 0; i < vbos.length; i++) {
-            vbos[i].dispose(gl);
-            vbos[i] = null;
+            if (vbos[i] != null) {
+                vbos[i].dispose(gl);
+                vbos[i] = null;
+            }
         }
-        ivbo.dispose(gl);
-        ivbo = null;
+        if (ivbo != null) {
+            ivbo.dispose(gl);
+            ivbo = null;
+        }
     }
 
     private IntBuffer gen_indices(int plen) {
