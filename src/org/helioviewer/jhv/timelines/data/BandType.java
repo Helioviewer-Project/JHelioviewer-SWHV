@@ -20,7 +20,7 @@ public class BandType {
     public BandType() {
     }
 
-    public BandType(JSONObject jo) throws Exception {
+    public BandType(JSONObject jo) {
         name = jo.optString("name", "unknown");
         label = jo.optString("label", "");
         unitLabel = jo.optString("unitLabel", "");
