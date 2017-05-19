@@ -255,9 +255,12 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof Band))
-            return false;
-        return ((Band) o).getName().equals(getName());
+        return o instanceof Band && ((Band) o).getName().equals(getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
 }
