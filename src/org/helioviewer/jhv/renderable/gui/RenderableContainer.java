@@ -3,7 +3,6 @@ package org.helioviewer.jhv.renderable.gui;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,7 +25,6 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -252,8 +250,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             Class<?> c = Class.forName(json.optString("className"));
             Constructor<?> cons = c.getConstructor(JSONObject.class);
             return cons.newInstance(jdata);
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException |
-                 IllegalAccessException | InvocationTargetException | SecurityException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -273,7 +270,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                         newlist.add(renderable);
                         renderable.deserializeVisibility(jo);
                     }
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -310,7 +307,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                             if (jo.optBoolean("master", false))
                                 masterRenderable = renderable;
                         }
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
