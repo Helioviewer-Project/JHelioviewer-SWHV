@@ -35,7 +35,7 @@ public class DataSourcesDB {
 
             insert = connection.prepareStatement("INSERT INTO DataSources(sourceId, server, observatory, dataset, start, end) VALUES(?,?,?,?,?,?)");
             insert.setQueryTimeout(30);
-            select = connection.prepareStatement("SELECT sourceId,server FROM DataSources WHERE server LIKE ? AND observatory LIKE ? AND dataset LIKE ?");
+            select = connection.prepareStatement("SELECT sourceId,server FROM DataSources WHERE server=? AND observatory LIKE ? AND dataset LIKE ?");
             select.setQueryTimeout(30);
         } catch (SQLException e) {
             Log.error("Could not create database connection", e);
@@ -60,7 +60,7 @@ public class DataSourcesDB {
     public static ArrayList<Pair<Integer, String>> doSelect(@NotNull String server, @NotNull String observatory, @NotNull String dataset) {
         ArrayList<Pair<Integer, String>> res = new ArrayList<>();
         try {
-            select.setString(1, "%" + server + "%");
+            select.setString(1, server);
             select.setString(2, "%" + observatory + "%");
             select.setString(3, "%" + dataset + "%");
 
