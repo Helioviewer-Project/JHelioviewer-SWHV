@@ -93,7 +93,7 @@ public class PfssData {
 
         FieldLineColor type = FieldLineColor.LOOPCOLOR;
         for (int i = 0; i < fieldlinex.length; i++) {
-            if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - qualityReduction) {
+            if (i / PfssSettings.POINTS_PER_LINE % 9 <= qualityReduction) {
                 double x = 3. * decode(fieldlinex[i]);
                 double y = 3. * decode(fieldliney[i]);
                 double z = 3. * decode(fieldlinez[i]);
