@@ -6,17 +6,14 @@ import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CommandLineProcessor {
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.layers.ImageLayer;
+
+public class CommandLine {
 
     private static String[] arguments;
     private static String usageMessage;
 
-    /**
-     * Sets the arguments (text from command line) to this class.
-     * 
-     * @param args
-     *            command line arguments.
-     */
     public static void setArguments(String[] args) {
         arguments = args;
         usageMessage = "The following command-line options are available: \n\n" +
@@ -24,12 +21,22 @@ public class CommandLineProcessor {
         "-jpip  JPIP_URL\n" + "       Allows users to pass a JPIP URL of a JP2 or JPX image to be opened upon program start. The option can be used multiple times.";
     }
 
-    /**
-     * Returns the values of the -jpx option.
-     * 
-     * @return list of values of the -jpx option as URLs
-     */
-    public static List<URI> getJPXOptionValues() {
+    public static void load() {
+        // -jpx
+        for (URI uri : getJPXOptionValues()) {
+            JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(), uri));
+        }
+        // -request: works only for default server
+        for (URI uri : getRequestOptionValues()) {
+            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.createImageLayer(), uri));
+        }
+        // -jpip
+        for (URI uri : getJPIPOptionValues()) {
+            JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(), uri));
+        }
+    }
+
+    private static List<URI> getJPXOptionValues() {
         List<String> jpxURLs = getOptionValues("jpx");
         LinkedList<URI> uris = new LinkedList<>();
         for (String jpxURL : jpxURLs) {
@@ -51,12 +58,29 @@ public class CommandLineProcessor {
         return uris;
     }
 
-    /**
-     * Returns the values of the -jpip option
-     * 
-     * @return list of values of the -jpip option as URIs
-     */
-    public static List<URI> getJPIPOptionValues() {
+    private static List<URI> getRequestOptionValues() {
+        List<String> jsonURLs = getOptionValues("request");
+        LinkedList<URI> uris = new LinkedList<>();
+        for (String jsonURL : jsonURLs) {
+            if (!jsonURL.isEmpty()) {
+                try {
+                    URI uri = new URI(jsonURL);
+                    if (uri.getScheme() == null) {
+                        File f = new File(jsonURL).getAbsoluteFile();
+                        if (f.canRead()) {
+                            uris.add(f.toURI());
+                        }
+                    } else
+                        uris.add(uri);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return uris;
+    }
+
+    private static List<URI> getJPIPOptionValues() {
         List<String> jpipURIs = getOptionValues("jpip");
         LinkedList<URI> uris = new LinkedList<>();
         for (String jpipURI : jpipURIs) {

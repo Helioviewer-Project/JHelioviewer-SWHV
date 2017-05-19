@@ -16,9 +16,8 @@ import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.io.CommandLineProcessor;
+import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.io.LoadStartup;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -32,14 +31,14 @@ public class JHelioviewer {
     public static void main(String[] args) {
         // Prints the usage message
         if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
-            System.out.println(CommandLineProcessor.getUsageMessage());
+            System.out.println(CommandLine.getUsageMessage());
             return;
         }
 
         // Uncaught runtime errors are displayed in a dialog box in addition
         JHVUncaughtExceptionHandler.setupHandlerForThread();
         // Save command line arguments
-        CommandLineProcessor.setArguments(args);
+        CommandLine.setArguments(args);
         // Save current default system timezone in user.timezone
         System.setProperty("user.timezone", TimeZone.getDefault().getID());
         // Per default all times should be given in GMT
@@ -123,7 +122,6 @@ public class JHelioviewer {
             frame.setVisible(true);
 
             DataSources.loadSources();
-            LoadStartup.loadCommandLine();
 
             try {
                 JHVUpdate update = new JHVUpdate(false);
