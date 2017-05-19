@@ -23,11 +23,11 @@ public class CommandLine {
 
     public static void load() {
         // -jpx
-        for (URI uri : getJPXOptionValues()) {
+        for (URI uri : getFileOptionValues("jpx")) {
             JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(), uri));
         }
         // -request: works only for default server
-        for (URI uri : getRequestOptionValues()) {
+        for (URI uri : getFileOptionValues("request")) {
             JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.createImageLayer(), uri));
         }
         // -jpip
@@ -36,45 +36,21 @@ public class CommandLine {
         }
     }
 
-    private static List<URI> getJPXOptionValues() {
-        List<String> jpxURLs = getOptionValues("jpx");
+    private static List<URI> getFileOptionValues(String param) {
+        List<String> opts = getOptionValues(param);
         LinkedList<URI> uris = new LinkedList<>();
-        for (String jpxURL : jpxURLs) {
-            if (!jpxURL.isEmpty()) {
-                try {
-                    URI uri = new URI(jpxURL);
-                    if (uri.getScheme() == null) {
-                        File f = new File(jpxURL).getAbsoluteFile();
-                        if (f.canRead()) {
-                            uris.add(f.toURI());
-                        }
-                    } else
-                        uris.add(uri);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return uris;
-    }
-
-    private static List<URI> getRequestOptionValues() {
-        List<String> jsonURLs = getOptionValues("request");
-        LinkedList<URI> uris = new LinkedList<>();
-        for (String jsonURL : jsonURLs) {
-            if (!jsonURL.isEmpty()) {
-                try {
-                    URI uri = new URI(jsonURL);
-                    if (uri.getScheme() == null) {
-                        File f = new File(jsonURL).getAbsoluteFile();
-                        if (f.canRead()) {
-                            uris.add(f.toURI());
-                        }
-                    } else
-                        uris.add(uri);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
+        for (String opt : opts) {
+            try {
+                URI uri = new URI(opt);
+                if (uri.getScheme() == null) {
+                    File f = new File(opt).getAbsoluteFile();
+                    if (f.canRead()) {
+                        uris.add(f.toURI());
+                    }
+                } else
+                    uris.add(uri);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
             }
         }
         return uris;
