@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -30,7 +31,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     public PfssRenderable(JSONObject jo) {
-        int qualityReduction = jo.optInt("qualityReduction", 0);
+        int qualityReduction = MathUtils.clip(jo.optInt("qualityReduction", 0), 0, PfssSettings.MAX_QUALITY);
         boolean fixedColor = jo.optBoolean("fixedColor", false);
         optionsPanel = new PfssOptionsPanel(qualityReduction, fixedColor);
     }
@@ -110,7 +111,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     private void renderData(GL2 gl, PfssData data, double aspect) {
-        int qualityReduction = optionsPanel.getQualityReduction();
+        int qualityReduction = PfssSettings.MAX_QUALITY - optionsPanel.getQualityReduction();
         boolean fixedColor = optionsPanel.getFixedColor();
 
         if (data != previousPfssData || data.needsUpdate(qualityReduction, fixedColor)) {

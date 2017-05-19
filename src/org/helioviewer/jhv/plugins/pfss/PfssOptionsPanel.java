@@ -26,9 +26,9 @@ class PfssOptionsPanel extends JPanel {
         fixedColor = _fixedColor;
         setLayout(new GridBagLayout());
 
-        JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(qualityReduction, 0, 8, 1));
+        JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(qualityReduction, 0, PfssSettings.MAX_QUALITY, 1));
         levelSpinner.addChangeListener(e -> {
-            qualityReduction = 8 - (Integer) levelSpinner.getValue();
+            qualityReduction = (Integer) levelSpinner.getValue();
             Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(levelSpinner);
