@@ -2,7 +2,6 @@ package org.helioviewer.jhv.renderable.gui;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
@@ -228,8 +227,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         ArrayList<Renderable> newlist = new ArrayList<>();
         Renderable masterRenderable = null;
 
-        try (InputStream in = Files.newInputStream(Paths.get(stateFile))) {
-            JSONObject data = JSONUtils.getJSONStream(in);
+        try {
+            JSONObject data = JSONUtils.getJSONFile(stateFile);
             JSONArray rja = data.getJSONArray("renderables");
             for (Object o : rja) {
                 if (o instanceof JSONObject) {

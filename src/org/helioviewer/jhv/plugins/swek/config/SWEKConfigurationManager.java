@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,9 +51,8 @@ public class SWEKConfigurationManager {
     }
 
     private static void readConfig() throws Exception {
-        File f = new File(configFile);
         try {
-            JSONObject json = JSONUtils.getJSONStream(Files.newInputStream(f.toPath()));
+            JSONObject json = JSONUtils.getJSONFile(configFile);
             if (json.getBoolean("manually_changed")) {
                 parseConfig(json);
                 return;
@@ -64,9 +62,9 @@ public class SWEKConfigurationManager {
         }
 
         try (InputStream is = FileUtils.getResourceInputStream('/' + configName)) {
-            FileUtils.save(is, f);
+            FileUtils.save(is, new File(configFile));
         }
-        parseConfig(JSONUtils.getJSONStream(Files.newInputStream(f.toPath())));
+        parseConfig(JSONUtils.getJSONFile(configFile));
     }
 
     private static void parseConfig(JSONObject obj) {
