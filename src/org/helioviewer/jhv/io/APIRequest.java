@@ -4,9 +4,13 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
+import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.database.DataSourcesDB;
 import org.json.JSONObject;
 
 public class APIRequest {
@@ -87,11 +91,30 @@ public class APIRequest {
     }
 
     public static APIRequest fromJson(JSONObject json) {
-        String _server = json.optString("server", "ROB");
+        String _server = json.optString("server", Settings.getSingletonInstance().getProperty("default.server"));
         int _sourceId = json.optInt("sourceId", 10);
-        long _startTime = json.optLong("startTime", System.currentTimeMillis());
+        long _startTime = json.optLong("startTime", System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS);
         long _endTime = json.optLong("endTime", System.currentTimeMillis());
         int _cadence = json.optInt("cadence", CADENCE_DEFAULT);
+        return new APIRequest(_server, _sourceId, _startTime, _endTime, _cadence);
+    }
+
+    public static APIRequest fromCmdJson(JSONObject json) throws Exception {
+        String _server = json.optString("server", Settings.getSingletonInstance().getProperty("default.server"));
+        String observatory = json.optString("observatory", "");
+        int _cadence = json.optInt("cadence", CADENCE_DEFAULT);
+
+        long _startTime = TimeUtils.parse(json.getString("startTime"));
+        long _endTime = TimeUtils.parse(json.getString("endTime"));
+        String dataset = json.getString("dataset");
+
+        ArrayList<Pair<Integer, String>> res = DataSourcesDB.doSelect(_server, observatory, dataset);
+        if (res.isEmpty())
+            throw new Exception("Empty result");
+
+        int _sourceId = res.get(0).a;
+        _server = res.get(0).b;
+
         return new APIRequest(_server, _sourceId, _startTime, _endTime, _cadence);
     }
 
