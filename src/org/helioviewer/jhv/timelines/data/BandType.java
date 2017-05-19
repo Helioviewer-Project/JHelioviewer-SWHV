@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.data;
 
 import java.util.HashMap;
 
+import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
 import org.json.JSONObject;
 
 public class BandType {
@@ -15,6 +16,20 @@ public class BandType {
     private boolean isLog;
     private String baseURL;
     private DataProvider dataprovider;
+
+    public BandType() {
+    }
+
+    public BandType(JSONObject jo) throws Exception {
+        name = jo.optString("name", "unknown");
+        label = jo.optString("label", "");
+        unitLabel = jo.optString("unitLabel", "");
+        min = jo.optDouble("min", 0);
+        max = jo.optDouble("max", 1);
+        isLog = jo.optBoolean("isLog", false);
+        baseURL = jo.optString("baseURL", "");
+        dataprovider = BandTypeAPI.eveDataprovider;
+    }
 
     public void serialize(JSONObject jo) {
         JSONObject bandType = new JSONObject();

@@ -25,7 +25,7 @@ import org.json.JSONObject;
 
 public class Band extends AbstractTimelineRenderable {
 
-    private final BandType bandType;
+    private BandType bandType;
     private final LineOptionPanel optionsPanel;
 
     private Color graphColor = Color.BLACK;
@@ -54,8 +54,8 @@ public class Band extends AbstractTimelineRenderable {
 
         String typeName = jbandType.optString("name", "");
         bandType = BandTypeAPI.getBandType(typeName);
-        if(bandType == null)
-            throw new Exception("Bandtype not defined");
+        if (bandType == null)
+            bandType = new BandType(jbandType);
     }
 
     @Override
