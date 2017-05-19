@@ -257,6 +257,7 @@ public class Band extends AbstractTimelineRenderable {
     public boolean equals(Object o) {
         if(!(o instanceof Band))
             return false;
-        return ((Band) o).getName() == this.getName();
+        return ((Band) o).getName().equals(getName());
     }
+
 }

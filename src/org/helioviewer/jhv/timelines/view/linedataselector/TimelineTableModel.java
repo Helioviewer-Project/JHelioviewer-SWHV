@@ -11,7 +11,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 @SuppressWarnings("serial")
 public class TimelineTableModel extends AbstractTableModel {
 
-    private ArrayList<TimelineRenderable> elements = new ArrayList<TimelineRenderable>();
+    private ArrayList<TimelineRenderable> elements = new ArrayList<>();
 
     public List<TimelineRenderable> getAllLineDataSelectorElements() {
         return elements;
@@ -46,9 +46,9 @@ public class TimelineTableModel extends AbstractTableModel {
         for (TimelineRenderable element : elements) {
             element.remove();
         }
-        elements = new ArrayList<TimelineRenderable>();
-        this.fireTableDataChanged();
-        DrawController.graphAreaChanged();        
+        elements = new ArrayList<>();
+        fireTableDataChanged();
+        DrawController.graphAreaChanged();
     }
 
     void updateCell(int row, int col) {
