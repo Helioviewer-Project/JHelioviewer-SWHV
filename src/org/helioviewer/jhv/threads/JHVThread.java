@@ -130,7 +130,7 @@ public class JHVThread {
                     Log.error("Could not create database connection" + e);
                     try {
                         connection.close();
-                    } catch (SQLException ignore) {
+                    } catch (Exception ignore) {
                     }
                     connection = null;
                 }
