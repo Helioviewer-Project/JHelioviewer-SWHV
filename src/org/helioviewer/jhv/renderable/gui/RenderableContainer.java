@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -22,6 +23,8 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -221,6 +224,21 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         } catch (IOException e) {
             e.printStackTrace();
         }
+        saveTimelineScene(main);
+    }
+
+    public void saveTimelineScene(JSONObject main) {
+        JSONArray ja = new JSONArray();
+        List<TimelineRenderable> lds = Timelines.getModel().getAllLineDataSelectorElements();
+        for (TimelineRenderable renderable : lds) {
+            JSONObject jo = new JSONObject();
+            JSONObject dataObject = new JSONObject();
+            jo.put("data", dataObject);
+            jo.put("className", renderable.getClass().getName());
+            renderable.serialize(dataObject);
+            ja.put(jo);
+        }
+        main.put("timelinerenderables", ja);
     }
 
     public void loadScene() {

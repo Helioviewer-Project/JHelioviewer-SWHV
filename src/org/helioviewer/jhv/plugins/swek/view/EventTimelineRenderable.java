@@ -24,6 +24,7 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
+import org.json.JSONObject;
 
 public class EventTimelineRenderable extends AbstractTimelineRenderable implements JHVEventHandler {
 
@@ -31,6 +32,10 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
     private static EventPlotConfiguration eventUnderMouse;
     private static JHVRelatedEvents highlightedEvent = null;
     private static int highlightedEventPosition = -1;
+
+    @Override
+    public void serialize(JSONObject jo) {
+    }
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {

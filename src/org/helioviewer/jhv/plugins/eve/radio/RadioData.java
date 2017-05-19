@@ -31,6 +31,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
+import org.json.JSONObject;
 
 public class RadioData extends AbstractTimelineRenderable {
 
@@ -49,6 +50,10 @@ public class RadioData extends AbstractTimelineRenderable {
         String cm = "Spectral";
         colorModel = createIndexColorModelFromLUT(LUT.get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
+    }
+
+    @Override
+    public void serialize(JSONObject jo) {
     }
 
     private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {

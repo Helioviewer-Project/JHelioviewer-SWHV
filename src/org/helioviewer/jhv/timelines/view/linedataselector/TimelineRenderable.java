@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.json.JSONObject;
 
 public interface TimelineRenderable {
 
@@ -55,5 +56,7 @@ public interface TimelineRenderable {
     String getStringValue(long ts);
 
     ClickableDrawable getDrawableUnderMouse();
+
+    void serialize(JSONObject jo);
 
 }
