@@ -76,16 +76,14 @@ public abstract class AbstractRenderable implements Renderable {
 
     @Override
     public void serializeVisibility(JSONArray va) {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < isVisible.length; i++)
             va.put(i, isVisible[i]);
     }
 
     @Override
     public void deserializeVisibility(JSONArray va) {
-        for (int i = 0; i < 4; i++) {
-            boolean v = va.getBoolean(i);
-            isVisible[i] = v;
-        }
+        for (int i = 0; i < isVisible.length; i++)
+            isVisible[i] = va.optBoolean(i, true);
     }
 
     @Override

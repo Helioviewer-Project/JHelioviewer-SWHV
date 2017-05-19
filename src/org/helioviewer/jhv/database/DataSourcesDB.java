@@ -28,10 +28,11 @@ public class DataSourcesDB {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite::memory:");
 
-            Statement create = connection.createStatement();
-            create.setQueryTimeout(30);
-            create.executeUpdate("drop table if exists DataSources"); // debug
-            create.executeUpdate("CREATE TABLE DataSources (sourceId INTEGER, server STRING, observatory STRING, dataset STRING, start INTEGER, end INTEGER, UNIQUE(sourceId, server) ON CONFLICT REPLACE)");
+            try (Statement create = connection.createStatement()) {
+                create.setQueryTimeout(30);
+                create.executeUpdate("drop table if exists DataSources"); // debug
+                create.executeUpdate("CREATE TABLE DataSources (sourceId INTEGER, server STRING, observatory STRING, dataset STRING, start INTEGER, end INTEGER, UNIQUE(sourceId, server) ON CONFLICT REPLACE)");
+            }
 
             insert = connection.prepareStatement("INSERT INTO DataSources(sourceId, server, observatory, dataset, start, end) VALUES(?,?,?,?,?,?)");
             insert.setQueryTimeout(30);
@@ -39,6 +40,10 @@ public class DataSourcesDB {
             select.setQueryTimeout(30);
         } catch (SQLException e) {
             Log.error("Could not create database connection", e);
+            try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
             connection = null;
         }
     }
