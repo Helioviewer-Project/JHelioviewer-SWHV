@@ -20,7 +20,7 @@ public class BandTypeAPI {
     private static final HashMap<String, BandGroup> groups = new HashMap<>();
     private static final ArrayList<BandGroup> orderedGroups = new ArrayList<>();
 
-    private static final EVEDataProvider eveDataprovider = new EVEDataProvider();
+    public static final EVEDataProvider eveDataprovider = new EVEDataProvider();
 
     public static void getDatasets() {
         try {
