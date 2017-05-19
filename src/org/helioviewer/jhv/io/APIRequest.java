@@ -90,24 +90,26 @@ public class APIRequest {
         return json;
     }
 
+    private static final int MAX_FRAMES = 100;
+
     public static APIRequest fromJson(JSONObject json) {
         String _server = json.optString("server", Settings.getSingletonInstance().getProperty("default.server"));
         int _sourceId = json.optInt("sourceId", 10);
         long _startTime = json.optLong("startTime", System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS);
         long _endTime = json.optLong("endTime", System.currentTimeMillis());
-        int _cadence = json.optInt("cadence", CADENCE_DEFAULT);
+        int _cadence = json.optInt("cadence", (int) Math.min(1, (_endTime - _startTime) / 1000 / MAX_FRAMES));
         return new APIRequest(_server, _sourceId, _startTime, _endTime, _cadence);
     }
 
-    public static APIRequest fromCmdJson(JSONObject json) throws Exception {
+    public static APIRequest fromRequestJson(JSONObject json) throws Exception {
         String _server = json.optString("server", Settings.getSingletonInstance().getProperty("default.server"));
         String observatory = json.optString("observatory", "");
-        int _cadence = json.optInt("cadence", CADENCE_DEFAULT);
 
         long _startTime = TimeUtils.parse(json.getString("startTime"));
         long _endTime = TimeUtils.parse(json.getString("endTime"));
-        String dataset = json.getString("dataset");
+        int _cadence = json.optInt("cadence", (int) Math.min(1, (_endTime - _startTime) / 1000 / MAX_FRAMES));
 
+        String dataset = json.getString("dataset");
         ArrayList<Pair<Integer, String>> res = DataSourcesDB.doSelect(_server, observatory, dataset);
         if (res.isEmpty())
             throw new Exception("Empty result");
