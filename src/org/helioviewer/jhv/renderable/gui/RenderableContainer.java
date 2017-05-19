@@ -269,7 +269,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
         Timelines.getModel().clear();
         for (TimelineRenderable tr : newlist) {
-            System.out.println(tr);
             Timelines.getModel().addLineData(tr);
         }
 
