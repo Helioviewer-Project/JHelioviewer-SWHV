@@ -1,14 +1,11 @@
 package org.helioviewer.jhv.io;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * A simple class to process command line arguments for JHelioviewer
- * specification.
- */
 public class CommandLineProcessor {
 
     private static String[] arguments;
@@ -34,17 +31,24 @@ public class CommandLineProcessor {
      */
     public static List<URI> getJPXOptionValues() {
         List<String> jpxURLs = getOptionValues("jpx");
-        LinkedList<URI> result = new LinkedList<>();
+        LinkedList<URI> uris = new LinkedList<>();
         for (String jpxURL : jpxURLs) {
             if (!jpxURL.isEmpty()) {
                 try {
-                    result.add(new URI(jpxURL));
+                    URI uri = new URI(jpxURL);
+                    if (uri.getScheme() == null) {
+                        File f = new File(jpxURL).getAbsoluteFile();
+                        if (f.canRead()) {
+                            uris.add(f.toURI());
+                        }
+                    } else
+                        uris.add(uri);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
             }
         }
-        return result;
+        return uris;
     }
 
     /**
@@ -58,7 +62,9 @@ public class CommandLineProcessor {
         for (String jpipURI : jpipURIs) {
             if (!jpipURI.isEmpty()) {
                 try {
-                    uris.add(new URI(jpipURI));
+                    URI uri = new URI(jpipURI);
+                    if ("jpip".equals(uri.getScheme()))
+                        uris.add(uri);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
@@ -104,11 +110,6 @@ public class CommandLineProcessor {
         return values;
     }
 
-    /**
-     * Returns the command line usage message.
-     * 
-     * @return command line usage message.
-     */
     public static String getUsageMessage() {
         return usageMessage;
     }
