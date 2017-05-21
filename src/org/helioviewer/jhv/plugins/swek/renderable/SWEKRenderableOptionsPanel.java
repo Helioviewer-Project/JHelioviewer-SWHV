@@ -13,9 +13,9 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 @SuppressWarnings("serial")
 class SWEKRenderableOptionsPanel extends JPanel {
 
-    boolean icons = true;
+    boolean icons;
 
-    public SWEKRenderableOptionsPanel() {
+    public SWEKRenderableOptionsPanel(boolean _icons) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c0 = new GridBagConstraints();
@@ -25,6 +25,7 @@ class SWEKRenderableOptionsPanel extends JPanel {
         c0.gridy = 0;
         c0.gridx = 0;
 
+        icons = _icons;
         JCheckBox check = new JCheckBox("Icons", icons);
         check.setHorizontalTextPosition(SwingConstants.LEFT);
         check.addActionListener(e -> {

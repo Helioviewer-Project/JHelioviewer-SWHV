@@ -81,22 +81,17 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void deserialize(JSONObject jo) {
-        if (jo.has("lonstepDegrees"))
-            lonstepDegrees = (float) jo.getDouble("lonstepDegrees");
-        if (jo.has("latstepDegrees"))
-            latstepDegrees = (float) jo.getDouble("latstepDegrees");
-        if (jo.has("showAxis"))
-            showAxis = jo.getBoolean("showAxis");
-        if (jo.has("showLabels"))
-            showLabels = jo.getBoolean("showLabels");
-        if (jo.has("showRadial"))
-            showRadial = jo.getBoolean("showRadial");
+        lonstepDegrees = (float) jo.optDouble("lonstepDegrees", lonstepDegrees);
+        latstepDegrees = (float) jo.optDouble("latstepDegrees", latstepDegrees);
+        showAxis = jo.optBoolean("showAxis", showAxis);
+        showLabels = jo.optBoolean("showLabels", showLabels);
+        showRadial = jo.optBoolean("showRadial", showRadial);
     }
 
     public RenderableGrid(JSONObject jo) {
-        if (jo != null) {
+        if (jo != null)
             deserialize(jo);
-        }
+
         optionsPanel = new RenderableGridOptionsPanel(this);
         setVisible(true);
 
