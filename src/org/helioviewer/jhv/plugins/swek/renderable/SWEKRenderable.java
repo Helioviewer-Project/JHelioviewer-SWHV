@@ -37,8 +37,8 @@ import com.jogamp.opengl.GL2;
 
 public class SWEKRenderable extends AbstractRenderable {
 
-    private static final SWEKRenderableOptionsPanel optionsPanel = new SWEKRenderableOptionsPanel();
     private static final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
+    private static SWEKRenderableOptionsPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
     private static final float LINEWIDTH = 1;
@@ -50,9 +50,16 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
     public SWEKRenderable() {
+        optionsPanel = new SWEKRenderableOptionsPanel(true);
     }
 
-    public SWEKRenderable(JSONObject o) {
+    public SWEKRenderable(JSONObject jo) {
+        optionsPanel = new SWEKRenderableOptionsPanel(jo.optBoolean("icons", true));
+    }
+
+    @Override
+    public void serialize(JSONObject jo) {
+        jo.put("icons", optionsPanel.icons);
     }
 
     private static void bindTexture(GL2 gl, String key, ImageIcon icon) {
@@ -472,10 +479,6 @@ public class SWEKRenderable extends AbstractRenderable {
             el.delete(gl);
         }
         iconCacheId.clear();
-    }
-
-    @Override
-    public void serialize(JSONObject jo) {
     }
 
 }

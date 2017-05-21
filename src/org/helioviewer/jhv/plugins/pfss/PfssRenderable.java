@@ -23,8 +23,8 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
 
     private static final double thickness = 0.0025;
     private final PfssOptionsPanel optionsPanel;
-    private PfssData previousPfssData = null;
     private final GLLine line = new GLLine();
+    private PfssData previousPfssData;
 
     public PfssRenderable() {
         optionsPanel = new PfssOptionsPanel(0, false);

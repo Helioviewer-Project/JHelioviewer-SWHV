@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -52,7 +53,8 @@ public class CommandLine {
                     File f = new File(opt).getAbsoluteFile();
                     if (f.canRead()) {
                         uris.add(f.toURI());
-                    }
+                    } else
+                        Log.error("File not found: " + opt);
                 } else
                     uris.add(uri);
             } catch (URISyntaxException e) {
