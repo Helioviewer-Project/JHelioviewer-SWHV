@@ -3,6 +3,7 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Component;
 
 import org.helioviewer.jhv.base.math.Mat4;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
@@ -23,19 +24,18 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     private final Camera miniCamera = new Camera();
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
 
-    public void deserialize() {
-    }
-
     @Override
     public void serialize(JSONObject jo) {
+        jo.put("scale", optionsPanel.scale);
     }
 
     public RenderableMiniview(JSONObject jo) {
-        this();
+        int scale = MathUtils.clip(jo.optInt("scale", 10), RenderableMiniviewOptionsPanel.MIN, RenderableMiniviewOptionsPanel.MAX);
+        optionsPanel = new RenderableMiniviewOptionsPanel(this, scale);
     }
 
     public RenderableMiniview() {
-        optionsPanel = new RenderableMiniviewOptionsPanel(this);
+        optionsPanel = new RenderableMiniviewOptionsPanel(this, 10);
         setVisible(true);
     }
 
