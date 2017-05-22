@@ -133,6 +133,8 @@ public class RenderableGrid extends AbstractRenderable {
 
         Mat4 cameraMatrix = getGridQuat(camera, gridChoice).toMatrix();
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+        drawEarthCircles(gl, vp.aspect, Sun.getEarth(camera.getViewpoint().time));
+
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
@@ -154,7 +156,6 @@ public class RenderableGrid extends AbstractRenderable {
             }
             gl.glPopMatrix();
         }
-        drawEarthCircles(gl, vp.aspect, Sun.getEarth(camera.getViewpoint().time));
     }
 
     @Override
