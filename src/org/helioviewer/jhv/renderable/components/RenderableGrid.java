@@ -407,19 +407,19 @@ public class RenderableGrid extends AbstractRenderable {
         FloatBuffer positionBuffer = BufferUtils.genFloatBuffer(plen * 3);
         FloatBuffer colorBuffer = BufferUtils.genFloatBuffer(plen * 4);
 
-        addToBuffer(positionBuffer, 0,-AXIS_STOP,0);
+        addToBuffer(positionBuffer, 0, -AXIS_STOP, 0);
         addToBuffer(colorBuffer, 0, 0, 1, 1);
         addToBuffer(positionBuffer, 0, -AXIS_START, 0);
         addToBuffer(colorBuffer, 0, 0, 1, 1);
 
         addToBuffer(positionBuffer, 0, -AXIS_START, 0);
         addToBuffer(colorBuffer, 0, 0, 0, 0);
-        addToBuffer(positionBuffer, 0, AXIS_STOP, 0);
-        addToBuffer(colorBuffer, 0, 0, 0, 0);
-
-        addToBuffer(positionBuffer, 0, AXIS_STOP, 0);
-        addToBuffer(colorBuffer, 1, 0, 0, 1);
         addToBuffer(positionBuffer, 0, AXIS_START, 0);
+        addToBuffer(colorBuffer, 0, 0, 0, 0);
+
+        addToBuffer(positionBuffer, 0, AXIS_START, 0);
+        addToBuffer(colorBuffer, 1, 0, 0, 1);
+        addToBuffer(positionBuffer, 0, AXIS_STOP, 0);
         addToBuffer(colorBuffer, 1, 0, 0, 1);
         positionBuffer.flip();
         colorBuffer.flip();
