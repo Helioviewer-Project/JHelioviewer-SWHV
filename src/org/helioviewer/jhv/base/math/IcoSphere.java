@@ -58,7 +58,7 @@ public class IcoSphere {
         faceIndices.add(beginPositionNumberCorona + 3);
 
         FloatBuffer positionBuffer = BufferUtils.genFloatBuffer(vertices.size());
-        for (Float vert : vertices) {
+        for (float vert : vertices) {
             if (vert == 0f)
                 vert = Math.nextAfter(vert, vert + 1.0f);
             positionBuffer.put(vert);
