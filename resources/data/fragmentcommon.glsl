@@ -46,7 +46,14 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
 
     float v;
     float conv = 0.;
-    if (isdifference != NODIFFERENCE) {
+    if (isdifference == NODIFFERENCE) {
+        v = fetch(image, texcoord, b);
+        for (int j = 0; j < FSIZE; j++) {
+            for (int i = 0; i < FSIZE; i++) {
+                conv += fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b) * blurKernel[FSIZE * j + i];
+            }
+        }
+    } else {
         v = fetch(image, texcoord, b) - fetch(differenceImage, difftexcoord, b);
         float diff;
         for (int j = 0; j < FSIZE; j++) {
@@ -58,13 +65,6 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
         }
         v = v * BOOST + 0.5;
         conv = conv * BOOST + 0.5;
-    } else {
-        v = fetch(image, texcoord, b);
-        for (int j = 0; j < FSIZE; j++) {
-            for (int i = 0; i < FSIZE; i++) {
-                conv += fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b) * blurKernel[FSIZE * j + i];
-            }
-        }
     }
     v = mix(v, conv, sharpenParam.z);
 
@@ -86,16 +86,14 @@ vec3 rotate_vector(vec4 quat, vec3 vec) {
 
 float intersectPlane(vec4 vecin) {
     vec3 altnormal = rotate_vector(cameraDifferenceRotationQuat, vec3(0., 0., 1.));
-    if (altnormal.z < 0.) {
+    if (altnormal.z < 0.)
         discard;
-    }
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
 
 float intersectPlanediff(vec4 vecin) {
     vec3 altnormal = rotate_vector(diffcameraDifferenceRotationQuat, vec3(0., 0., 1.));
-    if (altnormal.z < 0.) {
+    if (altnormal.z < 0.)
         discard;
-    }
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
