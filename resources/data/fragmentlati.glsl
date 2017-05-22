@@ -49,13 +49,13 @@ void main(void) {
     vec2 texcoord;
     float texcoord_radius;
     get_lati_texcoord(rect, texcoord, texcoord_radius);
-    if (isdifference != NODIFFERENCE) {
+    if (isdifference == NODIFFERENCE) {
+        color = getColor(texcoord, texcoord, texcoord_radius);
+    } else {
         vec2 difftexcoord;
         float difftexcoord_radius;
         get_lati_texcoord(differencerect, difftexcoord, difftexcoord_radius);
         color = getColor(texcoord, difftexcoord, texcoord_radius);
-    } else {
-        color = getColor(texcoord, texcoord, texcoord_radius);
     }
     gl_FragColor = color;
 }
