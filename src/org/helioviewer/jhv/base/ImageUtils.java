@@ -3,7 +3,6 @@ package org.helioviewer.jhv.base;
 import java.io.File;
 import java.io.IOException;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -40,28 +39,6 @@ public class ImageUtils {
         writer.dispose();
 
         // ImageIO.write(image, "png", new File(name));
-    }
-
-    public static Color getAverageColor(BufferedImage bufImg) {
-        double sumRed = 0;
-        double sumGreen = 0;
-        double sumBlue = 0;
-
-        for (int x = 0; x < bufImg.getWidth(); x++) {
-            for (int y = 0; y < bufImg.getHeight(); y++) {
-                Color curColor = new Color(bufImg.getRGB(x, y), true);
-                sumRed += curColor.getRed();
-                sumGreen += curColor.getGreen();
-                sumBlue += curColor.getBlue();
-            }
-        }
-
-        int totalPixels = bufImg.getWidth() * bufImg.getHeight();
-        float red = (float) (sumRed / totalPixels / 255);
-        float green = (float) (sumGreen / totalPixels / 255);
-        float blue = (float) (sumBlue / totalPixels / 255);
-
-        return new Color(red, green, blue);
     }
 
 }

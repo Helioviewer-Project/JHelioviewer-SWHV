@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
-import java.awt.Color;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
@@ -11,12 +10,8 @@ import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
 public class PfssData {
 
-    private static final float[] red = { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f, 1 };
-    private static final float[] white = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f, 1 };
-    private static final float[] blue = { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1 };
-
     private enum FieldLineColor {
-        OPENFIELDCOLOR(red), LOOPCOLOR(white), INSIDEFIELDCOLOR(blue);
+        OPENFIELDCOLOR(BufferUtils.colorRed), LOOPCOLOR(BufferUtils.colorWhite), INSIDEFIELDCOLOR(BufferUtils.colorBlue);
 
         final float[] color;
 

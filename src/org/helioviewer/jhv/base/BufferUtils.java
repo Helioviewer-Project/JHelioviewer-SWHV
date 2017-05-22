@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.base;
 
+import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -8,6 +9,12 @@ import org.helioviewer.jhv.base.math.Vec3;
 import com.jogamp.common.nio.Buffers;
 
 public class BufferUtils {
+
+    public static final float[] colorRed = { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f, 1 };
+    public static final float[] colorGreen = { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f, 1 };
+    public static final float[] colorBlue = { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1 };
+    public static final float[] colorWhite = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f, 1 };
+    public static final float[] colorYellow = { Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f, Color.YELLOW.getBlue() / 255f, 1 };
 
     public static FloatBuffer newFloatBuffer(int len) {
         return Buffers.newDirectFloatBuffer(len);
