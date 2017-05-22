@@ -140,7 +140,7 @@ public class RenderableGrid extends AbstractRenderable {
             }
         }
         gl.glPopMatrix();
-        drawEarthCircles(gl, vp.aspect, Sun.getEarth(camera.getViewpoint().time));
+        drawEarthCircles(gl, vp.aspect, Sun.getEarthQuat(camera.getViewpoint().time).orientation);
 
         if (showRadial) {
             cameraMatrix = camera.getViewpoint().orientation.toMatrix();
@@ -228,12 +228,9 @@ public class RenderableGrid extends AbstractRenderable {
         renderer.end3DRendering();
     }
 
-    private void drawEarthCircles(GL2 gl, double aspect, Position.L p) {
+    private void drawEarthCircles(GL2 gl, double aspect, Quat q) {
         gl.glPushMatrix();
-        gl.glRotatef((float) (90 - 180 / Math.PI * p.lon), 0, 1, 0);
-        earthCircleLine.render(gl, aspect, thicknessEarth);
-        gl.glRotatef(-90, 0, 1, 0);
-        gl.glRotatef((float) (90 - 180 / Math.PI * p.lat), 1, 0, 0);
+        gl.glMultMatrixd(q.toMatrix().transpose().m, 0);
         earthCircleLine.render(gl, aspect, thicknessEarth);
         gl.glPopMatrix();
     }
@@ -454,17 +451,35 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void initEarthCircles(GL2 gl) {
-        int no_points = SUBDIVISIONS + 1;
+        int no_points = 2 * (SUBDIVISIONS + 1) + 1;
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-        Vec3 v = new Vec3();
+
+        Vec3 rotv = new Vec3(), v = new Vec3();
+        Quat q = Quat.createRotation(Math.PI / 2, new Vec3(1, 0, 0));
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
             v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
             v.z = 0.;
-            BufferUtils.put3f(positionBuffer, v);
+            rotv = q.rotateVector(v);
+            BufferUtils.put3f(positionBuffer, rotv);
             colorBuffer.put(earthLineColor);
         }
+
+        BufferUtils.put3f(positionBuffer, rotv);
+        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+
+        v = new Vec3();
+        q = Quat.createRotation(Math.PI / 2, new Vec3(0, 1, 0));
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
+            v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
+            v.z = 0.;
+            rotv = q.rotateVector(v);
+            BufferUtils.put3f(positionBuffer, rotv);
+            colorBuffer.put(earthLineColor);
+        }
+
         positionBuffer.flip();
         colorBuffer.flip();
         earthCircleLine.setData(gl, positionBuffer, colorBuffer);
@@ -514,12 +529,10 @@ public class RenderableGrid extends AbstractRenderable {
             for (int k = -1; k <= 1; k = k + 2) {
                 rotation = latstepDegrees * j * k;
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
-
                     double scale = Math.cos(Math.PI / 180. * (90 - rotation));
                     v.y = scale;
                     v.x = Math.sqrt(1. - scale * scale) * Math.sin(2 * Math.PI * i / HALFDIVISIONS);
                     v.z = Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
-
                     if (i == 0) {
                         BufferUtils.put3f(positionBuffer, v);
                         BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
