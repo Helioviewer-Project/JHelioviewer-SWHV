@@ -3,12 +3,11 @@ package org.helioviewer.jhv.plugins.pfss.data;
 import java.awt.Color;
 import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
-
-import com.jogamp.common.nio.Buffers;
 
 public class PfssData {
 
@@ -52,8 +51,8 @@ public class PfssData {
         sphi = Math.sin(p.lon);
 
         int numberOfLines = fieldlinex.length / PfssSettings.POINTS_PER_LINE;
-        vertices = Buffers.newDirectFloatBuffer(3 * (fieldlinex.length + 2 * numberOfLines));
-        colors = Buffers.newDirectFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
+        vertices = BufferUtils.genFloatBuffer(3 * (fieldlinex.length + 2 * numberOfLines));
+        colors = BufferUtils.genFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
     }
 
     private void addColor(Color color) {
