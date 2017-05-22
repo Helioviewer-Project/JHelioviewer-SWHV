@@ -474,8 +474,9 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void initEarthCircles(GL2 gl) {
-        FloatBuffer positionBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 3);
-        FloatBuffer colorBuffer = FloatBuffer.allocate(2 * (SUBDIVISIONS + 3) * 4);
+        int no_points = (SUBDIVISIONS + 1);
+        FloatBuffer positionBuffer = FloatBuffer.allocate(no_points * 3);
+        FloatBuffer colorBuffer = FloatBuffer.allocate(no_points * 4);
         Vec3 v = new Vec3();
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
@@ -492,13 +493,15 @@ public class RenderableGrid extends AbstractRenderable {
     private void initGrid(GL2 gl) {
         int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
         int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
+        int HALFDIVISIONS = SUBDIVISIONS / 2;
 
-        FloatBuffer positionBuffer = FloatBuffer.allocate(2 * (no_lon_steps + no_lat_steps) * (SUBDIVISIONS + 3) * 3);
-        FloatBuffer colorBuffer = FloatBuffer.allocate(2 * (no_lon_steps + no_lat_steps) * (SUBDIVISIONS + 3) * 4);
+        int no_points = 2 * (no_lat_steps + no_lon_steps) * (HALFDIVISIONS + 3);
+
+        FloatBuffer positionBuffer = FloatBuffer.allocate(no_points * 3);
+        FloatBuffer colorBuffer = FloatBuffer.allocate(no_points * 4);
 
         Vec3 v = new Vec3();
         double rotation;
-        double HALFDIVISIONS = SUBDIVISIONS / 2;
         for (int j = 0; j < no_lon_steps; j++) {
             for (int k = -1; k <= 1; k = k + 2) {
                 rotation = lonstepDegrees * j * k;
