@@ -29,15 +29,17 @@ void get_lati_texcoord(const in vec4 rect, out vec2 texcoord, out float radius) 
     mat3 crotm = mat3(
        cos(hglt),                0.,         sin(hglt),
        -sin(crota) * sin(hglt),  cos(crota), sin(crota) * cos(hglt),
-       -cos(crota) * sin(hglt), -sin(crota), cos(crota) * cos(hglt) 
+       -cos(crota) * sin(hglt), -sin(crota), cos(crota) * cos(hglt)
     );
     vec3 xcartrot = crotm * xcart;
     if (xcartrot.x < 0.)
         discard;
-    float f = xcartrot.z * xcartrot.z + xcartrot.y * xcartrot.y;
     texcoord = vec2(rect.w * (xcartrot.y - rect.x), rect.w * (xcartrot.z - rect.y));
-    radius = f*f;
     clamp_texcoord(texcoord);
+
+//    float f = xcartrot.z * xcartrot.z + xcartrot.y * xcartrot.y;
+//    radius = f * f;
+    radius = 1.;
 }
 
 void main(void) {
@@ -46,7 +48,7 @@ void main(void) {
     vec4 color;
     vec2 texcoord;
     float texcoord_radius;
-    get_lati_texcoord(rect, texcoord, texcoord_radius); 
+    get_lati_texcoord(rect, texcoord, texcoord_radius);
     if (isdifference != NODIFFERENCE) {
         vec2 difftexcoord;
         float difftexcoord_radius;
