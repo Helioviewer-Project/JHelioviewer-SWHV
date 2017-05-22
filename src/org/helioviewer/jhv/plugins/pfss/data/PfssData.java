@@ -11,12 +11,16 @@ import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
 public class PfssData {
 
+    private static final float[] red = { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f, 1 };
+    private static final float[] white = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f, 1 };
+    private static final float[] blue = { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1 };
+
     private enum FieldLineColor {
-        OPENFIELDCOLOR(Color.RED), LOOPCOLOR(Color.WHITE), INSIDEFIELDCOLOR(Color.BLUE);
+        OPENFIELDCOLOR(red), LOOPCOLOR(white), INSIDEFIELDCOLOR(blue);
 
-        public final Color color;
+        final float[] color;
 
-        FieldLineColor(Color _color) {
+        FieldLineColor(float[] _color) {
             color = _color;
         }
     }
@@ -55,24 +59,15 @@ public class PfssData {
         colors = BufferUtils.genFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
     }
 
-    private void addColor(Color color) {
-        colors.put(color.getRed() / 255f);
-        colors.put(color.getGreen() / 255f);
-        colors.put(color.getBlue() / 255f);
-        colors.put(color.getAlpha() / 255f);
-    }
-
-    private void addVertex(float x, float y, float z) {
-        vertices.put(x);
-        vertices.put(y);
-        vertices.put(z);
+    private void addColor(float[] color) {
+        BufferUtils.put4f(colors, color[0], color[1], color[2], color[3]);
     }
 
     private void addColor(double bright, float opacity) {
         if (bright > 0) {
-            addColor(new Color(1f, (float) (1. - bright), (float) (1. - bright), opacity));
+            BufferUtils.put4f(colors, 1, (float) (1. - bright), (float) (1. - bright), opacity);
         } else {
-            addColor(new Color((float) (1. + bright), (float) (1. + bright), 1f, opacity));
+            BufferUtils.put4f(colors, (float) (1. + bright), (float) (1. + bright), 1, opacity);
         }
     }
 
@@ -104,9 +99,9 @@ public class PfssData {
                 y = helpy;
 
                 if (i % PfssSettings.POINTS_PER_LINE == 0) {
-                    addVertex((float) x, (float) z, (float) -y);
+                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     addColor(bright, 0);
-                    addVertex((float) x, (float) z, (float) -y);
+                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     if (!fixedColor) {
                         addColor(bright, 1);
                     } else {
@@ -126,16 +121,16 @@ public class PfssData {
                         addColor(type.color);
                     }
                 } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
-                    addVertex((float) x, (float) z, (float) -y);
+                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     if (!fixedColor) {
                         addColor(bright, 1);
                     } else {
                         addColor(type.color);
                     }
-                    addVertex((float) x, (float) z, (float) -y);
+                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     addColor(bright, 0);
                 } else {
-                    addVertex((float) x, (float) z, (float) -y);
+                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     if (!fixedColor) {
                         addColor(bright, 1);
                     } else {
