@@ -39,7 +39,7 @@ public class GLLine {
         GLSLLineShader.line.bindParams(gl);
 
         bindVBOs(gl);
-        gl.glDrawElements(GL2.GL_TRIANGLES, vbos[4].bufferSize, GL2.GL_UNSIGNED_INT, 0);
+        gl.glDrawElements(GL2.GL_TRIANGLES, ivbo.bufferSize, GL2.GL_UNSIGNED_INT, 0);
         unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
