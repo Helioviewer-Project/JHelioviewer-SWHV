@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import java.awt.Color;
-
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
@@ -16,13 +15,9 @@ import com.jogamp.opengl.GL2;
 
 abstract class AbstractAnnotateable implements Annotateable {
 
-    private static final Color colorActive = Color.red;
-    private static final Color colorDrag = Color.yellow;
-    private static final Color colorBase = Color.blue;
-
-    static final float[] activeColor = { colorActive.getRed() / 255f, colorActive.getGreen() / 255f, colorActive.getBlue() / 255f };
-    static final float[] dragColor = { colorDrag.getRed() / 255f, colorDrag.getGreen() / 255f, colorDrag.getBlue() / 255f };
-    static final float[] baseColor = { colorBase.getRed() / 255f, colorBase.getGreen() / 255f, colorBase.getBlue() / 255f };
+    static final float[] activeColor = BufferUtils.colorRed;
+    static final float[] dragColor = BufferUtils.colorYellow;
+    static final float[] baseColor = BufferUtils.colorBlue;
 
     static final float lineWidth = 2;
     static final double radius = Sun.Radius * 1.01;
