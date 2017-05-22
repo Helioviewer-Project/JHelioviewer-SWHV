@@ -34,7 +34,9 @@ public class RenderableGrid extends AbstractRenderable {
     // height of text in solar radii
     private static final float textScale = (float) (0.08 * Sun.Radius);
     private static final int SUBDIVISIONS = 360;
-    private static final double thickness = 0.002;
+    private static final double thickness = 0.0015;
+    private static final double thicknessEarth = 0.0015;
+    private static final double thicknessAxes = 0.004;
 
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
@@ -124,7 +126,7 @@ public class RenderableGrid extends AbstractRenderable {
             initGrid(gl);
         }
         if (showAxis)
-            axesline.render(gl, vp.aspect, thickness);
+            axesline.render(gl, vp.aspect, thicknessAxes);
 
         Mat4 cameraMatrix = getGridQuat(camera, gridChoice).toMatrix();
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
@@ -229,10 +231,10 @@ public class RenderableGrid extends AbstractRenderable {
     private void drawEarthCircles(GL2 gl, double aspect, Position.L p) {
         gl.glPushMatrix();
         gl.glRotatef((float) (90 - 180 / Math.PI * p.lon), 0, 1, 0);
-        earthCircleLine.render(gl, aspect, thickness);
+        earthCircleLine.render(gl, aspect, thicknessEarth);
         gl.glRotatef(-90, 0, 1, 0);
         gl.glRotatef((float) (90 - 180 / Math.PI * p.lat), 1, 0, 0);
-        earthCircleLine.render(gl, aspect, thickness);
+        earthCircleLine.render(gl, aspect, thicknessEarth);
         gl.glPopMatrix();
     }
 

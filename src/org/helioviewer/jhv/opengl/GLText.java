@@ -34,7 +34,7 @@ public class GLText {
             // renderer[idx].setSmoothing(false);
             renderer[idx].setColor(Color.WHITE);
             // precache for grid text
-            renderer[idx].draw3D("-0123456789.", 0, 0, -100, 0);
+            renderer[idx].draw3D("-0123456789.", 0, 0, 0, 0);
         }
         return renderer[idx];
     }
