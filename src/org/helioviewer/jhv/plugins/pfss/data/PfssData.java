@@ -59,10 +59,6 @@ public class PfssData {
         colors = BufferUtils.genFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
     }
 
-    private void addColor(float[] color) {
-        BufferUtils.put4f(colors, color[0], color[1], color[2], color[3]);
-    }
-
     private void addColor(double bright, float opacity) {
         if (bright > 0) {
             BufferUtils.put4f(colors, 1, (float) (1. - bright), (float) (1. - bright), opacity);
@@ -102,9 +98,7 @@ public class PfssData {
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     addColor(bright, 0);
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                    if (!fixedColor) {
-                        addColor(bright, 1);
-                    } else {
+                    if (fixedColor) {
                         double xo = 3. * decode(fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1]);
                         double yo = 3. * decode(fieldliney[i + PfssSettings.POINTS_PER_LINE - 1]);
                         double zo = 3. * decode(fieldlinez[i + PfssSettings.POINTS_PER_LINE - 1]);
@@ -118,23 +112,19 @@ public class PfssData {
                         } else {
                             type = FieldLineColor.OPENFIELDCOLOR;
                         }
-                        addColor(type.color);
-                    }
-                } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
-                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                    if (!fixedColor) {
+                        colors.put(type.color);
+                    } else
                         addColor(bright, 1);
-                    } else {
-                        addColor(type.color);
-                    }
-                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                    addColor(bright, 0);
                 } else {
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                    if (!fixedColor) {
+                    if (fixedColor)
+                        colors.put(type.color);
+                    else
                         addColor(bright, 1);
-                    } else {
-                        addColor(type.color);
+                    // end line
+                    if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
+                        BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
+                        addColor(bright, 0);
                     }
                 }
             }
