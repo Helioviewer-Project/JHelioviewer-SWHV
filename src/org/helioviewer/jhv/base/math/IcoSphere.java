@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.Pair;
 
 public class IcoSphere {
@@ -56,7 +57,7 @@ public class IcoSphere {
         faceIndices.add(beginPositionNumberCorona);
         faceIndices.add(beginPositionNumberCorona + 3);
 
-        FloatBuffer positionBuffer = FloatBuffer.allocate(vertices.size());
+        FloatBuffer positionBuffer = BufferUtils.genFloatBuffer(vertices.size());
         for (Float vert : vertices) {
             if (vert == 0f)
                 vert = Math.nextAfter(vert, vert + 1.0f);
@@ -64,7 +65,7 @@ public class IcoSphere {
         }
         positionBuffer.flip();
 
-        ShortBuffer indexBuffer = ShortBuffer.allocate(faceIndices.size());
+        ShortBuffer indexBuffer = BufferUtils.genShortBuffer(faceIndices.size());
         for (int i : faceIndices) {
             indexBuffer.put((short) i);
         }

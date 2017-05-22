@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
@@ -403,8 +404,8 @@ public class RenderableGrid extends AbstractRenderable {
 
     private void initAxes(GL2 gl) {
         int plen = 6;
-        FloatBuffer positionBuffer = FloatBuffer.allocate(plen * 3);
-        FloatBuffer colorBuffer = FloatBuffer.allocate(plen * 4);
+        FloatBuffer positionBuffer = BufferUtils.genFloatBuffer(plen * 3);
+        FloatBuffer colorBuffer = BufferUtils.genFloatBuffer(plen * 4);
 
         addToBuffer(positionBuffer, 0,-AXIS_STOP,0);
         addToBuffer(colorBuffer, 0, 0, 1, 1);
@@ -429,8 +430,8 @@ public class RenderableGrid extends AbstractRenderable {
         int no_lines = (int) Math.ceil(360 / STEP_DEGREES);
         
         int no_points = (END_RADIUS - START_RADIUS + 1) * (SUBDIVISIONS + 1) + 4 * no_lines;
-        FloatBuffer positionBuffer = FloatBuffer.allocate(no_points * 3);
-        FloatBuffer colorBuffer = FloatBuffer.allocate(no_points * 4);
+        FloatBuffer positionBuffer = BufferUtils.genFloatBuffer(no_points * 3);
+        FloatBuffer colorBuffer = BufferUtils.genFloatBuffer(no_points * 4);
         Vec3 v = new Vec3();
 
         for (double i = START_RADIUS; i <= END_RADIUS; i++) {
@@ -469,8 +470,8 @@ public class RenderableGrid extends AbstractRenderable {
 
     private void initEarthCircles(GL2 gl) {
         int no_points = (SUBDIVISIONS + 1);
-        FloatBuffer positionBuffer = FloatBuffer.allocate(no_points * 3);
-        FloatBuffer colorBuffer = FloatBuffer.allocate(no_points * 4);
+        FloatBuffer positionBuffer = BufferUtils.genFloatBuffer(no_points * 3);
+        FloatBuffer colorBuffer = BufferUtils.genFloatBuffer(no_points * 4);
         Vec3 v = new Vec3();
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
@@ -491,8 +492,8 @@ public class RenderableGrid extends AbstractRenderable {
 
         int no_points = 2 * (no_lat_steps + no_lon_steps) * (HALFDIVISIONS + 3);
 
-        FloatBuffer positionBuffer = FloatBuffer.allocate(no_points * 3);
-        FloatBuffer colorBuffer = FloatBuffer.allocate(no_points * 4);
+        FloatBuffer positionBuffer = BufferUtils.genFloatBuffer(no_points * 3);
+        FloatBuffer colorBuffer = BufferUtils.genFloatBuffer(no_points * 4);
 
         Vec3 v = new Vec3();
         double rotation;
