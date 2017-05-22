@@ -429,7 +429,7 @@ public class RenderableGrid extends AbstractRenderable {
     private void initRadialCircles(GL2 gl) {
         int no_lines = (int) Math.ceil(360 / STEP_DEGREES);
 
-        int no_points = (END_RADIUS - START_RADIUS + 1) * (SUBDIVISIONS + 1) + 4 * no_lines;
+        int no_points = (END_RADIUS - START_RADIUS + 1) * (SUBDIVISIONS + 1) + 4 * no_lines + 1;
         FloatBuffer positionBuffer = BufferUtils.genFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.genFloatBuffer(no_points * 4);
         Vec3 v = new Vec3();
@@ -443,6 +443,11 @@ public class RenderableGrid extends AbstractRenderable {
                 colorBuffer.put(radialLineColor);
             }
         }
+
+        //repeat last point with 0 alpha
+        addToBuffer(positionBuffer, v);
+        addToBuffer(colorBuffer, 0, 0, 0, 0);
+
         float i = 0;
         for (int j = 0; j < no_lines; j++) {
             i += STEP_DEGREES;
