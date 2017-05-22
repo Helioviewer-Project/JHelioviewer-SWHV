@@ -10,15 +10,15 @@ import com.jogamp.common.nio.Buffers;
 
 public class BufferUtils {
 
-    public static FloatBuffer genFloatBuffer(int len) {
+    public static FloatBuffer newFloatBuffer(int len) {
         return Buffers.newDirectFloatBuffer(len);
     }
 
-    public static IntBuffer genIntBuffer(int len) {
+    public static IntBuffer newIntBuffer(int len) {
         return Buffers.newDirectIntBuffer(len);
     }
 
-    public static ShortBuffer genShortBuffer(int len) {
+    public static ShortBuffer newShortBuffer(int len) {
         return Buffers.newDirectShortBuffer(len);
     }
 

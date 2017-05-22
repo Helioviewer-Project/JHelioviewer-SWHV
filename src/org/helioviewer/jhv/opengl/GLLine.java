@@ -82,7 +82,7 @@ public class GLLine {
     }
 
     private IntBuffer gen_indices(int plen) {
-        IntBuffer indicesBuffer = BufferUtils.genIntBuffer(6 * plen);
+        IntBuffer indicesBuffer = BufferUtils.newIntBuffer(6 * plen);
         for (int j = 0; j < 2 * plen - 3; j = j + 2) {
             indicesBuffer.put(j + 0);
             indicesBuffer.put(j + 1);
@@ -111,11 +111,11 @@ public class GLLine {
     }
 
     private void setBufferData(GL2 gl, FloatBuffer points, FloatBuffer colors, int plen) {
-        FloatBuffer previousLineBuffer = BufferUtils.genFloatBuffer(3 * 2 * plen);
-        FloatBuffer lineBuffer = BufferUtils.genFloatBuffer(3 * 2 * plen);
-        FloatBuffer nextLineBuffer = BufferUtils.genFloatBuffer(3 * 2 * plen);
-        FloatBuffer directionBuffer = BufferUtils.genFloatBuffer(2 * 2 * plen);
-        FloatBuffer colorBuffer = BufferUtils.genFloatBuffer(4 * 2 * plen);
+        FloatBuffer previousLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer lineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer nextLineBuffer = BufferUtils.newFloatBuffer(3 * 2 * plen);
+        FloatBuffer directionBuffer = BufferUtils.newFloatBuffer(2 * 2 * plen);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(4 * 2 * plen);
 
         int dir = -1;
         for (int i = 0; i < 2 * plen; i++) {

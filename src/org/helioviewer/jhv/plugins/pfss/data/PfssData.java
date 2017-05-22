@@ -55,8 +55,8 @@ public class PfssData {
         sphi = Math.sin(p.lon);
 
         int numberOfLines = fieldlinex.length / PfssSettings.POINTS_PER_LINE;
-        vertices = BufferUtils.genFloatBuffer(3 * (fieldlinex.length + 2 * numberOfLines));
-        colors = BufferUtils.genFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
+        vertices = BufferUtils.newFloatBuffer(3 * (fieldlinex.length + 2 * numberOfLines));
+        colors = BufferUtils.newFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
     }
 
     private void addColor(double bright) {
