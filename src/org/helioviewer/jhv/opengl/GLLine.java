@@ -32,7 +32,6 @@ public class GLLine {
     public void render(GL2 gl, double aspect, double thickness) {
         if (!hasPoints)
             return;
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE);
 
         GLSLLineShader.line.bind(gl);
         GLSLLineShader.line.setAspect(aspect);
@@ -44,8 +43,6 @@ public class GLLine {
         unbindVBOs(gl);
 
         GLSLShader.unbind(gl);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-
     }
 
     private void bindVBOs(GL2 gl) {
