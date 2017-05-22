@@ -59,11 +59,11 @@ public class PfssData {
         colors = BufferUtils.genFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
     }
 
-    private void addColor(double bright, float opacity) {
+    private void addColor(double bright) {
         if (bright > 0) {
-            BufferUtils.put4f(colors, 1, (float) (1. - bright), (float) (1. - bright), opacity);
+            BufferUtils.put4f(colors, 1, (float) (1. - bright), (float) (1. - bright), 1);
         } else {
-            BufferUtils.put4f(colors, (float) (1. + bright), (float) (1. + bright), 1, opacity);
+            BufferUtils.put4f(colors, (float) (1. + bright), (float) (1. + bright), 1, 1);
         }
     }
 
@@ -95,8 +95,10 @@ public class PfssData {
                 y = helpy;
 
                 if (i % PfssSettings.POINTS_PER_LINE == 0) {
+                    // start line
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                    addColor(bright, 0);
+                    BufferUtils.put4f(colors, 0, 0, 0, 0);
+
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     if (fixedColor) {
                         double xo = 3. * decode(fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1]);
@@ -114,17 +116,17 @@ public class PfssData {
                         }
                         colors.put(type.color);
                     } else
-                        addColor(bright, 1);
+                        addColor(bright);
                 } else {
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     if (fixedColor)
                         colors.put(type.color);
                     else
-                        addColor(bright, 1);
+                        addColor(bright);
                     // end line
                     if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
                         BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                        addColor(bright, 0);
+                        BufferUtils.put4f(colors, 0, 0, 0, 0);
                     }
                 }
             }
