@@ -17,20 +17,15 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 @SuppressWarnings("serial")
 class RenderableMiniviewOptionsPanel extends JPanel {
 
-    static final int MIN = 5;
-    static final int MAX = 15;
-    int scale;
-
-    public RenderableMiniviewOptionsPanel(RenderableMiniview miniview, int _scale) {
+    public RenderableMiniviewOptionsPanel(RenderableMiniview miniview, int scale, int min_scale, int max_scale) {
         setLayout(new GridBagLayout());
 
-        scale = _scale;
-        JSpinner spinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(scale), Double.valueOf(MIN), Double.valueOf(MAX), Double.valueOf(1)));
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(scale), Double.valueOf(min_scale), Double.valueOf(max_scale), Double.valueOf(1)));
         JFormattedTextField f = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-        f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%", MIN, MAX));
+        f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%", min_scale, max_scale));
 
         spinner.addChangeListener(e -> {
-            scale = ((Double) spinner.getValue()).intValue();
+            miniview.setScale(((Double) spinner.getValue()).intValue());
             miniview.reshapeViewport();
             Displayer.display();
         });

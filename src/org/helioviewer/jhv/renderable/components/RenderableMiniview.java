@@ -24,25 +24,33 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     private final Camera miniCamera = new Camera();
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
 
+    private static final int MIN_SCALE = 5;
+    private static final int MAX_SCALE = 15;
+    private int scale = 10;
+
     @Override
     public void serialize(JSONObject jo) {
-        jo.put("scale", optionsPanel.scale);
+        jo.put("scale", scale);
     }
 
     public RenderableMiniview(JSONObject jo) {
-        int scale = MathUtils.clip(jo.optInt("scale", 10), RenderableMiniviewOptionsPanel.MIN, RenderableMiniviewOptionsPanel.MAX);
-        optionsPanel = new RenderableMiniviewOptionsPanel(this, scale);
+        scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
+        optionsPanel = new RenderableMiniviewOptionsPanel(this, scale, MIN_SCALE, MAX_SCALE);
     }
 
     public RenderableMiniview() {
-        optionsPanel = new RenderableMiniviewOptionsPanel(this, 10);
+        optionsPanel = new RenderableMiniviewOptionsPanel(this, scale, MIN_SCALE, MAX_SCALE);
         setVisible(true);
+    }
+
+    void setScale(int _scale) {
+        scale = _scale;
     }
 
     public void reshapeViewport() {
         int vpw = Displayer.fullViewport.width;
         int offset = (int) (vpw * 0.01);
-        int size = (int) (vpw * 0.01 * optionsPanel.scale);
+        int size = (int) (vpw * 0.01 * scale);
 
         miniViewport = new Viewport(0, offset, offset, size, size);
     }
