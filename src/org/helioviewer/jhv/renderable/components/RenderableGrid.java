@@ -127,7 +127,6 @@ public class RenderableGrid extends AbstractRenderable {
         if (needsInit) {
             initGrid(gl);
         }
-
         if (showAxis)
             axesline.render(gl, vp.aspect, thickness);
 
@@ -427,22 +426,15 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void initRadialCircles(GL2 gl) {
-        int nolines = (int) Math.ceil(360 / STEP_DEGREES);
-
-        FloatBuffer positionBuffer = FloatBuffer
-                .allocate(((END_RADIUS - START_RADIUS + 1) * (SUBDIVISIONS + 1) + 4 * nolines) * 3);
-        FloatBuffer colorBuffer = FloatBuffer
-                .allocate(((END_RADIUS - START_RADIUS + 1) * (SUBDIVISIONS + 1) + 4 * nolines) * 4);
-        //double tn;
+        int no_lines = (int) Math.ceil(360 / STEP_DEGREES);
+        
+        int no_points = (END_RADIUS - START_RADIUS + 1) * (SUBDIVISIONS + 1) + 4 * no_lines;
+        FloatBuffer positionBuffer = FloatBuffer.allocate(no_points * 3);
+        FloatBuffer colorBuffer = FloatBuffer.allocate(no_points * 4);
         Vec3 v = new Vec3();
 
         for (double i = START_RADIUS; i <= END_RADIUS; i++) {
-/*          if (i % 10 == 0) {
-                tn = thickness;
-            } else {
-                tn = thickness / 2;
-            }
-*/          for (int j = 0; j <= SUBDIVISIONS; j++) {
+            for (int j = 0; j <= SUBDIVISIONS; j++) {
                 v.x = i * Sun.Radius * Math.cos(2 * Math.PI * j / SUBDIVISIONS);
                 v.y = i * Sun.Radius * Math.sin(2 * Math.PI * j / SUBDIVISIONS);
                 v.z = 0.;
@@ -450,8 +442,9 @@ public class RenderableGrid extends AbstractRenderable {
                 colorBuffer.put(radialLineColor);
             }
         }
-
-        for (float i = 0; i < 360; i += STEP_DEGREES) {
+        float i = 0;
+        for (int j = 0; j < no_lines; j++) {
+            i += STEP_DEGREES;
             Quat q = Quat.createRotation(2 * Math.PI * i / 360., new Vec3(0, 0, 1));
 
             v.set(START_RADIUS, 0, 0);
@@ -470,6 +463,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
         positionBuffer.flip();
         colorBuffer.flip();
+
         radialCircleLine.setData(gl, positionBuffer, colorBuffer);
     }
 
