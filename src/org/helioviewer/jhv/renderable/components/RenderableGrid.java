@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.renderable.components;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
@@ -37,14 +36,10 @@ public class RenderableGrid extends AbstractRenderable {
     private static final int SUBDIVISIONS = 360;
     private static final double thickness = 0.002;
 
-    private static final float[] color1 = { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f,
-            Color.RED.getBlue() / 255f, 1 };
-    private static final float[] color2 = { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f,
-            Color.GREEN.getBlue() / 255f, 1 };
-    private static final float[] earthLineColor = { Color.YELLOW.getRed() / 255f, Color.YELLOW.getGreen() / 255f,
-            Color.YELLOW.getBlue() / 255f, 1 };
-    private static final float[] radialLineColor = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f,
-            Color.WHITE.getBlue() / 255f, 1 };
+    private static final float[] color1 = BufferUtils.colorRed;
+    private static final float[] color2 = BufferUtils.colorGreen;
+    private static final float[] earthLineColor = BufferUtils.colorYellow;
+    private static final float[] radialLineColor = BufferUtils.colorWhite;
 
     private static final int END_RADIUS = 30;
     private static final int START_RADIUS = 2;
