@@ -28,7 +28,7 @@ public abstract class SWEKDownloader {
             boolean overmax = true;
             while (overmax && success) {
                 JSONObject eventJSON = JSONUtils.getJSONStream(new DownloadStream(createURL(eventType.getEventType(), start, end, params, page)).getInput());
-                overmax = eventJSON.has("overmax") && eventJSON.getBoolean("overmax");
+                overmax = eventJSON.optBoolean("overmax", false);
                 success = parseEvents(eventJSON, eventType) && parseAssociations(eventJSON);
                 page++;
             }
