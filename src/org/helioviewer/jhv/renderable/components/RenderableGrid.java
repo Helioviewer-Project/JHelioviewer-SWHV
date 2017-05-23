@@ -451,7 +451,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void initEarthCircles(GL2 gl) {
-        int no_points = 2 * (SUBDIVISIONS + 1) + 1;
+        int no_points = 2 * (SUBDIVISIONS + 3);
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
 
@@ -462,6 +462,10 @@ public class RenderableGrid extends AbstractRenderable {
             v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
             v.z = 0.;
             rotv = q.rotateVector(v);
+            if (i == 0) {
+                BufferUtils.put3f(positionBuffer, rotv);
+                BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+            }
             BufferUtils.put3f(positionBuffer, rotv);
             colorBuffer.put(earthLineColor);
         }
@@ -476,9 +480,16 @@ public class RenderableGrid extends AbstractRenderable {
             v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
             v.z = 0.;
             rotv = q.rotateVector(v);
+            if (i == 0) {
+                BufferUtils.put3f(positionBuffer, rotv);
+                BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+            }
             BufferUtils.put3f(positionBuffer, rotv);
             colorBuffer.put(earthLineColor);
         }
+
+        BufferUtils.put3f(positionBuffer, rotv);
+        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
 
         positionBuffer.flip();
         colorBuffer.flip();
