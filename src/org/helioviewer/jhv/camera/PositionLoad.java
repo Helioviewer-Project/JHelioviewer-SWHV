@@ -71,7 +71,7 @@ public class PositionLoad {
                 DownloadStream ds = new DownloadStream(buildURL(deltat), true);
                 JSONObject result = JSONUtils.getJSONStream(ds.getInput());
                 if (ds.isResponse400()) {
-                    report = result.has("faultstring") ? result.getString("faultstring") : "Invalid network response";
+                    report = result.optString("faultstring", "Invalid network response");
                 } else {
                     return parseData(result);
                 }

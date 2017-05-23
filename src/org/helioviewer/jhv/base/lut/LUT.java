@@ -139,18 +139,14 @@ public class LUT {
         for (int i = 0; i < length; ++i) {
             try {
                 JSONObject rule = colorRules.getJSONObject(i);
-                if (rule.has("observatory") && !rule.getString("observatory").equalsIgnoreCase(hvMetaData.getObservatory())) {
-                        continue;
-                }
-                if (rule.has("instrument") && !rule.getString("instrument").equalsIgnoreCase(hvMetaData.getInstrument())) {
-                        continue;
-                }
-                if (rule.has("detector") && !rule.getString("detector").equalsIgnoreCase(hvMetaData.getDetector())) {
-                        continue;
-                }
-                if (rule.has("measurement") && !rule.getString("measurement").equalsIgnoreCase(hvMetaData.getMeasurement())) {
-                        continue;
-                }
+                if (rule.has("observatory") && !rule.getString("observatory").equalsIgnoreCase(hvMetaData.getObservatory()))
+                    continue;
+                if (rule.has("instrument") && !rule.getString("instrument").equalsIgnoreCase(hvMetaData.getInstrument()))
+                    continue;
+                if (rule.has("detector") && !rule.getString("detector").equalsIgnoreCase(hvMetaData.getDetector()))
+                    continue;
+                if (rule.has("measurement") && !rule.getString("measurement").equalsIgnoreCase(hvMetaData.getMeasurement()))
+                    continue;
                 return standardList.get(rule.getString("color"));
             } catch (JSONException e) {
                 Log.warn("Rule " + i + " for the default color table is invalid!", e);

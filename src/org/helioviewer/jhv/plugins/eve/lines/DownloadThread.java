@@ -37,11 +37,7 @@ class DownloadThread extends JHVWorker<Pair<float[], long[]>, Void> {
     protected Pair<float[], long[]> backgroundWork() {
         try {
             JSONObject json = JSONUtils.getJSONStream(new DownloadStream(buildRequest(interval, band.getBandType())).getInput());
-
-            double multiplier = 1.0;
-            if (json.has("multiplier")) {
-                multiplier = json.getDouble("multiplier");
-            }
+            double multiplier = json.optDouble("multiplier", 1);
 
             JSONArray data = json.getJSONArray("data");
             int length = data.length();

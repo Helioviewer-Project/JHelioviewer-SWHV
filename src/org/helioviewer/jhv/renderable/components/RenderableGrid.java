@@ -365,7 +365,7 @@ public class RenderableGrid extends AbstractRenderable {
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(plen * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
 
-        for (int i = 0; i < (FLAT_STEPS_THETA + 1); i++) {
+        for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
             float start = -w / 2 + i * w / FLAT_STEPS_THETA;
             BufferUtils.put3f(positionBuffer, start, -h / 2, 0);
             BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
@@ -381,7 +381,7 @@ public class RenderableGrid extends AbstractRenderable {
             BufferUtils.put3f(positionBuffer, start, h / 2, 0);
             BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
         }
-        for (int i = 0; i < (FLAT_STEPS_RADIAL + 1); i++) {
+        for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
             float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
             BufferUtils.put3f(positionBuffer, -w / 2, start, 0);
             BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
