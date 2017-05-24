@@ -76,7 +76,7 @@ public class EventDatabase {
     private static final String SELECT_DATERANGE = "SELECT start, end FROM date_range where type_id=? order by start, end ";
     private static final String SELECT_LAST_EVENT = "SELECT end FROM events WHERE type_id=? order by end DESC LIMIT 1";
     private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link " + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id " + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id " + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
-    private static final String SELECT_EVENT_BY_ID = "SELECT e.id, e.start, e.end, e.data, event_type.name, event_type.supplier FROM events AS e LEFT JOIN event_type ON e.type_id = event_type.id WHERE e.id=?";
+    private static final String SELECT_EVENT_BY_ID = "SELECT e.id, e.start, e.end, e.data, event_type.supplier FROM events AS e LEFT JOIN event_type ON e.type_id = event_type.id WHERE e.id=?";
 
     private static final HashMap<Object, PreparedStatement> statements = new HashMap<>();
 
@@ -110,7 +110,7 @@ public class EventDatabase {
         int typeId = -1;
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_TYPE);
-            pstatement.setString(1, event.getEventType().getDisplayName());
+            pstatement.setString(1, event.getSupplier().getEventType().getDisplayName());
             pstatement.setString(2, event.getSupplier().getSupplierKey());
 
             try (ResultSet rs = pstatement.executeQuery()) {
@@ -119,7 +119,7 @@ public class EventDatabase {
                 }
             }
         } catch (SQLException e) {
-            Log.error("Could not fetch event type " + event.getEventType().getDisplayName() + ' ' + event.getSupplier().getSupplierKey() + ' ' + e.getMessage());
+            Log.error("Could not fetch event type " + event.getSupplier().getEventType().getDisplayName() + ' ' + event.getSupplier().getSupplierKey() + ' ' + e.getMessage());
         }
         return typeId;
     }
@@ -127,14 +127,14 @@ public class EventDatabase {
     private static void insertEventTypeIfNotExist(Connection connection, JHVEventType eventType) {
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, INSERT_EVENT_TYPE);
-            pstatement.setString(1, eventType.getEventType().getDisplayName());
+            pstatement.setString(1, eventType.getSupplier().getEventType().getDisplayName());
             pstatement.setString(2, eventType.getSupplier().getSupplierKey());
             pstatement.executeUpdate();
 
             String dbName = eventType.getSupplier().getDatabaseName();
             StringBuilder createtbl = new StringBuilder();
             createtbl.append("CREATE TABLE ").append(dbName).append(" (");
-            HashMap<String, String> fields = eventType.getEventType().getAllDatabaseFields();
+            HashMap<String, String> fields = eventType.getSupplier().getEventType().getAllDatabaseFields();
 
             for (Map.Entry<String, String> entry : fields.entrySet()) {
                 createtbl.append(entry.getKey()).append(' ').append(entry.getValue()).append(" DEFAULT NULL,");
@@ -449,7 +449,7 @@ public class EventDatabase {
 
     //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
     private static ArrayList<JHVEvent> _getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype, boolean full, boolean is_dbthread) {
-        SWEKEventType evt = jhvEventType.getEventType();
+        SWEKEventType evt = jhvEventType.getSupplier().getEventType();
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
         ArrayList<JsonEvent> jsonEvents = new ArrayList<>();
 
@@ -461,7 +461,7 @@ public class EventDatabase {
                     String w = swon.parameterWith.getParameterName().toLowerCase();
                     SWEKEventType reType = re.getRelatedWith();
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
-                        JHVEventType othert = JHVEventType.getJHVEventType(reType, supplier);
+                        JHVEventType othert = JHVEventType.getJHVEventType(supplier);
                         if (similartype == (othert == jhvEventType))
                             if (is_dbthread)
                                 jsonEvents.addAll(rel2prog(id, jhvEventType, othert, f, w));
@@ -478,7 +478,7 @@ public class EventDatabase {
                     String w = swon.parameterWith.getParameterName().toLowerCase();
                     SWEKEventType reType = re.getEvent();
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
-                        JHVEventType fromt = JHVEventType.getJHVEventType(reType, supplier);
+                        JHVEventType fromt = JHVEventType.getJHVEventType(supplier);
                         if (similartype == (fromt == jhvEventType))
                             if (is_dbthread)
                                 jsonEvents.addAll(rel2prog(id, fromt, jhvEventType, f, w));
@@ -808,7 +808,7 @@ public class EventDatabase {
                     }
                 }
 
-                String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.name, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList + ") AND events.id != " + event_id + ";";
+                String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList + ") AND events.id != " + event_id + ";";
                 ArrayList<JsonEvent> ret = new ArrayList<>();
                 try (Statement statement = connection.createStatement()) {
                     try (ResultSet rs = statement.executeQuery(query)) {
@@ -817,7 +817,7 @@ public class EventDatabase {
                             long start = rs.getLong(2);
                             long end = rs.getLong(3);
                             byte[] json = rs.getBytes(4);
-                            ret.add(new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getSWEKEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end));
+                            ret.add(new JsonEvent(json, JHVEventType.getJHVEventType(SWEKSupplier.getSupplier(rs.getString(5))), id, start, end));
                         }
                     }
                 }
@@ -869,7 +869,7 @@ public class EventDatabase {
                     long start = rs.getLong(2);
                     long end = rs.getLong(3);
                     byte[] json = rs.getBytes(4);
-                    je = new JsonEvent(json, JHVEventType.getJHVEventType(SWEKEventType.getSWEKEventType(rs.getString(5)), SWEKSupplier.getSupplier(rs.getString(6))), id, start, end);
+                    je = new JsonEvent(json, JHVEventType.getJHVEventType(SWEKSupplier.getSupplier(rs.getString(5))), id, start, end);
                 }
             }
             return je;

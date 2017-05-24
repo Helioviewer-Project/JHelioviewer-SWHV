@@ -30,7 +30,7 @@ public class HEKDownloader extends SWEKDownloader {
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
     private static void patch_event(JSONObject result, JHVEventType type) {
-        if (type.getEventType().getDisplayName().equals("Flare") && type.getSupplier().getDisplayName().contains("SWPC") && result.has("fl_goescls")) {
+        if (type.getSupplier().getEventType().getDisplayName().equals("Flare") && type.getSupplier().getDisplayName().contains("SWPC") && result.has("fl_goescls")) {
             result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
         }
     }
@@ -61,7 +61,7 @@ public class HEKDownloader extends SWEKDownloader {
                 archiv = TimeUtils.parse(result.getString("kb_archivdate"));
                 uid = result.getString("kb_archivid");
 
-                HashMap<String, String> dbFields = type.getEventType().getAllDatabaseFields();
+                HashMap<String, String> dbFields = type.getSupplier().getEventType().getAllDatabaseFields();
                 for (Map.Entry<String, String> entry : dbFields.entrySet()) {
                     String dbType = entry.getValue();
                     String fieldName = entry.getKey();
