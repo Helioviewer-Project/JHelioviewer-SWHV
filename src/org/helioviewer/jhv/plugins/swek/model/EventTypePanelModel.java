@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class EventTypePanelModel implements TreeModel {
 
     /** The event type for this model */
-    private final SWEKTreeModelEventType eventType;
+    private final SWEKEventType eventType;
 
     // private final List<TreeModelListener> listeners = new HashSet<TreeModelListener>();
 
@@ -30,7 +30,7 @@ public class EventTypePanelModel implements TreeModel {
      * @param _eventType
      *            The event type for which to create the tree model
      */
-    public EventTypePanelModel(SWEKTreeModelEventType _eventType) {
+    public EventTypePanelModel(SWEKEventType _eventType) {
         eventType = _eventType;
     }
 
@@ -88,31 +88,31 @@ public class EventTypePanelModel implements TreeModel {
     public void rowClicked(int row) {
         if (row == 0) {
             eventType.setCheckboxSelected(!eventType.isCheckboxSelected());
-            for (SWEKTreeModelSupplier supplier : eventType.getSwekTreeSuppliers()) {
+            for (SWEKSupplier supplier : eventType.getSuppliers()) {
                 supplier.setCheckboxSelected(eventType.isCheckboxSelected());
             }
             if (eventType.isCheckboxSelected()) {
-                fireNewEventTypeActive(eventType.getSwekEventType());
+                fireNewEventTypeActive(eventType);
             } else {
-                fireNewEventTypeInactive(eventType.getSwekEventType());
+                fireNewEventTypeInactive(eventType);
             }
-        } else if (row > 0 && row <= eventType.getSwekTreeSuppliers().size()) {
-            SWEKTreeModelSupplier supplier = eventType.getSwekTreeSuppliers().get(row - 1);
+        } else if (row > 0 && row <= eventType.getSuppliers().size()) {
+            SWEKSupplier supplier = eventType.getSuppliers().get(row - 1);
             supplier.setCheckboxSelected(!supplier.isCheckboxSelected());
             if (supplier.isCheckboxSelected()) {
                 eventType.setCheckboxSelected(true);
             } else {
                 boolean eventTypeSelected = false;
-                for (SWEKTreeModelSupplier stms : eventType.getSwekTreeSuppliers()) {
+                for (SWEKSupplier stms : eventType.getSuppliers()) {
                     eventTypeSelected = eventTypeSelected || stms.isCheckboxSelected();
                 }
-                SWEKTreeModel.resetEventType(eventType.getSwekEventType());
+                SWEKTreeModel.resetEventType(eventType);
                 eventType.setCheckboxSelected(eventTypeSelected);
             }
             if (supplier.isCheckboxSelected()) {
-                fireNewEventTypeAndSourceActive(eventType.getSwekEventType(), supplier.getSwekSupplier());
+                fireNewEventTypeAndSourceActive(eventType, supplier);
             } else {
-                fireNewEventTypeAndSourceInactive(eventType.getSwekEventType(), supplier.getSwekSupplier());
+                fireNewEventTypeAndSourceInactive(eventType, supplier);
             }
         }
     }
@@ -124,7 +124,7 @@ public class EventTypePanelModel implements TreeModel {
      */
     @Override
     public Object getChild(Object parent, int index) {
-        return parent instanceof SWEKTreeModelEventType ? ((SWEKTreeModelEventType) parent).getSwekTreeSuppliers().get(index) : null;
+        return parent instanceof SWEKEventType ? ((SWEKEventType) parent).getSuppliers().get(index) : null;
     }
 
     /*
@@ -134,7 +134,7 @@ public class EventTypePanelModel implements TreeModel {
      */
     @Override
     public int getChildCount(Object parent) {
-        return parent instanceof SWEKTreeModelEventType ? ((SWEKTreeModelEventType) parent).getSwekEventType().getSuppliers().size() : 0;
+        return parent instanceof SWEKEventType ? ((SWEKEventType) parent).getSuppliers().size() : 0;
     }
 
     /*
@@ -145,8 +145,8 @@ public class EventTypePanelModel implements TreeModel {
      */
     @Override
     public int getIndexOfChild(Object parent, Object child) {
-        if ((parent instanceof SWEKTreeModelEventType) && (child instanceof SWEKTreeModelSupplier)) {
-            return ((SWEKTreeModelEventType) parent).getSwekTreeSuppliers().indexOf(child);
+        if ((parent instanceof SWEKEventType) && (child instanceof SWEKSupplier)) {
+            return ((SWEKEventType) parent).getSuppliers().indexOf(child);
         }
         return -1;
     }
@@ -168,7 +168,7 @@ public class EventTypePanelModel implements TreeModel {
      */
     @Override
     public boolean isLeaf(Object node) {
-        return !(node instanceof SWEKTreeModelEventType);
+        return !(node instanceof SWEKEventType);
     }
 
     /*

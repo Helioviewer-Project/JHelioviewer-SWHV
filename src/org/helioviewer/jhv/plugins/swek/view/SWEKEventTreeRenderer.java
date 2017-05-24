@@ -2,8 +2,8 @@ package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 
@@ -14,20 +14,22 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelElement;
-import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
-import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelSupplier;
 
 @SuppressWarnings("serial")
 class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object whatToDisplay, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        if (whatToDisplay instanceof SWEKTreeModelEventType) {
-            return createLeaf(((SWEKTreeModelEventType) whatToDisplay).getSwekEventType().getEventName(), whatToDisplay, tree.getBackground());
-        } else if (whatToDisplay instanceof SWEKTreeModelSupplier) {
-            return createLeaf(((SWEKTreeModelSupplier) whatToDisplay).getSwekSupplier().getSupplierDisplayName(), whatToDisplay, tree.getBackground());
+        if (whatToDisplay instanceof SWEKEventType) {
+            return createLeaf(((SWEKEventType) whatToDisplay).getEventName(), whatToDisplay,
+                    tree.getBackground());
+        } else if (whatToDisplay instanceof SWEKSupplier) {
+            return createLeaf(((SWEKSupplier) whatToDisplay).getSupplierDisplayName(), whatToDisplay,
+                    tree.getBackground());
         } else {
             return super.getTreeCellRendererComponent(tree, whatToDisplay, selected, expanded, leaf, row, hasFocus);
         }
