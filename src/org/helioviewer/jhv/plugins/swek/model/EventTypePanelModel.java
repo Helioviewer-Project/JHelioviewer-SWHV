@@ -190,7 +190,7 @@ public class EventTypePanelModel implements TreeModel {
      * @param swekSupplier
      *            the supplier that became active
      */
-    public void fireNewEventTypeAndSourceActive(SWEKEventType swekEventType, SWEKSupplier swekSupplier) {
+    private void fireNewEventTypeAndSourceActive(SWEKEventType swekEventType, SWEKSupplier swekSupplier) {
         for (EventTypePanelModelListener l : panelModelListeners) {
             l.newEventTypeAndSourceActive(swekEventType, swekSupplier);
         }
@@ -205,7 +205,7 @@ public class EventTypePanelModel implements TreeModel {
      * @param supplier
      *            the source that became inactive
      */
-    public void fireNewEventTypeAndSourceInactive(SWEKEventType swekEventType, SWEKSupplier supplier) {
+    private void fireNewEventTypeAndSourceInactive(SWEKEventType swekEventType, SWEKSupplier supplier) {
         for (EventTypePanelModelListener l : panelModelListeners) {
             l.newEventTypeAndSourceInactive(swekEventType, supplier);
         }
