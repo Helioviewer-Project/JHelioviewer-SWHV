@@ -5,7 +5,11 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-public class SWEKEventType {
+import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
+import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelElement;
+import org.json.JSONObject;
+
+public class SWEKEventType extends SWEKTreeModelElement {
 
     private static List<SWEKRelatedEvents> swekrelEvents;
     private final String eventName;
@@ -18,6 +22,7 @@ public class SWEKEventType {
     private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<>();
 
     public SWEKEventType(String _eventName, List<SWEKSupplier> _suppliers, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
+        super(false, _eventIcon);
         eventName = _eventName.intern();
         suppliers = _suppliers;
         parameterList = _parameterList;
@@ -153,4 +158,9 @@ public class SWEKEventType {
         return false;
     }
 
+    public void serialize(JSONObject swekObject) {
+    }
+
+    public void deserialize(JSONObject swekObject, EventTypePanelModel eventPanelModel) {
+    }
 }
