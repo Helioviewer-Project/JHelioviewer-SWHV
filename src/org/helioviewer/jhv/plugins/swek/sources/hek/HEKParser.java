@@ -49,7 +49,7 @@ public class HEKParser implements SWEKParser {
         String waveValue = null;
 
         // First iterate over parameters in the config file
-        List<SWEKParameter> plist = currentEvent.getJHVEventType().getEventType().getParameterList();
+        List<SWEKParameter> plist = currentEvent.getJHVEventType().getSupplier().getEventType().getParameterList();
         Iterator<SWEKParameter> paramIterator = plist.iterator();
         HashSet<String> insertedKeys = new HashSet<>();
 

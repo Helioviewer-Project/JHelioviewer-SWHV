@@ -76,7 +76,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
                 dwMap.remove(eventType);
             }
         }
-        JHVEventCache.removeEvents(JHVEventType.getJHVEventType(eventType, supplier), keepActive);
+        JHVEventCache.removeEvents(JHVEventType.getJHVEventType(supplier), keepActive);
     }
 
     public static void workerForcedToStop(DownloadWorker worker) {
@@ -90,14 +90,14 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
 
     @Override
     public void newEventTypeAndSourceActive(SWEKEventType eventType, SWEKSupplier supplier) {
-        JHVEventType jhvType = JHVEventType.getJHVEventType(eventType, supplier);
+        JHVEventType jhvType = JHVEventType.getJHVEventType(supplier);
         addEventTypeToActiveEventTypeMap(jhvType);
         JHVEventCache.eventTypeActivated(jhvType);
     }
 
     @Override
     public void newEventTypeAndSourceInactive(SWEKEventType eventType, SWEKSupplier supplier) {
-        removeEventTypeFromActiveEventTypeMap(JHVEventType.getJHVEventType(eventType, supplier));
+        removeEventTypeFromActiveEventTypeMap(JHVEventType.getJHVEventType(supplier));
         stopDownloadingEventType(eventType, supplier, false);
     }
 
@@ -149,7 +149,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
 
     private static void downloadSelectedSuppliers(SWEKEventType swekEventType) {
         for (JHVEventType jhvType : activeEventTypes) {
-            if (jhvType.getEventType() == swekEventType)
+            if (jhvType.getSupplier().getEventType() == swekEventType)
                 downloadForAllDates(jhvType);
         }
     }
@@ -168,7 +168,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
 
     private static void startDownloadEventType(JHVEventType jhvType, Interval interval) {
         SWEKSupplier supplier = jhvType.getSupplier();
-        SWEKEventType eventType = jhvType.getEventType();
+        SWEKEventType eventType = jhvType.getSupplier().getEventType();
         List<SWEKParam> params = defineParameters(eventType, supplier);
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {

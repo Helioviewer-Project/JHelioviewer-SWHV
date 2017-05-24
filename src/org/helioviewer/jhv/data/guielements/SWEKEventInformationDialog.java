@@ -44,7 +44,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
     private final DataCollapsiblePanelModel model;
 
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent _event) {
-        super(ImageViewerGui.getMainFrame(), revent.getJHVEventType().getEventType().getDisplayName());
+        super(ImageViewerGui.getMainFrame(), revent.getJHVEventType().getSupplier().getEventType().getDisplayName());
         event = _event;
 
         rEvent = revent;

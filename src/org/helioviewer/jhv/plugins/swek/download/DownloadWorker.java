@@ -70,7 +70,7 @@ class DownloadWorker implements Runnable {
     }
 
     public SWEKEventType getEventType() {
-        return jhvType.getEventType();
+        return jhvType.getSupplier().getEventType();
     }
 
     public Interval getRequestInterval() {
