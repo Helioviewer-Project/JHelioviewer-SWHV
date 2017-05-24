@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
+import org.json.JSONObject;
 
 /**
  * This class is responsible to manage all plug-ins for JHV. It loads available
@@ -69,6 +70,30 @@ public class PluginManager {
         plugins.put(plugin, pluginContainer);
         if (pluginContainer.isActive()) {
             plugin.installPlugin();
+        }
+    }
+
+    public void loadState(JSONObject jo) {
+        for (String classname : jo.keySet()) {
+            for (Plugin plugin : plugins.keySet()) {
+                System.out.println(classname + " " + plugin.getClass().getName());
+                if (classname.equals(plugin.getClass().getName())) {
+                    JSONObject cl = jo.optJSONObject(classname);
+                    if (cl != null) {
+                        System.out.println(cl);
+                        plugin.loadState(cl);
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void saveState(JSONObject jo) {
+        for (Plugin plugin : plugins.keySet()) {
+            JSONObject swekObject = new JSONObject();
+            plugin.saveState(swekObject);
+            jo.put(plugin.getClass().getName(), swekObject);
         }
     }
 
