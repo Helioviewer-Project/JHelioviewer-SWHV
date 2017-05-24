@@ -270,7 +270,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                         newlist.add(renderable);
                         renderable.deserializeVisibility(jo);
                     }
-                } catch (Exception e) {
+                } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
                 }
             }
@@ -281,47 +281,50 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
     }
 
-    public void loadScene() {
-        loadScene(defaultState);
-    }
-
-    public void loadScene(String stateFile) {
+    private void loadRenderables(JSONObject data) {
         ArrayList<Renderable> newlist = new ArrayList<>();
         Renderable masterRenderable = null;
 
-        try {
-            JSONObject data = JSONUtils.getJSONFile(stateFile);
-            JSONArray rja = data.getJSONArray("renderables");
-            for (Object o : rja) {
-                if (o instanceof JSONObject) {
-                    JSONObject jo = (JSONObject) o;
-                    try {
-                        Object obj = json2Object(jo);
-                        if (obj instanceof Renderable) {
-                            Renderable renderable = (Renderable) obj;
-                            newlist.add(renderable);
-                            JSONArray va = jo.optJSONArray("visibility");
-                            if (va == null)
-                                va = new JSONArray(new double[] { 1, 0, 0, 0 });
-                            renderable.deserializeVisibility(va);
-                            if (jo.optBoolean("master", false))
-                                masterRenderable = renderable;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        JSONArray rja = data.getJSONArray("renderables");
+        for (Object o : rja) {
+            if (o instanceof JSONObject) {
+                JSONObject jo = (JSONObject) o;
+                try {
+                    Object obj = json2Object(jo);
+                    if (obj instanceof Renderable) {
+                        Renderable renderable = (Renderable) obj;
+                        newlist.add(renderable);
+                        JSONArray va = jo.optJSONArray("visibility");
+                        if (va == null)
+                            va = new JSONArray(new double[] { 1, 0, 0, 0 });
+                        renderable.deserializeVisibility(va);
+                        if (jo.optBoolean("master", false))
+                            masterRenderable = renderable;
                     }
+                } catch (Exception e) { // don't stop for a broken one
+                    e.printStackTrace();
                 }
             }
-            loadTimelines(data);
-
-            removedRenderables.addAll(renderables);
-            renderables = new ArrayList<>();
-
-            LoadState loadStateTask = new LoadState(newlist, masterRenderable, JHVDate.optional(data.optString("time")));
-            JHVGlobals.getExecutorService().execute(loadStateTask);
-        } catch (IOException e1) {
-            e1.printStackTrace();
         }
+        removedRenderables.addAll(renderables);
+        renderables = new ArrayList<>();
+
+        LoadState loadStateTask = new LoadState(newlist, masterRenderable, JHVDate.optional(data.optString("time")));
+        JHVGlobals.getExecutorService().execute(loadStateTask);
+    }
+
+    public void loadScene(String stateFile) {
+        try {
+            JSONObject data = JSONUtils.getJSONFile(stateFile);
+            loadTimelines(data);
+            loadRenderables(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadScene() {
+        loadScene(defaultState);
     }
 
     private class LoadState extends JHVWorker<Void, Void> {
