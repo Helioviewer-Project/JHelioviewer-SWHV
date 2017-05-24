@@ -16,8 +16,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.helioviewer.jhv.data.event.SWEKTreeModelElement;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelElement;
 
 @SuppressWarnings("serial")
 class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
