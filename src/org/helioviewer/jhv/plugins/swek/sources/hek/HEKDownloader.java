@@ -30,10 +30,7 @@ public class HEKDownloader extends SWEKDownloader {
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
     private static void patch_event(JSONObject result, JHVEventType type) {
-        boolean c1 = type.getEventType().getDisplayName().equals("Flare");
-        boolean c2 = type.getSupplier().getSupplierName().equals("SWPC");
-        boolean c = c1 && c2;
-        if (c && result.has("fl_goescls")) {
+        if (type.getEventType().getDisplayName().equals("Flare") && type.getSupplier().getDisplayName().contains("SWPC") && result.has("fl_goescls")) {
             result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
         }
     }
