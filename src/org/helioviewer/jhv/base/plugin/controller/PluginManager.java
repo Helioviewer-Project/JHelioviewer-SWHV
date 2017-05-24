@@ -76,11 +76,9 @@ public class PluginManager {
     public void loadState(JSONObject jo) {
         for (String classname : jo.keySet()) {
             for (Plugin plugin : plugins.keySet()) {
-                System.out.println(classname + " " + plugin.getClass().getName());
                 if (classname.equals(plugin.getClass().getName())) {
                     JSONObject cl = jo.optJSONObject(classname);
                     if (cl != null) {
-                        System.out.println(cl);
                         plugin.loadState(cl);
                     }
                 }
