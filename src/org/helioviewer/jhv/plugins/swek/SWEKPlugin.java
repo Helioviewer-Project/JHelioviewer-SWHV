@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.plugins.swek;
 
+import java.awt.Component;
+
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
@@ -10,9 +12,10 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
-import org.helioviewer.jhv.plugins.swek.view.EventTimelineRenderable;
 import org.helioviewer.jhv.plugins.swek.view.EventPanel;
+import org.helioviewer.jhv.plugins.swek.view.EventTimelineRenderable;
 import org.helioviewer.jhv.timelines.Timelines;
+import org.json.JSONObject;
 
 public class SWEKPlugin implements Plugin {
 
@@ -26,6 +29,20 @@ public class SWEKPlugin implements Plugin {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
         for (SWEKEventType eventType : SWEKConfigurationManager.loadConfig()) {
             swekPanel.add(new EventPanel(eventType));
+        }
+    }
+
+    public void serialize(JSONObject swekObject) {
+        for (Component c : swekPanel.getComponents()) {
+            if (c instanceof EventPanel)
+                ((EventPanel) c).serialize(swekObject);
+        }
+    }
+
+    public void deserialize(JSONObject swekObject) {
+        for (Component c : swekPanel.getComponents()) {
+            if (c instanceof EventPanel)
+                ((EventPanel) c).deserialize(swekObject);
         }
     }
 

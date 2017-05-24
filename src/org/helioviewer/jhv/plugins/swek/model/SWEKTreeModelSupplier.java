@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
+import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.json.JSONObject;
 
 public class SWEKTreeModelSupplier extends SWEKTreeModelElement {
 
@@ -25,6 +27,20 @@ public class SWEKTreeModelSupplier extends SWEKTreeModelElement {
      */
     public SWEKSupplier getSwekSupplier() {
         return swekSupplier;
+    }
+
+    public void serialize(JSONObject suppliers) {
+        suppliers.put(swekSupplier.getSupplierName(), isCheckboxSelected());
+    }
+
+    public void deserialize(JSONObject suppliers, EventTypePanelModel eventPanelModel, SWEKEventType swekEventType) {
+        boolean selected = suppliers.optBoolean(swekSupplier.getSupplierName(), false);
+        setCheckboxSelected(selected);
+        if (selected) {
+            eventPanelModel.fireNewEventTypeAndSourceActive(swekEventType, swekSupplier);
+        } else {
+            eventPanelModel.fireNewEventTypeAndSourceInactive(swekEventType, swekSupplier);
+        }
     }
 
 }

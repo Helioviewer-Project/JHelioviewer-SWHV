@@ -8,6 +8,7 @@ import javax.swing.tree.TreePath;
 
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.json.JSONObject;
 
 /**
  * The model of the event type panel. This model is a TreeModel and is used by
@@ -189,7 +190,7 @@ public class EventTypePanelModel implements TreeModel {
      * @param swekSupplier
      *            the supplier that became active
      */
-    private void fireNewEventTypeAndSourceActive(SWEKEventType swekEventType, SWEKSupplier swekSupplier) {
+    public void fireNewEventTypeAndSourceActive(SWEKEventType swekEventType, SWEKSupplier swekSupplier) {
         for (EventTypePanelModelListener l : panelModelListeners) {
             l.newEventTypeAndSourceActive(swekEventType, swekSupplier);
         }
@@ -204,7 +205,7 @@ public class EventTypePanelModel implements TreeModel {
      * @param supplier
      *            the source that became inactive
      */
-    private void fireNewEventTypeAndSourceInactive(SWEKEventType swekEventType, SWEKSupplier supplier) {
+    public void fireNewEventTypeAndSourceInactive(SWEKEventType swekEventType, SWEKSupplier supplier) {
         for (EventTypePanelModelListener l : panelModelListeners) {
             l.newEventTypeAndSourceInactive(swekEventType, supplier);
         }
@@ -232,6 +233,14 @@ public class EventTypePanelModel implements TreeModel {
         for (SWEKSupplier supplier : swekEventType.getSuppliers()) {
             fireNewEventTypeAndSourceInactive(swekEventType, supplier);
         }
+    }
+
+    public void serialize(JSONObject swekObject) {
+        eventType.serialize(swekObject);
+    }
+
+    public void deserialize(JSONObject swekObject, EventTypePanelModel eventPanelModel) {
+        eventType.deserialize(swekObject, eventPanelModel);
     }
 
 }
