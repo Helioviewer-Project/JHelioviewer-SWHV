@@ -203,7 +203,7 @@ public class JHVEventCache {
 
     public static void reset(SWEKEventType eventType) {
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
-            JHVEventType evt = JHVEventType.getJHVEventType(eventType, supplier);
+            JHVEventType evt = JHVEventType.getJHVEventType(supplier);
             downloadedCache.remove(evt);
             downloadedCache.put(evt, new RequestCache());
         }
