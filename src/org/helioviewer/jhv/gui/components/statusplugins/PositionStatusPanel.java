@@ -26,7 +26,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private void update(int x, int y) {
         Viewport vp = Displayer.getActiveViewport();
-        Vec2 coord = ImageViewerGui.getRenderableGrid().gridPoint(camera, vp, x, y);
+        Vec2 coord = ImageViewerGui.getRenderableContainer().getRenderableGrid().gridPoint(camera, vp, x, y);
 
         if (Displayer.mode == Displayer.DisplayMode.Latitudinal) {
             setText(String.format("(\u03C6,\u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y));
