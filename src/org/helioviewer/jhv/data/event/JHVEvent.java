@@ -24,7 +24,7 @@ public class JHVEvent {
 
     public JHVEvent(JHVEventType _eventType, int _id, long _start, long _end) {
         eventType = _eventType;
-        eventName = _eventType.getEventType().getEventName();
+        eventName = _eventType.getEventType().getDisplayName();
         start = _start;
         end = _end;
         id = _id;

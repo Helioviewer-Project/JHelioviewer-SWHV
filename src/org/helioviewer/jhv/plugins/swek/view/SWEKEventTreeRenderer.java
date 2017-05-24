@@ -23,15 +23,11 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
     @Override
-    public Component getTreeCellRendererComponent(JTree tree, Object whatToDisplay, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        if (whatToDisplay instanceof SWEKEventType) {
-            return createLeaf(((SWEKEventType) whatToDisplay).getEventName(), whatToDisplay,
-                    tree.getBackground());
-        } else if (whatToDisplay instanceof SWEKSupplier) {
-            return createLeaf(((SWEKSupplier) whatToDisplay).getSupplierDisplayName(), whatToDisplay,
-                    tree.getBackground());
+    public Component getTreeCellRendererComponent(JTree tree, Object obj, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        if (obj instanceof SWEKTreeModelElement) {
+            return createLeaf((SWEKTreeModelElement) obj, tree.getBackground());
         } else {
-            return super.getTreeCellRendererComponent(tree, whatToDisplay, selected, expanded, leaf, row, hasFocus);
+            return super.getTreeCellRendererComponent(tree, obj, selected, expanded, leaf, row, hasFocus);
         }
     }
 
@@ -66,17 +62,17 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
      *            What to be displayed
      * @return The panel to be placed in the tree
      */
-    private static JPanel createLeaf(String name, Object whatToDisplay, Color back) {
+    private static JPanel createLeaf(SWEKTreeModelElement element, Color back) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
-        ImageIcon icon = ((SWEKTreeModelElement) whatToDisplay).getIcon();
+        ImageIcon icon = element.getIcon();
         if (icon != null) {
             panel.add(new TreeLabel(icon), BorderLayout.LINE_START);
         }
 
-        JCheckBox checkBox = new JCheckBox(name);
-        checkBox.setSelected(((SWEKTreeModelElement) whatToDisplay).isCheckboxSelected());
+        JCheckBox checkBox = new JCheckBox(element.getDisplayName());
+        checkBox.setSelected(element.isSelected());
         checkBox.setBackground(back);
         panel.add(checkBox, BorderLayout.CENTER);
 
