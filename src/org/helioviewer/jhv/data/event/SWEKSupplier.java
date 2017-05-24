@@ -2,7 +2,6 @@ package org.helioviewer.jhv.data.event;
 
 import java.util.HashMap;
 
-import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.json.JSONObject;
 
 public class SWEKSupplier extends SWEKTreeModelElement {
@@ -64,8 +63,8 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
     public void serialize(JSONObject suppliers) {
     }
-    
-    public void deserialize(JSONObject suppliers, EventTypePanelModel eventPanelModel, SWEKEventType swekEventType) {
+
+    public void deserialize(JSONObject suppliers, SWEKEventType swekEventType) {
     }
 
 }
