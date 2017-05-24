@@ -14,12 +14,15 @@ import javax.swing.table.AbstractTableModel;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.JSONUtils;
+import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
+import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -218,12 +221,23 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
         main.put("renderables", ja);
         saveTimelineScene(main);
-
+        saveSWEKScene(main);
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(defaultState), StandardCharsets.UTF_8)) {
             main.write(writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void saveSWEKScene(JSONObject main) {
+        PluginContainer[] ps = PluginManager.getSingletonInstance().getAllPlugins();
+        JSONObject swekObject = new JSONObject();
+        for (PluginContainer p : ps) {
+            if (p.getPlugin() instanceof SWEKPlugin)
+                ((SWEKPlugin) p.getPlugin()).serialize(swekObject);
+        }
+        main.put("SWEK", swekObject);
+
     }
 
     public void saveTimelineScene(JSONObject main) {
@@ -254,6 +268,18 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void loadSWEKScene(JSONObject data) {
+        JSONObject swekObject = data.optJSONObject("SWEK");
+        if (swekObject != null) {
+            PluginContainer[] ps = PluginManager.getSingletonInstance().getAllPlugins();
+            for (PluginContainer p : ps) {
+                if (p.getPlugin() instanceof SWEKPlugin)
+                    ((SWEKPlugin) p.getPlugin()).deserialize(swekObject);
+            }
+        }
+
     }
 
     private void loadTimelines(JSONObject data) {
@@ -318,6 +344,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             JSONObject data = JSONUtils.getJSONFile(stateFile);
             loadTimelines(data);
             loadRenderables(data);
+            loadSWEKScene(data);
         } catch (Exception e) {
             e.printStackTrace();
         }

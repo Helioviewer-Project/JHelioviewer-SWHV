@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.json.JSONObject;
 
 // The SWEK tree model representation of the SWEK event type
 public class SWEKTreeModelEventType extends SWEKTreeModelElement {
@@ -53,6 +54,32 @@ public class SWEKTreeModelEventType extends SWEKTreeModelElement {
     private void fillSWEKTreeSuppliers() {
         for (SWEKSupplier swekSupplier : swekEventType.getSuppliers()) {
             swekTreeSuppliers.add(new SWEKTreeModelSupplier(swekSupplier));
+        }
+    }
+
+    public void serialize(JSONObject swekObject) {
+        JSONObject eventType = new JSONObject();
+        eventType.put("selected", isCheckboxSelected());
+        JSONObject suppliers = new JSONObject();
+        eventType.put("suppliers", suppliers);
+        swekObject.put(swekEventType.getEventName(), eventType);
+        for (SWEKTreeModelSupplier supplier : swekTreeSuppliers) {
+            supplier.serialize(suppliers);
+        }
+    }
+
+    public void deserialize(JSONObject swekObject, EventTypePanelModel eventPanelModel) {
+        JSONObject eventType = swekObject.optJSONObject(swekEventType.getEventName());
+        boolean selected;
+        if(eventType !=null) {
+            selected = eventType.optBoolean("selected", false);
+            setCheckboxSelected(selected);
+            JSONObject suppliers = eventType.optJSONObject("suppliers");
+            if (suppliers != null) {
+                for (SWEKTreeModelSupplier supplier : swekTreeSuppliers) {
+                    supplier.deserialize(suppliers, eventPanelModel, swekEventType);
+                }
+            }
         }
     }
 
