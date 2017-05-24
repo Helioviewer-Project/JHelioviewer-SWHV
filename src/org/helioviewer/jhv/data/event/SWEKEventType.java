@@ -10,16 +10,17 @@ import org.json.JSONObject;
 public class SWEKEventType extends SWEKTreeModelElement {
 
     private static List<SWEKRelatedEvents> swekrelEvents;
-    private final List<SWEKSupplier> suppliers;
     private final List<SWEKParameter> parameterList;
 
     private final boolean containsParameterFilter;
+
+    private List<SWEKSupplier> suppliers;
     private HashMap<String, String> databaseFields;
+
     private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<>();
 
-    public SWEKEventType(String _eventName, List<SWEKSupplier> _suppliers, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
+    public SWEKEventType(String _eventName, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
         setDisplayName(_eventName);
-        suppliers = _suppliers;
         parameterList = _parameterList;
         setIcon(_eventIcon);
 
@@ -75,13 +76,12 @@ public class SWEKEventType extends SWEKTreeModelElement {
         return swekrelEvents;
     }
 
-    /**
-     * Gets the list of suppliers.
-     *
-     * @return the suppliers
-     */
     public List<SWEKSupplier> getSuppliers() {
         return suppliers;
+    }
+
+    public void setSuppliers(List<SWEKSupplier> _suppliers) {
+        suppliers = _suppliers;
     }
 
     /**
