@@ -30,7 +30,7 @@ public class HEKDownloader extends SWEKDownloader {
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
     private static void patch_event(JSONObject result, JHVEventType type) {
-        boolean c1 = type.getEventType().getEventName().equals("Flare");
+        boolean c1 = type.getEventType().getDisplayName().equals("Flare");
         boolean c2 = type.getSupplier().getSupplierName().equals("SWPC");
         boolean c = c1 && c2;
         if (c && result.has("fl_goescls")) {
@@ -113,7 +113,7 @@ public class HEKDownloader extends SWEKDownloader {
     protected String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(_baseURL);
         baseURL.append("cmd=search&type=column&");
-        baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(eventType.getEventName())).append('&');
+        baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(eventType.getDisplayName())).append('&');
         baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
         baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.format(end)).append('&');
         baseURL = appendParams(baseURL, params);
