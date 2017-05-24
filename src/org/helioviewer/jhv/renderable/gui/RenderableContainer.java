@@ -21,7 +21,10 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
+import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
+import org.helioviewer.jhv.renderable.components.RenderableViewpoint;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
@@ -36,6 +39,29 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     private ArrayList<Renderable> renderables = new ArrayList<>();
     private ArrayList<Renderable> newRenderables = new ArrayList<>();
     private final ArrayList<Renderable> removedRenderables = new ArrayList<>();
+
+    private RenderableGrid renderableGrid;
+    private RenderableViewpoint renderableViewpoint;
+    private RenderableMiniview renderableMiniview;
+
+    public RenderableContainer() {
+        addRenderable(new RenderableGrid(null));
+        addRenderable(new RenderableViewpoint());
+        addRenderable(new RenderableTimeStamp());
+        addRenderable(new RenderableMiniview());
+    }
+
+    public RenderableViewpoint getRenderableViewpoint() {
+        return renderableViewpoint;
+    }
+
+    public RenderableGrid getRenderableGrid() {
+        return renderableGrid;
+    }
+
+    public RenderableMiniview getRenderableMiniview() {
+        return renderableMiniview;
+    }
 
     public void addBeforeRenderable(Renderable renderable) {
         int lastImagelayerIndex = -1;
@@ -55,6 +81,13 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void addRenderable(Renderable renderable) {
         renderables.add(renderable);
         newRenderables.add(renderable);
+
+        if (renderable instanceof RenderableGrid)
+            renderableGrid = (RenderableGrid) renderable;
+        else if (renderable instanceof RenderableViewpoint)
+            renderableViewpoint = (RenderableViewpoint) renderable;
+        else if (renderable instanceof RenderableMiniview)
+            renderableMiniview = (RenderableMiniview) renderable;
 
         int row = renderables.size() - 1;
         fireTableRowsInserted(row, row);

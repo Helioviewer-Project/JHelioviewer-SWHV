@@ -40,7 +40,7 @@ public class Displayer implements JHVEventHighlightListener {
     public static void setMode(DisplayMode newMode) {
         mode = newMode;
 
-        CameraHelper.zoomToFit(ImageViewerGui.getRenderableMiniview().getCamera());
+        CameraHelper.zoomToFit(ImageViewerGui.getRenderableContainer().getRenderableMiniview().getCamera());
         // ImageViewerGui.getRenderableMiniview().getCamera().reset();
 
         camera.reset();

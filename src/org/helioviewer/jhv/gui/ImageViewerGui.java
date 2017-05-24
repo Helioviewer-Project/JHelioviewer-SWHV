@@ -37,10 +37,6 @@ import org.helioviewer.jhv.input.NEWTKeyAdapter;
 import org.helioviewer.jhv.input.NEWTMouseAdapter;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
-import org.helioviewer.jhv.renderable.components.RenderableGrid;
-import org.helioviewer.jhv.renderable.components.RenderableMiniview;
-import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
-import org.helioviewer.jhv.renderable.components.RenderableViewpoint;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
 
@@ -69,9 +65,6 @@ public class ImageViewerGui {
 
     private static RenderableContainerPanel renderableContainerPanel;
     private static RenderableContainer renderableContainer;
-    private static RenderableViewpoint renderableViewpoint;
-    private static RenderableGrid renderableGrid;
-    private static RenderableMiniview renderableMiniview;
 
     private static InteractionRotate rotationInteraction;
     private static InteractionPan panInteraction;
@@ -94,13 +87,6 @@ public class ImageViewerGui {
 
         // Layer control
         renderableContainer = new RenderableContainer();
-        renderableGrid = new RenderableGrid(null);
-        renderableContainer.addRenderable(renderableGrid);
-        renderableViewpoint = new RenderableViewpoint();
-        renderableContainer.addRenderable(renderableViewpoint);
-        renderableContainer.addRenderable(new RenderableTimeStamp());
-        renderableMiniview = new RenderableMiniview();
-        renderableContainer.addRenderable(renderableMiniview);
         renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
 
         leftPane.add("Image Layers", renderableContainerPanel, true);
@@ -229,18 +215,6 @@ public class ImageViewerGui {
 
     public static FramerateStatusPanel getFramerateStatusPanel() {
         return framerateStatus;
-    }
-
-    public static RenderableViewpoint getRenderableViewpoint() {
-        return renderableViewpoint;
-    }
-
-    public static RenderableGrid getRenderableGrid() {
-        return renderableGrid;
-    }
-
-    public static RenderableMiniview getRenderableMiniview() {
-        return renderableMiniview;
     }
 
     public static RenderableContainer getRenderableContainer() {

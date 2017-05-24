@@ -12,6 +12,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
@@ -99,7 +100,7 @@ public class GLListener implements GLEventListener {
             reshaped = true;
             Displayer.setGLSize(x, y, width, height);
             Displayer.reshapeAll();
-            ImageViewerGui.getRenderableMiniview().reshapeViewport();
+            ImageViewerGui.getRenderableContainer().getRenderableMiniview().reshapeViewport();
             Displayer.render(1);
         });
     }
@@ -166,9 +167,10 @@ public class GLListener implements GLEventListener {
     }
 
     private static void renderMiniview(GL2 gl) {
-        if (ImageViewerGui.getRenderableMiniview().isVisible()) {
-            Viewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
-            Camera cameraMini = ImageViewerGui.getRenderableMiniview().getCamera();
+        RenderableMiniview miniview = ImageViewerGui.getRenderableContainer().getRenderableMiniview();
+        if (miniview.isVisible()) {
+            Viewport vp = miniview.getViewport();
+            Camera cameraMini = miniview.getCamera();
             cameraMini.timeChanged(Layers.getLastUpdatedTimestamp());
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
