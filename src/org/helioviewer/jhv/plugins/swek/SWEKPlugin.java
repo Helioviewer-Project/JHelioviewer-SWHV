@@ -25,13 +25,6 @@ public class SWEKPlugin implements Plugin {
     private static final SWEKRenderable renderable = new SWEKRenderable();
     private static final EventTimelineRenderable em = new EventTimelineRenderable();
 
-    public SWEKPlugin(JSONObject jo) {
-        swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
-        for (SWEKEventType eventType : SWEKConfigurationManager.loadConfig()) {
-            swekPanel.add(new EventPanel(eventType));
-        }
-    }
-
     public SWEKPlugin() {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
         for (SWEKEventType eventType : SWEKConfigurationManager.loadConfig()) {
