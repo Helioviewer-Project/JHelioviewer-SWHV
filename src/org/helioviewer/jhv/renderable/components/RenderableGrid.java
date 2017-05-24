@@ -43,7 +43,8 @@ public class RenderableGrid extends AbstractRenderable {
     private static final float[] earthLineColor = BufferUtils.colorYellow;
     private static final float[] radialLineColor = BufferUtils.colorWhite;
 
-    private static final int END_RADIUS = 30;
+    private static final int TENS_RADIUS = 3;
+    private static final int END_RADIUS = TENS_RADIUS * 10;
     private static final int START_RADIUS = 2;
     private static final float[] R_LABEL_POS = { 2, 8, 24 };
     private static final float STEP_DEGREES = 15;
@@ -67,6 +68,7 @@ public class RenderableGrid extends AbstractRenderable {
     private final GLLine flatline = new GLLine();
     private final GLLine earthCircleLine = new GLLine();
     private final GLLine radialCircleLine = new GLLine();
+    private final GLLine radialThickLine = new GLLine();
 
     private final Component optionsPanel;
 
@@ -149,6 +151,7 @@ public class RenderableGrid extends AbstractRenderable {
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
             {
                 radialCircleLine.render(gl, vp.aspect, thickness);
+                radialThickLine.render(gl, vp.aspect, 3 * thickness);
                 if (showLabels) {
                     drawRadialGridText(gl, pixelsPerSolarRadius);
                 }
@@ -188,7 +191,7 @@ public class RenderableGrid extends AbstractRenderable {
 
         renderer.begin3DRendering();
         {
-            for (int i = 0; i < (FLAT_STEPS_THETA + 1); ++i) {
+            for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
                 if (i == FLAT_STEPS_THETA / 2) {
                     continue;
                 }
@@ -196,7 +199,7 @@ public class RenderableGrid extends AbstractRenderable {
                 String label = formatter2.format(scale.getInterpolatedXValue(1. / FLAT_STEPS_THETA * i));
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
-            for (int i = 0; i < (FLAT_STEPS_RADIAL + 1); ++i) {
+            for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
                 String label = formatter2.format(scale.getInterpolatedYValue(1. / FLAT_STEPS_RADIAL * i));
                 float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
                 renderer.draw3D(label, 0, start, 0, textScaleFactor);
@@ -350,6 +353,7 @@ public class RenderableGrid extends AbstractRenderable {
         earthCircleLine.init(gl);
         initEarthCircles(gl);
         radialCircleLine.init(gl);
+        radialThickLine.init(gl);
         initRadialCircles(gl);
         flatline.init(gl);
     }
@@ -430,18 +434,33 @@ public class RenderableGrid extends AbstractRenderable {
     private void initRadialCircles(GL2 gl) {
         int no_lines = (int) Math.ceil(360 / STEP_DEGREES);
 
-        int no_points = (END_RADIUS - START_RADIUS + 1) * (SUBDIVISIONS + 1) + 4 * no_lines + 1;
+        int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 1) + 4 * no_lines + 1;
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-        Vec3 v = new Vec3();
+        FloatBuffer positionThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 3);
+        FloatBuffer colorThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 4);
 
-        for (double i = START_RADIUS; i <= END_RADIUS; i++) {
+        Vec3 v = new Vec3();
+        for (int i = START_RADIUS; i <= END_RADIUS; i++) {
             for (int j = 0; j <= SUBDIVISIONS; j++) {
                 v.x = i * Sun.Radius * Math.cos(2 * Math.PI * j / SUBDIVISIONS);
                 v.y = i * Sun.Radius * Math.sin(2 * Math.PI * j / SUBDIVISIONS);
                 v.z = 0.;
-                BufferUtils.put3f(positionBuffer, v);
-                colorBuffer.put(radialLineColor);
+                if (i % 10 == 0) {
+                    if (j == 0) {
+                        BufferUtils.put3f(positionThick, v);
+                        BufferUtils.put4f(colorThick, 0, 0, 0, 0);
+                    }
+                    BufferUtils.put3f(positionThick, v);
+                    colorThick.put(radialLineColor);
+                    if (j == SUBDIVISIONS) {
+                        BufferUtils.put3f(positionThick, v);
+                        BufferUtils.put4f(colorThick, 0, 0, 0, 0);
+                    }
+                } else {
+                    BufferUtils.put3f(positionBuffer, v);
+                    colorBuffer.put(radialLineColor);
+                }
             }
         }
 
@@ -470,8 +489,11 @@ public class RenderableGrid extends AbstractRenderable {
         }
         positionBuffer.flip();
         colorBuffer.flip();
+        positionThick.flip();
+        colorThick.flip();
 
         radialCircleLine.setData(gl, positionBuffer, colorBuffer);
+        radialThickLine.setData(gl, positionThick, colorThick);
     }
 
     private void initEarthCircles(GL2 gl) {
@@ -668,6 +690,7 @@ public class RenderableGrid extends AbstractRenderable {
         flatline.dispose(gl);
         earthCircleLine.dispose(gl);
         radialCircleLine.dispose(gl);
+        radialThickLine.dispose(gl);
     }
 
     public void setCoordinates(GridChoiceType _gridChoice) {
