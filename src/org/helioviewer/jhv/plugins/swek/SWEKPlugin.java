@@ -25,24 +25,17 @@ public class SWEKPlugin implements Plugin {
     private static final SWEKRenderable renderable = new SWEKRenderable();
     private static final EventTimelineRenderable em = new EventTimelineRenderable();
 
-    public SWEKPlugin() {
+    public SWEKPlugin(JSONObject jo) {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
         for (SWEKEventType eventType : SWEKConfigurationManager.loadConfig()) {
             swekPanel.add(new EventPanel(eventType));
         }
     }
 
-    public void serialize(JSONObject swekObject) {
-        for (Component c : swekPanel.getComponents()) {
-            if (c instanceof EventPanel)
-                ((EventPanel) c).serialize(swekObject);
-        }
-    }
-
-    public void deserialize(JSONObject swekObject) {
-        for (Component c : swekPanel.getComponents()) {
-            if (c instanceof EventPanel)
-                ((EventPanel) c).deserialize(swekObject);
+    public SWEKPlugin() {
+        swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
+        for (SWEKEventType eventType : SWEKConfigurationManager.loadConfig()) {
+            swekPanel.add(new EventPanel(eventType));
         }
     }
 
@@ -79,11 +72,19 @@ public class SWEKPlugin implements Plugin {
     }
 
     @Override
-    public void saveState(JSONObject jo) {
+    public void saveState(JSONObject swekObject) {
+        for (Component c : swekPanel.getComponents()) {
+            if (c instanceof EventPanel)
+                ((EventPanel) c).serialize(swekObject);
+        }
     }
 
     @Override
     public void loadState(JSONObject jo) {
+        for (Component c : swekPanel.getComponents()) {
+            if (c instanceof EventPanel)
+                ((EventPanel) c).deserialize(jo);
+        }
     }
 
     @Override
