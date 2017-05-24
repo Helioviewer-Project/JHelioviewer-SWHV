@@ -2,8 +2,12 @@ package org.helioviewer.jhv.data.event;
 
 import java.util.HashMap;
 
+import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
+import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelElement;
+import org.json.JSONObject;
+
 // Defines an event type supplier.
-public class SWEKSupplier {
+public class SWEKSupplier extends SWEKTreeModelElement {
 
     /** Name of the supplier */
     private final String supplierName;
@@ -27,6 +31,7 @@ public class SWEKSupplier {
      *            The source on which the supplier supplies its events
      */
     public SWEKSupplier(String _supplierName, String _supplierDisplayName, SWEKSource _source, String _db) {
+        super(false);
         supplierName = _supplierName;
         supplierDisplayName = _supplierDisplayName;
         source = _source;
@@ -58,6 +63,12 @@ public class SWEKSupplier {
 
     public String getSupplierKey() {
         return supplierName + source.getSourceName() + db;
+    }
+
+    public void serialize(JSONObject suppliers) {
+    }
+    
+    public void deserialize(JSONObject suppliers, EventTypePanelModel eventPanelModel, SWEKEventType swekEventType) {
     }
 
 }

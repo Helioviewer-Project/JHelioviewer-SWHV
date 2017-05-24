@@ -7,12 +7,12 @@ public class SWEKTreeModelElement {
     private boolean checkboxSelected;
     private final ImageIcon icon;
 
-    SWEKTreeModelElement(boolean isCheckBoxSelected) {
+    public SWEKTreeModelElement(boolean isCheckBoxSelected) {
         checkboxSelected = isCheckBoxSelected;
         icon = null;
     }
 
-    SWEKTreeModelElement(boolean isCheckBoxSelected, ImageIcon _icon) {
+    public SWEKTreeModelElement(boolean isCheckBoxSelected, ImageIcon _icon) {
         checkboxSelected = isCheckBoxSelected;
         icon = _icon;
     }
