@@ -13,8 +13,6 @@ public class SWEKSupplier extends SWEKTreeModelElement {
     /** The source from where is supplied */
     private final SWEKSource source;
 
-    /** The display name of the supplier */
-    private final String supplierDisplayName;
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
 
     /**
@@ -29,7 +27,7 @@ public class SWEKSupplier extends SWEKTreeModelElement {
      */
     public SWEKSupplier(String _supplierName, String _supplierDisplayName, SWEKSource _source, String _db) {
         supplierName = _supplierName;
-        supplierDisplayName = _supplierDisplayName;
+        setDisplayName(_supplierDisplayName);
         source = _source;
         db = _db;
 
@@ -43,10 +41,6 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
     public String getSupplierName() {
         return supplierName;
-    }
-
-    public String getSupplierDisplayName() {
-        return supplierDisplayName;
     }
 
     public String getDatabaseName() {

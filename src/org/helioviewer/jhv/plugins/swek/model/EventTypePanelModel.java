@@ -87,29 +87,29 @@ public class EventTypePanelModel implements TreeModel {
      */
     public void rowClicked(int row) {
         if (row == 0) {
-            eventType.setCheckboxSelected(!eventType.isCheckboxSelected());
+            eventType.setSelected(!eventType.isSelected());
             for (SWEKSupplier supplier : eventType.getSuppliers()) {
-                supplier.setCheckboxSelected(eventType.isCheckboxSelected());
+                supplier.setSelected(eventType.isSelected());
             }
-            if (eventType.isCheckboxSelected()) {
+            if (eventType.isSelected()) {
                 fireNewEventTypeActive(eventType);
             } else {
                 fireNewEventTypeInactive(eventType);
             }
         } else if (row > 0 && row <= eventType.getSuppliers().size()) {
             SWEKSupplier supplier = eventType.getSuppliers().get(row - 1);
-            supplier.setCheckboxSelected(!supplier.isCheckboxSelected());
-            if (supplier.isCheckboxSelected()) {
-                eventType.setCheckboxSelected(true);
+            supplier.setSelected(!supplier.isSelected());
+            if (supplier.isSelected()) {
+                eventType.setSelected(true);
             } else {
                 boolean eventTypeSelected = false;
                 for (SWEKSupplier stms : eventType.getSuppliers()) {
-                    eventTypeSelected = eventTypeSelected || stms.isCheckboxSelected();
+                    eventTypeSelected = eventTypeSelected || stms.isSelected();
                 }
                 SWEKTreeModel.resetEventType(eventType);
-                eventType.setCheckboxSelected(eventTypeSelected);
+                eventType.setSelected(eventTypeSelected);
             }
-            if (supplier.isCheckboxSelected()) {
+            if (supplier.isSelected()) {
                 fireNewEventTypeAndSourceActive(eventType, supplier);
             } else {
                 fireNewEventTypeAndSourceInactive(eventType, supplier);

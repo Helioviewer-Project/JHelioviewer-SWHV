@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 public class SWEKEventType extends SWEKTreeModelElement {
 
-    private final String eventName;
     private static List<SWEKRelatedEvents> swekrelEvents;
     private final List<SWEKSupplier> suppliers;
     private final List<SWEKParameter> parameterList;
@@ -19,13 +18,13 @@ public class SWEKEventType extends SWEKTreeModelElement {
     private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<>();
 
     public SWEKEventType(String _eventName, List<SWEKSupplier> _suppliers, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
-        eventName = _eventName.intern();
+        setDisplayName(_eventName);
         suppliers = _suppliers;
         parameterList = _parameterList;
         setIcon(_eventIcon);
 
         containsParameterFilter = checkFilters(parameterList);
-        swekEventTypes.put(eventName, this);
+        swekEventTypes.put(_eventName, this);
     }
 
     public static SWEKEventType getSWEKEventType(String name) {
@@ -74,15 +73,6 @@ public class SWEKEventType extends SWEKTreeModelElement {
 
     public static List<SWEKRelatedEvents> getSWEKRelatedEvents() {
         return swekrelEvents;
-    }
-
-    /**
-     * Gives the name of the event type.
-     *
-     * @return the eventName
-     */
-    public String getEventName() {
-        return eventName;
     }
 
     /**
