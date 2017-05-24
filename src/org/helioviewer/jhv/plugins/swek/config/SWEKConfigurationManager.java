@@ -119,7 +119,10 @@ public class SWEKConfigurationManager {
     }
 
     private static SWEKEventType parseEventType(JSONObject obj) {
-        return new SWEKEventType(parseEventName(obj), parseSuppliers(obj), parseParameterList(obj), parseEventIcon(obj));
+        SWEKEventType eventType = new SWEKEventType(parseEventName(obj), parseParameterList(obj), parseEventIcon(obj));
+        List<SWEKSupplier> suppliers = parseSuppliers(obj, eventType);
+        eventType.setSuppliers(suppliers);
+        return eventType;
     }
 
     private static ImageIcon parseEventIcon(JSONObject obj) {
@@ -141,17 +144,17 @@ public class SWEKConfigurationManager {
         return obj.getString("event_name");
     }
 
-    private static List<SWEKSupplier> parseSuppliers(JSONObject obj) {
+    private static List<SWEKSupplier> parseSuppliers(JSONObject obj, SWEKEventType eventType) {
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         List<SWEKSupplier> suppliers = new ArrayList<>();
         for (int i = 0; i < suppliersArray.length(); i++) {
-            suppliers.add(parseSupplier(suppliersArray.getJSONObject(i)));
+            suppliers.add(parseSupplier(suppliersArray.getJSONObject(i), eventType));
         }
         return suppliers;
     }
 
-    private static SWEKSupplier parseSupplier(JSONObject obj) {
-        return new SWEKSupplier(parseSupplierName(obj), parseSupplierDisplayName(obj), parseSupplierSource(obj), parseDbName(obj));
+    private static SWEKSupplier parseSupplier(JSONObject obj, SWEKEventType eventType) {
+        return new SWEKSupplier(parseSupplierName(obj), parseSupplierDisplayName(obj), eventType, parseSupplierSource(obj), parseDbName(obj));
     }
 
     private static String parseSupplierName(JSONObject obj) {
