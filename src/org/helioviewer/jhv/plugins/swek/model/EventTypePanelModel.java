@@ -239,8 +239,8 @@ public class EventTypePanelModel implements TreeModel {
         eventType.serialize(swekObject);
     }
 
-    public void deserialize(JSONObject swekObject, EventTypePanelModel eventPanelModel) {
-        eventType.deserialize(swekObject, eventPanelModel);
+    public void deserialize(JSONObject swekObject) {
+        eventType.deserialize(swekObject);
     }
 
 }

@@ -117,6 +117,6 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     }
 
     public void deserialize(JSONObject swekObject) {
-        eventPanelModel.deserialize(swekObject, eventPanelModel);
+        eventPanelModel.deserialize(swekObject);
     }
 }
