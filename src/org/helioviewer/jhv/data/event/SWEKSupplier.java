@@ -6,28 +6,19 @@ import org.json.JSONObject;
 
 public class SWEKSupplier extends SWEKTreeModelElement {
 
-    /** Name of the supplier */
     private final String supplierName;
     private final String db;
 
-    /** The source from where is supplied */
+    private final SWEKEventType eventType;
     private final SWEKSource source;
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
 
-    /**
-     * Creates a SWEK supplier with an supplier name and a source.
-     *
-     * @param _supplierName
-     *            The name of the supplier
-     * @param _supplierDisplayName
-     *            The display name of the supplier
-     * @param _source
-     *            The source on which the supplier supplies its events
-     */
-    public SWEKSupplier(String _supplierName, String _supplierDisplayName, SWEKSource _source, String _db) {
+    public SWEKSupplier(String _supplierName, String _supplierDisplayName, SWEKEventType _eventType, SWEKSource _source, String _db) {
         supplierName = _supplierName;
         setDisplayName(_supplierDisplayName);
+
+        eventType = _eventType;
         source = _source;
         db = _db;
 
@@ -51,14 +42,12 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         return source;
     }
 
+    public SWEKEventType getEventType() {
+        return eventType;
+    }
+
     public String getSupplierKey() {
         return supplierName + source.getSourceName() + db;
-    }
-
-    public void serialize(JSONObject suppliers) {
-    }
-
-    public void deserialize(JSONObject suppliers, SWEKEventType swekEventType) {
     }
 
 }
