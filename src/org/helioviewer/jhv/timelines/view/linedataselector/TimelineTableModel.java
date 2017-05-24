@@ -36,8 +36,10 @@ public class TimelineTableModel extends AbstractTableModel {
     public void removeLineData(TimelineRenderable element) {
         element.remove();
         int row = elements.indexOf(element);
-        elements.remove(element);
+        if (row == -1)
+            return;
 
+        elements.remove(element);
         fireTableRowsDeleted(row, row);
         DrawController.graphAreaChanged();
     }
