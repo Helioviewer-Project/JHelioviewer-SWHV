@@ -14,8 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import org.helioviewer.jhv.data.event.SWEKEventType;
-import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.data.event.SWEKTreeModelElement;
 import org.helioviewer.jhv.gui.ComponentUtils;
 
