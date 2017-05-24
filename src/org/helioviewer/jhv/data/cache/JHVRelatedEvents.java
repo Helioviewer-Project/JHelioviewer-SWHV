@@ -62,7 +62,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
     }
 
     public ImageIcon getIcon() {
-        return eventType.getEventType().getIcon();
+        return eventType.getSupplier().getEventType().getIcon();
     }
 
     void merge(JHVRelatedEvents found, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
