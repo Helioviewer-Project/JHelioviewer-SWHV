@@ -24,6 +24,7 @@ import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
+import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
 
@@ -38,13 +39,14 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
 
     // The timer handling the loading animation
     private final Timer loadingTimer = new Timer(500, this);
+    private final EventTypePanelModel eventPanelModel;
 
     public EventPanel(SWEKEventType _eventType) {
         eventType = _eventType;
         setLayout(new BorderLayout());
         SWEKTreeModel.addSWEKTreeModelListener(this);
 
-        EventTypePanelModel eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(eventType));
+        eventPanelModel = new EventTypePanelModel(new SWEKTreeModelEventType(eventType));
         eventPanelModel.addEventPanelModelListener(SWEKDownloadManager.getSingletonInstance());
 
         JTree eventTypeTree = new JTree(eventPanelModel);
@@ -111,4 +113,11 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         layer.repaint();
     }
 
+    public void serialize(JSONObject swekObject) {
+        eventPanelModel.serialize(swekObject);
+    }
+
+    public void deserialize(JSONObject swekObject) {
+        eventPanelModel.deserialize(swekObject, eventPanelModel);
+    }
 }
