@@ -79,12 +79,11 @@ public class SWEKPlugin implements Plugin {
     }
 
     @Override
-    public void setState(String state) {
+    public void saveState(JSONObject jo) {
     }
 
     @Override
-    public String getState() {
-        return null;
+    public void loadState(JSONObject jo) {
     }
 
     @Override

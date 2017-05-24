@@ -9,6 +9,7 @@ import org.helioviewer.jhv.plugins.eve.view.TimelineDataPanel;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
+import org.json.JSONObject;
 
 public class EVEPlugin implements Plugin {
 
@@ -66,12 +67,11 @@ public class EVEPlugin implements Plugin {
     }
 
     @Override
-    public void setState(String state) {
+    public void saveState(JSONObject jo) {
     }
 
     @Override
-    public String getState() {
-        return null;
+    public void loadState(JSONObject jo) {
     }
 
 }
