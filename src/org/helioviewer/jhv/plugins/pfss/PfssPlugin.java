@@ -13,6 +13,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.pfss.data.PfssCache;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.json.JSONObject;
 
 public class PfssPlugin implements Plugin {
 
@@ -71,12 +72,11 @@ public class PfssPlugin implements Plugin {
     }
 
     @Override
-    public void setState(String state) {
+    public void saveState(JSONObject jo) {
     }
 
     @Override
-    public String getState() {
-        return null;
+    public void loadState(JSONObject jo) {
     }
 
 }
