@@ -6,7 +6,6 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
-import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelElement;
 import org.json.JSONObject;
 
 public class SWEKEventType extends SWEKTreeModelElement {
@@ -15,18 +14,16 @@ public class SWEKEventType extends SWEKTreeModelElement {
     private final String eventName;
     private final List<SWEKSupplier> suppliers;
     private final List<SWEKParameter> parameterList;
-    private final ImageIcon eventIcon;
 
     private final boolean containsParameterFilter;
     private HashMap<String, String> databaseFields;
     private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<>();
 
     public SWEKEventType(String _eventName, List<SWEKSupplier> _suppliers, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
-        super(false, _eventIcon);
         eventName = _eventName.intern();
         suppliers = _suppliers;
         parameterList = _parameterList;
-        eventIcon = _eventIcon;
+        setIcon(_eventIcon);
 
         containsParameterFilter = checkFilters(parameterList);
         swekEventTypes.put(eventName, this);
@@ -125,15 +122,6 @@ public class SWEKEventType extends SWEKTreeModelElement {
     }
 
     /**
-     * Gets the event icon.
-     *
-     * @return the icon of the event type
-     */
-    public ImageIcon getEventIcon() {
-        return eventIcon;
-    }
-
-    /**
      * Checks if the event type contains parameter filter.
      *
      * @return
@@ -163,4 +151,5 @@ public class SWEKEventType extends SWEKTreeModelElement {
 
     public void deserialize(JSONObject swekObject, EventTypePanelModel eventPanelModel) {
     }
+
 }
