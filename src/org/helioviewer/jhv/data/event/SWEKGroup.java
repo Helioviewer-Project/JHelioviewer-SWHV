@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 
 import org.json.JSONObject;
 
-public class SWEKEventType extends SWEKTreeModelElement {
+public class SWEKGroup extends SWEKTreeModelElement {
 
     private static List<SWEKRelatedEvents> swekrelEvents;
     private final List<SWEKParameter> parameterList;
@@ -17,11 +17,10 @@ public class SWEKEventType extends SWEKTreeModelElement {
     private List<SWEKSupplier> suppliers;
     private HashMap<String, String> databaseFields;
 
-    public SWEKEventType(String _eventName, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
+    public SWEKGroup(String _eventName, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
         setDisplayName(_eventName);
         parameterList = _parameterList;
         setIcon(_eventIcon);
-
         containsParameterFilter = checkFilters(parameterList);
     }
 
@@ -41,7 +40,7 @@ public class SWEKEventType extends SWEKTreeModelElement {
             }
         }
         for (SWEKRelatedEvents re : swekrelEvents) {
-            if (re.getEvent() == this) {
+            if (re.getGroup() == this) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
 
                 for (SWEKRelatedOn swon : relon) {

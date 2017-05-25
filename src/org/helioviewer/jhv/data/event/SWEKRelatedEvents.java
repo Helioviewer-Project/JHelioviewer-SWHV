@@ -2,26 +2,23 @@ package org.helioviewer.jhv.data.event;
 
 import java.util.List;
 
-// Defines a relationship between events.
 public class SWEKRelatedEvents {
 
-    private final SWEKEventType event;
-
-    private final SWEKEventType relatedWith;
-
+    private final SWEKGroup group;
+    private final SWEKGroup relatedWith;
     private final List<SWEKRelatedOn> relatedOnList;
 
-    public SWEKRelatedEvents(SWEKEventType _event, SWEKEventType _relatedWith, List<SWEKRelatedOn> _relatedOnList) {
-        event = _event;
+    public SWEKRelatedEvents(SWEKGroup _group, SWEKGroup _relatedWith, List<SWEKRelatedOn> _relatedOnList) {
+        group = _group;
         relatedWith = _relatedWith;
         relatedOnList = _relatedOnList;
     }
 
-    public SWEKEventType getEvent() {
-        return event;
+    public SWEKGroup getGroup() {
+        return group;
     }
 
-    public SWEKEventType getRelatedWith() {
+    public SWEKGroup getRelatedWith() {
         return relatedWith;
     }
 

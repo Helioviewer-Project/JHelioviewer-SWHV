@@ -10,7 +10,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.data.cache.SWEKOperand;
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.plugins.swek.view.FilterDialog;
@@ -63,24 +63,24 @@ public class FilterPanelFactory {
         return spinner;
     }
 
-    public static List<FilterPanel> createFilterPanel(SWEKEventType eventType, FilterDialog filterDialog) {
+    public static List<FilterPanel> createFilterPanel(SWEKGroup group, FilterDialog filterDialog) {
         List<FilterPanel> panels = new ArrayList<>();
-        for (SWEKParameter parameter : eventType.getParameterList()) {
+        for (SWEKParameter parameter : group.getParameterList()) {
             if (parameter.getParameterFilter() != null) {
                 String filterType = parameter.getParameterFilter().getFilterType().toLowerCase();
                 switch (filterType) {
                     case "doublemaxfilter":
-                        panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
+                        panels.add(new FilterPanel(group, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
                         break;
                     case "doubleminfilter":
-                        panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL));
+                        panels.add(new FilterPanel(group, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL));
                         break;
                     case "doubleminmaxfilter":
-                        panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
-                        panels.add(new FilterPanel(eventType, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL));
+                        panels.add(new FilterPanel(group, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
+                        panels.add(new FilterPanel(group, parameter, generateMinOrMaxSpinner(filterDialog, parameter), filterDialog, SWEKOperand.SMALLER_OR_EQUAL));
                         break;
                     case "flarefilter":
-                        panels.add(new FilterPanel(eventType, parameter, generateFlareSpinner(filterDialog), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
+                        panels.add(new FilterPanel(group, parameter, generateFlareSpinner(filterDialog), filterDialog, SWEKOperand.BIGGER_OR_EQUAL));
                         break;
                     default:
                         break;
