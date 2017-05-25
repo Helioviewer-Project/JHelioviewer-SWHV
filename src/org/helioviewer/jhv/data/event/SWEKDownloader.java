@@ -27,7 +27,7 @@ public abstract class SWEKDownloader {
             boolean success = true;
             boolean overmax = true;
             while (overmax && success) {
-                JSONObject eventJSON = JSONUtils.getJSONStream(new DownloadStream(createURL(supplier.getEventType(), start, end, params, page)).getInput());
+                JSONObject eventJSON = JSONUtils.getJSONStream(new DownloadStream(createURL(supplier.getGroup(), start, end, params, page)).getInput());
                 overmax = eventJSON.optBoolean("overmax", false);
                 success = parseEvents(eventJSON, supplier) && parseAssociations(eventJSON);
                 page++;
@@ -45,6 +45,6 @@ public abstract class SWEKDownloader {
 
     protected abstract boolean parseAssociations(JSONObject eventJSON);
 
-    protected abstract String createURL(SWEKEventType supplier, long start, long end, List<SWEKParam> params, int page);
+    protected abstract String createURL(SWEKGroup group, long start, long end, List<SWEKParam> params, int page);
 
 }

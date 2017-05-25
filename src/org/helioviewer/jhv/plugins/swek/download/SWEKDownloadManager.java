@@ -16,7 +16,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.cache.JHVEventCacheRequestHandler;
 import org.helioviewer.jhv.data.cache.SWEKOperand;
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
@@ -40,7 +40,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
             JHVThread.afterExecute(r, t);
         }
     };
-    private static final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap = new HashMap<>();
+    private static final Map<SWEKGroup, ArrayList<DownloadWorker>> dwMap = new HashMap<>();
     private static final ArrayList<SWEKSupplier> activeEventTypes = new ArrayList<>();
 
     private static final SWEKDownloadManager instance = new SWEKDownloadManager();
@@ -53,15 +53,15 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         JHVEventCache.registerHandler(this);
     }
 
-    private static void stopDownloadingEventType(SWEKEventType eventType, boolean keepActive) {
-        for (SWEKSupplier supplier : eventType.getSuppliers()) {
-            stopDownloadingEventType(eventType, supplier, keepActive);
+    private static void stopDownloadingGroup(SWEKGroup group, boolean keepActive) {
+        for (SWEKSupplier supplier : group.getSuppliers()) {
+            stopDownloadingEventType(group, supplier, keepActive);
         }
     }
 
-    private static void stopDownloadingEventType(SWEKEventType eventType, SWEKSupplier supplier, boolean keepActive) {
-        if (dwMap.containsKey(eventType)) {
-            ArrayList<DownloadWorker> dwMapOnDate = dwMap.get(eventType);
+    private static void stopDownloadingEventType(SWEKGroup group, SWEKSupplier supplier, boolean keepActive) {
+        if (dwMap.containsKey(group)) {
+            ArrayList<DownloadWorker> dwMapOnDate = dwMap.get(group);
             for (Iterator<DownloadWorker> it = dwMapOnDate.iterator(); it.hasNext();) {
                 DownloadWorker dw = it.next();
                 if (dw.getSupplier().equals(supplier)) {
@@ -70,9 +70,9 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
                     it.remove();
                 }
             }
-            if (dwMap.get(eventType).isEmpty()) {
-                SWEKTreeModel.setStopLoading(eventType);
-                dwMap.remove(eventType);
+            if (dwMap.get(group).isEmpty()) {
+                SWEKTreeModel.setStopLoading(group);
+                dwMap.remove(group);
             }
         }
         JHVEventCache.removeEvents(supplier, keepActive);
@@ -88,41 +88,41 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     @Override
-    public void newEventTypeAndSourceActive(SWEKEventType eventType, SWEKSupplier supplier) {
+    public void groupAndSupplierActive(SWEKGroup group, SWEKSupplier supplier) {
         addEventTypeToActiveEventTypeMap(supplier);
         JHVEventCache.eventTypeActivated(supplier);
     }
 
     @Override
-    public void newEventTypeAndSourceInactive(SWEKEventType eventType, SWEKSupplier supplier) {
+    public void groupAndSupplierInactive(SWEKGroup group, SWEKSupplier supplier) {
         removeEventTypeFromActiveEventTypeMap(supplier);
-        stopDownloadingEventType(eventType, supplier, false);
+        stopDownloadingEventType(group, supplier, false);
     }
 
     @Override
-    public void filtersChanged(SWEKEventType swekEventType) {
-        stopDownloadingEventType(swekEventType, true);
-        JHVEventCache.reset(swekEventType);
-        downloadSelectedSuppliers(swekEventType);
+    public void filtersChanged(SWEKGroup group) {
+        stopDownloadingGroup(group, true);
+        JHVEventCache.reset(group);
+        downloadSelectedSuppliers(group);
     }
 
     private static void removeFromDownloaderMap(DownloadWorker worker) {
-        ArrayList<DownloadWorker> dwMapList = dwMap.get(worker.getEventType());
+        ArrayList<DownloadWorker> dwMapList = dwMap.get(worker.getGroup());
         if (dwMapList != null)
             dwMapList.remove(worker);
 
         boolean loadingCondition = (dwMapList != null) && !dwMapList.isEmpty();
         if (!loadingCondition)
-            SWEKTreeModel.setStopLoading(worker.getEventType());
+            SWEKTreeModel.setStopLoading(worker.getGroup());
     }
 
-    private static void addToDownloaderMap(SWEKEventType eventType, DownloadWorker dw) {
+    private static void addToDownloaderMap(SWEKGroup group, DownloadWorker dw) {
         ArrayList<DownloadWorker> dwMapList;
-        if (dwMap.containsKey(eventType)) {
-            dwMapList = dwMap.get(eventType);
+        if (dwMap.containsKey(group)) {
+            dwMapList = dwMap.get(group);
         } else {
             dwMapList = new ArrayList<>();
-            dwMap.put(eventType, dwMapList);
+            dwMap.put(group, dwMapList);
         }
         dwMapList.add(dw);
     }
@@ -135,19 +135,19 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         activeEventTypes.remove(jhvType);
     }
 
-    private static List<SWEKParam> defineParameters(SWEKEventType eventType, SWEKSupplier supplier) {
+    private static List<SWEKParam> defineParameters(SWEKGroup group, SWEKSupplier supplier) {
         List<SWEKParam> params = new ArrayList<>();
         params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
-        Map<SWEKParameter, List<SWEKParam>> paramsPerEventParameter = FilterManager.getFilterForEventType(eventType);
+        Map<SWEKParameter, List<SWEKParam>> paramsPerEventParameter = FilterManager.getFilterForGroup(group);
         for (List<SWEKParam> paramPerParameter : paramsPerEventParameter.values()) {
             params.addAll(paramPerParameter);
         }
         return params;
     }
 
-    private static void downloadSelectedSuppliers(SWEKEventType swekEventType) {
+    private static void downloadSelectedSuppliers(SWEKGroup group) {
         for (SWEKSupplier jhvType : activeEventTypes) {
-            if (jhvType.getEventType() == swekEventType)
+            if (jhvType.getGroup() == group)
                 downloadForAllDates(jhvType);
         }
     }
@@ -165,13 +165,13 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     private static void startDownloadEventType(SWEKSupplier supplier, Interval interval) {
-        SWEKEventType eventType = supplier.getEventType();
-        List<SWEKParam> params = defineParameters(eventType, supplier);
+        SWEKGroup group = supplier.getGroup();
+        List<SWEKParam> params = defineParameters(group, supplier);
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {
                 DownloadWorker dw = new DownloadWorker(supplier, intt, params);
-                SWEKTreeModel.setStartLoading(eventType);
-                addToDownloaderMap(eventType, dw);
+                SWEKTreeModel.setStartLoading(group);
+                addToDownloaderMap(group, dw);
                 downloadEventPool.execute(dw);
             }
         }
