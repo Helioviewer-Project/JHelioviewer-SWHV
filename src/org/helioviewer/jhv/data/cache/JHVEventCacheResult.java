@@ -5,23 +5,23 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.data.event.JHVEventType;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 
 public class JHVEventCacheResult {
 
-    private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> availableEvents;
-    private final Map<JHVEventType, List<Interval>> missingIntervals;
+    private final Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> availableEvents;
+    private final Map<SWEKSupplier, List<Interval>> missingIntervals;
 
-    public JHVEventCacheResult(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> _availableEvents, Map<JHVEventType, List<Interval>> _missingIntervals) {
+    public JHVEventCacheResult(Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> _availableEvents, Map<SWEKSupplier, List<Interval>> _missingIntervals) {
         availableEvents = _availableEvents;
         missingIntervals = _missingIntervals;
     }
 
-    public Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> getAvailableEvents() {
+    public Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> getAvailableEvents() {
         return availableEvents;
     }
 
-    public Map<JHVEventType, List<Interval>> getMissingIntervals() {
+    public Map<SWEKSupplier, List<Interval>> getMissingIntervals() {
         return missingIntervals;
     }
 

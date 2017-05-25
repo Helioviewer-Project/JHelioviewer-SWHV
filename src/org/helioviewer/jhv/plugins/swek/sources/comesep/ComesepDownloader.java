@@ -8,10 +8,10 @@ import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.data.event.SWEKDownloader;
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKParam;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +23,7 @@ public class ComesepDownloader extends SWEKDownloader {
     private static final String _baseurl = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
-    protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
+    protected boolean parseEvents(JSONObject eventJSON, SWEKSupplier supplier) {
         JSONArray results = eventJSON.getJSONArray("results");
         try {
             ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
@@ -50,7 +50,7 @@ public class ComesepDownloader extends SWEKDownloader {
                 event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, new ArrayList<>()));
             }
 
-            int[] ids = EventDatabase.dump_event2db(event2db_list, type);
+            int[] ids = EventDatabase.dump_event2db(event2db_list, supplier);
             for (int id : ids) {
                 if (id == -1) {
                     Log.error("failed to dump to database");

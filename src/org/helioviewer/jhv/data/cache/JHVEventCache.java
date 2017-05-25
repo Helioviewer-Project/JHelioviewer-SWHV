@@ -15,7 +15,6 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 
@@ -24,10 +23,10 @@ public class JHVEventCache {
     private static final double factor = 0.2;
 
     private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<>();
-    private static final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
+    private static final Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
     private static final Map<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
-    private static final Set<JHVEventType> activeEventTypes = new HashSet<>();
-    private static final Map<JHVEventType, RequestCache> downloadedCache = new HashMap<>();
+    private static final Set<SWEKSupplier> activeEventTypes = new HashSet<>();
+    private static final Map<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
     private static final ArrayList<JHVAssociation> assocs = new ArrayList<>();
 
     private static JHVEventCacheRequestHandler incomingRequestManager;
@@ -46,7 +45,7 @@ public class JHVEventCache {
         cacheEventHandlers.add(handler);
 
         JHVEventCacheResult result = get(startDate, endDate, newStartDate, newEndDate);
-        for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
+        for (SWEKSupplier eventType : result.getMissingIntervals().keySet()) {
             List<Interval> missingList = result.getMissingIntervals().get(eventType);
             for (Interval missing : missingList) {
                 requestEvents(eventType, missing);
@@ -60,12 +59,12 @@ public class JHVEventCache {
         fireEventCacheChanged();
     }
 
-    public static void removeEvents(JHVEventType eventType, boolean keepActive) {
+    public static void removeEvents(SWEKSupplier eventType, boolean keepActive) {
         removeEventType(eventType, keepActive);
         fireEventCacheChanged();
     }
 
-    private static void requestEvents(JHVEventType eventType, Interval interval) {
+    private static void requestEvents(SWEKSupplier eventType, Interval interval) {
         incomingRequestManager.handleRequestForInterval(eventType, interval);
     }
 
@@ -75,12 +74,12 @@ public class JHVEventCache {
         }
     }
 
-    public static void intervalsNotDownloaded(JHVEventType eventType, Interval interval) {
+    public static void intervalsNotDownloaded(SWEKSupplier eventType, Interval interval) {
         downloadedCache.get(eventType).removeRequestedInterval(interval.start, interval.end);
         get(interval.start, interval.end, interval.start, interval.end);
     }
 
-    public static void eventTypeActivated(JHVEventType eventType) {
+    public static void eventTypeActivated(SWEKSupplier eventType) {
         activeEventTypes.add(eventType);
         if (!downloadedCache.containsKey(eventType)) {
             downloadedCache.put(eventType, new RequestCache());
@@ -165,10 +164,10 @@ public class JHVEventCache {
     }
 
     public static JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
-        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<>();
-        Map<JHVEventType, List<Interval>> missingIntervals = new HashMap<>();
+        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<>();
+        Map<SWEKSupplier, List<Interval>> missingIntervals = new HashMap<>();
 
-        for (JHVEventType evt : activeEventTypes) {
+        for (SWEKSupplier evt : activeEventTypes) {
             SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
             if (sortedEvents != null) {
                 long delta = TimeUtils.DAY_IN_MILLIS * 30L;
@@ -184,28 +183,27 @@ public class JHVEventCache {
         return new JHVEventCacheResult(eventsResult, missingIntervals);
     }
 
-    private static void removeEventType(JHVEventType eventType, boolean keepActive) {
+    private static void removeEventType(SWEKSupplier eventType, boolean keepActive) {
         if (keepActive)
             deleteFromCache(eventType);
         else
             activeEventTypes.remove(eventType);
     }
 
-    private static void deleteFromCache(JHVEventType eventType) {
+    private static void deleteFromCache(SWEKSupplier eventType) {
         downloadedCache.put(eventType, new RequestCache());
         events.remove(eventType);
-        relEvents.entrySet().removeIf(entry -> entry.getValue().getJHVEventType() == eventType);
+        relEvents.entrySet().removeIf(entry -> entry.getValue().getSupplier() == eventType);
     }
 
-    public static Collection<Interval> getAllRequestIntervals(JHVEventType eventType) {
+    public static Collection<Interval> getAllRequestIntervals(SWEKSupplier eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
     }
 
     public static void reset(SWEKEventType eventType) {
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
-            JHVEventType evt = JHVEventType.getJHVEventType(supplier);
-            downloadedCache.remove(evt);
-            downloadedCache.put(evt, new RequestCache());
+            downloadedCache.remove(supplier);
+            downloadedCache.put(supplier, new RequestCache());
         }
     }
 
