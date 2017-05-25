@@ -69,7 +69,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
             panel.add(new TreeLabel(icon), BorderLayout.LINE_START);
         }
 
-        JCheckBox checkBox = new JCheckBox(element.getDisplayName());
+        JCheckBox checkBox = new JCheckBox(element.getName());
         checkBox.setSelected(element.isSelected());
         checkBox.setBackground(back);
         panel.add(checkBox, BorderLayout.CENTER);

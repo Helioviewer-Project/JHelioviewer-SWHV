@@ -29,12 +29,6 @@ public class HEKDownloader extends SWEKDownloader {
 
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
-    private static void patch_event(JSONObject result, SWEKSupplier supplier) {
-        if (supplier.getGroup().getDisplayName().equals("Flare") && supplier.getDisplayName().contains("SWPC") && result.has("fl_goescls")) {
-            result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
-        }
-    }
-
     @Override
     protected boolean parseEvents(JSONObject eventJSON, SWEKSupplier supplier) {
         JSONArray results = eventJSON.getJSONArray("result");
@@ -49,7 +43,10 @@ public class HEKDownloader extends SWEKDownloader {
                 Log.error("compression error");
                 return false;
             }
-            patch_event(result, supplier);
+
+            if (result.has("fl_goescls"))
+                result.put("JHV_GOESClass", GOESLevel.getFloatValue(result.getString("fl_goescls")));
+
             String uid;
             long start;
             long end;
@@ -110,7 +107,7 @@ public class HEKDownloader extends SWEKDownloader {
     protected String createURL(SWEKGroup group, long start, long end, List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(_baseURL);
         baseURL.append("cmd=search&type=column&");
-        baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(group.getDisplayName())).append('&');
+        baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(group.getName())).append('&');
         baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
         baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.format(end)).append('&');
         baseURL = appendParams(baseURL, params);

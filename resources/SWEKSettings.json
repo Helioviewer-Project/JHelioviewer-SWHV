@@ -888,9 +888,9 @@
                     "filter"                    : null,
                     "default_visible"           : true
                 },
-                { 
+                {
                     "source"                    : "HEK",
-                    "parameter_name"            : "fl_val",
+                    "parameter_name"            : "JHV_GOESClass",
                     "parameter_display_name"    : "GOES value",
                     "filter"                    :
                         {
