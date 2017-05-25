@@ -5,6 +5,6 @@ import org.json.JSONObject;
 
 public interface SWEKParser {
 
-    JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException;
+    JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException;
 
 }

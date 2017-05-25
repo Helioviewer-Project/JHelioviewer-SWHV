@@ -10,24 +10,24 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParser;
 import org.helioviewer.jhv.data.event.SWEKSource;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.EventDatabase.JsonEvent;
 
 // A download worker will download events for a type of event from a source.
 class DownloadWorker implements Runnable {
 
-    private final JHVEventType jhvType;
+    private final SWEKSupplier supplier;
     private final List<SWEKParam> params;
     private final Interval requestInterval;
 
-    public DownloadWorker(JHVEventType _jhvType, Interval _interval, List<SWEKParam> _params) {
+    public DownloadWorker(SWEKSupplier _supplier, Interval _interval, List<SWEKParam> _params) {
         requestInterval = _interval;
-        jhvType = _jhvType;
+        supplier = _supplier;
         params = _params;
     }
 
@@ -37,11 +37,10 @@ class DownloadWorker implements Runnable {
 
     @Override
     public void run() {
-        SWEKSource swekSource = jhvType.getSupplier().getSource();
-
-        boolean success = swekSource.getDownloader().extern2db(jhvType, requestInterval.start, requestInterval.end, params);
+        SWEKSource swekSource = supplier.getSource();
+        boolean success = swekSource.getDownloader().extern2db(supplier, requestInterval.start, requestInterval.end, params);
         if (success) {
-            ArrayList<JHVAssociation> associationList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, jhvType);
+            ArrayList<JHVAssociation> associationList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, supplier);
             EventQueue.invokeLater(() -> {
                 for (JHVAssociation assoc : associationList) {
                     JHVEventCache.add(assoc);
@@ -49,7 +48,7 @@ class DownloadWorker implements Runnable {
             });
 
             SWEKParser parser = swekSource.getParser();
-            ArrayList<JsonEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, jhvType, params);
+            ArrayList<JsonEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, supplier, params);
             for (JsonEvent event : eventList) {
                 JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end, false);
                 EventQueue.invokeLater(() -> JHVEventCache.add(ev));
@@ -59,18 +58,18 @@ class DownloadWorker implements Runnable {
                 JHVEventCache.finishedDownload();
                 SWEKDownloadManager.workerFinished(this);
             });
-            EventDatabase.addDaterange2db(requestInterval.start, requestInterval.end, jhvType);
+            EventDatabase.addDaterange2db(requestInterval.start, requestInterval.end, supplier);
         } else {
             EventQueue.invokeLater(() -> SWEKDownloadManager.workerForcedToStop(this));
         }
     }
 
-    public JHVEventType getJHVEventType() {
-        return jhvType;
+    public SWEKSupplier getSupplier() {
+        return supplier;
     }
 
     public SWEKEventType getEventType() {
-        return jhvType.getSupplier().getEventType();
+        return supplier.getEventType();
     }
 
     public Interval getRequestInterval() {

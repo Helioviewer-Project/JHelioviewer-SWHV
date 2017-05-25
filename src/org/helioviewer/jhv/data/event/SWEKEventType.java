@@ -17,19 +17,12 @@ public class SWEKEventType extends SWEKTreeModelElement {
     private List<SWEKSupplier> suppliers;
     private HashMap<String, String> databaseFields;
 
-    private static final HashMap<String, SWEKEventType> swekEventTypes = new HashMap<>();
-
     public SWEKEventType(String _eventName, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
         setDisplayName(_eventName);
         parameterList = _parameterList;
         setIcon(_eventIcon);
 
         containsParameterFilter = checkFilters(parameterList);
-        swekEventTypes.put(_eventName, this);
-    }
-
-    public static SWEKEventType getSWEKEventType(String name) {
-        return swekEventTypes.get(name);
     }
 
     public HashMap<String, String> getAllDatabaseFields() {
