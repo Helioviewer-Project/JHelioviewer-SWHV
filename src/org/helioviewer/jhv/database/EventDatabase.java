@@ -26,7 +26,6 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParser;
@@ -80,7 +79,7 @@ public class EventDatabase {
 
     private static final HashMap<Object, PreparedStatement> statements = new HashMap<>();
 
-    private static final HashMap<JHVEventType, RequestCache> downloadedCache = new HashMap<>();
+    private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
 
     private static PreparedStatement getPreparedStatement(Connection connection, String statement) {
         statement = statement.intern();
@@ -97,7 +96,7 @@ public class EventDatabase {
         return pstat;
     }
 
-    private static int getEventTypeId(Connection connection, JHVEventType eventType) {
+    private static int getEventTypeId(Connection connection, SWEKSupplier eventType) {
         int typeId = _getEventTypeId(connection, eventType);
         if (typeId == -1) {
             insertEventTypeIfNotExist(connection, eventType);
@@ -106,12 +105,12 @@ public class EventDatabase {
         return typeId;
     }
 
-    private static int _getEventTypeId(Connection connection, JHVEventType event) {
+    private static int _getEventTypeId(Connection connection, SWEKSupplier event) {
         int typeId = -1;
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_TYPE);
-            pstatement.setString(1, event.getSupplier().getEventType().getDisplayName());
-            pstatement.setString(2, event.getSupplier().getSupplierKey());
+            pstatement.setString(1, event.getEventType().getDisplayName());
+            pstatement.setString(2, event.getSupplierKey());
 
             try (ResultSet rs = pstatement.executeQuery()) {
                 if (rs.next()) {
@@ -119,22 +118,22 @@ public class EventDatabase {
                 }
             }
         } catch (SQLException e) {
-            Log.error("Could not fetch event type " + event.getSupplier().getEventType().getDisplayName() + ' ' + event.getSupplier().getSupplierKey() + ' ' + e.getMessage());
+            Log.error("Could not fetch event type " + event.getEventType().getDisplayName() + ' ' + event.getSupplierKey() + ' ' + e.getMessage());
         }
         return typeId;
     }
 
-    private static void insertEventTypeIfNotExist(Connection connection, JHVEventType eventType) {
+    private static void insertEventTypeIfNotExist(Connection connection, SWEKSupplier eventType) {
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, INSERT_EVENT_TYPE);
-            pstatement.setString(1, eventType.getSupplier().getEventType().getDisplayName());
-            pstatement.setString(2, eventType.getSupplier().getSupplierKey());
+            pstatement.setString(1, eventType.getEventType().getDisplayName());
+            pstatement.setString(2, eventType.getSupplierKey());
             pstatement.executeUpdate();
 
-            String dbName = eventType.getSupplier().getDatabaseName();
+            String dbName = eventType.getDatabaseName();
             StringBuilder createtbl = new StringBuilder();
             createtbl.append("CREATE TABLE ").append(dbName).append(" (");
-            HashMap<String, String> fields = eventType.getSupplier().getEventType().getAllDatabaseFields();
+            HashMap<String, String> fields = eventType.getEventType().getAllDatabaseFields();
 
             for (Map.Entry<String, String> entry : fields.entrySet()) {
                 createtbl.append(entry.getKey()).append(' ').append(entry.getValue()).append(" DEFAULT NULL,");
@@ -309,7 +308,7 @@ public class EventDatabase {
         return inserted_ids;
     }
 
-    public static int[] dump_event2db(ArrayList<Event2Db> event2db_list, JHVEventType type) {
+    public static int[] dump_event2db(ArrayList<Event2Db> event2db_list, SWEKSupplier type) {
         FutureTask<int[]> ft = new FutureTask<>(new DumpEvent2Db(event2db_list, type));
         executor.execute(ft);
         try {
@@ -321,10 +320,10 @@ public class EventDatabase {
     }
 
     private static class DumpEvent2Db implements Callable<int[]> {
-        private final JHVEventType type;
+        private final SWEKSupplier type;
         private final ArrayList<Event2Db> event2db_list;
 
-        public DumpEvent2Db(ArrayList<Event2Db> _event2db_list, JHVEventType _type) {
+        public DumpEvent2Db(ArrayList<Event2Db> _event2db_list, SWEKSupplier _type) {
             event2db_list = _event2db_list;
             type = _type;
         }
@@ -382,7 +381,7 @@ public class EventDatabase {
                                 fieldString.append(',').append(p.getParamName());
                                 varString.append(",?");
                             }
-                            String full_statement = "INSERT INTO " + type.getSupplier().getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
+                            String full_statement = "INSERT INTO " + type.getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
                             PreparedStatement pstatement = getPreparedStatement(connection, full_statement);
                             pstatement.setInt(1, generatedKey);
 
@@ -427,7 +426,7 @@ public class EventDatabase {
     }
 
     private static JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) {
-        SWEKParser parser = jsonEvent.type.getSupplier().getSource().getParser();
+        SWEKParser parser = jsonEvent.type.getSource().getParser();
         return parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
     }
 
@@ -443,13 +442,13 @@ public class EventDatabase {
         return uniqueEvents;
     }
 
-    public static ArrayList<JHVEvent> getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype, boolean full) {
+    public static ArrayList<JHVEvent> getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full) {
         return _getOtherRelations(id, jhvEventType, similartype, full, false);
     }
 
     //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
-    private static ArrayList<JHVEvent> _getOtherRelations(int id, JHVEventType jhvEventType, boolean similartype, boolean full, boolean is_dbthread) {
-        SWEKEventType evt = jhvEventType.getSupplier().getEventType();
+    private static ArrayList<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) {
+        SWEKEventType evt = jhvEventType.getEventType();
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
         ArrayList<JsonEvent> jsonEvents = new ArrayList<>();
 
@@ -461,12 +460,11 @@ public class EventDatabase {
                     String w = swon.parameterWith.getParameterName().toLowerCase();
                     SWEKEventType reType = re.getRelatedWith();
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
-                        JHVEventType othert = JHVEventType.getJHVEventType(supplier);
-                        if (similartype == (othert == jhvEventType))
+                        if (similartype == (supplier == jhvEventType))
                             if (is_dbthread)
-                                jsonEvents.addAll(rel2prog(id, jhvEventType, othert, f, w));
+                                jsonEvents.addAll(rel2prog(id, jhvEventType, supplier, f, w));
                             else
-                                jsonEvents.addAll(relations2Program(id, jhvEventType, othert, f, w));
+                                jsonEvents.addAll(relations2Program(id, jhvEventType, supplier, f, w));
                     }
                 }
             }
@@ -478,12 +476,11 @@ public class EventDatabase {
                     String w = swon.parameterWith.getParameterName().toLowerCase();
                     SWEKEventType reType = re.getEvent();
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
-                        JHVEventType fromt = JHVEventType.getJHVEventType(supplier);
-                        if (similartype == (fromt == jhvEventType))
+                        if (similartype == (supplier == jhvEventType))
                             if (is_dbthread)
-                                jsonEvents.addAll(rel2prog(id, fromt, jhvEventType, f, w));
+                                jsonEvents.addAll(rel2prog(id, supplier, jhvEventType, f, w));
                             else
-                                jsonEvents.addAll(relations2Program(id, fromt, jhvEventType, f, w));
+                                jsonEvents.addAll(relations2Program(id, supplier, jhvEventType, f, w));
                     }
                 }
             }
@@ -503,16 +500,16 @@ public class EventDatabase {
         return createUniqueList(nEvents);
     }
 
-    public static void addDaterange2db(long start, long end, JHVEventType type) {
+    public static void addDaterange2db(long start, long end, SWEKSupplier type) {
         executor.execute(new AddDateRange2db(start, end, type));
     }
 
     private static class AddDateRange2db implements Runnable {
-        private final JHVEventType type;
+        private final SWEKSupplier type;
         private final long start;
         private final long end;
 
-        public AddDateRange2db(long _start, long _end, JHVEventType _type) {
+        public AddDateRange2db(long _start, long _end, SWEKSupplier _type) {
             start = _start;
             end = _end;
             type = _type;
@@ -552,7 +549,7 @@ public class EventDatabase {
 
     }
 
-    public static ArrayList<Interval> db2daterange(JHVEventType type) {
+    public static ArrayList<Interval> db2daterange(SWEKSupplier type) {
         FutureTask<ArrayList<Interval>> ft = new FutureTask<>(new Db2DateRange(type));
         executor.execute(ft);
         try {
@@ -565,9 +562,9 @@ public class EventDatabase {
 
     private static class Db2DateRange implements Callable<ArrayList<Interval>> {
 
-        private final JHVEventType type;
+        private final SWEKSupplier type;
 
-        public Db2DateRange(JHVEventType _type) {
+        public Db2DateRange(SWEKSupplier _type) {
             type = _type;
         }
 
@@ -610,7 +607,7 @@ public class EventDatabase {
         }
     }
 
-    private static long getLastEvent(Connection connection, JHVEventType type) {
+    private static long getLastEvent(Connection connection, SWEKSupplier type) {
         int typeId = getEventTypeId(connection, type);
         long last_timestamp = Long.MIN_VALUE;
         if (typeId != -1) {
@@ -630,7 +627,7 @@ public class EventDatabase {
         return last_timestamp;
     }
 
-    public static ArrayList<JsonEvent> events2Program(long start, long end, JHVEventType type, List<SWEKParam> params) {
+    public static ArrayList<JsonEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEKParam> params) {
         FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<>(new Events2Program(start, end, type, params));
         executor.execute(ft);
         try {
@@ -644,11 +641,11 @@ public class EventDatabase {
     public static class JsonEvent {
         public final int id;
         public final byte[] json;
-        public final JHVEventType type;
+        public final SWEKSupplier type;
         public final long start;
         public final long end;
 
-        public JsonEvent(byte[] _json, JHVEventType _type, int _id, long _start, long _end) {
+        public JsonEvent(byte[] _json, SWEKSupplier _type, int _id, long _start, long _end) {
             start = _start;
             end = _end;
             type = _type;
@@ -659,12 +656,12 @@ public class EventDatabase {
     }
 
     private static class Events2Program implements Callable<ArrayList<JsonEvent>> {
-        private final JHVEventType type;
+        private final SWEKSupplier type;
         private final long start;
         private final long end;
         private final List<SWEKParam> params;
 
-        public Events2Program(long _start, long _end, JHVEventType _type, List<SWEKParam> _params) {
+        public Events2Program(long _start, long _end, SWEKSupplier _type, List<SWEKParam> _params) {
             type = _type;
             start = _start;
             end = _end;
@@ -682,7 +679,7 @@ public class EventDatabase {
             int typeId = getEventTypeId(connection, type);
             if (typeId != -1) {
                 try {
-                    String join = "LEFT JOIN " + type.getSupplier().getDatabaseName() + " AS tp ON tp.event_id=e.id";
+                    String join = "LEFT JOIN " + type.getDatabaseName() + " AS tp ON tp.event_id=e.id";
                     StringBuilder and = new StringBuilder();
                     for (SWEKParam p : params) {
                         if (!p.param.equals("provider")) {
@@ -713,7 +710,7 @@ public class EventDatabase {
         }
     }
 
-    public static ArrayList<JHVAssociation> associations2Program(long start, long end, JHVEventType type) {
+    public static ArrayList<JHVAssociation> associations2Program(long start, long end, SWEKSupplier type) {
         FutureTask<ArrayList<JHVAssociation>> ft = new FutureTask<>(new Associations2Program(start, end, type));
         executor.execute(ft);
         try {
@@ -725,11 +722,11 @@ public class EventDatabase {
     }
 
     private static class Associations2Program implements Callable<ArrayList<JHVAssociation>> {
-        private final JHVEventType type;
+        private final SWEKSupplier type;
         private final long start;
         private final long end;
 
-        public Associations2Program(long _start, long _end, JHVEventType _type) {
+        public Associations2Program(long _start, long _end, SWEKSupplier _type) {
             type = _type;
             start = _start;
             end = _end;
@@ -765,7 +762,7 @@ public class EventDatabase {
         }
     }
 
-    private static ArrayList<JsonEvent> relations2Program(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
+    private static ArrayList<JsonEvent> relations2Program(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) {
         FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<>(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
         executor.execute(ft);
         try {
@@ -776,7 +773,7 @@ public class EventDatabase {
         return new ArrayList<>();
     }
 
-    private static ArrayList<JsonEvent> rel2prog(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
+    private static ArrayList<JsonEvent> rel2prog(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) {
         Connection connection = ConnectionThread.getConnection();
         if (connection == null) {
             return new ArrayList<>();
@@ -787,8 +784,8 @@ public class EventDatabase {
 
         if (type_left_id != -1 && type_right_id != -1) {
             try {
-                String table_left_name = type_left.getSupplier().getDatabaseName();
-                String table_right_name = type_right.getSupplier().getDatabaseName();
+                String table_left_name = type_left.getDatabaseName();
+                String table_right_name = type_right.getDatabaseName();
 
                 String sqlt = "SELECT tl.event_id, tr.event_id FROM " + table_left_name + " AS tl," + table_right_name + " AS tr" + " WHERE tl." + param_left + "=tr." + param_right + " AND tl.event_id!=tr.event_id AND (tl.event_id=? OR tr.event_id=?)";
                 PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
@@ -817,7 +814,7 @@ public class EventDatabase {
                             long start = rs.getLong(2);
                             long end = rs.getLong(3);
                             byte[] json = rs.getBytes(4);
-                            ret.add(new JsonEvent(json, JHVEventType.getJHVEventType(SWEKSupplier.getSupplier(rs.getString(5))), id, start, end));
+                            ret.add(new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end));
                         }
                     }
                 }
@@ -831,14 +828,14 @@ public class EventDatabase {
     }
 
     private static class Relations2Program implements Callable<ArrayList<JsonEvent>> {
-        private final JHVEventType type_left;
-        private final JHVEventType type_right;
+        private final SWEKSupplier type_left;
+        private final SWEKSupplier type_right;
         private final String param_left;
         private final String param_right;
 
         private final int event_id;
 
-        public Relations2Program(int _event_id, JHVEventType _type_left, JHVEventType _type_right, String _param_left, String _param_right) {
+        public Relations2Program(int _event_id, SWEKSupplier _type_left, SWEKSupplier _type_right, String _param_left, String _param_right) {
             type_left = _type_left;
             type_right = _type_right;
             param_left = _param_left;
@@ -869,7 +866,7 @@ public class EventDatabase {
                     long start = rs.getLong(2);
                     long end = rs.getLong(3);
                     byte[] json = rs.getBytes(4);
-                    je = new JsonEvent(json, JHVEventType.getJHVEventType(SWEKSupplier.getSupplier(rs.getString(5))), id, start, end);
+                    je = new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end);
                 }
             }
             return je;

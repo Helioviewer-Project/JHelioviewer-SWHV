@@ -16,10 +16,10 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
-import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.data.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKParser;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,8 +29,8 @@ public class HEKParser implements SWEKParser {
     private static final ThreadLocal<DecimalFormat> formatter1 = ThreadLocal.withInitial(() -> MathUtils.numberFormatter("0", 1));
 
     @Override
-    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
-        JHVEvent currentEvent = new JHVEvent(type, id, start, end);
+    public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
+        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
 
         parseResult(json, currentEvent, full);
         currentEvent.finishParams();
@@ -49,7 +49,7 @@ public class HEKParser implements SWEKParser {
         String waveValue = null;
 
         // First iterate over parameters in the config file
-        List<SWEKParameter> plist = currentEvent.getJHVEventType().getSupplier().getEventType().getParameterList();
+        List<SWEKParameter> plist = currentEvent.getSupplier().getEventType().getParameterList();
         Iterator<SWEKParameter> paramIterator = plist.iterator();
         HashSet<String> insertedKeys = new HashSet<>();
 

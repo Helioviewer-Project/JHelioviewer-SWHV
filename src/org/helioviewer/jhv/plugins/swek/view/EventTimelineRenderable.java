@@ -17,7 +17,7 @@ import org.helioviewer.jhv.data.cache.JHVEventHandler;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
-import org.helioviewer.jhv.data.event.JHVEventType;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -74,7 +74,7 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
         highlightedEvent = null;
         highlightedEventPosition = -1;
 
-        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(xAxis.start, xAxis.end, xAxis.start, xAxis.end).getAvailableEvents();
+        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(xAxis.start, xAxis.end, xAxis.start, xAxis.end).getAvailableEvents();
         if (events.isEmpty())
             return;
 

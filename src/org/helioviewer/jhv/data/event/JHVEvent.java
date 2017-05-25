@@ -18,13 +18,13 @@ public class JHVEvent {
     private ArrayList<JHVEventParameter> allParametersArray = new ArrayList<>();
     private ArrayList<JHVEventParameter> visibleParametersArray = new ArrayList<>();
 
-    private final JHVEventType eventType;
+    private final SWEKSupplier supplier;
     private JHVPositionInformation positionInformation = null;
     private final int id;
 
-    public JHVEvent(JHVEventType _eventType, int _id, long _start, long _end) {
-        eventType = _eventType;
-        eventName = _eventType.getSupplier().getEventType().getDisplayName();
+    public JHVEvent(SWEKSupplier _supplier, int _id, long _start, long _end) {
+        supplier = _supplier;
+        eventName = _supplier.getEventType().getDisplayName();
         start = _start;
         end = _end;
         id = _id;
@@ -57,8 +57,8 @@ public class JHVEvent {
         return eventName;
     }
 
-    public JHVEventType getJHVEventType() {
-        return eventType;
+    public SWEKSupplier getSupplier() {
+        return supplier;
     }
 
     public JHVPositionInformation getPositionInformation() {
@@ -90,9 +90,9 @@ public class JHVEvent {
         boolean configured = false;
         String displayName;
 
-        SWEKParameter p = eventType.getSupplier().getEventType().getParameter(keyString);
+        SWEKParameter p = supplier.getEventType().getParameter(keyString);
         if (p == null) {
-            p = eventType.getSupplier().getSource().getParameter(keyString);
+            p = supplier.getSource().getParameter(keyString);
         }
 
         if (p != null) {

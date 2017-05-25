@@ -14,8 +14,8 @@ import org.json.JSONObject;
 
 public abstract class SWEKDownloader {
 
-    public boolean extern2db(JHVEventType eventType, long start, long end, List<SWEKParam> params) {
-        ArrayList<Interval> range = EventDatabase.db2daterange(eventType);
+    public boolean extern2db(SWEKSupplier supplier, long start, long end, List<SWEKParam> params) {
+        ArrayList<Interval> range = EventDatabase.db2daterange(supplier);
         for (Interval interval : range) {
             if (interval.start <= start && interval.end >= end) {
                 return true;
@@ -27,9 +27,9 @@ public abstract class SWEKDownloader {
             boolean success = true;
             boolean overmax = true;
             while (overmax && success) {
-                JSONObject eventJSON = JSONUtils.getJSONStream(new DownloadStream(createURL(eventType.getSupplier().getEventType(), start, end, params, page)).getInput());
+                JSONObject eventJSON = JSONUtils.getJSONStream(new DownloadStream(createURL(supplier.getEventType(), start, end, params, page)).getInput());
                 overmax = eventJSON.optBoolean("overmax", false);
-                success = parseEvents(eventJSON, eventType) && parseAssociations(eventJSON);
+                success = parseEvents(eventJSON, supplier) && parseAssociations(eventJSON);
                 page++;
             }
             return success;
@@ -41,10 +41,10 @@ public abstract class SWEKDownloader {
         return false;
     }
 
-    protected abstract boolean parseEvents(JSONObject eventJSON, JHVEventType type);
+    protected abstract boolean parseEvents(JSONObject eventJSON, SWEKSupplier supplier);
 
     protected abstract boolean parseAssociations(JSONObject eventJSON);
 
-    protected abstract String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page);
+    protected abstract String createURL(SWEKEventType supplier, long start, long end, List<SWEKParam> params, int page);
 
 }

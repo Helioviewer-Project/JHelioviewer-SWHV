@@ -5,16 +5,16 @@ import java.util.Locale;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.data.event.SWEKParser;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ComesepParser implements SWEKParser {
 
     @Override
-    public JHVEvent parseEventJSON(JSONObject json, JHVEventType type, int id, long start, long end, boolean full) throws JSONException {
-        JHVEvent currentEvent = new JHVEvent(type, id, start, end);
+    public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
+        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
 
         parseResult(json, currentEvent);
         currentEvent.finishParams();

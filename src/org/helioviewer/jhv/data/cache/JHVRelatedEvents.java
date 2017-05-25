@@ -13,7 +13,7 @@ import javax.swing.ImageIcon;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
-import org.helioviewer.jhv.data.event.JHVEventType;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
@@ -25,24 +25,24 @@ public class JHVRelatedEvents implements ClickableDrawable {
     private final SortedDateInterval interval = new SortedDateInterval(Long.MAX_VALUE, Long.MIN_VALUE);
     private final ArrayList<JHVAssociation> associations = new ArrayList<>();
 
-    private final JHVEventType eventType;
+    private final SWEKSupplier supplier;
     private final Color color;
     private boolean highlighted;
 
-    JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
-        eventType = event.getJHVEventType();
+    JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+        supplier = event.getSupplier();
         color = JHVCacheColors.getNextColor();
         highlighted = false;
 
         events.add(event);
 
-        if (!eventsMap.containsKey(eventType)) {
-            eventsMap.put(eventType, new TreeMap<>());
+        if (!eventsMap.containsKey(supplier)) {
+            eventsMap.put(supplier, new TreeMap<>());
         }
 
         interval.start = event.start;
         interval.end = event.end;
-        eventsMap.get(eventType).put(interval, this);
+        eventsMap.get(supplier).put(interval, this);
     }
 
     public ArrayList<JHVEvent> getEvents() {
@@ -62,26 +62,26 @@ public class JHVRelatedEvents implements ClickableDrawable {
     }
 
     public ImageIcon getIcon() {
-        return eventType.getSupplier().getEventType().getIcon();
+        return supplier.getEventType().getIcon();
     }
 
-    void merge(JHVRelatedEvents found, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    void merge(JHVRelatedEvents found, Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         events.addAll(found.events);
         associations.addAll(found.associations);
 
-        if (!eventsMap.containsKey(eventType)) {
-            eventsMap.put(eventType, new TreeMap<>());
+        if (!eventsMap.containsKey(supplier)) {
+            eventsMap.put(supplier, new TreeMap<>());
         }
-        eventsMap.get(eventType).remove(interval);
-        eventsMap.get(eventType).remove(found.interval);
+        eventsMap.get(supplier).remove(interval);
+        eventsMap.get(supplier).remove(found.interval);
 
         interval.start = Math.min(interval.start, found.interval.start);
         interval.end = Math.max(interval.end, found.interval.end);
-        eventsMap.get(eventType).put(interval, this);
+        eventsMap.get(supplier).put(interval, this);
     }
 
-    public JHVEventType getJHVEventType() {
-        return eventType;
+    public SWEKSupplier getSupplier() {
+        return supplier;
     }
 
     void highlight(boolean isHighlighted) {
@@ -157,7 +157,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         return nEvents;
     }
 
-    void swapEvent(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    void swapEvent(JHVEvent event, Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         int i = 0;
         while (events.get(i).getUniqueID() != event.getUniqueID()) {
             i++;
@@ -167,7 +167,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         resetTime(eventsMap);
     }
 
-    private void resetTime(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    private void resetTime(Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         long start = Long.MAX_VALUE;
         long end = Long.MIN_VALUE;
         for (JHVEvent evt : events) {
@@ -181,14 +181,14 @@ public class JHVRelatedEvents implements ClickableDrawable {
             }
         }
 
-        if (!eventsMap.containsKey(eventType)) {
-            eventsMap.put(eventType, new TreeMap<>());
+        if (!eventsMap.containsKey(supplier)) {
+            eventsMap.put(supplier, new TreeMap<>());
         }
-        eventsMap.get(eventType).remove(interval);
+        eventsMap.get(supplier).remove(interval);
 
         interval.start = start;
         interval.end = end;
-        eventsMap.get(eventType).put(interval, this);
+        eventsMap.get(supplier).put(interval, this);
     }
 
     @Override
