@@ -113,7 +113,7 @@ public class SWEKConfigurationManager {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
             SWEKGroup group = parseGroup(eventJSONArray.getJSONObject(i));
-            groups.put(group.getDisplayName(), group);
+            groups.put(group.getName(), group);
             orderedGroups.add(group);
         }
     }

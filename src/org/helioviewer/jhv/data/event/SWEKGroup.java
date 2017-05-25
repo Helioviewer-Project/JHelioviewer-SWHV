@@ -17,10 +17,10 @@ public class SWEKGroup extends SWEKTreeModelElement {
     private List<SWEKSupplier> suppliers;
     private HashMap<String, String> databaseFields;
 
-    public SWEKGroup(String _eventName, List<SWEKParameter> _parameterList, ImageIcon _eventIcon) {
-        setDisplayName(_eventName);
+    public SWEKGroup(String _name, List<SWEKParameter> _parameterList, ImageIcon _icon) {
+        name = _name;
         parameterList = _parameterList;
-        setIcon(_eventIcon);
+        icon = _icon;
         containsParameterFilter = checkFilters(parameterList);
     }
 

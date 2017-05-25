@@ -109,7 +109,7 @@ public class EventDatabase {
         int typeId = -1;
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_TYPE);
-            pstatement.setString(1, event.getGroup().getDisplayName());
+            pstatement.setString(1, event.getGroup().getName());
             pstatement.setString(2, event.getKey());
 
             try (ResultSet rs = pstatement.executeQuery()) {
@@ -118,7 +118,7 @@ public class EventDatabase {
                 }
             }
         } catch (SQLException e) {
-            Log.error("Could not fetch event type " + event.getGroup().getDisplayName() + ' ' + event.getKey() + ' ' + e.getMessage());
+            Log.error("Could not fetch event type " + event.getGroup().getName() + ' ' + event.getKey() + ' ' + e.getMessage());
         }
         return typeId;
     }
@@ -126,7 +126,7 @@ public class EventDatabase {
     private static void insertEventTypeIfNotExist(Connection connection, SWEKSupplier eventType) {
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, INSERT_EVENT_TYPE);
-            pstatement.setString(1, eventType.getGroup().getDisplayName());
+            pstatement.setString(1, eventType.getGroup().getName());
             pstatement.setString(2, eventType.getKey());
             pstatement.executeUpdate();
 
