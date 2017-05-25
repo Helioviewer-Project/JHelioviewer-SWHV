@@ -13,9 +13,9 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
 
-    public SWEKSupplier(String _supplierName, String _supplierDisplayName, SWEKGroup _group, SWEKSource _source, String _db) {
+    public SWEKSupplier(String _supplierName, String _name, SWEKGroup _group, SWEKSource _source, String _db) {
         supplierName = _supplierName;
-        setDisplayName(_supplierDisplayName);
+        name = _name;
 
         group = _group;
         source = _source;
