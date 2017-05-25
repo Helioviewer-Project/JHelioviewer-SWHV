@@ -2,8 +2,6 @@ package org.helioviewer.jhv.data.event;
 
 import java.util.HashMap;
 
-import org.json.JSONObject;
-
 public class SWEKSupplier extends SWEKTreeModelElement {
 
     private final String supplierName;

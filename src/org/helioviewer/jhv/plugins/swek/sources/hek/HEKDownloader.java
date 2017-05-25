@@ -15,10 +15,10 @@ import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.data.event.JHVEventType;
 import org.helioviewer.jhv.data.event.SWEKDownloader;
 import org.helioviewer.jhv.data.event.SWEKEventType;
 import org.helioviewer.jhv.data.event.SWEKParam;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.json.JSONArray;
@@ -29,14 +29,14 @@ public class HEKDownloader extends SWEKDownloader {
 
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
-    private static void patch_event(JSONObject result, JHVEventType type) {
-        if (type.getSupplier().getEventType().getDisplayName().equals("Flare") && type.getSupplier().getDisplayName().contains("SWPC") && result.has("fl_goescls")) {
+    private static void patch_event(JSONObject result, SWEKSupplier supplier) {
+        if (supplier.getEventType().getDisplayName().equals("Flare") && supplier.getDisplayName().contains("SWPC") && result.has("fl_goescls")) {
             result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
         }
     }
 
     @Override
-    protected boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
+    protected boolean parseEvents(JSONObject eventJSON, SWEKSupplier supplier) {
         JSONArray results = eventJSON.getJSONArray("result");
         ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public class HEKDownloader extends SWEKDownloader {
                 Log.error("compression error");
                 return false;
             }
-            patch_event(result, type);
+            patch_event(result, supplier);
             String uid;
             long start;
             long end;
@@ -61,7 +61,7 @@ public class HEKDownloader extends SWEKDownloader {
                 archiv = TimeUtils.parse(result.getString("kb_archivdate"));
                 uid = result.getString("kb_archivid");
 
-                HashMap<String, String> dbFields = type.getSupplier().getEventType().getAllDatabaseFields();
+                HashMap<String, String> dbFields = supplier.getEventType().getAllDatabaseFields();
                 for (Map.Entry<String, String> entry : dbFields.entrySet()) {
                     String dbType = entry.getValue();
                     String fieldName = entry.getKey();
@@ -89,7 +89,7 @@ public class HEKDownloader extends SWEKDownloader {
             event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, paramList));
         }
 
-        EventDatabase.dump_event2db(event2db_list, type);
+        EventDatabase.dump_event2db(event2db_list, supplier);
 
         return true;
     }
