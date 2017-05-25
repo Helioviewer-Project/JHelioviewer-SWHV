@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
 import java.util.HashSet;
+import java.util.List;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -16,7 +17,6 @@ import org.json.JSONObject;
  */
 public class EventTypePanelModel implements TreeModel {
 
-    /** The event type for this model */
     private final SWEKEventType eventType;
 
     // private final List<TreeModelListener> listeners = new HashSet<TreeModelListener>();
@@ -86,9 +86,10 @@ public class EventTypePanelModel implements TreeModel {
      *            The row that was selected
      */
     public void rowClicked(int row) {
+        List<SWEKSupplier> suppliers = eventType.getSuppliers();
         if (row == 0) {
             eventType.setSelected(!eventType.isSelected());
-            for (SWEKSupplier supplier : eventType.getSuppliers()) {
+            for (SWEKSupplier supplier : suppliers) {
                 supplier.setSelected(eventType.isSelected());
             }
             if (eventType.isSelected()) {
@@ -96,14 +97,14 @@ public class EventTypePanelModel implements TreeModel {
             } else {
                 fireNewEventTypeInactive(eventType);
             }
-        } else if (row > 0 && row <= eventType.getSuppliers().size()) {
-            SWEKSupplier supplier = eventType.getSuppliers().get(row - 1);
+        } else if (row > 0 && row <= suppliers.size()) {
+            SWEKSupplier supplier = suppliers.get(row - 1);
             supplier.setSelected(!supplier.isSelected());
             if (supplier.isSelected()) {
                 eventType.setSelected(true);
             } else {
                 boolean eventTypeSelected = false;
-                for (SWEKSupplier stms : eventType.getSuppliers()) {
+                for (SWEKSupplier stms : suppliers) {
                     eventTypeSelected = eventTypeSelected || stms.isSelected();
                 }
                 SWEKTreeModel.resetEventType(eventType);
