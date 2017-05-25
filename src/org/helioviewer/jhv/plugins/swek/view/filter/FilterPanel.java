@@ -10,7 +10,7 @@ import javax.swing.JSpinner;
 
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.data.cache.SWEKOperand;
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.download.FilterManager;
@@ -25,17 +25,17 @@ public class FilterPanel extends JPanel {
     private boolean enabled = false;
 
     private final SWEKParameter parameter;
-    private final SWEKEventType eventType;
+    private final SWEKGroup group;
 
     private final FilterDialog filterDialog;
     private final SWEKOperand operand;
 
-    public FilterPanel(SWEKEventType _eventType, SWEKParameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEKOperand _operand) {
+    public FilterPanel(SWEKGroup _group, SWEKParameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEKOperand _operand) {
         operand = _operand;
         filterDialog = _filterDialog;
         spinner = _spinner;
         parameter = _parameter;
-        eventType = _eventType;
+        group = _group;
 
         JCheckBox enableButton = new JCheckBox();
         enableButton.addActionListener(e -> toggleEnabled());
@@ -58,11 +58,11 @@ public class FilterPanel extends JPanel {
     }
 
     public void removeFilter() {
-        FilterManager.removeFilters(eventType);
+        FilterManager.removeFilters(group);
     }
 
     public void fireFilter() {
-        FilterManager.fireFilters(eventType);
+        FilterManager.fireFilters(group);
     }
 
     public void addFilter() {
@@ -70,7 +70,7 @@ public class FilterPanel extends JPanel {
             Object oval = spinner.getValue();
             String pval = oval instanceof String ? String.valueOf(GOESLevel.getFloatValue((String) oval)) : String.valueOf(oval);
             SWEKParam param = new SWEKParam(parameter.getParameterName(), pval, operand);
-            FilterManager.addFilter(eventType, parameter, param);
+            FilterManager.addFilter(group, parameter, param);
         }
     }
 

@@ -9,7 +9,7 @@ import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.event.SWEKDownloader;
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -76,7 +76,7 @@ public class ComesepDownloader extends SWEKDownloader {
     }
 
     @Override
-    protected String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page) {
+    protected String createURL(SWEKGroup group, long start, long end, List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(_baseurl);
         baseURL = appendModel(baseURL, params).append('&');
         baseURL.append("startdate=").append(TimeUtils.format(start)).append('&');

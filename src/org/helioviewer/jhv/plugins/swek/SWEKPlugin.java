@@ -6,7 +6,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
@@ -27,8 +27,8 @@ public class SWEKPlugin implements Plugin {
 
     public SWEKPlugin() {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
-        for (SWEKEventType eventType : SWEKConfigurationManager.loadConfig()) {
-            swekPanel.add(new EventPanel(eventType));
+        for (SWEKGroup group : SWEKConfigurationManager.loadConfig()) {
+            swekPanel.add(new EventPanel(group));
         }
     }
 

@@ -26,7 +26,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParser;
 import org.helioviewer.jhv.data.event.SWEKRelatedEvents;
@@ -109,7 +109,7 @@ public class EventDatabase {
         int typeId = -1;
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_TYPE);
-            pstatement.setString(1, event.getEventType().getDisplayName());
+            pstatement.setString(1, event.getGroup().getDisplayName());
             pstatement.setString(2, event.getKey());
 
             try (ResultSet rs = pstatement.executeQuery()) {
@@ -118,7 +118,7 @@ public class EventDatabase {
                 }
             }
         } catch (SQLException e) {
-            Log.error("Could not fetch event type " + event.getEventType().getDisplayName() + ' ' + event.getKey() + ' ' + e.getMessage());
+            Log.error("Could not fetch event type " + event.getGroup().getDisplayName() + ' ' + event.getKey() + ' ' + e.getMessage());
         }
         return typeId;
     }
@@ -126,14 +126,14 @@ public class EventDatabase {
     private static void insertEventTypeIfNotExist(Connection connection, SWEKSupplier eventType) {
         try {
             PreparedStatement pstatement = getPreparedStatement(connection, INSERT_EVENT_TYPE);
-            pstatement.setString(1, eventType.getEventType().getDisplayName());
+            pstatement.setString(1, eventType.getGroup().getDisplayName());
             pstatement.setString(2, eventType.getKey());
             pstatement.executeUpdate();
 
             String dbName = eventType.getDatabaseName();
             StringBuilder createtbl = new StringBuilder();
             createtbl.append("CREATE TABLE ").append(dbName).append(" (");
-            HashMap<String, String> fields = eventType.getEventType().getAllDatabaseFields();
+            HashMap<String, String> fields = eventType.getGroup().getAllDatabaseFields();
 
             for (Map.Entry<String, String> entry : fields.entrySet()) {
                 createtbl.append(entry.getKey()).append(' ').append(entry.getValue()).append(" DEFAULT NULL,");
@@ -448,17 +448,17 @@ public class EventDatabase {
 
     //Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
     private static ArrayList<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) {
-        SWEKEventType evt = jhvEventType.getEventType();
+        SWEKGroup group = jhvEventType.getGroup();
         ArrayList<JHVEvent> nEvents = new ArrayList<>();
         ArrayList<JsonEvent> jsonEvents = new ArrayList<>();
 
-        for (SWEKRelatedEvents re : SWEKEventType.getSWEKRelatedEvents()) {
-            if (re.getEvent() == evt) {
+        for (SWEKRelatedEvents re : SWEKGroup.getSWEKRelatedEvents()) {
+            if (re.getGroup() == group) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
                 for (SWEKRelatedOn swon : relon) {
                     String f = swon.parameterFrom.getParameterName().toLowerCase();
                     String w = swon.parameterWith.getParameterName().toLowerCase();
-                    SWEKEventType reType = re.getRelatedWith();
+                    SWEKGroup reType = re.getRelatedWith();
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
                         if (similartype == (supplier == jhvEventType))
                             if (is_dbthread)
@@ -469,12 +469,12 @@ public class EventDatabase {
                 }
             }
 
-            if (re.getRelatedWith() == evt) {
+            if (re.getRelatedWith() == group) {
                 List<SWEKRelatedOn> relon = re.getRelatedOnList();
                 for (SWEKRelatedOn swon : relon) {
                     String f = swon.parameterFrom.getParameterName().toLowerCase();
                     String w = swon.parameterWith.getParameterName().toLowerCase();
-                    SWEKEventType reType = re.getEvent();
+                    SWEKGroup reType = re.getGroup();
                     for (SWEKSupplier supplier : reType.getSuppliers()) {
                         if (similartype == (supplier == jhvEventType))
                             if (is_dbthread)

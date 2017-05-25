@@ -16,7 +16,7 @@ import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.event.SWEKDownloader;
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -30,7 +30,7 @@ public class HEKDownloader extends SWEKDownloader {
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
     private static void patch_event(JSONObject result, SWEKSupplier supplier) {
-        if (supplier.getEventType().getDisplayName().equals("Flare") && supplier.getDisplayName().contains("SWPC") && result.has("fl_goescls")) {
+        if (supplier.getGroup().getDisplayName().equals("Flare") && supplier.getDisplayName().contains("SWPC") && result.has("fl_goescls")) {
             result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
         }
     }
@@ -61,7 +61,7 @@ public class HEKDownloader extends SWEKDownloader {
                 archiv = TimeUtils.parse(result.getString("kb_archivdate"));
                 uid = result.getString("kb_archivid");
 
-                HashMap<String, String> dbFields = supplier.getEventType().getAllDatabaseFields();
+                HashMap<String, String> dbFields = supplier.getGroup().getAllDatabaseFields();
                 for (Map.Entry<String, String> entry : dbFields.entrySet()) {
                     String dbType = entry.getValue();
                     String fieldName = entry.getKey();
@@ -107,10 +107,10 @@ public class HEKDownloader extends SWEKDownloader {
     }
 
     @Override
-    protected String createURL(SWEKEventType eventType, long start, long end, List<SWEKParam> params, int page) {
+    protected String createURL(SWEKGroup group, long start, long end, List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(_baseURL);
         baseURL.append("cmd=search&type=column&");
-        baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(eventType.getDisplayName())).append('&');
+        baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(group.getDisplayName())).append('&');
         baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
         baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.format(end)).append('&');
         baseURL = appendParams(baseURL, params);
