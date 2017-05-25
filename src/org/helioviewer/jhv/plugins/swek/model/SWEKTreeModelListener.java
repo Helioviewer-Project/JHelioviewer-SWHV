@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 
 public interface SWEKTreeModelListener {
 
-    void startedDownloadingEventType(SWEKEventType eventType);
+    void startedDownloadingGroup(SWEKGroup group);
 
-    void stoppedDownloadingEventType(SWEKEventType eventType);
+    void stoppedDownloadingGroup(SWEKGroup group);
 
 }

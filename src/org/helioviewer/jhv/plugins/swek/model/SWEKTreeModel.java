@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.swek.model;
 
 import java.util.HashSet;
 
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 
 /**
  * This model manages all the SWEKEventTypeTreeModels and delegate events. This
@@ -22,20 +22,20 @@ public class SWEKTreeModel {
         listeners.remove(swekTreeModelListener);
     }
 
-    public static void setStartLoading(SWEKEventType eventType) {
+    public static void setStartLoading(SWEKGroup group) {
         for (SWEKTreeModelListener l : listeners) {
-            l.startedDownloadingEventType(eventType);
+            l.startedDownloadingGroup(group);
         }
     }
 
-    public static void setStopLoading(SWEKEventType eventType) {
+    public static void setStopLoading(SWEKGroup group) {
         for (SWEKTreeModelListener l : listeners) {
-            l.stoppedDownloadingEventType(eventType);
+            l.stoppedDownloadingGroup(group);
         }
     }
-
-    public static void resetEventType(SWEKEventType eventType) {
-        setStopLoading(eventType);
+/*
+    public static void resetGroup(SWEKGroup group) {
+        setStopLoading(group);
     }
-
+*/
 }

@@ -8,16 +8,16 @@ public class SWEKSupplier extends SWEKTreeModelElement {
     private final String db;
     private final String key;
 
-    private final SWEKEventType eventType;
+    private final SWEKGroup group;
     private final SWEKSource source;
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
 
-    public SWEKSupplier(String _supplierName, String _supplierDisplayName, SWEKEventType _eventType, SWEKSource _source, String _db) {
+    public SWEKSupplier(String _supplierName, String _supplierDisplayName, SWEKGroup _group, SWEKSource _source, String _db) {
         supplierName = _supplierName;
         setDisplayName(_supplierDisplayName);
 
-        eventType = _eventType;
+        group = _group;
         source = _source;
         db = _db;
 
@@ -41,8 +41,8 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         return source;
     }
 
-    public SWEKEventType getEventType() {
-        return eventType;
+    public SWEKGroup getGroup() {
+        return group;
     }
 
     public String getKey() {

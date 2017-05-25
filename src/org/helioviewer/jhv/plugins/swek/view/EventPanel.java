@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
@@ -30,8 +30,7 @@ import com.jidesoft.swing.JideButton;
 @SuppressWarnings("serial")
 public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionListener {
 
-    // The event type for which the event panel is created
-    private final SWEKEventType eventType;
+    private final SWEKGroup group;
 
     private final JLabel loadingLabel = new JLabel("    ");
     private final JLayer<JComponent> layer = new JLayer<>(null, MoviePanel.busyIndicator);
@@ -40,12 +39,12 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     private final Timer loadingTimer = new Timer(500, this);
     private final EventTypePanelModel eventPanelModel;
 
-    public EventPanel(SWEKEventType _eventType) {
-        eventType = _eventType;
+    public EventPanel(SWEKGroup _group) {
+        group = _group;
         setLayout(new BorderLayout());
         SWEKTreeModel.addSWEKTreeModelListener(this);
 
-        eventPanelModel = new EventTypePanelModel(eventType);
+        eventPanelModel = new EventTypePanelModel(group);
         eventPanelModel.addEventPanelModelListener(SWEKDownloadManager.getSingletonInstance());
 
         JTree eventTypeTree = new JTree(eventPanelModel);
@@ -73,8 +72,8 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         filterPanel.setBackground(eventTypeTree.getBackground());
         filterPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
 
-        if (eventType.containsFilter()) {
-            FilterDialog filterDialog = new FilterDialog(eventType);
+        if (group.containsFilter()) {
+            FilterDialog filterDialog = new FilterDialog(group);
             JideButton filterButton = new JideButton("Filter");
             filterButton.addActionListener(e -> filterDialog.setVisible(true));
             filterButton.addMouseListener(new MouseAdapter() {
@@ -92,16 +91,16 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     }
 
     @Override
-    public void startedDownloadingEventType(SWEKEventType _eventType) {
-        if (eventType.equals(_eventType) && !loadingTimer.isRunning()) {
+    public void startedDownloadingGroup(SWEKGroup _group) {
+        if (group.equals(_group) && !loadingTimer.isRunning()) {
             layer.setView(loadingLabel);
             loadingTimer.start();
         }
     }
 
     @Override
-    public void stoppedDownloadingEventType(SWEKEventType _eventType) {
-        if (eventType.equals(_eventType) && loadingTimer.isRunning()) {
+    public void stoppedDownloadingGroup(SWEKGroup _group) {
+        if (group.equals(_group) && loadingTimer.isRunning()) {
             loadingTimer.stop();
             layer.setView(null);
         }
@@ -119,4 +118,5 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     public void deserialize(JSONObject swekObject) {
         eventPanelModel.deserialize(swekObject);
     }
+
 }

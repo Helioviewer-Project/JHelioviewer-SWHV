@@ -24,7 +24,7 @@ public class JHVEvent {
 
     public JHVEvent(SWEKSupplier _supplier, int _id, long _start, long _end) {
         supplier = _supplier;
-        eventName = _supplier.getEventType().getDisplayName();
+        eventName = _supplier.getGroup().getDisplayName();
         start = _start;
         end = _end;
         id = _id;
@@ -90,7 +90,7 @@ public class JHVEvent {
         boolean configured = false;
         String displayName;
 
-        SWEKParameter p = supplier.getEventType().getParameter(keyString);
+        SWEKParameter p = supplier.getGroup().getParameter(keyString);
         if (p == null) {
             p = supplier.getSource().getParameter(keyString);
         }

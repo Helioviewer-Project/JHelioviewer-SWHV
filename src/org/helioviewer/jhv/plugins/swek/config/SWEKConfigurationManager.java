@@ -15,7 +15,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.data.event.SWEKEventType;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKParameterFilter;
 import org.helioviewer.jhv.data.event.SWEKRelatedEvents;
@@ -36,10 +36,10 @@ public class SWEKConfigurationManager {
     private static final String configFile = JHVDirectory.SETTINGS.getPath() + configName;
 
     private static final HashMap<String, SWEKSource> sources = new HashMap<>();
-    private static final HashMap<String, SWEKEventType> eventTypes = new HashMap<>();
-    private static final List<SWEKEventType> orderedEventTypes = new ArrayList<>();
+    private static final HashMap<String, SWEKGroup> groups = new HashMap<>();
+    private static final List<SWEKGroup> orderedGroups = new ArrayList<>();
 
-    public static List<SWEKEventType> loadConfig() {
+    public static List<SWEKGroup> loadConfig() {
         SWEKIconBank.init();
         try {
             readConfig();
@@ -47,7 +47,7 @@ public class SWEKConfigurationManager {
             Log.error("Configuration file could not be parsed: " + e);
         }
 
-        return orderedEventTypes;
+        return orderedGroups;
     }
 
     private static void readConfig() throws Exception {
@@ -70,8 +70,8 @@ public class SWEKConfigurationManager {
     private static void parseConfig(JSONObject obj) {
         EventDatabase.config_hash = Arrays.hashCode(obj.toString().toCharArray());
         parseSources(obj);
-        parseEventTypes(obj);
-        SWEKEventType.setSwekRelatedEvents(parseRelatedEvents(obj));
+        parseGroups(obj);
+        SWEKGroup.setSwekRelatedEvents(parseRelatedEvents(obj));
     }
 
     private static void parseSources(JSONObject obj) {
@@ -109,20 +109,20 @@ public class SWEKConfigurationManager {
         return parameterList;
     }
 
-    private static void parseEventTypes(JSONObject obj) {
+    private static void parseGroups(JSONObject obj) {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
-            SWEKEventType eventType = parseEventType(eventJSONArray.getJSONObject(i));
-            eventTypes.put(eventType.getDisplayName(), eventType);
-            orderedEventTypes.add(eventType);
+            SWEKGroup group = parseGroup(eventJSONArray.getJSONObject(i));
+            groups.put(group.getDisplayName(), group);
+            orderedGroups.add(group);
         }
     }
 
-    private static SWEKEventType parseEventType(JSONObject obj) {
-        SWEKEventType eventType = new SWEKEventType(parseEventName(obj), parseParameterList(obj), parseEventIcon(obj));
-        List<SWEKSupplier> suppliers = parseSuppliers(obj, eventType);
-        eventType.setSuppliers(suppliers);
-        return eventType;
+    private static SWEKGroup parseGroup(JSONObject obj) {
+        SWEKGroup group = new SWEKGroup(parseEventName(obj), parseParameterList(obj), parseEventIcon(obj));
+        List<SWEKSupplier> suppliers = parseSuppliers(obj, group);
+        group.setSuppliers(suppliers);
+        return group;
     }
 
     private static ImageIcon parseEventIcon(JSONObject obj) {
@@ -144,17 +144,17 @@ public class SWEKConfigurationManager {
         return obj.getString("event_name");
     }
 
-    private static List<SWEKSupplier> parseSuppliers(JSONObject obj, SWEKEventType eventType) {
+    private static List<SWEKSupplier> parseSuppliers(JSONObject obj, SWEKGroup group) {
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         List<SWEKSupplier> suppliers = new ArrayList<>();
         for (int i = 0; i < suppliersArray.length(); i++) {
-            suppliers.add(parseSupplier(suppliersArray.getJSONObject(i), eventType));
+            suppliers.add(parseSupplier(suppliersArray.getJSONObject(i), group));
         }
         return suppliers;
     }
 
-    private static SWEKSupplier parseSupplier(JSONObject obj, SWEKEventType eventType) {
-        return new SWEKSupplier(parseSupplierName(obj), parseSupplierDisplayName(obj), eventType, parseSupplierSource(obj), parseDbName(obj));
+    private static SWEKSupplier parseSupplier(JSONObject obj, SWEKGroup group) {
+        return new SWEKSupplier(parseSupplierName(obj), parseSupplierDisplayName(obj), group, parseSupplierSource(obj), parseDbName(obj));
     }
 
     private static String parseSupplierName(JSONObject obj) {
@@ -237,12 +237,12 @@ public class SWEKConfigurationManager {
         return new SWEKRelatedEvents(parseRelatedEventName(obj), parseRelatedWith(obj), parseRelatedOnList(obj));
     }
 
-    private static SWEKEventType parseRelatedEventName(JSONObject obj) {
-        return eventTypes.get(obj.getString("event_name"));
+    private static SWEKGroup parseRelatedEventName(JSONObject obj) {
+        return groups.get(obj.getString("event_name"));
     }
 
-    private static SWEKEventType parseRelatedWith(JSONObject obj) {
-        return eventTypes.get(obj.getString("related_with"));
+    private static SWEKGroup parseRelatedWith(JSONObject obj) {
+        return groups.get(obj.getString("related_with"));
     }
 
     private static List<SWEKRelatedEvents> parseRelatedEvents(JSONObject obj) {
