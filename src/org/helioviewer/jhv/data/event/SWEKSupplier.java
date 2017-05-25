@@ -6,6 +6,7 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
     private final String supplierName;
     private final String db;
+    private final String key;
 
     private final SWEKEventType eventType;
     private final SWEKSource source;
@@ -20,12 +21,12 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         source = _source;
         db = _db;
 
-        String key = supplierName + source.getSourceName() + db;
+        key = supplierName + source.getSourceName() + db;
         suppliers.put(key, this);
     }
 
-    public static SWEKSupplier getSupplier(String supplierNameKey) {
-        return suppliers.get(supplierNameKey);
+    public static SWEKSupplier getSupplier(String name) {
+        return suppliers.get(name);
     }
 
     public String getSupplierName() {
@@ -44,8 +45,8 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         return eventType;
     }
 
-    public String getSupplierKey() {
-        return supplierName + source.getSourceName() + db;
+    public String getKey() {
+        return key;
     }
 
 }
