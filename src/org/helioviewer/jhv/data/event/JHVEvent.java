@@ -24,7 +24,7 @@ public class JHVEvent {
 
     public JHVEvent(SWEKSupplier _supplier, int _id, long _start, long _end) {
         supplier = _supplier;
-        eventName = _supplier.getGroup().getDisplayName();
+        eventName = _supplier.getGroup().getName();
         start = _start;
         end = _end;
         id = _id;
