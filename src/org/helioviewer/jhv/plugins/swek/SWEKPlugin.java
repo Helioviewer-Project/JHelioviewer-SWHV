@@ -65,18 +65,20 @@ public class SWEKPlugin implements Plugin {
     }
 
     @Override
-    public void saveState(JSONObject swekObject) {
+    public void saveState(JSONObject jo) {
         for (Component c : swekPanel.getComponents()) {
-            if (c instanceof EventPanel)
-                ((EventPanel) c).serialize(swekObject);
+            if (c instanceof EventPanel) {
+                ((EventPanel) c).serialize(jo);
+            }
         }
     }
 
     @Override
     public void loadState(JSONObject jo) {
         for (Component c : swekPanel.getComponents()) {
-            if (c instanceof EventPanel)
+            if (c instanceof EventPanel) {
                 ((EventPanel) c).deserialize(jo);
+            }
         }
     }
 
