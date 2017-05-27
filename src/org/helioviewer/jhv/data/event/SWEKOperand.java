@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.cache;
+package org.helioviewer.jhv.data.event;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

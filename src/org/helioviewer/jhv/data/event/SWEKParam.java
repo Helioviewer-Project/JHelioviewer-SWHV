@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.data.event;
 
-import org.helioviewer.jhv.data.cache.SWEKOperand;
-
 public class SWEKParam {
 
     public final String param;
