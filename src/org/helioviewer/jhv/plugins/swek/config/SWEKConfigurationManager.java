@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.config;
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,7 +10,6 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
@@ -32,46 +30,22 @@ import org.json.JSONObject;
 
 public class SWEKConfigurationManager {
 
-    private static final String configName = "SWEKSettings.json";
-    private static final String configFile = JHVDirectory.SETTINGS.getPath() + configName;
-
     private static final HashMap<String, SWEKSource> sources = new HashMap<>();
     private static final HashMap<String, SWEKGroup> groups = new HashMap<>();
     private static final List<SWEKGroup> orderedGroups = new ArrayList<>();
 
     public static List<SWEKGroup> loadConfig() {
         SWEKIconBank.init();
-        try {
-            readConfig();
+        try (InputStream in = FileUtils.getResourceInputStream("/settings/SWEK.json")) {
+            JSONObject jo = JSONUtils.getJSONStream(in);
+            EventDatabase.config_hash = Arrays.hashCode(jo.toString().toCharArray());
+            parseSources(jo);
+            parseGroups(jo);
+            SWEKGroup.setSwekRelatedEvents(parseRelatedEvents(jo));
         } catch (Exception e) {
             Log.error("Configuration file could not be parsed: " + e);
         }
-
         return orderedGroups;
-    }
-
-    private static void readConfig() throws Exception {
-        try {
-            JSONObject json = JSONUtils.getJSONFile(configFile);
-            if (json.getBoolean("manually_changed")) {
-                parseConfig(json);
-                return;
-            }
-        } catch (Exception e) {
-            Log.error("Local configuration file could not be parsed: " + e);
-        }
-
-        try (InputStream is = FileUtils.getResourceInputStream('/' + configName)) {
-            FileUtils.save(is, new File(configFile));
-        }
-        parseConfig(JSONUtils.getJSONFile(configFile));
-    }
-
-    private static void parseConfig(JSONObject obj) {
-        EventDatabase.config_hash = Arrays.hashCode(obj.toString().toCharArray());
-        parseSources(obj);
-        parseGroups(obj);
-        SWEKGroup.setSwekRelatedEvents(parseRelatedEvents(obj));
     }
 
     private static void parseSources(JSONObject obj) {
@@ -85,7 +59,7 @@ public class SWEKConfigurationManager {
     }
 
     private static SWEKSource parseSource(JSONObject obj) {
-        String name = parseSourceName(obj);
+        String name = obj.getString("name");
         switch (name) {
             case "HEK":
                 return new SWEKSource(name, parseGeneralParameters(obj), new HEKParser(), new HEKDownloader());
@@ -94,10 +68,6 @@ public class SWEKConfigurationManager {
             default:
                 return null;
         }
-    }
-
-    private static String parseSourceName(JSONObject obj) {
-        return obj.getString("name");
     }
 
     private static List<SWEKParameter> parseGeneralParameters(JSONObject obj) {
