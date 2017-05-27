@@ -23,12 +23,10 @@ public class EventTypePanelModel implements TreeModel {
 
     @Override
     public void addTreeModelListener(TreeModelListener l) {
-        // listeners.add(l);
     }
 
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
-        // listeners.remove(l);
     }
 
     public void addEventPanelModelListener(EventTypePanelModelListener listener) {
