@@ -88,15 +88,14 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     @Override
-    public void groupAndSupplierActive(SWEKGroup group, SWEKSupplier supplier) {
-        addEventTypeToActiveEventTypeMap(supplier);
-        JHVEventCache.eventTypeActivated(supplier);
-    }
-
-    @Override
-    public void groupAndSupplierInactive(SWEKGroup group, SWEKSupplier supplier) {
-        removeEventTypeFromActiveEventTypeMap(supplier);
-        stopDownloadingEventType(group, supplier, false);
+    public void activateGroupAndSupplier(SWEKGroup group, SWEKSupplier supplier, boolean active) {
+        if (active) {
+            addEventTypeToActiveEventTypeMap(supplier);
+            JHVEventCache.eventTypeActivated(supplier);
+        } else {
+            removeEventTypeFromActiveEventTypeMap(supplier);
+            stopDownloadingEventType(group, supplier, false);
+        }
     }
 
     @Override

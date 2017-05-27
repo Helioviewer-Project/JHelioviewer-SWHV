@@ -5,8 +5,6 @@ import org.helioviewer.jhv.data.event.SWEKSupplier;
 
 public interface EventTypePanelModelListener {
 
-    void groupAndSupplierActive(SWEKGroup group, SWEKSupplier supplier);
-
-    void groupAndSupplierInactive(SWEKGroup group, SWEKSupplier supplier);
+    void activateGroupAndSupplier(SWEKGroup group, SWEKSupplier supplier, boolean active);
 
 }

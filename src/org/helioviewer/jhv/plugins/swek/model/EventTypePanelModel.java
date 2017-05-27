@@ -50,11 +50,7 @@ public class EventTypePanelModel implements TreeModel {
             for (SWEKSupplier supplier : suppliers) {
                 supplier.setSelected(group.isSelected());
             }
-            if (group.isSelected()) {
-                fireGroupActive(group);
-            } else {
-                fireGroupInactive(group);
-            }
+            fireActivateGroup(group, group.isSelected());
         } else if (row > 0 && row <= suppliers.size()) {
             SWEKSupplier supplier = suppliers.get(row - 1);
             supplier.setSelected(!supplier.isSelected());
@@ -68,11 +64,7 @@ public class EventTypePanelModel implements TreeModel {
                 SWEKTreeModel.setStopLoading(group);
                 group.setSelected(groupSelected);
             }
-            if (supplier.isSelected()) {
-                fireGroupAndSupplierActive(group, supplier);
-            } else {
-                fireGroupAndSupplierInactive(group, supplier);
-            }
+            fireActivateGroupAndSupplier(group, supplier, supplier.isSelected());
         }
     }
 
@@ -108,27 +100,15 @@ public class EventTypePanelModel implements TreeModel {
     public void valueForPathChanged(TreePath path, Object newValue) {
     }
 
-    private void fireGroupAndSupplierActive(SWEKGroup swekGroup, SWEKSupplier swekSupplier) {
+    private void fireActivateGroupAndSupplier(SWEKGroup swekGroup, SWEKSupplier swekSupplier, boolean active) {
         for (EventTypePanelModelListener l : panelModelListeners) {
-            l.groupAndSupplierActive(swekGroup, swekSupplier);
+            l.activateGroupAndSupplier(swekGroup, swekSupplier, active);
         }
     }
 
-    private void fireGroupAndSupplierInactive(SWEKGroup swekGroup, SWEKSupplier supplier) {
-        for (EventTypePanelModelListener l : panelModelListeners) {
-            l.groupAndSupplierInactive(swekGroup, supplier);
-        }
-    }
-
-    private void fireGroupActive(SWEKGroup swekGroup) {
+    private void fireActivateGroup(SWEKGroup swekGroup, boolean active) {
         for (SWEKSupplier supplier : swekGroup.getSuppliers()) {
-            fireGroupAndSupplierActive(swekGroup, supplier);
-        }
-    }
-
-    private void fireGroupInactive(SWEKGroup swekGroup) {
-        for (SWEKSupplier supplier : swekGroup.getSuppliers()) {
-            fireGroupAndSupplierInactive(swekGroup, supplier);
+            fireActivateGroupAndSupplier(swekGroup, supplier, active);
         }
     }
 
