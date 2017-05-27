@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import org.json.JSONObject;
-
 public class SWEKGroup extends SWEKTreeModelElement {
 
     private static List<SWEKRelatedEvents> swekrelEvents;
@@ -76,23 +74,10 @@ public class SWEKGroup extends SWEKTreeModelElement {
         suppliers = _suppliers;
     }
 
-    /**
-     * Get the list of event type specific parameters
-     *
-     * @return the parameterList
-     */
     public List<SWEKParameter> getParameterList() {
         return parameterList;
     }
 
-    /**
-     * Gets a parameter from the event type.
-     *
-     * @param name
-     *            the name of the parameter defined in the swek source
-     * @return the parameter if present in the event type, null if the parameter
-     *         was not found.
-     */
     public SWEKParameter getParameter(String name) {
         for (SWEKParameter parameter : parameterList) {
             if (parameter.getParameterName().equalsIgnoreCase(name)) {
@@ -102,22 +87,10 @@ public class SWEKGroup extends SWEKTreeModelElement {
         return null;
     }
 
-    /**
-     * Checks if the event type contains parameter filter.
-     *
-     * @return
-     */
     public boolean containsFilter() {
         return containsParameterFilter;
     }
 
-    /**
-     * Checks if the parameter list contains filters.
-     *
-     * @param parameters
-     *            the list of parameter for this event type
-     * @return true if there are filters in this event type, false if not
-     */
     private static boolean checkFilters(List<SWEKParameter> parameters) {
         for (SWEKParameter parameter : parameters) {
             if (parameter.getParameterFilter() != null) {
@@ -125,12 +98,6 @@ public class SWEKGroup extends SWEKTreeModelElement {
             }
         }
         return false;
-    }
-
-    public void serialize(JSONObject swekObject) {
-    }
-
-    public void deserialize(JSONObject swekObject) {
     }
 
 }
