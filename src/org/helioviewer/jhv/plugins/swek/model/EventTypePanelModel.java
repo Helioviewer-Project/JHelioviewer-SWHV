@@ -11,10 +11,6 @@ import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.json.JSONObject;
 
-/**
- * The model of the event type panel. This model is a TreeModel and is used by
- * the tree on the event type panel.
- */
 public class EventTypePanelModel implements TreeModel {
 
     private final SWEKGroup group;
@@ -47,25 +43,31 @@ public class EventTypePanelModel implements TreeModel {
         List<SWEKSupplier> suppliers = group.getSuppliers();
         if (row == 0) {
             group.setSelected(!group.isSelected());
+            boolean selected = group.isSelected();
+
             for (SWEKSupplier supplier : suppliers) {
-                supplier.setSelected(group.isSelected());
+                supplier.setSelected(selected);
+                fireActivateGroupAndSupplier(group, supplier, selected);
             }
-            fireActivateGroup(group, group.isSelected());
         } else if (row > 0 && row <= suppliers.size()) {
             SWEKSupplier supplier = suppliers.get(row - 1);
-            supplier.setSelected(!supplier.isSelected());
-            if (supplier.isSelected()) {
-                group.setSelected(true);
-            } else {
-                boolean groupSelected = false;
-                for (SWEKSupplier stms : suppliers) {
-                    groupSelected |= stms.isSelected();
-                }
-                SWEKTreeModel.setStopLoading(group);
-                group.setSelected(groupSelected);
-            }
-            fireActivateGroupAndSupplier(group, supplier, supplier.isSelected());
+            selectSupplier(supplier, !supplier.isSelected());
         }
+    }
+
+    private void selectSupplier(SWEKSupplier supplier, boolean selected) {
+        supplier.setSelected(selected);
+        if (selected) {
+            group.setSelected(true);
+        } else {
+            boolean groupSelected = false;
+            for (SWEKSupplier stms : group.getSuppliers()) {
+                groupSelected |= stms.isSelected();
+            }
+            // SWEKTreeModel.setStopLoading(group);
+            group.setSelected(groupSelected);
+        }
+        fireActivateGroupAndSupplier(group, supplier, selected);
     }
 
     @Override
@@ -106,18 +108,21 @@ public class EventTypePanelModel implements TreeModel {
         }
     }
 
-    private void fireActivateGroup(SWEKGroup swekGroup, boolean active) {
-        for (SWEKSupplier supplier : swekGroup.getSuppliers()) {
-            fireActivateGroupAndSupplier(swekGroup, supplier, active);
+    public void serialize(JSONObject jo) {
+        JSONObject go = new JSONObject();
+        for (SWEKSupplier supplier : group.getSuppliers()) {
+            go.put(supplier.getName(), supplier.isSelected());
         }
+        jo.put(group.getName(), go);
     }
 
-    public void serialize(JSONObject swekObject) {
-        group.serialize(swekObject);
-    }
-
-    public void deserialize(JSONObject swekObject) {
-        group.deserialize(swekObject);
+    public void deserialize(JSONObject jo) {
+        if (jo.has(group.getName())) {
+            JSONObject go = jo.getJSONObject(group.getName());
+            for (SWEKSupplier supplier : group.getSuppliers()) {
+                selectSupplier(supplier, go.optBoolean(supplier.getName(), false));
+            }
+        }
     }
 
 }
