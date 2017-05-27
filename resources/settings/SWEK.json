@@ -1,6 +1,4 @@
 {
-    "manually_changed": false,
-    "config_version": "v0.2",
     "sources" : [
         {
             "name"                  : "HEK",
