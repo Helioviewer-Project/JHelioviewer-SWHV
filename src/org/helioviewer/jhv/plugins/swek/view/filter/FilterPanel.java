@@ -9,8 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
 import org.helioviewer.jhv.base.conversion.GOESLevel;
-import org.helioviewer.jhv.data.cache.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKGroup;
+import org.helioviewer.jhv.data.event.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.download.FilterManager;

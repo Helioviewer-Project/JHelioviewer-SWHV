@@ -10,7 +10,6 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParser;
 import org.helioviewer.jhv.data.event.SWEKSource;
@@ -66,10 +65,6 @@ class DownloadWorker implements Runnable {
 
     public SWEKSupplier getSupplier() {
         return supplier;
-    }
-
-    public SWEKGroup getGroup() {
-        return supplier.getGroup();
     }
 
     public Interval getRequestInterval() {

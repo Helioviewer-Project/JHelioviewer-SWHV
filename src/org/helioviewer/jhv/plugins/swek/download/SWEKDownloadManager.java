@@ -15,8 +15,8 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.cache.JHVEventCacheRequestHandler;
-import org.helioviewer.jhv.data.cache.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKGroup;
+import org.helioviewer.jhv.data.event.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
@@ -106,13 +106,13 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     private static void removeFromDownloaderMap(DownloadWorker worker) {
-        ArrayList<DownloadWorker> dwMapList = dwMap.get(worker.getGroup());
+        ArrayList<DownloadWorker> dwMapList = dwMap.get(worker.getSupplier().getGroup());
         if (dwMapList != null)
             dwMapList.remove(worker);
 
         boolean loadingCondition = (dwMapList != null) && !dwMapList.isEmpty();
         if (!loadingCondition)
-            SWEKTreeModel.setStopLoading(worker.getGroup());
+            SWEKTreeModel.setStopLoading(worker.getSupplier().getGroup());
     }
 
     private static void addToDownloaderMap(SWEKGroup group, DownloadWorker dw) {
