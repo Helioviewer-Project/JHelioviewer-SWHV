@@ -8,17 +8,10 @@ import org.helioviewer.jhv.data.event.JHVEventParameter;
 @SuppressWarnings("serial")
 public class ParameterTableModel extends AbstractTableModel {
 
-    /** The parameters in this model */
     private final JHVEventParameter[] parameters;
 
     private static final int STRING_CUTOFF = 256;
 
-    /**
-     * Creates a parameter model for the given parameters.
-     *
-     * @param _parameters
-     *            the parameters
-     */
     public ParameterTableModel(JHVEventParameter[] _parameters) {
         parameters = _parameters;
     }
