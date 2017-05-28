@@ -136,6 +136,10 @@ public class ImageDataPanel extends JPanel {
         private final JHVCarringtonPicker endCarrington = new JHVCarringtonPicker();
 
         public TimeSelectionPanel() {
+            long milli = (System.currentTimeMillis() / 1000L) * 1000L;
+            setStartTime(milli - 2 * TimeUtils.DAY_IN_MILLIS);
+            setEndTime(milli);
+
             startDateTimePanel.addListener(e -> setStartTime(startDateTimePanel.getTime()));
             endDateTimePanel.addListener(e -> setEndTime(endDateTimePanel.getTime()));
             startCarrington.addJHVCalendarListener(e -> setStartTime(startCarrington.getTime()));
