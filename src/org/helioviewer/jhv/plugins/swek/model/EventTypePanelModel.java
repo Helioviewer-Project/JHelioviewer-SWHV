@@ -115,12 +115,11 @@ public class EventTypePanelModel implements TreeModel {
     }
 
     public void deserialize(JSONObject jo) {
-        if (jo.has(group.getName())) {
-            JSONObject go = jo.getJSONObject(group.getName());
+        JSONObject go = jo.optJSONObject(group.getName());
+        if (go != null)
             for (SWEKSupplier supplier : group.getSuppliers()) {
                 selectSupplier(supplier, go.optBoolean(supplier.getName(), false));
             }
-        }
     }
 
 }
