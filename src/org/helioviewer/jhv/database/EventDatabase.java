@@ -627,18 +627,7 @@ public class EventDatabase {
         return last_timestamp;
     }
 
-    public static ArrayList<JsonEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEKParam> params) {
-        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<>(new Events2Program(start, end, type, params));
-        executor.execute(ft);
-        try {
-            return ft.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.getCause().printStackTrace();
-        }
-        return new ArrayList<>();
-    }
-
-    public static class JsonEvent {
+    private static class JsonEvent {
         public final int id;
         public final byte[] json;
         public final SWEKSupplier type;
@@ -652,10 +641,20 @@ public class EventDatabase {
             id = _id;
             json = _json;
         }
-
     }
 
-    private static class Events2Program implements Callable<ArrayList<JsonEvent>> {
+    public static ArrayList<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEKParam> params) {
+        FutureTask<ArrayList<JHVEvent>> ft = new FutureTask<>(new Events2Program(start, end, type, params));
+        executor.execute(ft);
+        try {
+            return ft.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.getCause().printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    private static class Events2Program implements Callable<ArrayList<JHVEvent>> {
         private final SWEKSupplier type;
         private final long start;
         private final long end;
@@ -669,9 +668,9 @@ public class EventDatabase {
         }
 
         @Override
-        public ArrayList<JsonEvent> call() {
+        public ArrayList<JHVEvent> call() {
             Connection connection = ConnectionThread.getConnection();
-            ArrayList<JsonEvent> eventList = new ArrayList<>();
+            ArrayList<JHVEvent> eventList = new ArrayList<>();
             if (connection == null) {
                 return eventList;
             }
@@ -698,7 +697,7 @@ public class EventDatabase {
                             long _start = rs.getLong(2);
                             long _end = rs.getLong(3);
                             byte[] json = rs.getBytes(4);
-                            eventList.add(new JsonEvent(json, type, id, _start, _end));
+                            eventList.add(parseJSON(new JsonEvent(json, type, id, _start, _end), false));
                         }
                     }
                 } catch (SQLException e) {

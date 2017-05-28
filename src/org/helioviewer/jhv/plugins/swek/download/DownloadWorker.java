@@ -4,20 +4,15 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.base.GZIPUtils;
-import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.SWEKParam;
-import org.helioviewer.jhv.data.event.SWEKParser;
 import org.helioviewer.jhv.data.event.SWEKSource;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.database.EventDatabase.JsonEvent;
 
-// A download worker will download events for a type of event from a source.
 class DownloadWorker implements Runnable {
 
     private final SWEKSupplier supplier;
@@ -39,21 +34,13 @@ class DownloadWorker implements Runnable {
         SWEKSource swekSource = supplier.getSource();
         boolean success = swekSource.getDownloader().extern2db(supplier, requestInterval.start, requestInterval.end, params);
         if (success) {
-            ArrayList<JHVAssociation> associationList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, supplier);
+            ArrayList<JHVAssociation> assocList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, supplier);
+            ArrayList<JHVEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, supplier, params);
             EventQueue.invokeLater(() -> {
-                for (JHVAssociation assoc : associationList) {
+                for (JHVAssociation assoc : assocList)
                     JHVEventCache.add(assoc);
-                }
-            });
-
-            SWEKParser parser = swekSource.getParser();
-            ArrayList<JsonEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, supplier, params);
-            for (JsonEvent event : eventList) {
-                JHVEvent ev = parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(event.json)), event.type, event.id, event.start, event.end, false);
-                EventQueue.invokeLater(() -> JHVEventCache.add(ev));
-            }
-
-            EventQueue.invokeLater(() -> {
+                for (JHVEvent event : eventList)
+                    JHVEventCache.add(event);
                 JHVEventCache.finishedDownload();
                 SWEKDownloadManager.workerFinished(this);
             });
