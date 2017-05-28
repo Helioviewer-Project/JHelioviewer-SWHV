@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.guielements.listeners;
+package org.helioviewer.jhv.data.guielements.model;
 
 public interface DataCollapsiblePanelModelListener {
 
