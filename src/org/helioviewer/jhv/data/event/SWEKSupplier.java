@@ -15,7 +15,7 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
     public SWEKSupplier(String _supplierName, String _name, SWEKGroup _group, SWEKSource _source, String _db) {
         supplierName = _supplierName;
-        name = _name;
+        name = _name.intern();
 
         group = _group;
         source = _source;

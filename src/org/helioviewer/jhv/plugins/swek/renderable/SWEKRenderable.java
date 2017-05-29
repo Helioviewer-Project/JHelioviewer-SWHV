@@ -385,7 +385,7 @@ public class SWEKRenderable extends AbstractRenderable {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.getName() == "Coronal Mass Ejection") { // interned
+                if (evt.getName() == "CACTus") { // interned
                     drawCactusArc(gl, evtr, evt, controller.currentTime);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
@@ -406,7 +406,7 @@ public class SWEKRenderable extends AbstractRenderable {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.getName() == "Coronal Mass Ejection" && (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar)) { // interned
+                if (evt.getName() == "CACTus" && (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar)) { // interned
                     drawCactusArcScale(gl, evtr, evt, controller.currentTime, Displayer.mode.scale, vp);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
