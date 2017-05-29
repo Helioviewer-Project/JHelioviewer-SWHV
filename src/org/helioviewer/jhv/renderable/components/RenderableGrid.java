@@ -55,6 +55,8 @@ public class RenderableGrid extends AbstractRenderable {
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
+    private GridChoiceType gridChoice = GridChoiceType.Viewpoint;
+
     private float lonstepDegrees = 15f;
     private float latstepDegrees = 20f;
     private boolean needsInit = true;
@@ -79,6 +81,7 @@ public class RenderableGrid extends AbstractRenderable {
         jo.put("showAxis", showAxis);
         jo.put("showLabels", showLabels);
         jo.put("showRadial", showRadial);
+        jo.put("type", gridChoice);
     }
 
     private void deserialize(JSONObject jo) {
@@ -87,6 +90,12 @@ public class RenderableGrid extends AbstractRenderable {
         showAxis = jo.optBoolean("showAxis", showAxis);
         showLabels = jo.optBoolean("showLabels", showLabels);
         showRadial = jo.optBoolean("showRadial", showRadial);
+
+        String strGridChoice = jo.optString("type", gridChoice.toString());
+        try {
+            gridChoice = GridChoiceType.valueOf(strGridChoice);
+        } catch (Exception e) {
+        }
     }
 
     public RenderableGrid(JSONObject jo) {
@@ -100,8 +109,6 @@ public class RenderableGrid extends AbstractRenderable {
         makeLonLabels();
         makeRadialLabels();
     }
-
-    private GridChoiceType gridChoice = GridChoiceType.Viewpoint;
 
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
         return Displayer.mode.scale.mouseToGrid(x, y, vp, camera, gridChoice);
@@ -693,7 +700,11 @@ public class RenderableGrid extends AbstractRenderable {
         radialThickLine.dispose(gl);
     }
 
-    public void setCoordinates(GridChoiceType _gridChoice) {
+    GridChoiceType getGridChoice() {
+        return gridChoice;
+    }
+
+    void setGridChoice(GridChoiceType _gridChoice) {
         gridChoice = _gridChoice;
         makeLonLabels();
     }

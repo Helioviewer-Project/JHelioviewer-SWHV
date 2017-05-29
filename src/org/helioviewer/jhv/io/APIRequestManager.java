@@ -42,7 +42,7 @@ public class APIRequestManager {
                     Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
                 }
             } else {
-                // The server wants to load us the data
+                // The server wants to load the data
                 if (message != null) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
