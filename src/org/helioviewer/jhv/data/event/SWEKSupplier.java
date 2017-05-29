@@ -11,6 +11,8 @@ public class SWEKSupplier extends SWEKTreeModelElement {
     private final SWEKGroup group;
     private final SWEKSource source;
 
+    private final boolean isCactus;
+
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
 
     public SWEKSupplier(String _supplierName, String _name, SWEKGroup _group, SWEKSource _source, String _db) {
@@ -23,6 +25,8 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
         key = supplierName + source.getName() + db;
         suppliers.put(key, this);
+
+        isCactus = name == "CACTus" && source.getName() == "HEK"; // interned
     }
 
     public static SWEKSupplier getSupplier(String name) {
@@ -47,6 +51,10 @@ public class SWEKSupplier extends SWEKTreeModelElement {
 
     public String getKey() {
         return key;
+    }
+
+    public boolean isCactus() {
+        return isCactus;
     }
 
 }

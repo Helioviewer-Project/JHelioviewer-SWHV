@@ -117,7 +117,7 @@ public class JHVEvent {
     }
 
     public boolean isCactus() {
-        return supplier.getName() == "CACTus" && supplier.getSource().getName() == "HEK"; // interned
+        return supplier.isCactus();
     }
 
 }
