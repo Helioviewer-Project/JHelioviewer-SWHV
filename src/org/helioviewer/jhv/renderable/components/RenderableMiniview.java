@@ -21,7 +21,6 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private final RenderableMiniviewOptionsPanel optionsPanel;
 
-    private final Camera miniCamera = new Camera();
     private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
 
     private static final int MIN_SCALE = 5;
@@ -114,15 +113,11 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     @Override
     public void activeLayerChanged(View view) {
-        CameraHelper.zoomToFit(miniCamera);
+        CameraHelper.zoomToFit(Displayer.getMiniCamera());
     }
 
     public Viewport getViewport() {
         return miniViewport;
-    }
-
-    public Camera getCamera() {
-        return miniCamera;
     }
 
 }

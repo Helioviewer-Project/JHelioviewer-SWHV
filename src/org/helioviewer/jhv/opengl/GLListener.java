@@ -170,12 +170,12 @@ public class GLListener implements GLEventListener {
         RenderableMiniview miniview = ImageViewerGui.getRenderableContainer().getRenderableMiniview();
         if (miniview.isVisible()) {
             Viewport vp = miniview.getViewport();
-            Camera cameraMini = miniview.getCamera();
-            cameraMini.timeChanged(Layers.getLastUpdatedTimestamp());
+            Camera miniCamera = Displayer.getMiniCamera();
+            miniCamera.timeChanged(Layers.getLastUpdatedTimestamp());
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            CameraHelper.applyPerspective(cameraMini, vp, gl);
-            ImageViewerGui.getRenderableContainer().renderMiniview(cameraMini, vp, gl);
+            CameraHelper.applyPerspective(miniCamera, vp, gl);
+            ImageViewerGui.getRenderableContainer().renderMiniview(miniCamera, vp, gl);
         }
     }
 
