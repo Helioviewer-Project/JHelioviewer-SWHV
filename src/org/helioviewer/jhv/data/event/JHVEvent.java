@@ -9,8 +9,6 @@ public class JHVEvent {
     public final long start;
     public final long end;
 
-    private final String eventName;
-
     private JHVEventParameter[] allParameters;
     private JHVEventParameter[] visibleParameters;
     private JHVEventParameter[] simpleVisibleParameters;
@@ -24,7 +22,6 @@ public class JHVEvent {
 
     public JHVEvent(SWEKSupplier _supplier, int _id, long _start, long _end) {
         supplier = _supplier;
-        eventName = _supplier.getGroup().getName();
         start = _start;
         end = _end;
         id = _id;
@@ -54,7 +51,7 @@ public class JHVEvent {
     }
 
     public String getName() {
-        return eventName;
+        return supplier.getName();
     }
 
     public SWEKSupplier getSupplier() {
