@@ -16,7 +16,7 @@ public class SWEKGroup extends SWEKTreeModelElement {
     private HashMap<String, String> databaseFields;
 
     public SWEKGroup(String _name, List<SWEKParameter> _parameterList, ImageIcon _icon) {
-        name = _name;
+        name = _name.intern();
         parameterList = _parameterList;
         icon = _icon;
         containsParameterFilter = checkFilters(parameterList);
