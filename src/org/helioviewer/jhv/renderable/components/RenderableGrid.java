@@ -94,7 +94,7 @@ public class RenderableGrid extends AbstractRenderable {
         String strGridChoice = jo.optString("type", gridChoice.toString());
         try {
             gridChoice = GridChoiceType.valueOf(strGridChoice);
-        } catch (Exception e) {
+        } catch (Exception ignore) {
         }
     }
 

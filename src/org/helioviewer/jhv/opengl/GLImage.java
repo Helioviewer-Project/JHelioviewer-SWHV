@@ -220,11 +220,10 @@ public class GLImage {
         brightOffset = MathUtils.clip((float) json.optDouble("brightOffset", 0), -1, 2);
         brightScale = MathUtils.clip((float) json.optDouble("brightScale", 0), 0, 2 - brightOffset);
         enhanced = json.optBoolean("enhanced", false) ? 1 : 0;
-        String strdiffMode = json.optString("differenceMode", "None");
+        String strDiffMode = json.optString("differenceMode", diffMode.toString());
         try {
-            diffMode = DifferenceMode.valueOf(strdiffMode);
-        } catch (Exception e) {
-            diffMode = DifferenceMode.None;
+            diffMode = DifferenceMode.valueOf(strDiffMode);
+        } catch (Exception ignore) {
         }
         JSONObject colorObject = json.optJSONObject("color");
         if (colorObject != null) {
