@@ -9,7 +9,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
-import org.helioviewer.jhv.renderable.components.RenderableGrid.GridChoiceType;
+import org.helioviewer.jhv.renderable.components.RenderableGrid.GridType;
 
 public abstract class GridScale {
 
@@ -44,7 +44,7 @@ public abstract class GridScale {
 
     public abstract Vec3 transformInverse(Vec2 pt);
 
-    public abstract Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridChoiceType gridChoice);
+    public abstract Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType);
 
     public abstract Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
@@ -110,7 +110,7 @@ public abstract class GridScale {
         }
 
         @Override
-        public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridChoiceType gridChoice) {
+        public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
             double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect + 0.5;
             double y = CameraHelper.computeUpY(camera, vp, py) + 0.5;
             return new Vec2(getInterpolatedXValue(x), getInterpolatedYValue(y));
@@ -185,13 +185,13 @@ public abstract class GridScale {
         }
 
         @Override
-        public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridChoiceType gridChoice) {
+        public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
             Vec3 p = CameraHelper.getVectorFromSphere(camera, vp, px, py, Quat.ZERO, true);
             if (p == null)
                 return Vec2.NAN_VECTOR;
 
-            if (gridChoice != GridChoiceType.Viewpoint) {
-                Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, RenderableGrid.getGridQuat(camera, gridChoice));
+            if (gridType != GridType.Viewpoint) {
+                Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, RenderableGrid.getGridQuat(camera, gridType));
                 p = q.rotateInverseVector(p);
             }
 
@@ -199,7 +199,7 @@ public abstract class GridScale {
             double phi = 90 - MathUtils.radeg * Math.atan2(p.z, p.x);
             phi = MathUtils.mapToMinus180To180(phi);
 
-            if (gridChoice == GridChoiceType.Carrington && phi < 0)
+            if (gridType == GridType.Carrington && phi < 0)
                 phi += 360;
             return new Vec2(phi, theta);
         }

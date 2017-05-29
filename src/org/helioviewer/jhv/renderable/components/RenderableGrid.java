@@ -27,7 +27,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableGrid extends AbstractRenderable {
 
-    public enum GridChoiceType {
+    public enum GridType {
         Viewpoint, Stonyhurst, Carrington, HCI
     }
 
@@ -55,7 +55,7 @@ public class RenderableGrid extends AbstractRenderable {
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
-    private GridChoiceType gridChoice = GridChoiceType.Viewpoint;
+    private GridType gridType = GridType.Viewpoint;
 
     private float lonstepDegrees = 15f;
     private float latstepDegrees = 20f;
@@ -81,7 +81,7 @@ public class RenderableGrid extends AbstractRenderable {
         jo.put("showAxis", showAxis);
         jo.put("showLabels", showLabels);
         jo.put("showRadial", showRadial);
-        jo.put("type", gridChoice);
+        jo.put("type", gridType);
     }
 
     private void deserialize(JSONObject jo) {
@@ -91,9 +91,9 @@ public class RenderableGrid extends AbstractRenderable {
         showLabels = jo.optBoolean("showLabels", showLabels);
         showRadial = jo.optBoolean("showRadial", showRadial);
 
-        String strGridChoice = jo.optString("type", gridChoice.toString());
+        String strGridType = jo.optString("type", gridType.toString());
         try {
-            gridChoice = GridChoiceType.valueOf(strGridChoice);
+            gridType = GridType.valueOf(strGridType);
         } catch (Exception ignore) {
         }
     }
@@ -111,11 +111,11 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
-        return Displayer.mode.scale.mouseToGrid(x, y, vp, camera, gridChoice);
+        return Displayer.mode.scale.mouseToGrid(x, y, vp, camera, gridType);
     }
 
-    public static Quat getGridQuat(Camera camera, GridChoiceType _gridChoice) { // should be in GridScale
-        switch (_gridChoice) {
+    public static Quat getGridQuat(Camera camera, GridType _gridType) { // should be in GridScale
+        switch (_gridType) {
         case Viewpoint:
             return camera.getViewpoint().orientation;
         case Stonyhurst:
@@ -138,7 +138,7 @@ public class RenderableGrid extends AbstractRenderable {
         if (showAxis)
             axesline.render(gl, vp.aspect, thicknessAxes);
 
-        Mat4 cameraMatrix = getGridQuat(camera, gridChoice).toMatrix();
+        Mat4 cameraMatrix = getGridQuat(camera, gridType).toMatrix();
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
 
         gl.glPushMatrix();
@@ -316,8 +316,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
         for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
-            String txt = gridChoice == GridChoiceType.Carrington ? formatter1.format(theta + 360)
-                    : formatter1.format(theta);
+            String txt = gridType == GridType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
             lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size),
                     (float) theta));
         }
@@ -700,12 +699,12 @@ public class RenderableGrid extends AbstractRenderable {
         radialThickLine.dispose(gl);
     }
 
-    GridChoiceType getGridChoice() {
-        return gridChoice;
+    GridType getGridType() {
+        return gridType;
     }
 
-    void setGridChoice(GridChoiceType _gridChoice) {
-        gridChoice = _gridChoice;
+    void setGridType(GridType _gridType) {
+        gridType = _gridType;
         makeLonLabels();
     }
 

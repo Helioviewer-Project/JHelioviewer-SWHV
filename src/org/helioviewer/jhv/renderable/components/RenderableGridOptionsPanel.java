@@ -24,7 +24,7 @@ class RenderableGridOptionsPanel extends JPanel {
 
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
-    private JComboBox<RenderableGrid.GridChoiceType> gridChoiceBox;
+    private JComboBox<RenderableGrid.GridType> gridTypeBox;
     private final RenderableGrid grid;
 
     public RenderableGridOptionsPanel(RenderableGrid renderableGrid) {
@@ -78,8 +78,8 @@ class RenderableGridOptionsPanel extends JPanel {
         add(new JLabel("Grid type", JLabel.RIGHT), c0);
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.WEST;
-        createGridChoiceBox();
-        add(gridChoiceBox, c0);
+        createGridTypeBox();
+        add(gridTypeBox, c0);
 
         c0.gridy = 2;
 
@@ -108,11 +108,11 @@ class RenderableGridOptionsPanel extends JPanel {
         ComponentUtils.smallVariant(this);
     }
 
-    private void createGridChoiceBox() {
-        gridChoiceBox = new JComboBox<>(RenderableGrid.GridChoiceType.values());
-        gridChoiceBox.setSelectedItem(grid.getGridChoice());
-        gridChoiceBox.addActionListener(e -> {
-            grid.setGridChoice((RenderableGrid.GridChoiceType) gridChoiceBox.getSelectedItem());
+    private void createGridTypeBox() {
+        gridTypeBox = new JComboBox<>(RenderableGrid.GridType.values());
+        gridTypeBox.setSelectedItem(grid.getGridType());
+        gridTypeBox.addActionListener(e -> {
+            grid.setGridType((RenderableGrid.GridType) gridTypeBox.getSelectedItem());
             Displayer.display();
         });
     }
