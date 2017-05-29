@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.Locale;
 
 import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -18,15 +19,9 @@ public class APIRequestManager {
 
     public static URI requestRemoteFile(APIRequest req) throws IOException {
         try {
-            APIResponse response = new APIResponse(new DownloadStream(req.jpipRequest).getInput());
-            // Could we handle the answer from the server
-            if (!response.hasData()) {
-                Log.error("Could not understand server answer from " + req.jpipRequest);
-                Message.err("Invalid Server reply", "The server data could not be parsed.", false);
-                return null;
-            }
+            APIResponse response = new APIResponse(JSONUtils.getJSONStream(new DownloadStream(req.jpipRequest).getInput()));
             // Just some error from the server
-            String error = response.getString("error");
+            String error = response.getError();
             if (error != null) {
                 Log.error("Data query returned error: " + error);
                 Message.err("Error getting the data", Message.formatMessageString(error), false);
@@ -34,16 +29,10 @@ public class APIRequestManager {
             }
 
             // Try to load
-            if (response.getURI() != null) {
-                // The server wants to load us the data
-                String message = response.getString("message");
-                if (message != null) {
-                    Message.warn("Warning", Message.formatMessageString(message));
-                }
-                return response.getURI();
-            } else {
+            String message = response.getMessage();
+            URI uri = response.getURI();
+            if (uri == null) {
                 // We did not get a reply to load data or no reply at all
-                String message = response.getString("message");
                 if (message != null) {
                     Log.error("No data to load returned from " + req.jpipRequest);
                     Log.error("Server message: " + message);
@@ -52,10 +41,18 @@ public class APIRequestManager {
                     Log.error("Did not find URI in response to " + req.jpipRequest);
                     Message.err("No data source response", "While quering the data source, the server did not provide an answer.", false);
                 }
+            } else {
+                // The server wants to load us the data
+                if (message != null) {
+                    Message.warn("Warning", Message.formatMessageString(message));
+                }
+                return uri;
             }
         } catch (SocketTimeoutException e) {
             Log.error("Socket timeout while requesting JPIP URL", e);
             Message.err("Socket timeout", "Socket timeout while requesting JPIP URL", false);
+        } catch (Exception e) {
+            throw new IOException("Invalid response for " + req.jpipRequest, e);
         }
 
         return null;
