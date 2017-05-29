@@ -34,9 +34,9 @@ public class RenderableGrid extends AbstractRenderable {
     // height of text in solar radii
     private static final float textScale = (float) (0.08 * Sun.Radius);
     private static final int SUBDIVISIONS = 360;
-    private static final double thickness = 0.0015;
+    private static final double thickness = 0.001;
     private static final double thicknessEarth = 0.0015;
-    private static final double thicknessAxes = 0.004;
+    private static final double thicknessAxes = 0.003;
 
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
