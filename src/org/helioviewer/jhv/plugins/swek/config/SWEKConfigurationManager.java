@@ -53,7 +53,7 @@ public class SWEKConfigurationManager {
         for (int i = 0; i < sourcesArray.length(); i++) {
             SWEKSource source = parseSource(sourcesArray.getJSONObject(i));
             if (source != null) {
-                sources.put(source.getSourceName(), source);
+                sources.put(source.getName(), source);
             }
         }
     }

@@ -50,10 +50,6 @@ public class JHVEvent {
         return null;
     }
 
-    public String getName() {
-        return supplier.getName();
-    }
-
     public SWEKSupplier getSupplier() {
         return supplier;
     }
@@ -118,6 +114,10 @@ public class JHVEvent {
         simpleVisibleParameters = simpleVisibleParametersArray.toArray(new JHVEventParameter[simpleVisibleParametersArray.size()]);
 
         visibleParametersArray = new ArrayList<>();
+    }
+
+    public boolean isCactus() {
+        return supplier.getName() == "CACTus" && supplier.getSource().getName() == "HEK"; // interned
     }
 
 }
