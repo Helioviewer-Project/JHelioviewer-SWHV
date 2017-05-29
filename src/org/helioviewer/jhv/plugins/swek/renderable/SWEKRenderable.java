@@ -23,6 +23,7 @@ import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.JHVPositionInformation;
+import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -62,9 +63,11 @@ public class SWEKRenderable extends AbstractRenderable {
         jo.put("icons", optionsPanel.icons);
     }
 
-    private static void bindTexture(GL2 gl, String key, ImageIcon icon) {
+    private static void bindTexture(GL2 gl, SWEKGroup group) {
+        String key = group.getName();
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
+            ImageIcon icon = group.getIcon();
             BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics graph = bi.createGraphics();
             icon.paintIcon(null, graph, 0, 0);
@@ -134,7 +137,7 @@ public class SWEKRenderable extends AbstractRenderable {
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, p.orientation);
 
         if (optionsPanel.icons) {
-            bindTexture(gl, evt.getName(), evtr.getIcon());
+            bindTexture(gl, evtr.getSupplier().getGroup());
 
             double sz = ICON_SIZE;
             if (evtr.isHighlighted()) {
@@ -216,7 +219,7 @@ public class SWEKRenderable extends AbstractRenderable {
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            bindTexture(gl, evt.getName(), evtr.getIcon());
+            bindTexture(gl, evtr.getSupplier().getGroup());
             Color color = evtr.getColor();
             gl.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 0.6f);
             if (evtr.isHighlighted()) {
@@ -256,7 +259,7 @@ public class SWEKRenderable extends AbstractRenderable {
         if (pt != null) {
             pt = camera.getViewpoint().orientation.rotateVector(pt);
             Vec2 tf = scale.transform(pt);
-            bindTexture(gl, evt.getName(), evtr.getIcon());
+            bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
                 drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
             } else {
@@ -312,7 +315,7 @@ public class SWEKRenderable extends AbstractRenderable {
         gl.glEnd();
 
         if (optionsPanel.icons) {
-            bindTexture(gl, evt.getName(), evtr.getIcon());
+            bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
                 drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
             } else {
@@ -385,7 +388,7 @@ public class SWEKRenderable extends AbstractRenderable {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.getName() == "CACTus") { // interned
+                if (evt.isCactus()) {
                     drawCactusArc(gl, evtr, evt, controller.currentTime);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
@@ -406,7 +409,7 @@ public class SWEKRenderable extends AbstractRenderable {
             List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
             for (JHVRelatedEvents evtr : eventsToDraw) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-                if (evt.getName() == "CACTus" && (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar)) { // interned
+                if (evt.isCactus() && (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar)) {
                     drawCactusArcScale(gl, evtr, evt, controller.currentTime, Displayer.mode.scale, vp);
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);

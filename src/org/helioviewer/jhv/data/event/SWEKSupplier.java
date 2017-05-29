@@ -21,7 +21,7 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         source = _source;
         db = _db;
 
-        key = supplierName + source.getSourceName() + db;
+        key = supplierName + source.getName() + db;
         suppliers.put(key, this);
     }
 

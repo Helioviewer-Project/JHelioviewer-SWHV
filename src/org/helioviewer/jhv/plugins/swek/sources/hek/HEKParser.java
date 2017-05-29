@@ -286,7 +286,7 @@ public class HEKParser implements SWEKParser {
             }
 
             currentEvent.addPositionInformation(new JHVPositionInformation(jhvCentralPoint, jhvBoundedBox, jhvBoundCC,
-                    currentEvent.getName().equals("CACTus") ? new Position.Q(p.time, p.rad, new Quat(p.lat, p.lon)) : null)); // reduce memory usage
+                    currentEvent.isCactus() ? new Position.Q(p.time, p.rad, new Quat(p.lat, p.lon)) : null)); // reduce memory usage
         }
     }
 
