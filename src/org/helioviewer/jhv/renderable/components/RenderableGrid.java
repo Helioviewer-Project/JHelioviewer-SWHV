@@ -502,6 +502,8 @@ public class RenderableGrid extends AbstractRenderable {
         radialThickLine.setData(gl, positionThick, colorThick);
     }
 
+    private static final double gridRadius = Sun.Radius;
+
     private void initEarthCircles(GL2 gl) {
         int no_points = 2 * (SUBDIVISIONS + 3);
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
@@ -510,8 +512,8 @@ public class RenderableGrid extends AbstractRenderable {
         Vec3 rotv = new Vec3(), v = new Vec3();
         Quat q = Quat.createRotation(Math.PI / 2, new Vec3(1, 0, 0));
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
-            v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
+            v.x = gridRadius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
+            v.y = gridRadius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
@@ -528,8 +530,8 @@ public class RenderableGrid extends AbstractRenderable {
         v = new Vec3();
         q = Quat.createRotation(Math.PI / 2, new Vec3(0, 1, 0));
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            v.x = Sun.Radius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
-            v.y = Sun.Radius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
+            v.x = gridRadius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
+            v.y = gridRadius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
             v.z = 0.;
             rotv = q.rotateVector(v);
             if (i == 0) {
@@ -565,8 +567,8 @@ public class RenderableGrid extends AbstractRenderable {
                 rotation = lonstepDegrees * j * k;
                 Quat q = Quat.createRotation(Math.PI / 2 + Math.PI + 2 * Math.PI * rotation / 360., new Vec3(0, 1, 0));
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
-                    v.x = Sun.Radius * Math.cos(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
-                    v.y = Sun.Radius * Math.sin(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
+                    v.x = gridRadius * Math.cos(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
+                    v.y = gridRadius * Math.sin(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
                     v.z = 0.;
                     Vec3 rotv = q.rotateVector(v);
                     if (i == 0) {
@@ -593,9 +595,9 @@ public class RenderableGrid extends AbstractRenderable {
                 rotation = latstepDegrees * j * k;
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
                     double scale = Math.cos(Math.PI / 180. * (90 - rotation));
-                    v.y = scale;
-                    v.x = Math.sqrt(1. - scale * scale) * Math.sin(2 * Math.PI * i / HALFDIVISIONS);
-                    v.z = Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
+                    v.y = gridRadius * scale;
+                    v.x = gridRadius * Math.sqrt(1. - scale * scale) * Math.sin(2 * Math.PI * i / HALFDIVISIONS);
+                    v.z = gridRadius * Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
                     if (i == 0) {
                         BufferUtils.put3f(positionBuffer, v);
                         BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
