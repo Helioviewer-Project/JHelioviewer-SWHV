@@ -36,6 +36,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     public RenderableMiniview(JSONObject jo) {
         scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
         optionsPanel = new RenderableMiniviewOptionsPanel(this, scale, MIN_SCALE, MAX_SCALE);
+        reshapeViewport();
     }
 
     public RenderableMiniview() {
