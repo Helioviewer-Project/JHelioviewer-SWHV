@@ -34,7 +34,7 @@ public class LUTPanel implements FilterDetails {
         JideToggleButton enhanceButton = new JideToggleButton(Buttons.corona, parent.getGLImage().getEnhanced());
         enhanceButton.setToolTipText("Enhance off-disk corona");
         enhanceButton.addActionListener(e -> {
-            parent.getGLImage().setEnhanced(enhanceButton.isSelected() ? 1 : 0);
+            parent.getGLImage().setEnhanced(enhanceButton.isSelected());
             Displayer.display();
         });
 

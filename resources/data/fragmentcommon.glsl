@@ -15,14 +15,14 @@ uniform vec4 rect;
 uniform vec4 differencerect;
 uniform sampler1D lut;
 uniform vec3 brightness;
-uniform vec4 colorParam;
+uniform vec4 color;
 uniform float hgln;
 uniform float hglt;
 uniform float crota;
 
 uniform float blurKernel[FSIZE * FSIZE];
 uniform float offset[FSIZE];
-uniform vec3 sharpenParam;
+uniform vec3 sharpen;
 
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifferenceRotationQuat;
@@ -50,7 +50,7 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
         v = fetch(image, texcoord, b);
         for (int j = 0; j < FSIZE; j++) {
             for (int i = 0; i < FSIZE; i++) {
-                conv += fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b) * blurKernel[FSIZE * j + i];
+                conv += fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpen.xy, b) * blurKernel[FSIZE * j + i];
             }
         }
     } else {
@@ -58,17 +58,17 @@ vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
         float diff;
         for (int j = 0; j < FSIZE; j++) {
             for (int i = 0; i < FSIZE; i++) {
-                diff = fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b) -
-                       fetch(differenceImage, difftexcoord + vec2(offset[i], offset[j]) * sharpenParam.xy, b);
+                diff = fetch(image, texcoord + vec2(offset[i], offset[j]) * sharpen.xy, b) -
+                       fetch(differenceImage, difftexcoord + vec2(offset[i], offset[j]) * sharpen.xy, b);
                 conv += diff * blurKernel[FSIZE * j + i];
             }
         }
         v = v * BOOST + 0.5;
         conv = conv * BOOST + 0.5;
     }
-    v = mix(v, conv, sharpenParam.z);
+    v = mix(v, conv, sharpen.z);
 
-    return texture1D(lut, v) * colorParam;
+    return texture1D(lut, v) * color;
 }
 
 void clamp_texcoord(vec2 texcoord) {
