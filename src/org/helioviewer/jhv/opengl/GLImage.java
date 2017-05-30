@@ -214,41 +214,47 @@ public class GLImage {
         return blue != 0;
     }
 
-    public void fromJson(JSONObject json) {
-        sharpen = MathUtils.clip((float) json.optDouble("sharpen", 0), 0, 1);
-        opacity = MathUtils.clip((float) json.optDouble("opacity", 0), 0, 1);
-        brightOffset = MathUtils.clip((float) json.optDouble("brightOffset", 0), -1, 2);
-        brightScale = MathUtils.clip((float) json.optDouble("brightScale", 0), 0, 2 - brightOffset);
-        enhanced = json.optBoolean("enhanced", false) ? 1 : 0;
-        String strDiffMode = json.optString("differenceMode", diffMode.toString());
+    public boolean getInvertLUT() {
+        return invertLUT;
+    }
+
+    public void fromJson(JSONObject jo) {
+        sharpen = MathUtils.clip((float) jo.optDouble("sharpen", 0), 0, 1);
+        opacity = MathUtils.clip((float) jo.optDouble("opacity", 0), 0, 1);
+        brightOffset = MathUtils.clip((float) jo.optDouble("brightOffset", 0), -1, 2);
+        brightScale = MathUtils.clip((float) jo.optDouble("brightScale", 0), 0, 2 - brightOffset);
+        enhanced = jo.optBoolean("enhanced", false) ? 1 : 0;
+        String strDiffMode = jo.optString("differenceMode", diffMode.toString());
         try {
             diffMode = DifferenceMode.valueOf(strDiffMode);
         } catch (Exception ignore) {
         }
-        JSONObject colorObject = json.optJSONObject("color");
+        JSONObject colorObject = jo.optJSONObject("color");
         if (colorObject != null) {
             red = colorObject.optBoolean("red", true) ? 1 : 0;
             green = colorObject.optBoolean("green", true) ? 1 : 0;
             blue = colorObject.optBoolean("blue", true) ? 1 : 0;
         }
+        invertLUT = jo.optBoolean("invertLUT", false);
     }
 
     public JSONObject toJson() {
-        JSONObject json = new JSONObject();
-        json.put("sharpen", sharpen);
-        json.put("opacity", opacity);
-        json.put("brightOffset", brightOffset);
-        json.put("brightScale", brightScale);
-        json.put("enhanced", getEnhanced());
-        json.put("differenceMode", diffMode);
+        JSONObject jo = new JSONObject();
+        jo.put("sharpen", sharpen);
+        jo.put("opacity", opacity);
+        jo.put("brightOffset", brightOffset);
+        jo.put("brightScale", brightScale);
+        jo.put("enhanced", getEnhanced());
+        jo.put("differenceMode", diffMode);
 
         JSONObject colorObject = new JSONObject();
         colorObject.put("red", getRed());
         colorObject.put("green", getGreen());
         colorObject.put("blue", getBlue());
-        json.put("color", colorObject);
+        jo.put("color", colorObject);
+        jo.put("invertLUT", invertLUT);
 
-        return json;
+        return jo;
     }
 
 }

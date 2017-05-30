@@ -21,7 +21,7 @@ public class LUTPanel implements FilterDetails {
 
     public LUTPanel(ImageLayerOptions parent) {
         lutCombo = new LUTComboBox();
-        JideToggleButton invertButton = new JideToggleButton(Buttons.invert);
+        JideToggleButton invertButton = new JideToggleButton(Buttons.invert, parent.getGLImage().getInvertLUT());
         invertButton.setToolTipText("Invert color table");
 
         ActionListener listener = e -> {
@@ -32,7 +32,6 @@ public class LUTPanel implements FilterDetails {
         invertButton.addActionListener(listener);
 
         JideToggleButton enhanceButton = new JideToggleButton(Buttons.corona, parent.getGLImage().getEnhanced());
-
         enhanceButton.setToolTipText("Enhance off-disk corona");
         enhanceButton.addActionListener(e -> {
             parent.getGLImage().setEnhanced(enhanceButton.isSelected() ? 1 : 0);
