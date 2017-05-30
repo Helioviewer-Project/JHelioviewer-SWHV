@@ -96,9 +96,9 @@ public class GLSLSolarShader extends GLSLShader {
         crotaRef = gl.glGetUniformLocation(progID, "crota");
         polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
 
-        sharpenParamRef = gl.glGetUniformLocation(progID, "sharpenParam");
+        sharpenParamRef = gl.glGetUniformLocation(progID, "sharpen");
         brightParamRef = gl.glGetUniformLocation(progID, "brightness");
-        colorParamRef = gl.glGetUniformLocation(progID, "colorParam");
+        colorParamRef = gl.glGetUniformLocation(progID, "color");
         cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
         cutOffDirectionRef = gl.glGetUniformLocation(progID, "cutOffDirection");
         cutOffValueRef = gl.glGetUniformLocation(progID, "cutOffValue");
@@ -203,8 +203,8 @@ public class GLSLSolarShader extends GLSLShader {
         sharpenParamFloat[2] = -weighting; // used for mix
     }
 
-    public void setEnhanced(int _enhanced) {
-        enhanced[0] = _enhanced;
+    public void setEnhanced(boolean _enhanced) {
+        enhanced[0] = _enhanced ? 1 : 0;
     }
 
     public void setIsDifference(int isDifference) {

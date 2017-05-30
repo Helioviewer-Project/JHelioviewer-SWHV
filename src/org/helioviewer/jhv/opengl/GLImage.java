@@ -31,7 +31,7 @@ public class GLImage {
     private float brightScale = 1;
     private float opacity = 1;
     private float sharpen = 0;
-    private int enhanced = 0;
+    private boolean enhanced = false;
     private DifferenceMode diffMode = DifferenceMode.None;
 
     private LUT lut = gray;
@@ -178,7 +178,7 @@ public class GLImage {
         lutChanged = true;
     }
 
-    public void setEnhanced(int _enhanced) {
+    public void setEnhanced(boolean _enhanced) {
         enhanced = _enhanced;
     }
 
@@ -195,7 +195,7 @@ public class GLImage {
     }
 
     public boolean getEnhanced() {
-        return enhanced != 0;
+        return enhanced;
     }
 
     public float getOpacity() {
@@ -223,7 +223,7 @@ public class GLImage {
         opacity = MathUtils.clip((float) jo.optDouble("opacity", 0), 0, 1);
         brightOffset = MathUtils.clip((float) jo.optDouble("brightOffset", 0), -1, 2);
         brightScale = MathUtils.clip((float) jo.optDouble("brightScale", 0), 0, 2 - brightOffset);
-        enhanced = jo.optBoolean("enhanced", false) ? 1 : 0;
+        enhanced = jo.optBoolean("enhanced", false);
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
         try {
             diffMode = DifferenceMode.valueOf(strDiffMode);
@@ -235,7 +235,7 @@ public class GLImage {
             green = colorObject.optBoolean("green", true) ? 1 : 0;
             blue = colorObject.optBoolean("blue", true) ? 1 : 0;
         }
-        invertLUT = jo.optBoolean("invertLUT", false);
+        invertLUT = jo.optBoolean("invert", false);
     }
 
     public JSONObject toJson() {
@@ -252,7 +252,7 @@ public class GLImage {
         colorObject.put("green", getGreen());
         colorObject.put("blue", getBlue());
         jo.put("color", colorObject);
-        jo.put("invertLUT", invertLUT);
+        jo.put("invert", invertLUT);
 
         return jo;
     }
