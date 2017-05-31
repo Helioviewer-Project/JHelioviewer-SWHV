@@ -19,17 +19,14 @@ public class CommandLine {
     public static void setArguments(String[] args) {
         arguments = args;
         usageMessage = "The following command-line options are available: \n\n" +
-        "-jpx   JPX_REQUEST_URL\n" + "       Allows users to pass a JPX request URL for a JPX movie which will be opened upon program start. The option can be used multiple times." + "\n\n" +
-        "-jpip  JPIP_URL\n" + "       Allows users to pass a JPIP URL of a JP2 or JPX image to be opened upon program start. The option can be used multiple times.";
+        "-load    file location\n"         + "       Load or request a supported file at program start. The option can be used multiple times.\n\n" +
+        "-request request file location\n" + "       Load a request file and issue a request at program start. The option can be used multiple times.\n\n" +
+        "-state   state file\n"            + "       Load state file.";
     }
 
     public static void load() {
-        // -jpx
-        for (URI uri : getURIOptionValues("jpx")) {
-            JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(), uri));
-        }
-        // -jpip
-        for (URI uri : getJPIPOptionValues()) {
+        // -load
+        for (URI uri : getURIOptionValues("load")) {
             JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(), uri));
         }
         // -request: works only for default server
@@ -49,29 +46,16 @@ public class CommandLine {
         for (String opt : opts) {
             try {
                 URI uri = new URI(opt);
-                if (uri.getScheme() == null) {
+                String scheme = uri.getScheme();
+                if ("jpip".equals(scheme) || "http".equals(scheme) || "https".equals(scheme) || "file".equals(scheme))
+                    uris.add(uri);
+                else {
                     File f = new File(opt).getAbsoluteFile();
                     if (f.canRead()) {
                         uris.add(f.toURI());
                     } else
                         Log.error("File not found: " + opt);
-                } else
-                    uris.add(uri);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
-        return uris;
-    }
-
-    private static List<URI> getJPIPOptionValues() {
-        List<String> opts = getOptionValues("jpip");
-        LinkedList<URI> uris = new LinkedList<>();
-        for (String opt : opts) {
-            try {
-                URI uri = new URI(opt);
-                if ("jpip".equals(uri.getScheme()))
-                    uris.add(uri);
+                }
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
