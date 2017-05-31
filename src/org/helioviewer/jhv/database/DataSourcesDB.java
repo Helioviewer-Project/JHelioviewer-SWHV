@@ -16,8 +16,7 @@ public class DataSourcesDB {
 
     private static final DataSourcesDB instance = new DataSourcesDB();
 
-    public static DataSourcesDB getSingletonInstance() {
-        return instance;
+    public static void init() {
     }
 
     private static Connection connection;

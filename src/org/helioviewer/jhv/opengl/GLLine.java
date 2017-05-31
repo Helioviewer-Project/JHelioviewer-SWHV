@@ -86,7 +86,7 @@ public class GLLine {
     private IntBuffer gen_indices(int plen) {
         IntBuffer indicesBuffer = BufferUtils.newIntBuffer(6 * plen);
         for (int j = 0; j < 2 * plen - 3; j = j + 2) {
-            indicesBuffer.put(j + 0);
+            indicesBuffer.put(j);
             indicesBuffer.put(j + 1);
             indicesBuffer.put(j + 2);
             indicesBuffer.put(j + 2);
