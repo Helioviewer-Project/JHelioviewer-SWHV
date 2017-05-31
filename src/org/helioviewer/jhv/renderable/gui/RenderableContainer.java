@@ -240,12 +240,17 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
         JSONArray ja = new JSONArray();
         for (Renderable renderable : renderables) {
-            if (renderable instanceof ImageLayer && ((ImageLayer) renderable).isActiveImageLayer())
-                ja.put(renderable2json(renderable, true));
-            else
+            if (!(renderable instanceof ImageLayer))
                 ja.put(renderable2json(renderable, false));
         }
         main.put("renderables", ja);
+
+        JSONArray ji = new JSONArray();
+        for (Renderable renderable : renderables) {
+            if (renderable instanceof ImageLayer)
+                ji.put(renderable2json(renderable, ((ImageLayer) renderable).isActiveImageLayer()));
+        }
+        main.put("imageLayers", ji);
 
         saveTimelineScene(main);
         JSONObject plugins = new JSONObject();
@@ -259,7 +264,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     private JSONObject renderable2json(Renderable renderable, boolean master) {
-        JSONObject jo = new JSONObject().put("className", renderable.getClass().getName());
+        JSONObject jo = new JSONObject().put("className", renderable.getClass().getName()).put("name", renderable.getName());
         JSONObject dataObject = new JSONObject();
         renderable.serialize(dataObject);
         jo.put("data", dataObject);
@@ -275,7 +280,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         JSONArray ja = new JSONArray();
         List<TimelineRenderable> lds = Timelines.getModel().getAllLineDataSelectorElements();
         for (TimelineRenderable renderable : lds) {
-            JSONObject jo = new JSONObject().put("className", renderable.getClass().getName());
+            JSONObject jo = new JSONObject().put("className", renderable.getClass().getName()).put("name", renderable.getName());
             JSONObject dataObject = new JSONObject();
             renderable.serialize(dataObject);
             jo.put("data", dataObject);
