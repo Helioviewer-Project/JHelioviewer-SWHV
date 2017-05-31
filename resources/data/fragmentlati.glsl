@@ -1,11 +1,6 @@
-void get_lati_texcoord(float ln, float lt, float cr, const in vec4 rect, out vec2 texcoord) {
-    vec2 normalizedScreenpos = (gl_FragCoord.xy - viewportOffset) / viewport - .5;
-    normalizedScreenpos *= 2. * vec2(viewport.y / viewport.x, 1.);
-    vec4 scrpos = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) + .5;
-    clamp_texcoord(scrpos.xy);
-
+void get_lati_texcoord(const float ln, const float lt, const float cr, const vec4 scrpos, const vec4 rect, out vec2 texcoord) {
     float theta = scrpos.y * PI;
-    float phi = ln + scrpos.x * TWOPI;
+    float phi = PI + ln + scrpos.x * TWOPI;
 
     vec3 xcart;
     xcart.x = sin(theta) * cos(phi);
@@ -41,13 +36,15 @@ void main(void) {
         discard;
     vec4 color;
     vec2 texcoord;
-    get_lati_texcoord(hgln, hglt, crota, rect, texcoord);
+
+    vec4 scrpos = getScrPos();
+    get_lati_texcoord(hgln, hglt, crota, scrpos, rect, texcoord);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, 1);
     } else {
         vec2 difftexcoord;
         float difftexcoord_radius;
-        get_lati_texcoord(hglnDiff, hgltDiff, crotaDiff, differencerect, difftexcoord);
+        get_lati_texcoord(hglnDiff, hgltDiff, crotaDiff, scrpos, differencerect, difftexcoord);
         color = getColor(texcoord, difftexcoord, 1);
     }
     gl_FragColor = color;

@@ -81,11 +81,11 @@ void clamp_texcoord(vec2 texcoord) {
 }
 
 vec3 rotate_vector_inverse(vec4 quat, vec3 vec) {
-    return vec + 2.0 * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
+    return vec + 2. * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
 }
 
 vec3 rotate_vector(vec4 quat, vec3 vec) {
-    return vec + 2.0 * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
+    return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
 }
 
 float intersectPlane(vec4 vecin) {
@@ -100,4 +100,11 @@ float intersectPlanediff(vec4 vecin) {
     if (altnormal.z < 0.)
         discard;
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
+}
+
+vec4 getScrPos() {
+    vec2 normalizedScreenpos = 2. * vec2(viewport.y / viewport.x, 1.) * ((gl_FragCoord.xy - viewportOffset) / viewport - .5);
+    vec4 scrpos = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) + .5;
+    clamp_texcoord(scrpos.xy);
+    return scrpos;
 }
