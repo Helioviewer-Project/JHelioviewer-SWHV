@@ -1,4 +1,4 @@
-void get_lati_texcoord(float ln, float lt, float cr, const in vec4 rect, out vec2 texcoord, out float radius) {
+void get_lati_texcoord(float ln, float lt, float cr, const in vec4 rect, out vec2 texcoord) {
     vec2 normalizedScreenpos = (gl_FragCoord.xy - viewportOffset) / viewport - .5;
     normalizedScreenpos *= 2. * vec2(viewport.y / viewport.x, 1.);
     vec4 scrpos = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) + .5;
@@ -6,8 +6,6 @@ void get_lati_texcoord(float ln, float lt, float cr, const in vec4 rect, out vec
 
     float theta = scrpos.y * PI;
     float phi = PI + ln + scrpos.x * TWOPI;
-    while (phi > TWOPI)
-        phi -= TWOPI;
 
     vec3 xcart;
     xcart.x = sin(theta) * cos(phi);
@@ -36,10 +34,6 @@ void get_lati_texcoord(float ln, float lt, float cr, const in vec4 rect, out vec
         discard;
     texcoord = vec2(rect.w * (xcartrot.y - rect.x), rect.w * (xcartrot.z - rect.y));
     clamp_texcoord(texcoord);
-
-//    float f = xcartrot.z * xcartrot.z + xcartrot.y * xcartrot.y;
-//    radius = f * f;
-    radius = 1.;
 }
 
 void main(void) {
@@ -47,15 +41,14 @@ void main(void) {
         discard;
     vec4 color;
     vec2 texcoord;
-    float texcoord_radius;
-    get_lati_texcoord(hgln, hglt, crota, rect, texcoord, texcoord_radius);
+    get_lati_texcoord(hgln, hglt, crota, rect, texcoord);
     if (isdifference == NODIFFERENCE) {
-        color = getColor(texcoord, texcoord, texcoord_radius);
+        color = getColor(texcoord, texcoord, 1);
     } else {
         vec2 difftexcoord;
         float difftexcoord_radius;
-        get_lati_texcoord(hglnDiff, hgltDiff, crotaDiff, differencerect, difftexcoord, difftexcoord_radius);
-        color = getColor(texcoord, difftexcoord, texcoord_radius);
+        get_lati_texcoord(hglnDiff, hgltDiff, crotaDiff, differencerect, difftexcoord);
+        color = getColor(texcoord, difftexcoord, 1);
     }
     gl_FragColor = color;
 }
