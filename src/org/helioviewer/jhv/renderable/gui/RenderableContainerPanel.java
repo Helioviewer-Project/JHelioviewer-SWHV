@@ -60,6 +60,8 @@ public class RenderableContainerPanel extends JPanel {
     private final RenderableContainerTable grid;
     private final JPanel optionsPanelWrapper;
 
+    static JCheckBox multiview;
+
     public void lazyRepaint() {
         grid.lazyRepaint();
     }
@@ -143,9 +145,9 @@ public class RenderableContainerPanel extends JPanel {
             renderableContainer.refreshTable();
         });
 
-        JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
+        multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
-        multiview.addActionListener(e -> {
+        multiview.addItemListener(e -> {
             Displayer.multiview = multiview.isSelected();
             Layers.arrangeMultiView(Displayer.multiview);
         });
