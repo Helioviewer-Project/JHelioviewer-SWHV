@@ -16,9 +16,13 @@ uniform vec4 differencerect;
 uniform sampler1D lut;
 uniform vec3 brightness;
 uniform vec4 color;
+
 uniform float hgln;
 uniform float hglt;
+uniform float hglnDiff;
+uniform float hgltDiff;
 uniform float crota;
+uniform float crotaDiff;
 
 uniform float blurKernel[FSIZE * FSIZE];
 uniform float offset[FSIZE];

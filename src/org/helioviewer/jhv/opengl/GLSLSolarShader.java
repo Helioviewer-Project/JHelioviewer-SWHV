@@ -32,13 +32,16 @@ public class GLSLSolarShader extends GLSLShader {
     private int isDiffRef;
     private int isDiscRef;
 
-    private int sharpenRef;
     private int hgltRef;
     private int hglnRef;
+    private int hgltDiffRef;
+    private int hglnDiffRef;
     private int crotaRef;
+    private int crotaDiffRef;
 
     private int brightRef;
     private int colorRef;
+    private int sharpenRef;
     private int cutOffRadiusRef;
     private int cutOffDirectionRef;
     private int cutOffValueRef;
@@ -57,17 +60,21 @@ public class GLSLSolarShader extends GLSLShader {
     private final int[] isDiff = new int[1];
     private final int[] isDisc = new int[1];
 
-    private final float[] sharpen = new float[3];
     private final float[] hglt = new float[1];
     private final float[] hgln = new float[1];
+    private final float[] crota = new float[1];
+    private final float[] hgltDiff = new float[1];
+    private final float[] hglnDiff = new float[1];
+    private final float[] crotaDiff = new float[1];
+
     private final float[] bright = new float[3];
     private final float[] color = new float[4];
+    private final float[] sharpen = new float[3];
     private final float[] cutOffRadius = new float[2];
     private final float[] cutOffDirection = new float[3];
     private final float[] cutOffValue = new float[1];
     private final float[] polarRadii = new float[2];
     private final int[] enhanced = new int[1];
-    private final float[] crota = new float[1];
 
     private final float[] rect = new float[4];
     private final float[] diffRect = new float[4];
@@ -93,6 +100,10 @@ public class GLSLSolarShader extends GLSLShader {
         hgltRef = gl.glGetUniformLocation(progID, "hglt");
         hglnRef = gl.glGetUniformLocation(progID, "hgln");
         crotaRef = gl.glGetUniformLocation(progID, "crota");
+        hgltDiffRef = gl.glGetUniformLocation(progID, "hgltDiff");
+        hglnDiffRef = gl.glGetUniformLocation(progID, "hglnDiff");
+        crotaDiffRef = gl.glGetUniformLocation(progID, "crotaDiff");
+
         polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
 
         sharpenRef = gl.glGetUniformLocation(progID, "sharpen");
@@ -224,22 +235,28 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(cutOffDirectionRef, 1, cutOffDirection, 0);
     }
 
-    public void bindAngles(GL2 gl, Position.L viewpointL) {
+    public void bindAngles(GL2 gl, Position.L viewpointL, double _crota) {
         hglt[0] = (float) viewpointL.lat;
         hgln[0] = (float) ((viewpointL.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hgltRef, 1, hglt, 0);
         gl.glUniform1fv(hglnRef, 1, hgln, 0);
+        crota[0] = (float) _crota;
+        gl.glUniform1fv(crotaRef, 1, crota, 0);
+    }
+
+    public void bindAnglesDiff(GL2 gl, Position.L viewpointL, double _crota) {
+        hgltDiff[0] = (float) viewpointL.lat;
+        hglnDiff[0] = (float) ((viewpointL.lon + 2. * Math.PI) % (2. * Math.PI));
+        gl.glUniform1fv(hgltDiffRef, 1, hgltDiff, 0);
+        gl.glUniform1fv(hglnDiffRef, 1, hglnDiff, 0);
+        crotaDiff[0] = (float) _crota;
+        gl.glUniform1fv(crotaDiffRef, 1, crotaDiff, 0);
     }
 
     public void bindPolarRadii(GL2 gl, double start, double stop) {
         polarRadii[0] = (float) start;
         polarRadii[1] = (float) stop;
         gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
-    }
-
-    public void bindCROTA(GL2 gl, double _crota) {
-        crota[0] = (float) _crota;
-        gl.glUniform1fv(crotaRef, 1, crota, 0);
     }
 
     @Override
