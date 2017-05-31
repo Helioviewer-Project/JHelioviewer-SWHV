@@ -15,10 +15,7 @@ public class FITSView extends AbstractView {
 
     public FITSView(URI _uri) throws Exception {
         uri = _uri;
-        if (!uri.getScheme().equalsIgnoreCase("file"))
-            throw new Exception("FITS does not support the " + uri.getScheme() + " protocol");
-
-        FITSImage fits = new FITSImage(uri.toURL().toString());
+        FITSImage fits = new FITSImage(uri);
         if (fits.imageData == null)
             throw new Exception("Could not read FITS: " + uri);
 

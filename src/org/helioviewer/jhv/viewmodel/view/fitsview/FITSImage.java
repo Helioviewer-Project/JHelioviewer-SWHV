@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.viewmodel.view.fitsview;
 
+import java.io.BufferedInputStream;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
@@ -11,6 +13,7 @@ import nom.tam.fits.ImageHDU;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
+import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.Single8ImageData;
@@ -18,13 +21,14 @@ import org.helioviewer.jhv.viewmodel.imagedata.Single16ImageData;
 
 class FITSImage {
 
+    private static final int BUFSIZ = 65536;
     private static final double GAMMA = 1 / 2.2;
 
     String xml;
     ImageData imageData;
 
-    public FITSImage(String url) throws Exception {
-        try (Fits f = new Fits(url)) {
+    public FITSImage(URI uri) throws Exception {
+        try (Fits f = new Fits(new BufferedInputStream(new DownloadStream(uri.toURL()).getInput(), BUFSIZ))) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {
