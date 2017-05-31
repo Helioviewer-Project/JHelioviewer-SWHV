@@ -287,7 +287,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             jo.put("visibility", renderable.isVisible());
             ja.put(jo);
         }
-        main.put("timelinerenderables", ja);
+        main.put("timelines", ja);
     }
 
     private Object json2Object(JSONObject json) {
@@ -308,7 +308,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     private void loadTimelines(JSONObject data) {
         ArrayList<TimelineRenderable> newlist = new ArrayList<>();
 
-        JSONArray rja = data.getJSONArray("timelinerenderables");
+        JSONArray rja = data.getJSONArray("timelines");
         for (Object o : rja) {
             if (o instanceof JSONObject) {
                 JSONObject jo = (JSONObject) o;

@@ -71,7 +71,7 @@ class FITSImage {
                 }
             }
 
-            PixScale scale = new LinScale(min, max);
+            PixScale scale = new PowScale(min, max, GAMMA);
             short[] data = new short[width * height];
             for (int j = 0; j < height; j++) {
                 for (int i = 0; i < width; i++) {
@@ -94,7 +94,7 @@ class FITSImage {
                 }
             }
 
-            PixScale scale = new LinScale(min, max);
+            PixScale scale = new PowScale(min, max, GAMMA);
             short[] data = new short[width * height];
             for (int j = 0; j < height; j++) {
                 for (int i = 0; i < width; i++) {
@@ -121,10 +121,10 @@ class FITSImage {
             short[] data = new short[width * height];
             for (int j = 0; j < height; j++) {
                 for (int i = 0; i < width; i++) {
-                    data[width * (height - 1 - j) + i] = (short) (scale * (data2D[j][i] - min));
+                    data[width * (height - 1 - j) + i] = (short) (scale * Math.pow(data2D[j][i] - min, GAMMA));
                 }
             }
-            imageData = new Single16ImageData(width, height, GAMMA, ShortBuffer.wrap(data));
+            imageData = new Single16ImageData(width, height, 1, ShortBuffer.wrap(data));
         }
     }
 

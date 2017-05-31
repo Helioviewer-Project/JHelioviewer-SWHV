@@ -39,7 +39,7 @@ uniform vec2 cutOffRadius;
 uniform vec2 polarRadii;
 
 float fetch(sampler2D tex, vec2 coord, vec3 bright) {
-    return pow(texture2D(tex, coord).r, bright.z) * bright.y + bright.x;
+    return /*pow(texture2D(tex, coord).r, bright.z)*/ texture2D(tex, coord).r * bright.y + bright.x;
 }
 
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
