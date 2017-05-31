@@ -17,7 +17,7 @@ import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
+// import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -334,7 +334,30 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         ArrayList<Renderable> newlist = new ArrayList<>();
         Renderable masterRenderable = null;
 
+        removedRenderables.addAll(renderables);
+        renderables = new ArrayList<>();
+
         JSONArray rja = data.getJSONArray("renderables");
+        for (Object o : rja) {
+            if (o instanceof JSONObject) {
+                JSONObject jo = (JSONObject) o;
+                try {
+                    Object obj = json2Object(jo);
+                    if (obj instanceof Renderable) {
+                        Renderable renderable = (Renderable) obj;
+                        addRenderable(renderable);
+                        JSONArray va = jo.optJSONArray("visibility");
+                        if (va == null)
+                            va = new JSONArray(new double[] { 1, 0, 0, 0 });
+                        renderable.deserializeVisibility(va);
+                    }
+                } catch (Exception e) { // don't stop for a broken one
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        rja = data.getJSONArray("imageLayers");
         for (Object o : rja) {
             if (o instanceof JSONObject) {
                 JSONObject jo = (JSONObject) o;
@@ -355,8 +378,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 }
             }
         }
-        removedRenderables.addAll(renderables);
-        renderables = new ArrayList<>();
 
         LoadState loadStateTask = new LoadState(newlist, masterRenderable, JHVDate.optional(data.optString("time")));
         JHVGlobals.getExecutorService().execute(loadStateTask);
@@ -408,7 +429,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         protected void done() {
             if (!isCancelled()) {
                 for (Renderable renderable : newlist) {
-                    addRenderable(renderable);
+                    addBeforeRenderable(renderable);
                     if (renderable instanceof ImageLayer) {
                         ImageLayer layer = (ImageLayer) renderable;
                         layer.unload(); // prune failed layers
@@ -417,7 +438,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     }
                 }
                 Layers.setTime(time);
-                CameraHelper.zoomToFit(Displayer.getMiniCamera()); // funky
+                // CameraHelper.zoomToFit(Displayer.getMiniCamera()); // funky
             }
         }
     }
