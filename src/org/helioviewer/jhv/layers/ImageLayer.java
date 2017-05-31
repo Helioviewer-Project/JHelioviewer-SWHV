@@ -220,9 +220,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         shader.bind(gl);
         {
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
-
-            shader.setViewport(vp.x, vp.yGL, vp.width, vp.height);
-            shader.filter(gl);
+            shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
 
             camera.push(imageData.getViewpoint());
 
@@ -242,8 +240,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             } else if (diffMode == DifferenceMode.Running) {
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getCenterRotation()));
             }
-            shader.bindAngles(gl, imageData.getMetaData().getViewpointL());
-            shader.setPolarRadii(gl, scale.getYstart(), scale.getYstop());
+            shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
             camera.pop();
 
             positionVBO.bindArray(gl);

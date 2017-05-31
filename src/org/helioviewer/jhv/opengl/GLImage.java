@@ -58,19 +58,16 @@ public class GLImage {
     }
 
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
-        applyRegion(imageData, prevImageData, baseImageData, shader);
+        applyRegion(gl, imageData, prevImageData, baseImageData, shader);
 
-        shader.setBrightness(brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()), (float) imageData.getGamma());
-        shader.setColor(red, green, blue, opacity);
-        shader.setEnhanced(enhanced);
+        shader.bindBrightness(gl, brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()), (float) imageData.getGamma());
+        shader.bindColor(gl, red, green, blue, opacity);
+        shader.bindEnhanced(gl, enhanced);
+        shader.bindSharpen(gl, sharpen, 1f / imageData.getWidth(), 1f / imageData.getHeight(), 1f);
 
-        shader.setIsDifference(diffMode.ordinal());
+        shader.bindIsDifference(gl, diffMode.ordinal());
         if (diffMode != DifferenceMode.None)
             diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
-
-        int w = imageData.getWidth();
-        int h = imageData.getHeight();
-        shader.setSharpen(sharpen, 1f / w, 1f / h, 1f);
 
         applyLUT(gl);
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
@@ -80,9 +77,9 @@ public class GLImage {
         return diffMode == DifferenceMode.Base;
     }
 
-    private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
+    private void applyRegion(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         Region r = imageData.getRegion();
-        shader.changeRect(r.llx, r.lly, 1. / r.width, 1. / r.height);
+        shader.bindRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
 
         Region diffRegion = null;
         if (prevImageData != null && !isBaseDiff()) {
@@ -90,21 +87,19 @@ public class GLImage {
         } else if (baseImageData != null && isBaseDiff()) {
             diffRegion = baseImageData.getRegion();
         }
+        if (diffRegion != null)
+            shader.bindDifferenceRect(gl, diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
 
-        if (diffRegion != null) {
-            shader.setDifferenceRect(diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
-        }
-
-        MetaData metadata = imageData.getMetaData();
-        shader.setCROTA(metadata.getCROTA());
-        shader.setCutOffRadius(metadata.getInnerCutOffRadius(), Displayer.getShowCorona() ? metadata.getOuterCutOffRadius() : 1);
-        if (metadata.getCutOffValue() > 0) {
-            Vec3 cdir = metadata.getCutOffDirection();
-            shader.setCutOffDirection(cdir.x, cdir.y, 0);
-            shader.setCutOffValue(metadata.getCutOffValue());
-        } else {
-            shader.setCutOffValue(-1);
-        }
+        MetaData metaData = imageData.getMetaData();
+        shader.bindAngles(gl, metaData.getViewpointL());
+        shader.bindCROTA(gl, metaData.getCROTA());
+        shader.bindCutOffRadius(gl, metaData.getInnerCutOffRadius(), Displayer.getShowCorona() ? metaData.getOuterCutOffRadius() : 1);
+        if (metaData.getCutOffValue() > 0) {
+            Vec3 cdir = metaData.getCutOffDirection();
+            shader.bindCutOffDirection(gl, cdir.x, cdir.y, 0);
+            shader.bindCutOffValue(gl, metaData.getCutOffValue());
+        } else
+            shader.bindCutOffValue(gl, -1);
     }
 
     private void applyLUT(GL2 gl) {

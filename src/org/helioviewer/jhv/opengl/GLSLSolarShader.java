@@ -124,7 +124,6 @@ public class GLSLSolarShader extends GLSLShader {
         setTextureUnit(gl, "lut", 1);
         setTextureUnit(gl, "differenceImage", 2);
         unbind(gl);
-        setCutOffValue(-1);
     }
 
     public static void dispose(GL2 gl) {
@@ -146,37 +145,20 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
     }
 
-    public void changeRect(double xOffset, double yOffset, double xScale, double yScale) {
+    public void bindRect(GL2 gl, double xOffset, double yOffset, double xScale, double yScale) {
         rectVertex[0] = (float) xOffset;
         rectVertex[1] = (float) yOffset;
         rectVertex[2] = (float) xScale;
         rectVertex[3] = (float) yScale;
+        gl.glUniform4fv(rectRef, 1, rectVertex, 0);
     }
 
-    public void setDifferenceRect(double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
+    public void bindDifferenceRect(GL2 gl, double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
         differencerect[0] = (float) differenceXOffset;
         differencerect[1] = (float) differenceYOffset;
         differencerect[2] = (float) differenceXScale;
         differencerect[3] = (float) differenceYScale;
-    }
-
-    public void filter(GL2 gl) {
-        gl.glUniform1iv(isDifferenceValueRef, 1, isDifferenceValue, 0);
-        gl.glUniform1fv(hgltParamRef, 1, hgltParamFloat, 0);
-        gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
-
-        gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
-        gl.glUniform3fv(brightParamRef, 1, brightParamFloat, 0);
-        gl.glUniform4fv(colorParamRef, 1, colorParamFloat, 0);
-        gl.glUniform3fv(sharpenParamRef, 1, sharpenParamFloat, 0);
-        gl.glUniform4fv(rectRef, 1, rectVertex, 0);
         gl.glUniform4fv(differenceRectRef, 1, differencerect, 0);
-        gl.glUniform2fv(viewportRef, 1, viewport, 0);
-        gl.glUniform2fv(viewportOffsetRef, 1, viewportOffset, 0);
-        gl.glUniform2fv(cutOffRadiusRef, 1, cutOffRadiusFloat, 0);
-        gl.glUniform3fv(cutOffDirectionRef, 1, cutOffDirectionFloat, 0);
-        gl.glUniform1fv(cutOffValueRef, 1, cutOffValueFloat, 0);
-        gl.glUniform1fv(crotaRef, 1, crotaFloat, 0);
     }
 
     public void bindIsDisc(GL2 gl, int isDisc) {
@@ -184,53 +166,63 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1iv(isDiscRef, 1, isDiscValue, 0);
     }
 
-    public void setColor(float red, float green, float blue, float alpha) {
+    public void bindColor(GL2 gl, float red, float green, float blue, float alpha) {
         colorParamFloat[0] = red;
         colorParamFloat[1] = green;
         colorParamFloat[2] = blue;
         colorParamFloat[3] = alpha;
+        gl.glUniform4fv(colorParamRef, 1, colorParamFloat, 0);
     }
 
-    public void setBrightness(float offset, float scale, float gamma) {
+    public void bindBrightness(GL2 gl, float offset, float scale, float gamma) {
         brightParamFloat[0] = offset;
         brightParamFloat[1] = scale;
         brightParamFloat[2] = gamma;
+        gl.glUniform3fv(brightParamRef, 1, brightParamFloat, 0);
     }
 
-    public void setSharpen(float weighting, float pixelWidth, float pixelHeight, float span) {
+    public void bindSharpen(GL2 gl, float weighting, float pixelWidth, float pixelHeight, float span) {
         sharpenParamFloat[0] = pixelWidth * span;
         sharpenParamFloat[1] = pixelHeight * span;
         sharpenParamFloat[2] = -weighting; // used for mix
+        gl.glUniform3fv(sharpenParamRef, 1, sharpenParamFloat, 0);
     }
 
-    public void setEnhanced(boolean _enhanced) {
+    public void bindEnhanced(GL2 gl, boolean _enhanced) {
         enhanced[0] = _enhanced ? 1 : 0;
+        gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
     }
 
-    public void setIsDifference(int isDifference) {
+    public void bindIsDifference(GL2 gl, int isDifference) {
         isDifferenceValue[0] = isDifference;
+        gl.glUniform1iv(isDifferenceValueRef, 1, isDifferenceValue, 0);
     }
 
-    public void setViewport(float offsetX, float offsetY, float width, float height) {
+    public void bindViewport(GL2 gl, float offsetX, float offsetY, float width, float height) {
         viewportOffset[0] = offsetX;
         viewportOffset[1] = offsetY;
+        gl.glUniform2fv(viewportOffsetRef, 1, viewportOffset, 0);
         viewport[0] = width;
         viewport[1] = height;
+        gl.glUniform2fv(viewportRef, 1, viewport, 0);
     }
 
-    public void setCutOffRadius(double innerCutOffRadius, double outerCutOffRadius) {
+    public void bindCutOffRadius(GL2 gl, double innerCutOffRadius, double outerCutOffRadius) {
         cutOffRadiusFloat[0] = (float) innerCutOffRadius;
         cutOffRadiusFloat[1] = (float) outerCutOffRadius;
+        gl.glUniform2fv(cutOffRadiusRef, 1, cutOffRadiusFloat, 0);
     }
 
-    public void setCutOffValue(double val) {
+    public void bindCutOffValue(GL2 gl, double val) {
         cutOffValueFloat[0] = (float) val;
+        gl.glUniform1fv(cutOffValueRef, 1, cutOffValueFloat, 0);
     }
 
-    public void setCutOffDirection(double x, double y, double z) {
+    public void bindCutOffDirection(GL2 gl, double x, double y, double z) {
         cutOffDirectionFloat[0] = (float) x;
         cutOffDirectionFloat[1] = (float) y;
         cutOffDirectionFloat[2] = (float) z;
+        gl.glUniform3fv(cutOffDirectionRef, 1, cutOffDirectionFloat, 0);
     }
 
     public void bindAngles(GL2 gl, Position.L viewpointL) {
@@ -240,14 +232,15 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
     }
 
-    public void setPolarRadii(GL2 gl, double start, double stop) {
+    public void bindPolarRadii(GL2 gl, double start, double stop) {
         polarRadii[0] = (float) start;
         polarRadii[1] = (float) stop;
         gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
     }
 
-    public void setCROTA(double crota) {
+    public void bindCROTA(GL2 gl, double crota) {
         crotaFloat[0] = (float) crota;
+        gl.glUniform1fv(crotaRef, 1, crotaFloat, 0);
     }
 
     @Override
