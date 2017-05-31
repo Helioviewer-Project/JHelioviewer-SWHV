@@ -5,7 +5,7 @@ void get_lati_texcoord(float ln, float lt, float cr, const in vec4 rect, out vec
     clamp_texcoord(scrpos.xy);
 
     float theta = scrpos.y * PI;
-    float phi =  scrpos.x * TWOPI;
+    float phi = ln + scrpos.x * TWOPI;
 
     vec3 xcart;
     xcart.x = sin(theta) * cos(phi);
