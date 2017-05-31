@@ -17,6 +17,7 @@ import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -404,6 +405,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     }
                 }
                 Layers.setTime(time);
+                CameraHelper.zoomToFit(Displayer.getMiniCamera()); // funky
             }
         }
     }
