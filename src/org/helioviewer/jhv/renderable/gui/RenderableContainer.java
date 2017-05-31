@@ -237,6 +237,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void saveCurrentScene() {
         JSONObject main = new JSONObject();
         main.put("time", Layers.getLastUpdatedTimestamp());
+        main.put("multiview", RenderableContainerPanel.multiview.isSelected());
 
         JSONArray ja = new JSONArray();
         for (Renderable renderable : renderables) {
@@ -386,6 +387,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void loadScene(String stateFile) {
         try {
             JSONObject data = JSONUtils.getJSONFile(stateFile);
+            RenderableContainerPanel.multiview.setSelected(data.optBoolean("multiview", false));
             loadTimelines(data);
             loadRenderables(data);
             JSONObject plugins = data.optJSONObject("plugins");
