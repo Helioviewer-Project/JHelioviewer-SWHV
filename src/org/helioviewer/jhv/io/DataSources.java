@@ -95,7 +95,7 @@ public class DataSources {
             server = "ROB";
         Settings.getSingletonInstance().setProperty("default.server", server);
 
-        DataSourcesDB.getSingletonInstance();
+        DataSourcesDB.init();
         for (String serverName : serverSettings.keySet())
             JHVGlobals.getExecutorService().execute(new DataSourcesTask(serverName));
     }

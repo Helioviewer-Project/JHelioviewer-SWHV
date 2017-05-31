@@ -15,14 +15,6 @@ public class SimpleImageView extends AbstractView {
 
     private final URI uri;
 
-    /**
-     * Constructor which loads the corresponding image from given URI.
-     *
-     * @param _uri
-     *            URI where the source image is located
-     * @throws Exception
-     *            if the image is not readable
-     */
     public SimpleImageView(URI _uri) throws Exception {
         uri = _uri;
 
