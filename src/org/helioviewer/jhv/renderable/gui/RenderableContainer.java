@@ -237,21 +237,16 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void saveCurrentScene() {
         JSONObject main = new JSONObject();
         main.put("time", Layers.getLastUpdatedTimestamp());
+
         JSONArray ja = new JSONArray();
         for (Renderable renderable : renderables) {
-            JSONObject jo = new JSONObject();
-            JSONObject dataObject = new JSONObject();
-            jo.put("data", dataObject);
-            jo.put("className", renderable.getClass().getName());
-            renderable.serialize(dataObject);
-            ja.put(jo);
-            JSONArray va = new JSONArray();
-            renderable.serializeVisibility(va);
-            jo.put("visibility", va);
             if (renderable instanceof ImageLayer && ((ImageLayer) renderable).isActiveImageLayer())
-                jo.put("master", true);
+                ja.put(renderable2json(renderable, true));
+            else
+                ja.put(renderable2json(renderable, false));
         }
         main.put("renderables", ja);
+
         saveTimelineScene(main);
         JSONObject plugins = new JSONObject();
         PluginManager.getSingletonInstance().saveState(plugins);
@@ -263,15 +258,27 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
     }
 
+    private JSONObject renderable2json(Renderable renderable, boolean master) {
+        JSONObject jo = new JSONObject().put("className", renderable.getClass().getName());
+        JSONObject dataObject = new JSONObject();
+        renderable.serialize(dataObject);
+        jo.put("data", dataObject);
+        JSONArray va = new JSONArray();
+        renderable.serializeVisibility(va);
+        jo.put("visibility", va);
+        if (master)
+            jo.put("master", true);
+        return jo;
+    }
+
     public void saveTimelineScene(JSONObject main) {
         JSONArray ja = new JSONArray();
         List<TimelineRenderable> lds = Timelines.getModel().getAllLineDataSelectorElements();
         for (TimelineRenderable renderable : lds) {
-            JSONObject jo = new JSONObject();
+            JSONObject jo = new JSONObject().put("className", renderable.getClass().getName());
             JSONObject dataObject = new JSONObject();
-            jo.put("data", dataObject);
-            jo.put("className", renderable.getClass().getName());
             renderable.serialize(dataObject);
+            jo.put("data", dataObject);
             jo.put("visibility", renderable.isVisible());
             ja.put(jo);
         }
