@@ -1,7 +1,4 @@
-void get_polar_texcoord(float cr, const vec4 rect, out vec2 texcoord, out float radius) {
-    vec2 normalizedScreenpos = 2. * (((gl_FragCoord.xy - viewportOffset) / viewport) - .5) * vec2(viewport.y / viewport.x, 1.);
-    vec4 scrpos = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) + .5;
-    clamp_texcoord(scrpos.xy);
+void get_polar_texcoord(const float cr, const vec4 scrpos, const vec4 rect, out vec2 texcoord, out float radius) {
     float theta = -(scrpos.x * TWOPI + PI / 2. - cr);
     float start = polarRadii.x;
     float end = polarRadii.y;
@@ -27,16 +24,18 @@ void get_polar_texcoord(float cr, const vec4 rect, out vec2 texcoord, out float 
 }
 
 void main(void) {
+    vec4 color;
     vec2 texcoord;
     float radius;
-    get_polar_texcoord(crota, rect, texcoord, radius);
-    vec4 color;
+
+    vec4 scrpos = getScrPos();
+    get_polar_texcoord(crota, scrpos, rect, texcoord, radius);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, radius);
     } else {
         vec2 difftexcoord;
         float diffradius;
-        get_polar_texcoord(crotaDiff, differencerect, difftexcoord, diffradius);
+        get_polar_texcoord(crotaDiff, scrpos, differencerect, difftexcoord, diffradius);
         color = getColor(texcoord, difftexcoord, radius);
     }
     gl_FragColor = color;
