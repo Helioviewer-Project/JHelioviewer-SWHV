@@ -65,10 +65,6 @@ public class GLImage {
         shader.bindEnhanced(gl, enhanced);
         shader.bindSharpen(gl, sharpen, 1f / imageData.getWidth(), 1f / imageData.getHeight(), 1f);
 
-        shader.bindIsDifference(gl, diffMode.ordinal());
-        if (diffMode != DifferenceMode.None)
-            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
-
         applyLUT(gl);
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
@@ -81,6 +77,10 @@ public class GLImage {
         Region r = imageData.getRegion();
         shader.bindRect(gl, r.llx, r.lly, 1. / r.width, 1. / r.height);
 
+        shader.bindIsDiff(gl, diffMode.ordinal());
+        if (diffMode != DifferenceMode.None)
+            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
+
         Region diffRegion = null;
         if (prevImageData != null && !isBaseDiff()) {
             diffRegion = prevImageData.getRegion();
@@ -88,7 +88,7 @@ public class GLImage {
             diffRegion = baseImageData.getRegion();
         }
         if (diffRegion != null)
-            shader.bindDifferenceRect(gl, diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
+            shader.bindDiffRect(gl, diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
 
         MetaData metaData = imageData.getMetaData();
         shader.bindAngles(gl, metaData.getViewpointL());
