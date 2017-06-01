@@ -48,14 +48,20 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         }
     }
 
+    private static String formatArcsec(int p) {
+        if (Math.abs(p) > 1800)
+            return String.format("%+.2f\u00B0", p / 3600.);
+        else
+            return String.format("%+5d\u2033", p);
+    }
+
     private static String formatOrtho(Vec2 coord, double r, int px, int py) {
         String coordStr;
         if (coord == null || Double.isNaN(coord.x) || Double.isNaN(coord.y))
             coordStr = nullCoordStr;
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-
-        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : (%+5d\u2033,%+5d\u2033)", coordStr, r, px, py);
+        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %.2fR\u2299 | (x,y) : ", coordStr, r) + '(' + formatArcsec(px) + ',' + formatArcsec(py) + ')';
     }
 
     @Override
