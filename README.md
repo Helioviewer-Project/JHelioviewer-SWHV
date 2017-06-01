@@ -12,18 +12,38 @@ About
 -----
 
 JHelioviewer is a visualization tool for solar physics data based on the JPEG
-2000 image compression standard. JPEG 2000 offers many useful new features and
-has the potential to revolutionize the way high-resolution image data are
-disseminated and analyzed. Using JPEG 2000, we can serve data to a client in
-highly compressed, progressive in quality, and region-of-interest based form. These
-features make it possible to minimize the data transmitted while maximizing the
-use of the data that is transmitted. This is especially relevant for solar
-physics since NASA's Solar Dynamics Observatory (http://sdo.gsfc.nasa.gov/) is
-providing more than a terabyte of image data per day. Providing efficient access
-to such large data volumes at both high spatial and high time resolution is of
-paramount importance to support scientific discovery.
+2000 image compression standard and part of the open source ESA/NASA Helioviewer
+Project (https://github.com/Helioviewer-Project/).
+
+JPEG 2000 offers many useful features and has the potential to revolutionize the
+way high-resolution image data are disseminated and analyzed. Using JPEG 2000, data
+can be served to a client in highly compressed, progressive in quality, and
+region-of-interest based form. These features make it possible to minimize the data
+transmitted while maximizing the use of the data that is transmitted.
+
+Solar observatories are providing the world-wide community with a wealth of data,
+covering wide time ranges (e.g. Solar and Heliospheric Observatory, SOHO), multiple
+viewpoints (Solar TErrestrial RElations Observatory, STEREO), and returning large
+amounts of data (Solar Dynamics Observatory, SDO). In particular, the large volume
+of SDO data presents challenges; the data are available only from a few repositories,
+and full-disk, full-cadence data for reasonable durations of scientific interest are
+difficult to download, due to their size and the download rates available to most
+users. From a scientist's perspective this poses three problems: accessing, browsing,
+and finding interesting data as efficiently as possible.
+
+With JHelioviewer, users can visualise the Sun for any time period between September
+1991 and today; they can perform basic image processing in real time, track features
+on the Sun, and interactively overlay magnetic field extrapolations. The software
+integrates solar event data and a timeline display. Once an interesting event has
+been identified, science quality data can be accessed for in-depth analysis. As a
+first step towards supporting science planning of the upcoming Solar Orbiter mission,
+JHelioviewer offers a virtual camera model that enables users to set the vantage
+point to the location of a spacecraft or celestial body at any given time.
 
 References:
+
+- JHelioviewer paper by Mueller et al., Astronomy & Astrophysics, 2017:
+  https://doi.org/10.1051/0004-6361/201730893
 
 - JHelioviewer paper by Mueller et al., Computing Science and Engineering, 2009:
   http://jhelioviewer.org/pub/Mueller+al_CiSE2009.pdf
@@ -63,12 +83,3 @@ Development Information
 
 Some short build and installing instructions can be found in the file INSTALL
 (only contained in the source code).
-
-For more detailed help or further information on the design concept, coding
-guidelines and other development information please visit:
-
-http://wiki.helioviewer.org/wiki/JHelioviewer_Development_Information
-
-It is part of the Helioviewer project wiki:
-
-http://wiki.helioviewer.org/wiki/Main_Page
