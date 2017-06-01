@@ -132,7 +132,7 @@ class FITSImage {
         }
     }
 
-    private static abstract class PixScale {
+    private abstract static class PixScale {
 
         protected static final int MAX_LUT = 1024 * 1024;
         protected short[] lut;

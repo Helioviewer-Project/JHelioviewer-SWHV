@@ -135,7 +135,7 @@ public class GLSLShader {
         gl.glAttachShader(progID, vertexID);
         gl.glAttachShader(progID, fragmentID);
 
-        this.bindAttribs(gl);
+        bindAttribs(gl);
         gl.glLinkProgram(progID);
 
         int[] params = { 0 };

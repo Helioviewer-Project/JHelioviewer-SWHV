@@ -306,7 +306,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         return null;
     }
 
-    private void loadTimelines(JSONObject data) {
+    private static void loadTimelines(JSONObject data) {
         ArrayList<TimelineRenderable> newlist = new ArrayList<>();
 
         JSONArray rja = data.getJSONArray("timelines");
