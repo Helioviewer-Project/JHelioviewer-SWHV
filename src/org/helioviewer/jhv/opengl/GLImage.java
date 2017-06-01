@@ -240,7 +240,7 @@ public class GLImage {
         jo.put("opacity", opacity);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
-        jo.put("enhanced", getEnhanced());
+        jo.put("enhanced", enhanced);
         jo.put("differenceMode", diffMode);
 
         JSONObject colorObject = new JSONObject();

@@ -66,7 +66,7 @@ public class PfssData {
         return lastQuality != qualityReduction || lastFixedColor != fixedColor;
     }
 
-    private double decode(short f) {
+    private static double decode(short f) {
         return (f + 32768.) * (2. / 65535.) - 1.;
     }
 
