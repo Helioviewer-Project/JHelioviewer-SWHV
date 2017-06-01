@@ -83,7 +83,7 @@ public class GLLine {
         }
     }
 
-    private IntBuffer gen_indices(int plen) {
+    private static IntBuffer gen_indices(int plen) {
         IntBuffer indicesBuffer = BufferUtils.newIntBuffer(6 * plen);
         for (int j = 0; j < 2 * plen - 3; j = j + 2) {
             indicesBuffer.put(j);
@@ -97,7 +97,7 @@ public class GLLine {
         return indicesBuffer;
     }
 
-    private void addPoint(FloatBuffer to, FloatBuffer from, int start, int n) {
+    private static void addPoint(FloatBuffer to, FloatBuffer from, int start, int n) {
         for (int i = start; i < start + n; i++) {
             to.put(from.get(i));
         }

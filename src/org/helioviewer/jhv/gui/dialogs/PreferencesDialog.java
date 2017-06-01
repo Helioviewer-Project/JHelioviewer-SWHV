@@ -146,7 +146,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
     private static class DefaultsSelectionPanel extends JPanel {
 
         final JTable grid;
-        private final TableModel model;
+        final TableModel model;
 
         public DefaultsSelectionPanel() {
             super(new BorderLayout());

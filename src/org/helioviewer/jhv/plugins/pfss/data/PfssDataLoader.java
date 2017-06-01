@@ -66,7 +66,7 @@ class PfssDataLoader implements Runnable {
         }
     }
 
-    private PfssData getPfssData(byte[] fitsFile, long time) throws Exception {
+    private static PfssData getPfssData(byte[] fitsFile, long time) throws Exception {
         try (Fits fits = new Fits(new ByteArrayInputStream(fitsFile))) {
             BasicHDU<?> hdus[] = fits.read();
             if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))

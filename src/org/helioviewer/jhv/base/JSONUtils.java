@@ -36,9 +36,9 @@ public class JSONUtils {
 
     public static byte[] compressJSON(JSONObject json) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStreamWriter out = new OutputStreamWriter(new GZIPOutputStream(baos, BUFSIZ), StandardCharsets.UTF_8);
-        json.write(out);
-        out.close();
+        try (OutputStreamWriter out = new OutputStreamWriter(new GZIPOutputStream(baos, BUFSIZ), StandardCharsets.UTF_8)) {
+            json.write(out);
+        }
 
         return baos.toByteArray();
     }

@@ -264,7 +264,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
     }
 
-    private JSONObject renderable2json(Renderable renderable, boolean master) {
+    private static JSONObject renderable2json(Renderable renderable, boolean master) {
         JSONObject jo = new JSONObject().put("className", renderable.getClass().getName()).put("name", renderable.getName());
         JSONObject dataObject = new JSONObject();
         renderable.serialize(dataObject);
@@ -277,7 +277,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         return jo;
     }
 
-    public void saveTimelineScene(JSONObject main) {
+    private static void saveTimelineScene(JSONObject main) {
         JSONArray ja = new JSONArray();
         List<TimelineRenderable> lds = Timelines.getModel().getAllLineDataSelectorElements();
         for (TimelineRenderable renderable : lds) {
@@ -291,7 +291,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         main.put("timelines", ja);
     }
 
-    private Object json2Object(JSONObject json) {
+    private static Object json2Object(JSONObject json) {
         JSONObject jdata = json.optJSONObject("data");
         if (jdata == null)
             return null;

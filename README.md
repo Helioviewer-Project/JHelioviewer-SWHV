@@ -12,7 +12,7 @@ About
 -----
 
 JHelioviewer is a visualization tool for solar physics data based on the JPEG
-2000 image compression standard and part of the open source ESA/NASA Helioviewer
+2000 image compression standard, and part of the open source ESA/NASA Helioviewer
 Project (https://github.com/Helioviewer-Project/).
 
 JPEG 2000 offers many useful features and has the potential to revolutionize the
