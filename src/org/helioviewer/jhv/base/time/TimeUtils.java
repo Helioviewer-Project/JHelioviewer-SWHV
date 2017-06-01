@@ -75,7 +75,7 @@ public class TimeUtils {
     public static class SQLDateTimeFormatValidator implements FormatValidator {
 
         @Override
-        public Optional<String> validate(final String subject) {
+        public Optional<String> validate(String subject) {
             try {
                 long time = parseSQL(subject);
                 if (time < MINIMAL_DATE.milli || time > MAXIMAL_DATE.milli)

@@ -9,8 +9,8 @@ import org.json.JSONObject;
 
 class APIResponse {
 
-    private String err;
-    private String msg;
+    private final String err;
+    private final String msg;
     private URI uri;
     private long[] frames;
 

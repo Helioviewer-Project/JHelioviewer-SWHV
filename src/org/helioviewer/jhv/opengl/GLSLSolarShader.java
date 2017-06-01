@@ -10,12 +10,12 @@ public class GLSLSolarShader extends GLSLShader {
     public static final int positionRef = 0;
 
     private static final float[] blurKernel;
-    private static final float[] offset = new float[] { -1.2004377f, 0, 1.2004377f };
+    private static final float[] offsets = { -1.2004377f, 0, 1.2004377f };
 
     static {
         // float[] v = new float[] { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
         // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
-        float[] v = new float[] { .30613f, 0.38774f, .30613f };
+        float[] v = { .30613f, .38774f, .30613f };
 
         blurKernel = new float[] {
             v[0] * v[0], v[0] * v[1], v[0] * v[2],
@@ -128,7 +128,7 @@ public class GLSLSolarShader extends GLSLShader {
 
         bind(gl);
         gl.glUniform1fv(blurKernelRef, blurKernel.length, blurKernel, 0);
-        gl.glUniform1fv(offsetRef, offset.length, offset, 0);
+        gl.glUniform1fv(offsetRef, offsets.length, offsets, 0);
 
         setTextureUnit(gl, "image", 0);
         setTextureUnit(gl, "lut", 1);

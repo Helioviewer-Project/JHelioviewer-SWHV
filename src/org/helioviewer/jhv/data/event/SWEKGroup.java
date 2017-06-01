@@ -78,9 +78,9 @@ public class SWEKGroup extends SWEKTreeModelElement {
         return parameterList;
     }
 
-    public SWEKParameter getParameter(String name) {
+    public SWEKParameter getParameter(String _name) {
         for (SWEKParameter parameter : parameterList) {
-            if (parameter.getParameterName().equalsIgnoreCase(name)) {
+            if (parameter.getParameterName().equalsIgnoreCase(_name)) {
                 return parameter;
             }
         }

@@ -33,8 +33,8 @@ class JHVLoader {
         kduLibs.add(System.mapLibraryName("kdu_a77R"));
         kduLibs.add(System.mapLibraryName("kdu_jni"));
 
-        final String prefix = "kdulibs";
-        final String suffix = ".lock";
+        String prefix = "kdulibs";
+        String suffix = ".lock";
         // delete all kdulibs directories without a lock file
         FileFilter filter = p -> p.getName().startsWith(prefix) && !p.getName().endsWith(suffix);
         File[] dirs = JHVDirectory.LIBS.getFile().listFiles(filter);

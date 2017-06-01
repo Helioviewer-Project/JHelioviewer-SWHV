@@ -25,7 +25,7 @@ enum HEKEventEnum {
                 return event.eventAbbreviation;
             }
         }
-        return HEKEventEnum.UNKNOWN.eventAbbreviation;
+        return UNKNOWN.eventAbbreviation;
     }
 
 }
