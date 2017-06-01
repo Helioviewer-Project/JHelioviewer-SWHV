@@ -110,12 +110,12 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, D
         double ratioX = availableIntervalWidth / (double) (availableInterval.end - availableInterval.start);
 
         int min = DrawConstants.GRAPH_LEFT_SPACE;
-        if (movieStart >= availableInterval.start && availableInterval.start <= movieStart) {
+        if (movieStart >= availableInterval.start) {
             min += (int) ((movieStart - availableInterval.start) * ratioX);
         }
 
         int max = DrawConstants.GRAPH_LEFT_SPACE + availableIntervalWidth;
-        if (movieEnd >= availableInterval.start && availableInterval.start <= movieEnd) {
+        if (movieEnd >= availableInterval.start) {
             max = DrawConstants.GRAPH_LEFT_SPACE + (int) ((movieEnd - availableInterval.start) * ratioX);
         }
 
