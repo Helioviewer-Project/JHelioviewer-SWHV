@@ -92,7 +92,7 @@ public class PfssData {
                 if (i % PfssSettings.POINTS_PER_LINE == 0) {
                     // start line
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                    BufferUtils.put4f(colors, 0, 0, 0, 0);
+                    colors.put(BufferUtils.colorNull);
 
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     if (fixedColor) {
@@ -121,7 +121,7 @@ public class PfssData {
                     // end line
                     if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
                         BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                        BufferUtils.put4f(colors, 0, 0, 0, 0);
+                        colors.put(BufferUtils.colorNull);
                     }
                 }
             }
