@@ -18,6 +18,8 @@ class RenderableGridMath {
     private static final float[] axisSouthColor = BufferUtils.colorBlue;
     private static final float[] earthLineColor = BufferUtils.colorYellow;
     private static final float[] radialLineColor = BufferUtils.colorWhite;
+    private static final float[] color1 = BufferUtils.colorRed;
+    private static final float[] color2 = BufferUtils.colorGreen;
 
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
@@ -28,6 +30,9 @@ class RenderableGridMath {
     private static final int END_RADIUS = TENS_RADIUS * 10;
     private static final int START_RADIUS = 2;
     private static final float STEP_DEGREES = 15;
+
+    private static final int FLAT_STEPS_THETA = 24;
+    private static final int FLAT_STEPS_RADIAL = 10;
 
     static void initAxes(GL2 gl, GLLine axesLine) {
         int plen = 6;
@@ -162,6 +167,55 @@ class RenderableGridMath {
 
         radialCircleLine.setData(gl, positionBuffer, colorBuffer);
         radialThickLine.setData(gl, positionThick, colorThick);
+    }
+
+    static void initFlatGrid(GL2 gl, GLLine flatLine, double aspect) {
+        float w = (float) aspect;
+        float h = 1;
+
+        int plen = 4 * ((FLAT_STEPS_THETA + 1) + (FLAT_STEPS_RADIAL + 1));
+        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(plen * 3);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
+
+        for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
+            float start = -w / 2 + i * w / FLAT_STEPS_THETA;
+            BufferUtils.put3f(positionBuffer, start, -h / 2, 0);
+            colorBuffer.put(BufferUtils.colorNull);
+
+            BufferUtils.put3f(positionBuffer, start, -h / 2, 0);
+            if (i == FLAT_STEPS_THETA / 2) {
+                colorBuffer.put(color2);
+                colorBuffer.put(color2);
+            } else {
+                colorBuffer.put(color1);
+                colorBuffer.put(color1);
+            }
+            BufferUtils.put3f(positionBuffer, start, h / 2, 0);
+
+            BufferUtils.put3f(positionBuffer, start, h / 2, 0);
+            colorBuffer.put(BufferUtils.colorNull);
+        }
+        for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
+            float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
+            BufferUtils.put3f(positionBuffer, -w / 2, start, 0);
+            colorBuffer.put(BufferUtils.colorNull);
+
+            BufferUtils.put3f(positionBuffer, -w / 2, start, 0);
+            if (i == FLAT_STEPS_RADIAL / 2) {
+                colorBuffer.put(color2);
+                colorBuffer.put(color2);
+            } else {
+                colorBuffer.put(color1);
+                colorBuffer.put(color1);
+            }
+            BufferUtils.put3f(positionBuffer, w / 2, start, 0);
+
+            BufferUtils.put3f(positionBuffer, w / 2, start, 0);
+            colorBuffer.put(BufferUtils.colorNull);
+        }
+        positionBuffer.flip();
+        colorBuffer.flip();
+        flatLine.setData(gl, positionBuffer, colorBuffer);
     }
 
 }
