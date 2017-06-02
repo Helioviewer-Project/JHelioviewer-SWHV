@@ -35,10 +35,6 @@ public class RenderableGrid extends AbstractRenderable {
     private static final double thicknessAxes = 0.003;
 
     private static final float[] R_LABEL_POS = { 2, 8, 24 };
-    private static final float STEP_DEGREES = 15;
-
-    private static final int FLAT_STEPS_THETA = 24;
-    private static final int FLAT_STEPS_RADIAL = 10;
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
@@ -188,17 +184,17 @@ public class RenderableGrid extends AbstractRenderable {
 
         renderer.begin3DRendering();
         {
-            for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
-                if (i == FLAT_STEPS_THETA / 2) {
+            for (int i = 0; i <= RenderableGridMath.FLAT_STEPS_THETA; i++) {
+                if (i == RenderableGridMath.FLAT_STEPS_THETA / 2) {
                     continue;
                 }
-                float start = -w / 2 + i * w / FLAT_STEPS_THETA;
-                String label = formatter2.format(scale.getInterpolatedXValue(1. / FLAT_STEPS_THETA * i));
+                float start = -w / 2 + i * w / RenderableGridMath.FLAT_STEPS_THETA;
+                String label = formatter2.format(scale.getInterpolatedXValue(1. / RenderableGridMath.FLAT_STEPS_THETA * i));
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
-            for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
-                String label = formatter2.format(scale.getInterpolatedYValue(1. / FLAT_STEPS_RADIAL * i));
-                float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
+            for (int i = 0; i <= RenderableGridMath.FLAT_STEPS_RADIAL; i++) {
+                String label = formatter2.format(scale.getInterpolatedYValue(1. / RenderableGridMath.FLAT_STEPS_RADIAL * i));
+                float start = -h / 2 + i * h / RenderableGridMath.FLAT_STEPS_RADIAL;
                 renderer.draw3D(label, 0, start, 0, textScaleFactor);
             }
         }
@@ -254,7 +250,7 @@ public class RenderableGrid extends AbstractRenderable {
 
         radialLabels.clear();
 
-        for (double phi = 0; phi < 360; phi += STEP_DEGREES) {
+        for (double phi = 0; phi < 360; phi += RenderableGridMath.STEP_DEGREES) {
             double angle = -phi * Math.PI / 180.;
             String txt = formatter1.format(phi);
             radialLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size - horizontalAdjustment),

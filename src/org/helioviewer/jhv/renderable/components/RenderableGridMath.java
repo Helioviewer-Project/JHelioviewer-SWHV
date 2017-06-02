@@ -30,10 +30,10 @@ class RenderableGridMath {
     private static final int TENS_RADIUS = 3;
     private static final int END_RADIUS = TENS_RADIUS * 10;
     private static final int START_RADIUS = 2;
-    private static final float STEP_DEGREES = 15;
+    static final float STEP_DEGREES = 15;
 
-    private static final int FLAT_STEPS_THETA = 24;
-    private static final int FLAT_STEPS_RADIAL = 10;
+    static final int FLAT_STEPS_THETA = 24;
+    static final int FLAT_STEPS_RADIAL = 10;
 
     static void initAxes(GL2 gl, GLLine axesLine) {
         int plen = 6;
