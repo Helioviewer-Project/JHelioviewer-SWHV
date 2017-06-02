@@ -38,8 +38,6 @@ public class RenderableGrid extends AbstractRenderable {
     private static final double thicknessEarth = 0.0015;
     private static final double thicknessAxes = 0.003;
 
-    private static final float[] axisNorthColor = BufferUtils.colorRed;
-    private static final float[] axisSouthColor = BufferUtils.colorBlue;
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
     private static final float[] earthLineColor = BufferUtils.colorYellow;
@@ -68,7 +66,7 @@ public class RenderableGrid extends AbstractRenderable {
     private boolean showRadial = false;
 
     private final GLLine gridline = new GLLine();
-    private final GLLine axesline = new GLLine();
+    private final GLLine axesLine = new GLLine();
     private final GLLine flatline = new GLLine();
     private final GLLine earthCircleLine = new GLLine();
     private final GLLine radialCircleLine = new GLLine();
@@ -138,7 +136,7 @@ public class RenderableGrid extends AbstractRenderable {
             initGrid(gl);
         }
         if (showAxis)
-            axesline.render(gl, vp.aspect, thicknessAxes);
+            axesLine.render(gl, vp.aspect, thicknessAxes);
 
         Mat4 cameraMatrix = getGridQuat(camera, gridType).toMatrix();
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
@@ -356,8 +354,10 @@ public class RenderableGrid extends AbstractRenderable {
     public void init(GL2 gl) {
         gridline.init(gl);
         initGrid(gl);
-        axesline.init(gl);
-        initAxes(gl);
+
+        axesLine.init(gl);
+        RenderableGridMath.initAxes(gl, axesLine);
+
         earthCircleLine.init(gl);
         initEarthCircles(gl);
         radialCircleLine.init(gl);
@@ -365,9 +365,6 @@ public class RenderableGrid extends AbstractRenderable {
         initRadialCircles(gl);
         flatline.init(gl);
     }
-
-    private static final float AXIS_START = (float) (1. * Sun.Radius);
-    private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
 
     private void initFlatline(GL2 gl, double aspect) {
         float w = (float) aspect;
@@ -416,31 +413,6 @@ public class RenderableGrid extends AbstractRenderable {
         positionBuffer.flip();
         colorBuffer.flip();
         flatline.setData(gl, positionBuffer, colorBuffer);
-    }
-
-    private void initAxes(GL2 gl) {
-        int plen = 6;
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(plen * 3);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
-
-        BufferUtils.put3f(positionBuffer, 0, -AXIS_STOP, 0);
-        colorBuffer.put(axisSouthColor);
-        BufferUtils.put3f(positionBuffer, 0, -AXIS_START, 0);
-        colorBuffer.put(axisSouthColor);
-
-        BufferUtils.put3f(positionBuffer, 0, -AXIS_START, 0);
-        colorBuffer.put(BufferUtils.colorNull);
-        BufferUtils.put3f(positionBuffer, 0, AXIS_START, 0);
-        colorBuffer.put(BufferUtils.colorNull);
-
-        BufferUtils.put3f(positionBuffer, 0, AXIS_START, 0);
-        colorBuffer.put(axisNorthColor);
-        BufferUtils.put3f(positionBuffer, 0, AXIS_STOP, 0);
-        colorBuffer.put(axisNorthColor);
-
-        positionBuffer.flip();
-        colorBuffer.flip();
-        axesline.setData(gl, positionBuffer, colorBuffer);
     }
 
     private void initRadialCircles(GL2 gl) {
@@ -700,7 +672,7 @@ public class RenderableGrid extends AbstractRenderable {
     @Override
     public void dispose(GL2 gl) {
         gridline.dispose(gl);
-        axesline.dispose(gl);
+        axesLine.dispose(gl);
         flatline.dispose(gl);
         earthCircleLine.dispose(gl);
         radialCircleLine.dispose(gl);
