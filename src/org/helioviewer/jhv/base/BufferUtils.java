@@ -10,6 +10,7 @@ import com.jogamp.common.nio.Buffers;
 
 public class BufferUtils {
 
+    public static final float[] colorNull = { 0, 0, 0, 0 };
     public static final float[] colorRed = { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f, 1 };
     public static final float[] colorGreen = { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f, 1 };
     public static final float[] colorBlue = { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f, 1 };

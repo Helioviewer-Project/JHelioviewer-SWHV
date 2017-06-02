@@ -38,6 +38,8 @@ public class RenderableGrid extends AbstractRenderable {
     private static final double thicknessEarth = 0.0015;
     private static final double thicknessAxes = 0.003;
 
+    private static final float[] axisNorthColor = BufferUtils.colorRed;
+    private static final float[] axisSouthColor = BufferUtils.colorBlue;
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
     private static final float[] earthLineColor = BufferUtils.colorYellow;
@@ -378,7 +380,8 @@ public class RenderableGrid extends AbstractRenderable {
         for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
             float start = -w / 2 + i * w / FLAT_STEPS_THETA;
             BufferUtils.put3f(positionBuffer, start, -h / 2, 0);
-            BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+            colorBuffer.put(BufferUtils.colorNull);
+
             BufferUtils.put3f(positionBuffer, start, -h / 2, 0);
             if (i == FLAT_STEPS_THETA / 2) {
                 colorBuffer.put(color2);
@@ -388,13 +391,14 @@ public class RenderableGrid extends AbstractRenderable {
                 colorBuffer.put(color1);
             }
             BufferUtils.put3f(positionBuffer, start, h / 2, 0);
+
             BufferUtils.put3f(positionBuffer, start, h / 2, 0);
-            BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+            colorBuffer.put(BufferUtils.colorNull);
         }
         for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
             float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
             BufferUtils.put3f(positionBuffer, -w / 2, start, 0);
-            BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+            colorBuffer.put(BufferUtils.colorNull);
 
             BufferUtils.put3f(positionBuffer, -w / 2, start, 0);
             if (i == FLAT_STEPS_RADIAL / 2) {
@@ -405,8 +409,9 @@ public class RenderableGrid extends AbstractRenderable {
                 colorBuffer.put(color1);
             }
             BufferUtils.put3f(positionBuffer, w / 2, start, 0);
+
             BufferUtils.put3f(positionBuffer, w / 2, start, 0);
-            BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+            colorBuffer.put(BufferUtils.colorNull);
         }
         positionBuffer.flip();
         colorBuffer.flip();
@@ -419,19 +424,20 @@ public class RenderableGrid extends AbstractRenderable {
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
 
         BufferUtils.put3f(positionBuffer, 0, -AXIS_STOP, 0);
-        BufferUtils.put4f(colorBuffer, 0, 0, 1, 1);
+        colorBuffer.put(axisSouthColor);
         BufferUtils.put3f(positionBuffer, 0, -AXIS_START, 0);
-        BufferUtils.put4f(colorBuffer, 0, 0, 1, 1);
+        colorBuffer.put(axisSouthColor);
 
         BufferUtils.put3f(positionBuffer, 0, -AXIS_START, 0);
-        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+        colorBuffer.put(BufferUtils.colorNull);
         BufferUtils.put3f(positionBuffer, 0, AXIS_START, 0);
-        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+        colorBuffer.put(BufferUtils.colorNull);
 
         BufferUtils.put3f(positionBuffer, 0, AXIS_START, 0);
-        BufferUtils.put4f(colorBuffer, 1, 0, 0, 1);
+        colorBuffer.put(axisNorthColor);
         BufferUtils.put3f(positionBuffer, 0, AXIS_STOP, 0);
-        BufferUtils.put4f(colorBuffer, 1, 0, 0, 1);
+        colorBuffer.put(axisNorthColor);
+
         positionBuffer.flip();
         colorBuffer.flip();
         axesline.setData(gl, positionBuffer, colorBuffer);
@@ -455,13 +461,13 @@ public class RenderableGrid extends AbstractRenderable {
                 if (i % 10 == 0) {
                     if (j == 0) {
                         BufferUtils.put3f(positionThick, v);
-                        BufferUtils.put4f(colorThick, 0, 0, 0, 0);
+                        colorThick.put(BufferUtils.colorNull);
                     }
                     BufferUtils.put3f(positionThick, v);
                     colorThick.put(radialLineColor);
                     if (j == SUBDIVISIONS) {
                         BufferUtils.put3f(positionThick, v);
-                        BufferUtils.put4f(colorThick, 0, 0, 0, 0);
+                        colorThick.put(BufferUtils.colorNull);
                     }
                 } else {
                     BufferUtils.put3f(positionBuffer, v);
@@ -472,7 +478,7 @@ public class RenderableGrid extends AbstractRenderable {
 
         // repeat last point with 0 alpha
         BufferUtils.put3f(positionBuffer, v);
-        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+        colorBuffer.put(BufferUtils.colorNull);
 
         float i = 0;
         for (int j = 0; j < no_lines; j++) {
@@ -482,7 +488,7 @@ public class RenderableGrid extends AbstractRenderable {
             v.set(START_RADIUS, 0, 0);
             Vec3 rotv1 = q.rotateVector(v);
             BufferUtils.put3f(positionBuffer, rotv1);
-            BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+            colorBuffer.put(BufferUtils.colorNull);
             BufferUtils.put3f(positionBuffer, rotv1);
             colorBuffer.put(radialLineColor);
 
@@ -491,7 +497,7 @@ public class RenderableGrid extends AbstractRenderable {
             BufferUtils.put3f(positionBuffer, rotv2);
             colorBuffer.put(radialLineColor);
             BufferUtils.put3f(positionBuffer, rotv2);
-            BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+            colorBuffer.put(BufferUtils.colorNull);
         }
         positionBuffer.flip();
         colorBuffer.flip();
@@ -518,14 +524,14 @@ public class RenderableGrid extends AbstractRenderable {
             rotv = q.rotateVector(v);
             if (i == 0) {
                 BufferUtils.put3f(positionBuffer, rotv);
-                BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+                colorBuffer.put(BufferUtils.colorNull);
             }
             BufferUtils.put3f(positionBuffer, rotv);
             colorBuffer.put(earthLineColor);
         }
 
         BufferUtils.put3f(positionBuffer, rotv);
-        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+        colorBuffer.put(BufferUtils.colorNull);
 
         v = new Vec3();
         q = Quat.createRotation(Math.PI / 2, new Vec3(0, 1, 0));
@@ -536,14 +542,14 @@ public class RenderableGrid extends AbstractRenderable {
             rotv = q.rotateVector(v);
             if (i == 0) {
                 BufferUtils.put3f(positionBuffer, rotv);
-                BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+                colorBuffer.put(BufferUtils.colorNull);
             }
             BufferUtils.put3f(positionBuffer, rotv);
             colorBuffer.put(earthLineColor);
         }
 
         BufferUtils.put3f(positionBuffer, rotv);
-        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+        colorBuffer.put(BufferUtils.colorNull);
 
         positionBuffer.flip();
         colorBuffer.flip();
@@ -573,7 +579,7 @@ public class RenderableGrid extends AbstractRenderable {
                     Vec3 rotv = q.rotateVector(v);
                     if (i == 0) {
                         BufferUtils.put3f(positionBuffer, rotv);
-                        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+                        colorBuffer.put(BufferUtils.colorNull);
                     }
                     BufferUtils.put3f(positionBuffer, rotv);
                     if (i % 2 == 0) {
@@ -584,7 +590,7 @@ public class RenderableGrid extends AbstractRenderable {
 
                     if (i == HALFDIVISIONS) {
                         BufferUtils.put3f(positionBuffer, rotv);
-                        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+                        colorBuffer.put(BufferUtils.colorNull);
                     }
                 }
             }
@@ -600,7 +606,7 @@ public class RenderableGrid extends AbstractRenderable {
                     v.z = gridRadius * Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
                     if (i == 0) {
                         BufferUtils.put3f(positionBuffer, v);
-                        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+                        colorBuffer.put(BufferUtils.colorNull);
                     }
                     BufferUtils.put3f(positionBuffer, v);
                     if (i % 2 == 0) {
@@ -610,7 +616,7 @@ public class RenderableGrid extends AbstractRenderable {
                     }
                     if (i == HALFDIVISIONS) {
                         BufferUtils.put3f(positionBuffer, v);
-                        BufferUtils.put4f(colorBuffer, 0, 0, 0, 0);
+                        colorBuffer.put(BufferUtils.colorNull);
                     }
                 }
             }
