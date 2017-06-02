@@ -29,14 +29,18 @@ public class CommandLine {
         for (URI uri : getURIOptionValues("load")) {
             JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(), uri));
         }
-        // -request: works only for default server
-        for (URI uri : getURIOptionValues("request")) {
-            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.createImageLayer(), uri));
-        }
         // -state
         for (String file : getOptionValues("state")) {
             ImageViewerGui.getRenderableContainer().loadScene(file);
             break;
+        }
+    }
+
+    // after DataSources is loaded
+    public static void loadRequest() {
+        // -request: works only for default server
+        for (URI uri : getURIOptionValues("request")) {
+            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.createImageLayer(), uri));
         }
     }
 
