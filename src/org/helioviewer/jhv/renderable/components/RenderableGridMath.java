@@ -17,11 +17,17 @@ class RenderableGridMath {
     private static final float[] axisNorthColor = BufferUtils.colorRed;
     private static final float[] axisSouthColor = BufferUtils.colorBlue;
     private static final float[] earthLineColor = BufferUtils.colorYellow;
+    private static final float[] radialLineColor = BufferUtils.colorWhite;
 
     private static final float AXIS_START = (float) (1. * Sun.Radius);
     private static final float AXIS_STOP = (float) (1.2 * Sun.Radius);
 
     private static final double EARTH_CIRCLE_RADIUS = Sun.Radius;
+
+    private static final int TENS_RADIUS = 3;
+    private static final int END_RADIUS = TENS_RADIUS * 10;
+    private static final int START_RADIUS = 2;
+    private static final float STEP_DEGREES = 15;
 
     static void initAxes(GL2 gl, GLLine axesLine) {
         int plen = 6;
@@ -92,6 +98,70 @@ class RenderableGridMath {
         positionBuffer.flip();
         colorBuffer.flip();
         earthCircleLine.setData(gl, positionBuffer, colorBuffer);
+    }
+
+    static void initRadialCircles(GL2 gl, GLLine radialCircleLine, GLLine radialThickLine) {
+        int no_lines = (int) Math.ceil(360 / STEP_DEGREES);
+
+        int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 1) + 4 * no_lines + 1;
+        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
+        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
+        FloatBuffer positionThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 3);
+        FloatBuffer colorThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 4);
+
+        Vec3 v = new Vec3();
+        for (int i = START_RADIUS; i <= END_RADIUS; i++) {
+            for (int j = 0; j <= SUBDIVISIONS; j++) {
+                v.x = i * Sun.Radius * Math.cos(2 * Math.PI * j / SUBDIVISIONS);
+                v.y = i * Sun.Radius * Math.sin(2 * Math.PI * j / SUBDIVISIONS);
+                v.z = 0.;
+                if (i % 10 == 0) {
+                    if (j == 0) {
+                        BufferUtils.put3f(positionThick, v);
+                        colorThick.put(BufferUtils.colorNull);
+                    }
+                    BufferUtils.put3f(positionThick, v);
+                    colorThick.put(radialLineColor);
+                    if (j == SUBDIVISIONS) {
+                        BufferUtils.put3f(positionThick, v);
+                        colorThick.put(BufferUtils.colorNull);
+                    }
+                } else {
+                    BufferUtils.put3f(positionBuffer, v);
+                    colorBuffer.put(radialLineColor);
+                }
+            }
+        }
+
+        BufferUtils.put3f(positionBuffer, v);
+        colorBuffer.put(BufferUtils.colorNull);
+
+        float i = 0;
+        for (int j = 0; j < no_lines; j++) {
+            i += STEP_DEGREES;
+            Quat q = Quat.createRotation(2 * Math.PI * i / 360., new Vec3(0, 0, 1));
+
+            v.set(START_RADIUS, 0, 0);
+            Vec3 rotv1 = q.rotateVector(v);
+            BufferUtils.put3f(positionBuffer, rotv1);
+            colorBuffer.put(BufferUtils.colorNull);
+            BufferUtils.put3f(positionBuffer, rotv1);
+            colorBuffer.put(radialLineColor);
+
+            v.set(END_RADIUS, 0, 0);
+            Vec3 rotv2 = q.rotateVector(v);
+            BufferUtils.put3f(positionBuffer, rotv2);
+            colorBuffer.put(radialLineColor);
+            BufferUtils.put3f(positionBuffer, rotv2);
+            colorBuffer.put(BufferUtils.colorNull);
+        }
+        positionBuffer.flip();
+        colorBuffer.flip();
+        positionThick.flip();
+        colorThick.flip();
+
+        radialCircleLine.setData(gl, positionBuffer, colorBuffer);
+        radialThickLine.setData(gl, positionThick, colorThick);
     }
 
 }
