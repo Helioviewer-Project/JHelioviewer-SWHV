@@ -40,7 +40,6 @@ public class RenderableGrid extends AbstractRenderable {
 
     private static final float[] color1 = BufferUtils.colorRed;
     private static final float[] color2 = BufferUtils.colorGreen;
-    private static final float[] earthLineColor = BufferUtils.colorYellow;
     private static final float[] radialLineColor = BufferUtils.colorWhite;
 
     private static final int TENS_RADIUS = 3;
@@ -359,7 +358,8 @@ public class RenderableGrid extends AbstractRenderable {
         RenderableGridMath.initAxes(gl, axesLine);
 
         earthCircleLine.init(gl);
-        initEarthCircles(gl);
+        RenderableGridMath.initEarthCircles(gl, earthCircleLine);
+
         radialCircleLine.init(gl);
         radialThickLine.init(gl);
         initRadialCircles(gl);
@@ -481,52 +481,6 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private static final double gridRadius = Sun.Radius;
-
-    private void initEarthCircles(GL2 gl) {
-        int no_points = 2 * (SUBDIVISIONS + 3);
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-
-        Vec3 rotv = new Vec3(), v = new Vec3();
-        Quat q = Quat.createRotation(Math.PI / 2, new Vec3(1, 0, 0));
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            v.x = gridRadius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
-            v.y = gridRadius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
-            v.z = 0.;
-            rotv = q.rotateVector(v);
-            if (i == 0) {
-                BufferUtils.put3f(positionBuffer, rotv);
-                colorBuffer.put(BufferUtils.colorNull);
-            }
-            BufferUtils.put3f(positionBuffer, rotv);
-            colorBuffer.put(earthLineColor);
-        }
-
-        BufferUtils.put3f(positionBuffer, rotv);
-        colorBuffer.put(BufferUtils.colorNull);
-
-        v = new Vec3();
-        q = Quat.createRotation(Math.PI / 2, new Vec3(0, 1, 0));
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            v.x = gridRadius * Math.cos(2 * Math.PI * i / SUBDIVISIONS);
-            v.y = gridRadius * Math.sin(2 * Math.PI * i / SUBDIVISIONS);
-            v.z = 0.;
-            rotv = q.rotateVector(v);
-            if (i == 0) {
-                BufferUtils.put3f(positionBuffer, rotv);
-                colorBuffer.put(BufferUtils.colorNull);
-            }
-            BufferUtils.put3f(positionBuffer, rotv);
-            colorBuffer.put(earthLineColor);
-        }
-
-        BufferUtils.put3f(positionBuffer, rotv);
-        colorBuffer.put(BufferUtils.colorNull);
-
-        positionBuffer.flip();
-        colorBuffer.flip();
-        earthCircleLine.setData(gl, positionBuffer, colorBuffer);
-    }
 
     private void initGrid(GL2 gl) {
         int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
