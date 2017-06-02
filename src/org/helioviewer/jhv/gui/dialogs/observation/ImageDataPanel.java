@@ -57,7 +57,7 @@ public class ImageDataPanel extends JPanel {
         if (!sourcesTree.setParsedData(parser)) // not preferred
             return;
 
-        CommandLine.load();
+        CommandLine.loadRequest();
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid

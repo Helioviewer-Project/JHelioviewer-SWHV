@@ -122,6 +122,7 @@ public class JHelioviewer {
             frame.setVisible(true);
 
             DataSources.loadSources();
+            CommandLine.load();
 
             try {
                 JHVUpdate update = new JHVUpdate(false);
