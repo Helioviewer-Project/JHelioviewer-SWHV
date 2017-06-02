@@ -45,8 +45,8 @@ public class RenderableGrid extends AbstractRenderable {
 
     private GridType gridType = GridType.Viewpoint;
 
-    private float lonstepDegrees = 15f;
-    private float latstepDegrees = 20f;
+    private double lonstepDegrees = 15;
+    private double latstepDegrees = 20;
     private boolean gridNeedsInit = true;
 
     private boolean showAxis = true;
@@ -73,8 +73,8 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void deserialize(JSONObject jo) {
-        lonstepDegrees = (float) jo.optDouble("lonstepDegrees", lonstepDegrees);
-        latstepDegrees = (float) jo.optDouble("latstepDegrees", latstepDegrees);
+        lonstepDegrees = jo.optDouble("lonstepDegrees", lonstepDegrees);
+        latstepDegrees = jo.optDouble("latstepDegrees", latstepDegrees);
         showAxis = jo.optBoolean("showAxis", showAxis);
         showLabels = jo.optBoolean("showLabels", showLabels);
         showRadial = jo.optBoolean("showRadial", showRadial);
@@ -389,7 +389,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     public void setLonstepDegrees(double _lonstepDegrees) {
-        lonstepDegrees = (float) _lonstepDegrees;
+        lonstepDegrees = _lonstepDegrees;
         makeLonLabels();
         gridNeedsInit = true;
     }
@@ -399,7 +399,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     public void setLatstepDegrees(double _latstepDegrees) {
-        latstepDegrees = (float) _latstepDegrees;
+        latstepDegrees = _latstepDegrees;
         makeLatLabels();
         gridNeedsInit = true;
     }
