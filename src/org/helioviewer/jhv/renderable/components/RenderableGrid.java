@@ -1,18 +1,15 @@
 package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
-import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
@@ -33,13 +30,9 @@ public class RenderableGrid extends AbstractRenderable {
 
     // height of text in solar radii
     private static final float textScale = (float) (0.08 * Sun.Radius);
-    private static final int SUBDIVISIONS = 360;
     private static final double thickness = 0.001;
     private static final double thicknessEarth = 0.0015;
     private static final double thicknessAxes = 0.003;
-
-    private static final float[] color1 = BufferUtils.colorRed;
-    private static final float[] color2 = BufferUtils.colorGreen;
 
     private static final float[] R_LABEL_POS = { 2, 8, 24 };
     private static final float STEP_DEGREES = 15;
@@ -54,7 +47,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     private float lonstepDegrees = 15f;
     private float latstepDegrees = 20f;
-    private boolean needsInit = true;
+    private boolean gridNeedsInit = true;
 
     private boolean showAxis = true;
     private boolean showLabels = true;
@@ -65,7 +58,7 @@ public class RenderableGrid extends AbstractRenderable {
     private final GLLine radialCircleLine = new GLLine();
     private final GLLine radialThickLine = new GLLine();
     private final GLLine flatLine = new GLLine();
-    private final GLLine gridline = new GLLine();
+    private final GLLine gridLine = new GLLine();
 
     private final Component optionsPanel;
 
@@ -127,9 +120,11 @@ public class RenderableGrid extends AbstractRenderable {
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-        if (needsInit) {
-            initGrid(gl);
+        if (gridNeedsInit) {
+            RenderableGridMath.initGrid(gl, gridLine, lonstepDegrees, latstepDegrees);
+            gridNeedsInit = false;
         }
+
         if (showAxis)
             axesLine.render(gl, vp.aspect, thicknessAxes);
 
@@ -139,7 +134,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
-            gridline.render(gl, vp.aspect, thickness);
+            gridLine.render(gl, vp.aspect, thickness);
             if (showLabels) {
                 drawGridText(gl, pixelsPerSolarRadius);
             }
@@ -347,8 +342,9 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public void init(GL2 gl) {
-        gridline.init(gl);
-        initGrid(gl);
+        gridLine.init(gl);
+        RenderableGridMath.initGrid(gl, gridLine, lonstepDegrees, latstepDegrees);
+        gridNeedsInit = false;
 
         axesLine.init(gl);
         RenderableGridMath.initAxes(gl, axesLine);
@@ -363,78 +359,14 @@ public class RenderableGrid extends AbstractRenderable {
         flatLine.init(gl);
     }
 
-    private static final double gridRadius = Sun.Radius;
-
-    private void initGrid(GL2 gl) {
-        int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
-        int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
-        int HALFDIVISIONS = SUBDIVISIONS / 2;
-
-        int no_points = 2 * (no_lat_steps + no_lon_steps) * (HALFDIVISIONS + 3);
-
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
-
-        Vec3 v = new Vec3();
-        double rotation;
-        for (int j = 0; j < no_lon_steps; j++) {
-            for (int k = -1; k <= 1; k = k + 2) {
-                rotation = lonstepDegrees * j * k;
-                Quat q = Quat.createRotation(Math.PI / 2 + Math.PI + 2 * Math.PI * rotation / 360., new Vec3(0, 1, 0));
-                for (int i = 0; i <= HALFDIVISIONS; i++) {
-                    v.x = gridRadius * Math.cos(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
-                    v.y = gridRadius * Math.sin(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
-                    v.z = 0.;
-                    Vec3 rotv = q.rotateVector(v);
-                    if (i == 0) {
-                        BufferUtils.put3f(positionBuffer, rotv);
-                        colorBuffer.put(BufferUtils.colorNull);
-                    }
-                    BufferUtils.put3f(positionBuffer, rotv);
-                    if (i % 2 == 0) {
-                        colorBuffer.put(color1);
-                    } else {
-                        colorBuffer.put(color2);
-                    }
-
-                    if (i == HALFDIVISIONS) {
-                        BufferUtils.put3f(positionBuffer, rotv);
-                        colorBuffer.put(BufferUtils.colorNull);
-                    }
-                }
-            }
-        }
-
-        for (int j = 0; j < no_lat_steps; j++) {
-            for (int k = -1; k <= 1; k = k + 2) {
-                rotation = latstepDegrees * j * k;
-                for (int i = 0; i <= HALFDIVISIONS; i++) {
-                    double scale = Math.cos(Math.PI / 180. * (90 - rotation));
-                    v.y = gridRadius * scale;
-                    v.x = gridRadius * Math.sqrt(1. - scale * scale) * Math.sin(2 * Math.PI * i / HALFDIVISIONS);
-                    v.z = gridRadius * Math.sqrt(1. - scale * scale) * Math.cos(2 * Math.PI * i / HALFDIVISIONS);
-                    if (i == 0) {
-                        BufferUtils.put3f(positionBuffer, v);
-                        colorBuffer.put(BufferUtils.colorNull);
-                    }
-                    BufferUtils.put3f(positionBuffer, v);
-                    if (i % 2 == 0) {
-                        colorBuffer.put(color1);
-                    } else {
-                        colorBuffer.put(color2);
-                    }
-                    if (i == HALFDIVISIONS) {
-                        BufferUtils.put3f(positionBuffer, v);
-                        colorBuffer.put(BufferUtils.colorNull);
-                    }
-                }
-            }
-        }
-
-        positionBuffer.flip();
-        colorBuffer.flip();
-        gridline.setData(gl, positionBuffer, colorBuffer);
-        needsInit = false;
+    @Override
+    public void dispose(GL2 gl) {
+        gridLine.dispose(gl);
+        axesLine.dispose(gl);
+        earthCircleLine.dispose(gl);
+        radialCircleLine.dispose(gl);
+        radialThickLine.dispose(gl);
+        flatLine.dispose(gl);
     }
 
     @Override
@@ -459,7 +391,7 @@ public class RenderableGrid extends AbstractRenderable {
     public void setLonstepDegrees(double _lonstepDegrees) {
         lonstepDegrees = (float) _lonstepDegrees;
         makeLonLabels();
-        needsInit = true;
+        gridNeedsInit = true;
     }
 
     public double getLatstepDegrees() {
@@ -469,7 +401,7 @@ public class RenderableGrid extends AbstractRenderable {
     public void setLatstepDegrees(double _latstepDegrees) {
         latstepDegrees = (float) _latstepDegrees;
         makeLatLabels();
-        needsInit = true;
+        gridNeedsInit = true;
     }
 
     public boolean getShowLabels() {
@@ -504,16 +436,6 @@ public class RenderableGrid extends AbstractRenderable {
     @Override
     public boolean isDeletable() {
         return false;
-    }
-
-    @Override
-    public void dispose(GL2 gl) {
-        gridline.dispose(gl);
-        axesLine.dispose(gl);
-        earthCircleLine.dispose(gl);
-        radialCircleLine.dispose(gl);
-        radialThickLine.dispose(gl);
-        flatLine.dispose(gl);
     }
 
     GridType getGridType() {
