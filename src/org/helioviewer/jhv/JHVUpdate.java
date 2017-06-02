@@ -13,23 +13,6 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
 
-/**
- * Class to test in a new thread if there is a newer version of JHelioviewer
- * released and shows a message.
- *
- * After construction the code is available in run(), ie as a Runnable object.
- * To start in parallel use check().
- *
- * If verbose is false, ie. when called during startup, the property
- * update.check.next is used to suspend the checks: - If it is negative, the
- * update check is suspended forever - If it is 0, the update check is done - If
- * it is positive, it is decremented and then checked if 0
- *
- * For further version this gives much room for improvement: - automated
- * download - ... ?
- *
- * @author Helge Dietert
- */
 public class JHVUpdate implements Runnable {
     /**
      * Determines whether to show a message box if already the latest version is
@@ -78,7 +61,6 @@ public class JHVUpdate implements Runnable {
             }
         }
 
-        Log.trace("Start checking for updates");
         try (BufferedReader in = new BufferedReader(new InputStreamReader(new DownloadStream(JHVGlobals.downloadURL + "VERSION").getInput(), StandardCharsets.UTF_8))) {
             String version = in.readLine();
             if (version == null || version.isEmpty()) {
