@@ -25,7 +25,6 @@ import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.viewmodel.metadata.AIAResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 
-// Main
 public class JHelioviewer {
 
     public static void main(String[] args) {
