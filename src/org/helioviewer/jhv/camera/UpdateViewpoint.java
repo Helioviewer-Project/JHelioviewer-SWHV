@@ -11,10 +11,19 @@ public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
 
+    UpdateViewpoint updateEcliptic = new UpdateViewpointEcliptic();
     UpdateViewpoint updateEarthFixedDistance = new UpdateViewpointEarthFixedDistance();
     UpdateViewpoint updateEarth = new UpdateViewpointEarth();
     UpdateViewpoint updateExpert = new UpdateViewpointExpert();
     UpdateViewpoint updateObserver = new UpdateViewpointObserver();
+
+    class UpdateViewpointEcliptic implements UpdateViewpoint {
+        @Override
+        public Position.Q update(JHVDate time) {
+            Position.L p = Sun.getEarth(time);
+            return new Position.Q(time, Sun.EpochEarthQ.distance, Quat.rotate(Quat.Q90, new Quat(p.lat, p.lon)));
+        }
+    }
 
     class UpdateViewpointEarthFixedDistance implements UpdateViewpoint {
         @Override

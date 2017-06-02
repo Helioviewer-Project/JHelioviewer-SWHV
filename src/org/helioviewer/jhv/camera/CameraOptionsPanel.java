@@ -27,7 +27,7 @@ import com.jidesoft.swing.JideButton;
 public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
 
     private enum CameraMode {
-        Observer, Earth, Other
+        Observer, Earth, Ecliptic, Other
     }
 
     private static final double FOVAngleDefault = 0.8;
@@ -145,6 +145,9 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
             break;
             case Earth:
                 update = UpdateViewpoint.updateEarth;
+            break;
+            case Ecliptic:
+                update = UpdateViewpoint.updateEcliptic;
             break;
             default:
                 update = UpdateViewpoint.updateObserver;
