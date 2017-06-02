@@ -60,12 +60,12 @@ public class RenderableGrid extends AbstractRenderable {
     private boolean showLabels = true;
     private boolean showRadial = false;
 
-    private final GLLine gridline = new GLLine();
     private final GLLine axesLine = new GLLine();
-    private final GLLine flatline = new GLLine();
     private final GLLine earthCircleLine = new GLLine();
     private final GLLine radialCircleLine = new GLLine();
     private final GLLine radialThickLine = new GLLine();
+    private final GLLine flatLine = new GLLine();
+    private final GLLine gridline = new GLLine();
 
     private final Component optionsPanel;
 
@@ -179,10 +179,10 @@ public class RenderableGrid extends AbstractRenderable {
 
     private void drawGridFlat(GL2 gl, Viewport vp) {
         if (previousAspect != vp.aspect) {
-            initFlatline(gl, vp.aspect);
+            RenderableGridMath.initFlatGrid(gl, flatLine, vp.aspect);
             previousAspect = vp.aspect;
         }
-        flatline.render(gl, vp.aspect, thickness);
+        flatLine.render(gl, vp.aspect, thickness);
     }
 
     private static void drawGridTextFlat(int size, GridScale scale, Viewport vp) {
@@ -360,56 +360,7 @@ public class RenderableGrid extends AbstractRenderable {
         radialThickLine.init(gl);
         RenderableGridMath.initRadialCircles(gl, radialCircleLine, radialThickLine);
 
-        flatline.init(gl);
-    }
-
-    private void initFlatline(GL2 gl, double aspect) {
-        float w = (float) aspect;
-        float h = 1;
-
-        int plen = 4 * ((FLAT_STEPS_THETA + 1) + (FLAT_STEPS_RADIAL + 1));
-        FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(plen * 3);
-        FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(plen * 4);
-
-        for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
-            float start = -w / 2 + i * w / FLAT_STEPS_THETA;
-            BufferUtils.put3f(positionBuffer, start, -h / 2, 0);
-            colorBuffer.put(BufferUtils.colorNull);
-
-            BufferUtils.put3f(positionBuffer, start, -h / 2, 0);
-            if (i == FLAT_STEPS_THETA / 2) {
-                colorBuffer.put(color2);
-                colorBuffer.put(color2);
-            } else {
-                colorBuffer.put(color1);
-                colorBuffer.put(color1);
-            }
-            BufferUtils.put3f(positionBuffer, start, h / 2, 0);
-
-            BufferUtils.put3f(positionBuffer, start, h / 2, 0);
-            colorBuffer.put(BufferUtils.colorNull);
-        }
-        for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
-            float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
-            BufferUtils.put3f(positionBuffer, -w / 2, start, 0);
-            colorBuffer.put(BufferUtils.colorNull);
-
-            BufferUtils.put3f(positionBuffer, -w / 2, start, 0);
-            if (i == FLAT_STEPS_RADIAL / 2) {
-                colorBuffer.put(color2);
-                colorBuffer.put(color2);
-            } else {
-                colorBuffer.put(color1);
-                colorBuffer.put(color1);
-            }
-            BufferUtils.put3f(positionBuffer, w / 2, start, 0);
-
-            BufferUtils.put3f(positionBuffer, w / 2, start, 0);
-            colorBuffer.put(BufferUtils.colorNull);
-        }
-        positionBuffer.flip();
-        colorBuffer.flip();
-        flatline.setData(gl, positionBuffer, colorBuffer);
+        flatLine.init(gl);
     }
 
     private static final double gridRadius = Sun.Radius;
@@ -559,10 +510,10 @@ public class RenderableGrid extends AbstractRenderable {
     public void dispose(GL2 gl) {
         gridline.dispose(gl);
         axesLine.dispose(gl);
-        flatline.dispose(gl);
         earthCircleLine.dispose(gl);
         radialCircleLine.dispose(gl);
         radialThickLine.dispose(gl);
+        flatLine.dispose(gl);
     }
 
     GridType getGridType() {
