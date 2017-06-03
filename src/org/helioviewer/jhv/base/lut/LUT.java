@@ -14,7 +14,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

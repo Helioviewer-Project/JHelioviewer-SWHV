@@ -8,11 +8,11 @@ import java.util.Locale;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
-import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.viewmodel.view.fitsview.FITSView;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2View;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
-import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
+import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.fitsview.FITSView;
+import org.helioviewer.jhv.view.jp2view.JP2View;
+import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
+import org.helioviewer.jhv.view.simpleimageview.SimpleImageView;
 
 public class APIRequestManager {
 

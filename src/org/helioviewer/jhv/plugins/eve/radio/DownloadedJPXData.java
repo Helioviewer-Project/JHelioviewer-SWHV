@@ -12,16 +12,16 @@ import java.awt.image.Raster;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageDataHandler;
+import org.helioviewer.jhv.imagedata.Single8ImageData;
+import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
-import org.helioviewer.jhv.viewmodel.imagedata.Single8ImageData;
-import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
+import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
 
 class DownloadedJPXData implements ImageDataHandler {
 

@@ -22,7 +22,7 @@ import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVWorker;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.view.View;
 
 public class DownloadViewTask extends JHVWorker<Void, Void> {
 

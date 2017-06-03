@@ -10,7 +10,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.layers.filters.*;
 import org.helioviewer.jhv.opengl.GLImage;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 public class ImageLayerOptions extends JPanel {

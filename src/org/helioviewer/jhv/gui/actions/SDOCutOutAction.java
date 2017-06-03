@@ -7,10 +7,10 @@ import javax.swing.AbstractAction;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.metadata.MetaData;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 public class SDOCutOutAction extends AbstractAction {

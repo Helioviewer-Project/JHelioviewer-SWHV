@@ -12,8 +12,8 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.imagedata.ImageData.ImageFormat;
+import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageData.ImageFormat;
 
 import com.jogamp.opengl.GL2;
 

@@ -11,7 +11,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.view.View;
 
 import com.jidesoft.swing.JideToggleButton;
 

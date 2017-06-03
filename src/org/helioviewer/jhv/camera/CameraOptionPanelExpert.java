@@ -19,7 +19,7 @@ import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.gui.components.base.JSeparatorComboBox;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener {
