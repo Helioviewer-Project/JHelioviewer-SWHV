@@ -14,6 +14,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
@@ -100,7 +101,7 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
         ComponentUtils.smallVariant(this);
 
         PositionLoad positionLoad = new PositionLoad(this);
-        ((UpdateViewpoint.UpdateViewpointExpert) UpdateViewpoint.updateExpert).setPositionLoad(positionLoad);
+        UpdateViewpoint.expert.setPositionLoad(positionLoad);
         expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
     }
 
@@ -140,17 +141,18 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
 
         switch (mode) {
             case Other:
-                update = UpdateViewpoint.updateExpert;
+                update = UpdateViewpoint.expert;
                 panel = expertOptionPanel;
             break;
             case Earth:
-                update = UpdateViewpoint.updateEarth;
+                update = UpdateViewpoint.earth;
             break;
             case Ecliptic:
-                update = UpdateViewpoint.updateEcliptic;
+                UpdateViewpoint.ecliptic.setDistance(2 * Sun.MeanEarthDistance / Math.tan(0.5 * Displayer.getCamera().getFOV()));
+                update = UpdateViewpoint.ecliptic;
             break;
             default:
-                update = UpdateViewpoint.updateObserver;
+                update = UpdateViewpoint.observer;
         }
         Displayer.setViewpointUpdate(update);
         Displayer.getCamera().reset();

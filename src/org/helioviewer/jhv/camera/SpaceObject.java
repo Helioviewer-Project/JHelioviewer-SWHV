@@ -48,14 +48,14 @@ class SpaceObject {
         objectList.add(new SpaceObject("SOHO", "SOHO", 2));
         objectList.add(new SpaceObject("STEREO%20Ahead", "STEREO Ahead", 2));
         objectList.add(new SpaceObject("STEREO%20Behind", "STEREO Behind", 2));
-        objectList.add(new SpaceObject("PROBA2", "PROBA2", 2));
+        objectList.add(new SpaceObject("PROBA2", "PROBA-2", 2));
         objectList.add(new SpaceObject("SDO", "SDO", 2));
 
         objectList.add(new JSeparator());
 
         objectList.add(new SpaceObject("Solar%20Orbiter", "Solar Orbiter", 2));
-        objectList.add(new SpaceObject("SPP", "Solar Probe Plus", 2));
-        objectList.add(new SpaceObject("PROBA3", "PROBA3", 2));
+        objectList.add(new SpaceObject("SPP", "Parker Solar Probe", 2));
+        objectList.add(new SpaceObject("PROBA3", "PROBA-3", 2));
     }
 
     private SpaceObject(String _urlName, String _labelName, double _sizeInMeters) {

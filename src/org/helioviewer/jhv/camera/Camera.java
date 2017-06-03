@@ -48,6 +48,7 @@ public class Camera {
         currentDragRotation.clear();
 
         updateCamera(Layers.getLastUpdatedTimestamp());
+        CameraHelper.zoomToFit(this);
         Displayer.render(1);
     }
 
