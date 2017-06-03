@@ -24,8 +24,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
 import org.apache.log4j.NDC;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
+import org.helioviewer.jhv.log.Log;
 
 class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 

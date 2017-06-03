@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.logging;
+package org.helioviewer.jhv.log;
 
 import java.io.File;
 import java.text.ParseException;

@@ -16,8 +16,8 @@ import java.util.jar.Manifest;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVExecutor;
 
 import com.jidesoft.comparator.AlphanumComparator;

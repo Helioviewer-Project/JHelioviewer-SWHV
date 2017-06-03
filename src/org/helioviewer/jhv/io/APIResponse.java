@@ -3,7 +3,7 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.net.URI;
 
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

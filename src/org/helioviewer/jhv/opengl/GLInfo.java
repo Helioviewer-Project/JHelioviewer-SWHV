@@ -2,7 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import javax.swing.JOptionPane;
 
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;

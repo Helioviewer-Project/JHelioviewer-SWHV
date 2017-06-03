@@ -18,8 +18,8 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.log.Log;
 
 import com.jidesoft.plaf.LookAndFeelFactory;
 

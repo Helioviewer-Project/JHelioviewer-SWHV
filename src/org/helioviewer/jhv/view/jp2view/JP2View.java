@@ -12,7 +12,6 @@ import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -20,6 +19,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;

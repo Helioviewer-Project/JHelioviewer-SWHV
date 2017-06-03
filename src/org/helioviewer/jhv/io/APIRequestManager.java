@@ -6,8 +6,8 @@ import java.net.URI;
 import java.util.Locale;
 
 import org.helioviewer.jhv.base.JSONUtils;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fitsview.FITSView;
 import org.helioviewer.jhv.view.jp2view.JP2View;

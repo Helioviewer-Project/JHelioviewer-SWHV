@@ -4,7 +4,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;

@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.math;
 
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 
 public class Vec2 {
     /**

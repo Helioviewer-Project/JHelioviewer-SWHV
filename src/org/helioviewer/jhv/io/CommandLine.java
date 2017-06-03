@@ -7,9 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.log.Log;
 
 public class CommandLine {
 

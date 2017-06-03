@@ -5,8 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.ExitHooks;
+import org.helioviewer.jhv.log.Log;
 
 public class OSXHandler {
 

@@ -13,11 +13,11 @@ import nom.tam.fits.ImageHDU;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.io.DownloadStream;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.Single8ImageData;
 import org.helioviewer.jhv.imagedata.Single16ImageData;
+import org.helioviewer.jhv.log.Log;
 
 class FITSImage {
 

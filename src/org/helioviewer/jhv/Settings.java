@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 
 public class Settings {
 

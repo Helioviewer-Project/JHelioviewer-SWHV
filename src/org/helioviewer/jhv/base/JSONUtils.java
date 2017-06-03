@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.zip.GZIPOutputStream;
 
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 

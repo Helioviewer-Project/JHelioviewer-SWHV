@@ -11,10 +11,10 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.imagedata.Single8ImageData;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
