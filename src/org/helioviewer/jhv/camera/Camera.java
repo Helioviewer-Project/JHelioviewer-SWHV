@@ -48,7 +48,6 @@ public class Camera {
         currentDragRotation.clear();
 
         updateCamera(Layers.getLastUpdatedTimestamp());
-        CameraHelper.zoomToFit(this);
         Displayer.render(1);
     }
 
@@ -98,7 +97,7 @@ public class Camera {
         updateRotation();
     }
 
-    public void setCameraFOV(double _fov) {
+    public void setFOV(double _fov) {
         if (_fov < MIN_FOV) {
             fov = MIN_FOV;
         } else if (_fov > MAX_FOV) {
@@ -107,6 +106,10 @@ public class Camera {
             fov = _fov;
         }
         updateWidth();
+    }
+
+    public double getFOV() {
+        return fov;
     }
 
     public void setTrackingMode(boolean _trackingMode) {
@@ -123,7 +126,7 @@ public class Camera {
     }
 
     public void zoom(double wr) {
-        setCameraFOV(fov * (1 + 0.015 * wr));
+        setFOV(fov * (1 + 0.015 * wr));
     }
 
     public void timeChanged(JHVDate date) {
