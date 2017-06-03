@@ -1,10 +1,10 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
 
 import com.jogamp.opengl.GL2;

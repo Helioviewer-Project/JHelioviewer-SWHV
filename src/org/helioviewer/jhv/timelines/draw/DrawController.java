@@ -6,13 +6,13 @@ import java.awt.Rectangle;
 import java.util.HashSet;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
+import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 import org.helioviewer.jhv.viewmodel.view.View;

@@ -1,10 +1,10 @@
 package org.helioviewer.jhv.camera;
 
-import org.helioviewer.jhv.base.astronomy.Position;
-import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 public interface UpdateViewpoint {

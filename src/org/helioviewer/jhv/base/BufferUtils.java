@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.math.Vec3;
 
 import com.jogamp.common.nio.Buffers;
 

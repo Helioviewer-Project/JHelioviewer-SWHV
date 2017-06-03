@@ -2,10 +2,10 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLLine;
 
 import com.jogamp.opengl.GL2;

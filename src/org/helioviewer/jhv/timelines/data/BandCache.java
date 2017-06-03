@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;

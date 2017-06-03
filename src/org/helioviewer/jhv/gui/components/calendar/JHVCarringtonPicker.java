@@ -15,9 +15,9 @@ import javax.swing.JPanel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
-import org.helioviewer.jhv.base.astronomy.Carrington;
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.astronomy.Carrington;
+import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.swing.JideButton;
 

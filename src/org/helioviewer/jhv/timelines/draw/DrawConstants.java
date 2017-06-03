@@ -5,8 +5,8 @@ import java.awt.Font;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.math.MathUtils;
 
 public class DrawConstants {
 

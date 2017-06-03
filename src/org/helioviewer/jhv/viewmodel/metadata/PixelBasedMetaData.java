@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 
 public class PixelBasedMetaData extends AbstractMetaData {

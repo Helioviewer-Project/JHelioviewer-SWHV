@@ -19,11 +19,11 @@ import java.util.concurrent.ExecutionException;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;

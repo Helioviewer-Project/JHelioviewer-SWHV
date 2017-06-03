@@ -10,10 +10,10 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.data.Band;
 import org.helioviewer.jhv.timelines.data.BandColors;
 import org.helioviewer.jhv.timelines.data.BandGroup;

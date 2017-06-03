@@ -12,7 +12,7 @@ import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_istream_ref;
 import kdu_jni.Kdu_region_compositor;
 
-import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
 public class KakaduHelper {

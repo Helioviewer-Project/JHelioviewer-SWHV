@@ -10,10 +10,10 @@ import java.io.OutputStream;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.io.DownloadStream;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
+import org.helioviewer.jhv.time.JHVDate;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;

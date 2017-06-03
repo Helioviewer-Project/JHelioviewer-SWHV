@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.math;
+package org.helioviewer.jhv.math;
 
 import org.helioviewer.jhv.base.logging.Log;
 

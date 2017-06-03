@@ -4,15 +4,15 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.JSONUtils;
-import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.DownloadStream;
 import org.helioviewer.jhv.io.PositionRequest;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
 public class PositionLoad {

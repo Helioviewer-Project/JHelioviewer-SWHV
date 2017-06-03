@@ -2,8 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.EventQueue;
 
-import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Mat4;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -12,6 +11,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 
 import com.jogamp.nativewindow.ScalableSurface;

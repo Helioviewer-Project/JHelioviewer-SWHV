@@ -2,7 +2,7 @@ package org.helioviewer.jhv.base.interval;
 
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class Interval implements Comparable<Interval> {

@@ -1,10 +1,10 @@
-package org.helioviewer.jhv.base.astronomy;
+package org.helioviewer.jhv.astronomy;
 
-import org.helioviewer.jhv.base.math.MathUtils;
-import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.time.JulianDay;
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.time.JulianDay;
+import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.TimeUtils;
 
 public class Sun {
 

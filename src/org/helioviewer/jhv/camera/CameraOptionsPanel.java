@@ -14,7 +14,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;

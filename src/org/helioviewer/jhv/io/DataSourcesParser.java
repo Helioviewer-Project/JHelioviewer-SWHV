@@ -6,8 +6,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.database.DataSourcesDB;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
 public class DataSourcesParser {

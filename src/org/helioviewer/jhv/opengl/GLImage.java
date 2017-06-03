@@ -4,9 +4,9 @@ import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.base.math.MathUtils;
-import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.json.JSONObject;

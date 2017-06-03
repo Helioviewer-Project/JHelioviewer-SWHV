@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.time;
+package org.helioviewer.jhv.time;
 
 import org.jetbrains.annotations.NotNull;
 

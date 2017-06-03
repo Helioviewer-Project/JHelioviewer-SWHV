@@ -4,12 +4,12 @@ import java.awt.Component;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
