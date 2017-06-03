@@ -14,7 +14,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.InteractionAnnotate;
@@ -35,6 +34,7 @@ import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.NEWTKeyAdapter;
 import org.helioviewer.jhv.input.NEWTMouseAdapter;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;

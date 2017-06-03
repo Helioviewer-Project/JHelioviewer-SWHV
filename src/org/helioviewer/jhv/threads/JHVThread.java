@@ -13,8 +13,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.database.EventDatabase;
+import org.helioviewer.jhv.log.Log;
 import org.jetbrains.annotations.NotNull;
 
 public class JHVThread {

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.logging;
+package org.helioviewer.jhv.log;
 
 import java.io.IOException;
 import java.io.InputStream;

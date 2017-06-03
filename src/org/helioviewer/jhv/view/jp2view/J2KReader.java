@@ -2,8 +2,8 @@ package org.helioviewer.jhv.view.jp2view;
 
 import java.io.IOException;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.jhv.view.jp2view.image.ImageParams;

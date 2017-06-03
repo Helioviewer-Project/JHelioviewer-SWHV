@@ -2,9 +2,9 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;
 
 public class LoadRemoteTask extends LoadURITask {

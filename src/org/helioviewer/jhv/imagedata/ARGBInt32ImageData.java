@@ -7,7 +7,7 @@ import java.awt.image.DataBufferInt;
 import java.nio.Buffer;
 import java.nio.IntBuffer;
 
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 
 public class ARGBInt32ImageData extends ImageData {
 

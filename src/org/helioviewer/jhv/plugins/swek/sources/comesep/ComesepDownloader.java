@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.event.SWEKDownloader;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;

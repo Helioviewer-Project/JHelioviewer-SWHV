@@ -12,7 +12,6 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKParameterFilter;
@@ -21,6 +20,7 @@ import org.helioviewer.jhv.data.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.event.SWEKSource;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader;

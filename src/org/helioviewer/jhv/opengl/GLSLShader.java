@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLException;

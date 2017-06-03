@@ -23,7 +23,6 @@ import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.SWEKGroup;
@@ -32,6 +31,7 @@ import org.helioviewer.jhv.data.event.SWEKParser;
 import org.helioviewer.jhv.data.event.SWEKRelatedEvents;
 import org.helioviewer.jhv.data.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 

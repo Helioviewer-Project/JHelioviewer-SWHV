@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import kdu_jni.KduException;
 
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduEngine;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduHelper;

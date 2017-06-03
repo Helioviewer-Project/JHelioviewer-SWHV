@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.logging;
+package org.helioviewer.jhv.log;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;

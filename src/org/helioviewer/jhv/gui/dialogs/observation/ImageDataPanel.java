@@ -16,16 +16,16 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.gui.components.calendar.JHVCarringtonPicker;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 
 /**

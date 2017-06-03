@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.view;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;

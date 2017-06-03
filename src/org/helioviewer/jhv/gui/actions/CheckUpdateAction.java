@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.JHVUpdate;
+import org.helioviewer.jhv.log.Log;
 
 @SuppressWarnings("serial")
 public class CheckUpdateAction extends AbstractAction {

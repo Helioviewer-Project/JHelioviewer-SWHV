@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.log.Log;
 import org.jetbrains.annotations.NotNull;
 
 public class DataSourcesDB {
