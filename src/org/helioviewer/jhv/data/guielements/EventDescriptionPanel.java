@@ -11,10 +11,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.event.JHVEvent;
+import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
 class EventDescriptionPanel extends JPanel implements MouseListener {

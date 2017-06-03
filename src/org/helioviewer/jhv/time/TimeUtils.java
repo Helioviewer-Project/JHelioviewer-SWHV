@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.time;
+package org.helioviewer.jhv.time;
 
 import java.time.Instant;
 import java.time.LocalDate;

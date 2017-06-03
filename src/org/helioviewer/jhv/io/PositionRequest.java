@@ -4,11 +4,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 
-import org.helioviewer.jhv.base.astronomy.Position;
-import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

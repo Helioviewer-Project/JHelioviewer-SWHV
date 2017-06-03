@@ -25,11 +25,11 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;

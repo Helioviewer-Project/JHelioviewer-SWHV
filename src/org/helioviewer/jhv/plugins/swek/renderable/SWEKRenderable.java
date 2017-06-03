@@ -10,13 +10,8 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.astronomy.Position;
-import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Mat4;
-import org.helioviewer.jhv.base.math.MathUtils;
-import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
@@ -28,6 +23,11 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.math.Mat4;
+import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;

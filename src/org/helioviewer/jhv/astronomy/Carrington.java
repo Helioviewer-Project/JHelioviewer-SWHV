@@ -1,11 +1,11 @@
-package org.helioviewer.jhv.base.astronomy;
+package org.helioviewer.jhv.astronomy;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.JulianDay;
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.JulianDay;
+import org.helioviewer.jhv.time.TimeUtils;
 
 public class Carrington {
 

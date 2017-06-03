@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.timelines.draw;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.time.TimeUtils;
 
 public class TimeAxis {
 

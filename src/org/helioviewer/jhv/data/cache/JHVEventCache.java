@@ -12,11 +12,11 @@ import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.helioviewer.jhv.time.TimeUtils;
 
 public class JHVEventCache {
 

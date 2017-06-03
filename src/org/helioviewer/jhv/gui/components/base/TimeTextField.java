@@ -5,7 +5,7 @@ import java.awt.event.FocusEvent;
 
 import javax.swing.JTextField;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
 public class TimeTextField extends JTextField {

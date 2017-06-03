@@ -3,12 +3,12 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Color;
 import java.awt.Component;
 
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;

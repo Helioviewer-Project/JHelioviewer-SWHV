@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.database.DataSourcesDB;
 import org.json.JSONObject;
 

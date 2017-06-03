@@ -9,11 +9,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
+import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
 public class DateTimePanel extends JPanel implements ActionListener, JHVCalendarListener {

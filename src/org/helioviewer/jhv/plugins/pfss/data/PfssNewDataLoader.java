@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.io.DownloadStream;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 import org.helioviewer.jhv.threads.CancelTask;
+import org.helioviewer.jhv.time.TimeUtils;
 
 public class PfssNewDataLoader implements Runnable {
 

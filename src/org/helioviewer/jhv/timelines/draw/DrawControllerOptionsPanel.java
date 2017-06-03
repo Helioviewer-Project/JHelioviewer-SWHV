@@ -6,11 +6,11 @@ import java.util.Calendar;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.base.astronomy.Carrington;
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 import com.jidesoft.swing.JideToggleButton;

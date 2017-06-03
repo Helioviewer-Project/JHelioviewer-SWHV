@@ -21,7 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.swing.JideButton;
 

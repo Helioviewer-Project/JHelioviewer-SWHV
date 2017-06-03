@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.camera;
 
-import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec3;
 
 import com.jogamp.newt.event.MouseEvent;
 

@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 
 @SuppressWarnings("serial")

@@ -1,7 +1,7 @@
-package org.helioviewer.jhv.base.astronomy;
+package org.helioviewer.jhv.astronomy;
 
-import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.time.JHVDate;
 
 public class Position {
 

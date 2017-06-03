@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 

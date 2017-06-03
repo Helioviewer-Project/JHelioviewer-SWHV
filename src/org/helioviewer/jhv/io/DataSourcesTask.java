@@ -8,9 +8,9 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
 public class DataSourcesTask extends JHVWorker<Void, Void> {

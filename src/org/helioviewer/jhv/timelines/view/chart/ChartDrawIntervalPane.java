@@ -17,8 +17,8 @@ import java.util.GregorianCalendar;
 
 import javax.swing.JComponent;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.DrawListener;

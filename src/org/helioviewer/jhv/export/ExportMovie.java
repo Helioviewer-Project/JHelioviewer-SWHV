@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.ImageUtils;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -20,6 +19,7 @@ import org.helioviewer.jhv.layers.FrameListener;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jogamp.opengl.GL2;
 

@@ -12,7 +12,7 @@ import java.awt.image.Raster;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;

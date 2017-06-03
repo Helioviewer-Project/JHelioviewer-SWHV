@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.math;
+package org.helioviewer.jhv.math;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

@@ -2,14 +2,14 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
 
-import org.helioviewer.jhv.base.math.Mat4;
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.math.Mat4;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.viewmodel.view.View;

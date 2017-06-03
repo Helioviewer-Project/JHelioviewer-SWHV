@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.viewmodel.imagedata;
 
-import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.math.MathUtils;
 
 public class SubImage {
 

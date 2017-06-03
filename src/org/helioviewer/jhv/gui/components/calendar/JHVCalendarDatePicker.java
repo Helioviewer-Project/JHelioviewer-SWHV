@@ -19,8 +19,8 @@ import javax.swing.JTextField;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.swing.JideButton;
 

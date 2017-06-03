@@ -14,7 +14,7 @@ import java.util.Map;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
