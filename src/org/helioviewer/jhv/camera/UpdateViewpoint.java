@@ -11,36 +11,43 @@ public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
 
-    UpdateViewpoint updateEcliptic = new UpdateViewpointEcliptic();
-    UpdateViewpoint updateEarthFixedDistance = new UpdateViewpointEarthFixedDistance();
-    UpdateViewpoint updateEarth = new UpdateViewpointEarth();
-    UpdateViewpoint updateExpert = new UpdateViewpointExpert();
-    UpdateViewpoint updateObserver = new UpdateViewpointObserver();
+    Ecliptic ecliptic = new Ecliptic();
+    EarthFixedDistance earthFixedDistance = new EarthFixedDistance();
+    Earth earth = new Earth();
+    Expert expert = new Expert();
+    Observer observer = new Observer();
 
-    class UpdateViewpointEcliptic implements UpdateViewpoint {
+    class Ecliptic implements UpdateViewpoint {
+
+        private double distance;
+
+        void setDistance(double d) {
+            distance = d;
+        }
+
         @Override
         public Position.Q update(JHVDate time) {
             Position.L p = Sun.getEarth(time);
-            return new Position.Q(time, Sun.EpochEarthQ.distance, Quat.rotate(Quat.Q90, new Quat(p.lat, p.lon)));
+            return new Position.Q(time, distance, Quat.rotate(Quat.Q90, new Quat(p.lat, p.lon)));
         }
     }
 
-    class UpdateViewpointEarthFixedDistance implements UpdateViewpoint {
+    class EarthFixedDistance implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             Position.L p = Sun.getEarth(time);
-            return new Position.Q(time, Sun.EpochEarthQ.distance, new Quat(0, p.lon));
+            return new Position.Q(time, Sun.MeanEarthDistance, new Quat(0, p.lon));
         }
     }
 
-    class UpdateViewpointEarth implements UpdateViewpoint {
+    class Earth implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             return Sun.getEarthQuat(time);
         }
     }
 
-    class UpdateViewpointObserver implements UpdateViewpoint {
+    class Observer implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             View view = Layers.getActiveView();
@@ -48,7 +55,7 @@ public interface UpdateViewpoint {
         }
     }
 
-    class UpdateViewpointExpert implements UpdateViewpoint {
+    class Expert implements UpdateViewpoint {
 
         private PositionLoad positionLoad;
 

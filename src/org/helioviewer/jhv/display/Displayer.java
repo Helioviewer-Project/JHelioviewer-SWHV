@@ -46,7 +46,7 @@ public class Displayer implements JHVEventHighlightListener {
         camera.reset();
     }
 
-    private static UpdateViewpoint updateViewpoint = UpdateViewpoint.updateObserver;
+    private static UpdateViewpoint updateViewpoint = UpdateViewpoint.observer;
 
     public static void setViewpointUpdate(UpdateViewpoint update) {
         updateViewpoint = update;
@@ -55,7 +55,7 @@ public class Displayer implements JHVEventHighlightListener {
     public static UpdateViewpoint getUpdateViewpoint() {
         if (mode == DisplayMode.Orthographic)
             return updateViewpoint;
-        return UpdateViewpoint.updateEarthFixedDistance;
+        return UpdateViewpoint.earthFixedDistance;
     }
 
     static int glWidth = 1;
