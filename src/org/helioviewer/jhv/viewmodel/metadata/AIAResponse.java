@@ -6,9 +6,9 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
+import org.helioviewer.jhv.io.DownloadStream;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")

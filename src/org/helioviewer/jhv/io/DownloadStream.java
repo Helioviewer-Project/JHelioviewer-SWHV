@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base;
+package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
 
@@ -15,6 +15,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.base.logging.Log;
 
 public class DownloadStream {
@@ -49,12 +50,8 @@ public class DownloadStream {
         ignore400 = _ignore400;
     }
 
-    private DownloadStream(URL _url, boolean _ignore400) {
+    public DownloadStream(URL _url, boolean _ignore400) {
         this(_url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), _ignore400);
-    }
-
-    public DownloadStream(String _url, boolean _ignore400) throws MalformedURLException {
-        this(new URL(_url), _ignore400);
     }
 
     public DownloadStream(URL _url) {

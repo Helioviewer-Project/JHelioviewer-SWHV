@@ -9,9 +9,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.io.DownloadStream;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 

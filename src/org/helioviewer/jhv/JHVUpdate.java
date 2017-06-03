@@ -8,10 +8,10 @@ import java.nio.charset.StandardCharsets;
 
 import javax.swing.JOptionPane;
 
-import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
+import org.helioviewer.jhv.io.DownloadStream;
 
 public class JHVUpdate implements Runnable {
     /**
