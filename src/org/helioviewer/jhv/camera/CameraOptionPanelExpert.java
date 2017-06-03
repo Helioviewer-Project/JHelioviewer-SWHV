@@ -130,7 +130,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         objectCombobox.setSelectedItem(SpaceObject.earth);
         objectCombobox.addActionListener(e -> {
             String object = ((SpaceObject) objectCombobox.getSelectedItem()).getUrlName();
-            positionLoad.setObserver(object, true);
+            positionLoad.setTarget(object, true);
             // Displayer.render();
         });
         add(objectCombobox, c);
