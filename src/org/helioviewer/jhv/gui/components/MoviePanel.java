@@ -42,8 +42,8 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
+import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.View.AnimationMode;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;

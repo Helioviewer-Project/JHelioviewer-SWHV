@@ -19,11 +19,11 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.viewmodel.metadata.AIAResponse;
-import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
+import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMessageSystem;
 
 public class JHelioviewer {
 

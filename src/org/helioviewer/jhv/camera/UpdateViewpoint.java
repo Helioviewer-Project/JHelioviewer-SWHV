@@ -5,7 +5,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVDate;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.view.View;
 
 public interface UpdateViewpoint {
 

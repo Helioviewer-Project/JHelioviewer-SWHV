@@ -13,12 +13,12 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.jhv.viewmodel.metadata.MetaData;
-import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
+import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.View.AnimationMode;
 
 public class Layers {
 

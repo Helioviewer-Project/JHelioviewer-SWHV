@@ -15,7 +15,7 @@ import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.view.View;
 
 public class DrawController implements JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {
 

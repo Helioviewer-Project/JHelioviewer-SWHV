@@ -11,8 +11,8 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.metadata.MetaData;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 public class ZoomOneToOneAction extends AbstractAction {

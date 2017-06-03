@@ -29,8 +29,8 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
-import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
+import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
 import org.json.JSONObject;
 
 public class RadioData extends AbstractTimelineRenderable {

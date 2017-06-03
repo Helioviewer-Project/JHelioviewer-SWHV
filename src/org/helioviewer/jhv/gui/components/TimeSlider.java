@@ -11,7 +11,7 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.view.View;
 
 /**
  * Extension of JSlider displaying the caching status on the track.
