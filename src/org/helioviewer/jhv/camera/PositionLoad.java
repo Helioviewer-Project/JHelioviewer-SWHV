@@ -2,19 +2,17 @@ package org.helioviewer.jhv.camera;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Iterator;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.astronomy.Position;
-import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.io.PositionRequest;
 import org.helioviewer.jhv.threads.JHVWorker;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class PositionLoad {
@@ -22,7 +20,7 @@ public class PositionLoad {
     private static final String LOADEDSTATE = "Loaded";
     private static final String FAILEDSTATE = "Failed";
 
-    private String observer = "Earth";
+    private String target = "Earth";
 
     private long beginTime = TimeUtils.EPOCH.milli;
     private long endTime = TimeUtils.EPOCH.milli;
@@ -39,24 +37,16 @@ public class PositionLoad {
 
     private class LoadPositionWorker extends JHVWorker<Position.L[], Void> {
 
-        private static final String baseURL = "http://swhv.oma.be/position?";
-        private static final String target = "SUN";
-
         private String report = null;
 
+        private final String tgt;
         private final long start;
         private final long end;
-        private final String obs;
 
-        public LoadPositionWorker(long _start, long _end, String _obs) {
+        public LoadPositionWorker(String _tgt, long _start, long _end) {
+            tgt = _tgt;
             start = _start;
             end = _end;
-            obs = _obs;
-        }
-
-        private String buildURL(long deltat) {
-            return baseURL + "abcorr=LT%2BS&utc=" + TimeUtils.format(start) + "&utc_end=" + TimeUtils.format(end) +
-                   "&deltat=" + deltat + "&observer=" + obs + "&target=" + target + "&ref=HEEQ&kind=latitudinal";
         }
 
         @Override
@@ -68,12 +58,12 @@ public class PositionLoad {
                 deltat = span / max;
 
             try {
-                DownloadStream ds = new DownloadStream(buildURL(deltat), true);
+                DownloadStream ds = new DownloadStream(new PositionRequest(tgt, start, end, deltat).url, true);
                 JSONObject result = JSONUtils.getJSONStream(ds.getInput());
                 if (ds.isResponse400()) {
                     report = result.optString("faultstring", "Invalid network response");
                 } else {
-                    return parseData(result);
+                    return PositionRequest.parseResponse(result);
                 }
             } catch (UnknownHostException e) {
                 Log.debug("Unknown host, network down?", e);
@@ -84,33 +74,6 @@ public class PositionLoad {
             }
 
             return null;
-        }
-
-        private Position.L[] parseData(JSONObject jsonResult) throws Exception {
-            JSONArray resArray = jsonResult.getJSONArray("result");
-            int len = resArray.length();
-            Position.L[] ret = new Position.L[len];
-
-            for (int j = 0; j < len; j++) {
-                JSONObject posObject = resArray.getJSONObject(j);
-                Iterator<String> iterKeys = posObject.keys();
-                if (!iterKeys.hasNext())
-                    throw new Exception("unexpected format");
-
-                String dateString = iterKeys.next();
-                JSONArray posArray = posObject.getJSONArray(dateString);
-
-                double rad = posArray.getDouble(0) * (1000. / Sun.RadiusMeter);
-                double jlon = posArray.getDouble(1);
-                double lon = jlon + (jlon > 0 ? -Math.PI : Math.PI);
-                double lat = -posArray.getDouble(2);
-
-                JHVDate time = new JHVDate(dateString);
-                Position.L p = Sun.getEarth(time);
-
-                ret[j] = new Position.L(time, rad, -lon + p.lon, lat);
-            }
-            return ret;
         }
 
         @Override
@@ -159,7 +122,7 @@ public class PositionLoad {
         }
         receiver.fireLoaded("Loading...");
 
-        worker = new LoadPositionWorker(beginTime, endTime, observer);
+        worker = new LoadPositionWorker(target, beginTime, endTime);
         worker.setThreadName("MAIN--PositionLoad");
         JHVGlobals.getExecutorService().execute(worker);
     }
@@ -228,8 +191,8 @@ public class PositionLoad {
         }
     }
 
-    public void setObserver(String object, boolean applyChanges) {
-        observer = object;
+    public void setTarget(String object, boolean applyChanges) {
+        target = object;
         if (applyChanges) {
             applyChanges();
         }
