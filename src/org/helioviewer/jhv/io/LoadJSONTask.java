@@ -2,7 +2,6 @@ package org.helioviewer.jhv.io;
 
 import java.net.URI;
 
-import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;

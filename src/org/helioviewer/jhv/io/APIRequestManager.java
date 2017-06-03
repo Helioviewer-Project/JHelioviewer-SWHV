@@ -5,7 +5,6 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.Locale;
 
-import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
