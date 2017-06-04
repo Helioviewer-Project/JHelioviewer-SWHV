@@ -17,15 +17,11 @@ import org.json.JSONObject;
 
 public class PositionLoad {
 
-    private static final String LOADEDSTATE = "Loaded";
-    private static final String FAILEDSTATE = "Failed";
-
     private String target = "Earth";
 
     private long beginTime = TimeUtils.EPOCH.milli;
     private long endTime = TimeUtils.EPOCH.milli;
 
-    private boolean isLoaded = false;
     private Position.L[] position = new Position.L[0];
     private JHVWorker<Position.L[], Void> worker;
 
@@ -68,9 +64,9 @@ public class PositionLoad {
             } catch (UnknownHostException e) {
                 Log.debug("Unknown host, network down?", e);
             } catch (IOException e) {
-                report = FAILEDSTATE + ": server error";
+                report = "Failed: server error";
             } catch (Exception e) {
-                report = FAILEDSTATE + ": JSON parse error: " + e;
+                report = "Failed: JSON parse error: " + e;
             }
 
             return null;
@@ -91,7 +87,7 @@ public class PositionLoad {
                         report = "empty response";
                     } else {
                         position = newPosition;
-                        setLoaded(true);
+                        receiver.fireLoaded("Loaded");
                     }
                 }
                 if (report != null) {
@@ -102,24 +98,14 @@ public class PositionLoad {
         }
     }
 
-    private void setLoaded(boolean _isLoaded) {
-        isLoaded = _isLoaded;
-        if (isLoaded) {
-            receiver.fireLoaded(LOADEDSTATE);
-        }
-    }
-
     public boolean isLoaded() {
-        return isLoaded;
+        return position.length > 0;
     }
 
     private void applyChanges() {
-        setLoaded(false);
         position = new Position.L[0];
-
-        if (worker != null) {
+        if (worker != null)
             worker.cancel(false);
-        }
         receiver.fireLoaded("Loading...");
 
         worker = new LoadPositionWorker(target, beginTime, endTime);
@@ -127,36 +113,9 @@ public class PositionLoad {
         JHVGlobals.getExecutorService().execute(worker);
     }
 
-    public void setBeginTime(long _beginTime, boolean applyChanges) {
-        beginTime = _beginTime;
-        if (applyChanges) {
-            applyChanges();
-        }
-    }
-
-    public void setEndTime(long _endTime, boolean applyChanges) {
-        endTime = _endTime;
-        if (applyChanges) {
-            applyChanges();
-        }
-    }
-
-    public long getStartTime() {
-        if (position.length > 0) {
-            return position[0].time.milli;
-        }
-        return -1L;
-    }
-
-    public long getEndTime() {
-        if (position.length > 0) {
-            return position[position.length - 1].time.milli;
-        }
-        return -1L;
-    }
 
     public Position.Q getInterpolatedPosition(long currentCameraTime) {
-        if (isLoaded && position.length > 0) {
+        if (position.length > 0) {
             double dist, hgln, hglt;
             long milli;
 
@@ -186,16 +145,38 @@ public class PositionLoad {
                 hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
             }
             return new Position.Q(new JHVDate(milli), dist, new Quat(hglt, hgln));
-        } else {
+        } else
             return null;
-        }
     }
 
     public void setTarget(String object, boolean applyChanges) {
         target = object;
-        if (applyChanges) {
+        if (applyChanges)
             applyChanges();
-        }
+    }
+
+    public void setBeginTime(long _beginTime, boolean applyChanges) {
+        beginTime = _beginTime;
+        if (applyChanges)
+            applyChanges();
+    }
+
+    public void setEndTime(long _endTime, boolean applyChanges) {
+        endTime = _endTime;
+        if (applyChanges)
+            applyChanges();
+    }
+
+    public long getStartTime() {
+        if (position.length > 0)
+            return position[0].time.milli;
+        return -1L;
+    }
+
+    public long getEndTime() {
+        if (position.length > 0)
+            return position[position.length - 1].time.milli;
+        return -1L;
     }
 
 }
