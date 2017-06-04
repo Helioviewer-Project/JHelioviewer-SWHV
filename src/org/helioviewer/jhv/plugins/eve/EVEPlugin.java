@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.eve;
 
 import java.util.concurrent.ExecutorService;
 
-import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
+import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eve.radio.RadioData;
 import org.helioviewer.jhv.plugins.eve.view.TimelineDataPanel;

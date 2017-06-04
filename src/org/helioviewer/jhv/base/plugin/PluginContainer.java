@@ -1,6 +1,4 @@
-package org.helioviewer.jhv.base.plugin.controller;
-
-import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
+package org.helioviewer.jhv.base.plugin;
 
 // The basic class which manages the interface between JHV and the contained
 // plugin. It manages the current status of the corresponding plug-in.

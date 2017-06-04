@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.JSONUtils;
-import org.helioviewer.jhv.base.plugin.controller.PluginManager;
+import org.helioviewer.jhv.base.plugin.PluginManager;
 import org.helioviewer.jhv.camera.Camera;
 // import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;

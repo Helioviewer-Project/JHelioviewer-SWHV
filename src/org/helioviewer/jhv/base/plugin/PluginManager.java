@@ -1,9 +1,8 @@
-package org.helioviewer.jhv.base.plugin.controller;
+package org.helioviewer.jhv.base.plugin;
 
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.json.JSONObject;
 
 /**

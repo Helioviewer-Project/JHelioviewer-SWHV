@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.plugin.controller;
+package org.helioviewer.jhv.base.plugin;
 
 import java.io.File;
 import java.io.IOException;
