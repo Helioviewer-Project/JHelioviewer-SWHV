@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.ProxySettings;
 import org.helioviewer.jhv.base.message.Message;
-import org.helioviewer.jhv.base.plugin.controller.PluginManager;
+import org.helioviewer.jhv.base.plugin.PluginManager;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLine;

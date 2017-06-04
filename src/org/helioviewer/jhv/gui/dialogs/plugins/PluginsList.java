@@ -7,8 +7,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
-import org.helioviewer.jhv.base.plugin.controller.PluginManager;
+import org.helioviewer.jhv.base.plugin.PluginContainer;
+import org.helioviewer.jhv.base.plugin.PluginManager;
 
 @SuppressWarnings("serial")
 class PluginsList extends JPanel {

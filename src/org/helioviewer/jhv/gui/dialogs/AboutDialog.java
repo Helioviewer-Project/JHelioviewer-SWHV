@@ -13,9 +13,9 @@ import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.plugin.controller.PluginContainer;
-import org.helioviewer.jhv.base.plugin.controller.PluginManager;
-import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
+import org.helioviewer.jhv.base.plugin.PluginContainer;
+import org.helioviewer.jhv.base.plugin.PluginManager;
+import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
