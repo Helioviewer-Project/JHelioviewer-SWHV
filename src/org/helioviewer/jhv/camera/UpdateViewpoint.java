@@ -65,30 +65,28 @@ public interface UpdateViewpoint {
 
         @Override
         public Position.Q update(JHVDate time) {
-            if (positionLoad.isLoaded()) {
-                long tLayerStart = 0, tLayerEnd = 0;
-                // Active layer times
-                View view = Layers.getActiveView();
-                if (view != null) {
-                    tLayerStart = view.getFirstTime().milli;
-                    tLayerEnd = view.getLastTime().milli;
-                }
+            if (!positionLoad.isLoaded())
+                return Sun.getEarthQuat(time);
 
-                // camera times
-                long tPositionStart = positionLoad.getStartTime();
-                long tPositionEnd = positionLoad.getEndTime();
-
-                long currentCameraTime;
-                if (tLayerEnd == tLayerStart)
-                    currentCameraTime = tPositionEnd;
-                else
-                    currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (time.milli - tLayerStart) / (double) (tLayerEnd - tLayerStart));
-
-                Position.Q pos = positionLoad.getInterpolatedPosition(currentCameraTime);
-                if (pos != null)
-                    return pos;
+            long tLayerStart = 0, tLayerEnd = 0;
+            // Active layer times
+            View view = Layers.getActiveView();
+            if (view != null) {
+                tLayerStart = view.getFirstTime().milli;
+                tLayerEnd = view.getLastTime().milli;
             }
-            return Sun.getEarthQuat(time);
+
+            // camera times
+            long tPositionStart = positionLoad.getStartTime();
+            long tPositionEnd = positionLoad.getEndTime();
+
+            long cameraTime;
+            if (tLayerEnd == tLayerStart)
+                cameraTime = tPositionEnd;
+            else
+                cameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (time.milli - tLayerStart) / (double) (tLayerEnd - tLayerStart));
+
+            return positionLoad.getInterpolatedPosition(cameraTime);
         }
 
     }

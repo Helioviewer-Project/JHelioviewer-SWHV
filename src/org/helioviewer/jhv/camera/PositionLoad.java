@@ -9,6 +9,7 @@ import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.io.DownloadStream;
 import org.helioviewer.jhv.io.PositionRequest;
 import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
@@ -113,40 +114,33 @@ public class PositionLoad {
         JHVGlobals.getExecutorService().execute(worker);
     }
 
+    public Position.Q getInterpolatedPosition(long time) {
+        double dist, hgln, hglt;
+        long milli;
 
-    public Position.Q getInterpolatedPosition(long currentCameraTime) {
-        if (position.length > 0) {
-            double dist, hgln, hglt;
-            long milli;
+        long tstart = position[0].time.milli;
+        long tend = position[position.length - 1].time.milli;
+        if (tstart == tend) {
+            milli = position[0].time.milli;
+            dist = position[0].rad;
+            hgln = position[0].lon;
+            hglt = position[0].lat;
+        } else {
+            double interpolatedIndex = (time - tstart) / (double) (tend - tstart) * position.length;
+            int i = (int) interpolatedIndex;
+            i = MathUtils.clip(i, 0, position.length - 1);
+            int inext = Math.min(i + 1, position.length - 1);
 
-            long tstart = getStartTime();
-            long tend = getEndTime();
-            if (tstart == tend) {
-                milli = position[0].time.milli;
-                dist = position[0].rad;
-                hgln = position[0].lon;
-                hglt = position[0].lat;
-            } else {
-                double interpolatedIndex = (currentCameraTime - tstart) / (double) (tend - tstart) * position.length;
-                int i = (int) interpolatedIndex;
-                i = Math.min(i, position.length - 1);
-                if (i < 0) {
-                    i = 0;
-                }
-                int inext = Math.min(i + 1, position.length - 1);
+            tstart = position[i].time.milli;
+            tend = position[inext].time.milli;
 
-                tstart = position[i].time.milli;
-                tend = position[inext].time.milli;
-
-                double alpha = tend == tstart ? 1. : ((currentCameraTime - tstart) / (double) (tend - tstart)) % 1.;
-                milli = (long) ((1. - alpha) * position[i].time.milli + alpha * position[inext].time.milli);
-                dist = (1. - alpha) * position[i].rad + alpha * position[inext].rad;
-                hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
-                hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
-            }
-            return new Position.Q(new JHVDate(milli), dist, new Quat(hglt, hgln));
-        } else
-            return null;
+            double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
+            milli = (long) ((1. - alpha) * position[i].time.milli + alpha * position[inext].time.milli);
+            dist = (1. - alpha) * position[i].rad + alpha * position[inext].rad;
+            hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
+            hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
+        }
+        return new Position.Q(new JHVDate(milli), dist, new Quat(hglt, hgln));
     }
 
     public void setTarget(String object, boolean applyChanges) {
