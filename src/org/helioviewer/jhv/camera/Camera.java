@@ -52,26 +52,6 @@ public class Camera {
         Displayer.render(1);
     }
 
-    private Position.Q saveViewpoint = null;
-
-    public void push(Position.Q v) {
-        if (!trackingMode) {
-            saveViewpoint = viewpoint;
-            viewpoint = v;
-            updateRotation();
-            updateWidth();
-        }
-    }
-
-    public void pop() {
-        if (!trackingMode && saveViewpoint != null) {
-            viewpoint = saveViewpoint;
-            saveViewpoint = null;
-            updateRotation();
-            updateWidth();
-        }
-    }
-
     public Position.Q getViewpoint() {
         return viewpoint;
     }

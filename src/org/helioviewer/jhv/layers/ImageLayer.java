@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -222,26 +223,25 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
             shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
 
-            camera.push(imageData.getViewpoint());
+            Position.Q viewpoint = imageData.getViewpoint();
 
-            Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp);
+            Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp, viewpoint.distance);
             if (Displayer.mode == Displayer.DisplayMode.Orthographic)
                 vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
             else
                 vpmi.translate(new Vec3(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.));
-
-            Quat q = camera.getRotation();
             shader.bindMatrix(gl, vpmi.getFloatArray());
-            shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
 
+            Quat q = Quat.rotate(camera.getCurrentDragRotation(), viewpoint.orientation);
+            shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getCenterRotation()));
             DifferenceMode diffMode = glImage.getDifferenceMode();
             if (diffMode == DifferenceMode.Base) {
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getCenterRotation()));
             } else if (diffMode == DifferenceMode.Running) {
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getCenterRotation()));
             }
+
             shader.bindPolarRadii(gl, scale.getYstart(), scale.getYstop());
-            camera.pop();
 
             positionVBO.bindArray(gl);
             indexVBO.bindArray(gl);
