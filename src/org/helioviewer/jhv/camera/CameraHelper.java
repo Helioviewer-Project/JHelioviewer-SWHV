@@ -13,12 +13,12 @@ import com.jogamp.opengl.GL2;
 
 public class CameraHelper {
 
-    private static final double clipNear = Sun.Radius * 3;
-    private static final double clipFar = Sun.Radius * 10000;
+    private static final double clipNear = 3 * Sun.Radius;
+    private static final double clipFar = 10000 * Sun.Radius;
     private static final double[] identity = Mat4.identity().m;
 
-    public static Mat4 getOrthoMatrixInverse(Camera camera, Viewport vp) {
-        double width = camera.getWidth();
+    public static Mat4 getOrthoMatrixInverse(Camera camera, Viewport vp, double distance) {
+        double width = distance * Math.tan(0.5 * camera.getFOV());
         return Mat4.orthoInverse(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
     }
 
