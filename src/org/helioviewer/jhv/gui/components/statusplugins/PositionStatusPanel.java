@@ -41,19 +41,19 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
 
                 double d = camera.getViewpoint().distance;
-                int px = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(v.x, d));
-                int py = (int) Math.round((3600 * 180 / Math.PI) * Math.atan2(v.y, d));
+                double px = (180 / Math.PI) * Math.atan2(v.x, d);
+                double py = (180 / Math.PI) * Math.atan2(v.y, d);
 
                 setText(formatOrtho(coord, r, px, py));
             }
         }
     }
 
-    private static String formatArcsec(int a) {
-        if (Math.abs(a) < 1800)
-            return String.format("%+5d\u2033", a);
+    private static String formatXY(double p) {
+        if (Math.abs(p) < 0.5)
+            return String.format("%+5d\u2033", (int) Math.round(3600 * p));
         else
-            return String.format("%+.2f\u00B0", a / 3600.);
+            return String.format("%+.2f\u00B0", p);
     }
 
     private static String formatR(double r) {
@@ -63,13 +63,13 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             return String.format("%.2fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatOrtho(Vec2 coord, double r, int px, int py) {
+    private static String formatOrtho(Vec2 coord, double r, double px, double py) {
         String coordStr;
         if (coord == null || Double.isNaN(coord.x) || Double.isNaN(coord.y))
             coordStr = nullCoordStr;
         else
             coordStr = String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %s | (x,y) : (%s,%s)", coordStr, formatR(r), formatArcsec(px), formatArcsec(py));
+        return String.format("(\u03C6,\u03B8) : (%s) | \u03c1 : %s | (x,y) : (%s,%s)", coordStr, formatR(r), formatXY(px), formatXY(py));
     }
 
     @Override
