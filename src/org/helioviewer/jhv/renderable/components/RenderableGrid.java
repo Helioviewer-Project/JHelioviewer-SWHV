@@ -28,6 +28,9 @@ public class RenderableGrid extends AbstractRenderable {
         Viewpoint, Stonyhurst, Carrington, HCI
     }
 
+    private static final double RADIAL_UNIT = Sun.Radius /*Sun.MeanEarthDistance / 10*/;
+    private static final double RADIAL_STEP = 15 /*45*/;
+
     // height of text in solar radii
     private static final float textScale = (float) (0.08 * Sun.Radius);
     private static final double thickness = 0.001;
@@ -250,7 +253,7 @@ public class RenderableGrid extends AbstractRenderable {
 
         radialLabels.clear();
 
-        for (double phi = 0; phi < 360; phi += RenderableGridMath.STEP_DEGREES) {
+        for (double phi = 0; phi < 360; phi += RADIAL_STEP) {
             double angle = -phi * Math.PI / 180.;
             String txt = formatter1.format(phi);
             radialLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size - horizontalAdjustment),
@@ -350,7 +353,7 @@ public class RenderableGrid extends AbstractRenderable {
 
         radialCircleLine.init(gl);
         radialThickLine.init(gl);
-        RenderableGridMath.initRadialCircles(gl, radialCircleLine, radialThickLine);
+        RenderableGridMath.initRadialCircles(gl, radialCircleLine, radialThickLine, RADIAL_UNIT, RADIAL_STEP);
 
         flatLine.init(gl);
     }

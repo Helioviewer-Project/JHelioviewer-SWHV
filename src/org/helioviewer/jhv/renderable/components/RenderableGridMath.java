@@ -30,7 +30,6 @@ class RenderableGridMath {
     private static final int TENS_RADIUS = 3;
     private static final int END_RADIUS = TENS_RADIUS * 10;
     private static final int START_RADIUS = 2;
-    static final float STEP_DEGREES = 15;
 
     static final int FLAT_STEPS_THETA = 24;
     static final int FLAT_STEPS_RADIAL = 10;
@@ -106,8 +105,8 @@ class RenderableGridMath {
         earthCircleLine.setData(gl, positionBuffer, colorBuffer);
     }
 
-    static void initRadialCircles(GL2 gl, GLLine radialCircleLine, GLLine radialThickLine) {
-        int no_lines = (int) Math.ceil(360 / STEP_DEGREES);
+    static void initRadialCircles(GL2 gl, GLLine radialCircleLine, GLLine radialThickLine, double unit, double step) {
+        int no_lines = (int) Math.ceil(360 / step);
 
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 1) + 4 * no_lines + 1;
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
@@ -118,8 +117,8 @@ class RenderableGridMath {
         Vec3 v = new Vec3();
         for (int i = START_RADIUS; i <= END_RADIUS; i++) {
             for (int j = 0; j <= SUBDIVISIONS; j++) {
-                v.x = i * Sun.Radius * Math.cos(2 * Math.PI * j / SUBDIVISIONS);
-                v.y = i * Sun.Radius * Math.sin(2 * Math.PI * j / SUBDIVISIONS);
+                v.x = i * unit * Math.cos(2 * Math.PI * j / SUBDIVISIONS);
+                v.y = i * unit * Math.sin(2 * Math.PI * j / SUBDIVISIONS);
                 v.z = 0.;
                 if (i % 10 == 0) {
                     if (j == 0) {
@@ -144,17 +143,17 @@ class RenderableGridMath {
 
         float i = 0;
         for (int j = 0; j < no_lines; j++) {
-            i += STEP_DEGREES;
-            Quat q = Quat.createRotation(2 * Math.PI * i / 360., new Vec3(0, 0, 1));
+            i += step;
+            Quat q = Quat.createRotation((Math.PI / 180) * i, new Vec3(0, 0, 1));
 
-            v.set(START_RADIUS, 0, 0);
+            v.set(START_RADIUS * unit, 0, 0);
             Vec3 rotv1 = q.rotateVector(v);
             BufferUtils.put3f(positionBuffer, rotv1);
             colorBuffer.put(BufferUtils.colorNull);
             BufferUtils.put3f(positionBuffer, rotv1);
             colorBuffer.put(radialLineColor);
 
-            v.set(END_RADIUS, 0, 0);
+            v.set(END_RADIUS * unit, 0, 0);
             Vec3 rotv2 = q.rotateVector(v);
             BufferUtils.put3f(positionBuffer, rotv2);
             colorBuffer.put(radialLineColor);
@@ -233,7 +232,7 @@ class RenderableGridMath {
         for (int j = 0; j < no_lon_steps; j++) {
             for (int k = -1; k <= 1; k = k + 2) {
                 rotation = lonstepDegrees * j * k;
-                Quat q = Quat.createRotation(Math.PI / 2 + Math.PI + 2 * Math.PI * rotation / 360., new Vec3(0, 1, 0));
+                Quat q = Quat.createRotation(Math.PI / 2 + Math.PI + (Math.PI / 180) * rotation, new Vec3(0, 1, 0));
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
                     v.x = GRID_RADIUS * Math.cos(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
                     v.y = GRID_RADIUS * Math.sin(-Math.PI / 2 + Math.PI * i / HALFDIVISIONS);
