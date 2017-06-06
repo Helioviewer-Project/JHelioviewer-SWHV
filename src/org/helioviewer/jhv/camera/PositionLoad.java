@@ -135,12 +135,11 @@ public class PositionLoad {
             tend = position[inext].time.milli;
 
             double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
-            milli = (long) ((1. - alpha) * position[i].time.milli + alpha * position[inext].time.milli);
             dist = (1. - alpha) * position[i].rad + alpha * position[inext].rad;
             hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
             hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
         }
-        return new Position.Q(new JHVDate(milli), dist, new Quat(hglt, hgln));
+        return new Position.Q(new JHVDate(time), dist, new Quat(hglt, hgln));
     }
 
     public void setTarget(String object, boolean applyChanges) {
