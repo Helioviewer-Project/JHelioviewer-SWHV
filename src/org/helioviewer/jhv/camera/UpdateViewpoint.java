@@ -88,7 +88,7 @@ public interface UpdateViewpoint {
                 cameraTime = (long) (positionStart + alpha * (positionEnd - positionStart) + .5);
             }
 
-            return positionLoad.getInterpolatedPosition(cameraTime);
+            return positionLoad.getInterpolatedQ(cameraTime);
         }
 
     }

@@ -59,11 +59,7 @@ public class PositionRequest {
             double rad = posArray.getDouble(0) * (1000. / Sun.RadiusMeter);
             double lon = posArray.getDouble(1);
             double lat = posArray.getDouble(2);
-
-            JHVDate time = new JHVDate(dateString);
-            Position.L p = Sun.getEarth(time);
-
-            ret[j] = new Position.L(time, rad, p.lon - lon, lat);
+            ret[j] = new Position.L(new JHVDate(dateString), rad, lon, lat);
         }
         return ret;
     }
