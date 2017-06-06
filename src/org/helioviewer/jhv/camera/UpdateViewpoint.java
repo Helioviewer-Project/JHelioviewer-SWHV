@@ -68,23 +68,25 @@ public interface UpdateViewpoint {
             if (!positionLoad.isLoaded())
                 return Sun.getEarthQuat(time);
 
-            long tLayerStart = 0, tLayerEnd = 0;
+            long layerStart = 0, layerEnd = 0;
             // Active layer times
             View view = Layers.getActiveView();
             if (view != null) {
-                tLayerStart = view.getFirstTime().milli;
-                tLayerEnd = view.getLastTime().milli;
+                layerStart = view.getFirstTime().milli;
+                layerEnd = view.getLastTime().milli;
             }
 
             // camera times
-            long tPositionStart = positionLoad.getStartTime();
-            long tPositionEnd = positionLoad.getEndTime();
+            long positionStart = positionLoad.getStartTime();
+            long positionEnd = positionLoad.getEndTime();
 
             long cameraTime;
-            if (tLayerEnd == tLayerStart)
-                cameraTime = tPositionEnd;
-            else
-                cameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (time.milli - tLayerStart) / (double) (tLayerEnd - tLayerStart));
+            if (layerEnd == layerStart)
+                cameraTime = positionEnd;
+            else {
+                double alpha = (time.milli - layerStart) / (double) (layerEnd - layerStart); //!
+                cameraTime = (long) (positionStart + alpha * (positionEnd - positionStart) + .5);
+            }
 
             return positionLoad.getInterpolatedPosition(cameraTime);
         }
