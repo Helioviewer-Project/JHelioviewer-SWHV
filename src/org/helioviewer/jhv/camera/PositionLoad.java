@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.io.DownloadStream;
 import org.helioviewer.jhv.io.PositionRequest;
@@ -114,7 +115,7 @@ public class PositionLoad {
         JHVGlobals.getExecutorService().execute(worker);
     }
 
-    public Position.Q getInterpolatedPosition(long time) {
+    public Position.L getInterpolatedL(long time) {
         double dist, hgln, hglt;
         long milli;
 
@@ -139,7 +140,13 @@ public class PositionLoad {
             hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
             hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
         }
-        return new Position.Q(new JHVDate(time), dist, new Quat(hglt, hgln));
+        return new Position.L(new JHVDate(time), dist, hgln, hglt);
+    }
+
+    public Position.Q getInterpolatedQ(long time) {
+        Position.L p = getInterpolatedL(time);
+        Position.L e = Sun.getEarth(p.time);
+        return new Position.Q(p.time, p.rad, new Quat(p.lat, e.lon - p.lon));
     }
 
     public void setTarget(String object, boolean applyChanges) {
