@@ -117,12 +117,9 @@ public class PositionLoad {
 
     public Position.L getInterpolatedL(long time) {
         double dist, hgln, hglt;
-        long milli;
-
         long tstart = position[0].time.milli;
         long tend = position[position.length - 1].time.milli;
         if (tstart == tend) {
-            milli = position[0].time.milli;
             dist = position[0].rad;
             hgln = position[0].lon;
             hglt = position[0].lat;

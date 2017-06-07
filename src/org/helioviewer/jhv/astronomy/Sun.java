@@ -50,7 +50,7 @@ public class Sun {
 
     static {
         EpochEarthL = getEarth(TimeUtils.EPOCH);
-        EpochEarthQ = new Position.Q(EpochEarthL.time, EpochEarthL.rad, new Quat(EpochEarthL.lat, EpochEarthL.lon));
+        EpochEarthQ = getEarthQuat(TimeUtils.EPOCH);
     }
 
     public static Position.L getEarth(JHVDate time) {
