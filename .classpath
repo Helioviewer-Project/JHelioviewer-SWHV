@@ -12,7 +12,7 @@
     <classpathentry kind="lib" path="lib/gluegen-rt-natives-macosx-universal.jar"/>
     <classpathentry kind="lib" path="lib/gluegen-rt-natives-windows-amd64.jar"/>
     <classpathentry kind="lib" path="lib/gluegen-rt-natives-windows-i586.jar"/>
-    <classpathentry kind="lib" path="lib/guava-21.0.jar"/>
+    <classpathentry kind="lib" path="lib/guava-22.0.jar"/>
     <classpathentry kind="lib" path="lib/jackson-core-2.8.8.jar"/>
     <classpathentry kind="lib" path="lib/jcodec-0.1.9.jar"/>
     <classpathentry kind="lib" path="lib/jide-oss-3.6.16.jar"/>
