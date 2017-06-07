@@ -429,7 +429,8 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        mouseClicked(e);
+        BasicSliderUI ui = (BasicSliderUI) timeSlider.getUI();
+        timeSlider.setValue(ui.valueForXPosition(e.getX()));
     }
 
     @Override
@@ -438,8 +439,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        BasicSliderUI ui = (BasicSliderUI) timeSlider.getUI();
-        timeSlider.setValue(ui.valueForXPosition(e.getX()));
     }
 
     @Override
@@ -457,6 +456,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         if (wasPlaying) {
             Layers.pauseMovie();
         }
+        mouseDragged(e);
     }
 
     @Override
