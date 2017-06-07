@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
@@ -25,6 +28,14 @@ class TimeSlider extends JSlider implements LazyComponent {
     public TimeSlider(int _orientation, int min, int max, int value) {
         super(_orientation, min, max, value);
         setUI(new TimeSliderUI(this));
+
+        // remove all mouse listeners installed by BasicSliderUI.TrackListener
+        for (MouseListener l : getMouseListeners())
+            removeMouseListener(l);
+        for (MouseMotionListener l : getMouseMotionListeners())
+            removeMouseMotionListener(l);
+        for (MouseWheelListener l : getMouseWheelListeners())
+            removeMouseWheelListener(l);
     }
 
     // Overrides updateUI, to keep own SliderUI
@@ -66,17 +77,6 @@ class TimeSlider extends JSlider implements LazyComponent {
 
         public TimeSliderUI(JSlider component) {
             super(component);
-        }
-
-        @Override
-        protected TrackListener createTrackListener(JSlider _slider) {
-            return new TimeTrackListener();
-        }
-
-        @Override
-        protected void scrollDueToClickInTrack(int dir) {
-            if (trackListener instanceof TimeTrackListener)
-                slider.setValue(valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
         }
 
         @Override
@@ -127,11 +127,6 @@ class TimeSlider extends JSlider implements LazyComponent {
             g.dispose();
         }
 
-        // Overrides the track listener to access currentX
-        private class TimeTrackListener extends TrackListener {
-            public int getCurrentX() {
-                return currentMouseX;
-            }
-        }
     }
+
 }
