@@ -5,7 +5,6 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;

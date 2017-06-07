@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
@@ -30,6 +31,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -49,7 +51,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements ChangeListener, MouseListener, MouseWheelListener {
+public class MoviePanel extends JPanel implements ChangeListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
     // different animation speeds
     private enum SpeedUnit {
@@ -187,6 +189,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         timeSlider.setSnapToTicks(true);
         timeSlider.addChangeListener(this);
         timeSlider.addMouseListener(this);
+        timeSlider.addMouseMotionListener(this);
         addMouseWheelListener(this);
 
         timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RIGHT_ARROW");
@@ -425,7 +428,18 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     }
 
     @Override
+    public void mouseDragged(MouseEvent e) {
+        mouseClicked(e);
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+    }
+
+    @Override
     public void mouseClicked(MouseEvent e) {
+        BasicSliderUI ui = (BasicSliderUI) timeSlider.getUI();
+        timeSlider.setValue(ui.valueForXPosition(e.getX()));
     }
 
     @Override
