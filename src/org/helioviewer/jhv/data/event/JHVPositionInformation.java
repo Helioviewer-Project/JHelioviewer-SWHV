@@ -43,7 +43,7 @@ public class JHVPositionInformation {
         return boundBox;
     }
 
-    public Position.Q getEarthPosition() {
+    public Position.Q getEarth() {
         return earthPosition;
     }
 

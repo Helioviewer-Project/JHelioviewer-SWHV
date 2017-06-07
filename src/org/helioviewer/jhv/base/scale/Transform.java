@@ -38,8 +38,7 @@ public interface Transform {
             double y = r * Math.cos(theta);
             double x = r * Math.sin(theta);
             double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
-            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
-            Quat q = new Quat(p.lat, p.lon);
+            Quat q = Sun.getEarthQuat(Layers.getLastUpdatedTimestamp()).orientation;
             return q.rotateInverseVector(new Vec3(x, y, z));
         }
     }
