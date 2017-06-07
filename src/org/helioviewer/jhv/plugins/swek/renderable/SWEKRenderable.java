@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
@@ -115,26 +114,26 @@ public class SWEKRenderable extends AbstractRenderable {
         int lineResolution = 2;
         int angularResolution = (int) (angularWidthDegree / 4);
 
-        Position.Q p = evt.getPositionInformation().getEarthPosition();
+        Quat q = evt.getPositionInformation().getEarth().orientation;
         Color color = evtr.getColor();
 
         gl.glColor3f(0, 0, 0);
         gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);
 
         double thetaStart = principalAngle - angularWidth / 2.;
-        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.orientation);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q);
         double thetaEnd = principalAngle + angularWidth / 2.;
-        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.orientation);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q);
 
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
         gl.glLineWidth(LINEWIDTH_CACTUS);
 
-        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.orientation);
-        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.orientation);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q);
 
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, p.orientation);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, p.orientation);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, p.orientation);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q);
 
         if (optionsPanel.icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
@@ -156,7 +155,7 @@ public class SWEKRenderable extends AbstractRenderable {
 
                     v.x = r * Math.cos(theta);
                     v.y = r * Math.sin(theta);
-                    Vec3 res = p.orientation.rotateInverseVector(v);
+                    Vec3 res = q.rotateInverseVector(v);
 
                     gl.glTexCoord2f(el[0], el[1]);
                     gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);

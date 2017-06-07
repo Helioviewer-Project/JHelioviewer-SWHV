@@ -27,8 +27,7 @@ public interface UpdateViewpoint {
 
         @Override
         public Position.Q update(JHVDate time) {
-            Position.L p = Sun.getEarth(time);
-            return new Position.Q(time, distance, Quat.rotate(Quat.Q90, new Quat(p.lat, p.lon)));
+            return new Position.Q(time, distance, Quat.rotate(Quat.Q90, Sun.getEarthQuat(time).orientation));
         }
     }
 
