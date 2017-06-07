@@ -5,6 +5,11 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JulianDay;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.jetbrains.annotations.NotNull;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class Sun {
 
@@ -35,13 +40,30 @@ public class Sun {
     public static final Position.L EpochEarthL;
     public static final Position.Q EpochEarthQ;
 
+    private static final LoadingCache<JHVDate, Position.L> cache = CacheBuilder.newBuilder().maximumSize(10000).
+        build(new CacheLoader<JHVDate, Position.L>() {
+            @Override
+            public Position.L load(@NotNull JHVDate time) {
+                return getEarthInternal(time);
+            }
+        });
+
     static {
         EpochEarthL = getEarth(TimeUtils.EPOCH);
         EpochEarthQ = new Position.Q(EpochEarthL.time, EpochEarthL.rad, new Quat(EpochEarthL.lat, EpochEarthL.lon));
     }
 
-    // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
     public static Position.L getEarth(JHVDate time) {
+        try {
+            return cache.get(time);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return getEarthInternal(time);
+    }
+
+    // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
+    private static Position.L getEarthInternal(JHVDate time) {
         double mjd = JulianDay.milli2mjd(time.milli);
         double t = JulianDay.mjd2jcy(mjd, 2415020.);
 
