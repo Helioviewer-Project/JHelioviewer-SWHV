@@ -18,7 +18,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
-    private TimelineDataPanel observationPanel = new TimelineDataPanel();
+    private final TimelineDataPanel observationPanel = new TimelineDataPanel();
 
     public TimelineDialog() {
         super(ImageViewerGui.getMainFrame(), "New Layer", true);
