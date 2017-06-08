@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eve.lines;
+package org.helioviewer.jhv.timelines.data;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -9,8 +9,6 @@ import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.io.DownloadStream;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.timelines.TimelineSettings;
-import org.helioviewer.jhv.timelines.data.BandGroup;
-import org.helioviewer.jhv.timelines.data.BandType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,8 +17,6 @@ public class BandTypeAPI {
 
     private static final HashMap<String, BandGroup> groups = new HashMap<>();
     private static final ArrayList<BandGroup> orderedGroups = new ArrayList<>();
-
-    public static final EVEDataProvider eveDataprovider = new EVEDataProvider();
 
     public static void getDatasets() {
         try {
