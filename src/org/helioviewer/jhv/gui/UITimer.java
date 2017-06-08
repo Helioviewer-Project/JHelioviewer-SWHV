@@ -42,7 +42,7 @@ public class UITimer {
 
             int f = 0;
             if (Layers.isMoviePlaying()) {
-                f = (int) (Layers.getActiveView().getCurrentFramerate() + 0.5f);
+                f = Layers.getActiveView().getCurrentFramerate();
             }
 
             if (f != frameRate) {

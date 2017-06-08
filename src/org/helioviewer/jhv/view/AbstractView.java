@@ -55,7 +55,7 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public float getCurrentFramerate() {
+    public int getCurrentFramerate() {
         return 0;
     }
 
