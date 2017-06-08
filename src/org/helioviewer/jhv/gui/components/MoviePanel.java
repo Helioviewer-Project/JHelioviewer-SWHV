@@ -10,11 +10,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -31,7 +26,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -51,7 +45,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements ChangeListener, MouseListener, MouseMotionListener, MouseWheelListener {
+public class MoviePanel extends JPanel implements ChangeListener {
 
     // different animation speeds
     private enum SpeedUnit {
@@ -129,11 +123,8 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         protected abstract Dimension getSize();
     }
 
-    // Status
-    private static boolean isAdvanced = false;
-    private static boolean wasPlaying = false;
+    private static boolean isAdvanced;
 
-    // Gui elements
     private static TimeSlider timeSlider;
     private static JLabel frameNumberLabel;
     private static JideButton prevFrameButton;
@@ -150,8 +141,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
     private static final JPanel speedPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
     private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
     private static final JPanel recordPanel = new JPanel(new GridBagLayout());
-
-    private static boolean someoneIsDragging = false;
 
     private static MoviePanel instance;
 
@@ -186,11 +175,7 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
         // Time line
         timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
-        timeSlider.setSnapToTicks(true);
         timeSlider.addChangeListener(this);
-        timeSlider.addMouseListener(this);
-        timeSlider.addMouseMotionListener(this);
-        addMouseWheelListener(this);
 
         timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RIGHT_ARROW");
         timeSlider.getActionMap().put("RIGHT_ARROW", getNextFrameAction());
@@ -387,10 +372,8 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
         recordPanel.setVisible(advanced);
     }
 
-    /**
-     * Updates the speed of the animation. This function is called when changing
-     * the speed of the animation or its unit.
-     */
+    // Updates the speed of the animation. This function is called when changing
+    // the speed of the animation or its unit.
     private static void updateMovieSpeed() {
         int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
         if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
@@ -410,73 +393,21 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        // Jump to different frame
-        int val = timeSlider.getValue();
-        Layers.setFrame(val);
-        frameNumberLabel.setText((val + 1) + "/" + (timeSlider.getMaximum() + 1));
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        if (isEnabled()) {
-            if (e.getWheelRotation() < 0) {
-                Layers.nextFrame();
-            } else if (e.getWheelRotation() > 0) {
-                Layers.previousFrame();
-            }
+        if (!timeSlider.getValueIsAdjusting()) {
+            int val = timeSlider.getValue();
+            Layers.setFrame(val);
+            frameNumberLabel.setText((val + 1) + "/" + (timeSlider.getMaximum() + 1));
         }
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        BasicSliderUI ui = (BasicSliderUI) timeSlider.getUI();
-        timeSlider.setValue(ui.valueForXPosition(e.getX()));
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        someoneIsDragging = true;
-        wasPlaying = Layers.isMoviePlaying();
-        if (wasPlaying) {
-            Layers.pauseMovie();
-        }
-        mouseDragged(e);
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        if (wasPlaying) {
-            Layers.playMovie();
-        }
-        someoneIsDragging = false;
     }
 
     // only for Layers
     public static void setPlayState(boolean play) {
-        if (!someoneIsDragging) {
-            if (play) {
-                playButton.setText(Buttons.pause);
-                playButton.setToolTipText("Pause movie");
-            } else {
-                playButton.setText(Buttons.play);
-                playButton.setToolTipText("Play movie");
-            }
+       if (play) {
+            playButton.setText(Buttons.pause);
+            playButton.setToolTipText("Pause movie");
+        } else {
+            playButton.setText(Buttons.play);
+            playButton.setToolTipText("Play movie");
         }
     }
 
@@ -515,7 +446,6 @@ public class MoviePanel extends JPanel implements ChangeListener, MouseListener,
                 ImageViewerGui.getFramerateStatusPanel().update(f);
             }
 
-            //EventQueue.invokeLater(DrawController::draw);
             DrawController.draw();
         }
 
