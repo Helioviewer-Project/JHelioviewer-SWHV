@@ -39,6 +39,8 @@ public class UITimer {
             }
             MoviePanel.getTimeSlider().lazyRepaint();
             ImageViewerGui.getRenderableContainerPanel().lazyRepaint();
+            ImageViewerGui.getCarringtonStatusPanel().lazyRepaint();
+            ImageViewerGui.getZoomStatusPanel().lazyRepaint();
 
             int f = 0;
             if (Layers.isMoviePlaying()) {
