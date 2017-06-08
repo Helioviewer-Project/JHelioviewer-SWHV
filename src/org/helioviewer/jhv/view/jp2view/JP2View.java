@@ -50,9 +50,9 @@ public class JP2View extends AbstractView {
     private int targetFrame = 0;
     private int trueFrame = -1;
 
-    private int fpsCount = 0;
+    private int fps;
+    private int fpsCount;
     private long fpsTime = System.currentTimeMillis();
-    private float fps;
 
     private final RenderExecutor executor = new RenderExecutor();
     private final URI uri;
@@ -212,16 +212,15 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public float getCurrentFramerate() {
+    public int getCurrentFramerate() {
         long currentTime = System.currentTimeMillis();
         long delta = currentTime - fpsTime;
 
         if (delta > 1000) {
-            fps = 1000 * fpsCount / (float) delta;
+            fps = (int) (1000 * fpsCount / (double) delta + .5);
             fpsCount = 0;
             fpsTime = currentTime;
         }
-
         return fps;
     }
 
