@@ -26,6 +26,8 @@ import org.json.JSONObject;
 
 public class Band extends AbstractTimelineRenderable {
 
+    private static final DataProvider dataProvider = BandTypeAPI.eveDataprovider;
+
     private BandType bandType;
     private final LineOptionPanel optionsPanel;
 
@@ -50,7 +52,7 @@ public class Band extends AbstractTimelineRenderable {
         yAxis = new YAxis(yo);
         optionsPanel = new LineOptionPanel(this);
         JSONObject jbandType = jo.optJSONObject("bandType");
-        if(jbandType == null)
+        if (jbandType == null)
             throw new Exception("Bandtype not defined");
 
         String typeName = jbandType.optString("name", "");
@@ -58,11 +60,11 @@ public class Band extends AbstractTimelineRenderable {
         if (bandType == null)
             bandType = new BandType(jbandType);
         JSONObject jcolor = jo.optJSONObject("color");
-        if(jcolor !=null) {
+        if (jcolor != null) {
             int r = MathUtils.clip(jcolor.optInt("r", 0), 0, 255);
             int g = MathUtils.clip(jcolor.optInt("g", 0), 0, 255);
             int b = MathUtils.clip(jcolor.optInt("b", 0), 0, 255);
-            graphColor = new Color(r,g,b);
+            graphColor = new Color(r, g, b);
         }
     }
 
@@ -106,7 +108,7 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public void remove() {
-        bandType.getDataprovider().stopDownloads(this);
+        dataProvider.stopDownloads(this);
         BandColors.resetColor(graphColor);
     }
 
@@ -127,7 +129,7 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public boolean isDownloading() {
-        return bandType.getDataprovider().isDownloadActive(this);
+        return dataProvider.isDownloadActive(this);
     }
 
     @Override
@@ -152,9 +154,9 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
-        if (!isVisible) {
+        if (!isVisible)
             return;
-        }
+
         g.setColor(graphColor);
         for (BandCache.GraphPolyline line : graphPolylines) {
             g.drawPolyline(line.xPoints, line.yPoints, line.yPoints.length);
@@ -228,7 +230,7 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        bandType.getDataprovider().updateBand(this, selectedAxis.start, selectedAxis.end);
+        dataProvider.updateBand(this, selectedAxis.start, selectedAxis.end);
         updateGraphsData();
     }
 

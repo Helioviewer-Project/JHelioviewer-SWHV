@@ -2,7 +2,6 @@ package org.helioviewer.jhv.timelines.data;
 
 import java.util.HashMap;
 
-import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
 import org.json.JSONObject;
 
 public class BandType {
@@ -15,7 +14,6 @@ public class BandType {
     private double max;
     private boolean isLog;
     private String baseURL;
-    private DataProvider dataprovider;
 
     public BandType() {
     }
@@ -28,7 +26,6 @@ public class BandType {
         max = jo.optDouble("max", 1);
         isLog = jo.optBoolean("isLog", false);
         baseURL = jo.optString("baseURL", "");
-        dataprovider = BandTypeAPI.eveDataprovider;
     }
 
     public void serialize(JSONObject jo) {
@@ -106,14 +103,6 @@ public class BandType {
 
     public String getBaseURL() {
         return baseURL;
-    }
-
-    public DataProvider getDataprovider() {
-        return dataprovider;
-    }
-
-    public void setDataprovider(DataProvider _dataprovider) {
-        dataprovider = _dataprovider;
     }
 
 }
