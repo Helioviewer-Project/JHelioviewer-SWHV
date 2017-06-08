@@ -11,6 +11,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
@@ -28,6 +29,7 @@ import org.helioviewer.jhv.view.View;
 public class TimeSlider extends JSlider implements LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
 
     private final TimeSliderUI ui;
+    private JLabel label;
     private boolean dirty;
     private boolean wasPlaying;
 
@@ -50,6 +52,10 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
         addMouseWheelListener(this);
     }
 
+    void setLabel(JLabel _label) {
+        label = _label;
+    }
+
     // Overrides updateUI, to keep own SliderUI
     @Override
     public void updateUI() {
@@ -69,6 +75,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
     public void lazyRepaint() {
         if (dirty) {
             super.repaint();
+            label.setText((getValue() + 1) + "/" + (getMaximum() + 1));
             dirty = false;
         }
     }
