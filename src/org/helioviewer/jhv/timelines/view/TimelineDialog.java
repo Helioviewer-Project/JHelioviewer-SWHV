@@ -78,6 +78,7 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         observationPanel.updateGroupValues();
         pack();
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        pack(); // weird
         setVisible(true);
     }
 
