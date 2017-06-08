@@ -23,21 +23,17 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
 
@@ -305,7 +301,6 @@ public class MoviePanel extends JPanel implements ChangeListener {
         add(recordPanel);
 
         setEnabledState(false);
-        sliderTimer.start();
     }
 
     public static void clickRecordButton() {
@@ -411,44 +406,8 @@ public class MoviePanel extends JPanel implements ChangeListener {
         }
     }
 
-    private static final Timer sliderTimer = new Timer(1000 / 10, new SliderListener());
-    public static final BusyIndicator busyIndicator = new BusyIndicator();
-
-    private static volatile boolean cacheChanged = false;
-
-    // accessed from J2KReader threads
-    public static void cacheStatusChanged() {
-        cacheChanged = true;
-    }
-
-    private static class SliderListener implements ActionListener {
-
-        private int frameRate = -1;
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BusyIndicator.incrementAngle();
-
-            if (cacheChanged) {
-                cacheChanged = false;
-                timeSlider.repaint();
-            }
-            timeSlider.lazyRepaint();
-            ImageViewerGui.getRenderableContainerPanel().lazyRepaint();
-
-            int f = 0;
-            if (Layers.isMoviePlaying()) {
-                f = (int) (Layers.getActiveView().getCurrentFramerate() + 0.5f);
-            }
-
-            if (f != frameRate) {
-                frameRate = f;
-                ImageViewerGui.getFramerateStatusPanel().update(f);
-            }
-
-            DrawController.draw();
-        }
-
+    public static TimeSlider getTimeSlider() {
+        return timeSlider;
     }
 
     private static AbstractAction playPauseAction = null;
