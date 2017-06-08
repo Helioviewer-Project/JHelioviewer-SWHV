@@ -15,7 +15,7 @@ import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
+import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
@@ -26,7 +26,7 @@ import org.json.JSONObject;
 
 public class Band extends AbstractTimelineRenderable {
 
-    private static final DataProvider dataProvider = BandTypeAPI.eveDataprovider;
+    private static final DataProvider dataProvider = EVEPlugin.eveDataprovider;
 
     private BandType bandType;
     private final LineOptionPanel optionsPanel;
