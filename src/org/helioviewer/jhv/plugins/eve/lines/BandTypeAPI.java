@@ -41,7 +41,6 @@ public class BandTypeAPI {
         try {
             for (int i = 0; i < jsonObjectArray.length(); i++) {
                 bandtypes[i] = new BandType();
-                bandtypes[i].setDataprovider(eveDataprovider);
 
                 JSONObject job = jsonObjectArray.getJSONObject(i);
                 if (job.has("label")) {

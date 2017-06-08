@@ -108,15 +108,12 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
     @Override
     public void loadButtonPressed() {
         BandType bandType = (BandType) comboBoxData.getSelectedItem();
-        if (bandType == null) {
+        if (bandType == null)
             return;
-        }
 
         Band band = new Band(bandType);
-        Timelines.getModel().addLineData(band); // updateBand does stuff with TimelineTableModel
-
         band.setDataColor(BandColors.getNextColor());
-        bandType.getDataprovider().updateBand(band, DrawController.availableAxis.start, DrawController.availableAxis.end);
+        Timelines.getModel().addLineData(band);
 
         long time = calendarStartDate.getTime();
         long movieStart = Layers.getStartDate().milli;
