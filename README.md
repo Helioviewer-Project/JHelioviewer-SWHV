@@ -31,7 +31,7 @@ difficult to download, due to their size and the download rates available to mos
 users. From a scientist's perspective this poses three problems: accessing, browsing,
 and finding interesting data as efficiently as possible.
 
-With JHelioviewer, users can visualise the Sun for any time period between September
+With JHelioviewer users can visualise the Sun for any time period between September
 1991 and today; they can perform basic image processing in real time, track features
 on the Sun, and interactively overlay magnetic field extrapolations. The software
 integrates solar event data and a timeline display. Once an interesting event has

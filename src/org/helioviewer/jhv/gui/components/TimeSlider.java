@@ -5,8 +5,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import javax.swing.JSlider;
@@ -23,12 +25,18 @@ import org.helioviewer.jhv.view.View;
  * from the global look and feel.
  */
 @SuppressWarnings("serial")
-class TimeSlider extends JSlider implements LazyComponent {
+class TimeSlider extends JSlider implements LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
+
+    private final TimeSliderUI ui;
+    private boolean dirty;
+    private boolean wasPlaying;
 
     public TimeSlider(int _orientation, int min, int max, int value) {
         super(_orientation, min, max, value);
-        setUI(new TimeSliderUI(this));
+        setSnapToTicks(true);
 
+        ui = new TimeSliderUI(this);
+        setUI(ui);
         // remove all mouse listeners installed by BasicSliderUI.TrackListener
         for (MouseListener l : getMouseListeners())
             removeMouseListener(l);
@@ -36,6 +44,10 @@ class TimeSlider extends JSlider implements LazyComponent {
             removeMouseMotionListener(l);
         for (MouseWheelListener l : getMouseWheelListeners())
             removeMouseWheelListener(l);
+
+        addMouseListener(this);
+        addMouseMotionListener(this);
+        addMouseWheelListener(this);
     }
 
     // Overrides updateUI, to keep own SliderUI
@@ -53,14 +65,55 @@ class TimeSlider extends JSlider implements LazyComponent {
         dirty = true;
     }
 
-    private boolean dirty = false;
-
     @Override
     public void lazyRepaint() {
         if (dirty) {
             super.repaint();
             dirty = false;
         }
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (e.getWheelRotation() < 0)
+            Layers.nextFrame();
+        else if (e.getWheelRotation() > 0)
+            Layers.previousFrame();
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        setValue(ui.valueForXPosition(e.getX()));
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        wasPlaying = Layers.isMoviePlaying();
+        if (wasPlaying)
+            Layers.pauseMovie();
+        mouseDragged(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (wasPlaying)
+            Layers.playMovie();
     }
 
     /**
@@ -88,7 +141,7 @@ class TimeSlider extends JSlider implements LazyComponent {
             g.drawLine(x, thumbRect.y, x, thumbRect.y + thumbRect.height - 1);
         }
 
-        // Draws the different region (no/partial/complete information
+        // Draws the different regions: no/partial/complete information
         @Override
         public void paintTrack(Graphics g1) {
             Graphics2D g = (Graphics2D) g1.create();
