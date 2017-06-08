@@ -18,7 +18,7 @@ public class BandTypeAPI {
     private static final HashMap<String, BandGroup> groups = new HashMap<>();
     private static final ArrayList<BandGroup> orderedGroups = new ArrayList<>();
 
-    public static void getDatasets() {
+    static void getDatasets() {
         try {
             JSONObject jsonmain = JSONUtils.getJSONStream(new DownloadStream(TimelineSettings.baseURL).getInput());
             updateBandGroups(jsonmain.getJSONArray("groups"));
