@@ -3,7 +3,6 @@ package org.helioviewer.jhv.timelines.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.helioviewer.jhv.log.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
