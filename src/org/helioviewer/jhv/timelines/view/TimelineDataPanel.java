@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eve.view;
+package org.helioviewer.jhv.timelines.view;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -6,7 +6,6 @@ import java.util.HashSet;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -14,17 +13,16 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.data.Band;
 import org.helioviewer.jhv.timelines.data.BandColors;
 import org.helioviewer.jhv.timelines.data.BandGroup;
 import org.helioviewer.jhv.timelines.data.BandType;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.view.TimelineContentPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
+public class TimelineDataPanel extends JPanel {
 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
     private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
@@ -62,7 +60,6 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
         add(comboBoxData, c);
     }
 
-    @Override
     public void setupDatasets() {
         DefaultComboBoxModel<BandGroup> model = new DefaultComboBoxModel<>(BandTypeAPI.getGroups());
         if (model.getSize() > 0) {
@@ -71,16 +68,13 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
         }
     }
 
-    @Override
-    public void updateGroupValues() {
-        if (!userSet) {
+    void updateGroupValues() {
+        if (!userSet)
             calendarStartDate.setTime(Layers.getStartDate().milli);
-        }
 
         BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
-        if (selectedGroup == null) {
+        if (selectedGroup == null)
             return;
-        }
 
         DefaultComboBoxModel<BandType> model = (DefaultComboBoxModel<BandType>) comboBoxData.getModel();
         model.removeAllElements();
@@ -100,13 +94,11 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
             }
         }
 
-        if (model.getSize() > 0) {
+        if (model.getSize() > 0)
             comboBoxData.setSelectedIndex(0);
-        }
     }
 
-    @Override
-    public void loadButtonPressed() {
+    void loadButtonPressed() {
         BandType bandType = (BandType) comboBoxData.getSelectedItem();
         if (bandType == null)
             return;
@@ -124,11 +116,6 @@ public class TimelineDataPanel extends JPanel implements TimelineContentPanel {
             long now = System.currentTimeMillis();
             DrawController.setSelectedInterval(Math.min(time, now), Math.min(time + 2 * TimeUtils.DAY_IN_MILLIS, now));
         }
-    }
-
-    @Override
-    public JComponent getTimelineContentPanel() {
-        return this;
     }
 
 }

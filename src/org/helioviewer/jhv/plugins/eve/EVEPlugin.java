@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutorService;
 import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.plugins.eve.lines.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eve.radio.RadioData;
-import org.helioviewer.jhv.plugins.eve.view.TimelineDataPanel;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -26,7 +25,6 @@ public class EVEPlugin implements Plugin {
     public void installPlugin() {
         tl.installTimelines();
 
-        Timelines.td.setObservationPanel(new TimelineDataPanel());
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
             @Override

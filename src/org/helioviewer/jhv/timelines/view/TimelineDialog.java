@@ -6,7 +6,6 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -19,7 +18,7 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
-    private TimelineContentPanel observationPanel = new EmptyTimelineContentPanel();
+    private TimelineDataPanel observationPanel = new TimelineDataPanel();
 
     public TimelineDialog() {
         super(ImageViewerGui.getMainFrame(), "New Layer", true);
@@ -65,9 +64,8 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
 
     @Override
     public JComponent createContentPanel() {
-        JComponent panel = observationPanel.getTimelineContentPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        return panel;
+        observationPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        return observationPanel;
     }
 
     @Override
@@ -83,33 +81,8 @@ public class TimelineDialog extends StandardDialog implements ShowableDialog {
         setVisible(true);
     }
 
-    public TimelineContentPanel getObservationPanel() {
+    public TimelineDataPanel getObservationPanel() {
         return observationPanel;
-    }
-
-    public void setObservationPanel(TimelineContentPanel timelineContentPanel) {
-        observationPanel = timelineContentPanel;
-    }
-
-    private static class EmptyTimelineContentPanel implements TimelineContentPanel {
-
-        @Override
-        public void loadButtonPressed() {
-        }
-
-        @Override
-        public JComponent getTimelineContentPanel() {
-            return new JPanel();
-        }
-
-        @Override
-        public void setupDatasets() {
-        }
-
-        @Override
-        public void updateGroupValues() {
-        }
-
     }
 
 }
