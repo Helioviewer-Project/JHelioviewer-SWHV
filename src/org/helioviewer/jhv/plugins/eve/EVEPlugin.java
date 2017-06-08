@@ -6,9 +6,8 @@ import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.plugins.eve.lines.EVEDataProvider;
 import org.helioviewer.jhv.plugins.eve.radio.RadioData;
 import org.helioviewer.jhv.threads.JHVExecutor;
-import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.data.BandTypeAPI;
+import org.helioviewer.jhv.timelines.data.BandTypeTask;
 import org.json.JSONObject;
 
 public class EVEPlugin implements Plugin {
@@ -26,24 +25,7 @@ public class EVEPlugin implements Plugin {
     @Override
     public void installPlugin() {
         tl.installTimelines();
-
-        JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
-
-            @Override
-            protected Void backgroundWork() {
-                BandTypeAPI.getDatasets();
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                Timelines.td.getObservationPanel().setupDatasets();
-            }
-
-        };
-
-        loadSources.setThreadName("EVE--LoadSources");
-        executorService.execute(loadSources);
+        executorService.execute(new BandTypeTask());
     }
 
     @Override
