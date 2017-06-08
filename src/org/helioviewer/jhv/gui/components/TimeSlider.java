@@ -25,7 +25,7 @@ import org.helioviewer.jhv.view.View;
  * from the global look and feel.
  */
 @SuppressWarnings("serial")
-class TimeSlider extends JSlider implements LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
+public class TimeSlider extends JSlider implements LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
 
     private final TimeSliderUI ui;
     private boolean dirty;

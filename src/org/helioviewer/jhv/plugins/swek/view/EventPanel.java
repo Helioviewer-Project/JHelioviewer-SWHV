@@ -18,7 +18,7 @@ import javax.swing.JTree;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.data.event.SWEKGroup;
-import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
@@ -33,7 +33,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     private final SWEKGroup group;
 
     private final JLabel loadingLabel = new JLabel("    ");
-    private final JLayer<JComponent> layer = new JLayer<>(null, MoviePanel.busyIndicator);
+    private final JLayer<JComponent> layer = new JLayer<>(null, UITimer.busyIndicator);
 
     // The timer handling the loading animation
     private final Timer loadingTimer = new Timer(500, this);

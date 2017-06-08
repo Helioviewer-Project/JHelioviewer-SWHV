@@ -7,14 +7,14 @@ import javax.swing.JLabel;
 import javax.swing.JLayer;
 import javax.swing.JTable;
 
-import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 @SuppressWarnings("serial")
 public class RendererLoading extends JHVTableCellRenderer {
 
-    private final JLayer<JComponent> layer = new JLayer<>(null, MoviePanel.busyIndicator);
+    private final JLayer<JComponent> layer = new JLayer<>(null, UITimer.busyIndicator);
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

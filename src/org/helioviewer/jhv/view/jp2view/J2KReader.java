@@ -2,7 +2,7 @@ package org.helioviewer.jhv.view.jp2view;
 
 import java.io.IOException;
 
-import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.jp2view.cache.CacheStatus;
 import org.helioviewer.jhv.view.jp2view.concurrency.BooleanSignal;
@@ -181,7 +181,7 @@ class J2KReader implements Runnable {
                         }
                     }
 
-                    MoviePanel.cacheStatusChanged();
+                    UITimer.cacheStatusChanged();
 
                     // select next query based on strategy
                     if (!singleFrame)
