@@ -215,6 +215,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
         // Current frame number
         frameNumberLabel = new JLabel((timeSlider.getValue() + 1) + "/" + (timeSlider.getMaximum() + 1), JLabel.RIGHT);
         frameNumberLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+        timeSlider.setLabel(frameNumberLabel);
         secondLine.add(frameNumberLabel, BorderLayout.EAST);
 
         // The speed panel has some distinction from above as it is one of the advanced options
@@ -382,17 +383,13 @@ public class MoviePanel extends JPanel implements ChangeListener {
         // update just UI, tbd
         timeSlider.removeChangeListener(instance);
         timeSlider.setValue(frame);
-        frameNumberLabel.setText((frame + 1) + "/" + (timeSlider.getMaximum() + 1));
         timeSlider.addChangeListener(instance);
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (!timeSlider.getValueIsAdjusting()) {
-            int val = timeSlider.getValue();
-            Layers.setFrame(val);
-            frameNumberLabel.setText((val + 1) + "/" + (timeSlider.getMaximum() + 1));
-        }
+        if (!timeSlider.getValueIsAdjusting())
+            Layers.setFrame(timeSlider.getValue());
     }
 
     // only for Layers
