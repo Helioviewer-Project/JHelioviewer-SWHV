@@ -122,7 +122,6 @@ public class MoviePanel extends JPanel implements ChangeListener {
     private static boolean isAdvanced;
 
     private static TimeSlider timeSlider;
-    private static JLabel frameNumberLabel;
     private static JideButton prevFrameButton;
     private static JideButton nextFrameButton;
     private static JideButton playButton;
@@ -213,7 +212,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
         secondLine.add(buttonPanel, BorderLayout.WEST);
 
         // Current frame number
-        frameNumberLabel = new JLabel((timeSlider.getValue() + 1) + "/" + (timeSlider.getMaximum() + 1), JLabel.RIGHT);
+        JLabel frameNumberLabel = new JLabel((timeSlider.getValue() + 1) + "/" + (timeSlider.getMaximum() + 1), JLabel.RIGHT);
         frameNumberLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         timeSlider.setLabel(frameNumberLabel);
         secondLine.add(frameNumberLabel, BorderLayout.EAST);

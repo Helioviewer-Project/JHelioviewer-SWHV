@@ -25,7 +25,7 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
+public class CameraOptionsPanel extends JPanel {
 
     private enum CameraMode {
         Observer, Earth, Ecliptic, Other
@@ -101,9 +101,10 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
 
         ComponentUtils.smallVariant(this);
 
-        PositionLoad positionLoad = new PositionLoad(this);
+        expertOptionPanel = new CameraOptionPanelExpert();
+        PositionLoad positionLoad = new PositionLoad(expertOptionPanel);
+        expertOptionPanel.setPositionLoad(positionLoad);
         UpdateViewpoint.expert.setPositionLoad(positionLoad);
-        expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
     }
 
     public double getFOVAngle() {
@@ -159,12 +160,6 @@ public class CameraOptionsPanel extends JPanel implements PositionLoadFire {
         Displayer.getCamera().reset();
 
         switchOptionsPanel(panel);
-    }
-
-    @Override
-    public void fireLoaded(String state) {
-        expertOptionPanel.fireLoaded(state);
-        Displayer.getCamera().refresh();
     }
 
 }
