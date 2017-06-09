@@ -43,15 +43,43 @@ public interface UpdateViewpoint {
     class Ecliptic implements UpdateViewpoint {
 
         private double distance;
+        private PositionLoad positionLoad;
+
+        void setPositionLoad(PositionLoad _positionLoad) {
+            positionLoad = _positionLoad;
+        }
 
         void setDistance(double d) {
             distance = d;
         }
 
-        private PositionLoad positionLoad;
+        public Position.L getPosition(JHVDate time) {
+            if (!positionLoad.isLoaded()) {
+                Position.L p = Sun.getEarth(time);
+                return new Position.L(time, p.rad, 0, p.lat);
+            }
 
-        void setPositionLoad(PositionLoad _positionLoad) {
-            positionLoad = _positionLoad;
+            long layerStart = 0, layerEnd = 0;
+            // Active layer times
+            View view = Layers.getActiveView();
+            if (view != null) {
+                layerStart = view.getFirstTime().milli;
+                layerEnd = view.getLastTime().milli;
+            }
+
+            // camera times
+            long positionStart = positionLoad.getStartTime();
+            long positionEnd = positionLoad.getEndTime();
+
+            long cameraTime;
+            if (layerEnd == layerStart)
+                cameraTime = positionEnd;
+            else {
+                double alpha = (time.milli - layerStart) / (double) (layerEnd - layerStart); //!
+                cameraTime = (long) (positionStart + alpha * (positionEnd - positionStart) + .5);
+            }
+
+            return positionLoad.getInterpolatedL(cameraTime);
         }
 
         @Override
