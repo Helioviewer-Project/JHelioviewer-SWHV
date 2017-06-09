@@ -1,23 +1,28 @@
 package org.helioviewer.jhv.camera;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
-import org.helioviewer.jhv.gui.components.base.JSeparatorComboBox;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.view.View;
@@ -52,7 +57,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         c.gridy = 2;
         add(new JSeparator(SwingConstants.HORIZONTAL), c);
         c.gridy = 3;
-        addObjectCombobox(c);
+        addObjectList(c);
         c.gridy = 4;
         add(exactDateCheckBox, c);
         c.gridy = 5;
@@ -123,15 +128,23 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         }
     }
 
-    private void addObjectCombobox(GridBagConstraints c) {
-        JSeparatorComboBox objectCombobox = new JSeparatorComboBox(SpaceObject.getObjectList().toArray());
-        objectCombobox.setSelectedItem(SpaceObject.earth);
-        objectCombobox.addActionListener(e -> {
-            String object = ((SpaceObject) objectCombobox.getSelectedItem()).getUrlName();
-            positionLoad.setTarget(object, true);
-            // Displayer.render();
+    private void addObjectList(GridBagConstraints c) {
+        JList<Object> objectList = new JList<>(SpaceObject.getObjectArray());
+        objectList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        objectList.setSelectedValue(SpaceObject.Earth, true);
+        objectList.setCellRenderer(new SpaceObject.CellRenderer());
+        objectList.addListSelectionListener(e -> {
+            for (Object obj : objectList.getSelectedValuesList()) {
+                String object = ((SpaceObject) obj).getUrlName();
+                positionLoad.setTarget(object, true);
+                break;
+            }
         });
-        add(objectCombobox, c);
+
+        JScrollPane jsp = new JScrollPane(objectList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+        jsp.getViewport().setBackground(objectList.getBackground());
+        add(jsp, c);
     }
 
     private void setStartTime(boolean applyChanges) {
