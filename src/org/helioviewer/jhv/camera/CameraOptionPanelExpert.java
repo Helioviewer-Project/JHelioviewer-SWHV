@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.gui.components.base.JSeparatorComboBox;
@@ -22,9 +23,7 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
-public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener {
-
-    private final PositionLoad positionLoad;
+public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener, PositionLoadFire {
 
     private final JLabel loadedLabel = new JLabel("Status: Not loaded");
     private final JCheckBox exactDateCheckBox = new JCheckBox("Use master layer timestamps", true);
@@ -32,10 +31,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
 
     private JPanel buttonPanel;
+    private PositionLoad positionLoad;
 
-    CameraOptionPanelExpert(PositionLoad _positionLoad) {
-        positionLoad = _positionLoad;
-
+    CameraOptionPanelExpert() {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
@@ -174,8 +172,14 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         setEndTime(true);
     }
 
-    void fireLoaded(String state) {
+    void setPositionLoad(PositionLoad _positionLoad) {
+        positionLoad = _positionLoad;
+    }
+
+    @Override
+    public void fireLoaded(String state) {
         loadedLabel.setText("<html><body style='width: 200px'>Status: " + state);
+        Displayer.getCamera().refresh();
     }
 
 }
