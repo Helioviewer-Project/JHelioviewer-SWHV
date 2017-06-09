@@ -66,20 +66,7 @@ public interface UpdateViewpoint {
                 layerStart = view.getFirstTime().milli;
                 layerEnd = view.getLastTime().milli;
             }
-
-            // camera times
-            long positionStart = positionLoad.getStartTime();
-            long positionEnd = positionLoad.getEndTime();
-
-            long cameraTime;
-            if (layerEnd == layerStart)
-                cameraTime = positionEnd;
-            else {
-                double alpha = (time.milli - layerStart) / (double) (layerEnd - layerStart); //!
-                cameraTime = (long) (positionStart + alpha * (positionEnd - positionStart) + .5);
-            }
-
-            return positionLoad.getInterpolatedL(cameraTime);
+            return positionLoad.getInterpolatedL(positionLoad.interpolateTime(time.milli, layerStart, layerEnd));
         }
 
         @Override
@@ -108,20 +95,7 @@ public interface UpdateViewpoint {
                 layerStart = view.getFirstTime().milli;
                 layerEnd = view.getLastTime().milli;
             }
-
-            // camera times
-            long positionStart = positionLoad.getStartTime();
-            long positionEnd = positionLoad.getEndTime();
-
-            long cameraTime;
-            if (layerEnd == layerStart)
-                cameraTime = positionEnd;
-            else {
-                double alpha = (time.milli - layerStart) / (double) (layerEnd - layerStart); //!
-                cameraTime = (long) (positionStart + alpha * (positionEnd - positionStart) + .5);
-            }
-
-            return positionLoad.getInterpolatedQ(cameraTime);
+            return positionLoad.getInterpolatedQ(positionLoad.interpolateTime(time.milli, layerStart, layerEnd));
         }
 
     }
