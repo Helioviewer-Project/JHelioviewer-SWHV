@@ -129,14 +129,13 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     private void addObjectList(GridBagConstraints c) {
-        JList<Object> objectList = new JList<>(SpaceObject.getObjectArray());
+        JList<SpaceObject> objectList = new JList<>(SpaceObject.getObjectArray());
         objectList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectList.setSelectedValue(SpaceObject.Earth, true);
         objectList.setCellRenderer(new SpaceObject.CellRenderer());
         objectList.addListSelectionListener(e -> {
-            for (Object obj : objectList.getSelectedValuesList()) {
-                String object = ((SpaceObject) obj).getUrlName();
-                positionLoad.setTarget(object, true);
+            for (SpaceObject object : objectList.getSelectedValuesList()) {
+                positionLoad.setTarget(object.getUrlName(), true);
                 break;
             }
         });
