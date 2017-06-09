@@ -11,23 +11,24 @@ public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
 
-    Ecliptic ecliptic = new Ecliptic();
-    EarthFixedDistance earthFixedDistance = new EarthFixedDistance();
-    Earth earth = new Earth();
-    Expert expert = new Expert();
     Observer observer = new Observer();
+    Earth earth = new Earth();
+    EarthFixedDistance earthFixedDistance = new EarthFixedDistance();
+    Ecliptic ecliptic = new Ecliptic();
+    Expert expert = new Expert();
 
-    class Ecliptic implements UpdateViewpoint {
-
-        private double distance;
-
-        void setDistance(double d) {
-            distance = d;
-        }
-
+    class Observer implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
-            return new Position.Q(time, distance, Quat.rotate(Quat.Q90, Sun.getEarthQuat(time).orientation));
+            View view = Layers.getActiveView();
+            return view == null ? Sun.getEarthQuat(time) : view.getMetaData(time).getViewpoint();
+        }
+    }
+
+    class Earth implements UpdateViewpoint {
+        @Override
+        public Position.Q update(JHVDate time) {
+            return Sun.getEarthQuat(time);
         }
     }
 
@@ -39,18 +40,23 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Earth implements UpdateViewpoint {
-        @Override
-        public Position.Q update(JHVDate time) {
-            return Sun.getEarthQuat(time);
-        }
-    }
+    class Ecliptic implements UpdateViewpoint {
 
-    class Observer implements UpdateViewpoint {
+        private double distance;
+
+        void setDistance(double d) {
+            distance = d;
+        }
+
+        private PositionLoad positionLoad;
+
+        void setPositionLoad(PositionLoad _positionLoad) {
+            positionLoad = _positionLoad;
+        }
+
         @Override
         public Position.Q update(JHVDate time) {
-            View view = Layers.getActiveView();
-            return view == null ? Sun.getEarthQuat(time) : view.getMetaData(time).getViewpoint();
+            return new Position.Q(time, distance, Quat.rotate(Quat.Q90, Sun.getEarthQuat(time).orientation));
         }
     }
 

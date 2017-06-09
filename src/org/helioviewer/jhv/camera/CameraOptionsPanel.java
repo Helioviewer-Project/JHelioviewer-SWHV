@@ -35,6 +35,7 @@ public class CameraOptionsPanel extends JPanel {
     private double FOVAngle = FOVAngleDefault * Math.PI / 180.;
 
     private final CameraOptionPanelExpert expertOptionPanel;
+    private final CameraOptionPanelExpert eclipticOptionPanel;
     private CameraOptionPanel currentOptionPanel;
 
     private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
@@ -105,6 +106,11 @@ public class CameraOptionsPanel extends JPanel {
         PositionLoad positionLoad = new PositionLoad(expertOptionPanel);
         expertOptionPanel.setPositionLoad(positionLoad);
         UpdateViewpoint.expert.setPositionLoad(positionLoad);
+
+        eclipticOptionPanel = new CameraOptionPanelExpert();
+        PositionLoad positionLoad1 = new PositionLoad(eclipticOptionPanel);
+        eclipticOptionPanel.setPositionLoad(positionLoad1);
+        UpdateViewpoint.ecliptic.setPositionLoad(positionLoad1);
     }
 
     public double getFOVAngle() {
@@ -135,6 +141,7 @@ public class CameraOptionsPanel extends JPanel {
         }
         currentOptionPanel = newOptionPanel;
         revalidate();
+        repaint();
     }
 
     private void changeCamera(CameraMode mode) {
@@ -152,6 +159,7 @@ public class CameraOptionsPanel extends JPanel {
             case Ecliptic:
                 UpdateViewpoint.ecliptic.setDistance(2 * Sun.MeanEarthDistance / Math.tan(0.5 * Displayer.getCamera().getFOV()));
                 update = UpdateViewpoint.ecliptic;
+                panel = eclipticOptionPanel;
             break;
             default:
                 update = UpdateViewpoint.observer;
