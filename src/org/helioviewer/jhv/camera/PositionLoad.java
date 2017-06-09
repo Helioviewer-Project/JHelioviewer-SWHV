@@ -115,6 +115,17 @@ public class PositionLoad {
         JHVGlobals.getExecutorService().execute(worker);
     }
 
+    public long interpolateTime(long time, long start, long end) {
+        long pStart = position[0].time.milli;
+        long pEnd = position[position.length - 1].time.milli;
+        if (start == end)
+            return pEnd;
+        else {
+            double f = (time - start) / (double) (end - start); //!
+            return (long) (pStart + f * (pEnd - pStart) + .5);
+        }
+    }
+
     public Position.L getInterpolatedL(long time) {
         double dist, hgln, hglt;
         long tstart = position[0].time.milli;
@@ -162,18 +173,6 @@ public class PositionLoad {
         endTime = _endTime;
         if (applyChanges)
             applyChanges();
-    }
-
-    public long getStartTime() {
-        if (position.length > 0)
-            return position[0].time.milli;
-        return -1L;
-    }
-
-    public long getEndTime() {
-        if (position.length > 0)
-            return position[position.length - 1].time.milli;
-        return -1L;
     }
 
 }
