@@ -5,10 +5,10 @@ public class Quat {
     private static final double EPSILON = 0.000001;
 
     public static final Quat ZERO = new Quat();
-    public static final Quat Q90 = new Quat(Math.PI / 2, Math.PI / 2);
+    public static final Quat Q90 = new Quat(Math.PI / 2, 0);
 
-    private double a;
-    private Vec3 u;
+    private final double a;
+    private final Vec3 u;
 
     public static Quat createRotation(double angle, Vec3 v) {
         if (angle == 0.)
@@ -61,10 +61,36 @@ public class Quat {
         this.u = u;
     }
 
-    public Quat() {
+    private Quat() {
         this(1, new Vec3(0., 0., 0.));
     }
 
+    public Mat4 toMatrix() {
+        double w = a, w2 = w * w;
+        double x = u.x, x2 = x * x;
+        double y = u.y, y2 = y * y;
+        double z = u.z, z2 = z * z;
+
+        return new Mat4(w2 + x2 - y2 - z2, 2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0, 2 * x * y + 2 * w * z, w2 - x2 + y2 - z2, 2 * y * z - 2 * w * x, 0, 2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2, 0, 0, 0, 0, w2 + x2 + y2 + z2);
+        /*
+         * return new GL3DMat4( w2+x2-y2-z2, 2*x*y+2*w*z, 2*x*z-2*w*y, 0,
+         *
+         * 2*x*y-2*w*z, w2-x2+y2-z2, 2*y*z+2*w*x, 0,
+         *
+         * 2*x*z+2*w*y, 2*y*z-2*w*x, w2-x2-y2+z2, 0,
+         *
+         * 0, 0, 0, 1 );
+         */
+    }
+
+    public double getAngle() {
+        return a;
+    }
+
+    public Vec3 getRotationAxis() {
+        return u;
+    }
+/*
     public void clear() {
         this.a = 1;
         this.u = new Vec3();
@@ -87,32 +113,6 @@ public class Quat {
         return new Quat(an, x, y, z);
     }
 
-    public Mat4 toMatrix() {
-        double w = a, w2 = w * w;
-        double x = u.x, x2 = x * x;
-        double y = u.y, y2 = y * y;
-        double z = u.z, z2 = z * z;
-
-        return new Mat4(w2 + x2 - y2 - z2, 2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0, 2 * x * y + 2 * w * z, w2 - x2 + y2 - z2, 2 * y * z - 2 * w * x, 0, 2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2, 0, 0, 0, 0, w2 + x2 + y2 + z2);
-        /*
-         * return new GL3DMat4( w2+x2-y2-z2, 2*x*y+2*w*z, 2*x*z-2*w*y, 0,
-         * 
-         * 2*x*y-2*w*z, w2-x2+y2-z2, 2*y*z+2*w*x, 0,
-         * 
-         * 2*x*z+2*w*y, 2*y*z-2*w*x, w2-x2-y2+z2, 0,
-         * 
-         * 0, 0, 0, 1 );
-         */
-    }
-
-    public double getAngle() {
-        return this.a;
-    }
-
-    public Vec3 getRotationAxis() {
-        return this.u;
-    }
-
     public Quat add(Quat q) {
         this.u.add(q.u);
         this.a += q.a;
@@ -130,7 +130,7 @@ public class Quat {
         this.u.multiply(s);
         return this;
     }
-
+*/
     public static Quat rotate(Quat q1, Quat q2) {
         Quat q = new Quat(
             q1.a * q2.a - q1.u.x * q2.u.x - q1.u.y * q2.u.y - q1.u.z * q2.u.z,
@@ -150,7 +150,7 @@ public class Quat {
         // q.normalize();
         return q;
     }
-
+/*
     public Quat slerp(Quat r, double t) {
         double cosAngle = dot(r);
 
@@ -202,10 +202,19 @@ public class Quat {
         return this.a * q.a + this.u.x * q.u.x + this.u.y * q.u.y + this.u.z * q.u.z;
     }
 
+    public void conjugate() {
+        u.x = -u.x;
+        u.y = -u.y;
+        u.z = -u.z;
+    }
+
+    public Quat copy() {
+        return new Quat(this.a, this.u.copy());
+    }
+*/
     public static Quat calcRotation(Vec3 startPoint, Vec3 endPoint) {
         Vec3 rotationAxis = Vec3.cross(startPoint, endPoint);
         double rotationAngle = Math.atan2(rotationAxis.length(), Vec3.dot(startPoint, endPoint));
-
         return createRotation(rotationAngle, rotationAxis);
     }
 
@@ -231,18 +240,8 @@ public class Quat {
         return new Vec3(vvx, vvy, vvz);
     }
 
-    public void conjugate() {
-        u.x = -u.x;
-        u.y = -u.y;
-        u.z = -u.z;
-    }
-
     public float[] getFloatArray() {
         return new float[] { (float) u.x, (float) u.y, (float) u.z, (float) a };
-    }
-
-    public Quat copy() {
-        return new Quat(this.a, this.u.copy());
     }
 
     @Override

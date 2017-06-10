@@ -15,9 +15,9 @@ public class Camera {
     private static final double MAX_FOV = INITFOV * 30;
     private double fov = INITFOV;
 
-    private Quat rotation = new Quat();
+    private Quat rotation = Quat.ZERO;
     private final Vec2 currentTranslation = new Vec2();
-    private Quat currentDragRotation = new Quat();
+    private Quat currentDragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
     private boolean trackingMode;
@@ -45,7 +45,7 @@ public class Camera {
 
     public void reset() {
         currentTranslation.clear();
-        currentDragRotation.clear();
+        currentDragRotation = Quat.ZERO;
 
         updateCamera(Layers.getLastUpdatedTimestamp());
         CameraHelper.zoomToFit(this);
