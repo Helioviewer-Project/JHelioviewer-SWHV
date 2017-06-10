@@ -103,12 +103,12 @@ public class CameraOptionsPanel extends JPanel {
         ComponentUtils.smallVariant(this);
 
         expertOptionPanel = new CameraOptionPanelExpert();
-        PositionLoad positionLoad = new PositionLoad(expertOptionPanel);
+        PositionLoad positionLoad = new PositionLoad(expertOptionPanel, "HEEQ");
         expertOptionPanel.setPositionLoad(positionLoad);
         UpdateViewpoint.expert.setPositionLoad(positionLoad);
 
         eclipticOptionPanel = new CameraOptionPanelExpert();
-        PositionLoad positionLoad1 = new PositionLoad(eclipticOptionPanel);
+        PositionLoad positionLoad1 = new PositionLoad(eclipticOptionPanel, "HEE");
         eclipticOptionPanel.setPositionLoad(positionLoad1);
         UpdateViewpoint.ecliptic.setPositionLoad(positionLoad1);
     }

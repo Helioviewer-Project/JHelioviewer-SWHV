@@ -18,19 +18,21 @@ public class PositionRequest {
     private static final String observer = "SUN";
 
     private final String target;
+    private final String frame;
     private final long startTime;
     private final long endTime;
     private final long deltat;
 
     public final URL url;
 
-    public PositionRequest(String _target, long _startTime, long _endTime, long _deltat) {
+    public PositionRequest(String _target, String _frame, long _startTime, long _endTime, long _deltat) {
         target = _target;
+        frame = _frame;
         startTime = _startTime;
         endTime = _endTime;
         deltat = _deltat;
 
-        String req = baseURL + "ref=HEEQ&kind=latitudinal" + "&observer=" + observer + "&target=" + target +
+        String req = baseURL + "ref=" + frame + "&kind=latitudinal" + "&observer=" + observer + "&target=" + target +
                     "&utc=" + TimeUtils.format(startTime) + "&utc_end=" + TimeUtils.format(endTime) + "&deltat=" + deltat;
 
         URL _url = null;
