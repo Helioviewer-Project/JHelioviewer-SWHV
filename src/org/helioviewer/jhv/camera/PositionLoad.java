@@ -28,9 +28,11 @@ public class PositionLoad {
     private JHVWorker<Position.L[], Void> worker;
 
     private final PositionLoadFire receiver;
+    private final String frame;
 
-    public PositionLoad(PositionLoadFire _receiver) {
+    public PositionLoad(PositionLoadFire _receiver, String _frame) {
         receiver = _receiver;
+        frame = _frame;
     }
 
     private class LoadPositionWorker extends JHVWorker<Position.L[], Void> {
@@ -56,7 +58,7 @@ public class PositionLoad {
                 deltat = span / max;
 
             try {
-                DownloadStream ds = new DownloadStream(new PositionRequest(tgt, start, end, deltat).url, true);
+                DownloadStream ds = new DownloadStream(new PositionRequest(tgt, frame, start, end, deltat).url, true);
                 JSONObject result = JSONUtils.getJSONStream(ds.getInput());
                 if (ds.isResponse400()) {
                     report = result.optString("faultstring", "Invalid network response");

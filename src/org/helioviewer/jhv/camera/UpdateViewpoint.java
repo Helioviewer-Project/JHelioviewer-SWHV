@@ -56,7 +56,7 @@ public interface UpdateViewpoint {
         public Position.L getPosition(JHVDate time) {
             if (!positionLoad.isLoaded()) {
                 Position.L p = Sun.getEarth(time);
-                return new Position.L(time, p.rad, 0, p.lat);
+                return new Position.L(time, p.rad, 0, 0);
             }
 
             long layerStart = 0, layerEnd = 0;
