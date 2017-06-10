@@ -330,10 +330,6 @@ public class Mat4 {
         return this;
     }
 
-    public static Mat4 rotation(Quat q) {
-        return rotation(q.getAngle(), q.getRotationAxis());
-    }
-
     public static Mat4 rotation(double angle, Vec3 axis) {
         return rotation(angle, axis.x, axis.y, axis.z);
     }
