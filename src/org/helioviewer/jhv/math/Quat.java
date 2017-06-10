@@ -24,6 +24,10 @@ public class Quat {
         return new Quat(Math.cos(halfAngle), v.x * m, v.y * m, v.z * m);
     }
 
+    public static Quat createRotationAxis(double angle, Quat q) {
+        return createRotation(angle, q.u);
+    }
+
     public Quat(double ax, double ay, double az) {
         ax /= 2.;
         ay /= 2.;
@@ -32,11 +36,8 @@ public class Quat {
         double sy = Math.sin(ay), cy = Math.cos(ay);
         double sz = Math.sin(az), cz = Math.cos(az);
 
-        this.a = cx * cy * cz + sx * sy * sz;
-        this.u = new Vec3(
-                 sx * cy * cz - cx * sy * sz,
-                 cx * sy * cz + sx * cy * sz,
-                 sx * sy * cz - cx * cy * sz);
+        a = cx * cy * cz + sx * sy * sz;
+        u = new Vec3(sx * cy * cz - cx * sy * sz, cx * sy * cz + sx * cy * sz, sx * sy * cz - cx * cy * sz);
     }
 
     public Quat(double ax, double ay) {
@@ -45,20 +46,17 @@ public class Quat {
         double sx = Math.sin(ax), cx = Math.cos(ax);
         double sy = Math.sin(ay), cy = Math.cos(ay);
 
-        this.a = cx * cy;
-        this.u = new Vec3(
-                 sx * cy,
-                 cx * sy,
-                 sx * sy);
+        a = cx * cy;
+        u = new Vec3(sx * cy, cx * sy, sx * sy);
     }
 
     private Quat(double a, double x, double y, double z) {
         this(a, new Vec3(x, y, z));
     }
 
-    private Quat(double a, Vec3 u) {
-        this.a = a;
-        this.u = u;
+    private Quat(double _a, Vec3 _u) {
+        a = _a;
+        u = _u;
     }
 
     private Quat() {
@@ -82,15 +80,11 @@ public class Quat {
          * 0, 0, 0, 1 );
          */
     }
-
+/*
     public double getAngle() {
         return a;
     }
 
-    public Vec3 getRotationAxis() {
-        return u;
-    }
-/*
     public void clear() {
         this.a = 1;
         this.u = new Vec3();
@@ -132,23 +126,19 @@ public class Quat {
     }
 */
     public static Quat rotate(Quat q1, Quat q2) {
-        Quat q = new Quat(
+        return new Quat(
             q1.a * q2.a - q1.u.x * q2.u.x - q1.u.y * q2.u.y - q1.u.z * q2.u.z,
             q1.a * q2.u.x + q1.u.x * q2.a + q1.u.y * q2.u.z - q1.u.z * q2.u.y,
             q1.a * q2.u.y + q1.u.y * q2.a + q1.u.z * q2.u.x - q1.u.x * q2.u.z,
             q1.a * q2.u.z + q1.u.z * q2.a + q1.u.x * q2.u.y - q1.u.y * q2.u.x);
-        // q.normalize();
-        return q;
     }
 
     public static Quat rotateWithConjugate(Quat q1, Quat q2) {
-        Quat q = new Quat(
+        return new Quat(
             q1.a * q2.a + q1.u.x * q2.u.x + q1.u.y * q2.u.y + q1.u.z * q2.u.z,
            -q1.a * q2.u.x + q1.u.x * q2.a - q1.u.y * q2.u.z + q1.u.z * q2.u.y,
            -q1.a * q2.u.y + q1.u.y * q2.a - q1.u.z * q2.u.x + q1.u.x * q2.u.z,
            -q1.a * q2.u.z + q1.u.z * q2.a - q1.u.x * q2.u.y + q1.u.y * q2.u.x);
-        // q.normalize();
-        return q;
     }
 /*
     public Quat slerp(Quat r, double t) {

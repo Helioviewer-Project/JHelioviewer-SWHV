@@ -75,7 +75,7 @@ public class ViewROI {
             double rotationAngleY = Math.abs(Math.atan2(rotationAxis.length(), Vec3.dot(startPoint, endPoint)));
 
             if (Math.max(rotationAngleZ, rotationAngleY) > Math.PI / 2) {
-                camDiff = Quat.rotateWithConjugate(camDiff, Quat.createRotation(Math.PI, imageRotation.getRotationAxis()));
+                camDiff = Quat.rotateWithConjugate(camDiff, Quat.createRotationAxis(Math.PI, imageRotation));
                 for (int i = 0; i < pointlist.length; i++) {
                     Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, dePoints[i].x, dePoints[i].y, camDiff);
                     if (hitPoint != null) {
