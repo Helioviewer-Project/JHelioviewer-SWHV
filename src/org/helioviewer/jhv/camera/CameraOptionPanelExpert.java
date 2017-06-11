@@ -69,8 +69,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         c.gridy = 7;
         addSyncButtons(c);
 
-        startDateTimePanel.addListener(e -> setStartTime(true));
-        endDateTimePanel.addListener(e -> setEndTime(true));
+        startDateTimePanel.addListener(e -> request());
+        endDateTimePanel.addListener(e -> request());
 
         startDateTimePanel.setVisible(false);
         endDateTimePanel.setVisible(false);
@@ -80,10 +80,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             startDateTimePanel.setVisible(selected);
             endDateTimePanel.setVisible(selected);
             buttonPanel.setVisible(selected);
-            if (selected) {
-                setStartTime(false);
-                setEndTime(true);
-            }
+            if (selected)
+                request();
         });
 
         ComponentUtils.smallVariant(this);
@@ -123,9 +121,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     @Override
     public void activeLayerChanged(View view) {
-        if (exactDateCheckBox.isSelected()) {
+        if (exactDateCheckBox.isSelected())
             syncWithLayer();
-        }
     }
 
     private void addObjectList(GridBagConstraints c) {
@@ -135,7 +132,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         objectList.setCellRenderer(new SpaceObject.CellRenderer());
         objectList.addListSelectionListener(e -> {
             for (SpaceObject object : objectList.getSelectedValuesList()) {
-                positionLoad.setTarget(object.getUrlName(), true);
+                target = object.getUrlName();
+                request();
                 break;
             }
         });
@@ -146,14 +144,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         add(jsp, c);
     }
 
-    private void setStartTime(boolean applyChanges) {
-        positionLoad.setBeginTime(startDateTimePanel.getTime(), applyChanges);
-    }
-
-    private void setEndTime(boolean applyChanges) {
-        positionLoad.setEndTime(endDateTimePanel.getTime(), applyChanges);
-    }
-
     @Override
     void syncWithLayer() {
         View view = Layers.getActiveView();
@@ -162,26 +152,21 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         startDateTimePanel.setTime(view.getFirstTime().milli);
         endDateTimePanel.setTime(view.getLastTime().milli);
-        setStartTime(false);
-        setEndTime(true);
+        request();
     }
 
     private void syncBothLayerNow() {
         long now = System.currentTimeMillis();
-
         startDateTimePanel.setTime(now);
         endDateTimePanel.setTime(now);
-        setStartTime(false);
-        setEndTime(true);
+        request();
     }
 
     private void syncWithLayerCurrentTime() {
         long now = Layers.getLastUpdatedTimestamp().milli;
-
         startDateTimePanel.setTime(now);
         endDateTimePanel.setTime(now);
-        setStartTime(false);
-        setEndTime(true);
+        request();
     }
 
     void setPositionLoad(PositionLoad _positionLoad) {
@@ -192,6 +177,12 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     public void fireLoaded(String state) {
         loadedLabel.setText("<html><body style='width: 200px'>Status: " + state);
         Displayer.getCamera().refresh();
+    }
+
+    private String target = "Earth";
+
+    private void request() {
+        positionLoad.request(this, target, startDateTimePanel.getTime(), endDateTimePanel.getTime());
     }
 
 }

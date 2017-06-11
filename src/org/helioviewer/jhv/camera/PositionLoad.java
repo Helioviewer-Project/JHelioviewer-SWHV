@@ -14,24 +14,16 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
-import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
 public class PositionLoad {
 
-    private String target = "Earth";
-
-    private long beginTime = TimeUtils.EPOCH.milli;
-    private long endTime = TimeUtils.EPOCH.milli;
-
     private Position.L[] position = new Position.L[0];
     private JHVWorker<Position.L[], Void> worker;
 
-    private final PositionLoadFire receiver;
     private final String frame;
 
-    public PositionLoad(PositionLoadFire _receiver, String _frame) {
-        receiver = _receiver;
+    public PositionLoad(String _frame) {
         frame = _frame;
     }
 
@@ -39,14 +31,17 @@ public class PositionLoad {
 
         private String report = null;
 
+        private final PositionLoadFire receiver;
         private final String tgt;
         private final long start;
         private final long end;
 
-        public LoadPositionWorker(String _tgt, long _start, long _end) {
+        public LoadPositionWorker(PositionLoadFire _receiver, String _tgt, long _start, long _end) {
+            receiver = _receiver;
             tgt = _tgt;
             start = _start;
             end = _end;
+            receiver.fireLoaded("Loading...");
         }
 
         @Override
@@ -106,13 +101,12 @@ public class PositionLoad {
         return position.length > 0;
     }
 
-    private void applyChanges() {
+    void request(PositionLoadFire receiver, String target, long beginTime, long endTime) {
         position = new Position.L[0];
         if (worker != null)
             worker.cancel(false);
-        receiver.fireLoaded("Loading...");
 
-        worker = new LoadPositionWorker(target, beginTime, endTime);
+        worker = new LoadPositionWorker(receiver, target, beginTime, endTime);
         worker.setThreadName("MAIN--PositionLoad");
         JHVGlobals.getExecutorService().execute(worker);
     }
@@ -157,24 +151,6 @@ public class PositionLoad {
         Position.L p = getInterpolatedL(time);
         Position.L e = Sun.getEarth(p.time);
         return new Position.Q(p.time, p.rad, new Quat(p.lat, e.lon - p.lon));
-    }
-
-    public void setTarget(String object, boolean applyChanges) {
-        target = object;
-        if (applyChanges)
-            applyChanges();
-    }
-
-    public void setBeginTime(long _beginTime, boolean applyChanges) {
-        beginTime = _beginTime;
-        if (applyChanges)
-            applyChanges();
-    }
-
-    public void setEndTime(long _endTime, boolean applyChanges) {
-        endTime = _endTime;
-        if (applyChanges)
-            applyChanges();
     }
 
 }
