@@ -34,10 +34,15 @@ public class JHVGlobals {
 
     public static final int hiDpiCutoff = 1024;
 
-    private static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("MAIN", 10);
+    private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("MAIN", 10);
+    private static final ExecutorService reaperService = JHVExecutor.createReaperService();
 
     public static ExecutorService getExecutorService() {
         return executorService;
+    }
+
+    public static ExecutorService getReaperService() {
+        return reaperService;
     }
 
     private static int readTimeout = -1;

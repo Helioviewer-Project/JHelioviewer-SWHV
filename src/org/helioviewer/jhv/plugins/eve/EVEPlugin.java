@@ -13,7 +13,7 @@ import org.json.JSONObject;
 public class EVEPlugin implements Plugin {
 
     private static final int MAX_WORKER_THREADS = 12;
-    public static final ExecutorService executorService = JHVExecutor.getJHVWorkersExecutorService("EVE", MAX_WORKER_THREADS);
+    public static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("EVE", MAX_WORKER_THREADS);
     public static final EVEDataProvider eveDataprovider = new EVEDataProvider();
 
     private final Timelines tl = new Timelines();
