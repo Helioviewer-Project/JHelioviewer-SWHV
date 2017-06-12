@@ -64,27 +64,28 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
 
     @Override
     protected void done() {
-        if (!isCancelled()) {
-            Position.L[] newPosition = null;
-            try {
-                newPosition = get();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (isCancelled()) {
+            receiver.fireLoaded("Cancelled");
+            return;
+        }
 
-            if (report == null) {
-                if (newPosition == null || newPosition.length == 0) {
-                    report = "empty response";
-                } else {
-                    position = newPosition;
-                    receiver.fireLoaded("Loaded");
-                }
-            }
-            if (report != null) {
-                receiver.fireLoaded(report);
-                report = null;
+        Position.L[] newPosition = null;
+        try {
+            newPosition = get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (report == null) {
+            if (newPosition == null || newPosition.length == 0) {
+                report = "empty response";
+            } else {
+                position = newPosition;
+                receiver.fireLoaded("Loaded");
             }
         }
+        if (report != null)
+            receiver.fireLoaded(report);
     }
 
     public boolean isLoaded() {
