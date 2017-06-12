@@ -137,8 +137,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     private void request() {
-        container.setStartTime(startDateTimePanel.getTime());
-        container.setEndTime(endDateTimePanel.getTime());
+        container.loadSelected(startDateTimePanel.getTime(), endDateTimePanel.getTime());
     }
 
 }
