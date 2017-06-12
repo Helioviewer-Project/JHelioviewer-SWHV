@@ -45,8 +45,6 @@ import com.jogamp.newt.opengl.GLWindow;
 
 public class ImageViewerGui {
 
-    public static final int SIDE_PANEL_WIDTH = 320;
-
     private static JFrame mainFrame;
     private static JScrollPane leftScrollPane;
 
