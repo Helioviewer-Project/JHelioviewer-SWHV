@@ -19,6 +19,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
+import org.helioviewer.jhv.camera.UpdateViewpoint;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -32,17 +33,21 @@ public class SpaceObjectContainer extends JPanel {
     private static final int OBJECT_COL = 1;
     private static final int STATUS_COL = 2;
 
+    private final UpdateViewpoint uv;
+    private final String frame;
     private final boolean exclusive;
+
     private final ObjectTableModel model = new ObjectTableModel();
     private final JTable grid = new JTable(model);
 
     private long startTime = TimeUtils.EPOCH.milli;
     private long endTime = TimeUtils.EPOCH.milli;
-    private String frame = "HEEQ";
 
-    public SpaceObjectContainer(boolean _exclusive) {
+    public SpaceObjectContainer(UpdateViewpoint _uv, String _frame, boolean _exclusive) {
         setLayout(new BorderLayout());
 
+        uv = _uv;
+        frame = _frame;
         exclusive = _exclusive;
 
         grid.setTableHeader(null);
@@ -93,19 +98,15 @@ public class SpaceObjectContainer extends JPanel {
         endTime = _endTime;
     }
 
-    public void setFrame(String _frame) {
-        frame = _frame;
-    }
-
     private void selectElement(SpaceObjectElement element) {
         if (exclusive) {
-            model.deselectAll();
-            element.select(frame, startTime, endTime);
+            model.deselectAll(uv);
+            element.select(uv, frame, startTime, endTime);
         } else {
             if (element.isSelected())
-                element.deselect();
+                element.deselect(uv);
             else
-                element.select(frame, startTime, endTime);
+                element.select(uv, frame, startTime, endTime);
         }
         model.fireTableRowsUpdated(0, model.getRowCount());
     }
@@ -128,10 +129,10 @@ public class SpaceObjectContainer extends JPanel {
                 elementList.add(new SpaceObjectElement(object));
         }
 
-        public void deselectAll() {
+        public void deselectAll(UpdateViewpoint _uv) {
             for (SpaceObjectElement element : elementList) {
                 if (element.isSelected())
-                    element.deselect();
+                    element.deselect(_uv);
             }
         }
 

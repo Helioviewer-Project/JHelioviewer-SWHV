@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera.object;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
+import org.helioviewer.jhv.camera.UpdateViewpoint;
 
 public class SpaceObjectElement {
 
@@ -17,11 +18,11 @@ public class SpaceObjectElement {
         return object;
     }
 
-    public void select(String frame, long startTime, long endTime) {
+    public void select(UpdateViewpoint uv, String frame, long startTime, long endTime) {
         selected = true;
     }
 
-    public void deselect() {
+    public void deselect(UpdateViewpoint uv) {
         selected = false;
     }
 
