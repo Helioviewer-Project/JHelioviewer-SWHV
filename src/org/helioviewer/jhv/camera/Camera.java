@@ -38,7 +38,7 @@ public class Camera {
         cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
     }
 
-    void refresh() {
+    public void refresh() {
         updateCamera(Layers.getLastUpdatedTimestamp());
         Displayer.render(1);
     }

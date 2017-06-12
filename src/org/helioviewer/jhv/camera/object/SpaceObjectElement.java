@@ -7,6 +7,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.camera.LoadPosition;
 import org.helioviewer.jhv.camera.LoadPositionFire;
 import org.helioviewer.jhv.camera.UpdateViewpoint;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.threads.CancelTask;
 
 public class SpaceObjectElement implements LoadPositionFire {
@@ -55,6 +56,7 @@ public class SpaceObjectElement implements LoadPositionFire {
     @Override
     public void fireLoaded(String _status) {
         status = _status;
+        Displayer.getCamera().refresh();
     }
 
     @Override
