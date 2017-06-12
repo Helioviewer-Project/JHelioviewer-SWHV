@@ -13,13 +13,15 @@ import org.helioviewer.jhv.threads.CancelTask;
 public class SpaceObjectElement implements LoadPositionFire {
 
     private final SpaceObject object;
+    private final SpaceObjectModel model;
 
     private boolean selected;
     private String status;
     private LoadPosition load;
 
-    public SpaceObjectElement(SpaceObject _object) {
+    public SpaceObjectElement(SpaceObject _object, SpaceObjectModel _model) {
         object = _object;
+        model = _model;
     }
 
     public SpaceObject getObject() {
@@ -32,6 +34,7 @@ public class SpaceObjectElement implements LoadPositionFire {
         if (load != null) {
             load.cancel(true);
             uv.unsetLoadPosition(load);
+            fireLoaded(null);
         }
 
         load = new LoadPosition(this, object, frame, startTime, endTime);
@@ -46,6 +49,7 @@ public class SpaceObjectElement implements LoadPositionFire {
         if (load != null) {
             load.cancel(true);
             uv.unsetLoadPosition(load);
+            fireLoaded(null);
             load = null;
         }
         Displayer.display();
@@ -62,6 +66,7 @@ public class SpaceObjectElement implements LoadPositionFire {
     @Override
     public void fireLoaded(String _status) {
         status = _status;
+        model.refresh(this);
         Displayer.getCamera().refresh();
     }
 

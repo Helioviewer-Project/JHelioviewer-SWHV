@@ -10,38 +10,44 @@ import org.helioviewer.jhv.camera.UpdateViewpoint;
 @SuppressWarnings("serial")
 public class SpaceObjectModel extends AbstractTableModel {
 
-    private final ArrayList<SpaceObjectElement> elementList = new ArrayList<>();
+    private final ArrayList<SpaceObjectElement> elements = new ArrayList<>();
 
     public SpaceObjectModel() {
         for (SpaceObject object : SpaceObject.getObjectList())
-            elementList.add(new SpaceObjectElement(object));
+            elements.add(new SpaceObjectElement(object, this));
     }
 
-    public void deselectAll(UpdateViewpoint _uv) {
-        for (SpaceObjectElement element : elementList) {
+    public void deselectAll(UpdateViewpoint uv) {
+        for (SpaceObjectElement element : elements) {
             if (element.isSelected())
-                element.deselect(_uv);
+                element.deselect(uv);
         }
     }
 
-    public void loadSelected(UpdateViewpoint _uv, String _frame, long _startTime, long _endTime) {
-        for (SpaceObjectElement element : elementList) {
+    public void loadSelected(UpdateViewpoint uv, String frame, long startTime, long endTime) {
+        for (SpaceObjectElement element : elements) {
             if (element.isSelected())
-                element.select(_uv, _frame, _startTime, _endTime); // force load
+                element.select(uv, frame, startTime, endTime); // force load
         }
     }
 
     public SpaceObjectElement selectionElement(SpaceObject object) {
-        for (SpaceObjectElement element : elementList) {
+        for (SpaceObjectElement element : elements) {
             if (element.getObject() == object)
                 return element;
         }
         return null;
     }
 
+    public void refresh(SpaceObjectElement element) {
+        int idx = elements.indexOf(element);
+        if (idx >= 0)
+            fireTableRowsUpdated(idx, idx);
+    }
+
     @Override
     public int getRowCount() {
-        return elementList.size();
+        return elements.size();
     }
 
     @Override
@@ -51,7 +57,7 @@ public class SpaceObjectModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        return elementList.get(row);
+        return elements.get(row);
     }
 
 }
