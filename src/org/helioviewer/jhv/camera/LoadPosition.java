@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.io.DownloadStream;
@@ -18,7 +19,7 @@ import org.json.JSONObject;
 public class LoadPosition extends JHVWorker<Position.L[], Void> {
 
     private final LoadPositionFire receiver;
-    private final String target;
+    private final SpaceObject target;
     private final String frame;
     private final long start;
     private final long end;
@@ -26,7 +27,7 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
     private Position.L[] position = new Position.L[0];
     private String report = null;
 
-    public LoadPosition(LoadPositionFire _receiver, String _target, String _frame, long _start, long _end) {
+    public LoadPosition(LoadPositionFire _receiver, SpaceObject _target, String _frame, long _start, long _end) {
         receiver = _receiver;
         target = _target;
         frame = _frame;
@@ -45,7 +46,7 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
             deltat = span / max;
 
         try {
-            DownloadStream ds = new DownloadStream(new PositionRequest(target, frame, start, end, deltat).url, true);
+            DownloadStream ds = new DownloadStream(new PositionRequest(target.getUrlName(), frame, start, end, deltat).url, true);
             JSONObject result = JSONUtils.getJSONStream(ds.getInput());
             if (ds.isResponse400()) {
                 report = result.optString("faultstring", "Invalid network response");
@@ -86,6 +87,10 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
         }
         if (report != null)
             receiver.fireLoaded(report);
+    }
+
+    public SpaceObject getTarget() {
+        return target;
     }
 
     public boolean isLoaded() {
