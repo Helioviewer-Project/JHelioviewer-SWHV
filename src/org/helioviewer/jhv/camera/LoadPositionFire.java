@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.camera;
 
-interface PositionLoadFire {
+interface LoadPositionFire {
 
     void fireLoaded(String state);
 

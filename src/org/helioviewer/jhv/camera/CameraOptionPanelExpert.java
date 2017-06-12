@@ -19,6 +19,7 @@ import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -28,17 +29,19 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
-public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener, PositionLoadFire {
+public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener, LoadPositionFire {
 
     private final JLabel loadedLabel = new JLabel("Status: Not loaded");
     private final JCheckBox exactDateCheckBox = new JCheckBox("Use master layer timestamps", true);
     private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
     private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
-    private final PositionLoad positionLoad;
 
-    CameraOptionPanelExpert(String frame, UpdateViewpoint uv) {
-        positionLoad = new PositionLoad(frame);
-        uv.setPositionLoad(positionLoad);
+    private final String frame;
+    private final UpdateViewpoint updateViewpoint;
+
+    CameraOptionPanelExpert(String _frame, UpdateViewpoint _updateViewpoint) {
+        frame = _frame;
+        updateViewpoint = _updateViewpoint;
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -178,7 +181,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     private String target = "Earth";
 
     private void request() {
-        positionLoad.request(this, target, startDateTimePanel.getTime(), endDateTimePanel.getTime());
+        LoadPosition load = new LoadPosition(this, target, frame, startDateTimePanel.getTime(), endDateTimePanel.getTime());
+        updateViewpoint.setLoadPosition(load);
+        JHVGlobals.getExecutorService().execute(load);
     }
 
 }

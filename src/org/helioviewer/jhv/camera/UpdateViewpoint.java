@@ -10,7 +10,7 @@ import org.helioviewer.jhv.view.View;
 public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
-    void setPositionLoad(PositionLoad _positionLoad);
+    void setLoadPosition(LoadPosition _loadPosition);
 
     Observer observer = new Observer();
     Earth earth = new Earth();
@@ -50,7 +50,7 @@ public interface UpdateViewpoint {
         }
 
         public Position.L getPosition(JHVDate time) {
-            if (!positionLoad.isLoaded()) {
+            if (loadPosition == null || !loadPosition.isLoaded()) {
                 Position.L p = Sun.getEarth(time);
                 return new Position.L(time, p.rad, 0, 0);
             }
@@ -62,7 +62,7 @@ public interface UpdateViewpoint {
                 layerStart = view.getFirstTime().milli;
                 layerEnd = view.getLastTime().milli;
             }
-            return positionLoad.getInterpolatedL(positionLoad.interpolateTime(time.milli, layerStart, layerEnd));
+            return loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd));
         }
 
         @Override
@@ -74,7 +74,7 @@ public interface UpdateViewpoint {
     class Expert extends Viewpoint {
         @Override
         public Position.Q update(JHVDate time) {
-            if (!positionLoad.isLoaded())
+            if (loadPosition == null || !loadPosition.isLoaded())
                 return Sun.getEarthQuat(time);
 
             long layerStart = 0, layerEnd = 0;
@@ -84,7 +84,7 @@ public interface UpdateViewpoint {
                 layerStart = view.getFirstTime().milli;
                 layerEnd = view.getLastTime().milli;
             }
-            return positionLoad.getInterpolatedQ(positionLoad.interpolateTime(time.milli, layerStart, layerEnd));
+            return loadPosition.getInterpolatedQ(loadPosition.interpolateTime(time.milli, layerStart, layerEnd));
         }
 
     }
