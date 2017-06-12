@@ -17,6 +17,7 @@ public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
     void setLoadPosition(LoadPosition _loadPosition);
+    void unsetLoadPosition(LoadPosition _loadPosition);
 
     Observer observer = new Observer();
     Earth earth = new Earth();
@@ -27,6 +28,10 @@ public interface UpdateViewpoint {
     class Observer implements UpdateViewpoint {
         @Override
         public void setLoadPosition(LoadPosition _loadPosition) {
+        }
+
+        @Override
+        public void unsetLoadPosition(LoadPosition _loadPosition) {
         }
 
         @Override
@@ -42,6 +47,10 @@ public interface UpdateViewpoint {
         }
 
         @Override
+        public void unsetLoadPosition(LoadPosition _loadPosition) {
+        }
+
+        @Override
         public Position.Q update(JHVDate time) {
             return Sun.getEarthQuat(time);
         }
@@ -50,6 +59,10 @@ public interface UpdateViewpoint {
     class EarthFixedDistance implements UpdateViewpoint {
         @Override
         public void setLoadPosition(LoadPosition _loadPosition) {
+        }
+
+        @Override
+        public void unsetLoadPosition(LoadPosition _loadPosition) {
         }
 
         @Override
@@ -97,6 +110,11 @@ public interface UpdateViewpoint {
         }
 
         @Override
+        public void unsetLoadPosition(LoadPosition loadPosition) {
+            loadMap.remove(loadPosition.getTarget());
+        }
+
+        @Override
         public Position.Q update(JHVDate time) {
             return new Position.Q(time, distance, Quat.rotate(Quat.Q90, Sun.getEarthQuat(time).orientation));
         }
@@ -109,6 +127,11 @@ public interface UpdateViewpoint {
         @Override
         public void setLoadPosition(LoadPosition _loadPosition) {
             loadPosition = _loadPosition;
+        }
+
+        @Override
+        public void unsetLoadPosition(LoadPosition _loadPosition) {
+            loadPosition = null;
         }
 
         @Override
