@@ -102,8 +102,8 @@ public class CameraOptionsPanel extends JPanel {
 
         ComponentUtils.smallVariant(this);
 
-        expertOptionPanel = new CameraOptionPanelExpert("HEEQ", UpdateViewpoint.expert, true);
-        eclipticOptionPanel = new CameraOptionPanelExpert("HEE", UpdateViewpoint.ecliptic, false);
+        expertOptionPanel = new CameraOptionPanelExpert(UpdateViewpoint.expert, "HEEQ", true);
+        eclipticOptionPanel = new CameraOptionPanelExpert(UpdateViewpoint.ecliptic, "HEE", false);
     }
 
     public double getFOVAngle() {

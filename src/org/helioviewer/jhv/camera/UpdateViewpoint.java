@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -100,8 +99,7 @@ public interface UpdateViewpoint {
             }
 
             ArrayList<Pair<SpaceObject, Position.L>> ret = new ArrayList<>(loadSet.size());
-            for (Iterator<LoadPosition> it = loadSet.iterator(); it.hasNext();) {
-                LoadPosition loadPosition = it.next();
+            for (LoadPosition loadPosition : loadSet) {
                 ret.add(new Pair<>(loadPosition.getTarget(), getPositionInternal(loadPosition, time, layerStart, layerEnd)));
             }
             return ret;
