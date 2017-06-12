@@ -1,14 +1,21 @@
 package org.helioviewer.jhv.camera.object;
 
-import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.camera.UpdateViewpoint;
+import java.util.concurrent.TimeUnit;
 
-public class SpaceObjectElement {
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.astronomy.SpaceObject;
+import org.helioviewer.jhv.camera.LoadPosition;
+import org.helioviewer.jhv.camera.LoadPositionFire;
+import org.helioviewer.jhv.camera.UpdateViewpoint;
+import org.helioviewer.jhv.threads.CancelTask;
+
+public class SpaceObjectElement implements LoadPositionFire {
 
     private final SpaceObject object;
 
     private boolean selected;
     private String status;
+    private LoadPosition load;
 
     public SpaceObjectElement(SpaceObject _object) {
         object = _object;
@@ -20,22 +27,34 @@ public class SpaceObjectElement {
 
     public void select(UpdateViewpoint uv, String frame, long startTime, long endTime) {
         selected = true;
+
+        load = new LoadPosition(this, object, frame, startTime, endTime);
+        uv.setLoadPosition(load);
+        JHVGlobals.getExecutorService().execute(load);
+        JHVGlobals.getReaperService().schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
     }
 
     public void deselect(UpdateViewpoint uv) {
         selected = false;
+
+        if (load != null) {
+            load.cancel(true);
+            uv.unsetLoadPosition(load);
+            load = null;
+        }
     }
 
     public boolean isSelected() {
         return selected;
     }
 
-    public void setStatus(String _status) {
-        status = _status;
-    }
-
     public String getStatus() {
         return status;
+    }
+
+    @Override
+    public void fireLoaded(String _status) {
+        status = _status;
     }
 
     @Override

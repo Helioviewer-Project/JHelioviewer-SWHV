@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -35,13 +36,13 @@ public class JHVGlobals {
     public static final int hiDpiCutoff = 1024;
 
     private static final ExecutorService executorService = JHVExecutor.createJHVWorkersExecutorService("MAIN", 10);
-    private static final ExecutorService reaperService = JHVExecutor.createReaperService();
+    private static final ScheduledExecutorService reaperService = JHVExecutor.createReaperService();
 
     public static ExecutorService getExecutorService() {
         return executorService;
     }
 
-    public static ExecutorService getReaperService() {
+    public static ScheduledExecutorService getReaperService() {
         return reaperService;
     }
 
