@@ -27,14 +27,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
     private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
 
-    private final String frame;
-    private final UpdateViewpoint uv;
     private final SpaceObjectContainer container;
 
-    CameraOptionPanelExpert(String _frame, UpdateViewpoint _uv, boolean exclusive) {
-        frame = _frame;
-        uv = _uv;
-
+    CameraOptionPanelExpert(UpdateViewpoint uv, String frame, boolean exclusive) {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
