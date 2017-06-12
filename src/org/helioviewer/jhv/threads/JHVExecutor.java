@@ -5,6 +5,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -59,17 +61,23 @@ import sun.awt.AppContext;
     }
 */
 
-    public static ExecutorService getJHVWorkersExecutorService(String name, int MAX_WORKER_THREADS) {
-        ExecutorService executorService = new ThreadPoolExecutor(MAX_WORKER_THREADS / 2, MAX_WORKER_THREADS,
-                10L, TimeUnit.MINUTES, new LinkedBlockingQueue<>(), new JHVThread.NamedThreadFactory("JHVWorker-" + name)) {
+    public static ExecutorService createReaperService() {
+        ExecutorService service = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("Reaper"), new ThreadPoolExecutor.DiscardPolicy());
+        shutdownOnDisposal(service);
+        return service;
+    }
+
+    public static ExecutorService createJHVWorkersExecutorService(String name, int MAX_WORKER_THREADS) {
+        ExecutorService service = new ThreadPoolExecutor(MAX_WORKER_THREADS / 2, MAX_WORKER_THREADS, 10L, TimeUnit.MINUTES,
+                new LinkedBlockingQueue<>(), new JHVThread.NamedThreadFactory("JHVWorker-" + name)) {
             @Override
             protected void afterExecute(Runnable r, Throwable t) {
                 super.afterExecute(r, t);
                 JHVThread.afterExecute(r, t);
             }
         };
-        shutdownOnDisposal(executorService);
-        return executorService;
+        shutdownOnDisposal(service);
+        return service;
     }
 
     private static void shutdownOnDisposal(ExecutorService es) {
