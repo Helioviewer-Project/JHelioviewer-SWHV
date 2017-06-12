@@ -66,22 +66,53 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         add(loadedLabelPanel, c);
         c.gridy = 2;
         add(new JSeparator(SwingConstants.HORIZONTAL), c);
+
         c.gridy = 3;
-        addObjectList(c);
+        JList<SpaceObject> objectList = new JList<>(SpaceObject.getObjectArray());
+        objectList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        objectList.setSelectedValue(SpaceObject.Earth, true);
+        objectList.setCellRenderer(new SpaceObject.CellRenderer());
+        objectList.addListSelectionListener(e -> {
+            for (SpaceObject object : objectList.getSelectedValuesList()) {
+                target = object;
+                request();
+            }
+        });
+
+        JScrollPane jsp = new JScrollPane(objectList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+        jsp.getViewport().setBackground(objectList.getBackground());
+        add(jsp, c);
+
         c.gridy = 4;
         add(exactDateCheckBox, c);
         c.gridy = 5;
+        startDateTimePanel.addListener(e -> request());
         startDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(startDateTimePanel, c);
         c.gridy = 6;
+        endDateTimePanel.addListener(e -> request());
         endDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(endDateTimePanel, c);
-        c.gridy = 7;
-        JPanel buttonPanel = syncButtons();
-        add(buttonPanel, c);
 
-        startDateTimePanel.addListener(e -> request());
-        endDateTimePanel.addListener(e -> request());
+        c.gridy = 7;
+        JButton synchronizeWithLayersButton = new JButton("Sync");
+        synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
+        synchronizeWithLayersButton.addActionListener(e -> syncWithLayer());
+
+        JButton synchronizeWithNowButton = new JButton("Now");
+        synchronizeWithNowButton.setToolTipText("Fill twice current time");
+        synchronizeWithNowButton.addActionListener(e -> syncBothLayerNow());
+
+        JButton synchronizeWithCurrentButton = new JButton("Current");
+        synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
+        synchronizeWithCurrentButton.addActionListener(e -> syncWithLayerCurrentTime());
+
+        JPanel buttonPanel = new JPanel(new GridLayout(0, 3));
+        buttonPanel.add(synchronizeWithLayersButton);
+        buttonPanel.add(synchronizeWithCurrentButton);
+        buttonPanel.add(synchronizeWithNowButton);
+        add(buttonPanel, c);
 
         startDateTimePanel.setVisible(false);
         endDateTimePanel.setVisible(false);
@@ -98,26 +129,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         ComponentUtils.smallVariant(this);
     }
 
-    private JPanel syncButtons() {
-        JButton synchronizeWithLayersButton = new JButton("Sync");
-        synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
-        synchronizeWithLayersButton.addActionListener(e -> syncWithLayer());
-
-        JButton synchronizeWithNowButton = new JButton("Now");
-        synchronizeWithNowButton.setToolTipText("Fill twice current time");
-        synchronizeWithNowButton.addActionListener(e -> syncBothLayerNow());
-
-        JButton synchronizeWithCurrentButton = new JButton("Current");
-        synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
-        synchronizeWithCurrentButton.addActionListener(e -> syncWithLayerCurrentTime());
-
-        JPanel panel = new JPanel(new GridLayout(0, 3));
-        panel.add(synchronizeWithLayersButton);
-        panel.add(synchronizeWithCurrentButton);
-        panel.add(synchronizeWithNowButton);
-        return panel;
-    }
-
     @Override
     void activate() {
         Layers.addLayersListener(this);
@@ -132,25 +143,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     public void activeLayerChanged(View view) {
         if (exactDateCheckBox.isSelected())
             syncWithLayer();
-    }
-
-    private void addObjectList(GridBagConstraints c) {
-        JList<SpaceObject> objectList = new JList<>(SpaceObject.getObjectArray());
-        objectList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        objectList.setSelectedValue(SpaceObject.Earth, true);
-        objectList.setCellRenderer(new SpaceObject.CellRenderer());
-        objectList.addListSelectionListener(e -> {
-            for (SpaceObject object : objectList.getSelectedValuesList()) {
-                target = object.getUrlName();
-                request();
-                break;
-            }
-        });
-
-        JScrollPane jsp = new JScrollPane(objectList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
-        jsp.getViewport().setBackground(objectList.getBackground());
-        add(jsp, c);
     }
 
     @Override
@@ -184,13 +176,13 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         Displayer.getCamera().refresh();
     }
 
-    private String target = "Earth";
+    private SpaceObject target = SpaceObject.Earth;
 
     private void request() {
         LoadPosition load = new LoadPosition(this, target, frame, startDateTimePanel.getTime(), endDateTimePanel.getTime());
         updateViewpoint.setLoadPosition(load);
         JHVGlobals.getExecutorService().execute(load);
-        reaperPool.schedule(new CancelTask(load), 60, TimeUnit.SECONDS);
+        reaperPool.schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
     }
 
     private static final ScheduledExecutorService reaperPool = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("Position Reaper"),

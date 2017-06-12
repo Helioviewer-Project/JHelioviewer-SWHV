@@ -1,7 +1,13 @@
 package org.helioviewer.jhv.camera;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVDate;
@@ -18,7 +24,11 @@ public interface UpdateViewpoint {
     Ecliptic ecliptic = new Ecliptic();
     Expert expert = new Expert();
 
-    class Observer extends Viewpoint {
+    class Observer implements UpdateViewpoint {
+        @Override
+        public void setLoadPosition(LoadPosition _loadPosition) {
+        }
+
         @Override
         public Position.Q update(JHVDate time) {
             View view = Layers.getActiveView();
@@ -26,14 +36,22 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Earth extends Viewpoint {
+    class Earth implements UpdateViewpoint {
+        @Override
+        public void setLoadPosition(LoadPosition _loadPosition) {
+        }
+
         @Override
         public Position.Q update(JHVDate time) {
             return Sun.getEarthQuat(time);
         }
     }
 
-    class EarthFixedDistance extends Viewpoint {
+    class EarthFixedDistance implements UpdateViewpoint {
+        @Override
+        public void setLoadPosition(LoadPosition _loadPosition) {
+        }
+
         @Override
         public Position.Q update(JHVDate time) {
             Position.L p = Sun.getEarth(time);
@@ -41,20 +59,24 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Ecliptic extends Viewpoint {
+    class Ecliptic implements UpdateViewpoint {
 
         private double distance;
+        private HashMap<SpaceObject, LoadPosition> loadMap = new HashMap<>();
 
         void setDistance(double d) {
             distance = d;
         }
 
-        public Position.L getPosition(JHVDate time) {
-            if (loadPosition == null || !loadPosition.isLoaded()) {
+        private Position.L getPositionInternal(LoadPosition loadPosition, JHVDate time, long layerStart, long layerEnd) {
+            if (!loadPosition.isLoaded()) {
                 Position.L p = Sun.getEarth(time);
                 return new Position.L(time, p.rad, 0, 0);
             }
+            return loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd));
+        }
 
+        public List<Pair<SpaceObject, Position.L>> getPosition(JHVDate time) {
             long layerStart = 0, layerEnd = 0;
             // Active layer times
             View view = Layers.getActiveView();
@@ -62,7 +84,16 @@ public interface UpdateViewpoint {
                 layerStart = view.getFirstTime().milli;
                 layerEnd = view.getLastTime().milli;
             }
-            return loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd));
+
+            ArrayList<Pair<SpaceObject, Position.L>> ret = new ArrayList<>(loadMap.size());
+            for (LoadPosition loadPosition : loadMap.values())
+                ret.add(new Pair<SpaceObject, Position.L>(loadPosition.getTarget(), getPositionInternal(loadPosition, time, layerStart, layerEnd)));
+            return ret;
+        }
+
+        @Override
+        public void setLoadPosition(LoadPosition loadPosition) {
+            loadMap.put(loadPosition.getTarget(), loadPosition);
         }
 
         @Override
@@ -71,7 +102,15 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Expert extends Viewpoint {
+    class Expert implements UpdateViewpoint {
+
+        private LoadPosition loadPosition;
+
+        @Override
+        public void setLoadPosition(LoadPosition _loadPosition) {
+            loadPosition = _loadPosition;
+        }
+
         @Override
         public Position.Q update(JHVDate time) {
             if (loadPosition == null || !loadPosition.isLoaded())
