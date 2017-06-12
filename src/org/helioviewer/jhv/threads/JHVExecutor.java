@@ -61,8 +61,8 @@ import sun.awt.AppContext;
     }
 */
 
-    public static ExecutorService createReaperService() {
-        ExecutorService service = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("Reaper"), new ThreadPoolExecutor.DiscardPolicy());
+    public static ScheduledExecutorService createReaperService() {
+        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("Reaper"), new ThreadPoolExecutor.DiscardPolicy());
         shutdownOnDisposal(service);
         return service;
     }
