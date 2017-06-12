@@ -2,11 +2,11 @@ package org.helioviewer.jhv.camera;
 
 public abstract class Viewpoint implements UpdateViewpoint {
 
-        protected PositionLoad positionLoad;
+        protected LoadPosition loadPosition;
 
         @Override
-        public void setPositionLoad(PositionLoad _positionLoad) {
-            positionLoad = _positionLoad;
+        public void setLoadPosition(LoadPosition _loadPosition) {
+            loadPosition = _loadPosition;
         }
 
 }
