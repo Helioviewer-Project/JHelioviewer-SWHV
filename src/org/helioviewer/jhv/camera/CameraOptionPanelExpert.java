@@ -34,11 +34,12 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     private final JCheckBox exactDateCheckBox = new JCheckBox("Use master layer timestamps", true);
     private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
     private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
+    private final PositionLoad positionLoad;
 
-    private JPanel buttonPanel;
-    private PositionLoad positionLoad;
+    CameraOptionPanelExpert(String frame, UpdateViewpoint uv) {
+        positionLoad = new PositionLoad(frame);
+        uv.setPositionLoad(positionLoad);
 
-    CameraOptionPanelExpert() {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
@@ -67,7 +68,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         endDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(endDateTimePanel, c);
         c.gridy = 7;
-        addSyncButtons(c);
+        JPanel buttonPanel = syncButtons();
+        add(buttonPanel, c);
 
         startDateTimePanel.addListener(e -> request());
         endDateTimePanel.addListener(e -> request());
@@ -87,7 +89,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         ComponentUtils.smallVariant(this);
     }
 
-    private void addSyncButtons(GridBagConstraints c) {
+    private JPanel syncButtons() {
         JButton synchronizeWithLayersButton = new JButton("Sync");
         synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
         synchronizeWithLayersButton.addActionListener(e -> syncWithLayer());
@@ -100,13 +102,11 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
         synchronizeWithCurrentButton.addActionListener(e -> syncWithLayerCurrentTime());
 
-        buttonPanel = new JPanel(new GridLayout(0, 3));
-
-        buttonPanel.add(synchronizeWithLayersButton);
-        buttonPanel.add(synchronizeWithCurrentButton);
-        buttonPanel.add(synchronizeWithNowButton);
-
-        add(buttonPanel, c);
+        JPanel panel = new JPanel(new GridLayout(0, 3));
+        panel.add(synchronizeWithLayersButton);
+        panel.add(synchronizeWithCurrentButton);
+        panel.add(synchronizeWithNowButton);
+        return panel;
     }
 
     @Override
@@ -167,10 +167,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         startDateTimePanel.setTime(now);
         endDateTimePanel.setTime(now);
         request();
-    }
-
-    void setPositionLoad(PositionLoad _positionLoad) {
-        positionLoad = _positionLoad;
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.helioviewer.jhv.view.View;
 public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
+    void setPositionLoad(PositionLoad _positionLoad);
 
     Observer observer = new Observer();
     Earth earth = new Earth();
@@ -17,7 +18,7 @@ public interface UpdateViewpoint {
     Ecliptic ecliptic = new Ecliptic();
     Expert expert = new Expert();
 
-    class Observer implements UpdateViewpoint {
+    class Observer extends Viewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             View view = Layers.getActiveView();
@@ -25,14 +26,14 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Earth implements UpdateViewpoint {
+    class Earth extends Viewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             return Sun.getEarthQuat(time);
         }
     }
 
-    class EarthFixedDistance implements UpdateViewpoint {
+    class EarthFixedDistance extends Viewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             Position.L p = Sun.getEarth(time);
@@ -40,14 +41,9 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Ecliptic implements UpdateViewpoint {
+    class Ecliptic extends Viewpoint {
 
         private double distance;
-        private PositionLoad positionLoad;
-
-        void setPositionLoad(PositionLoad _positionLoad) {
-            positionLoad = _positionLoad;
-        }
 
         void setDistance(double d) {
             distance = d;
@@ -75,14 +71,7 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Expert implements UpdateViewpoint {
-
-        private PositionLoad positionLoad;
-
-        void setPositionLoad(PositionLoad _positionLoad) {
-            positionLoad = _positionLoad;
-        }
-
+    class Expert extends Viewpoint {
         @Override
         public Position.Q update(JHVDate time) {
             if (!positionLoad.isLoaded())
