@@ -27,7 +27,6 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.components.Buttons;
@@ -272,7 +271,7 @@ public class RenderableContainerPanel extends JPanel {
         grid.setDropMode(DropMode.INSERT_ROWS);
         grid.setTransferHandler(new TableRowTransferHandler(grid));
 
-        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, getGridRowHeight() * NUMBEROFVISIBLEROWS + 1));
+        jsp.setPreferredSize(new Dimension(-1, getGridRowHeight() * NUMBEROFVISIBLEROWS + 1));
         grid.setRowHeight(getGridRowHeight());
 
         optionsPanelWrapper = new JPanel(new BorderLayout());

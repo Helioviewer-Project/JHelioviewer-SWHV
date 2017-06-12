@@ -19,7 +19,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -188,7 +187,7 @@ public class TimelinePanel extends JPanel {
         });
 
         int h = getGridRowHeight(grid);
-        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, h * NUMBEROFVISIBLEROWS + 1));
+        jsp.setPreferredSize(new Dimension(-1, h * NUMBEROFVISIBLEROWS + 1));
         grid.setRowHeight(h);
 
         optionsPanelWrapper = new JPanel(new BorderLayout());
