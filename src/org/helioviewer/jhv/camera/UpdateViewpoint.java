@@ -1,7 +1,8 @@
 package org.helioviewer.jhv.camera;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -75,7 +76,7 @@ public interface UpdateViewpoint {
     class Ecliptic implements UpdateViewpoint {
 
         private double distance;
-        private HashMap<SpaceObject, LoadPosition> loadMap = new HashMap<>();
+        private HashSet<LoadPosition> loadSet = new HashSet<>();
 
         void setDistance(double d) {
             distance = d;
@@ -98,20 +99,22 @@ public interface UpdateViewpoint {
                 layerEnd = view.getLastTime().milli;
             }
 
-            ArrayList<Pair<SpaceObject, Position.L>> ret = new ArrayList<>(loadMap.size());
-            for (LoadPosition loadPosition : loadMap.values())
+            ArrayList<Pair<SpaceObject, Position.L>> ret = new ArrayList<>(loadSet.size());
+            for (Iterator<LoadPosition> it = loadSet.iterator(); it.hasNext();) {
+                LoadPosition loadPosition = it.next();
                 ret.add(new Pair<>(loadPosition.getTarget(), getPositionInternal(loadPosition, time, layerStart, layerEnd)));
+            }
             return ret;
         }
 
         @Override
         public void setLoadPosition(LoadPosition loadPosition) {
-            loadMap.put(loadPosition.getTarget(), loadPosition);
+            loadSet.add(loadPosition);
         }
 
         @Override
         public void unsetLoadPosition(LoadPosition loadPosition) {
-            loadMap.remove(loadPosition.getTarget());
+            loadSet.remove(loadPosition);
         }
 
         @Override
