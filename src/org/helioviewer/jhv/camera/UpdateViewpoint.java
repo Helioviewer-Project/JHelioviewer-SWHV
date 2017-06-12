@@ -100,7 +100,7 @@ public interface UpdateViewpoint {
 
             ArrayList<Pair<SpaceObject, Position.L>> ret = new ArrayList<>(loadMap.size());
             for (LoadPosition loadPosition : loadMap.values())
-                ret.add(new Pair<SpaceObject, Position.L>(loadPosition.getTarget(), getPositionInternal(loadPosition, time, layerStart, layerEnd)));
+                ret.add(new Pair<>(loadPosition.getTarget(), getPositionInternal(loadPosition, time, layerStart, layerEnd)));
             return ret;
         }
 

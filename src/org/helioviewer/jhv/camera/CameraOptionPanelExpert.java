@@ -1,53 +1,39 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.threads.CancelTask;
-import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
-public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener, LoadPositionFire {
+public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener {
 
-    private final JLabel loadedLabel = new JLabel("Status: Not loaded");
     private final JCheckBox exactDateCheckBox = new JCheckBox("Use master layer timestamps", true);
     private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
     private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
 
     private final String frame;
-    private final UpdateViewpoint updateViewpoint;
+    private final UpdateViewpoint uv;
+    private final SpaceObjectContainer container;
 
-    CameraOptionPanelExpert(String _frame, UpdateViewpoint _updateViewpoint) {
+    CameraOptionPanelExpert(String _frame, UpdateViewpoint _uv, boolean exclusive) {
         frame = _frame;
-        updateViewpoint = _updateViewpoint;
+        uv = _uv;
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -59,43 +45,23 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         c.fill = GridBagConstraints.HORIZONTAL;
         add(new JSeparator(SwingConstants.HORIZONTAL), c);
 
-        JPanel loadedLabelPanel = new JPanel();
-        loadedLabelPanel.setLayout(new BoxLayout(loadedLabelPanel, BoxLayout.LINE_AXIS));
-        loadedLabelPanel.add(loadedLabel);
         c.gridy = 1;
-        add(loadedLabelPanel, c);
+        container = new SpaceObjectContainer(uv, frame, exclusive);
+        container.selectObject(SpaceObject.Earth);
+        add(container, c);
+
         c.gridy = 2;
-        add(new JSeparator(SwingConstants.HORIZONTAL), c);
-
-        c.gridy = 3;
-        JList<SpaceObject> objectList = new JList<>(SpaceObject.getObjectArray());
-        objectList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        objectList.setSelectedValue(SpaceObject.Earth, true);
-        objectList.setCellRenderer(new SpaceObject.CellRenderer());
-        objectList.addListSelectionListener(e -> {
-            for (SpaceObject object : objectList.getSelectedValuesList()) {
-                target = object;
-                request();
-            }
-        });
-
-        JScrollPane jsp = new JScrollPane(objectList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
-        jsp.getViewport().setBackground(objectList.getBackground());
-        add(jsp, c);
-
-        c.gridy = 4;
         add(exactDateCheckBox, c);
-        c.gridy = 5;
+        c.gridy = 3;
         startDateTimePanel.addListener(e -> request());
         startDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(startDateTimePanel, c);
-        c.gridy = 6;
+        c.gridy = 4;
         endDateTimePanel.addListener(e -> request());
         endDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(endDateTimePanel, c);
 
-        c.gridy = 7;
+        c.gridy = 5;
         JButton synchronizeWithLayersButton = new JButton("Sync");
         synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
         synchronizeWithLayersButton.addActionListener(e -> syncWithLayer());
@@ -170,22 +136,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         request();
     }
 
-    @Override
-    public void fireLoaded(String state) {
-        loadedLabel.setText("<html><body style='width: 200px'>Status: " + state);
-        Displayer.getCamera().refresh();
-    }
-
-    private SpaceObject target = SpaceObject.Earth;
-
     private void request() {
-        LoadPosition load = new LoadPosition(this, target, frame, startDateTimePanel.getTime(), endDateTimePanel.getTime());
-        updateViewpoint.setLoadPosition(load);
-        JHVGlobals.getExecutorService().execute(load);
-        reaperPool.schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
+        container.setStartTime(startDateTimePanel.getTime());
+        container.setEndTime(endDateTimePanel.getTime());
     }
-
-    private static final ScheduledExecutorService reaperPool = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("Position Reaper"),
-        new ThreadPoolExecutor.DiscardPolicy());
 
 }

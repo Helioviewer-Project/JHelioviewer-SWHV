@@ -2,6 +2,7 @@ package org.helioviewer.jhv.astronomy;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import javax.swing.DefaultListCellRenderer;
@@ -46,6 +47,11 @@ public class SpaceObject {
             put("PROBA-3", new SpaceObject("PROBA3", "PROBA-3", 2 / Sun.RadiusMeter, Color.WHITE, JHVTableCellRenderer.cellBorder));
         }
     };
+
+    public static Collection<SpaceObject> getObjectList() {
+        return objectMap.values();
+    }
+
     public static SpaceObject Earth = objectMap.get("Earth");
 
     public static SpaceObject[] getObjectArray() {
@@ -77,7 +83,7 @@ public class SpaceObject {
         return color;
     }
 
-    Border getBorder() {
+    public Border getBorder() {
         return border;
     }
 
