@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -16,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.camera.UpdateViewpoint;
@@ -37,7 +35,7 @@ public class SpaceObjectContainer extends JPanel {
     private final String frame;
     private final boolean exclusive;
 
-    private final ObjectTableModel model = new ObjectTableModel();
+    private final SpaceObjectModel model = new SpaceObjectModel();
     private final JTable grid = new JTable(model);
 
     private long startTime = TimeUtils.EPOCH.milli;
@@ -116,54 +114,6 @@ public class SpaceObjectContainer extends JPanel {
             rowHeight = grid.getRowHeight() + 4;
         }
         return rowHeight;
-    }
-
-    private static class ObjectTableModel extends AbstractTableModel {
-
-        private final ArrayList<SpaceObjectElement> elementList = new ArrayList<>();
-
-        ObjectTableModel() {
-            for (SpaceObject object : SpaceObject.getObjectList())
-                elementList.add(new SpaceObjectElement(object));
-        }
-
-        public void deselectAll(UpdateViewpoint _uv) {
-            for (SpaceObjectElement element : elementList) {
-                if (element.isSelected())
-                    element.deselect(_uv);
-            }
-        }
-
-        public void loadSelected(UpdateViewpoint _uv, String _frame, long _startTime, long _endTime) {
-            for (SpaceObjectElement element : elementList) {
-                if (element.isSelected())
-                    element.select(_uv, _frame, _startTime, _endTime); // force load
-            }
-        }
-
-        public SpaceObjectElement selectionElement(SpaceObject object) {
-            for (SpaceObjectElement element : elementList) {
-                if (element.getObject() == object)
-                    return element;
-            }
-            return null;
-        }
-
-        @Override
-        public int getRowCount() {
-            return elementList.size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return 3;
-        }
-
-        @Override
-        public Object getValueAt(int row, int column) {
-            return elementList.get(row);
-        }
-
     }
 
     private static class ObjectRenderer extends JHVTableCellRenderer {
