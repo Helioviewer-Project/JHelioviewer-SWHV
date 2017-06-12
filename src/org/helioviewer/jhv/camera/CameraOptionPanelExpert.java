@@ -5,6 +5,10 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -26,6 +30,8 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.threads.CancelTask;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
@@ -184,6 +190,10 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         LoadPosition load = new LoadPosition(this, target, frame, startDateTimePanel.getTime(), endDateTimePanel.getTime());
         updateViewpoint.setLoadPosition(load);
         JHVGlobals.getExecutorService().execute(load);
+        reaperPool.schedule(new CancelTask(load), 60, TimeUnit.SECONDS);
     }
+
+    private static final ScheduledExecutorService reaperPool = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("Position Reaper"),
+        new ThreadPoolExecutor.DiscardPolicy());
 
 }
