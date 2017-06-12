@@ -1,13 +1,9 @@
 package org.helioviewer.jhv.astronomy;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.border.Border;
 
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
@@ -34,7 +30,7 @@ public class SpaceObject {
             put("Neptune", new SpaceObject("Neptune%20Barycenter", "Neptune", 24622000 / Sun.RadiusMeter, new Color(124, 157, 226), JHVTableCellRenderer.cellBorder));
             put("Pluto", new SpaceObject("Pluto%20Barycenter", "Pluto", 1195000 / Sun.RadiusMeter, new Color(205, 169, 140), JHVTableCellRenderer.cellEmphasisBorder));
 
-            put("67P/Churyumov-Gerasimenko", new SpaceObject("CHURYUMOV-GERASIMENKO", "67P/Churyumov-Gerasimenko", 2200 / Sun.RadiusMeter, Color.WHITE, JHVTableCellRenderer.cellEmphasisBorder));
+            put("Comet 67P", new SpaceObject("CHURYUMOV-GERASIMENKO", "Comet 67P", 2200 / Sun.RadiusMeter, Color.WHITE, JHVTableCellRenderer.cellEmphasisBorder));
 
             put("SOHO", new SpaceObject("SOHO", "SOHO", 2 / Sun.RadiusMeter, Color.WHITE, JHVTableCellRenderer.cellBorder));
             put("STEREO Ahead", new SpaceObject("STEREO%20Ahead", "STEREO Ahead", 2 / Sun.RadiusMeter, Color.WHITE, JHVTableCellRenderer.cellBorder));
@@ -53,10 +49,6 @@ public class SpaceObject {
     }
 
     public static SpaceObject Earth = objectMap.get("Earth");
-
-    public static SpaceObject[] getObjectArray() {
-        return objectMap.values().toArray(new SpaceObject[objectMap.size()]);
-    }
 
     private SpaceObject(String _urlName, String _name, double _radius, Color _color, Border _border) {
         urlName = _urlName;
@@ -85,16 +77,6 @@ public class SpaceObject {
 
     public Border getBorder() {
         return border;
-    }
-
-    public static class CellRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean hasFocus) {
-            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, hasFocus);
-            if (value instanceof SpaceObject)
-                label.setBorder(((SpaceObject) value).getBorder());
-            return label;
-        }
     }
 
 }
