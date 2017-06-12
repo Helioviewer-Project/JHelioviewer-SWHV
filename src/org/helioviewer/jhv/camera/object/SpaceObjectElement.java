@@ -29,6 +29,11 @@ public class SpaceObjectElement implements LoadPositionFire {
     public void select(UpdateViewpoint uv, String frame, long startTime, long endTime) {
         selected = true;
 
+        if (load != null) {
+            load.cancel(true);
+            uv.unsetLoadPosition(load);
+        }
+
         load = new LoadPosition(this, object, frame, startTime, endTime);
         uv.setLoadPosition(load);
         JHVGlobals.getExecutorService().execute(load);

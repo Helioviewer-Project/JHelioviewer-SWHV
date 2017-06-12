@@ -90,12 +90,10 @@ public class SpaceObjectContainer extends JPanel {
         selectElement(model.selectionElement(object));
     }
 
-    public void setStartTime(long _startTime) {
+    public void loadSelected(long _startTime, long _endTime) {
         startTime = _startTime;
-    }
-
-    public void setEndTime(long _endTime) {
         endTime = _endTime;
+        model.loadSelected(uv, frame, startTime, endTime);
     }
 
     private void selectElement(SpaceObjectElement element) {
@@ -133,6 +131,13 @@ public class SpaceObjectContainer extends JPanel {
             for (SpaceObjectElement element : elementList) {
                 if (element.isSelected())
                     element.deselect(_uv);
+            }
+        }
+
+        public void loadSelected(UpdateViewpoint _uv, String _frame, long _startTime, long _endTime) {
+            for (SpaceObjectElement element : elementList) {
+                if (element.isSelected())
+                    element.select(_uv, _frame, _startTime, _endTime); // force load
             }
         }
 
