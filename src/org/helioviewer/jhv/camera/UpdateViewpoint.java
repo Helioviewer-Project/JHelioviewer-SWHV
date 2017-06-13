@@ -1,13 +1,11 @@
 package org.helioviewer.jhv.camera;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVDate;
@@ -75,21 +73,28 @@ public interface UpdateViewpoint {
     class Ecliptic implements UpdateViewpoint {
 
         private double distance;
-        private HashSet<LoadPosition> loadSet = new HashSet<>();
+        private HashMap<LoadPosition, Position.L> loadMap = new HashMap<>();
 
         void setDistance(double d) {
             distance = d;
         }
 
-        private Position.L getPositionInternal(LoadPosition loadPosition, JHVDate time, long layerStart, long layerEnd) {
-            if (!loadPosition.isLoaded()) {
-                Position.L p = Sun.getEarth(time);
-                return new Position.L(time, p.rad, 0, 0);
-            }
-            return loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd));
+        public Set<Map.Entry<LoadPosition, Position.L>> getPositions() {
+            return loadMap.entrySet();
         }
 
-        public List<Pair<SpaceObject, Position.L>> getPosition(JHVDate time) {
+        @Override
+        public void setLoadPosition(LoadPosition loadPosition) {
+            loadMap.put(loadPosition, null);
+        }
+
+        @Override
+        public void unsetLoadPosition(LoadPosition loadPosition) {
+            loadMap.remove(loadPosition);
+        }
+
+        @Override
+        public Position.Q update(JHVDate time) {
             long layerStart = 0, layerEnd = 0;
             // Active layer times
             View view = Layers.getActiveView();
@@ -98,25 +103,15 @@ public interface UpdateViewpoint {
                 layerEnd = view.getLastTime().milli;
             }
 
-            ArrayList<Pair<SpaceObject, Position.L>> ret = new ArrayList<>(loadSet.size());
-            for (LoadPosition loadPosition : loadSet) {
-                ret.add(new Pair<>(loadPosition.getTarget(), getPositionInternal(loadPosition, time, layerStart, layerEnd)));
+            for (LoadPosition loadPosition : loadMap.keySet()) {
+                if (!loadPosition.isLoaded()) {
+                    Position.L p = Sun.getEarth(time);
+                    loadMap.put(loadPosition, new Position.L(time, p.rad, 0, 0));
+                    continue;
+                }
+                loadMap.put(loadPosition, loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd)));
             }
-            return ret;
-        }
 
-        @Override
-        public void setLoadPosition(LoadPosition loadPosition) {
-            loadSet.add(loadPosition);
-        }
-
-        @Override
-        public void unsetLoadPosition(LoadPosition loadPosition) {
-            loadSet.remove(loadPosition);
-        }
-
-        @Override
-        public Position.Q update(JHVDate time) {
             return new Position.Q(time, distance, Quat.rotate(Quat.Q90, Sun.getEarthQuat(time).orientation));
         }
     }

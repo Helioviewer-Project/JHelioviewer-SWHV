@@ -2,9 +2,14 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.Map;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
+import org.helioviewer.jhv.camera.LoadPosition;
+import org.helioviewer.jhv.camera.UpdateViewpoint;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -43,8 +48,25 @@ public class RenderableViewpoint extends AbstractRenderable {
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
-            gl.glLineWidth(lineWidth);
+            if (Displayer.getUpdateViewpoint() == UpdateViewpoint.ecliptic) {
+                gl.glPointSize(20.0f);
+                gl.glBegin(GL2.GL_POINTS);
 
+                for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.ecliptic.getPositions()) {
+                    Position.L p = entry.getValue();
+                    if (p == null) // not loaded yet
+                        continue;
+                    Color c = entry.getKey().getTarget().getColor();
+
+                    gl.glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
+                    gl.glVertex3f((float) (p.rad * Math.cos(p.lon)), (float) (p.rad * Math.sin(p.lon)), 0);
+                }
+
+                gl.glEnd();
+            }
+
+
+            gl.glLineWidth(lineWidth);
             gl.glBegin(GL2.GL_LINE_LOOP);
 
             double x, y, z, n;
