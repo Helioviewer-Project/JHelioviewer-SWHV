@@ -117,8 +117,7 @@ public class Sun {
     }
 
     public static Position.Q getEarthQuat(JHVDate time) {
-        Position.L p = getEarth(time);
-        return new Position.Q(time, p.rad, new Quat(p.lat, p.lon));
+        return getEarth(time).toQ();
     }
 
     // better precison, to be recovered later

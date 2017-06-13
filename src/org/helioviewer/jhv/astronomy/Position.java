@@ -24,6 +24,10 @@ public class Position {
             return String.format("%s [%f,%f,%f]", time, rad, lon, lat);
         }
 
+        public Q toQ() {
+            return new Position.Q(time, rad, new Quat(lat, lon));
+        }
+
     }
 
     public static class Q {

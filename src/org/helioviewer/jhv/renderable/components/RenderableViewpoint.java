@@ -49,22 +49,19 @@ public class RenderableViewpoint extends AbstractRenderable {
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
             if (Displayer.getUpdateViewpoint() == UpdateViewpoint.ecliptic) {
-                gl.glPointSize(20.0f);
+                gl.glPointSize(20f);
                 gl.glBegin(GL2.GL_POINTS);
-
                 for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.ecliptic.getPositions()) {
                     Position.L p = entry.getValue();
                     if (p == null) // not loaded yet
                         continue;
-                    Color c = entry.getKey().getTarget().getColor();
 
+                    Color c = entry.getKey().getTarget().getColor();
                     gl.glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
                     gl.glVertex3f((float) (p.rad * Math.cos(p.lon)), (float) (p.rad * Math.sin(p.lon)), 0);
                 }
-
                 gl.glEnd();
             }
-
 
             gl.glLineWidth(lineWidth);
             gl.glBegin(GL2.GL_LINE_LOOP);
