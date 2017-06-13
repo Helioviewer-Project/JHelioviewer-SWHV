@@ -36,7 +36,6 @@ public class SpaceObjectContainer extends JPanel {
     private final boolean exclusive;
 
     private final SpaceObjectModel model = new SpaceObjectModel();
-    private final JTable grid = new JTable(model);
 
     private long startTime = TimeUtils.EPOCH.milli;
     private long endTime = TimeUtils.EPOCH.milli;
@@ -48,6 +47,7 @@ public class SpaceObjectContainer extends JPanel {
         frame = _frame;
         exclusive = _exclusive;
 
+        JTable grid = new JTable(model);
         grid.setTableHeader(null);
         grid.setShowGrid(false);
         grid.setRowSelectionAllowed(true);
@@ -104,7 +104,6 @@ public class SpaceObjectContainer extends JPanel {
             else
                 element.select(uv, frame, startTime, endTime);
         }
-        model.fireTableRowsUpdated(0, model.getRowCount());
     }
 
     private int rowHeight = -1;
