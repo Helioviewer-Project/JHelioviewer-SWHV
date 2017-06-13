@@ -50,9 +50,10 @@ public class SpaceObjectElement implements LoadPositionFire {
             load.cancel(true);
             uv.unsetLoadPosition(load);
             fireLoaded(null);
+
             load = null;
+            Displayer.display();
         }
-        Displayer.display();
     }
 
     public boolean isSelected() {
