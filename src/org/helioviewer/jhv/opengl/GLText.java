@@ -57,6 +57,9 @@ public class GLText {
     private static final int BOTTOM_MARGIN_TEXT = 5;
 
     public static void drawText(GL2 gl, Viewport vp, List<String> txts, int pt_x, int pt_y) {
+        if (txts.isEmpty())
+            return;
+
         TextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
         float fontSize = renderer.getFont().getSize2D();
 

@@ -377,8 +377,7 @@ public class SWEKRenderable extends AbstractRenderable {
                 txts.add(p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue());
             }
         }
-        if (!txts.isEmpty())
-            GLText.drawText(gl, vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
+        GLText.drawText(gl, vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
     @Override

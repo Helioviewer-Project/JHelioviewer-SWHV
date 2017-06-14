@@ -2,23 +2,30 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.camera.LoadPosition;
 import org.helioviewer.jhv.camera.UpdateViewpoint;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.newt.event.MouseListener;
 
-public class RenderableViewpoint extends AbstractRenderable {
+public class RenderableViewpoint extends AbstractRenderable implements MouseListener {
 
     private final CameraOptionsPanel optionsPanel = new CameraOptionsPanel();
     private static final double epsilon = 0.01;
@@ -49,7 +56,7 @@ public class RenderableViewpoint extends AbstractRenderable {
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
             if (Displayer.getUpdateViewpoint() == UpdateViewpoint.ecliptic) {
-                gl.glPointSize(20f);
+                gl.glPointSize(15f);
                 gl.glBegin(GL2.GL_POINTS);
                 for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.ecliptic.getPositions()) {
                     Position.L p = entry.getValue();
@@ -135,9 +142,94 @@ public class RenderableViewpoint extends AbstractRenderable {
         gl.glPopMatrix();
     }
 
+    private static final int MOUSE_OFFSET_X = 25;
+    private static final int MOUSE_OFFSET_Y = 25;
+    private ArrayList<String> text = new ArrayList<>();
+    private int mouseX, mouseY;
+
+    @Override
+    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+        GLText.drawText(gl, vp, text, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        if (Displayer.getUpdateViewpoint() == UpdateViewpoint.ecliptic) {
+            mouseX = e.getX();
+            mouseY = e.getY();
+            Camera camera = Displayer.getCamera();
+            Vec3 v = CameraHelper.getVectorFromPlane(Displayer.getCamera(), Displayer.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
+            if (v == null)
+                return;
+
+            double width = camera.getWidth(), minDist = 10;
+            String name = null;
+            for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.ecliptic.getPositions()) {
+                Position.L p = entry.getValue();
+                if (p == null) // not loaded yet
+                    continue;
+
+                double deltaX = Math.abs(p.rad * Math.cos(p.lon) - v.x);
+                double deltaY = Math.abs(p.rad * Math.sin(p.lon) - v.y);
+                double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
+                if (dist < minDist) {
+                    minDist = dist;
+                    name = entry.getKey().getTarget().toString();
+                }
+            }
+            if (!text.isEmpty()) {
+                text.clear();
+                Displayer.display();
+            }
+            if (minDist < 0.01) {
+                text.add(name);
+                Displayer.display();
+            }
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseEvent e) {
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+
+        if (visible)
+            ImageViewerGui.getInputController().addPlugin(this);
+        else
+            ImageViewerGui.getInputController().removePlugin(this);
+    }
+
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
+        ImageViewerGui.getInputController().removePlugin(this);
     }
 
     @Override
