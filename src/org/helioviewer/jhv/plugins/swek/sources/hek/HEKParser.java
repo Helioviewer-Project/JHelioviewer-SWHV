@@ -17,7 +17,6 @@ import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKParser;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONArray;

@@ -112,7 +112,6 @@ public interface UpdateViewpoint {
                 }
                 loadMap.put(loadPosition, loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd)));
             }
-
             return new Position.Q(time, distance, Quat.rotate(Quat.Q90, p.toQ().orientation));
         }
     }
