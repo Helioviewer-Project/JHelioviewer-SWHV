@@ -9,6 +9,4 @@ class CameraOptionPanel extends JPanel {
 
     void deactivate() {}
 
-    void syncWithLayer() {}
-
 }
