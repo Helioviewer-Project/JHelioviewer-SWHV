@@ -22,7 +22,7 @@ import org.helioviewer.jhv.view.jp2view.kakadu.KakaduEngine;
 
 class J2KRender implements Runnable {
 
-    private static final int MAX_INACTIVE_LAYERS = 100;
+    private static final int MAX_INACTIVE_LAYERS = 200;
 
     private static final ThreadLocal<int[]> bufferLocal = ThreadLocal.withInitial(() -> new int[KakaduConstants.MAX_RENDER_SAMPLES]);
     private static final ThreadLocal<Kdu_thread_env> threadLocal = ThreadLocal.withInitial(J2KRender::createThreadEnv);
