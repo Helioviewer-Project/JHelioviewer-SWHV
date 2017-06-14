@@ -17,7 +17,7 @@ public class SpaceObject {
     private final Color color;
     private final Border border;
 
-    private static LinkedHashMap<String, SpaceObject> objectMap = new LinkedHashMap<String, SpaceObject>() {
+    private static final LinkedHashMap<String, SpaceObject> objectMap = new LinkedHashMap<String, SpaceObject>() {
         {
             put("Mercury", new SpaceObject("Mercury", "Mercury", 2439700 / Sun.RadiusMeter, Color.GRAY, JHVTableCellRenderer.cellBorder));
             put("Venus", new SpaceObject("Venus", "Venus", 6051800 / Sun.RadiusMeter, new Color(181, 110, 26), JHVTableCellRenderer.cellBorder));
@@ -48,7 +48,7 @@ public class SpaceObject {
         return objectMap.values();
     }
 
-    public static SpaceObject Earth = objectMap.get("Earth");
+    public static final SpaceObject Earth = objectMap.get("Earth");
 
     private SpaceObject(String _urlName, String _name, double _radius, Color _color, Border _border) {
         urlName = _urlName;
@@ -62,11 +62,6 @@ public class SpaceObject {
         return urlName;
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
-
     public double getRadius() {
         return radius;
     }
@@ -77,6 +72,24 @@ public class SpaceObject {
 
     public Border getBorder() {
         return border;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SpaceObject))
+            return false;
+        SpaceObject r = (SpaceObject) o;
+        return urlName.equals(r.urlName);
+    }
+
+    @Override
+    public int hashCode() {
+        return urlName.hashCode();
     }
 
 }

@@ -46,7 +46,7 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
             deltat = span / max;
 
         try {
-            DownloadStream ds = new DownloadStream(new PositionRequest(target.getUrlName(), frame, start, end, deltat).url, true);
+            DownloadStream ds = new DownloadStream(new PositionRequest(target, frame, start, end, deltat).url, true);
             JSONObject result = JSONUtils.getJSONStream(ds.getInput());
             if (ds.isResponse400()) {
                 report = result.optString("faultstring", "Invalid network response");

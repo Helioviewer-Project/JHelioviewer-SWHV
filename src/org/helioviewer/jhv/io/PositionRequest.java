@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Iterator;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.JHVDate;
@@ -17,7 +18,7 @@ public class PositionRequest {
     private static final String baseURL = "http://swhv.oma.be/position?";
     private static final String observer = "SUN";
 
-    private final String target;
+    private final SpaceObject target;
     private final String frame;
     private final long startTime;
     private final long endTime;
@@ -25,14 +26,14 @@ public class PositionRequest {
 
     public final URL url;
 
-    public PositionRequest(String _target, String _frame, long _startTime, long _endTime, long _deltat) {
+    public PositionRequest(SpaceObject _target, String _frame, long _startTime, long _endTime, long _deltat) {
         target = _target;
         frame = _frame;
         startTime = _startTime;
         endTime = _endTime;
         deltat = _deltat;
 
-        String req = baseURL + "ref=" + frame + "&kind=latitudinal" + "&observer=" + observer + "&target=" + target +
+        String req = baseURL + "ref=" + frame + "&kind=latitudinal" + "&observer=" + observer + "&target=" + target.getUrlName() +
                     "&utc=" + TimeUtils.format(startTime) + "&utc_end=" + TimeUtils.format(endTime) + "&deltat=" + deltat;
 
         URL _url = null;
