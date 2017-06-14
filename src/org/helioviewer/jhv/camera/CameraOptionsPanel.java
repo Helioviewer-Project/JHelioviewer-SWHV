@@ -39,10 +39,11 @@ public class CameraOptionsPanel extends JPanel {
 
     private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
                                               "<b>Earth</b>: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
-                                              "<b>Ecliptic</b>: view onto ecliptic.\nCamera time defined by timestamps of the master layer, unless " +
-                                              "\"Use master layer timestamps\" is off.\nIn that case, camera time is interpolated in the configured time interval.\n\n" +
-                                              "<b>Other</b>: view from selected object.\nCamera time defined by timestamps of the master layer, unless " +
-                                              "\"Use master layer timestamps\" is off.\nIn that case, camera time is interpolated in the configured time interval.";
+                                              "<b>Ecliptic</b>: view onto ecliptic.\nCamera time defined by timestamps of the master layer.\n" +
+                                              "Object positions are interpolated in the time interval of the master layer, unless " +
+                                              "\"Use master layer time interval\" is off.\nIn that case, the positions are interpolated in the configured time interval.\n\n" +
+                                              "<b>Other</b>: view from selected object.\nCamera time is interpolated in the time interval of the master layer, unless " +
+                                              "\"Use master layer time interval\" is off.\nIn that case, camera time is interpolated in the configured time interval.";
 
     public CameraOptionsPanel() {
         setLayout(new GridBagLayout());
@@ -120,7 +121,6 @@ public class CameraOptionsPanel extends JPanel {
 
         if (newOptionPanel != null) {
             newOptionPanel.activate();
-            newOptionPanel.syncWithLayer();
 
             GridBagConstraints c = new GridBagConstraints();
             c.weightx = 1;

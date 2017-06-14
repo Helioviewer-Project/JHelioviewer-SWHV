@@ -18,7 +18,7 @@ import org.helioviewer.jhv.view.View;
 @SuppressWarnings("serial")
 public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener {
 
-    private final JCheckBox exactDateCheckBox = new JCheckBox("Use master layer timestamps", true);
+    private final JCheckBox exactDateCheckBox = new JCheckBox("Use master layer time interval", true);
     private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
     private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
 
@@ -54,10 +54,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             boolean selected = !exactDateCheckBox.isSelected();
             startDateTimePanel.setVisible(selected);
             endDateTimePanel.setVisible(selected);
-            if (selected)
-                request();
-            else
-                syncWithLayer();
+            syncWithLayer();
         });
 
         ComponentUtils.smallVariant(this);
@@ -66,6 +63,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     @Override
     void activate() {
         Layers.addLayersListener(this);
+        syncWithLayer();
     }
 
     @Override
@@ -75,12 +73,13 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     @Override
     public void activeLayerChanged(View view) {
-        if (exactDateCheckBox.isSelected())
-            syncWithLayer();
+        syncWithLayer();
     }
 
-    @Override
-    void syncWithLayer() {
+    private void syncWithLayer() {
+        if (!exactDateCheckBox.isSelected())
+            return;
+
         View view = Layers.getActiveView();
         if (view == null)
             return;
