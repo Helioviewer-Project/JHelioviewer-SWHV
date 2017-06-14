@@ -59,12 +59,9 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
                 gl.glPointSize(15f);
                 gl.glBegin(GL2.GL_POINTS);
                 for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.ecliptic.getPositions()) {
-                    Position.L p = entry.getValue();
-                    if (p == null) // not loaded yet
-                        continue;
-
                     Color c = entry.getKey().getTarget().getColor();
                     gl.glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
+                    Position.L p = entry.getValue();
                     gl.glVertex3f((float) (p.rad * Math.cos(p.lon)), (float) (p.rad * Math.sin(p.lon)), 0);
                 }
                 gl.glEnd();
@@ -166,9 +163,6 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
             String name = null;
             for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.ecliptic.getPositions()) {
                 Position.L p = entry.getValue();
-                if (p == null) // not loaded yet
-                    continue;
-
                 double deltaX = Math.abs(p.rad * Math.cos(p.lon) - v.x);
                 double deltaY = Math.abs(p.rad * Math.sin(p.lon) - v.y);
                 double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;

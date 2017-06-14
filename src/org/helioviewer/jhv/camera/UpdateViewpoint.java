@@ -85,7 +85,8 @@ public interface UpdateViewpoint {
 
         @Override
         public void setLoadPosition(LoadPosition loadPosition) {
-            loadMap.put(loadPosition, null);
+            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+            loadMap.put(loadPosition, new Position.L(p.time, p.rad, 0, 0));
         }
 
         @Override
@@ -103,16 +104,11 @@ public interface UpdateViewpoint {
                 layerEnd = view.getLastTime().milli;
             }
 
-            Position.L p = Sun.getEarth(time);
-            Position.L e = new Position.L(time, p.rad, 0, 0);
             for (LoadPosition loadPosition : loadMap.keySet()) {
-                if (!loadPosition.isLoaded()) {
-                    loadMap.put(loadPosition, e);
-                    continue;
-                }
-                loadMap.put(loadPosition, loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd)));
+                if (loadPosition.isLoaded())
+                    loadMap.put(loadPosition, loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd)));
             }
-            return new Position.Q(time, distance, Quat.rotate(Quat.Q90, p.toQ().orientation));
+            return new Position.Q(time, distance, Quat.rotate(Quat.Q90, Sun.getEarthQuat(time).orientation));
         }
     }
 
