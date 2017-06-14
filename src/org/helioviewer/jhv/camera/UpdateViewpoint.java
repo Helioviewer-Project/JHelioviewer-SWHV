@@ -73,7 +73,7 @@ public interface UpdateViewpoint {
     class Ecliptic implements UpdateViewpoint {
 
         private double distance;
-        private HashMap<LoadPosition, Position.L> loadMap = new HashMap<>();
+        private final HashMap<LoadPosition, Position.L> loadMap = new HashMap<>();
 
         void setDistance(double d) {
             distance = d;

@@ -141,7 +141,7 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
 
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
-    private ArrayList<String> text = new ArrayList<>();
+    private final ArrayList<String> text = new ArrayList<>();
     private int mouseX, mouseY;
 
     @Override
