@@ -9,8 +9,6 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
@@ -35,39 +33,37 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         c.weightx = 1;
         c.weighty = 0;
         c.gridx = 0;
-        c.gridy = 0;
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
-        add(new JSeparator(SwingConstants.HORIZONTAL), c);
 
-        c.gridy = 1;
+        c.gridy = 0;
         container = new SpaceObjectContainer(uv, frame, exclusive);
         container.selectObject(SpaceObject.Earth);
         add(container, c);
 
-        c.gridy = 2;
+        c.gridy = 1;
         add(exactDateCheckBox, c);
-        c.gridy = 3;
+        c.gridy = 2;
         startDateTimePanel.addListener(e -> request());
         startDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(startDateTimePanel, c);
-        c.gridy = 4;
+        c.gridy = 3;
         endDateTimePanel.addListener(e -> request());
         endDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(endDateTimePanel, c);
 
-        c.gridy = 5;
+        c.gridy = 4;
         JButton synchronizeWithLayersButton = new JButton("Sync");
         synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
         synchronizeWithLayersButton.addActionListener(e -> syncWithLayer());
 
         JButton synchronizeWithNowButton = new JButton("Now");
         synchronizeWithNowButton.setToolTipText("Fill twice current time");
-        synchronizeWithNowButton.addActionListener(e -> syncBothLayerNow());
+        synchronizeWithNowButton.addActionListener(e -> syncWithNow());
 
         JButton synchronizeWithCurrentButton = new JButton("Current");
-        synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
-        synchronizeWithCurrentButton.addActionListener(e -> syncWithLayerCurrentTime());
+        synchronizeWithCurrentButton.setToolTipText("Fill twice layer time");
+        synchronizeWithCurrentButton.addActionListener(e -> syncWithCurrentTime());
 
         JPanel buttonPanel = new JPanel(new GridLayout(0, 3));
         buttonPanel.add(synchronizeWithLayersButton);
@@ -85,6 +81,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             buttonPanel.setVisible(selected);
             if (selected)
                 request();
+            else
+                syncWithLayer();
         });
 
         ComponentUtils.smallVariant(this);
@@ -117,14 +115,14 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         request();
     }
 
-    private void syncBothLayerNow() {
+    private void syncWithNow() {
         long now = System.currentTimeMillis();
         startDateTimePanel.setTime(now);
         endDateTimePanel.setTime(now);
         request();
     }
 
-    private void syncWithLayerCurrentTime() {
+    private void syncWithCurrentTime() {
         long now = Layers.getLastUpdatedTimestamp().milli;
         startDateTimePanel.setTime(now);
         endDateTimePanel.setTime(now);
