@@ -3,12 +3,9 @@ package org.helioviewer.jhv.camera;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
@@ -51,33 +48,12 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         endDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(endDateTimePanel, c);
 
-        c.gridy = 4;
-        JButton synchronizeWithLayersButton = new JButton("Sync");
-        synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
-        synchronizeWithLayersButton.addActionListener(e -> syncWithLayer());
-
-        JButton synchronizeWithNowButton = new JButton("Now");
-        synchronizeWithNowButton.setToolTipText("Fill twice current time");
-        synchronizeWithNowButton.addActionListener(e -> syncWithNow());
-
-        JButton synchronizeWithCurrentButton = new JButton("Current");
-        synchronizeWithCurrentButton.setToolTipText("Fill twice layer time");
-        synchronizeWithCurrentButton.addActionListener(e -> syncWithCurrentTime());
-
-        JPanel buttonPanel = new JPanel(new GridLayout(0, 3));
-        buttonPanel.add(synchronizeWithLayersButton);
-        buttonPanel.add(synchronizeWithCurrentButton);
-        buttonPanel.add(synchronizeWithNowButton);
-        add(buttonPanel, c);
-
         startDateTimePanel.setVisible(false);
         endDateTimePanel.setVisible(false);
-        buttonPanel.setVisible(false);
         exactDateCheckBox.addActionListener(e -> {
             boolean selected = !exactDateCheckBox.isSelected();
             startDateTimePanel.setVisible(selected);
             endDateTimePanel.setVisible(selected);
-            buttonPanel.setVisible(selected);
             if (selected)
                 request();
             else
@@ -111,20 +87,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         startDateTimePanel.setTime(view.getFirstTime().milli);
         endDateTimePanel.setTime(view.getLastTime().milli);
-        request();
-    }
-
-    private void syncWithNow() {
-        long now = System.currentTimeMillis();
-        startDateTimePanel.setTime(now);
-        endDateTimePanel.setTime(now);
-        request();
-    }
-
-    private void syncWithCurrentTime() {
-        long now = Layers.getLastUpdatedTimestamp().milli;
-        startDateTimePanel.setTime(now);
-        endDateTimePanel.setTime(now);
         request();
     }
 
