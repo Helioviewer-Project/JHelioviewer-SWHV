@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -46,7 +45,6 @@ public class CameraOptionsPanel extends JPanel {
 
     public CameraOptionsPanel() {
         setLayout(new GridBagLayout());
-        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.CENTER;
@@ -127,7 +125,7 @@ public class CameraOptionsPanel extends JPanel {
             c.weightx = 1;
             c.weighty = 1;
             c.gridwidth = 2;
-            c.fill = GridBagConstraints.HORIZONTAL;
+            c.fill = GridBagConstraints.BOTH;
             c.gridx = 0;
             c.gridy = 2;
             add(newOptionPanel, c);

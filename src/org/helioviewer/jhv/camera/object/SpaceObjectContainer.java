@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.camera.object;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -11,7 +10,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -22,7 +20,7 @@ import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
-public class SpaceObjectContainer extends JPanel {
+public class SpaceObjectContainer extends JScrollPane {
 
     private static final int ICON_WIDTH = 12;
     private static final int NUMBEROFVISIBLEROWS = 5;
@@ -41,8 +39,6 @@ public class SpaceObjectContainer extends JPanel {
     private long endTime = TimeUtils.EPOCH.milli;
 
     public SpaceObjectContainer(UpdateViewpoint _uv, String _frame, boolean _exclusive) {
-        setLayout(new BorderLayout());
-
         uv = _uv;
         frame = _frame;
         exclusive = _exclusive;
@@ -75,13 +71,14 @@ public class SpaceObjectContainer extends JPanel {
             }
         });
 
-        JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
-        jsp.getViewport().setBackground(grid.getBackground());
-        jsp.setPreferredSize(new Dimension(-1, getGridRowHeight(grid) * NUMBEROFVISIBLEROWS + 1));
-        grid.setRowHeight(getGridRowHeight(grid));
+        setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
 
-        add(jsp);
+        setViewportView(grid);
+        getViewport().setBackground(grid.getBackground());
+        setPreferredSize(new Dimension(-1, getGridRowHeight(grid) * NUMBEROFVISIBLEROWS + 1));
+        grid.setRowHeight(getGridRowHeight(grid));
     }
 
     public void selectObject(SpaceObject object) {

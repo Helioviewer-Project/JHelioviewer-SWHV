@@ -33,8 +33,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         c.weightx = 1;
         c.weighty = 0;
         c.gridx = 0;
-        c.anchor = GridBagConstraints.LINE_START;
-        c.fill = GridBagConstraints.HORIZONTAL;
+        c.fill = GridBagConstraints.BOTH;
 
         c.gridy = 0;
         container = new SpaceObjectContainer(uv, frame, exclusive);
