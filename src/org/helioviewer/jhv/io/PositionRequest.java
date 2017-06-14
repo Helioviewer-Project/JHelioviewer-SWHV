@@ -44,6 +44,20 @@ public class PositionRequest {
         url = _url;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PositionRequest))
+            return false;
+        PositionRequest r = (PositionRequest) o;
+        return target.equals(r.target) && frame.equals(r.frame) && startTime == r.startTime && endTime == r.endTime && deltat == r.deltat;
+    }
+
+    @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
+    }
+
     public static Position.L[] parseResponse(JSONObject jo) throws Exception {
         JSONArray res = jo.getJSONArray("result");
         int len = res.length();
