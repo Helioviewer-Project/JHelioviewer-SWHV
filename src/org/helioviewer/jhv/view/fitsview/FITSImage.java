@@ -49,6 +49,8 @@ class FITSImage {
     }
 
     private void readHDU(BasicHDU<?> hdu) throws Exception {
+        if (hdu.getAxes().length != 2)
+            throw new Exception("Only 2D FITS files supported");
         int bitsPerPixel = hdu.getBitPix();
         if (bitsPerPixel == BasicHDU.BITPIX_BYTE) {
             byte[][] data2D = (byte[][]) hdu.getKernel();
