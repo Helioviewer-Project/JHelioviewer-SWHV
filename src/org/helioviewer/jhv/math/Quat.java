@@ -5,7 +5,6 @@ public class Quat {
     private static final double EPSILON = 0.000001;
 
     public static final Quat ZERO = new Quat();
-    public static final Quat Q90 = new Quat(Math.PI / 2, 0);
 
     private final double a;
     private final Vec3 u;

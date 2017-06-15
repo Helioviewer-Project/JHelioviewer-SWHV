@@ -55,10 +55,10 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
-            if (Displayer.getUpdateViewpoint() == UpdateViewpoint.ecliptic) {
+            if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
                 gl.glPointSize(15f);
                 gl.glBegin(GL2.GL_POINTS);
-                for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.ecliptic.getPositions()) {
+                for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
                     Color c = entry.getKey().getTarget().getColor();
                     gl.glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
                     Position.L p = entry.getValue();
@@ -151,7 +151,7 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (Displayer.getUpdateViewpoint() == UpdateViewpoint.ecliptic) {
+        if (Displayer.getUpdateViewpoint() == UpdateViewpoint.equatorial) {
             mouseX = e.getX();
             mouseY = e.getY();
             Camera camera = Displayer.getCamera();
@@ -161,7 +161,7 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
 
             double width = camera.getWidth(), minDist = 10;
             String name = null;
-            for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.ecliptic.getPositions()) {
+            for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
                 Position.L p = entry.getValue();
                 double deltaX = Math.abs(p.rad * Math.cos(p.lon) - v.x);
                 double deltaY = Math.abs(p.rad * Math.sin(p.lon) - v.y);

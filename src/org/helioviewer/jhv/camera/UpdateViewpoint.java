@@ -20,7 +20,7 @@ public interface UpdateViewpoint {
     Observer observer = new Observer();
     Earth earth = new Earth();
     EarthFixedDistance earthFixedDistance = new EarthFixedDistance();
-    Ecliptic ecliptic = new Ecliptic();
+    Equatorial equatorial = new Equatorial();
     Expert expert = new Expert();
 
     class Observer implements UpdateViewpoint {
@@ -70,7 +70,7 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Ecliptic implements UpdateViewpoint {
+    class Equatorial implements UpdateViewpoint {
 
         private double distance;
         private final HashMap<LoadPosition, Position.L> loadMap = new HashMap<>();
@@ -86,7 +86,7 @@ public interface UpdateViewpoint {
         @Override
         public void setLoadPosition(LoadPosition loadPosition) {
             Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
-            loadMap.put(loadPosition, new Position.L(p.time, p.rad, 0, 0));
+            loadMap.put(loadPosition, new Position.L(p.time, p.rad, 0, /* -? */ p.lat));
         }
 
         @Override
@@ -108,7 +108,9 @@ public interface UpdateViewpoint {
                 if (loadPosition.isLoaded())
                     loadMap.put(loadPosition, loadPosition.getInterpolatedL(loadPosition.interpolateTime(time.milli, layerStart, layerEnd)));
             }
-            return new Position.Q(time, distance, Quat.rotate(Quat.Q90, Sun.getEarthQuat(time).orientation));
+
+            Position.L p = Sun.getEarth(time);
+            return new Position.Q(time, distance, new Quat(Math.PI / 2, p.lon));
         }
     }
 
