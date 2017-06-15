@@ -75,8 +75,12 @@ public class HelioviewerMetaData extends AbstractMetaData {
     }
 
     private void retrieveOcculterRadii(MetaDataContainer m) {
-        innerRadius = m.getDouble("HV_ROCC_INNER").orElse(innerRadius) * Sun.Radius;
-        outerRadius = m.getDouble("HV_ROCC_OUTER").orElse(outerRadius) * Sun.Radius;
+        innerRadius = m.getDouble("HV_ROCC_INNER").orElse(innerRadius);
+        outerRadius = m.getDouble("HV_ROCC_OUTER").orElse(outerRadius);
+        innerRadius = m.getDouble("HV_INNER").orElse(innerRadius); // Euhforia
+        outerRadius = m.getDouble("HV_OUTER").orElse(outerRadius);
+        innerRadius *= Sun.Radius;
+        outerRadius *= Sun.Radius;
 
         if (innerRadius == 0) {
             if (detector.equalsIgnoreCase("C2")) {
