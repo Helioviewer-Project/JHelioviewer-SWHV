@@ -208,6 +208,11 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         _render(camera, vp, gl, depthScale);
     }
 
+    private static Mat4 getOrthoMatrixInverse(double fov, double aspect, double distance) {
+        double width = distance * Math.tan(0.5 * fov);
+        return Mat4.orthoInverse(-width * aspect, width * aspect, -width, width, CameraHelper.clipNear, CameraHelper.clipFar);
+    }
+
     private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange) {
         if (imageData == null) {
             return;
@@ -225,7 +230,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
             Position.Q viewpoint = imageData.getViewpoint();
 
-            Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp, viewpoint.distance);
+            Mat4 vpmi = getOrthoMatrixInverse(camera.getFOV(), vp.aspect, viewpoint.distance); // use current FOV
             if (Displayer.mode == Displayer.DisplayMode.Orthographic)
                 vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
             else

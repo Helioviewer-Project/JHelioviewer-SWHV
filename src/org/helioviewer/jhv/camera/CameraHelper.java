@@ -13,14 +13,9 @@ import com.jogamp.opengl.GL2;
 
 public class CameraHelper {
 
-    private static final double clipNear = 3 * Sun.Radius;
-    private static final double clipFar = 10000 * Sun.Radius;
+    public static final double clipNear = 3 * Sun.Radius;
+    public static final double clipFar = 10000 * Sun.Radius;
     private static final double[] identity = Mat4.identity().m;
-
-    public static Mat4 getOrthoMatrixInverse(Camera camera, Viewport vp, double distance) {
-        double width = distance * Math.tan(0.5 * camera.getFOV());
-        return Mat4.orthoInverse(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
-    }
 
     public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
