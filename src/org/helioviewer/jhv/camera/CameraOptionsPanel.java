@@ -27,19 +27,19 @@ import com.jidesoft.swing.JideButton;
 public class CameraOptionsPanel extends JPanel {
 
     private enum CameraMode {
-        Observer, Earth, Ecliptic, Other
+        Observer, Earth, Equatorial, Other
     }
 
     private static final double FOVAngleDefault = 0.8;
     private double FOVAngle = FOVAngleDefault * Math.PI / 180.;
 
     private final CameraOptionPanelExpert expertOptionPanel;
-    private final CameraOptionPanelExpert eclipticOptionPanel;
+    private final CameraOptionPanelExpert equatorialOptionPanel;
     private CameraOptionPanel currentOptionPanel;
 
     private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
                                               "<b>Earth</b>: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
-                                              "<b>Ecliptic</b>: view onto ecliptic.\nCamera time defined by timestamps of the master layer.\n" +
+                                              "<b>Equatorial</b>: view onto the solar equatorial plane.\nCamera time defined by timestamps of the master layer.\n" +
                                               "Object positions are interpolated in the time interval of the master layer, unless " +
                                               "\"Use master layer time interval\" is off.\nIn that case, the positions are interpolated in the configured time interval.\n\n" +
                                               "<b>Other</b>: view from selected object.\nCamera time is interpolated in the time interval of the master layer, unless " +
@@ -103,7 +103,7 @@ public class CameraOptionsPanel extends JPanel {
         ComponentUtils.smallVariant(this);
 
         expertOptionPanel = new CameraOptionPanelExpert(UpdateViewpoint.expert, "HEEQ", true);
-        eclipticOptionPanel = new CameraOptionPanelExpert(UpdateViewpoint.ecliptic, "HEE", false);
+        equatorialOptionPanel = new CameraOptionPanelExpert(UpdateViewpoint.equatorial, "HEEQ", false);
     }
 
     public double getFOVAngle() {
@@ -148,10 +148,10 @@ public class CameraOptionsPanel extends JPanel {
             case Earth:
                 update = UpdateViewpoint.earth;
             break;
-            case Ecliptic:
-                UpdateViewpoint.ecliptic.setDistance(2 * Sun.MeanEarthDistance / Math.tan(0.5 * Displayer.getCamera().getFOV()));
-                update = UpdateViewpoint.ecliptic;
-                panel = eclipticOptionPanel;
+            case Equatorial:
+                UpdateViewpoint.equatorial.setDistance(2 * Sun.MeanEarthDistance / Math.tan(0.5 * Displayer.getCamera().getFOV()));
+                update = UpdateViewpoint.equatorial;
+                panel = equatorialOptionPanel;
             break;
             default:
                 update = UpdateViewpoint.observer;
