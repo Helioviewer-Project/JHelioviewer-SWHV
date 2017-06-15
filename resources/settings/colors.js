@@ -70,7 +70,7 @@
  {"instrument":"SXT",
   "color":"Yohkoh SXT"},
  {"instrument":"XRT",
-  "color":"Hinode XRT"}]
+  "color":"Red Temperature"}]
 // Configuration about the used default color tables
 // This must be an array and the fist matching rule will be used
 // A rule can query "observatory", "instrument", "detector", "measurement"
