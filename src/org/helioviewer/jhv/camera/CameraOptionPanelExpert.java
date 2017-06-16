@@ -7,7 +7,6 @@ import java.awt.GridBagLayout;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 
-import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
@@ -33,8 +32,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         c.fill = GridBagConstraints.BOTH;
 
         c.gridy = 0;
-        container = new SpaceObjectContainer(uv, frame, exclusive);
-        container.selectObject(SpaceObject.Earth);
+        container = new SpaceObjectContainer(null, uv, frame, exclusive);
         add(container, c);
 
         c.gridy = 1;
