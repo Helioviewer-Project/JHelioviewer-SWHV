@@ -50,7 +50,7 @@ public class PositionRequest {
         if (!(o instanceof PositionRequest))
             return false;
         PositionRequest r = (PositionRequest) o;
-        return target.equals(r.target) && frame.equals(r.frame) && startTime == r.startTime && endTime == r.endTime && deltat == r.deltat;
+        return startTime == r.startTime && endTime == r.endTime && deltat == r.deltat && frame.equals(r.frame) && target.equals(r.target);
     }
 
     @Override

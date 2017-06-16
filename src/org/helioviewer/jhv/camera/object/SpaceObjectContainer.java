@@ -82,7 +82,9 @@ public class SpaceObjectContainer extends JScrollPane {
     }
 
     public void selectObject(SpaceObject object) {
-        selectElement(model.selectionElement(object));
+        SpaceObjectElement element = model.selectionElement(object);
+        if (element != null) // found
+            selectElement(element);
     }
 
     public void loadSelected(long _startTime, long _endTime) {
