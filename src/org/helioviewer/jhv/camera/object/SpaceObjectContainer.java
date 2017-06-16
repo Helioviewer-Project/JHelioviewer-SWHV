@@ -40,7 +40,7 @@ public class SpaceObjectContainer extends JScrollPane {
     private long startTime = TimeUtils.EPOCH.milli;
     private long endTime = TimeUtils.EPOCH.milli;
 
-    public SpaceObjectContainer(JSONObject jo, UpdateViewpoint _uv, String _frame, boolean _exclusive) {
+    public SpaceObjectContainer(JSONArray ja, UpdateViewpoint _uv, String _frame, boolean _exclusive) {
         uv = _uv;
         frame = _frame;
         exclusive = _exclusive;
@@ -83,10 +83,8 @@ public class SpaceObjectContainer extends JScrollPane {
         grid.setRowHeight(getGridRowHeight(grid));
 
         try {
-            JSONArray ja = jo.getJSONArray("objects");
-            for (int i = 0; i < ja.length(); i++) {
+            for (int i = 0; i < ja.length(); i++)
                 selectObject(SpaceObject.get(ja.getString(i)));
-            }
         } catch (Exception e) {
             selectObject(SpaceObject.get("Earth"));
         }
@@ -103,10 +101,6 @@ public class SpaceObjectContainer extends JScrollPane {
         endTime = _endTime;
         for (SpaceObjectElement element : model.getSelected())
             element.load(uv, frame, startTime, endTime);
-
-        JSONObject jo = new JSONObject();
-        serialize(jo);
-        System.out.println(">> " + jo);
     }
 
     private void selectElement(SpaceObjectElement element) {
@@ -131,11 +125,11 @@ public class SpaceObjectContainer extends JScrollPane {
         return rowHeight;
     }
 
-    public void serialize(JSONObject jo) {
+    public JSONArray toJson() {
         JSONArray ja = new JSONArray();
         for (SpaceObjectElement element : model.getSelected())
             ja.put(element);
-        jo.put("objects", ja);
+        return ja;
     }
 
     private static class ObjectRenderer extends JHVTableCellRenderer {
