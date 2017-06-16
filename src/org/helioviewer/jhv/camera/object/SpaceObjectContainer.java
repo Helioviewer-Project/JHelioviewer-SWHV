@@ -18,6 +18,8 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.camera.UpdateViewpoint;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public class SpaceObjectContainer extends JScrollPane {
@@ -38,7 +40,7 @@ public class SpaceObjectContainer extends JScrollPane {
     private long startTime = TimeUtils.EPOCH.milli;
     private long endTime = TimeUtils.EPOCH.milli;
 
-    public SpaceObjectContainer(UpdateViewpoint _uv, String _frame, boolean _exclusive) {
+    public SpaceObjectContainer(JSONObject jo, UpdateViewpoint _uv, String _frame, boolean _exclusive) {
         uv = _uv;
         frame = _frame;
         exclusive = _exclusive;
@@ -79,9 +81,18 @@ public class SpaceObjectContainer extends JScrollPane {
         getViewport().setBackground(grid.getBackground());
         setPreferredSize(new Dimension(-1, getGridRowHeight(grid) * NUMBEROFVISIBLEROWS + 1));
         grid.setRowHeight(getGridRowHeight(grid));
+
+        try {
+            JSONArray ja = jo.getJSONArray("objects");
+            for (int i = 0; i < ja.length(); i++) {
+                selectObject(SpaceObject.get(ja.getString(i)));
+            }
+        } catch (Exception e) {
+            selectObject(SpaceObject.get("Earth"));
+        }
     }
 
-    public void selectObject(SpaceObject object) {
+    private void selectObject(SpaceObject object) {
         SpaceObjectElement element = model.elementOf(object);
         if (element != null) // found
             selectElement(element);
@@ -92,6 +103,10 @@ public class SpaceObjectContainer extends JScrollPane {
         endTime = _endTime;
         for (SpaceObjectElement element : model.getSelected())
             element.load(uv, frame, startTime, endTime);
+
+        JSONObject jo = new JSONObject();
+        serialize(jo);
+        System.out.println(">> " + jo);
     }
 
     private void selectElement(SpaceObjectElement element) {
@@ -114,6 +129,13 @@ public class SpaceObjectContainer extends JScrollPane {
             rowHeight = grid.getRowHeight() + 4;
         }
         return rowHeight;
+    }
+
+    public void serialize(JSONObject jo) {
+        JSONArray ja = new JSONArray();
+        for (SpaceObjectElement element : model.getSelected())
+            ja.put(element);
+        jo.put("objects", ja);
     }
 
     private static class ObjectRenderer extends JHVTableCellRenderer {

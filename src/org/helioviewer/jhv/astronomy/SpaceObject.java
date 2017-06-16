@@ -44,11 +44,13 @@ public class SpaceObject {
         }
     };
 
-    public static Collection<SpaceObject> getObjectList() {
+    public static Collection<SpaceObject> getObjects() {
         return objectMap.values();
     }
 
-    public static final SpaceObject Earth = objectMap.get("Earth");
+    public static SpaceObject get(String obj) {
+        return objectMap.get(obj);
+    }
 
     private SpaceObject(String _urlName, String _name, double _radius, Color _color, Border _border) {
         urlName = _urlName;

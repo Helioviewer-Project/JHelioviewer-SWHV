@@ -13,7 +13,7 @@ class SpaceObjectModel extends AbstractTableModel {
     private final ArrayList<SpaceObjectElement> elements = new ArrayList<>();
 
     SpaceObjectModel() {
-        for (SpaceObject object : SpaceObject.getObjectList())
+        for (SpaceObject object : SpaceObject.getObjects())
             elements.add(new SpaceObjectElement(object, this));
     }
 
