@@ -14,12 +14,12 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 @SuppressWarnings("serial")
 class RenderableTimeStampOptionsPanel extends JPanel {
 
-    public RenderableTimeStampOptionsPanel(RenderableTimeStamp timeStamp) {
+    public RenderableTimeStampOptionsPanel(RenderableTimeStamp timeStamp, int scale, int min_scale, int max_scale) {
         setLayout(new GridBagLayout());
 
-        JSlider slider = new JSlider(JSlider.HORIZONTAL, 100, 200, 100);
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, min_scale, max_scale, scale);
         slider.addChangeListener(e -> {
-            timeStamp.setSize(slider.getValue() / 100.);
+            timeStamp.setScale(slider.getValue());
             Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(slider);

@@ -48,8 +48,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public RenderableContainer() {
         addRenderable(new RenderableGrid(null));
         addRenderable(new RenderableViewpoint(null));
-        addRenderable(new RenderableTimeStamp());
-        addRenderable(new RenderableMiniview());
+        addRenderable(new RenderableTimeStamp(null));
+        addRenderable(new RenderableMiniview(null));
     }
 
     public RenderableViewpoint getRenderableViewpoint() {

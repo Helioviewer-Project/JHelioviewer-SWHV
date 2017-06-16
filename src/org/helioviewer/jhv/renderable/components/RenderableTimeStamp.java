@@ -8,6 +8,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.json.JSONObject;
@@ -17,13 +18,25 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableTimeStamp extends AbstractRenderable {
 
-    private final RenderableTimeStampOptionsPanel optionsPanel = new RenderableTimeStampOptionsPanel(this);
-    private double size = 1;
+    private static final int MIN_SCALE = 100;
+    private static final int MAX_SCALE = 200;
+    private int scale = 100;
 
-    public RenderableTimeStamp() {
+    private final RenderableTimeStampOptionsPanel optionsPanel;
+
+    @Override
+    public void serialize(JSONObject jo) {
+        jo.put("scale", scale);
     }
 
-    public RenderableTimeStamp(JSONObject o) {
+    public RenderableTimeStamp(JSONObject jo) {
+        if (jo != null)
+            scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
+        optionsPanel = new RenderableTimeStampOptionsPanel(this, scale, MIN_SCALE, MAX_SCALE);
+    }
+
+    void setScale(int _scale) {
+        scale = _scale;
     }
 
     @Override
@@ -44,7 +57,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
         }
 
         int delta = (int) (vp.height * 0.01);
-        TextRenderer renderer = GLText.getRenderer(Math.min(GLText.TEXT_SIZE_LARGE, (int) (vp.height * 0.02 * size)));
+        TextRenderer renderer = GLText.getRenderer(Math.min(GLText.TEXT_SIZE_LARGE, (int) (vp.height * 0.02 * scale * 0.01)));
 
         renderer.beginRendering(vp.width, vp.height, true);
         renderer.setColor(Color.BLACK);
@@ -52,10 +65,6 @@ public class RenderableTimeStamp extends AbstractRenderable {
         renderer.setColor(Color.WHITE);
         renderer.draw(text, delta + 1, delta + 1);
         renderer.endRendering();
-    }
-
-    void setSize(double _size) {
-        size = _size;
     }
 
     @Override
@@ -89,10 +98,6 @@ public class RenderableTimeStamp extends AbstractRenderable {
 
     @Override
     public void dispose(GL2 gl) {
-    }
-
-    @Override
-    public void serialize(JSONObject jo) {
     }
 
 }
