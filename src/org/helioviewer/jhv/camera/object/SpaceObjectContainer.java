@@ -82,7 +82,7 @@ public class SpaceObjectContainer extends JScrollPane {
     }
 
     public void selectObject(SpaceObject object) {
-        SpaceObjectElement element = model.selectionElement(object);
+        SpaceObjectElement element = model.elementOf(object);
         if (element != null) // found
             selectElement(element);
     }
@@ -90,18 +90,20 @@ public class SpaceObjectContainer extends JScrollPane {
     public void loadSelected(long _startTime, long _endTime) {
         startTime = _startTime;
         endTime = _endTime;
-        model.loadSelected(uv, frame, startTime, endTime);
+        for (SpaceObjectElement element : model.getSelected())
+            element.load(uv, frame, startTime, endTime);
     }
 
     private void selectElement(SpaceObjectElement element) {
         if (exclusive) {
-            model.deselectAll(uv);
-            element.select(uv, frame, startTime, endTime);
+            for (SpaceObjectElement e : model.getSelected())
+                e.unload(uv);
+            element.load(uv, frame, startTime, endTime);
         } else {
             if (element.isSelected())
-                element.deselect(uv);
+                element.unload(uv);
             else
-                element.select(uv, frame, startTime, endTime);
+                element.load(uv, frame, startTime, endTime);
         }
     }
 

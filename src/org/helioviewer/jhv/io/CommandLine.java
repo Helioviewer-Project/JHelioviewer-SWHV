@@ -91,7 +91,7 @@ public class CommandLine {
      *            name of the option.
      * @return the values associated to the option.
      * */
-    public static List<String> getOptionValues(String param) {
+    private static List<String> getOptionValues(String param) {
         param = '-' + param;
         LinkedList<String> values = new LinkedList<>();
         if (arguments != null) {
