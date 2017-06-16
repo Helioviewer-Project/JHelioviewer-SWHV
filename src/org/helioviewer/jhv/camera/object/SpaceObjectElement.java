@@ -10,7 +10,7 @@ import org.helioviewer.jhv.camera.UpdateViewpoint;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.threads.CancelTask;
 
-public class SpaceObjectElement implements LoadPositionFire {
+class SpaceObjectElement implements LoadPositionFire {
 
     private final SpaceObject object;
     private final SpaceObjectModel model;
@@ -19,16 +19,16 @@ public class SpaceObjectElement implements LoadPositionFire {
     private String status;
     private LoadPosition load;
 
-    public SpaceObjectElement(SpaceObject _object, SpaceObjectModel _model) {
+    SpaceObjectElement(SpaceObject _object, SpaceObjectModel _model) {
         object = _object;
         model = _model;
     }
 
-    public SpaceObject getObject() {
+    SpaceObject getObject() {
         return object;
     }
 
-    public void select(UpdateViewpoint uv, String frame, long startTime, long endTime) {
+    void load(UpdateViewpoint uv, String frame, long startTime, long endTime) {
         selected = true;
 
         if (load != null) {
@@ -43,7 +43,7 @@ public class SpaceObjectElement implements LoadPositionFire {
         JHVGlobals.getReaperService().schedule(new CancelTask(load), 120, TimeUnit.SECONDS);
     }
 
-    public void deselect(UpdateViewpoint uv) {
+    void unload(UpdateViewpoint uv) {
         selected = false;
 
         if (load != null) {
@@ -56,11 +56,11 @@ public class SpaceObjectElement implements LoadPositionFire {
         }
     }
 
-    public boolean isSelected() {
+    boolean isSelected() {
         return selected;
     }
 
-    public String getStatus() {
+    String getStatus() {
         return status;
     }
 
