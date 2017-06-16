@@ -180,6 +180,7 @@ public class CameraOptionsPanel extends JPanel {
         }
         Displayer.setViewpointUpdate(update);
         Displayer.getCamera().reset();
+        Displayer.getMiniCamera().reset();
 
         switchOptionsPanel(panel);
     }

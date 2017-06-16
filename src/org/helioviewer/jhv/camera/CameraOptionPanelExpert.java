@@ -12,6 +12,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,9 +20,9 @@ import org.json.JSONObject;
 @SuppressWarnings("serial")
 public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener {
 
-    private final JCheckBox exactDateCheckBox = new JCheckBox("Use master layer time interval", true);
-    private final DateTimePanel startDateTimePanel = new DateTimePanel("Start");
-    private final DateTimePanel endDateTimePanel = new DateTimePanel("End");
+    private final JCheckBox syncCheckBox;
+    private final DateTimePanel startPanel = new DateTimePanel("Start");
+    private final DateTimePanel endPanel = new DateTimePanel("End");
 
     private final SpaceObjectContainer container;
 
@@ -33,30 +34,37 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         c.gridx = 0;
         c.fill = GridBagConstraints.BOTH;
 
+        boolean sync = true;
+        JSONArray ja = null;
+        JHVDate start = Layers.getLastUpdatedTimestamp(), end = Layers.getLastUpdatedTimestamp();
+        if (jo != null) {
+            ja = jo.optJSONArray("objects");
+            sync = jo.optBoolean("syncInterval", sync);
+            if (!sync) {
+                start = JHVDate.optional(jo.optString("startTime"));
+                end = JHVDate.optional(jo.optString("endTime"));
+            }
+        }
+
         c.gridy = 0;
-        JSONArray ja = jo == null ? null : jo.optJSONArray("objects");
         container = new SpaceObjectContainer(ja, uv, frame, exclusive);
         add(container, c);
 
         c.gridy = 1;
-        add(exactDateCheckBox, c);
-        c.gridy = 2;
-        startDateTimePanel.addListener(e -> request());
-        startDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
-        add(startDateTimePanel, c);
-        c.gridy = 3;
-        endDateTimePanel.addListener(e -> request());
-        endDateTimePanel.add(Box.createRigidArea(new Dimension(40, 0)));
-        add(endDateTimePanel, c);
+        syncCheckBox = new JCheckBox("Use master layer time interval", sync);
+        syncCheckBox.addActionListener(e -> syncWithLayer());
+        add(syncCheckBox, c);
 
-        startDateTimePanel.setVisible(false);
-        endDateTimePanel.setVisible(false);
-        exactDateCheckBox.addActionListener(e -> {
-            boolean selected = !exactDateCheckBox.isSelected();
-            startDateTimePanel.setVisible(selected);
-            endDateTimePanel.setVisible(selected);
-            syncWithLayer();
-        });
+        c.gridy = 2;
+        startPanel.setTime(start.milli);
+        startPanel.addListener(e -> request());
+        startPanel.add(Box.createRigidArea(new Dimension(40, 0)));
+        add(startPanel, c);
+        c.gridy = 3;
+        endPanel.setTime(end.milli);
+        endPanel.addListener(e -> request());
+        endPanel.add(Box.createRigidArea(new Dimension(40, 0)));
+        add(endPanel, c);
 
         ComponentUtils.smallVariant(this);
     }
@@ -79,25 +87,34 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     JSONObject toJson() {
         JSONObject jo = new JSONObject();
+        boolean sync = syncCheckBox.isSelected();
+        jo.put("syncInterval", sync);
+        if (!sync) {
+            jo.put("startTime", new JHVDate(startPanel.getTime()));
+            jo.put("endTime", new JHVDate(endPanel.getTime()));
+        }
         jo.put("objects", container.toJson());
         return jo;
     }
 
     private void syncWithLayer() {
-        if (!exactDateCheckBox.isSelected())
+        boolean notSync = !syncCheckBox.isSelected();
+        startPanel.setVisible(notSync);
+        endPanel.setVisible(notSync);
+        if (notSync)
             return;
 
         View view = Layers.getActiveView();
         if (view == null)
             return;
 
-        startDateTimePanel.setTime(view.getFirstTime().milli);
-        endDateTimePanel.setTime(view.getLastTime().milli);
+        startPanel.setTime(view.getFirstTime().milli);
+        endPanel.setTime(view.getLastTime().milli);
         request();
     }
 
     private void request() {
-        container.loadSelected(startDateTimePanel.getTime(), endDateTimePanel.getTime());
+        container.loadSelected(startPanel.getTime(), endPanel.getTime());
     }
 
 }
