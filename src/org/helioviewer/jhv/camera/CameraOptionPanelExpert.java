@@ -13,6 +13,8 @@ import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.view.View;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener {
@@ -23,7 +25,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private final SpaceObjectContainer container;
 
-    CameraOptionPanelExpert(UpdateViewpoint uv, String frame, boolean exclusive) {
+    CameraOptionPanelExpert(JSONObject jo, UpdateViewpoint uv, String frame, boolean exclusive) {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
@@ -32,7 +34,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         c.fill = GridBagConstraints.BOTH;
 
         c.gridy = 0;
-        container = new SpaceObjectContainer(null, uv, frame, exclusive);
+        JSONArray ja = jo == null ? null : jo.optJSONArray("objects");
+        container = new SpaceObjectContainer(ja, uv, frame, exclusive);
         add(container, c);
 
         c.gridy = 1;
@@ -72,6 +75,12 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     @Override
     public void activeLayerChanged(View view) {
         syncWithLayer();
+    }
+
+    JSONObject toJson() {
+        JSONObject jo = new JSONObject();
+        jo.put("objects", container.toJson());
+        return jo;
     }
 
     private void syncWithLayer() {

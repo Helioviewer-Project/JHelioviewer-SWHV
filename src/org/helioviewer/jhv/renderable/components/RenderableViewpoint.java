@@ -27,7 +27,7 @@ import com.jogamp.newt.event.MouseListener;
 
 public class RenderableViewpoint extends AbstractRenderable implements MouseListener {
 
-    private final CameraOptionsPanel optionsPanel = new CameraOptionsPanel();
+    private final CameraOptionsPanel optionsPanel;
     private static final double epsilon = 0.01;
 
     private static final float lineWidth = 2;
@@ -37,10 +37,8 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
 
     private String timeString = null;
 
-    public RenderableViewpoint() {
-    }
-
-    public RenderableViewpoint(JSONObject o) {
+    public RenderableViewpoint(JSONObject jo) {
+        optionsPanel = new CameraOptionsPanel(jo);
     }
 
     @Override
@@ -262,6 +260,7 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
 
     @Override
     public void serialize(JSONObject jo) {
+        optionsPanel.serialize(jo);
     }
 
 }

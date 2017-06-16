@@ -20,6 +20,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
 
@@ -45,7 +46,7 @@ public class CameraOptionsPanel extends JPanel {
                                               "<b>Other</b>: view from selected object.\nCamera time is interpolated in the time interval of the master layer, unless " +
                                               "\"Use master layer time interval\" is off.\nIn that case, camera time is interpolated in the configured time interval.";
 
-    public CameraOptionsPanel() {
+    public CameraOptionsPanel(JSONObject jo) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
@@ -102,12 +103,19 @@ public class CameraOptionsPanel extends JPanel {
 
         ComponentUtils.smallVariant(this);
 
-        expertOptionPanel = new CameraOptionPanelExpert(UpdateViewpoint.expert, "HEEQ", true);
-        equatorialOptionPanel = new CameraOptionPanelExpert(UpdateViewpoint.equatorial, "HEEQ", false);
+        JSONObject joExpert = jo == null ? null : jo.optJSONObject("expert");
+        expertOptionPanel = new CameraOptionPanelExpert(joExpert, UpdateViewpoint.expert, "HEEQ", true);
+        JSONObject joEquatorial = jo == null ? null : jo.optJSONObject("equatorial");
+        equatorialOptionPanel = new CameraOptionPanelExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
     }
 
     public double getFOVAngle() {
         return FOVAngle;
+    }
+
+    public void serialize(JSONObject jo) {
+        jo.put("expert", expertOptionPanel.toJson());
+        jo.put("equatorial", equatorialOptionPanel.toJson());
     }
 
     private void switchOptionsPanel(CameraOptionPanel newOptionPanel) {
