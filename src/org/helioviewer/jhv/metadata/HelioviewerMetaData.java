@@ -39,11 +39,11 @@ public class HelioviewerMetaData extends AbstractMetaData {
 
         identifyObservation(m);
 
-        instrument = instrument.intern();
-        detector = detector.intern();
-        measurement = measurement.intern();
-        observatory = observatory.intern();
-        fullName = fullName.intern();
+        instrument = instrument.trim().intern();
+        detector = detector.trim().intern();
+        measurement = measurement.trim().intern();
+        observatory = observatory.trim().intern();
+        fullName = fullName.trim().intern();
 
         retrievePosition(m, retrieveDateTime(m));
         centerRotation = retrieveCenterRotation(m);
