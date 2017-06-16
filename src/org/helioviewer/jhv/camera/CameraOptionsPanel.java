@@ -20,6 +20,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.helioviewer.jhv.math.MathUtils;
 import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
@@ -31,9 +32,9 @@ public class CameraOptionsPanel extends JPanel {
         Observer, Earth, Equatorial, Other
     }
 
-    private static final double FOVAngleDefault = 0.8;
-    private double FOVAngle = FOVAngleDefault * Math.PI / 180.;
+    private double fovAngle = 0.8;
 
+    private final ButtonGroup modeGroup = new ButtonGroup();
     private final CameraOptionPanelExpert expertOptionPanel;
     private final CameraOptionPanelExpert equatorialOptionPanel;
     private CameraOptionPanel currentOptionPanel;
@@ -57,17 +58,34 @@ public class CameraOptionsPanel extends JPanel {
         c.gridx = 0;
         c.gridy = 0;
 
+        CameraMode defaultMode = CameraMode.Observer;
+        double fovMin = 0, fovMax = 180;
+        JSONObject joExpert = null;
+        JSONObject joEquatorial = null;
+        if (jo != null) {
+            fovAngle = MathUtils.clip(jo.optDouble("fovAngle", fovAngle), fovMin, fovMax);
+            String strMode = jo.optString("mode", defaultMode.toString());
+            try {
+                defaultMode = CameraMode.valueOf(strMode);
+            } catch (Exception ignore) {
+            }
+            joExpert = jo.optJSONObject("expert");
+            joEquatorial = jo.optJSONObject("equatorial");
+        }
+
+        expertOptionPanel = new CameraOptionPanelExpert(joExpert, UpdateViewpoint.expert, "HEEQ", true);
+        equatorialOptionPanel = new CameraOptionPanelExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
+
         JPanel radio = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
         radio.add(new JLabel("View", JLabel.RIGHT));
-
-        ButtonGroup group = new ButtonGroup();
         for (CameraMode mode : CameraMode.values()) {
             JRadioButton item = new JRadioButton(mode.toString());
-            if (mode == CameraMode.Observer)
-                item.setSelected(true);
             item.addActionListener(e -> changeCamera(mode));
-            group.add(item);
+            item.setActionCommand(mode.toString());
             radio.add(item);
+            modeGroup.add(item);
+            if (mode == defaultMode)
+                item.doClick();
         }
         add(radio, c);
 
@@ -82,16 +100,15 @@ public class CameraOptionsPanel extends JPanel {
         JPanel fovPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
         fovPanel.add(new JLabel("FOV angle", JLabel.RIGHT));
 
-        double min = 0, max = 180;
-        JSpinner fovSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(FOVAngleDefault), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
+        JSpinner fovSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(fovAngle), Double.valueOf(fovMin), Double.valueOf(fovMax), Double.valueOf(0.01)));
         fovSpinner.setMaximumSize(new Dimension(6, 22));
         fovSpinner.addChangeListener(e -> {
-            FOVAngle = (Double) fovSpinner.getValue() * Math.PI / 180.;
+            fovAngle = (Double) fovSpinner.getValue();
             Displayer.display();
         });
 
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
-        f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", min, max));
+        f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", fovMin, fovMax));
 
         WheelSupport.installMouseWheelSupport(fovSpinner);
         fovPanel.add(fovSpinner);
@@ -102,18 +119,15 @@ public class CameraOptionsPanel extends JPanel {
         add(fovPanel, c);
 
         ComponentUtils.smallVariant(this);
-
-        JSONObject joExpert = jo == null ? null : jo.optJSONObject("expert");
-        expertOptionPanel = new CameraOptionPanelExpert(joExpert, UpdateViewpoint.expert, "HEEQ", true);
-        JSONObject joEquatorial = jo == null ? null : jo.optJSONObject("equatorial");
-        equatorialOptionPanel = new CameraOptionPanelExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
     }
 
     public double getFOVAngle() {
-        return FOVAngle;
+        return fovAngle * (Math.PI / 180.);
     }
 
     public void serialize(JSONObject jo) {
+        jo.put("mode", modeGroup.getSelection().getActionCommand());
+        jo.put("fovAngle", fovAngle);
         jo.put("expert", expertOptionPanel.toJson());
         jo.put("equatorial", equatorialOptionPanel.toJson());
     }

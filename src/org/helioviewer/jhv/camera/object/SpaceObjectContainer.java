@@ -19,7 +19,6 @@ import org.helioviewer.jhv.camera.UpdateViewpoint;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public class SpaceObjectContainer extends JScrollPane {
