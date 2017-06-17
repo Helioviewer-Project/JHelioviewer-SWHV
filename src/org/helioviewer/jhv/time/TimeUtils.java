@@ -7,15 +7,21 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
+import org.jetbrains.annotations.NotNull;
+import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 public class TimeUtils {
 
     private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
     private static final DateTimeFormatter sqlFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
+
+    private static final PrettyTimeParser prettyParser = new PrettyTimeParser();
 
     public static final long DAY_IN_MILLIS = 86400000;
     public static final long MINUTE_IN_MILLIS = 60000;
@@ -48,14 +54,6 @@ public class TimeUtils {
         return fileFormatter.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
     }
 
-    public static long optParse(String date, long milli) {
-        try {
-            return parse(date);
-        } catch (Exception e) {
-            return milli;
-        }
-    }
-
     public static long parse(String date) {
         return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
     }
@@ -70,6 +68,18 @@ public class TimeUtils {
 
     public static long parseTime(String date) {
         return LocalTime.parse(date, DateTimeFormatter.ISO_LOCAL_TIME).toSecondOfDay() * 1000L;
+    }
+
+    public static long optParse(String date, @NotNull String alt) {
+        try {
+            return prettyParser.parse(date).get(0).getTime();
+        } catch (Exception e) {
+            List<Date> dates = prettyParser.parse(alt);
+            if (dates.isEmpty())
+                return EPOCH.milli;
+            else
+                return dates.get(0).getTime();
+        }
     }
 
     public static class SQLDateTimeFormatValidator implements FormatValidator {

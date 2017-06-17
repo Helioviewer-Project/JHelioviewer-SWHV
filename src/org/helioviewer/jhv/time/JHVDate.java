@@ -7,14 +7,6 @@ public class JHVDate implements Comparable<JHVDate> {
     private final String string;
     public final long milli;
 
-    public static JHVDate optional(String date) {
-        try {
-            return new JHVDate(date);
-        } catch (Exception e) {
-            return TimeUtils.EPOCH;
-        }
-    }
-
     public JHVDate(String date) {
         this(TimeUtils.parse(date));
     }

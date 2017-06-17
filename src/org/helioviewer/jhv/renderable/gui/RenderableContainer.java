@@ -27,6 +27,7 @@ import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
 import org.helioviewer.jhv.renderable.components.RenderableViewpoint;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 import org.json.JSONArray;
@@ -380,7 +381,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
 
-        LoadState loadStateTask = new LoadState(newlist, masterRenderable, JHVDate.optional(data.optString("time")));
+        LoadState loadStateTask = new LoadState(newlist, masterRenderable, new JHVDate(TimeUtils.optParse(data.optString("time"), "now")));
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
