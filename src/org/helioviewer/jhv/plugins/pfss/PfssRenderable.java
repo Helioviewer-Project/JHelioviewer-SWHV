@@ -31,14 +31,14 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     public PfssRenderable(JSONObject jo) {
-        int qualityReduction = MathUtils.clip(jo.optInt("qualityReduction", 0), 0, PfssSettings.MAX_QUALITY);
+        int detail = MathUtils.clip(jo.optInt("detail", 0), 0, PfssSettings.MAX_DETAIL);
         boolean fixedColor = jo.optBoolean("fixedColor", false);
-        optionsPanel = new PfssOptionsPanel(qualityReduction, fixedColor);
+        optionsPanel = new PfssOptionsPanel(detail, fixedColor);
     }
 
     @Override
     public void serialize(JSONObject jo) {
-        jo.put("qualityReduction", optionsPanel.getQualityReduction());
+        jo.put("detail", optionsPanel.getDetail());
         jo.put("fixedColor", optionsPanel.getFixedColor());
     }
 
@@ -111,11 +111,11 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     private void renderData(GL2 gl, PfssData data, double aspect) {
-        int qualityReduction = optionsPanel.getQualityReduction();
+        int detail = optionsPanel.getDetail();
         boolean fixedColor = optionsPanel.getFixedColor();
 
-        if (data != previousPfssData || data.needsUpdate(qualityReduction, fixedColor)) {
-            data.calculatePositions(qualityReduction, fixedColor);
+        if (data != previousPfssData || data.needsUpdate(detail, fixedColor)) {
+            data.calculatePositions(detail, fixedColor);
             line.setData(gl, data.vertices, data.colors);
 
             timeString = data.getDateObs().toString();

@@ -31,7 +31,7 @@ public class PfssData {
     public final FloatBuffer vertices;
     public final FloatBuffer colors;
 
-    private int lastQuality;
+    private int lastDetail;
     private boolean lastFixedColor;
 
     final long time;
@@ -62,23 +62,23 @@ public class PfssData {
         }
     }
 
-    public boolean needsUpdate(int qualityReduction, boolean fixedColor) {
-        return lastQuality != qualityReduction || lastFixedColor != fixedColor;
+    public boolean needsUpdate(int detail, boolean fixedColor) {
+        return lastDetail != detail || lastFixedColor != fixedColor;
     }
 
     private static double decode(short f) {
         return (f + 32768.) * (2. / 65535.) - 1.;
     }
 
-    public void calculatePositions(int qualityReduction, boolean fixedColor) {
-        lastQuality = qualityReduction;
+    public void calculatePositions(int detail, boolean fixedColor) {
+        lastDetail = detail;
         lastFixedColor = fixedColor;
         vertices.clear();
         colors.clear();
 
         FieldLineColor type = FieldLineColor.LOOPCOLOR;
         for (int i = 0; i < fieldlinex.length; i++) {
-            if (i / PfssSettings.POINTS_PER_LINE % 9 <= qualityReduction) {
+            if (i / PfssSettings.POINTS_PER_LINE % 9 <= detail) {
                 double x = 3. * decode(fieldlinex[i]);
                 double y = 3. * decode(fieldliney[i]);
                 double z = 3. * decode(fieldlinez[i]);
