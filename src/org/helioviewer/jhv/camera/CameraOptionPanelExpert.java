@@ -48,7 +48,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         }
 
         c.gridy = 0;
-        container = new SpaceObjectContainer(ja, uv, frame, exclusive);
+        container = new SpaceObjectContainer(ja, uv, frame, exclusive, start, end);
         add(container, c);
 
         c.gridy = 1;
@@ -68,8 +68,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         add(endPanel, c);
 
         ComponentUtils.smallVariant(this);
-
-        container.setTime(startPanel.getTime(), endPanel.getTime());
     }
 
     @Override
