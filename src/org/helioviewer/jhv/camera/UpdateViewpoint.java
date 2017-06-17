@@ -14,6 +14,7 @@ import org.helioviewer.jhv.view.View;
 public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
+    void clear();
     void setLoadPosition(LoadPosition _loadPosition);
     void unsetLoadPosition(LoadPosition _loadPosition);
 
@@ -24,6 +25,10 @@ public interface UpdateViewpoint {
     Expert expert = new Expert();
 
     class Observer implements UpdateViewpoint {
+        @Override
+        public void clear() {
+        }
+
         @Override
         public void setLoadPosition(LoadPosition _loadPosition) {
         }
@@ -41,6 +46,10 @@ public interface UpdateViewpoint {
 
     class Earth implements UpdateViewpoint {
         @Override
+        public void clear() {
+        }
+
+        @Override
         public void setLoadPosition(LoadPosition _loadPosition) {
         }
 
@@ -55,6 +64,10 @@ public interface UpdateViewpoint {
     }
 
     class EarthFixedDistance implements UpdateViewpoint {
+        @Override
+        public void clear() {
+        }
+
         @Override
         public void setLoadPosition(LoadPosition _loadPosition) {
         }
@@ -81,6 +94,11 @@ public interface UpdateViewpoint {
 
         public Set<Map.Entry<LoadPosition, Position.L>> getPositions() {
             return loadMap.entrySet();
+        }
+
+        @Override
+        public void clear() {
+            loadMap.clear();
         }
 
         @Override
@@ -117,6 +135,11 @@ public interface UpdateViewpoint {
     class Expert implements UpdateViewpoint {
 
         private LoadPosition loadPosition;
+
+        @Override
+        public void clear() {
+            loadPosition = null;
+        }
 
         @Override
         public void setLoadPosition(LoadPosition _loadPosition) {

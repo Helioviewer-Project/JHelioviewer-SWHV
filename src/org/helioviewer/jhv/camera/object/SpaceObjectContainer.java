@@ -82,6 +82,7 @@ public class SpaceObjectContainer extends JScrollPane {
         setPreferredSize(new Dimension(-1, getGridRowHeight(grid) * NUMBEROFVISIBLEROWS + 1));
         grid.setRowHeight(getGridRowHeight(grid));
 
+        uv.clear();
         try {
             for (int i = 0; i < ja.length(); i++)
                 selectObject(SpaceObject.get(ja.getString(i)));
