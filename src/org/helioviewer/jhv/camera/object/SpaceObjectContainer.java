@@ -17,7 +17,6 @@ import javax.swing.ListSelectionModel;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.camera.UpdateViewpoint;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
-import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 
 @SuppressWarnings("serial")
