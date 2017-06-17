@@ -72,13 +72,13 @@ public class TimeUtils {
 
     public static long optParse(String date, @NotNull String alt) {
         try {
-            return prettyParser.parse(date).get(0).getTime();
+            return prettyParser.parse(date).get(0).getTime() / 1000 * 1000;
         } catch (Exception e) {
             List<Date> dates = prettyParser.parse(alt);
             if (dates.isEmpty())
                 return EPOCH.milli;
             else
-                return dates.get(0).getTime();
+                return dates.get(0).getTime() / 1000 * 1000;
         }
     }
 
