@@ -18,17 +18,17 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 @SuppressWarnings("serial")
 class PfssOptionsPanel extends JPanel {
 
-    private int qualityReduction;
+    private int detail;
     private boolean fixedColor;
 
-    public PfssOptionsPanel(int _qualityReduction, boolean _fixedColor) {
-        qualityReduction = _qualityReduction;
+    public PfssOptionsPanel(int _detail, boolean _fixedColor) {
+        detail = _detail;
         fixedColor = _fixedColor;
         setLayout(new GridBagLayout());
 
-        JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(qualityReduction, 0, PfssSettings.MAX_QUALITY, 1));
+        JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(detail, 0, PfssSettings.MAX_DETAIL, 1));
         levelSpinner.addChangeListener(e -> {
-            qualityReduction = (Integer) levelSpinner.getValue();
+            detail = (Integer) levelSpinner.getValue();
             Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(levelSpinner);
@@ -40,7 +40,7 @@ class PfssOptionsPanel extends JPanel {
 
         c0.gridx = 0;
         c0.anchor = GridBagConstraints.EAST;
-        add(new JLabel("Level", JLabel.RIGHT), c0);
+        add(new JLabel("Detail", JLabel.RIGHT), c0);
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.WEST;
@@ -67,8 +67,8 @@ class PfssOptionsPanel extends JPanel {
         ComponentUtils.smallVariant(this);
     }
 
-    int getQualityReduction() {
-        return qualityReduction;
+    int getDetail() {
+        return detail;
     }
 
     boolean getFixedColor() {
