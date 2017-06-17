@@ -238,6 +238,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void saveCurrentScene() {
         JSONObject main = new JSONObject();
         main.put("time", Layers.getLastUpdatedTimestamp());
+        main.put("play", Layers.isMoviePlaying());
         main.put("multiview", RenderableContainerPanel.multiview.isSelected());
 
         JSONArray ja = new JSONArray();
@@ -381,7 +382,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
 
-        LoadState loadStateTask = new LoadState(newlist, masterRenderable, new JHVDate(TimeUtils.optParse(data.optString("time"), "now")));
+        LoadState loadStateTask = new LoadState(newlist, masterRenderable, new JHVDate(TimeUtils.optParse(data.optString("time"), "now")), data.optBoolean("play", false));
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
@@ -407,11 +408,13 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         private final ArrayList<Renderable> newlist;
         private final Renderable master;
         private final JHVDate time;
+        private final boolean play;
 
-        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, JHVDate _time) {
+        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, JHVDate _time, boolean _play) {
             newlist = _newlist;
             master = _master;
             time = _time;
+            play = _play;
         }
 
         @Override
@@ -441,6 +444,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     }
                 }
                 Layers.setTime(time);
+                if (play)
+                    Layers.playMovie();
                 // CameraHelper.zoomToFit(Displayer.getMiniCamera()); // funky
             }
         }
