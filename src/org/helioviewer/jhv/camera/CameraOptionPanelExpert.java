@@ -13,6 +13,7 @@ import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,13 +37,13 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         boolean sync = true;
         JSONArray ja = null;
-        JHVDate start = Layers.getLastUpdatedTimestamp(), end = Layers.getLastUpdatedTimestamp();
+        long start = Layers.getLastUpdatedTimestamp().milli, end = start;
         if (jo != null) {
             ja = jo.optJSONArray("objects");
             sync = jo.optBoolean("syncInterval", sync);
             if (!sync) {
-                start = JHVDate.optional(jo.optString("startTime"));
-                end = JHVDate.optional(jo.optString("endTime"));
+                start = TimeUtils.optParse(jo.optString("startTime"), "2 days ago");
+                end = TimeUtils.optParse(jo.optString("endTime"), "now");
             }
         }
 
@@ -56,17 +57,19 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         add(syncCheckBox, c);
 
         c.gridy = 2;
-        startPanel.setTime(start.milli);
+        startPanel.setTime(start);
         startPanel.addListener(e -> request());
         startPanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(startPanel, c);
         c.gridy = 3;
-        endPanel.setTime(end.milli);
+        endPanel.setTime(end);
         endPanel.addListener(e -> request());
         endPanel.add(Box.createRigidArea(new Dimension(40, 0)));
         add(endPanel, c);
 
         ComponentUtils.smallVariant(this);
+
+        container.setTime(startPanel.getTime(), endPanel.getTime());
     }
 
     @Override

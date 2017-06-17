@@ -92,22 +92,22 @@ public class APIRequest {
 
     private static final int MAX_FRAMES = 99;
 
-    public static APIRequest fromJson(JSONObject json) {
-        String _server = json.optString("server", Settings.getSingletonInstance().getProperty("default.server"));
-        int _sourceId = json.optInt("sourceId", 10);
-        long _startTime = TimeUtils.optParse(json.optString("startTime"), System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS);
-        long _endTime = TimeUtils.optParse(json.optString("endTime"), System.currentTimeMillis());
-        int _cadence = json.optInt("cadence", (int) Math.max(1, (_endTime - _startTime) / 1000 / MAX_FRAMES));
+    public static APIRequest fromJson(JSONObject jo) {
+        String _server = jo.optString("server", Settings.getSingletonInstance().getProperty("default.server"));
+        int _sourceId = jo.optInt("sourceId", 10);
+        long _startTime = TimeUtils.optParse(jo.optString("startTime"), "2 days ago");
+        long _endTime = TimeUtils.optParse(jo.optString("endTime"), "now");
+        int _cadence = jo.optInt("cadence", (int) Math.max(1, (_endTime - _startTime) / 1000 / MAX_FRAMES));
         return new APIRequest(_server, _sourceId, _startTime, _endTime, _cadence);
     }
 
-    public static APIRequest fromRequestJson(JSONObject json) throws Exception {
-        long _startTime = TimeUtils.parse(json.getString("startTime"));
-        long _endTime = TimeUtils.parse(json.getString("endTime"));
-        int _cadence = json.optInt("cadence", (int) Math.max(1, (_endTime - _startTime) / 1000 / MAX_FRAMES));
+    public static APIRequest fromRequestJson(JSONObject jo) throws Exception {
+        long _startTime = TimeUtils.optParse(jo.optString("startTime"), "2 days ago");
+        long _endTime = TimeUtils.optParse(jo.optString("startTime"), "now");
+        int _cadence = jo.optInt("cadence", (int) Math.max(1, (_endTime - _startTime) / 1000 / MAX_FRAMES));
 
-        String observatory = json.optString("observatory", "");
-        String dataset = json.getString("dataset");
+        String observatory = jo.optString("observatory", "");
+        String dataset = jo.getString("dataset");
         ArrayList<Pair<Integer, String>> res = DataSourcesDB.doSelect(Settings.getSingletonInstance().getProperty("default.server"), observatory, dataset);
         if (res.isEmpty())
             throw new Exception("Empty request result");
