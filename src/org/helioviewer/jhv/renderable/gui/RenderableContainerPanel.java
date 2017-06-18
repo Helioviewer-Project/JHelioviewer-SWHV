@@ -148,7 +148,7 @@ public class RenderableContainerPanel extends JPanel {
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
         multiview.addItemListener(e -> {
             Displayer.multiview = multiview.isSelected();
-            Layers.arrangeMultiView(Displayer.multiview);
+            renderableContainer.arrangeMultiView(Displayer.multiview);
         });
         ComponentUtils.smallVariant(multiview);
 

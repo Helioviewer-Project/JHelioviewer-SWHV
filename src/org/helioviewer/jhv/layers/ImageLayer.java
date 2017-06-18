@@ -117,8 +117,12 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (Displayer.multiview) {
-            Layers.arrangeMultiView(true);
+            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
         }
+    }
+
+    public static boolean isCor(String name) {
+        return name.contains("LASCO") || name.contains("COR");
     }
 
     private float opacity = -1;
@@ -139,14 +143,14 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         ImageViewerGui.getRenderableContainer().refreshTable();
 
         if (Displayer.multiview) {
-            Layers.arrangeMultiView(true);
+            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
         } else if (opacity == -1) { // first time
-            if (Layers.isCor(view.getName()))
+            if (isCor(view.getName()))
                 opacity = 1;
             else {
                 int count = 0;
                 for (int i = 0; i < Layers.getNumLayers(); i++) {
-                    if (!Layers.isCor(Layers.getLayer(i).getName()))
+                    if (!isCor(Layers.getLayer(i).getName()))
                         count++;
                 }
                 opacity = (float) (1. / (count == 0 ? 1 : count /* satisfy coverity */));
@@ -176,7 +180,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
         unsetView();
         if (Displayer.multiview) {
-            Layers.arrangeMultiView(true);
+            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
         }
         dispose(gl);
     }
@@ -358,7 +362,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         return view != null && view.isDownloading();
     }
 
-    void setOpacity(float _opacity) { // deliberate, for multiview
+    public void setOpacity(float _opacity) { // deliberate, for multiview
         optionsPanel.setOpacity(_opacity);
     }
 

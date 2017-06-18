@@ -106,42 +106,6 @@ public class Layers {
         }
     }
 
-    static boolean isCor(String name) {
-        return name.contains("LASCO") || name.contains("COR");
-    }
-
-    public static void arrangeMultiView(boolean multiview) {
-        int ct = 0;
-
-        if (multiview) {
-            for (View v : layers) {
-                ImageLayer l = v.getImageLayer();
-                if (l.isVisible()) {
-                    l.setVisible(ct);
-                    l.setOpacity(1);
-                    ct++;
-                }
-            }
-        } else {
-            for (View v : layers) {
-                ImageLayer l = v.getImageLayer();
-                if (l.isVisible()) {
-                    l.setVisible(0);
-                    float opacity;
-                    if (isCor(l.getName()))
-                        opacity = 1;
-                    else {
-                        opacity = (float) (1. / (1. + ct));
-                        ct++;
-                    }
-                    l.setOpacity(opacity);
-                }
-            }
-        }
-        Displayer.reshapeAll();
-        Displayer.render(1);
-    }
-
     static void setActiveView(View view) {
         if (view != activeView) {
             activeView = view;

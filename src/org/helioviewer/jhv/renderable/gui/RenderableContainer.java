@@ -189,8 +189,44 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         refreshTable();
 
         if (Displayer.multiview) {
-            Layers.arrangeMultiView(true);
+            arrangeMultiView(true);
         }
+    }
+
+    public void arrangeMultiView(boolean multiview) {
+        int ct = 0;
+
+        if (multiview) {
+            for (Renderable r : renderables) {
+                if (r instanceof ImageLayer) {
+                    ImageLayer l = (ImageLayer) r;
+                    if (l.isVisible()) {
+                        l.setVisible(ct);
+                        l.setOpacity(1);
+                        ct++;
+                    }
+                }
+            }
+        } else {
+            for (Renderable r : renderables) {
+                if (r instanceof ImageLayer) {
+                    ImageLayer l = (ImageLayer) r;
+                    if (l.isVisible()) {
+                        l.setVisible(0);
+                        float opacity;
+                        if (ImageLayer.isCor(l.getName()))
+                            opacity = 1;
+                        else {
+                            opacity = (float) (1. / (1. + ct));
+                            ct++;
+                        }
+                        l.setOpacity(opacity);
+                    }
+                }
+            }
+        }
+        Displayer.reshapeAll();
+        Displayer.render(1);
     }
 
     @Override
