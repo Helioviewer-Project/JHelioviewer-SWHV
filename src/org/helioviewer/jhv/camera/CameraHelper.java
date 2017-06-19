@@ -13,7 +13,7 @@ import com.jogamp.opengl.GL2;
 
 public class CameraHelper {
 
-    private static final double halfDepth = 15 * Sun.Radius; // half LASCO C3
+    private static final double halfDepth = 31 * Sun.Radius; // radial grid + 1 fuzz
     private static final double[] identity = Mat4.identity().m;
 
     public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
