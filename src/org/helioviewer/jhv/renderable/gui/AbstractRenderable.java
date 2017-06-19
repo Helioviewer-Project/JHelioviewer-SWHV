@@ -8,6 +8,7 @@ import com.jogamp.opengl.GL2;
 
 public abstract class AbstractRenderable implements Renderable {
 
+    private boolean enabled;
     protected final boolean[] isVisible = { false, false, false, false };
 
     @Override
@@ -35,16 +36,15 @@ public abstract class AbstractRenderable implements Renderable {
 
     @Override
     public void setVisible(boolean visible) {
-        for (int i = 0; i < isVisible.length; i++) {
+        for (int i = 0; i < isVisible.length; i++)
             isVisible[i] = visible;
-        }
+        enabled = visible;
     }
 
     @Override
     public void setVisible(int j) {
-        for (int i = 0; i < isVisible.length; i++) {
+        for (int i = 0; i < isVisible.length; i++)
             isVisible[i] = false;
-        }
         if (j >= 0 && j < isVisible.length)
             isVisible[j] = true;
     }
@@ -76,14 +76,18 @@ public abstract class AbstractRenderable implements Renderable {
 
     @Override
     public void serializeVisibility(JSONArray va) {
-        for (int i = 0; i < isVisible.length; i++)
+        int i = 0;
+        for (; i < isVisible.length; i++)
             va.put(i, isVisible[i]);
+        va.put(i, enabled);
     }
 
     @Override
     public void deserializeVisibility(JSONArray va) {
-        for (int i = 0; i < isVisible.length; i++)
+        int i = 0;
+        for (; i < isVisible.length; i++)
             isVisible[i] = va.optBoolean(i, true);
+        setVisible(enabled = va.optBoolean(i, false));
     }
 
     @Override
