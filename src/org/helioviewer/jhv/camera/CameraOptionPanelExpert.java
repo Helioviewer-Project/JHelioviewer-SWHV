@@ -46,6 +46,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
                 end = TimeUtils.optParse(jo.optString("endTime"), "now");
             }
         }
+        if (ja == null)
+            ja = new JSONArray(new String[] { "Earth" });
 
         c.gridy = 0;
         container = new SpaceObjectContainer(ja, uv, frame, exclusive, start, end);
