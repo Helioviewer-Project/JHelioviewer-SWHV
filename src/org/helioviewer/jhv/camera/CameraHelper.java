@@ -13,8 +13,7 @@ import com.jogamp.opengl.GL2;
 
 public class CameraHelper {
 
-    public static final double clipNear = 3 * Sun.Radius;
-    public static final double clipFar = 10000 * Sun.Radius;
+    private static final double halfDepth = 15 * Sun.Radius; // half LASCO C3
     private static final double[] identity = Mat4.identity().m;
 
     public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
@@ -33,10 +32,11 @@ public class CameraHelper {
         gl.glLoadIdentity();
 
         double width = camera.getWidth();
-        gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
+        double distance = camera.getViewpoint().distance;
+        gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, distance - halfDepth, distance + halfDepth);
 
         Vec2 translation = camera.getCurrentTranslation();
-        Mat4 cameraTransformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, -camera.getViewpoint().distance);
+        Mat4 cameraTransformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, -distance);
         // applyCamera
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadMatrixd(cameraTransformation.m, 0);
