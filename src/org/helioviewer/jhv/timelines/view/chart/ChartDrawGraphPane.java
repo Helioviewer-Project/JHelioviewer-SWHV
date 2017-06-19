@@ -217,7 +217,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         currWidth += (int) tickTextBounds.getWidth();
 
         for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
-            if (el.isVisible() && el.hasValueAsString()) {
+            if (el.isEnabled() && el.hasValueAsString()) {
                 lbl = ", ";
                 g.setColor(Color.BLACK);
                 g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);

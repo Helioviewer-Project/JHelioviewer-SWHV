@@ -149,12 +149,12 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public boolean showYAxis() {
-        return isVisible;
+        return enabled;
     }
 
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
-        if (!isVisible)
+        if (!enabled)
             return;
 
         g.setColor(graphColor);
@@ -179,7 +179,7 @@ public class Band extends AbstractTimelineRenderable {
     }
 
     private void updateGraphsData() {
-        if (isVisible) {
+        if (enabled) {
             Rectangle graphArea = DrawController.getGraphArea();
             updateWarnLevels(graphArea);
             graphPolylines.clear();

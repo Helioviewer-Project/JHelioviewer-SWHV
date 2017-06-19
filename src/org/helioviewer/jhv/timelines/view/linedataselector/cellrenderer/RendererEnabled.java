@@ -9,11 +9,11 @@ import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class TimelineVisibleRenderer extends JHVTableCellRenderer {
+public class RendererEnabled extends JHVTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
 
-    public TimelineVisibleRenderer() {
+    public RendererEnabled() {
         setHorizontalAlignment(CENTER);
         checkBox.putClientProperty("JComponent.sizeVariant", "small");
         checkBox.setBorderPainted(true);
@@ -24,7 +24,7 @@ public class TimelineVisibleRenderer extends JHVTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof TimelineRenderable) {
-            checkBox.setSelected(((TimelineRenderable) value).isVisible());
+            checkBox.setSelected(((TimelineRenderable) value).isEnabled());
         }
         checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
         return checkBox;

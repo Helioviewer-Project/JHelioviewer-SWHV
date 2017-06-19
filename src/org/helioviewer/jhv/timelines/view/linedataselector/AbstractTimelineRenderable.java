@@ -9,16 +9,16 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 public abstract class AbstractTimelineRenderable implements TimelineRenderable {
 
-    protected boolean isVisible = true;
+    protected boolean enabled = true;
 
     @Override
-    public boolean isVisible() {
-        return isVisible;
+    public boolean isEnabled() {
+        return enabled;
     }
 
     @Override
-    public void setVisible(boolean visible) {
-        isVisible = visible;
+    public void setEnabled(boolean _enabled) {
+        enabled = _enabled;
     }
 
     @Override
