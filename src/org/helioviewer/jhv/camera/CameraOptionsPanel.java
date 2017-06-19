@@ -13,7 +13,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
@@ -32,7 +31,7 @@ public class CameraOptionsPanel extends JPanel {
         Observer, Earth, Equatorial, Other
     }
 
-    private double fovAngle = 0.8;
+    private double fovAngle = Camera.INITFOV / Math.PI * 180;
 
     private final ButtonGroup modeGroup = new ButtonGroup();
     private final CameraOptionPanelExpert expertOptionPanel;
@@ -171,7 +170,6 @@ public class CameraOptionsPanel extends JPanel {
                 update = UpdateViewpoint.earth;
             break;
             case Equatorial:
-                UpdateViewpoint.equatorial.setDistance(2 * Sun.MeanEarthDistance / Math.tan(0.5 * Displayer.getCamera().getFOV()));
                 update = UpdateViewpoint.equatorial;
                 panel = equatorialOptionPanel;
             break;

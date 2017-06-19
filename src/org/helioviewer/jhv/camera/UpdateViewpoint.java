@@ -85,12 +85,8 @@ public interface UpdateViewpoint {
 
     class Equatorial implements UpdateViewpoint {
 
-        private double distance;
+        private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(0.5 * Math.PI / 180);
         private final HashMap<LoadPosition, Position.L> loadMap = new HashMap<>();
-
-        void setDistance(double d) {
-            distance = d;
-        }
 
         public Set<Map.Entry<LoadPosition, Position.L>> getPositions() {
             return loadMap.entrySet();
