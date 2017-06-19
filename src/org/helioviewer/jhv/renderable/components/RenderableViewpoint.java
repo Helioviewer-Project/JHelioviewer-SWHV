@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.renderable.components;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Map;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
@@ -32,8 +32,8 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
 
     private static final float lineWidth = 2;
 
-    private static final float[] color1 = { Color.BLUE.getRed() / 255f, Color.BLUE.getGreen() / 255f, Color.BLUE.getBlue() / 255f };
-    private static final float[] color2 = { Color.WHITE.getRed() / 255f, Color.WHITE.getGreen() / 255f, Color.WHITE.getBlue() / 255f };
+    private static final float[] color1 = BufferUtils.colorBlue;
+    private static final float[] color2 = BufferUtils.colorWhite;
 
     private String timeString = null;
 
@@ -57,8 +57,8 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
                 gl.glPointSize(15f);
                 gl.glBegin(GL2.GL_POINTS);
                 for (Map.Entry<LoadPosition, Position.L> entry : UpdateViewpoint.equatorial.getPositions()) {
-                    Color c = entry.getKey().getTarget().getColor();
-                    gl.glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
+                    float[] c = entry.getKey().getTarget().getColor();
+                    gl.glColor3f(c[0], c[1], c[2]);
                     Position.L p = entry.getValue();
                     gl.glVertex3f((float) (p.rad * Math.cos(p.lon)), (float) (p.rad * Math.sin(p.lon)), 0);
                 }
