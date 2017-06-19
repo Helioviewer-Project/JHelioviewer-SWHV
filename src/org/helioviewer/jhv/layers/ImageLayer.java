@@ -215,7 +215,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private static Mat4 getOrthoMatrixInverse(double fov, double aspect, double distance) {
         double width = distance * Math.tan(0.5 * fov);
-        return Mat4.orthoInverse(-width * aspect, width * aspect, -width, width, CameraHelper.clipNear, CameraHelper.clipFar);
+        return Mat4.orthoInverse(-width * aspect, width * aspect, -width, width, 0, 0); // do clipping planes matter?
     }
 
     private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange) {
