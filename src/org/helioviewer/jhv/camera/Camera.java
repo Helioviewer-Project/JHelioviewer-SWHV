@@ -10,7 +10,7 @@ import org.helioviewer.jhv.time.JHVDate;
 
 public class Camera {
 
-    static final double INITFOV = (48. / 60.) * Math.PI / 180.;
+    static final double INITFOV = 1. * Math.PI / 180.;
     private static final double MIN_FOV = INITFOV * 0.1;
     private static final double MAX_FOV = INITFOV * 30;
     private double fov = INITFOV;
