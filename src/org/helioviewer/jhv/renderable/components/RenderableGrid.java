@@ -37,7 +37,7 @@ public class RenderableGrid extends AbstractRenderable {
     private static final double thicknessEarth = 0.0015;
     private static final double thicknessAxes = 0.003;
 
-    private static final float[] R_LABEL_POS = { 2, 8, 24 };
+    private static final float[] R_LABEL_POS = { (float) (2 * RADIAL_UNIT), (float) (8 * RADIAL_UNIT), (float) (24 * RADIAL_UNIT) };
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
@@ -126,14 +126,14 @@ public class RenderableGrid extends AbstractRenderable {
             axesLine.render(gl, vp.aspect, thicknessAxes);
 
         Mat4 cameraMatrix = getGridQuat(camera, gridType).toMatrix();
-        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+        double pixelsPerSolarRadius = textScale * vp.height / (2 * camera.getWidth());
 
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
             gridLine.render(gl, vp.aspect, thickness);
             if (showLabels) {
-                drawGridText(gl, pixelsPerSolarRadius);
+                drawGridText(gl, (int) pixelsPerSolarRadius);
             }
         }
         gl.glPopMatrix();
@@ -147,7 +147,7 @@ public class RenderableGrid extends AbstractRenderable {
                 radialCircleLine.render(gl, vp.aspect, thickness);
                 radialThickLine.render(gl, vp.aspect, 3 * thickness);
                 if (showLabels) {
-                    drawRadialGridText(gl, pixelsPerSolarRadius);
+                    drawRadialGridText(gl, pixelsPerSolarRadius * RADIAL_UNIT);
                 }
             }
             gl.glPopMatrix();
@@ -209,7 +209,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glPopMatrix();
     }
 
-    private void drawRadialGridText(GL2 gl, int size) {
+    private void drawRadialGridText(GL2 gl, double size) {
         gl.glDisable(GL2.GL_CULL_FACE);
 
         float fuzz = 0.75f;
