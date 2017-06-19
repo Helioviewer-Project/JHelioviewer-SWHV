@@ -59,6 +59,4 @@ public interface TimelineRenderable {
 
     void serialize(JSONObject jo);
 
-    void deserializeVisibility(JSONObject jo);
-
 }

@@ -9,11 +9,11 @@ import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 @SuppressWarnings("serial")
-public class RendererVisible extends JHVTableCellRenderer {
+public class RendererEnabled extends JHVTableCellRenderer {
 
     private final JCheckBox checkBox = new JCheckBox();
 
-    public RendererVisible() {
+    public RendererEnabled() {
         setHorizontalAlignment(CENTER);
         checkBox.putClientProperty("JComponent.sizeVariant", "small");
         checkBox.setBorderPainted(true);

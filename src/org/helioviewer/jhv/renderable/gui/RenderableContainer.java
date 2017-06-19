@@ -357,7 +357,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     if (obj instanceof TimelineRenderable) {
                         TimelineRenderable renderable = (TimelineRenderable) obj;
                         newlist.add(renderable);
-                        renderable.deserializeVisibility(jo);
+                        renderable.setVisible(jo.optBoolean("visibility", true));
                     }
                 } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
@@ -388,7 +388,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                         addRenderable(renderable);
                         JSONArray va = jo.optJSONArray("visibility");
                         if (va == null)
-                            va = new JSONArray(new double[] { 1, 0, 0, 0 });
+                            va = new JSONArray(new boolean[] { false, false, false, false });
                         renderable.deserializeVisibility(va);
                         renderable.setEnabled(jo.optBoolean("enabled", false));
                     }
@@ -409,11 +409,11 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                         newlist.add(renderable);
                         JSONArray va = jo.optJSONArray("visibility");
                         if (va == null)
-                            va = new JSONArray(new double[] { 1, 0, 0, 0 });
+                            va = new JSONArray(new boolean[] { false, false, false, false });
                         renderable.deserializeVisibility(va);
+                        renderable.setEnabled(jo.optBoolean("enabled", false));
                         if (jo.optBoolean("master", false))
                             masterRenderable = renderable;
-                        renderable.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
