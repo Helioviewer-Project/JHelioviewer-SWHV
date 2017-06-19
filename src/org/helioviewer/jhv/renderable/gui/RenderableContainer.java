@@ -368,9 +368,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     private void loadRenderables(JSONObject data) {
-        ArrayList<Renderable> newlist = new ArrayList<>();
-        Renderable masterRenderable = null;
-
         removedRenderables.addAll(renderables);
         renderables = new ArrayList<>();
 
@@ -390,6 +387,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 }
             }
         }
+
+        ArrayList<Renderable> newlist = new ArrayList<>();
+        Renderable masterRenderable = null;
 
         rja = data.getJSONArray("imageLayers");
         for (Object o : rja) {
@@ -461,24 +461,25 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
         @Override
         protected void done() {
-            if (!isCancelled()) {
-                for (Renderable renderable : newlist) {
-                    addBeforeRenderable(renderable);
-                    if (renderable instanceof ImageLayer) {
-                        ImageLayer layer = (ImageLayer) renderable;
-                        layer.unload(); // prune failed layers
-                        if (layer == master)
-                            layer.setActiveImageLayer();
-                    }
+            if (isCancelled())
+                return;
+
+            for (Renderable renderable : newlist) {
+                addBeforeRenderable(renderable);
+                if (renderable instanceof ImageLayer) {
+                    ImageLayer layer = (ImageLayer) renderable;
+                    layer.unload(); // prune failed layers
+                    if (layer == master)
+                        layer.setActiveImageLayer();
                 }
-                if (Displayer.multiview) {
-                    arrangeMultiView(true);
-                }
-                Layers.setTime(time);
-                if (play)
-                    Layers.playMovie();
-                // CameraHelper.zoomToFit(Displayer.getMiniCamera()); // funky
             }
+            if (Displayer.multiview) {
+                arrangeMultiView(true);
+            }
+            Layers.setTime(time);
+            if (play)
+                Layers.playMovie();
+            // CameraHelper.zoomToFit(Displayer.getMiniCamera()); // funky
         }
     }
 
