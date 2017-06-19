@@ -34,11 +34,11 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererEnabled;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererLoading;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererName;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererRemove;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererTime;
-import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererVisible;
 
 import com.jidesoft.swing.JideButton;
 
@@ -47,7 +47,7 @@ public class RenderableContainerPanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
 
-    private static final int VISIBLE_COL = 0;
+    private static final int ENABLED_COL = 0;
     private static final int TITLE_COL = 1;
     public static final int TIME_COL = 2;
     private static final int DOWNLOAD_COL = 3;
@@ -73,7 +73,7 @@ public class RenderableContainerPanel extends JPanel {
 
         @Override
         public void changeSelection(int row, int col, boolean toggle, boolean extend) {
-            if (col != VISIBLE_COL && col != REMOVE_COL)
+            if (col != ENABLED_COL && col != REMOVE_COL)
                 super.changeSelection(row, col, toggle, extend);
             // otherwise prevent changing selection
         }
@@ -172,9 +172,9 @@ public class RenderableContainerPanel extends JPanel {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new RendererVisible());
-        grid.getColumnModel().getColumn(VISIBLE_COL).setPreferredWidth(ICON_WIDTH + 8);
-        grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(ENABLED_COL).setCellRenderer(new RendererEnabled());
+        grid.getColumnModel().getColumn(ENABLED_COL).setPreferredWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(ENABLED_COL).setMaxWidth(ICON_WIDTH + 8);
 
         grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new RendererName());
 
@@ -237,7 +237,7 @@ public class RenderableContainerPanel extends JPanel {
                     return;
                 }
 
-                if (col == VISIBLE_COL) {
+                if (col == ENABLED_COL) {
                     renderable.setEnabled(!renderable.isEnabled());
                     renderableContainer.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
