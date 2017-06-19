@@ -51,25 +51,22 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
 
     @Override
     public void newEventsReceived() {
-        if (isVisible) {
+        if (enabled)
             DrawController.drawRequest();
-        }
     }
 
     @Override
     public void cacheUpdated() {
         TimeAxis xAxis = DrawController.selectedAxis;
         JHVEventCache.requestForInterval(xAxis.start, xAxis.end, this);
-        if (isVisible) {
+        if (enabled)
             DrawController.drawRequest();
-        }
     }
 
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Point mousePosition) {
-        if (!isVisible) {
+        if (!enabled)
             return;
-        }
 
         highlightedEvent = null;
         highlightedEventPosition = -1;
@@ -256,12 +253,10 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
 
     @Override
     public boolean highLightChanged(Point p) {
-        if (!isVisible) {
+        if (!enabled)
             return false;
-        }
-        if (eventUnderMouse == null) {
+        if (eventUnderMouse == null)
             return true;
-        }
         return !(eventUnderMouse.x0 <= p.x && p.x <= eventUnderMouse.x1 && eventUnderMouse.yPosition - 4 <= p.y && p.y <= eventUnderMouse.yPosition + 5);
     }
 

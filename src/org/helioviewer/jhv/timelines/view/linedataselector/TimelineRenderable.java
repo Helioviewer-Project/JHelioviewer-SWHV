@@ -15,9 +15,9 @@ public interface TimelineRenderable {
 
     void remove();
 
-    void setVisible(boolean visible);
+    void setEnabled(boolean enabled);
 
-    boolean isVisible();
+    boolean isEnabled();
 
     String getName();
 

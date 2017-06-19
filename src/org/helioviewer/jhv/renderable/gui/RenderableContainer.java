@@ -307,9 +307,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         JSONObject dataObject = new JSONObject();
         renderable.serialize(dataObject);
         jo.put("data", dataObject);
-        JSONArray va = new JSONArray();
-        renderable.serializeVisibility(va);
-        jo.put("visibility", va);
         jo.put("enabled", renderable.isEnabled());
         if (master)
             jo.put("master", true);
@@ -324,7 +321,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             JSONObject dataObject = new JSONObject();
             renderable.serialize(dataObject);
             jo.put("data", dataObject);
-            jo.put("visibility", renderable.isVisible());
+            jo.put("enabled", renderable.isEnabled());
             ja.put(jo);
         }
         main.put("timelines", ja);
@@ -357,7 +354,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     if (obj instanceof TimelineRenderable) {
                         TimelineRenderable renderable = (TimelineRenderable) obj;
                         newlist.add(renderable);
-                        renderable.setVisible(jo.optBoolean("visibility", true));
+                        renderable.setEnabled(jo.optBoolean("enabled", true));
                     }
                 } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
@@ -386,10 +383,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     if (obj instanceof Renderable) {
                         Renderable renderable = (Renderable) obj;
                         addRenderable(renderable);
-                        JSONArray va = jo.optJSONArray("visibility");
-                        if (va == null)
-                            va = new JSONArray(new boolean[] { false, false, false, false });
-                        renderable.deserializeVisibility(va);
                         renderable.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
@@ -407,10 +400,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     if (obj instanceof Renderable) {
                         Renderable renderable = (Renderable) obj;
                         newlist.add(renderable);
-                        JSONArray va = jo.optJSONArray("visibility");
-                        if (va == null)
-                            va = new JSONArray(new boolean[] { false, false, false, false });
-                        renderable.deserializeVisibility(va);
                         renderable.setEnabled(jo.optBoolean("enabled", false));
                         if (jo.optBoolean("master", false))
                             masterRenderable = renderable;

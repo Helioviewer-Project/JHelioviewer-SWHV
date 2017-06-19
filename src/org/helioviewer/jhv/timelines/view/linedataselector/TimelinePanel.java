@@ -22,11 +22,11 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineColorRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineLoadingRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineNameRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineRemoveRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.TimelineVisibleRenderer;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererColor;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererEnabled;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererLoading;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererName;
+import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererRemove;
 
 import com.jidesoft.swing.JideButton;
 
@@ -35,7 +35,7 @@ public class TimelinePanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
 
-    private static final int VISIBLE_COL = 0;
+    private static final int ENABLED_COL = 0;
     private static final int TITLE_COL = 1;
     static final int LOADING_COL = 2;
     private static final int LINECOLOR_COL = 3;
@@ -54,7 +54,7 @@ public class TimelinePanel extends JPanel {
 
         @Override
         public void changeSelection(int row, int col, boolean toggle, boolean extend) {
-            if (col != VISIBLE_COL && col != REMOVE_COL)
+            if (col != ENABLED_COL && col != REMOVE_COL)
                 super.changeSelection(row, col, toggle, extend);
             // otherwise prevent changing selection
         }
@@ -110,21 +110,21 @@ public class TimelinePanel extends JPanel {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new TimelineVisibleRenderer());
-        grid.getColumnModel().getColumn(VISIBLE_COL).setPreferredWidth(ICON_WIDTH + 8);
-        grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(ENABLED_COL).setCellRenderer(new RendererEnabled());
+        grid.getColumnModel().getColumn(ENABLED_COL).setPreferredWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(ENABLED_COL).setMaxWidth(ICON_WIDTH + 8);
 
-        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new TimelineNameRenderer());
+        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new RendererName());
 
-        grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new TimelineLoadingRenderer());
+        grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new RendererLoading());
         grid.getColumnModel().getColumn(LOADING_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(LOADING_COL).setMaxWidth(ICON_WIDTH + 2);
 
-        grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new TimelineColorRenderer());
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new RendererColor());
         grid.getColumnModel().getColumn(LINECOLOR_COL).setPreferredWidth(20);
         grid.getColumnModel().getColumn(LINECOLOR_COL).setMaxWidth(20);
 
-        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new TimelineRemoveRenderer());
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RendererRemove());
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
@@ -171,8 +171,8 @@ public class TimelinePanel extends JPanel {
 
                 TimelineRenderable timeline = (TimelineRenderable) grid.getValueAt(row, col);
 
-                if (col == VISIBLE_COL) {
-                    timeline.setVisible(!timeline.isVisible());
+                if (col == ENABLED_COL) {
+                    timeline.setEnabled(!timeline.isEnabled());
                     model.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
                         setOptionsPanel(timeline);
@@ -209,7 +209,7 @@ public class TimelinePanel extends JPanel {
         optionsPanelWrapper.removeAll();
         Component optionsPanel = timeline == null ? null : timeline.getOptionsPanel();
         if (optionsPanel != null) {
-            ComponentUtils.setEnabled(optionsPanel, timeline.isVisible());
+            ComponentUtils.setEnabled(optionsPanel, timeline.isEnabled());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         }
         revalidate();

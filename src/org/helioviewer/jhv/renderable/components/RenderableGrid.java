@@ -90,8 +90,6 @@ public class RenderableGrid extends AbstractRenderable {
             deserialize(jo);
 
         optionsPanel = new RenderableGridOptionsPanel(this);
-        setVisible(true);
-
         makeLatLabels();
         makeLonLabels();
         makeRadialLabels();

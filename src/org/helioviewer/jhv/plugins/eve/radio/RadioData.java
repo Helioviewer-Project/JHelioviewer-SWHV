@@ -45,11 +45,10 @@ public class RadioData extends AbstractTimelineRenderable {
     private static IndexColorModel colorModel;
 
     public RadioData() {
-        isVisible = false;
-
         String cm = "Spectral";
         colorModel = createIndexColorModelFromLUT(LUT.get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
+        setEnabled(false);
     }
 
     public RadioData(JSONObject jo) {
@@ -196,7 +195,7 @@ public class RadioData extends AbstractTimelineRenderable {
 
     @Override
     public boolean showYAxis() {
-        return isVisible;
+        return enabled;
     }
 
     @Override
@@ -205,8 +204,8 @@ public class RadioData extends AbstractTimelineRenderable {
     }
 
     @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
+    public void setEnabled(boolean _enabled) {
+        super.setEnabled(_enabled);
         clearCache();
         fetchData(DrawController.selectedAxis);
     }
@@ -253,7 +252,7 @@ public class RadioData extends AbstractTimelineRenderable {
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        if (isVisible) {
+        if (enabled) {
             boolean timediffCond = selectedAxis.end - selectedAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
             if (timediffCond) {
                 requestForData();
@@ -264,9 +263,9 @@ public class RadioData extends AbstractTimelineRenderable {
 
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
-        if (!isVisible) {
+        if (!enabled)
             return;
-        }
+
         boolean timediffCond = timeAxis.end - timeAxis.start <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
         if (timediffCond) {
             for (DownloadedJPXData djpx : cache.values()) {

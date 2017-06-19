@@ -7,11 +7,11 @@ import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
-public class TimelineRemoveRenderer extends JHVTableCellRenderer {
+public class RendererRemove extends JHVTableCellRenderer {
 
     private final Font font = Buttons.getMaterialFont(getFont().getSize2D());
 
-    public TimelineRemoveRenderer() {
+    public RendererRemove() {
         setHorizontalAlignment(CENTER);
     }
 
