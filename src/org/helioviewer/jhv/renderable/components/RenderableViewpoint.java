@@ -209,10 +209,10 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
     }
 
     @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
+    public void setEnabled(boolean _enabled) {
+        super.setEnabled(_enabled);
 
-        if (visible)
+        if (_enabled)
             ImageViewerGui.getInputController().addPlugin(this);
         else
             ImageViewerGui.getInputController().removePlugin(this);

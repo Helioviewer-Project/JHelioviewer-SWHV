@@ -53,10 +53,10 @@ public class Layers {
         return layers.size();
     }
 
-    public static int getNumVisibleLayers() {
+    public static int getNumEnabledLayers() {
         int ct = 0;
         for (View v : layers)
-            if (v.getImageLayer().isVisible())
+            if (v.getImageLayer().isEnabled())
                 ct++;
         return ct;
     }
@@ -316,7 +316,7 @@ public class Layers {
         double size = 0;
 
         for (View v : layers) {
-            if (v.getImageLayer().isVisible()) {
+            if (v.getImageLayer().isEnabled()) {
                 MetaData m = v.getImageLayer().getMetaData();
                 double newSize = m.getPhysicalRegion().height;
                 if (newSize > size) {
@@ -331,7 +331,7 @@ public class Layers {
         double size = 0;
 
         for (View v : layers) {
-            if (v.getImageLayer().isVisible()) {
+            if (v.getImageLayer().isEnabled()) {
                 MetaData m = v.getImageLayer().getMetaData();
                 double h = m.getPhysicalRegion().height;
                 double w = m.getPhysicalRegion().width;
@@ -348,7 +348,7 @@ public class Layers {
         StringBuilder str = new StringBuilder();
 
         for (View v : layers) {
-            if (v.getImageLayer().isVisible()) {
+            if (v.getImageLayer().isEnabled()) {
                 MetaData m = v.getImageLayer().getMetaData();
                 if (m instanceof HelioviewerMetaData) {
                     HelioviewerMetaData hm = (HelioviewerMetaData) m;

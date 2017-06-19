@@ -446,10 +446,10 @@ public class SWEKRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
+    public void setEnabled(boolean _enabled) {
+        super.setEnabled(_enabled);
 
-        if (visible) {
+        if (_enabled) {
             controller.timeChanged(Layers.getLastUpdatedTimestamp().milli);
             Layers.addTimeListener(controller);
             ImageViewerGui.getInputController().addPlugin(controller);
@@ -471,7 +471,6 @@ public class SWEKRenderable extends AbstractRenderable {
 
     @Override
     public void init(GL2 gl) {
-        setVisible(true);
     }
 
     @Override

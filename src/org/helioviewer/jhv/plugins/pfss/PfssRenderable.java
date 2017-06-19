@@ -77,9 +77,10 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     }
 
     @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
-        if (!visible)
+    public void setEnabled(boolean _enabled) {
+        super.setEnabled(_enabled);
+
+        if (!_enabled)
             timeString = null;
         else if (previousPfssData != null)
             timeString = previousPfssData.getDateObs().toString();
