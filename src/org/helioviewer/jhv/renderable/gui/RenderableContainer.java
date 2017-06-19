@@ -200,7 +200,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             for (Renderable r : renderables) {
                 if (r instanceof ImageLayer) {
                     ImageLayer l = (ImageLayer) r;
-                    if (l.isVisible()) {
+                    if (l.isEnabled()) {
                         l.setVisible(ct);
                         l.setOpacity(1);
                         ct++;
@@ -211,7 +211,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             for (Renderable r : renderables) {
                 if (r instanceof ImageLayer) {
                     ImageLayer l = (ImageLayer) r;
-                    if (l.isVisible()) {
+                    if (l.isEnabled()) {
                         l.setVisible(0);
                         float opacity;
                         if (ImageLayer.isCor(l.getName()))
@@ -310,6 +310,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         JSONArray va = new JSONArray();
         renderable.serializeVisibility(va);
         jo.put("visibility", va);
+        jo.put("enabled", renderable.isEnabled());
         if (master)
             jo.put("master", true);
         return jo;
@@ -389,6 +390,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                         if (va == null)
                             va = new JSONArray(new double[] { 1, 0, 0, 0 });
                         renderable.deserializeVisibility(va);
+                        renderable.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
@@ -411,6 +413,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                         renderable.deserializeVisibility(va);
                         if (jo.optBoolean("master", false))
                             masterRenderable = renderable;
+                        renderable.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
@@ -478,6 +481,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                         if (layer == master)
                             layer.setActiveImageLayer();
                     }
+                }
+                if (Displayer.multiview) {
+                    arrangeMultiView(true);
                 }
                 Layers.setTime(time);
                 if (play)

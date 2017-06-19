@@ -24,7 +24,7 @@ public class RendererVisible extends JHVTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof Renderable) {
-            checkBox.setSelected(((Renderable) value).isVisible());
+            checkBox.setSelected(((Renderable) value).isEnabled());
         }
         checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
         return checkBox;

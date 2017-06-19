@@ -29,13 +29,15 @@ public interface Renderable {
 
     String getName();
 
-    boolean isVisible(int i);
+    boolean isEnabled();
 
-    boolean isVisible();
+    void setEnabled(boolean b);
 
     int isVisibleIdx();
 
-    void setVisible(boolean b);
+    boolean isVisible(int idx);
+
+    void setVisible(int idx);
 
     String getTimeString();
 
@@ -46,8 +48,6 @@ public interface Renderable {
     void init(GL2 gl);
 
     void dispose(GL2 gl);
-
-    void setVisible(int ctImages);
 
     void serialize(JSONObject jo);
 

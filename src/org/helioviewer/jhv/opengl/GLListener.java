@@ -168,7 +168,7 @@ public class GLListener implements GLEventListener {
 
     private static void renderMiniview(GL2 gl) {
         RenderableMiniview miniview = ImageViewerGui.getRenderableContainer().getRenderableMiniview();
-        if (miniview.isVisible()) {
+        if (miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
             Camera miniCamera = Displayer.getMiniCamera();
             miniCamera.timeChanged(Layers.getLastUpdatedTimestamp());

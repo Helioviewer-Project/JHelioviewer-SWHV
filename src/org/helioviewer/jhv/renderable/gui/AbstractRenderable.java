@@ -12,17 +12,28 @@ public abstract class AbstractRenderable implements Renderable {
     protected final boolean[] isVisible = { false, false, false, false };
 
     @Override
-    public boolean isVisible(int i) {
-        return isVisible[i];
+    public void setEnabled(boolean _enabled) {
+        enabled = _enabled;
+        for (int i = 0; i < isVisible.length; i++)
+            isVisible[i] = _enabled;
     }
 
     @Override
-    public boolean isVisible() {
-        for (boolean visible : isVisible) {
-            if (visible)
-                return true;
-        }
-        return false;
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void setVisible(int j) {
+        for (int i = 0; i < isVisible.length; i++)
+            isVisible[i] = false;
+        if (j >= 0 && j < isVisible.length)
+            isVisible[j] = true;
+    }
+
+    @Override
+    public boolean isVisible(int idx) {
+        return isVisible[idx];
     }
 
     @Override
@@ -32,21 +43,6 @@ public abstract class AbstractRenderable implements Renderable {
                 return i;
         }
         return -1;
-    }
-
-    @Override
-    public void setVisible(boolean visible) {
-        for (int i = 0; i < isVisible.length; i++)
-            isVisible[i] = visible;
-        enabled = visible;
-    }
-
-    @Override
-    public void setVisible(int j) {
-        for (int i = 0; i < isVisible.length; i++)
-            isVisible[i] = false;
-        if (j >= 0 && j < isVisible.length)
-            isVisible[j] = true;
     }
 
     @Override
@@ -76,18 +72,14 @@ public abstract class AbstractRenderable implements Renderable {
 
     @Override
     public void serializeVisibility(JSONArray va) {
-        int i = 0;
-        for (; i < isVisible.length; i++)
+        for (int i = 0; i < isVisible.length; i++)
             va.put(i, isVisible[i]);
-        va.put(i, enabled);
     }
 
     @Override
     public void deserializeVisibility(JSONArray va) {
-        int i = 0;
-        for (; i < isVisible.length; i++)
+        for (int i = 0; i < isVisible.length; i++)
             isVisible[i] = va.optBoolean(i, true);
-        setVisible(enabled = va.optBoolean(i, false));
     }
 
     @Override

@@ -114,8 +114,9 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
+    public void setEnabled(boolean _enabled) {
+        super.setEnabled(_enabled);
+
         if (Displayer.multiview) {
             ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
         }
@@ -134,7 +135,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         view = _view;
         worker = null; // drop reference
 
-        setVisible(true); // enable optionsPanel
+        setEnabled(true); // enable optionsPanel
         ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(this);
 
         view.setImageLayer(this);

@@ -238,7 +238,7 @@ public class RenderableContainerPanel extends JPanel {
                 }
 
                 if (col == VISIBLE_COL) {
-                    renderable.setVisible(!renderable.isVisible());
+                    renderable.setEnabled(!renderable.isEnabled());
                     renderableContainer.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
                         setOptionsPanel(renderable);
@@ -293,7 +293,7 @@ public class RenderableContainerPanel extends JPanel {
         optionsPanelWrapper.removeAll();
         Component optionsPanel = renderable == null ? null : renderable.getOptionsPanel();
         if (optionsPanel != null) {
-            ComponentUtils.setEnabled(optionsPanel, renderable.isVisible());
+            ComponentUtils.setEnabled(optionsPanel, renderable.isEnabled());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         }
         revalidate();
