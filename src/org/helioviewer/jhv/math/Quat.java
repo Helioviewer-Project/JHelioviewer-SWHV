@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.math;
 
+import org.json.JSONArray;
+
 public class Quat {
 
     private static final double EPSILON = 0.000001;
@@ -235,7 +237,19 @@ public class Quat {
 
     @Override
     public String toString() {
-        return "[" + a + ", " + u.x + ", " + u.y + ", " + u.z + "]";
+        return toJson().toString();
+    }
+
+    public JSONArray toJson() {
+        return new JSONArray(new double[] { a, u.x, u.y, u.z });
+    }
+
+    public static Quat fromJson(JSONArray ja) {
+        try {
+            return new Quat(ja.getDouble(0), ja.getDouble(1), ja.getDouble(2), ja.getDouble(3));
+        } catch (Exception e) {
+            return ZERO;
+        }
     }
 
     @Override
