@@ -142,11 +142,8 @@ public class GLListener implements GLEventListener {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
-                gl.glPushMatrix();
-                gl.glTranslatef((float) camera.getCurrentTranslation().x, (float) camera.getCurrentTranslation().y, 0f);
                 ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
-                gl.glPopMatrix();
             }
         }
     }
