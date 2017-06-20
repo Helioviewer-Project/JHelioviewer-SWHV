@@ -8,6 +8,7 @@ import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLHelper;
 
 import com.jogamp.opengl.GL2;
 
@@ -22,10 +23,10 @@ public class CameraHelper {
         double width = camera.getWidth();
         gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, -1, 1);
 
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+
         Vec2 translation = camera.getCurrentTranslation();
         Mat4 transformation = Mat4.translation(translation.x, translation.y, 0);
-
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadMatrixd(transformation.m, 0);
     }
 
@@ -36,10 +37,16 @@ public class CameraHelper {
         double width = camera.getWidth();
         gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, -halfDepth, halfDepth);
 
-        Vec2 translation = camera.getCurrentTranslation();
-        Mat4 transformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, 0);
-
         gl.glMatrixMode(GL2.GL_MODELVIEW);
+
+        Vec2 translation = camera.getCurrentTranslation();
+        Mat4 transformation = Mat4.translation(translation.x, translation.y, 0);
+        gl.glLoadMatrixd(transformation.m, 0);
+
+        gl.glColor3f(0, 0, 0);
+        GLHelper.drawCircleFront(gl, 0, 0, 0.98 * Sun.Radius, 30);
+
+        transformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, 0);
         gl.glLoadMatrixd(transformation.m, 0);
     }
 

@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.EventQueue;
 
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -11,7 +10,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 
 import com.jogamp.nativewindow.ScalableSurface;
@@ -105,25 +103,13 @@ public class GLListener implements GLEventListener {
         });
     }
 
-    private static void renderBlackCircle(GL2 gl, double[] matrix) {
-        gl.glPushMatrix();
-        gl.glMultMatrixd(matrix, 0);
-        {
-            gl.glColor3f(0, 0, 0);
-            GLHelper.drawCircleFront(gl, 0, 0, 0.98 * Sun.Radius, 30);
-        }
-        gl.glPopMatrix();
-    }
-
     public static void renderScene(Camera camera, GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
-        Mat4 inverse = camera.getRotation().toMatrix().transpose();
         for (Viewport vp : Displayer.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 CameraHelper.applyPerspective(camera, vp, gl);
-                renderBlackCircle(gl, inverse.m);
                 ImageViewerGui.getRenderableContainer().render(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
             }
