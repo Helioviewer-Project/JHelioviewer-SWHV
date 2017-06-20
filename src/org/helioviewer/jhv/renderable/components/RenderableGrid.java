@@ -59,6 +59,10 @@ public class RenderableGrid extends AbstractRenderable {
     private final GLLine flatLine = new GLLine();
     private final GLLine gridLine = new GLLine();
 
+    private final ArrayList<GridLabel> latLabels = new ArrayList<>();
+    private final ArrayList<GridLabel> lonLabels = new ArrayList<>();
+    private final ArrayList<GridLabel> radialLabels;
+
     private final Component optionsPanel;
 
     @Override
@@ -92,7 +96,7 @@ public class RenderableGrid extends AbstractRenderable {
         optionsPanel = new RenderableGridOptionsPanel(this);
         makeLatLabels();
         makeLonLabels();
-        makeRadialLabels();
+        radialLabels = makeRadialLabels(0);
     }
 
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
@@ -240,23 +244,18 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private final ArrayList<GridLabel> latLabels = new ArrayList<>();
-    private final ArrayList<GridLabel> lonLabels = new ArrayList<>();
-    private final ArrayList<GridLabel> radialLabels = new ArrayList<>();
-
-    private void makeRadialLabels() {
+    private ArrayList<GridLabel> makeRadialLabels(double delta) {
         double size = Sun.Radius;
         double horizontalAdjustment = textScale / 2.;
         double verticalAdjustment = textScale / 3.;
 
-        radialLabels.clear();
-
+        ArrayList<GridLabel> labels = new ArrayList<>();
         for (double phi = 0; phi < 360; phi += RADIAL_STEP) {
-            double angle = -phi * Math.PI / 180.;
+            double angle = -phi * Math.PI / 180. + delta;
             String txt = formatter1.format(phi);
-            radialLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size - horizontalAdjustment),
-                    (float) (Math.cos(angle) * size - verticalAdjustment), 0));
+            labels.add(new GridLabel(txt, (float) (Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
         }
+        return labels;
     }
 
     private void makeLatLabels() {
