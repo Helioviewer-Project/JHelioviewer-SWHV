@@ -484,6 +484,9 @@ public class SWEKRenderable extends AbstractRenderable {
 
     @Override
     public void dispose(GL2 gl) {
+        ImageViewerGui.getInputController().removePlugin(controller);
+        Layers.removeTimeListener(controller);
+
         for (GLTexture el : iconCacheId.values())
             el.delete(gl);
         iconCacheId.clear();

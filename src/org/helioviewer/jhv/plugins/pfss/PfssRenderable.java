@@ -104,10 +104,12 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     @Override
     public void init(GL2 gl) {
         line.init(gl);
+        Layers.addTimespanListener(this);
     }
 
     @Override
     public void dispose(GL2 gl) {
+        Layers.removeTimespanListener(this);
         previousPfssData = null;
         line.dispose(gl);
     }
