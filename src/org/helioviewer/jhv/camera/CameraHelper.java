@@ -14,7 +14,6 @@ import com.jogamp.opengl.GL2;
 public class CameraHelper {
 
     private static final double halfDepth = 3 * Sun.MeanEarthDistance;
-    private static final double[] identity = Mat4.identity().m;
 
     public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
@@ -23,8 +22,11 @@ public class CameraHelper {
         double width = camera.getWidth();
         gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, -1, 1);
 
+        Vec2 translation = camera.getCurrentTranslation();
+        Mat4 transformation = Mat4.translation(translation.x, translation.y, 0);
+
         gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadMatrixd(identity, 0);
+        gl.glLoadMatrixd(transformation.m, 0);
     }
 
     public static void applyPerspective(Camera camera, Viewport vp, GL2 gl) {
@@ -35,10 +37,10 @@ public class CameraHelper {
         gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, -halfDepth, halfDepth);
 
         Vec2 translation = camera.getCurrentTranslation();
-        Mat4 cameraTransformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, 0);
-        // applyCamera
+        Mat4 transformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, 0);
+
         gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadMatrixd(cameraTransformation.m, 0);
+        gl.glLoadMatrixd(transformation.m, 0);
     }
 
     private static double computeNormalizedX(Viewport vp, double screenX) {
