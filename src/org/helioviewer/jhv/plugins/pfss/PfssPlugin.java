@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.pfss.data.PfssCache;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONObject;
@@ -46,14 +45,12 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
-        Layers.addTimespanListener(renderable);
         ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
 
     @Override
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
-        Layers.removeTimespanListener(renderable);
     }
 
     @Override
