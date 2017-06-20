@@ -19,7 +19,6 @@ import org.helioviewer.jhv.io.LoadRemoteTask;
 import org.helioviewer.jhv.math.IcoSphere;
 import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
@@ -236,9 +235,9 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
             Mat4 vpmi = getOrthoMatrixInverse(camera.getFOV(), vp.aspect, viewpoint.distance); // use current FOV
             if (Displayer.mode == Displayer.DisplayMode.Orthographic)
-                vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
+                vpmi.translate(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.);
             else
-                vpmi.translate(new Vec3(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.));
+                vpmi.translate(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.);
             shader.bindMatrix(gl, vpmi.getFloatArray());
 
             Quat q = Quat.rotate(camera.getCurrentDragRotation(), viewpoint.orientation);
