@@ -93,7 +93,10 @@ public class SpaceObjectContainer extends JScrollPane {
             selectElement(element);
     }
 
-    public void loadSelected(long _startTime, long _endTime) {
+    public void setTime(long _startTime, long _endTime) {
+        if (startTime == _startTime && endTime == _endTime)
+            return;
+
         startTime = _startTime;
         endTime = _endTime;
         for (SpaceObjectElement element : model.getSelected())
