@@ -92,6 +92,8 @@ public class RenderableGrid extends AbstractRenderable {
     public RenderableGrid(JSONObject jo) {
         if (jo != null)
             deserialize(jo);
+        else
+            setEnabled(true);
 
         optionsPanel = new RenderableGridOptionsPanel(this);
         makeLatLabels();

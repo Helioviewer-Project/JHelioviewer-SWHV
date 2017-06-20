@@ -3,12 +3,17 @@ package org.helioviewer.jhv.plugins.swek.renderable;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
@@ -20,6 +25,7 @@ import org.helioviewer.jhv.data.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Mat4;
@@ -38,7 +44,7 @@ import com.jogamp.opengl.GL2;
 public class SWEKRenderable extends AbstractRenderable {
 
     private static final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
-    private static SWEKRenderableOptionsPanel optionsPanel;
+    private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
     private static final float LINEWIDTH = 1;
@@ -49,17 +55,20 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
-    public SWEKRenderable() {
-        optionsPanel = new SWEKRenderableOptionsPanel(true);
-    }
+    private static boolean icons = true;
 
     public SWEKRenderable(JSONObject jo) {
-        optionsPanel = new SWEKRenderableOptionsPanel(jo.optBoolean("icons", true));
+        if (jo != null)
+            icons = jo.optBoolean("icons", icons);
+        else
+            setEnabled(true);
+
+        optionsPanel = optionsPanel();
     }
 
     @Override
     public void serialize(JSONObject jo) {
-        jo.put("icons", optionsPanel.icons);
+        jo.put("icons", icons);
     }
 
     private static void bindTexture(GL2 gl, SWEKGroup group) {
@@ -135,7 +144,7 @@ public class SWEKRenderable extends AbstractRenderable {
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q);
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q);
 
-        if (optionsPanel.icons) {
+        if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
 
             double sz = ICON_SIZE;
@@ -313,7 +322,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
         gl.glEnd();
 
-        if (optionsPanel.icons) {
+        if (icons) {
             bindTexture(gl, evtr.getSupplier().getGroup());
             if (evtr.isHighlighted()) {
                 drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
@@ -391,7 +400,7 @@ public class SWEKRenderable extends AbstractRenderable {
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
 
-                    if (optionsPanel.icons) {
+                    if (icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
                         drawIcon(gl, evtr, evt);
                         gl.glEnable(GL2.GL_DEPTH_TEST);
@@ -412,7 +421,7 @@ public class SWEKRenderable extends AbstractRenderable {
                 } else {
                     drawPolygon(camera, vp, gl, evtr, evt);
 
-                    if (optionsPanel.icons) {
+                    if (icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
                         drawIconScale(gl, evtr, evt, Displayer.mode.scale, camera, vp);
                         gl.glEnable(GL2.GL_DEPTH_TEST);
@@ -475,10 +484,31 @@ public class SWEKRenderable extends AbstractRenderable {
 
     @Override
     public void dispose(GL2 gl) {
-        for (GLTexture el : iconCacheId.values()) {
+        for (GLTexture el : iconCacheId.values())
             el.delete(gl);
-        }
         iconCacheId.clear();
+    }
+
+    private static JPanel optionsPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints c0 = new GridBagConstraints();
+        c0.anchor = GridBagConstraints.CENTER;
+        c0.weightx = 1.;
+        c0.weighty = 1.;
+        c0.gridy = 0;
+        c0.gridx = 0;
+
+        JCheckBox check = new JCheckBox("Icons", icons);
+        check.setHorizontalTextPosition(SwingConstants.LEFT);
+        check.addActionListener(e -> {
+            icons = !icons;
+            Displayer.display();
+        });
+        panel.add(check, c0);
+
+        ComponentUtils.smallVariant(panel);
+        return panel;
     }
 
 }

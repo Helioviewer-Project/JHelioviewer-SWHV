@@ -26,13 +26,14 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
     private final GLLine line = new GLLine();
     private PfssData previousPfssData;
 
-    public PfssRenderable() {
-        optionsPanel = new PfssOptionsPanel(0, false);
-    }
-
     public PfssRenderable(JSONObject jo) {
-        int detail = MathUtils.clip(jo.optInt("detail", 0), 0, PfssSettings.MAX_DETAIL);
-        boolean fixedColor = jo.optBoolean("fixedColor", false);
+        int detail = 0;
+        boolean fixedColor = false;
+
+        if (jo != null) {
+            detail = MathUtils.clip(jo.optInt("detail", detail), 0, PfssSettings.MAX_DETAIL);
+            fixedColor = jo.optBoolean("fixedColor", fixedColor);
+        }
         optionsPanel = new PfssOptionsPanel(detail, fixedColor);
     }
 
