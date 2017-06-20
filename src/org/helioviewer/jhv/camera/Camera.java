@@ -7,6 +7,8 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVDate;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class Camera {
 
@@ -114,6 +116,24 @@ public class Camera {
         if (!trackingMode) {
             updateCamera(date);
         }
+    }
+
+    public JSONObject toJson() {
+        JSONObject jo = new JSONObject();
+        jo.put("dragRotation", currentDragRotation.toJson());
+        jo.put("translationX", currentTranslation.x);
+        jo.put("translationY", currentTranslation.y);
+        jo.put("fov", fov);
+        return jo;
+    }
+
+    public void fromJson(JSONObject jo) {
+        JSONArray ja = jo.optJSONArray("dragRotation");
+        if (ja != null)
+            currentDragRotation = Quat.fromJson(ja);
+        currentTranslation.x = jo.optDouble("translationX", currentTranslation.x);
+        currentTranslation.y = jo.optDouble("translationY", currentTranslation.y);
+        fov = jo.optDouble("fov", fov);
     }
 
 }

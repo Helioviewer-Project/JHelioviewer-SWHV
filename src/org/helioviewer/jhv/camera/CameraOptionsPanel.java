@@ -68,6 +68,10 @@ public class CameraOptionsPanel extends JPanel {
                 defaultMode = CameraMode.valueOf(strMode);
             } catch (Exception ignore) {
             }
+            JSONObject jc = jo.optJSONObject("camera");
+            if (jc != null)
+                Displayer.getCamera().fromJson(jc);
+
             joExpert = jo.optJSONObject("expert");
             joEquatorial = jo.optJSONObject("equatorial");
         }
@@ -79,12 +83,19 @@ public class CameraOptionsPanel extends JPanel {
         radio.add(new JLabel("View", JLabel.RIGHT));
         for (CameraMode mode : CameraMode.values()) {
             JRadioButton item = new JRadioButton(mode.toString());
-            item.addActionListener(e -> changeCamera(mode));
+            item.addActionListener(e -> {
+                changeCamera(mode);
+                Displayer.getCamera().reset();
+                Displayer.getMiniCamera().reset();
+            });
             item.setActionCommand(mode.toString());
             radio.add(item);
             modeGroup.add(item);
-            if (mode == defaultMode)
-                item.doClick();
+
+            if (mode == defaultMode) {
+                modeGroup.setSelected(item.getModel(), true);
+                changeCamera(mode);
+            }
         }
         add(radio, c);
 
@@ -126,6 +137,7 @@ public class CameraOptionsPanel extends JPanel {
 
     public void serialize(JSONObject jo) {
         jo.put("mode", modeGroup.getSelection().getActionCommand());
+        jo.put("camera", Displayer.getCamera().toJson());
         jo.put("fovAngle", fovAngle);
         jo.put("expert", expertOptionPanel.toJson());
         jo.put("equatorial", equatorialOptionPanel.toJson());
@@ -177,9 +189,6 @@ public class CameraOptionsPanel extends JPanel {
                 update = UpdateViewpoint.observer;
         }
         Displayer.setViewpointUpdate(update);
-        Displayer.getCamera().reset();
-        Displayer.getMiniCamera().reset();
-
         switchOptionsPanel(panel);
     }
 

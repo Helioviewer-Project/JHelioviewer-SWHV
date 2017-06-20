@@ -81,13 +81,13 @@ public class APIRequest {
     }
 
     public JSONObject toJson() {
-        JSONObject json = new JSONObject();
-        json.put("server", server);
-        json.put("sourceId", sourceId);
-        json.put("startTime", TimeUtils.format(startTime));
-        json.put("endTime", TimeUtils.format(endTime));
-        json.put("cadence", cadence);
-        return json;
+        JSONObject jo = new JSONObject();
+        jo.put("server", server);
+        jo.put("sourceId", sourceId);
+        jo.put("startTime", TimeUtils.format(startTime));
+        jo.put("endTime", TimeUtils.format(endTime));
+        jo.put("cadence", cadence);
+        return jo;
     }
 
     private static final int MAX_FRAMES = 99;
