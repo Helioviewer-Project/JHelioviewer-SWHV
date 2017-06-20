@@ -22,7 +22,7 @@ public class SWEKPlugin implements Plugin {
     private static final JPanel swekPanel = new JPanel();
 
     private static final SWEKData swekData = new SWEKData();
-    private static final SWEKRenderable renderable = new SWEKRenderable();
+    private static final SWEKRenderable renderable = new SWEKRenderable(null);
     private static final EventTimelineRenderable em = new EventTimelineRenderable();
 
     public SWEKPlugin() {
