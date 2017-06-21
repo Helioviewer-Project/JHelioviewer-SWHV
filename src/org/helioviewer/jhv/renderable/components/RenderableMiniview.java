@@ -4,18 +4,15 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.JSlider;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -125,15 +122,13 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private JPanel optionsPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
-        JSpinner spinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(scale), Double.valueOf(MIN_SCALE), Double.valueOf(MAX_SCALE), Double.valueOf(1)));
-        JFormattedTextField f = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-        f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%", MIN_SCALE, MAX_SCALE));
-        spinner.addChangeListener(e -> {
-            scale = ((Double) spinner.getValue()).intValue();
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, MIN_SCALE, MAX_SCALE, scale);
+        slider.addChangeListener(e -> {
+            scale = slider.getValue();
             reshapeViewport();
             Displayer.display();
         });
-        WheelSupport.installMouseWheelSupport(spinner);
+        WheelSupport.installMouseWheelSupport(slider);
 
         GridBagConstraints c0 = new GridBagConstraints();
         c0.anchor = GridBagConstraints.EAST;
@@ -144,7 +139,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
         panel.add(new JLabel("Size", JLabel.RIGHT), c0);
         c0.anchor = GridBagConstraints.WEST;
         c0.gridx = 1;
-        panel.add(spinner, c0);
+        panel.add(slider, c0);
 
         ComponentUtils.smallVariant(panel);
         return panel;
