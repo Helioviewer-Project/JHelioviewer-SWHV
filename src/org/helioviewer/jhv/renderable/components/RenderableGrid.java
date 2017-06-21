@@ -36,18 +36,17 @@ public class RenderableGrid extends AbstractRenderable {
     private static final float[] R_LABEL_POS_FAR = { (float) (2 * RADIAL_UNIT_FAR), (float) (8 * RADIAL_UNIT_FAR), (float) (24 * RADIAL_UNIT_FAR) };
 
     // height of text in solar radii
-    private static final float textScale = (float) (0.08 * Sun.Radius);
+    private static final float textScale = GridLabel.textScale;
     private static final double thickness = 0.001;
     private static final double thicknessEarth = 0.0015;
     private static final double thicknessAxes = 0.003;
 
-    private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
     private GridType gridType = GridType.Viewpoint;
 
-    private double lonstepDegrees = 15;
-    private double latstepDegrees = 20;
+    private double lonStep = 15;
+    private double latStep = 20;
     private boolean gridNeedsInit = true;
 
     private boolean showAxis = true;
@@ -63,8 +62,8 @@ public class RenderableGrid extends AbstractRenderable {
     private final GLLine flatLine = new GLLine();
     private final GLLine gridLine = new GLLine();
 
-    private final ArrayList<GridLabel> latLabels = new ArrayList<>();
-    private final ArrayList<GridLabel> lonLabels = new ArrayList<>();
+    private ArrayList<GridLabel> latLabels;
+    private ArrayList<GridLabel> lonLabels;
     private final ArrayList<GridLabel> radialLabels;
     private final ArrayList<GridLabel> radialLabelsFar;
 
@@ -72,8 +71,8 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public void serialize(JSONObject jo) {
-        jo.put("lonstepDegrees", lonstepDegrees);
-        jo.put("latstepDegrees", latstepDegrees);
+        jo.put("lonStep", lonStep);
+        jo.put("latStep", latStep);
         jo.put("showAxis", showAxis);
         jo.put("showLabels", showLabels);
         jo.put("showRadial", showRadial);
@@ -81,8 +80,8 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void deserialize(JSONObject jo) {
-        lonstepDegrees = jo.optDouble("lonstepDegrees", lonstepDegrees);
-        latstepDegrees = jo.optDouble("latstepDegrees", latstepDegrees);
+        lonStep = jo.optDouble("lonStep", lonStep);
+        latStep = jo.optDouble("latStep", latStep);
         showAxis = jo.optBoolean("showAxis", showAxis);
         showLabels = jo.optBoolean("showLabels", showLabels);
         showRadial = jo.optBoolean("showRadial", showRadial);
@@ -99,12 +98,12 @@ public class RenderableGrid extends AbstractRenderable {
             deserialize(jo);
         else
             setEnabled(true);
-
         optionsPanel = new RenderableGridOptionsPanel(this);
-        makeLatLabels();
-        makeLonLabels();
-        radialLabels = makeRadialLabels(0, RADIAL_STEP);
-        radialLabelsFar = makeRadialLabels(Math.PI / 2, RADIAL_STEP_FAR);
+
+        latLabels = GridLabel.makeLatLabels(latStep);
+        lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
+        radialLabels = GridLabel.makeRadialLabels(0, RADIAL_STEP);
+        radialLabelsFar = GridLabel.makeRadialLabels(Math.PI / 2, RADIAL_STEP_FAR);
     }
 
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
@@ -130,7 +129,7 @@ public class RenderableGrid extends AbstractRenderable {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
-            RenderableGridMath.initGrid(gl, gridLine, lonstepDegrees, latstepDegrees);
+            RenderableGridMath.initGrid(gl, gridLine, lonStep, latStep);
             gridNeedsInit = false;
         }
 
@@ -247,84 +246,6 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glEnable(GL2.GL_CULL_FACE);
     }
 
-    private static class GridLabel {
-        final String txt;
-        final float x;
-        final float y;
-        final float theta;
-
-        GridLabel(String _txt, float _x, float _y, float _theta) {
-            txt = _txt;
-            x = _x;
-            y = _y;
-            theta = _theta;
-        }
-    }
-
-    private ArrayList<GridLabel> makeRadialLabels(double delta, double radialStep) {
-        double size = Sun.Radius;
-        double horizontalAdjustment = textScale / 2.;
-        double verticalAdjustment = textScale / 3.;
-
-        ArrayList<GridLabel> labels = new ArrayList<>();
-        for (double phi = 0; phi < 360; phi += radialStep) {
-            double angle = -phi * Math.PI / 180. + delta;
-            String txt = formatter1.format(phi);
-            labels.add(new GridLabel(txt, (float) (Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
-        }
-        return labels;
-    }
-
-    private void makeLatLabels() {
-        double size = Sun.Radius * 1.1;
-        // adjust for font size in horizontal and vertical direction (centering the text approximately)
-        double horizontalAdjustment = textScale / 2.;
-        double verticalAdjustment = textScale / 3.;
-
-        latLabels.clear();
-
-        for (double phi = 0; phi <= 90; phi += latstepDegrees) {
-            double angle = (90 - phi) * Math.PI / 180.;
-            String txt = formatter1.format(phi);
-
-            latLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size),
-                    (float) (Math.cos(angle) * size - verticalAdjustment), 0));
-            if (phi != 90) {
-                latLabels.add(new GridLabel(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment),
-                        (float) (Math.cos(angle) * size - verticalAdjustment), 0));
-            }
-        }
-        for (double phi = -latstepDegrees; phi >= -90; phi -= latstepDegrees) {
-            double angle = (90 - phi) * Math.PI / 180.;
-            String txt = formatter1.format(phi);
-
-            latLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size),
-                    (float) (Math.cos(angle) * size - verticalAdjustment), 0));
-            if (phi != -90) {
-                latLabels.add(new GridLabel(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment),
-                        (float) (Math.cos(angle) * size - verticalAdjustment), 0));
-            }
-        }
-    }
-
-    private void makeLonLabels() {
-        lonLabels.clear();
-
-        double size = Sun.Radius * 1.05;
-        for (double theta = 0; theta <= 180.; theta += lonstepDegrees) {
-            double angle = (90 - theta) * Math.PI / 180.;
-            String txt = formatter1.format(theta);
-            lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size),
-                    (float) theta));
-        }
-        for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
-            double angle = (90 - theta) * Math.PI / 180.;
-            String txt = gridType == GridType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
-            lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size),
-                    (float) theta));
-        }
-    }
-
     private void drawGridText(GL2 gl, int size) {
         TextRenderer renderer = GLText.getRenderer(size);
         // the scale factor has to be divided by the current font size
@@ -356,7 +277,7 @@ public class RenderableGrid extends AbstractRenderable {
     @Override
     public void init(GL2 gl) {
         gridLine.init(gl);
-        RenderableGridMath.initGrid(gl, gridLine, lonstepDegrees, latstepDegrees);
+        RenderableGridMath.initGrid(gl, gridLine, lonStep, latStep);
         gridNeedsInit = false;
 
         axesLine.init(gl);
@@ -402,23 +323,23 @@ public class RenderableGrid extends AbstractRenderable {
         return "Grid";
     }
 
-    public double getLonstepDegrees() {
-        return lonstepDegrees;
+    public double getLonStep() {
+        return lonStep;
     }
 
-    public void setLonstepDegrees(double _lonstepDegrees) {
-        lonstepDegrees = _lonstepDegrees;
-        makeLonLabels();
+    public void setLonStep(double _lonStep) {
+        lonStep = _lonStep;
+        lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
         gridNeedsInit = true;
     }
 
-    public double getLatstepDegrees() {
-        return latstepDegrees;
+    public double getLatStep() {
+        return latStep;
     }
 
-    public void setLatstepDegrees(double _latstepDegrees) {
-        latstepDegrees = _latstepDegrees;
-        makeLatLabels();
+    public void setLatStep(double _latStep) {
+        latStep = _latStep;
+        latLabels = GridLabel.makeLatLabels(latStep);
         gridNeedsInit = true;
     }
 
@@ -462,7 +383,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     void setGridType(GridType _gridType) {
         gridType = _gridType;
-        makeLonLabels();
+        lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
     }
 
 }
