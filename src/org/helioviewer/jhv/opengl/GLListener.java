@@ -120,7 +120,7 @@ public class GLListener implements GLEventListener {
         if (Displayer.mode == Displayer.DisplayMode.Polar) {
             GridScale.polar.set(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize());
         } else if (Displayer.mode == Displayer.DisplayMode.LogPolar) {
-            GridScale.logpolar.set(0, 360, 0.05, 0.5 * Layers.getLargestPhysicalSize());
+            GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * Layers.getLargestPhysicalSize()));
         }
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
