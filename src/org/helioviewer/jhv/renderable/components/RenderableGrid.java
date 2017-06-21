@@ -151,7 +151,7 @@ public class RenderableGrid extends AbstractRenderable {
         drawEarthCircles(gl, vp.aspect, Sun.getEarthQuat(camera.getViewpoint().time).orientation);
 
         if (showRadial) {
-            boolean far = camera.getViewpoint().distance > 100 * Sun.MeanEarthDistance ? true : false;
+            boolean far = camera.getViewpoint().distance > 100 * Sun.MeanEarthDistance;
             cameraMatrix = camera.getViewpoint().orientation.toMatrix();
             gl.glPushMatrix();
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
