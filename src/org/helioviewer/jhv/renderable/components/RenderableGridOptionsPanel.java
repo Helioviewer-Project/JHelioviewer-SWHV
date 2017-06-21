@@ -118,18 +118,18 @@ class RenderableGridOptionsPanel extends JPanel {
     }
 
     private void createGridResolutionX(RenderableGrid renderableGrid) {
-        gridResolutionXSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLonstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
+        gridResolutionXSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLonStep()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionXSpinner.addChangeListener(e -> {
-            grid.setLonstepDegrees((Double) gridResolutionXSpinner.getValue());
+            grid.setLonStep((Double) gridResolutionXSpinner.getValue());
             Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(gridResolutionXSpinner);
     }
 
     private void createGridResolutionY(RenderableGrid renderableGrid) {
-        gridResolutionYSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLatstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
+        gridResolutionYSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLatStep()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionYSpinner.addChangeListener(e -> {
-            grid.setLatstepDegrees((Double) gridResolutionYSpinner.getValue());
+            grid.setLatStep((Double) gridResolutionYSpinner.getValue());
             Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(gridResolutionYSpinner);
