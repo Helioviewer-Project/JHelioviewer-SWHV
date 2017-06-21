@@ -55,7 +55,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
 
-    private static boolean icons = true;
+    private boolean icons = true;
 
     public SWEKRenderable(JSONObject jo) {
         if (jo != null)
@@ -71,7 +71,7 @@ public class SWEKRenderable extends AbstractRenderable {
         jo.put("icons", icons);
     }
 
-    private static void bindTexture(GL2 gl, SWEKGroup group) {
+    private void bindTexture(GL2 gl, SWEKGroup group) {
         String key = group.getName();
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
@@ -90,7 +90,7 @@ public class SWEKRenderable extends AbstractRenderable {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private static void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q) {
+    private void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q) {
         gl.glBegin(GL2.GL_LINE_STRIP);
         {
             Vec3 v = new Vec3();
@@ -111,7 +111,7 @@ public class SWEKRenderable extends AbstractRenderable {
 
     private static final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
-    private static void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
+    private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
@@ -175,7 +175,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -220,7 +220,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -238,7 +238,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
+    private void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
         double width2 = width / 4.;
         double height2 = height / 4.;
 
@@ -258,7 +258,7 @@ public class SWEKRenderable extends AbstractRenderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private static void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
+    private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -276,7 +276,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale, Viewport vp) {
+    private void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale, Viewport vp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
         double speed = SWEKData.readCMESpeed(evt);
@@ -332,7 +332,7 @@ public class SWEKRenderable extends AbstractRenderable {
         }
     }
 
-    private static void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
+    private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
         y = -y;
 
         double width2 = width / 2.;
@@ -376,7 +376,7 @@ public class SWEKRenderable extends AbstractRenderable {
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private static void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
+    private void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<>();
         JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
         JHVEventParameter[] params = evt.getSimpleVisibleEventParameters();
@@ -492,8 +492,14 @@ public class SWEKRenderable extends AbstractRenderable {
         iconCacheId.clear();
     }
 
-    private static JPanel optionsPanel() {
+    private JPanel optionsPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
+        JCheckBox check = new JCheckBox("Icons", icons);
+        check.setHorizontalTextPosition(SwingConstants.LEFT);
+        check.addActionListener(e -> {
+            icons = !icons;
+            Displayer.display();
+        });
 
         GridBagConstraints c0 = new GridBagConstraints();
         c0.anchor = GridBagConstraints.CENTER;
@@ -501,13 +507,6 @@ public class SWEKRenderable extends AbstractRenderable {
         c0.weighty = 1.;
         c0.gridy = 0;
         c0.gridx = 0;
-
-        JCheckBox check = new JCheckBox("Icons", icons);
-        check.setHorizontalTextPosition(SwingConstants.LEFT);
-        check.addActionListener(e -> {
-            icons = !icons;
-            Displayer.display();
-        });
         panel.add(check, c0);
 
         ComponentUtils.smallVariant(panel);

@@ -1,11 +1,22 @@
 package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.math.Mat4;
@@ -19,13 +30,12 @@ import com.jogamp.opengl.GL2;
 
 public class RenderableMiniview extends AbstractRenderable implements LayersListener {
 
-    private final RenderableMiniviewOptionsPanel optionsPanel;
-
-    private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
-
     private static final int MIN_SCALE = 5;
     private static final int MAX_SCALE = 15;
     private int scale = 10;
+
+    private final JPanel optionsPanel;
+    private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
 
     @Override
     public void serialize(JSONObject jo) {
@@ -37,19 +47,14 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
             scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
         else
             setEnabled(true);
-        optionsPanel = new RenderableMiniviewOptionsPanel(this, scale, MIN_SCALE, MAX_SCALE);
+        optionsPanel = optionsPanel();
         reshapeViewport();
-    }
-
-    void setScale(int _scale) {
-        scale = _scale;
     }
 
     public void reshapeViewport() {
         int vpw = Displayer.fullViewport.width;
         int offset = (int) (vpw * 0.01);
         int size = (int) (vpw * 0.01 * scale);
-
         miniViewport = new Viewport(0, offset, offset, size, size);
     }
 
@@ -116,6 +121,33 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     public Viewport getViewport() {
         return miniViewport;
+    }
+
+    private JPanel optionsPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(scale), Double.valueOf(MIN_SCALE), Double.valueOf(MAX_SCALE), Double.valueOf(1)));
+        JFormattedTextField f = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+        f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%", MIN_SCALE, MAX_SCALE));
+        spinner.addChangeListener(e -> {
+            scale = ((Double) spinner.getValue()).intValue();
+            reshapeViewport();
+            Displayer.display();
+        });
+        WheelSupport.installMouseWheelSupport(spinner);
+
+        GridBagConstraints c0 = new GridBagConstraints();
+        c0.anchor = GridBagConstraints.EAST;
+        c0.weightx = 1.;
+        c0.weighty = 1.;
+        c0.gridy = 0;
+        c0.gridx = 0;
+        panel.add(new JLabel("Size", JLabel.RIGHT), c0);
+        c0.anchor = GridBagConstraints.WEST;
+        c0.gridx = 1;
+        panel.add(spinner, c0);
+
+        ComponentUtils.smallVariant(panel);
+        return panel;
     }
 
 }
