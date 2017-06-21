@@ -3,6 +3,7 @@ package org.helioviewer.jhv.display;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.base.scale.GridScale;
@@ -26,10 +27,13 @@ public class Displayer implements JHVEventHighlightListener {
 
         public final GLSLSolarShader shader;
         public final GridScale scale;
+        public final JRadioButtonMenuItem radio;
 
         DisplayMode(GLSLSolarShader _shader, GridScale _scale) {
             shader = _shader;
             scale = _scale;
+            radio = new JRadioButtonMenuItem(toString());
+            radio.addActionListener(e -> setProjectionMode(this));
         }
 
     }
@@ -37,7 +41,7 @@ public class Displayer implements JHVEventHighlightListener {
     public static DisplayMode mode = DisplayMode.Orthographic;
     public static boolean multiview = false;
 
-    public static void setMode(DisplayMode newMode) {
+    private static void setProjectionMode(DisplayMode newMode) {
         mode = newMode;
 
         // CameraHelper.zoomToFit(miniCamera);

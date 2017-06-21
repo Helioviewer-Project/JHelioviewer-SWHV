@@ -276,6 +276,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         main.put("time", Layers.getLastUpdatedTimestamp());
         main.put("play", Layers.isMoviePlaying());
         main.put("multiview", RenderableContainerPanel.multiview.isSelected());
+        main.put("projection", Displayer.mode);
 
         JSONArray ja = new JSONArray();
         for (Renderable renderable : renderables) {
@@ -418,6 +419,10 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         try {
             JSONObject data = JSONUtils.getJSONFile(stateFile);
             RenderableContainerPanel.multiview.setSelected(data.optBoolean("multiview", false));
+            try {
+                Displayer.DisplayMode.valueOf(data.optString("projection")).radio.doClick();
+            } catch (Exception ignore) {
+            }
             loadTimelines(data);
             loadRenderables(data);
             JSONObject plugins = data.optJSONObject("plugins");

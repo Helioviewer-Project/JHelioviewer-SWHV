@@ -213,12 +213,10 @@ public class TopToolBar extends JToolBar {
         JPopupMenu projectionPopup = new JPopupMenu();
         ButtonGroup projectionGroup = new ButtonGroup();
         for (Displayer.DisplayMode el : Displayer.DisplayMode.values()) {
-            JRadioButtonMenuItem projectionItem = new JRadioButtonMenuItem(el.toString());
             if (el == Displayer.DisplayMode.Orthographic)
-                projectionItem.setSelected(true);
-            projectionItem.addActionListener(e -> Displayer.setMode(el));
-            projectionPopup.add(projectionItem);
-            projectionGroup.add(projectionItem);
+                el.radio.setSelected(true);
+            projectionPopup.add(el.radio);
+            projectionGroup.add(el.radio);
         }
 
         projectionButton.addMouseListener(new MouseAdapter() {
