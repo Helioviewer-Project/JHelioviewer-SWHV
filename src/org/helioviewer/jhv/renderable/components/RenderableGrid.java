@@ -28,16 +28,18 @@ public class RenderableGrid extends AbstractRenderable {
         Viewpoint, Stonyhurst, Carrington, HCI
     }
 
-    private static final double RADIAL_UNIT = Sun.Radius /*Sun.MeanEarthDistance / 10*/;
-    private static final double RADIAL_STEP = 15 /*45*/;
+    private static final double RADIAL_UNIT = Sun.Radius;
+    private static final double RADIAL_STEP = 15;
+    private static final double RADIAL_UNIT_FAR = Sun.MeanEarthDistance / 10;
+    private static final double RADIAL_STEP_FAR = 45;
+    private static final float[] R_LABEL_POS = { (float) (2 * RADIAL_UNIT), (float) (8 * RADIAL_UNIT), (float) (24 * RADIAL_UNIT) };
+    private static final float[] R_LABEL_POS_FAR = { (float) (2 * RADIAL_UNIT_FAR), (float) (8 * RADIAL_UNIT_FAR), (float) (24 * RADIAL_UNIT_FAR) };
 
     // height of text in solar radii
     private static final float textScale = (float) (0.08 * Sun.Radius);
     private static final double thickness = 0.001;
     private static final double thicknessEarth = 0.0015;
     private static final double thicknessAxes = 0.003;
-
-    private static final float[] R_LABEL_POS = { (float) (2 * RADIAL_UNIT), (float) (8 * RADIAL_UNIT), (float) (24 * RADIAL_UNIT) };
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
@@ -56,12 +58,15 @@ public class RenderableGrid extends AbstractRenderable {
     private final GLLine earthCircleLine = new GLLine();
     private final GLLine radialCircleLine = new GLLine();
     private final GLLine radialThickLine = new GLLine();
+    private final GLLine radialCircleLineFar = new GLLine();
+    private final GLLine radialThickLineFar = new GLLine();
     private final GLLine flatLine = new GLLine();
     private final GLLine gridLine = new GLLine();
 
     private final ArrayList<GridLabel> latLabels = new ArrayList<>();
     private final ArrayList<GridLabel> lonLabels = new ArrayList<>();
     private final ArrayList<GridLabel> radialLabels;
+    private final ArrayList<GridLabel> radialLabelsFar;
 
     private final Component optionsPanel;
 
@@ -98,7 +103,8 @@ public class RenderableGrid extends AbstractRenderable {
         optionsPanel = new RenderableGridOptionsPanel(this);
         makeLatLabels();
         makeLonLabels();
-        radialLabels = makeRadialLabels(0);
+        radialLabels = makeRadialLabels(0, RADIAL_STEP);
+        radialLabelsFar = makeRadialLabels(Math.PI / 2, RADIAL_STEP_FAR);
     }
 
     public Vec2 gridPoint(Camera camera, Viewport vp, int x, int y) {
@@ -146,14 +152,23 @@ public class RenderableGrid extends AbstractRenderable {
         drawEarthCircles(gl, vp.aspect, Sun.getEarthQuat(camera.getViewpoint().time).orientation);
 
         if (showRadial) {
+            boolean far = camera.getViewpoint().distance > 100 * Sun.MeanEarthDistance ? true : false;
             cameraMatrix = camera.getViewpoint().orientation.toMatrix();
             gl.glPushMatrix();
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
             {
-                radialCircleLine.render(gl, vp.aspect, thickness);
-                radialThickLine.render(gl, vp.aspect, 3 * thickness);
+                if (far) {
+                    radialCircleLineFar.render(gl, vp.aspect, thickness);
+                    radialThickLineFar.render(gl, vp.aspect, 3 * thickness);
+                } else {
+                    radialCircleLine.render(gl, vp.aspect, thickness);
+                    radialThickLine.render(gl, vp.aspect, 3 * thickness);
+                }
                 if (showLabels) {
-                    drawRadialGridText(gl, pixelsPerSolarRadius * RADIAL_UNIT);
+                    if (far)
+                        drawRadialGridText(gl, radialLabelsFar, pixelsPerSolarRadius * RADIAL_UNIT_FAR, R_LABEL_POS_FAR);
+                    else
+                        drawRadialGridText(gl, radialLabels, pixelsPerSolarRadius * RADIAL_UNIT, R_LABEL_POS);
                 }
             }
             gl.glPopMatrix();
@@ -215,15 +230,15 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glPopMatrix();
     }
 
-    private void drawRadialGridText(GL2 gl, double size) {
+    private void drawRadialGridText(GL2 gl, ArrayList<GridLabel> labels, double size, float[] labelPos) {
         gl.glDisable(GL2.GL_CULL_FACE);
 
         float fuzz = 0.75f;
-        for (float rsize : R_LABEL_POS) {
+        for (float rsize : labelPos) {
             TextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             float textScaleFactor = textScale / renderer.getFont().getSize2D();
             renderer.begin3DRendering();
-            for (GridLabel label : radialLabels) {
+            for (GridLabel label : labels) {
                 renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, 0, fuzz * rsize * textScaleFactor);
             }
             renderer.end3DRendering();
@@ -246,13 +261,13 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private ArrayList<GridLabel> makeRadialLabels(double delta) {
+    private ArrayList<GridLabel> makeRadialLabels(double delta, double radialStep) {
         double size = Sun.Radius;
         double horizontalAdjustment = textScale / 2.;
         double verticalAdjustment = textScale / 3.;
 
         ArrayList<GridLabel> labels = new ArrayList<>();
-        for (double phi = 0; phi < 360; phi += RADIAL_STEP) {
+        for (double phi = 0; phi < 360; phi += radialStep) {
             double angle = -phi * Math.PI / 180. + delta;
             String txt = formatter1.format(phi);
             labels.add(new GridLabel(txt, (float) (Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
@@ -353,6 +368,9 @@ public class RenderableGrid extends AbstractRenderable {
         radialCircleLine.init(gl);
         radialThickLine.init(gl);
         RenderableGridMath.initRadialCircles(gl, radialCircleLine, radialThickLine, RADIAL_UNIT, RADIAL_STEP);
+        radialCircleLineFar.init(gl);
+        radialThickLineFar.init(gl);
+        RenderableGridMath.initRadialCircles(gl, radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
 
         flatLine.init(gl);
     }
@@ -364,6 +382,8 @@ public class RenderableGrid extends AbstractRenderable {
         earthCircleLine.dispose(gl);
         radialCircleLine.dispose(gl);
         radialThickLine.dispose(gl);
+        radialCircleLineFar.dispose(gl);
+        radialThickLineFar.dispose(gl);
         flatLine.dispose(gl);
     }
 
