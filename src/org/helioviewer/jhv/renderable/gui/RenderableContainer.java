@@ -399,8 +399,12 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         for (Object o : rja) {
             if (o instanceof JSONObject) {
                 JSONObject jo = (JSONObject) o;
+                JSONObject jd = jo.optJSONObject("data");
+                if (jd == null)
+                    continue;
+
                 try {
-                    ImageLayer layer = ImageLayer.createImageLayer(jo.optJSONObject("data"));
+                    ImageLayer layer = ImageLayer.createImageLayer(jd);
                     newlist.add(layer);
                     layer.setEnabled(jo.optBoolean("enabled", false)); // pointless
                     if (jo.optBoolean("master", false))
