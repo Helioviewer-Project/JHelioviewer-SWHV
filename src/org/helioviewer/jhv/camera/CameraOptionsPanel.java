@@ -28,7 +28,15 @@ import com.jidesoft.swing.JideButton;
 public class CameraOptionsPanel extends JPanel {
 
     private enum CameraMode {
-        Observer, Earth, Equatorial, Other
+        Observer, Earth, Equatorial, Other;
+
+        final JRadioButton radio;
+
+        CameraMode() {
+            radio = new JRadioButton(toString());
+            radio.setActionCommand(toString());
+        }
+
     }
 
     private double fovAngle = Camera.INITFOV / Math.PI * 180;
@@ -57,47 +65,20 @@ public class CameraOptionsPanel extends JPanel {
         c.gridx = 0;
         c.gridy = 0;
 
-        CameraMode defaultMode = CameraMode.Observer;
-        double fovMin = 0, fovMax = 180;
-        JSONObject joExpert = null;
-        JSONObject joEquatorial = null;
-        if (jo != null) {
-            fovAngle = MathUtils.clip(jo.optDouble("fovAngle", fovAngle), fovMin, fovMax);
-            String strMode = jo.optString("mode", defaultMode.toString());
-            try {
-                defaultMode = CameraMode.valueOf(strMode);
-            } catch (Exception ignore) {
-            }
-            JSONObject jc = jo.optJSONObject("camera");
-            if (jc != null)
-                Displayer.getCamera().fromJson(jc);
-
-            joExpert = jo.optJSONObject("expert");
-            joEquatorial = jo.optJSONObject("equatorial");
-        }
-
-        expertOptionPanel = new CameraOptionPanelExpert(joExpert, UpdateViewpoint.expert, "HEEQ", true);
-        equatorialOptionPanel = new CameraOptionPanelExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
-
-        JPanel radio = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
-        radio.add(new JLabel("View", JLabel.RIGHT));
+        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+        radioPanel.add(new JLabel("View", JLabel.RIGHT));
         for (CameraMode mode : CameraMode.values()) {
-            JRadioButton item = new JRadioButton(mode.toString());
-            item.addActionListener(e -> {
-                changeCamera(mode);
-                Displayer.getCamera().reset();
-                Displayer.getMiniCamera().reset();
+            JRadioButton radio = mode.radio;
+            if (mode == CameraMode.Observer)
+                radio.setSelected(true);
+            radio.addItemListener(e -> {
+                if (radio.isSelected())
+                    changeCamera(mode);
             });
-            item.setActionCommand(mode.toString());
-            radio.add(item);
-            modeGroup.add(item);
-
-            if (mode == defaultMode) {
-                modeGroup.setSelected(item.getModel(), true);
-                changeCamera(mode);
-            }
+            radioPanel.add(radio);
+            modeGroup.add(radio);
         }
-        add(radio, c);
+        add(radioPanel, c);
 
         JideButton info = new JideButton(Buttons.info);
         info.setToolTipText("Show viewpoint info");
@@ -106,6 +87,28 @@ public class CameraOptionsPanel extends JPanel {
         c.gridx = 1;
         c.weightx = 0;
         add(info, c);
+
+        // create panels before potential camera change
+        JSONObject joExpert = null;
+        JSONObject joEquatorial = null;
+        if (jo != null) {
+            joExpert = jo.optJSONObject("expert");
+            joEquatorial = jo.optJSONObject("equatorial");
+        }
+        expertOptionPanel = new CameraOptionPanelExpert(joExpert, UpdateViewpoint.expert, "HEEQ", true);
+        equatorialOptionPanel = new CameraOptionPanelExpert(joEquatorial, UpdateViewpoint.equatorial, "HEEQ", false);
+
+        double fovMin = 0, fovMax = 180;
+        if (jo != null) {
+            fovAngle = MathUtils.clip(jo.optDouble("fovAngle", fovAngle), fovMin, fovMax);
+            try {
+                CameraMode.valueOf(jo.optString("mode")).radio.setSelected(true);
+            } catch (Exception ignore) {
+            }
+            JSONObject jc = jo.optJSONObject("camera");
+            if (jc != null)
+                Displayer.getCamera().fromJson(jc);
+        }
 
         JPanel fovPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
         fovPanel.add(new JLabel("FOV angle", JLabel.RIGHT));
@@ -189,6 +192,8 @@ public class CameraOptionsPanel extends JPanel {
                 update = UpdateViewpoint.observer;
         }
         Displayer.setViewpointUpdate(update);
+        Displayer.getCamera().reset();
+        Displayer.getMiniCamera().reset();
         switchOptionsPanel(panel);
     }
 
