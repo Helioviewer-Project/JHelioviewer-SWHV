@@ -216,7 +216,7 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
             ImageViewerGui.getInputController().addPlugin(this);
         else {
             ImageViewerGui.getInputController().removePlugin(this);
-            optionsPanel.reset();
+            optionsPanel.resetViewpoint();
         }
     }
 

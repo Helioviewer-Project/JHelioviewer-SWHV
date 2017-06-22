@@ -134,7 +134,7 @@ public class CameraOptionsPanel extends JPanel {
         ComponentUtils.smallVariant(this);
     }
 
-    public void reset() {
+    public void resetViewpoint() {
         CameraMode.Observer.radio.setSelected(true);
     }
 
