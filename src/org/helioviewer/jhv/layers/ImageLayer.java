@@ -47,8 +47,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private static final String loading = "Loading...";
 
-    public static ImageLayer createImageLayer() {
-        ImageLayer imageLayer = new ImageLayer();
+    public static ImageLayer createImageLayer(JSONObject jo) {
+        ImageLayer imageLayer = new ImageLayer(jo);
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
         return imageLayer;
     }
@@ -62,14 +62,16 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
     }
 
-    public ImageLayer(JSONObject jo) {
-        JSONObject apiRequest = jo.optJSONObject("APIRequest");
-        if (apiRequest != null) {
-            load(APIRequest.fromJson(apiRequest));
+    private ImageLayer(JSONObject jo) {
+        if (jo != null) {
+            JSONObject apiRequest = jo.optJSONObject("APIRequest");
+            if (apiRequest != null) {
+                load(APIRequest.fromJson(apiRequest));
 
-            JSONObject imageParams = jo.optJSONObject("imageParams");
-            if (imageParams != null)
-                glImage.fromJson(imageParams);
+                JSONObject imageParams = jo.optJSONObject("imageParams");
+                if (imageParams != null)
+                    glImage.fromJson(imageParams);
+            }
         }
         optionsPanel = new ImageLayerOptions(this);
     }
@@ -91,10 +93,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             worker = null;
             Displayer.display();
         }
-    }
-
-    private ImageLayer() {
-        optionsPanel = new ImageLayerOptions(this);
     }
 
     @Override

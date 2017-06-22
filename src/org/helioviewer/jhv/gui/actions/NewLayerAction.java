@@ -24,7 +24,7 @@ public class NewLayerAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ObservationDialog.getInstance().showDialog(true, ImageLayer.createImageLayer());
+        ObservationDialog.getInstance().showDialog(true, ImageLayer.createImageLayer(null));
     }
 
 }

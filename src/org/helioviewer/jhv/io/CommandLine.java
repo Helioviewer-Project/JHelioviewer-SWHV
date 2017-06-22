@@ -27,7 +27,7 @@ public class CommandLine {
     public static void load() {
         // -load
         for (URI uri : getURIOptionValues("load")) {
-            JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(), uri));
+            JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(null), uri));
         }
         // -state
         for (String file : getOptionValues("state")) {
@@ -40,7 +40,7 @@ public class CommandLine {
     public static void loadRequest() {
         // -request: works only for default server
         for (URI uri : getURIOptionValues("request")) {
-            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.createImageLayer(), uri));
+            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.createImageLayer(null), uri));
         }
     }
 

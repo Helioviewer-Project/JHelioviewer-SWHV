@@ -53,7 +53,7 @@ public class OpenLocalFileAction extends AbstractAction {
             for (File fileName : fileNames) {
                 if (fileName.isFile()) {
                     URI uri = fileName.toURI();
-                    LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(), uri);
+                    LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(null), uri);
                     JHVGlobals.getExecutorService().execute(uriTask);
                 }
             }
