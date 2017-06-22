@@ -69,6 +69,8 @@ public class ImageViewerGui {
     private static InteractionAnnotate annotateInteraction;
     private static Interaction currentInteraction;
 
+    private static TopToolBar toolBar;
+
     public static JFrame prepareGui() {
         mainFrame = createMainFrame();
         mainFrame.setJMenuBar(new MenuBar());
@@ -125,7 +127,8 @@ public class ImageViewerGui {
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
 
-        mainFrame.add(new TopToolBar(), BorderLayout.PAGE_START);
+        toolBar = new TopToolBar();
+        mainFrame.add(toolBar, BorderLayout.PAGE_START);
         mainFrame.add(midSplitPane, BorderLayout.CENTER);
         mainFrame.add(statusPanel, BorderLayout.PAGE_END);
 
@@ -241,6 +244,10 @@ public class ImageViewerGui {
 
     public static InteractionAnnotate getAnnotateInteraction() {
         return annotateInteraction;
+    }
+
+    public static TopToolBar getToolBar() {
+        return toolBar;
     }
 
 }

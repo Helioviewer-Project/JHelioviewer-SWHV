@@ -19,6 +19,7 @@ import org.helioviewer.jhv.camera.Camera;
 // import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
@@ -277,6 +278,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         main.put("play", Layers.isMoviePlaying());
         main.put("multiview", RenderableContainerPanel.multiview.isSelected());
         main.put("projection", Displayer.mode);
+        main.put("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
+        main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
 
         JSONArray ja = new JSONArray();
         for (Renderable renderable : renderables) {
@@ -411,10 +414,12 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
 
+        ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", true));
         JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), System.currentTimeMillis()));
         boolean multiview = data.optBoolean("multiview", false);
+        boolean tracking = data.optBoolean("tracking", false);
         boolean play = data.optBoolean("play", false);
-        LoadState loadStateTask = new LoadState(newlist, masterRenderable, time, multiview, play);
+        LoadState loadStateTask = new LoadState(newlist, masterRenderable, time, multiview, tracking, play);
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
@@ -444,13 +449,15 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         private final Renderable master;
         private final JHVDate time;
         private final boolean multiview;
+        private final boolean tracking;
         private final boolean play;
 
-        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, JHVDate _time, boolean _multiview, boolean _play) {
+        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, JHVDate _time, boolean _multiview, boolean _tracking, boolean _play) {
             newlist = _newlist;
             master = _master;
             time = _time;
             multiview = _multiview;
+            tracking = _tracking;
             play = _play;
         }
 
@@ -487,6 +494,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
             Layers.setTime(time);
             RenderableContainerPanel.multiview.setSelected(multiview);
+            ImageViewerGui.getToolBar().getTrackingButton().setSelected(tracking);
             if (play)
                 Layers.playMovie();
             // CameraHelper.zoomToFit(Displayer.getMiniCamera()); // funky
