@@ -414,10 +414,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
 
-        try {
-            Displayer.DisplayMode.valueOf(data.optString("projection")).radio.doClick();
-        } catch (Exception ignore) {
-        }
         ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected()));
         JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Layers.getLastUpdatedTimestamp().milli));
         boolean multiview = data.optBoolean("multiview", RenderableContainerPanel.multiview.isSelected());
@@ -430,6 +426,11 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void loadScene(String stateFile) {
         try {
             JSONObject data = JSONUtils.getJSONFile(stateFile);
+            // to be loaded before viewpoint
+            try {
+                Displayer.DisplayMode.valueOf(data.optString("projection")).radio.doClick();
+            } catch (Exception ignore) {
+            }
             loadTimelines(data);
             loadRenderables(data);
             JSONObject plugins = data.optJSONObject("plugins");

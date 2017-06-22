@@ -13,7 +13,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Displayer;
