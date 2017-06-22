@@ -414,10 +414,14 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
 
-        ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", true));
-        JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), System.currentTimeMillis()));
-        boolean multiview = data.optBoolean("multiview", false);
-        boolean tracking = data.optBoolean("tracking", false);
+        try {
+            Displayer.DisplayMode.valueOf(data.optString("projection")).radio.doClick();
+        } catch (Exception ignore) {
+        }
+        ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected()));
+        JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Layers.getLastUpdatedTimestamp().milli));
+        boolean multiview = data.optBoolean("multiview", RenderableContainerPanel.multiview.isSelected());
+        boolean tracking = data.optBoolean("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
         LoadState loadStateTask = new LoadState(newlist, masterRenderable, time, multiview, tracking, play);
         JHVGlobals.getExecutorService().execute(loadStateTask);
@@ -426,10 +430,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void loadScene(String stateFile) {
         try {
             JSONObject data = JSONUtils.getJSONFile(stateFile);
-            try {
-                Displayer.DisplayMode.valueOf(data.optString("projection")).radio.doClick();
-            } catch (Exception ignore) {
-            }
             loadTimelines(data);
             loadRenderables(data);
             JSONObject plugins = data.optJSONObject("plugins");
