@@ -381,11 +381,9 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         return imageData.getAutoBrightness();
     }
 
-    @Override
     public boolean isLoadedForState() {
-        if (view == null) {
+        if (view == null)
             return worker == null;
-        }
         return view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
     }
 

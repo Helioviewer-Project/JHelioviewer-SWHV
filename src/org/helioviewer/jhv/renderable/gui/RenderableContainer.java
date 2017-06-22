@@ -392,8 +392,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
 
-        ArrayList<Renderable> newlist = new ArrayList<>();
-        Renderable masterRenderable = null;
+        ArrayList<ImageLayer> newlist = new ArrayList<>();
+        ImageLayer masterLayer = null;
 
         rja = data.getJSONArray("imageLayers");
         for (Object o : rja) {
@@ -401,12 +401,12 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 JSONObject jo = (JSONObject) o;
                 try {
                     Object obj = json2Object(jo);
-                    if (obj instanceof Renderable) {
-                        Renderable renderable = (Renderable) obj;
-                        newlist.add(renderable);
-                        renderable.setEnabled(jo.optBoolean("enabled", false));
+                    if (obj instanceof ImageLayer) {
+                        ImageLayer layer = (ImageLayer) obj;
+                        newlist.add(layer);
+                        layer.setEnabled(jo.optBoolean("enabled", false));
                         if (jo.optBoolean("master", false))
-                            masterRenderable = renderable;
+                            masterLayer = layer;
                     }
                 } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
@@ -419,7 +419,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         boolean multiview = data.optBoolean("multiview", RenderableContainerPanel.multiview.isSelected());
         boolean tracking = data.optBoolean("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
-        LoadState loadStateTask = new LoadState(newlist, masterRenderable, time, multiview, tracking, play);
+        LoadState loadStateTask = new LoadState(newlist, masterLayer, time, multiview, tracking, play);
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
@@ -446,14 +446,14 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     private class LoadState extends JHVWorker<Void, Void> {
-        private final ArrayList<Renderable> newlist;
-        private final Renderable master;
+        private final ArrayList<ImageLayer> newlist;
+        private final ImageLayer master;
         private final JHVDate time;
         private final boolean multiview;
         private final boolean tracking;
         private final boolean play;
 
-        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, JHVDate _time, boolean _multiview, boolean _tracking, boolean _play) {
+        public LoadState(ArrayList<ImageLayer> _newlist, ImageLayer _master, JHVDate _time, boolean _multiview, boolean _tracking, boolean _play) {
             newlist = _newlist;
             master = _master;
             time = _time;
@@ -464,8 +464,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
         @Override
         protected Void backgroundWork() {
-            for (Renderable renderable : newlist) {
-                while (!renderable.isLoadedForState()) {
+            for (ImageLayer layer : newlist) {
+                while (!layer.isLoadedForState()) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -481,14 +481,11 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             if (isCancelled())
                 return;
 
-            for (Renderable renderable : newlist) {
-                addBeforeRenderable(renderable);
-                if (renderable instanceof ImageLayer) {
-                    ImageLayer layer = (ImageLayer) renderable;
-                    layer.unload(); // prune failed layers
-                    if (layer == master)
-                        layer.setActiveImageLayer();
-                }
+            for (ImageLayer layer : newlist) {
+                addBeforeRenderable(layer);
+                layer.unload(); // prune failed layers
+                if (layer == master)
+                    layer.setActiveImageLayer();
             }
             if (Displayer.multiview) {
                 arrangeMultiView(true);
