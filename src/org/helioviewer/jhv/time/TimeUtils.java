@@ -7,12 +7,9 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import org.everit.json.schema.FormatValidator;
-import org.jetbrains.annotations.NotNull;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 public class TimeUtils {
@@ -70,15 +67,11 @@ public class TimeUtils {
         return LocalTime.parse(date, DateTimeFormatter.ISO_LOCAL_TIME).toSecondOfDay() * 1000L;
     }
 
-    public static long optParse(String date, @NotNull String alt) {
+    public static long optParse(String date, long alt) {
         try {
             return prettyParser.parse(date).get(0).getTime() / 1000 * 1000;
         } catch (Exception e) {
-            List<Date> dates = prettyParser.parse(alt);
-            if (dates.isEmpty())
-                return EPOCH.milli;
-            else
-                return dates.get(0).getTime() / 1000 * 1000;
+            return alt;
         }
     }
 

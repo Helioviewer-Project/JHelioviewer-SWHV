@@ -42,8 +42,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             ja = jo.optJSONArray("objects");
             sync = jo.optBoolean("syncInterval", sync);
             if (!sync) {
-                start = TimeUtils.optParse(jo.optString("startTime"), "2 days ago");
-                end = TimeUtils.optParse(jo.optString("endTime"), "now");
+                start = TimeUtils.optParse(jo.optString("startTime"), System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS);
+                end = TimeUtils.optParse(jo.optString("endTime"), System.currentTimeMillis());
             }
         }
         if (ja == null)

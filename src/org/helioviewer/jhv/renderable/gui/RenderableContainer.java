@@ -411,7 +411,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
 
-        JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), "now"));
+        JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), System.currentTimeMillis()));
         boolean multiview = data.optBoolean("multiview", false);
         boolean play = data.optBoolean("play", false);
         LoadState loadStateTask = new LoadState(newlist, masterRenderable, time, multiview, play);
