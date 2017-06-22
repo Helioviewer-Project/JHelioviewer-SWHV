@@ -50,16 +50,6 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         }
     }
 
-    /**
-     * Creates a leaf of the tree. This leaf will be a panel with the name of
-     * the leaf and a checkbox indicating whether the leaf was selected or not.
-     *
-     * @param name
-     *            The name of the leaf
-     * @param whatToDisplay
-     *            What to be displayed
-     * @return The panel to be placed in the tree
-     */
     private static JPanel createLeaf(SWEKTreeModelElement element, Color back) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
