@@ -22,7 +22,7 @@ public class Camera {
     private Quat currentDragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
-    private boolean trackingMode;
+    private boolean tracking;
 
     private Position.Q viewpoint = Sun.EpochEarthQ;
 
@@ -95,13 +95,15 @@ public class Camera {
         return fov;
     }
 
-    public void setTrackingMode(boolean _trackingMode) {
-        trackingMode = _trackingMode;
-        refresh();
+    public void setTrackingMode(boolean _tracking) {
+        if (tracking != _tracking) {
+            tracking = _tracking;
+            refresh();
+        }
     }
 
     public boolean getTrackingMode() {
-        return trackingMode;
+        return tracking;
     }
 
     public double getWidth() {
@@ -113,7 +115,7 @@ public class Camera {
     }
 
     public void timeChanged(JHVDate date) {
-        if (!trackingMode) {
+        if (!tracking) {
             updateCamera(date);
         }
     }
