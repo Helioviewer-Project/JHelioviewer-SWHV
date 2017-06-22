@@ -109,6 +109,17 @@ public class TopToolBar extends JToolBar {
         setDisplayMode(displayMode);
     }
 
+    private JideToggleButton coronaButton;
+    private JideToggleButton trackingButton;
+
+    public JideToggleButton getShowCoronaButton() {
+        return coronaButton;
+    }
+
+    public JideToggleButton getTrackingButton() {
+        return trackingButton;
+    }
+
     private void createNewToolBar() {
         InteractionMode interactionMode = InteractionMode.ROTATE;
         try {
@@ -191,14 +202,14 @@ public class TopToolBar extends JToolBar {
 
         add(new JToolBar.Separator(dim));
 
-        JideToggleButton trackButton = toolToggleButton(ButtonText.TRACK);
-        trackButton.setSelected(Displayer.getCamera().getTrackingMode());
-        trackButton.addActionListener(e -> Displayer.getCamera().setTrackingMode(trackButton.isSelected()));
-        addButton(trackButton);
+        trackingButton = toolToggleButton(ButtonText.TRACK);
+        trackingButton.setSelected(Displayer.getCamera().getTrackingMode());
+        trackingButton.addItemListener(e -> Displayer.getCamera().setTrackingMode(trackingButton.isSelected()));
+        addButton(trackingButton);
 
-        JideToggleButton coronaButton = toolToggleButton(ButtonText.OFFDISK);
+        coronaButton = toolToggleButton(ButtonText.OFFDISK);
         coronaButton.setSelected(Displayer.getShowCorona());
-        coronaButton.addActionListener(e -> {
+        coronaButton.addItemListener(e -> {
             Displayer.setShowCorona(coronaButton.isSelected());
             Displayer.display();
         });
