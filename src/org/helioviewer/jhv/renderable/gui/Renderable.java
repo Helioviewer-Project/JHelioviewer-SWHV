@@ -50,6 +50,4 @@ public interface Renderable {
 
     void serialize(JSONObject jo);
 
-    boolean isLoadedForState();
-
 }
