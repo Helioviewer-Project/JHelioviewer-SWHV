@@ -18,7 +18,7 @@ class GridLabel {
     final float y;
     final float theta;
 
-    GridLabel(String _txt, float _x, float _y, float _theta) {
+    private GridLabel(String _txt, float _x, float _y, float _theta) {
         txt = _txt;
         x = _x;
         y = _y;

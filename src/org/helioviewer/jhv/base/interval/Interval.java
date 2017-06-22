@@ -98,7 +98,7 @@ public class Interval implements Comparable<Interval> {
 
     @Override
     public int compareTo(@NotNull Interval o) {
-        return start < o.start ? -1 : (start > o.start ? 1 : 0);
+        return Long.compare(start, o.start);
     }
 
 }

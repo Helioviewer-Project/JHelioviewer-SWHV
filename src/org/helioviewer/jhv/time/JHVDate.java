@@ -20,7 +20,7 @@ public class JHVDate implements Comparable<JHVDate> {
 
     @Override
     public int compareTo(@NotNull JHVDate dt) {
-        return milli < dt.milli ? -1 : (milli > dt.milli ? +1 : 0);
+        return Long.compare(milli, dt.milli);
     }
 
     @Override
