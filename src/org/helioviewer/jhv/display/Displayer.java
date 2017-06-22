@@ -43,10 +43,8 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static void setProjectionMode(DisplayMode newMode) {
         mode = newMode;
-
         // CameraHelper.zoomToFit(miniCamera);
         // ImageViewerGui.getRenderableMiniview().getCamera().reset();
-
         camera.reset();
     }
 
@@ -222,8 +220,8 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static boolean showCorona = true;
 
-    public static void toggleShowCorona() {
-        showCorona = !showCorona;
+    public static void setShowCorona(boolean _showCorona) {
+        showCorona = _showCorona;
     }
 
     public static boolean getShowCorona() {

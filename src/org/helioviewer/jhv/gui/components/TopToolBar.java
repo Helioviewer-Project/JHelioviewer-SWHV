@@ -192,15 +192,14 @@ public class TopToolBar extends JToolBar {
         add(new JToolBar.Separator(dim));
 
         JideToggleButton trackButton = toolToggleButton(ButtonText.TRACK);
-        trackButton.addActionListener(e -> {
-            Camera camera = Displayer.getCamera();
-            camera.setTrackingMode(!camera.getTrackingMode());
-        });
+        trackButton.setSelected(Displayer.getCamera().getTrackingMode());
+        trackButton.addActionListener(e -> Displayer.getCamera().setTrackingMode(trackButton.isSelected()));
         addButton(trackButton);
 
         JideToggleButton coronaButton = toolToggleButton(ButtonText.OFFDISK);
+        coronaButton.setSelected(Displayer.getShowCorona());
         coronaButton.addActionListener(e -> {
-            Displayer.toggleShowCorona();
+            Displayer.setShowCorona(coronaButton.isSelected());
             Displayer.display();
         });
         addButton(coronaButton);
