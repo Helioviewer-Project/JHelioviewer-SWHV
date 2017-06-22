@@ -411,14 +411,16 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
 
-        LoadState loadStateTask = new LoadState(newlist, masterRenderable, new JHVDate(TimeUtils.optParse(data.optString("time"), "now")), data.optBoolean("play", false));
+        JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), "now"));
+        boolean multiview = data.optBoolean("multiview", false);
+        boolean play = data.optBoolean("play", false);
+        LoadState loadStateTask = new LoadState(newlist, masterRenderable, time, multiview, play);
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
     public void loadScene(String stateFile) {
         try {
             JSONObject data = JSONUtils.getJSONFile(stateFile);
-            RenderableContainerPanel.multiview.setSelected(data.optBoolean("multiview", false));
             try {
                 Displayer.DisplayMode.valueOf(data.optString("projection")).radio.doClick();
             } catch (Exception ignore) {
@@ -441,12 +443,14 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         private final ArrayList<Renderable> newlist;
         private final Renderable master;
         private final JHVDate time;
+        private final boolean multiview;
         private final boolean play;
 
-        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, JHVDate _time, boolean _play) {
+        public LoadState(ArrayList<Renderable> _newlist, Renderable _master, JHVDate _time, boolean _multiview, boolean _play) {
             newlist = _newlist;
             master = _master;
             time = _time;
+            multiview = _multiview;
             play = _play;
         }
 
@@ -482,6 +486,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                 arrangeMultiView(true);
             }
             Layers.setTime(time);
+            RenderableContainerPanel.multiview.setSelected(multiview);
             if (play)
                 Layers.playMovie();
             // CameraHelper.zoomToFit(Displayer.getMiniCamera()); // funky
