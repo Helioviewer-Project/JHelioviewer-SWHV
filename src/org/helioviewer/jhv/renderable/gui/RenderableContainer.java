@@ -394,7 +394,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
         ArrayList<ImageLayer> newlist = new ArrayList<>();
         ImageLayer masterLayer = null;
-
         rja = data.getJSONArray("imageLayers");
         for (Object o : rja) {
             if (o instanceof JSONObject) {
@@ -415,12 +414,15 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             }
         }
 
+        if (masterLayer != null)
+            masterLayer.setActiveImageLayer();
+        RenderableContainerPanel.multiview.setSelected(data.optBoolean("multiview", RenderableContainerPanel.multiview.isSelected()));
         ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected()));
+
         JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Layers.getLastUpdatedTimestamp().milli));
-        boolean multiview = data.optBoolean("multiview", RenderableContainerPanel.multiview.isSelected());
         boolean tracking = data.optBoolean("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
-        LoadState loadStateTask = new LoadState(newlist, masterLayer, time, multiview, tracking, play);
+        LoadState loadStateTask = new LoadState(newlist, time, tracking, play);
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
@@ -448,17 +450,13 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     private class LoadState extends JHVWorker<Void, Void> {
         private final ArrayList<ImageLayer> newlist;
-        private final ImageLayer master;
         private final JHVDate time;
-        private final boolean multiview;
         private final boolean tracking;
         private final boolean play;
 
-        public LoadState(ArrayList<ImageLayer> _newlist, ImageLayer _master, JHVDate _time, boolean _multiview, boolean _tracking, boolean _play) {
+        public LoadState(ArrayList<ImageLayer> _newlist, JHVDate _time, boolean _tracking, boolean _play) {
             newlist = _newlist;
-            master = _master;
             time = _time;
-            multiview = _multiview;
             tracking = _tracking;
             play = _play;
         }
@@ -484,14 +482,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
             for (ImageLayer layer : newlist) {
                 layer.unload(); // prune failed layers
-                if (layer == master)
-                    layer.setActiveImageLayer();
-            }
-            if (Displayer.multiview) {
-                arrangeMultiView(true);
             }
             Layers.setTime(time);
-            RenderableContainerPanel.multiview.setSelected(multiview);
             ImageViewerGui.getToolBar().getTrackingButton().setSelected(tracking);
             if (play)
                 Layers.playMovie();
