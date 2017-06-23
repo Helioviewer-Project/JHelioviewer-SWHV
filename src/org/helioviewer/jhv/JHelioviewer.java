@@ -21,6 +21,7 @@ import org.helioviewer.jhv.log.LogSettings;
 import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
+import org.helioviewer.jhv.plugins.samp.SampPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMessageSystem;
 
@@ -104,6 +105,7 @@ public class JHelioviewer {
                       PluginManager.getSingletonInstance().addPlugin(new EVEPlugin(), "Eve");
                       PluginManager.getSingletonInstance().addPlugin(new SWEKPlugin(), "SWEK");
                       PluginManager.getSingletonInstance().addPlugin(new PfssPlugin(), "PFSS");
+                      PluginManager.getSingletonInstance().addPlugin(new SampPlugin(), "SAMP");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
