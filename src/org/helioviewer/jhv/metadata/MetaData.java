@@ -16,6 +16,8 @@ public interface MetaData {
 
     int getPixelHeight();
 
+    double getUnitPerArcsec();
+
     double getResponseFactor();
 
     Position.Q getViewpoint();

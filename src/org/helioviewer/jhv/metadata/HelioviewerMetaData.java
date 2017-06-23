@@ -216,7 +216,7 @@ public class HelioviewerMetaData extends AbstractMetaData {
             double arcsecPerPixelX = m.getRequiredDouble("CDELT1");
             double arcsecPerPixelY = m.getRequiredDouble("CDELT2");
             double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
-            double unitPerArcsec = Sun.Radius / radiusSunInArcsec;
+            unitPerArcsec = Sun.Radius / radiusSunInArcsec;
 
             unitPerPixelX = arcsecPerPixelX * unitPerArcsec;
             unitPerPixelY = arcsecPerPixelY * unitPerArcsec;
