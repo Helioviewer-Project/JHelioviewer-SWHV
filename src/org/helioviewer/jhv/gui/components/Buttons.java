@@ -61,19 +61,21 @@ public class Buttons {
 
     // toolbar
 
-    private static final String TB_PRE = "<html><center><font face='Material Design Icons' size=5>";
+    public static String toolBar(MaterialDesign uc) {
+        return "<html><center><font face='Material Design Icons' size=5>" + uc2ent(uc) + "</font>";
+    }
 
-    public static final String cutOut = TB_PRE + uc2ent(MaterialDesign.MDI_VECTOR_CIRCLE_VARIANT) + "</font>";
-    public static final String projection = TB_PRE + uc2ent(MaterialDesign.MDI_CUBE_OUTLINE) + "</font>";
-    public static final String offDisk = TB_PRE + uc2ent(MaterialDesign.MDI_WEATHER_SUNNY) + "</font>";
-    public static final String track = TB_PRE +  uc2ent(MaterialDesign.MDI_CROSSHAIRS_GPS) + "</font>";
-    public static final String annotate = TB_PRE +  uc2ent(MaterialDesign.MDI_SHAPE_POLYGON_PLUS) + "</font>";
-    public static final String rotate = TB_PRE + uc2ent(MaterialDesign.MDI_ROTATE_3D) + "</font>";
-    public static final String pan = TB_PRE + uc2ent(MaterialDesign.MDI_CURSOR_MOVE) + "</font>";
-    public static final String resetCamera = TB_PRE + uc2ent(MaterialDesign.MDI_CROSSHAIRS) + "</font>";
-    public static final String zoomOne = TB_PRE + uc2ent(MaterialDesign.MDI_PLUS_ONE) + "</font>";
-    public static final String zoomFit = TB_PRE + uc2ent(MaterialDesign.MDI_CROP_LANDSCAPE) + "</font>";
-    public static final String zoomOut = TB_PRE + uc2ent(MaterialDesign.MDI_MAGNIFY_MINUS) + "</font>";
-    public static final String zoomIn = TB_PRE + uc2ent(MaterialDesign.MDI_MAGNIFY_PLUS) + "</font>";
+    public static final String cutOut = toolBar(MaterialDesign.MDI_VECTOR_CIRCLE_VARIANT);
+    public static final String projection = toolBar(MaterialDesign.MDI_CUBE_OUTLINE);
+    public static final String offDisk = toolBar(MaterialDesign.MDI_WEATHER_SUNNY);
+    public static final String track = toolBar(MaterialDesign.MDI_CROSSHAIRS_GPS);
+    public static final String annotate = toolBar(MaterialDesign.MDI_SHAPE_POLYGON_PLUS);
+    public static final String rotate = toolBar(MaterialDesign.MDI_ROTATE_3D);
+    public static final String pan = toolBar(MaterialDesign.MDI_CURSOR_MOVE);
+    public static final String resetCamera = toolBar(MaterialDesign.MDI_CROSSHAIRS);
+    public static final String zoomOne = toolBar(MaterialDesign.MDI_PLUS_ONE);
+    public static final String zoomFit = toolBar(MaterialDesign.MDI_CROP_LANDSCAPE);
+    public static final String zoomOut = toolBar(MaterialDesign.MDI_MAGNIFY_MINUS);
+    public static final String zoomIn = toolBar(MaterialDesign.MDI_MAGNIFY_PLUS);
 
 }

@@ -33,7 +33,8 @@ public enum MaterialDesign {
     MDI_PLUS_ONE("mdi-plus-one", '\uf41b'),
     MDI_CROP_LANDSCAPE("mdi-crop-landscape", '\uf1a0'),
     MDI_MAGNIFY_MINUS("mdi-magnify-minus", '\uf34a'),
-    MDI_MAGNIFY_PLUS("mdi-magnify-plus", '\uf34b');
+    MDI_MAGNIFY_PLUS("mdi-magnify-plus", '\uf34b'),
+    MDI_SHARE_VARIANT("mdi-share-variant", '\uf497');
 
     public final char code;
 
