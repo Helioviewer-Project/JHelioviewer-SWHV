@@ -26,6 +26,10 @@ public class Region {
         uly = lly + height;
     }
 
+    public static Region scale(Region r, double f) {
+        return new Region(r.llx * f, r.lly * f, r.width * f, r.height * f);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Region))

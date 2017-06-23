@@ -9,14 +9,12 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 public class SDOCutOutAction extends AbstractAction {
 
     private static final String baseURL = "http://www.lmsal.com/get_aia_data/?";
-    private static final double AIA_CDELT = 0.6;
 
     public SDOCutOutAction() {
         super("SDO Cut-out");
@@ -45,19 +43,11 @@ public class SDOCutOutAction extends AbstractAction {
         if (v != null) {
             ImageData imd = v.getImageLayer().getImageData();
             if (imd != null) {
-                Region region = imd.getRegion();
-                MetaData md = imd.getMetaData();
-                Region fullregion = md.getPhysicalRegion();
-                double arcsec_in_image = AIA_CDELT * 4096;
-                double centr_x = region.llx + region.width / 2.;
-                double centr_y = region.lly + region.height / 2.;
-                double arc_w = arcsec_in_image / fullregion.width;
-                double arc_h = arcsec_in_image / fullregion.height;
-
-                url.append(String.format("&width=%.1f", region.width * arc_w));
-                url.append(String.format("&height=%.1f", region.height * arc_h));
-                url.append(String.format("&xCen=%.1f", centr_x * arc_w - AIA_CDELT / 2.));
-                url.append(String.format("&yCen=%.1f", -centr_y * arc_h + AIA_CDELT / 2.));
+                Region region = Region.scale(imd.getRegion(), 1 / imd.getMetaData().getUnitPerArcsec());
+                url.append(String.format("&width=%.1f", region.width));
+                url.append(String.format("&height=%.1f", region.height));
+                url.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
+                url.append(String.format("&yCen=%.1f", -(region.lly + region.height / 2.)));
             }
         }
 

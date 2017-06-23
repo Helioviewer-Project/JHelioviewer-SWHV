@@ -13,6 +13,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     int pixelW;
     int pixelH;
+    double unitPerArcsec = Double.NaN;
     double responseFactor = 1;
 
     Position.L viewpointL = Sun.EpochEarthL;
@@ -43,6 +44,11 @@ public abstract class AbstractMetaData implements MetaData {
     @Override
     public int getPixelHeight() {
         return pixelH;
+    }
+
+    @Override
+    public double getUnitPerArcsec() {
+        return unitPerArcsec;
     }
 
     @Override
