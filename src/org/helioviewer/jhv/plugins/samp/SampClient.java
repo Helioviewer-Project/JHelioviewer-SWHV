@@ -2,14 +2,18 @@ package org.helioviewer.jhv.plugins.samp;
 
 import java.io.IOException;
 
+import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
 import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.layers.Layers;
 
 class SampClient extends HubConnector {
+
+    private final static String MTYPE_VIEW_DATA = "jhv.vso.load";
 
     SampClient(ClientProfile _profile) {
         super(_profile);
@@ -35,6 +39,13 @@ class SampClient extends HubConnector {
     }
 
     void notifyRequestData() {
+        Message msg = new Message(MTYPE_VIEW_DATA);
+        // Layers.getSAMPMessage(msg);
+        try {
+            getConnection().notifyAll(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

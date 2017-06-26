@@ -46,3 +46,4 @@ availability/
 build/builds
 *.DS_Store
 tags
+.ipynb_checkpoints
