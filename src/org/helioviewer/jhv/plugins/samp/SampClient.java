@@ -1,14 +1,20 @@
 package org.helioviewer.jhv.plugins.samp;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
+import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.ClientProfile;
+import org.astrogrid.samp.client.HubConnection;
 import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.io.LoadURITask;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 
 class SampClient extends HubConnector {
@@ -33,6 +39,18 @@ class SampClient extends HubConnector {
         meta.setName("JHelioviewer");
         meta.setDescriptionText(JHVGlobals.userAgent);
         declareMetadata(meta);
+
+        addMessageHandler(new AbstractMessageHandler("image.load.fits") {
+            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    URI uri = new URI(msg.getParam("url").toString());
+                    JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(null), uri));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
         declareSubscriptions(computeSubscriptions());
 
         setAutoconnect(10);
