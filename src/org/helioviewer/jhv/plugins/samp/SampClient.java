@@ -41,10 +41,23 @@ class SampClient extends HubConnector {
         declareMetadata(meta);
 
         addMessageHandler(new AbstractMessageHandler("image.load.fits") {
+            @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
-                    URI uri = new URI(msg.getParam("url").toString());
-                    JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(null), uri));
+                    openURI(msg.getParam("url").toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
+        // lie about support for FITS tables to get SSA to send us FITS
+        addMessageHandler(new AbstractMessageHandler("table.load.fits") {
+            @Override
+            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    if ("SSA".equals(c.getMetadata(senderId).getName()))
+                        openURI(msg.getParam("url").toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -54,6 +67,11 @@ class SampClient extends HubConnector {
         declareSubscriptions(computeSubscriptions());
 
         setAutoconnect(10);
+    }
+
+    private void openURI(String _uri) throws Exception {
+        URI uri = new URI(_uri);
+        JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(null), uri));
     }
 
     void notifyRequestData() {
