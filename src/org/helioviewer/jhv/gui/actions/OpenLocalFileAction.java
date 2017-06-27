@@ -5,7 +5,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.net.URI;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
@@ -52,8 +51,7 @@ public class OpenLocalFileAction extends AbstractAction {
             Settings.getSingletonInstance().save("default.local.path");
             for (File fileName : fileNames) {
                 if (fileName.isFile()) {
-                    URI uri = fileName.toURI();
-                    LoadURITask uriTask = new LoadURITask(ImageLayer.createImageLayer(null), uri);
+                    LoadURITask uriTask = new LoadURITask(ImageLayer.create(null), fileName.toURI());
                     JHVGlobals.getExecutorService().execute(uriTask);
                 }
             }

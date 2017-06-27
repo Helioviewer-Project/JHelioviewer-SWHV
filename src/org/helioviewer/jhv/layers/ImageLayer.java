@@ -47,7 +47,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private static final String loading = "Loading...";
 
-    public static ImageLayer createImageLayer(JSONObject jo) {
+    public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
         return imageLayer;
