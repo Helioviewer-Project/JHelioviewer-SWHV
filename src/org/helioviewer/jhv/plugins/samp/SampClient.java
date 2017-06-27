@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugins.samp;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
@@ -34,11 +35,13 @@ class SampClient extends HubConnector {
             }
         }
 
-        Metadata meta = new Metadata();
-        // TODO: name / description
-        meta.setName("JHelioviewer");
-        meta.setDescriptionText(JHVGlobals.userAgent);
-        declareMetadata(meta);
+        HashMap<String, String> meta = new HashMap<>();
+        meta.put("samp.name", "JHelioviewer");
+        meta.put("samp.description.text", JHVGlobals.userAgent);
+        meta.put("samp.icon.url", "http://swhv.oma.be/user_manual/hvImage_160x160.png");
+        meta.put("author.mail", JHVGlobals.emailAddress);
+        meta.put("author.name", "ESA JHelioviewer Team");
+        declareMetadata(Metadata.asMetadata(meta));
 
         addMessageHandler(new AbstractMessageHandler("image.load.fits") {
             @Override

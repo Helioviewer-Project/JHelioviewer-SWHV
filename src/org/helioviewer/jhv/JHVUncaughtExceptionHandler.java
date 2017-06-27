@@ -30,7 +30,6 @@ import org.helioviewer.jhv.log.Log;
 class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String BUG_URL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
-    private static final String MAIL_URL = "swhv@sidc.be";
 
     private static final int default_width = 600;
     private static final int default_height = 400;
@@ -67,7 +66,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         report.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
         report.setText("Fatal error detected." +
-                       "<p>Please email this report at <a href='mailto:" + MAIL_URL + "'>" + MAIL_URL + "</a> " +
+                       "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +
                        "or use it to open an issue at <a href='" + BUG_URL + "'>" + BUG_URL + "</a>.<br/>" +
                        "This report was sent to swhv.oma.be.");
         objects.add(report);
