@@ -15,7 +15,7 @@ import org.astrogrid.samp.hub.HubServiceMode;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.io.LoadURITask;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
+//import org.helioviewer.jhv.layers.Layers;
 
 class SampClient extends HubConnector {
 
@@ -69,9 +69,8 @@ class SampClient extends HubConnector {
         setAutoconnect(10);
     }
 
-    private void openURI(String _uri) throws Exception {
-        URI uri = new URI(_uri);
-        JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.createImageLayer(null), uri));
+    private void openURI(String uri) throws Exception {
+        JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.create(null), new URI(uri)));
     }
 
     void notifyRequestData() {

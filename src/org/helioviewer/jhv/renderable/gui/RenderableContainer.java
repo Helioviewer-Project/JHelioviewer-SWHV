@@ -402,7 +402,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     continue;
 
                 try {
-                    ImageLayer layer = ImageLayer.createImageLayer(jd);
+                    ImageLayer layer = ImageLayer.create(jd);
                     newlist.add(layer);
                     layer.setEnabled(jo.optBoolean("enabled", false)); // pointless
                     if (jo.optBoolean("master", false))

@@ -69,7 +69,7 @@ public class ImageDataPanel extends JPanel {
             timeSelectionPanel.setEndTime(item.end);
 
             if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                loadRemote(ImageLayer.createImageLayer(null), item);
+                loadRemote(ImageLayer.create(null), item);
             }
         }
     }
