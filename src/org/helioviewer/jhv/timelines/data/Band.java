@@ -43,6 +43,7 @@ public class Band extends AbstractTimelineRenderable {
         bandType = _bandType;
         optionsPanel = new LineOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
+        graphColor = BandColors.getNextColor();
     }
 
     public Band(JSONObject jo) throws Exception {

@@ -14,7 +14,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.data.Band;
-import org.helioviewer.jhv.timelines.data.BandColors;
 import org.helioviewer.jhv.timelines.data.BandGroup;
 import org.helioviewer.jhv.timelines.data.BandType;
 import org.helioviewer.jhv.timelines.data.BandTypeAPI;
@@ -103,9 +102,7 @@ public class TimelineDataPanel extends JPanel {
         if (bandType == null)
             return;
 
-        Band band = new Band(bandType);
-        band.setDataColor(BandColors.getNextColor());
-        Timelines.getModel().addLineData(band);
+        Timelines.getModel().addLineData(new Band(bandType));
 
         long time = calendarStartDate.getTime();
         long movieStart = Layers.getStartDate().milli;
