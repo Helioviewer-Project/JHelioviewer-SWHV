@@ -27,7 +27,7 @@ public class CommandLine {
     public static void load() {
         // -load
         for (URI uri : getURIOptionValues("load")) {
-            JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.create(null), uri));
+            Layer.image.add(uri);
         }
         // -state
         for (String file : getOptionValues("state")) {

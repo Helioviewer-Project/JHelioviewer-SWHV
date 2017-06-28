@@ -12,7 +12,7 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.input.KeyShortcuts;
-import org.helioviewer.jhv.plugins.eve.EVEPlugin;
+import org.helioviewer.jhv.io.Layer;
 
 @SuppressWarnings("serial")
 public class OpenLocalFileAction extends AbstractAction {
@@ -42,7 +42,7 @@ public class OpenLocalFileAction extends AbstractAction {
             Settings.getSingletonInstance().save("default.local.path");
             for (File fileName : fileNames) {
                 if (fileName.isFile())
-                    EVEPlugin.eveDataprovider.loadBand(fileName.toURI());
+                    Layer.timeline.add(fileName.toURI());
             }
         }
     }

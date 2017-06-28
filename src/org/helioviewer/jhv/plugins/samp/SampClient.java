@@ -14,8 +14,7 @@ import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.io.LoadURITask;
-import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.io.Layer;
 //import org.helioviewer.jhv.layers.Layers;
 
 class SampClient extends HubConnector {
@@ -47,7 +46,7 @@ class SampClient extends HubConnector {
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
-                    openURI(msg.getParam("url").toString());
+                    Layer.image.add(new URI(msg.getParam("url").toString()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -60,7 +59,7 @@ class SampClient extends HubConnector {
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
                     if ("SSA".equals(c.getMetadata(senderId).getName()))
-                        openURI(msg.getParam("url").toString());
+                        Layer.image.add(new URI(msg.getParam("url").toString()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -70,10 +69,6 @@ class SampClient extends HubConnector {
         declareSubscriptions(computeSubscriptions());
 
         setAutoconnect(10);
-    }
-
-    private void openURI(String uri) throws Exception {
-        JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.create(null), new URI(uri)));
     }
 
     void notifyRequestData() {
