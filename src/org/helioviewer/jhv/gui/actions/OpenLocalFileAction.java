@@ -27,7 +27,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 public class OpenLocalFileAction extends AbstractAction {
 
     public OpenLocalFileAction() {
-        super("Open...");
+        super("Open Image Layer...");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);
