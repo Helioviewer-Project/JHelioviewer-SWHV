@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.eve.lines;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,11 @@ public class EVEDataProvider implements DataProvider {
 
     private static final HashMap<Band, List<Interval>> downloadMap = new HashMap<>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<>();
+
+    @Override
+    public void loadBand(URI uri) {
+        EVEPlugin.executorService.submit(new LoadThread(uri));
+    }
 
     @Override
     public void updateBand(Band band, long start, long end) {
