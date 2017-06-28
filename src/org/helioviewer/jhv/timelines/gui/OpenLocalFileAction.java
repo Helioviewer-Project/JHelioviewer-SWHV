@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eve.gui;
+package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.FileDialog;
 import java.awt.Toolkit;
