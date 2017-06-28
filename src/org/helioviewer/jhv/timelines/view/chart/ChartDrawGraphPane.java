@@ -216,18 +216,18 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
         currWidth += (int) tickTextBounds.getWidth();
 
+        String value;
         for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
-            if (el.isEnabled() && el.hasValueAsString()) {
+            if (el.isEnabled() && (value = el.getStringValue(ts)) != null) {
                 lbl = ", ";
                 g.setColor(Color.BLACK);
                 g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
                 tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
                 currWidth += (int) tickTextBounds.getWidth();
 
-                lbl = el.getStringValue(ts);
                 g.setColor(el.getDataColor());
-                g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
-                tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
+                g.drawString(value, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
+                tickTextBounds = g.getFontMetrics().getStringBounds(value, g);
                 currWidth += (int) tickTextBounds.getWidth();
             }
         }
