@@ -11,15 +11,11 @@ public class BandTypeAPI {
     private static final HashMap<String, ArrayList<BandType>> groups = new HashMap<>();
 
     static void updateBandTypes(JSONArray jo) {
-        BandType[] bandtypes = new BandType[jo.length()];
         for (int i = 0; i < jo.length(); i++) {
-            bandtypes[i] = new BandType(jo.getJSONObject(i));
-        }
-
-        for (BandType bandtype : bandtypes) {
+            BandType bandtype = new BandType(jo.getJSONObject(i));
             String group = bandtype.getGroup();
             if (!groups.containsKey(group)) {
-                groups.put(group, new ArrayList<>(Arrays.asList(bandtypes)));
+                groups.put(group, new ArrayList<>(Arrays.asList(bandtype)));
             } else
                 groups.get(group).add(bandtype);
         }
