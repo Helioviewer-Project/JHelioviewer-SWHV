@@ -23,6 +23,15 @@ public class BandType {
         }
     }
 
+    public static BandType getBandType(String name) {
+        for (List<BandType> list : groups.values()) {
+            for (BandType bt : list)
+                if (bt.getName().equals(name))
+                    return bt;
+        }
+        return null;
+    }
+
     public static List<BandType> getBandTypes(String group) {
         List<BandType> list = groups.get(group);
         return list == null ? new ArrayList<>() : list;
