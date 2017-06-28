@@ -4,6 +4,7 @@ import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
@@ -21,7 +22,7 @@ public class OpenLocalFileAction extends AbstractAction {
     public OpenLocalFileAction() {
         super("Open Timeline...");
 
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | ActionEvent.ALT_MASK);
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_DOWN_MASK);
         putValue(ACCELERATOR_KEY, key);
         KeyShortcuts.registerKey(key, this);
     }
