@@ -6,12 +6,12 @@ import javax.swing.JMenuItem;
 
 import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.plugins.eve.gui.OpenLocalFileAction;
 import org.helioviewer.jhv.plugins.eve.lines.EVEDataProvider;
 import org.helioviewer.jhv.plugins.eve.radio.RadioData;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.data.BandTypeTask;
+import org.helioviewer.jhv.timelines.gui.OpenLocalFileAction;
 import org.json.JSONObject;
 
 public class EVEPlugin implements Plugin {
