@@ -13,16 +13,16 @@ class DownloadThread extends JHVWorker<EVEResponse, Void> {
     private final Interval interval;
     private final Band band;
 
-    public DownloadThread(Band _band, Interval _interval) {
+    DownloadThread(Band _band, Interval _interval) {
         interval = _interval;
         band = _band;
     }
 
-    public Interval getInterval() {
+    Interval getInterval() {
         return interval;
     }
 
-    public Band getBand() {
+    Band getBand() {
         return band;
     }
 
@@ -42,6 +42,8 @@ class DownloadThread extends JHVWorker<EVEResponse, Void> {
             try {
                 EVEResponse r = get();
                 if (r != null) {
+                    if (!r.bandType.equals(band.getBandType().getName()))
+                        throw new Exception("Expected " + band.getBandType().getName() + ", got " + r.bandType);
                     band.addToCache(r.values, r.dates);
                 }
             } catch (Exception e) {
