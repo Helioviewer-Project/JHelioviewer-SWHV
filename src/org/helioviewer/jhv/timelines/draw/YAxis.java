@@ -18,8 +18,7 @@ public class YAxis {
     public YAxis(double _start, double _end, String _label, boolean isLogScale) {
         start = _start;
         end = _end;
-        String label = _label;
-        scale = isLogScale ? new YAxisLogScale(label) : new YAxisPositiveIdentityScale(label);
+        scale = isLogScale ? new YAxisLogScale(_label) : new YAxisPositiveIdentityScale(_label);
         scaledMinBound = scale(UNSCALED_MIN_BOUND);
         scaledMaxBound = scale(UNSCALED_MAX_BOUND);
     }
