@@ -3,7 +3,7 @@ package org.helioviewer.jhv.gui.actions.filefilters;
 import java.io.File;
 import java.io.FilenameFilter;
 
-public class AllSupportedImageTypesFilenameFilter implements FilenameFilter {
+public class AllFilenameFilter implements FilenameFilter {
 
     private final ExtensionFileFilter.AllSupportedImageTypesFilter fileFilter = new ExtensionFileFilter.AllSupportedImageTypesFilter();
 

@@ -91,10 +91,6 @@ public class BandType {
         return label;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
     public String getUnitLabel() {
         return unitLabel;
     }
