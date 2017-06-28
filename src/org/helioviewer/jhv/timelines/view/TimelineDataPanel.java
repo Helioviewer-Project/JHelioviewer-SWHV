@@ -79,16 +79,13 @@ public class TimelineDataPanel extends JPanel {
 
         HashSet<BandType> bandTypesInSelectorModel = new HashSet<>();
         for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
-            if (el instanceof Band) {
-                Band band = (Band) el;
-                bandTypesInSelectorModel.add(band.getBandType());
-            }
+            if (el instanceof Band)
+                bandTypesInSelectorModel.add(((Band) el).getBandType());
         }
 
         for (BandType value : BandTypeAPI.getBandTypes(selectedGroup)) {
-            if (!bandTypesInSelectorModel.contains(value)) {
+            if (!bandTypesInSelectorModel.contains(value))
                 model.addElement(value);
-            }
         }
 
         if (model.getSize() > 0)

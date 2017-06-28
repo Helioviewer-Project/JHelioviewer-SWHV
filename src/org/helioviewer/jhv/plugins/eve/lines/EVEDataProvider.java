@@ -59,9 +59,8 @@ public class EVEDataProvider implements DataProvider {
 
     private static ArrayList<Interval> getIntervals(Band band, long start, long end) {
         List<Interval> missingIntervals = band.addRequest(start, end);
-        if (missingIntervals.isEmpty()) {
+        if (missingIntervals.isEmpty())
             return null;
-        }
 
         ArrayList<Interval> intervals = new ArrayList<>();
         for (Interval i : missingIntervals) {

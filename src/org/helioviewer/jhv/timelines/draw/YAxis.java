@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.timelines.draw;
 
-import org.json.JSONObject;
-
 public class YAxis {
 
     public double start;
@@ -15,37 +13,15 @@ public class YAxis {
 
     private final double scaledMinBound;
     private final double scaledMaxBound;
-    private final String label;
     private boolean highlighted = false;
 
     public YAxis(double _start, double _end, String _label, boolean isLogScale) {
         start = _start;
         end = _end;
-        label = _label;
+        String label = _label;
         scale = isLogScale ? new YAxisLogScale(label) : new YAxisPositiveIdentityScale(label);
         scaledMinBound = scale(UNSCALED_MIN_BOUND);
         scaledMaxBound = scale(UNSCALED_MAX_BOUND);
-    }
-
-    public YAxis(JSONObject jo) {
-        long now = System.currentTimeMillis();
-        start = jo.optDouble("start", now);
-        end = jo.optDouble("end", now);
-        label = jo.optString("label", "");
-        scale = jo.optBoolean("isLogScale", false) ? new YAxisLogScale(label) : new YAxisPositiveIdentityScale(label);
-        scaledMinBound = jo.optDouble("scaledMinBound", UNSCALED_MIN_BOUND) ;
-        scaledMaxBound = jo.optDouble("scaledMaxBound", UNSCALED_MAX_BOUND);
-    }
-
-    public void serialize(JSONObject jo) {
-        JSONObject yaxis = new JSONObject();
-        yaxis.put("start", start);
-        yaxis.put("end", end);
-        yaxis.put("label", label);
-        yaxis.put("isLogScale", scale instanceof YAxisLogScale);
-        yaxis.put("scaledMinBound", scaledMinBound);
-        yaxis.put("scaledMaxBound", scaledMaxBound);
-        jo.put("y-axis", yaxis);
     }
 
     public void reset(double _start, double _end) {

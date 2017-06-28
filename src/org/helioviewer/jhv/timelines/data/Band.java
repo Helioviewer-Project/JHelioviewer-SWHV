@@ -47,19 +47,14 @@ public class Band extends AbstractTimelineRenderable {
     }
 
     public Band(JSONObject jo) throws Exception {
-        JSONObject yo = jo.optJSONObject("y-axis");
-        if (yo == null)
-            yo = new JSONObject();
-        yAxis = new YAxis(yo);
-        optionsPanel = new LineOptionPanel(this);
         JSONObject jbandType = jo.optJSONObject("bandType");
         if (jbandType == null)
             throw new Exception("Bandtype not defined");
 
-        String typeName = jbandType.optString("name", "");
-        bandType = BandTypeAPI.getBandType(typeName);
-        if (bandType == null)
-            bandType = new BandType(jbandType);
+        bandType = new BandType(jbandType);
+        optionsPanel = new LineOptionPanel(this);
+        yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
+
         JSONObject jcolor = jo.optJSONObject("color");
         if (jcolor != null) {
             int r = MathUtils.clip(jcolor.optInt("r", 0), 0, 255);
@@ -72,12 +67,7 @@ public class Band extends AbstractTimelineRenderable {
     @Override
     public void serialize(JSONObject jo) {
         bandType.serialize(jo);
-        yAxis.serialize(jo);
-        JSONObject jgraphColor = new JSONObject();
-        jgraphColor.put("r", graphColor.getRed());
-        jgraphColor.put("g", graphColor.getGreen());
-        jgraphColor.put("b", graphColor.getBlue());
-        jo.put("color", jgraphColor);
+        jo.put("color", new JSONObject().put("r", graphColor.getRed()).put("g", graphColor.getGreen()).put("b", graphColor.getBlue()));
     }
 
     @Override
