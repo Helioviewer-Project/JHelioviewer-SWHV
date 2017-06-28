@@ -103,6 +103,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
 
     @Override
     public void mouseEntered(MouseEvent e) {
+        requestFocusInWindow();
     }
 
     @Override

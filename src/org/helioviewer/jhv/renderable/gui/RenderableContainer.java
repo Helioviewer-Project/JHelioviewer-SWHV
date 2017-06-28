@@ -447,7 +447,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         loadScene(defaultState);
     }
 
-    private class LoadState extends JHVWorker<Void, Void> {
+    private static class LoadState extends JHVWorker<Void, Void> {
         private final ArrayList<ImageLayer> newlist;
         private final JHVDate time;
         private final boolean tracking;
