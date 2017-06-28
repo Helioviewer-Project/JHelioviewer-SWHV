@@ -4,12 +4,6 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
-/**
- * Abstract class representing a file filter which filters based on the
- * extension of a file.
- * 
- * @author Markus Langenberg
- */
 abstract class ExtensionFileFilter extends FileFilter {
 
     public static class AllSupportedImageTypesFilter extends ExtensionFileFilter {
@@ -21,6 +15,19 @@ abstract class ExtensionFileFilter extends FileFilter {
         @Override
         public String getDescription() {
             return "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".jp2\", \".jpx\")";
+        }
+
+    }
+
+    static class JsonFilter extends ExtensionFileFilter {
+
+        public JsonFilter() {
+            extensions = new String[] { "json" };
+        }
+
+        @Override
+        public String getDescription() {
+            return "JSON files (\".json\")";
         }
 
     }

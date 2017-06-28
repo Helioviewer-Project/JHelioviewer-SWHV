@@ -102,7 +102,7 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public String getName() {
-        return bandType.getLabel();
+        return bandType.toString();
     }
 
     @Override
