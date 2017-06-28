@@ -15,7 +15,6 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.data.Band;
 import org.helioviewer.jhv.timelines.data.BandType;
-import org.helioviewer.jhv.timelines.data.BandTypeAPI;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
@@ -59,7 +58,7 @@ public class TimelineDataPanel extends JPanel {
     }
 
     public void setupDatasets() {
-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(BandTypeAPI.getGroups());
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(BandType.getGroups());
         if (model.getSize() > 0) {
             comboBoxGroup.setModel(model);
             comboBoxGroup.setSelectedIndex(0);
@@ -83,7 +82,7 @@ public class TimelineDataPanel extends JPanel {
                 bandTypesInSelectorModel.add(((Band) el).getBandType());
         }
 
-        for (BandType value : BandTypeAPI.getBandTypes(selectedGroup)) {
+        for (BandType value : BandType.getBandTypes(selectedGroup)) {
             if (!bandTypesInSelectorModel.contains(value))
                 model.addElement(value);
         }
