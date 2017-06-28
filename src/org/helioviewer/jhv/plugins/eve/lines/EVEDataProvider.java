@@ -16,7 +16,7 @@ public class EVEDataProvider implements DataProvider {
 
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
-    private static final HashMap<Band, ArrayList<Interval>> downloadMap = new HashMap<>();
+    private static final HashMap<Band, List<Interval>> downloadMap = new HashMap<>();
     private static final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<>();
 
     @Override
@@ -76,10 +76,9 @@ public class EVEDataProvider implements DataProvider {
             Band band = job.getBand();
             Interval interval = job.getInterval();
 
-            ArrayList<Interval> list = downloadMap.get(band);
-            if (list == null) {
+            List<Interval> list = downloadMap.get(band);
+            if (list == null)
                 list = new ArrayList<>();
-            }
             list.add(interval);
 
             downloadMap.put(band, list);
@@ -89,25 +88,23 @@ public class EVEDataProvider implements DataProvider {
     }
 
     static void downloadFinished(Band band, Interval interval) {
-        ArrayList<Interval> list = downloadMap.get(band);
+        List<Interval> list = downloadMap.get(band);
         if (list != null) {
             list.remove(interval);
-            if (list.isEmpty()) {
+            if (list.isEmpty())
                 downloadMap.remove(band);
-            }
         }
         Timelines.getModel().downloadFinished(band);
     }
 
     @Override
     public void stopDownloads(Band band) {
-        ArrayList<Interval> list = downloadMap.get(band);
-        if (list == null) {
+        List<Interval> list = downloadMap.get(band);
+        if (list == null)
             return;
-        }
-        if (list.isEmpty()) {
+        if (list.isEmpty())
             downloadMap.remove(band);
-        }
+
         List<Future<?>> fjs = futureJobs.get(band);
         for (Future<?> fj : fjs) {
             fj.cancel(true);
@@ -118,7 +115,7 @@ public class EVEDataProvider implements DataProvider {
 
     @Override
     public boolean isDownloadActive(Band band) {
-        ArrayList<Interval> list = downloadMap.get(band);
+        List<Interval> list = downloadMap.get(band);
         return list != null && !list.isEmpty();
     }
 
