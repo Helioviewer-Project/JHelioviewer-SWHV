@@ -33,9 +33,7 @@ public class BandTypeAPI {
 
     public static List<BandType> getBandTypes(String group) {
         List<BandType> list = groups.get(group);
-        if (list == null)
-            return new ArrayList<>();
-        return list;
+        return list == null ? new ArrayList<>() : list;
     }
 
     public static String[] getGroups() {
