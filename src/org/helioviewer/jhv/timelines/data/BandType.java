@@ -47,8 +47,6 @@ public class BandType {
                 }
             }
         }
-
-        System.out.println(">>> " + json);
     }
 
     public void serialize(JSONObject jo) {

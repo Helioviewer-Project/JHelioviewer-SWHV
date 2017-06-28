@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.timelines.data;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.json.JSONArray;
@@ -15,7 +15,7 @@ public class BandTypeAPI {
             BandType bandtype = new BandType(jo.getJSONObject(i));
             String group = bandtype.getGroup();
             if (!groups.containsKey(group)) {
-                groups.put(group, new ArrayList<>(Arrays.asList(bandtype)));
+                groups.put(group, new ArrayList<>(Collections.singletonList(bandtype)));
             } else
                 groups.get(group).add(bandtype);
         }
