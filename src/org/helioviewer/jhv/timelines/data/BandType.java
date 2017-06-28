@@ -15,11 +15,10 @@ public class BandType {
     static void loadBandTypes(JSONArray jo) {
         for (int i = 0; i < jo.length(); i++) {
             BandType bandtype = new BandType(jo.getJSONObject(i));
-            String group = bandtype.getGroup();
-            if (!groups.containsKey(group)) {
-                groups.put(group, new ArrayList<>(Collections.singletonList(bandtype)));
-            } else
-                groups.get(group).add(bandtype);
+            if (groups.containsKey(bandtype.group))
+                groups.get(bandtype.group).add(bandtype);
+            else
+                groups.put(bandtype.group, new ArrayList<>(Collections.singletonList(bandtype)));
         }
     }
 
@@ -114,10 +113,6 @@ public class BandType {
 
     public String getName() {
         return name;
-    }
-
-    public String getGroup() {
-        return group;
     }
 
     public boolean isLogScale() {

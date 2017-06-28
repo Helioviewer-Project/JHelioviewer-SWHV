@@ -16,7 +16,7 @@ class EVEResponse {
     final long[] dates;
     final float[] values;
 
-    EVEResponse(String _bandType, long[] _dates, float[] _values) {
+    private EVEResponse(String _bandType, long[] _dates, float[] _values) {
         bandType = _bandType;
         dates = _dates;
         values = _values;
