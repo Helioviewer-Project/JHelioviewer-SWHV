@@ -89,11 +89,6 @@ public class BandType {
         jo.put("bandType", json);
     }
 
-    @Override
-    public String toString() {
-        return label;
-    }
-
     public String getUnitLabel() {
         return unitLabel;
     }
@@ -120,6 +115,21 @@ public class BandType {
 
     public String getBaseURL() {
         return baseURL;
+    }
+
+    @Override
+    public String toString() {
+        return label;
+    }
+
+   @Override
+    public boolean equals(Object o) {
+        return o instanceof BandType && o.toString().equals(toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 
 }

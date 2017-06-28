@@ -239,13 +239,18 @@ public class Band extends AbstractTimelineRenderable {
     }
 
     @Override
+    public String toString() {
+        return bandType.toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
-        return o instanceof Band && ((Band) o).getName().equals(getName());
+        return o instanceof Band && o.toString().equals(toString());
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return toString().hashCode();
     }
 
 }
