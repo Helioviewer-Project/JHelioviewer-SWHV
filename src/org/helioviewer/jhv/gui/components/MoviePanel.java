@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -449,7 +450,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         public PreviousFrameAction() {
             super("Step to Previous Frame");
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | ActionEvent.ALT_MASK);
+            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_DOWN_MASK);
             putValue(ACCELERATOR_KEY, key);
             KeyShortcuts.registerKey(key, this);
         }
@@ -467,7 +468,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         public NextFrameAction() {
             super("Step to Next Frame");
-            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | ActionEvent.ALT_MASK);
+            KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_DOWN_MASK);
             putValue(ACCELERATOR_KEY, key);
             KeyShortcuts.registerKey(key, this);
         }
