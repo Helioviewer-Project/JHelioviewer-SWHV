@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.actions;
+package org.helioviewer.jhv.plugins.eve.gui;
 
 import java.awt.FileDialog;
 import java.awt.Toolkit;
@@ -9,27 +9,18 @@ import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.actions.filefilters.AllSupportedImageTypesFilenameFilter;
 import org.helioviewer.jhv.input.KeyShortcuts;
-import org.helioviewer.jhv.io.LoadURITask;
-import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 
-/**
- * Action to open a local file
- * Opens a file chooser dialog, opens the selected file. Currently supports the
- * following file extensions: "jpg", "jpeg", "png", "fts", "fits", "jp2" and
- * "jpx"
- */
 @SuppressWarnings("serial")
 public class OpenLocalFileAction extends AbstractAction {
 
     public OpenLocalFileAction() {
-        super("Open Image Layer...");
+        super("Open Timeline...");
 
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | ActionEvent.ALT_MASK);
         putValue(ACCELERATOR_KEY, key);
         KeyShortcuts.registerKey(key, this);
     }
@@ -38,7 +29,7 @@ public class OpenLocalFileAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         FileDialog fileDialog = new FileDialog(ImageViewerGui.getMainFrame(), "Choose a file", FileDialog.LOAD);
         // does not work on Windows
-        fileDialog.setFilenameFilter(new AllSupportedImageTypesFilenameFilter());
+        // fileDialog.setFilenameFilter(new AllSupportedImageTypesFilenameFilter());
         fileDialog.setMultipleMode(true);
         fileDialog.setDirectory(Settings.getSingletonInstance().getProperty("default.local.path"));
         fileDialog.setVisible(true);
@@ -50,10 +41,8 @@ public class OpenLocalFileAction extends AbstractAction {
             Settings.getSingletonInstance().setProperty("default.local.path", directory);
             Settings.getSingletonInstance().save("default.local.path");
             for (File fileName : fileNames) {
-                if (fileName.isFile()) {
-                    LoadURITask uriTask = new LoadURITask(ImageLayer.create(null), fileName.toURI());
-                    JHVGlobals.getExecutorService().execute(uriTask);
-                }
+                if (fileName.isFile())
+                    EVEPlugin.eveDataprovider.loadBand(fileName.toURI());
             }
         }
     }

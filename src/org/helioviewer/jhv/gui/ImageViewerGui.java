@@ -70,10 +70,12 @@ public class ImageViewerGui {
     private static Interaction currentInteraction;
 
     private static TopToolBar toolBar;
+    private static MenuBar menuBar;
 
     public static JFrame prepareGui() {
         mainFrame = createMainFrame();
-        mainFrame.setJMenuBar(new MenuBar());
+        menuBar = new MenuBar();
+        mainFrame.setJMenuBar(menuBar);
 
         Camera camera = Displayer.getCamera();
         rotationInteraction = new InteractionRotate(camera);
@@ -248,6 +250,10 @@ public class ImageViewerGui {
 
     public static TopToolBar getToolBar() {
         return toolBar;
+    }
+
+    public static MenuBar getMenuBar() {
+        return menuBar;
     }
 
 }
