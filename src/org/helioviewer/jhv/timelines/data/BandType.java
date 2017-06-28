@@ -2,42 +2,57 @@ package org.helioviewer.jhv.timelines.data;
 
 import java.util.HashMap;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class BandType {
 
-    private String label;
-    private String name;
-    private String unitLabel;
+    private String name = "unknown";
+    private String group = "unknown";
+    private String baseURL = "";
+    private String label = "";
+    private String unitLabel = "";
     private final HashMap<String, Double> warnLevels = new HashMap<>();
-    private double min;
-    private double max;
+    private double min = 0;
+    private double max = 1;
     private boolean isLog;
-    private String baseURL;
 
-    public BandType() {
-    }
+    private final JSONObject json;
 
     public BandType(JSONObject jo) {
-        name = jo.optString("name", "unknown");
-        label = jo.optString("label", "");
-        unitLabel = jo.optString("unitLabel", "");
-        min = jo.optDouble("min", 0);
-        max = jo.optDouble("max", 1);
-        isLog = jo.optBoolean("isLog", false);
-        baseURL = jo.optString("baseURL", "");
+        json = jo;
+
+        name = jo.optString("name", name);
+        group = jo.optString("group", group);
+        baseURL = jo.optString("baseUrl", baseURL);
+        label = jo.optString("label", label);
+        unitLabel = jo.optString("unitLabel", unitLabel);
+
+        JSONArray range = jo.optJSONArray("range");
+        if (range != null) {
+            min = range.optDouble(0, min);
+            max = range.optDouble(1, max);
+        }
+
+        String scale = jo.optString("scale", "");
+        if ("logarithmic".equals(scale))
+            isLog = true;
+
+        JSONArray warn = jo.optJSONArray("warnLevels");
+        if (warn != null) {
+            for (Object o : warn) {
+                if (o instanceof JSONObject) {
+                    JSONObject obj = (JSONObject) o;
+                    warnLevels.put(obj.getString("warnLabel"), obj.getDouble("warnValue"));
+                }
+            }
+        }
+
+        System.out.println(">>> " + json);
     }
 
     public void serialize(JSONObject jo) {
-        JSONObject bandType = new JSONObject();
-        bandType.put("name", name);
-        bandType.put("label", label);
-        bandType.put("unitLabel", unitLabel);
-        bandType.put("min", min);
-        bandType.put("max", max);
-        bandType.put("isLog", isLog);
-        bandType.put("baseURL", baseURL);
-        jo.put("bandType", bandType);
+        jo.put("bandType", json);
     }
 
     @Override
@@ -49,16 +64,8 @@ public class BandType {
         return label;
     }
 
-    public void setLabel(String _label) {
-        label = _label;
-    }
-
     public String getUnitLabel() {
         return unitLabel;
-    }
-
-    public void setUnitLabel(String _unitLabel) {
-        unitLabel = _unitLabel;
     }
 
     public HashMap<String, Double> getWarnLevels() {
@@ -69,36 +76,20 @@ public class BandType {
         return min;
     }
 
-    public void setMin(double _min) {
-        min = _min;
-    }
-
     public double getMax() {
         return max;
-    }
-
-    public void setMax(double _max) {
-        max = _max;
-    }
-
-    public void setName(String _name) {
-        name = _name;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setScale(String scale) {
-        isLog = scale.equals("logarithmic");
+    public String getGroup() {
+        return group;
     }
 
     public boolean isLogScale() {
         return isLog;
-    }
-
-    public void setBaseURL(String _baseURL) {
-        baseURL = _baseURL;
     }
 
     public String getBaseURL() {

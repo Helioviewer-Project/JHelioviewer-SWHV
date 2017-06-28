@@ -14,7 +14,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.data.Band;
-import org.helioviewer.jhv.timelines.data.BandGroup;
 import org.helioviewer.jhv.timelines.data.BandType;
 import org.helioviewer.jhv.timelines.data.BandTypeAPI;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -24,7 +23,7 @@ import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 public class TimelineDataPanel extends JPanel {
 
     private final JHVCalendarDatePicker calendarStartDate = new JHVCalendarDatePicker();
-    private final JComboBox<BandGroup> comboBoxGroup = new JComboBox<>();
+    private final JComboBox<String> comboBoxGroup = new JComboBox<>();
     private final JComboBox<BandType> comboBoxData = new JComboBox<>();
 
     private boolean userSet;
@@ -60,7 +59,7 @@ public class TimelineDataPanel extends JPanel {
     }
 
     public void setupDatasets() {
-        DefaultComboBoxModel<BandGroup> model = new DefaultComboBoxModel<>(BandTypeAPI.getGroups());
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(BandTypeAPI.getGroups());
         if (model.getSize() > 0) {
             comboBoxGroup.setModel(model);
             comboBoxGroup.setSelectedIndex(0);
@@ -71,7 +70,7 @@ public class TimelineDataPanel extends JPanel {
         if (!userSet)
             calendarStartDate.setTime(Layers.getStartDate().milli);
 
-        BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
+        String selectedGroup = (String) comboBoxGroup.getSelectedItem();
         if (selectedGroup == null)
             return;
 

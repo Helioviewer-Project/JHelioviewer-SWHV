@@ -22,7 +22,6 @@ public class BandTypeTask extends JHVWorker<Void, Void> {
     protected Void backgroundWork() {
        try {
             JSONObject jo = JSONUtils.getJSONStream(new DownloadStream(TimelineSettings.baseURL).getInput());
-            BandTypeAPI.updateBandGroups(jo.getJSONArray("groups"));
             BandTypeAPI.updateBandTypes(jo.getJSONArray("objects"));
         } catch (UnknownHostException e) {
             Log.debug("Unknown host, network down?", e);

@@ -72,9 +72,6 @@ public class Band extends AbstractTimelineRenderable {
     @Override
     public void serialize(JSONObject jo) {
         bandType.serialize(jo);
-        BandGroup bandGroup = BandTypeAPI.getGroup(bandType);
-        if (bandGroup != null)
-            bandGroup.serialize(jo);
         yAxis.serialize(jo);
         JSONObject jgraphColor = new JSONObject();
         jgraphColor.put("r", graphColor.getRed());
