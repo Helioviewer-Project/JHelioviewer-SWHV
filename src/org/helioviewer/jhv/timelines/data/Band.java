@@ -234,11 +234,6 @@ public class Band extends AbstractTimelineRenderable {
     }
 
     @Override
-    public boolean hasValueAsString() {
-        return true;
-    }
-
-    @Override
     public boolean hasDataColor() {
         return true;
     }

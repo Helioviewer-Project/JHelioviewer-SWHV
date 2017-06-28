@@ -51,8 +51,6 @@ public interface TimelineRenderable {
 
     boolean highLightChanged(Point p);
 
-    boolean hasValueAsString();
-
     String getStringValue(long ts);
 
     ClickableDrawable getDrawableUnderMouse();

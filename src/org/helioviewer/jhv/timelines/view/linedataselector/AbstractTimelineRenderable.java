@@ -40,11 +40,6 @@ public abstract class AbstractTimelineRenderable implements TimelineRenderable {
     }
 
     @Override
-    public boolean hasValueAsString() {
-        return false;
-    }
-
-    @Override
     public String getStringValue(long ts) {
         return null;
     }
