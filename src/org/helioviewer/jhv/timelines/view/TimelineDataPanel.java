@@ -85,8 +85,7 @@ public class TimelineDataPanel extends JPanel {
             }
         }
 
-        BandType[] values = BandTypeAPI.getBandTypes(selectedGroup);
-        for (BandType value : values) {
+        for (BandType value : BandTypeAPI.getBandTypes(selectedGroup)) {
             if (!bandTypesInSelectorModel.contains(value)) {
                 model.addElement(value);
             }
