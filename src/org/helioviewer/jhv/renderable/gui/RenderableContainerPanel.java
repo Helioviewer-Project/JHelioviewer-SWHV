@@ -132,10 +132,7 @@ public class RenderableContainerPanel extends JPanel {
         jsp.getViewport().setBackground(grid.getBackground());
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);
-        addLayerButton.addActionListener(e -> {
-            NewLayerAction layerAction = new NewLayerAction();
-            layerAction.actionPerformed(new ActionEvent(addLayerButton, 0, ""));
-        });
+        addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
         JideButton syncSpanButton = new JideButton(Buttons.syncLayers);
         syncSpanButton.setToolTipText("Synchronize layers time span");

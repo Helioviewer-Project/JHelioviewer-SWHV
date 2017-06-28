@@ -15,7 +15,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 public class NewLayerAction extends AbstractAction {
 
     public NewLayerAction() {
-        super("New Layer...");
+        super("New Image Layer...");
 
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, key);
