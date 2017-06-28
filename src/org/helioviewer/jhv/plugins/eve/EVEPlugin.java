@@ -11,6 +11,7 @@ import org.helioviewer.jhv.plugins.eve.radio.RadioData;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.data.BandTypeTask;
+import org.helioviewer.jhv.timelines.gui.NewLayerAction;
 import org.helioviewer.jhv.timelines.gui.OpenLocalFileAction;
 import org.json.JSONObject;
 
@@ -21,7 +22,8 @@ public class EVEPlugin implements Plugin {
     public static final EVEDataProvider eveDataprovider = new EVEDataProvider();
 
     private final Timelines tl = new Timelines();
-    private final JMenuItem open = new JMenuItem(new OpenLocalFileAction());
+    private final JMenuItem newItem = new JMenuItem(new NewLayerAction());
+    private final JMenuItem openItem = new JMenuItem(new OpenLocalFileAction());
 
     public EVEPlugin() {
         Timelines.getModel().addLineData(new RadioData());
@@ -31,13 +33,15 @@ public class EVEPlugin implements Plugin {
     public void installPlugin() {
         tl.installTimelines();
         executorService.execute(new BandTypeTask());
-        ImageViewerGui.getMenuBar().getMenu(0).add(open, 2);
+        ImageViewerGui.getMenuBar().getMenu(0).add(newItem, 1);
+        ImageViewerGui.getMenuBar().getMenu(0).add(openItem, 3);
     }
 
     @Override
     public void uninstallPlugin() {
         tl.uninstallTimelines();
-        ImageViewerGui.getMenuBar().getMenu(0).remove(open);
+        ImageViewerGui.getMenuBar().getMenu(0).remove(newItem);
+        ImageViewerGui.getMenuBar().getMenu(0).remove(openItem);
     }
 
     @Override
