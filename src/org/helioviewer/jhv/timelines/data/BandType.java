@@ -28,7 +28,7 @@ public class BandType {
                 if (bt.getName().equals(name))
                     return bt;
         }
-        return null;
+        return new BandType(new JSONObject("{}"));
     }
 
     public static List<BandType> getBandTypes(String group) {
@@ -43,12 +43,12 @@ public class BandType {
     private String name = "unknown";
     private String group = "unknown";
     private String baseURL = "";
-    private String label = "";
-    private String unitLabel = "";
+    private String label = "Unknown";
+    private String unitLabel = "unknown";
     private final HashMap<String, Double> warnLevels = new HashMap<>();
     private double min = 0;
     private double max = 1;
-    private boolean isLog;
+    private boolean isLog = true;
 
     private final JSONObject json;
 
@@ -59,7 +59,10 @@ public class BandType {
         group = jo.optString("group", group);
         baseURL = jo.optString("baseUrl", baseURL);
         label = jo.optString("label", label);
+
         unitLabel = jo.optString("unitLabel", unitLabel);
+        if ("".equals(unitLabel)) // crashes ChartDrawGraphPane.drawVerticalLabels
+            unitLabel = " ";
 
         JSONArray range = jo.optJSONArray("range");
         if (range != null) {
