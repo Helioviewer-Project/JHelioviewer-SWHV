@@ -10,7 +10,7 @@ import org.helioviewer.jhv.plugins.eve.lines.EVEDataProvider;
 import org.helioviewer.jhv.plugins.eve.radio.RadioData;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.data.BandTypeTask;
+import org.helioviewer.jhv.timelines.band.BandTypeTask;
 import org.helioviewer.jhv.timelines.gui.NewLayerAction;
 import org.helioviewer.jhv.timelines.gui.OpenLocalFileAction;
 import org.json.JSONObject;

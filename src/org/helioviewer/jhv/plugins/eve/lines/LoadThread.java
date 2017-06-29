@@ -4,8 +4,8 @@ import java.net.URI;
 
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.data.Band;
-import org.helioviewer.jhv.timelines.data.BandType;
+import org.helioviewer.jhv.timelines.band.Band;
+import org.helioviewer.jhv.timelines.band.BandType;
 
 class LoadThread extends JHVWorker<EVEResponse, Void> {
 

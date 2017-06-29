@@ -10,10 +10,10 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.data.Band;
-import org.helioviewer.jhv.timelines.data.DataProvider;
+import org.helioviewer.jhv.timelines.band.Band;
+import org.helioviewer.jhv.timelines.band.BandDataProvider;
 
-public class EVEDataProvider implements DataProvider {
+public class EVEDataProvider implements BandDataProvider {
 
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 

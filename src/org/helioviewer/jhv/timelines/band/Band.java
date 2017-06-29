@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.data;
+package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -20,16 +20,15 @@ import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.view.LineOptionPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
 import org.json.JSONObject;
 
 public class Band extends AbstractTimelineRenderable {
 
-    private static final DataProvider dataProvider = EVEPlugin.eveDataprovider;
+    private static final BandDataProvider dataProvider = EVEPlugin.eveDataprovider;
 
     private BandType bandType;
-    private final LineOptionPanel optionsPanel;
+    private final BandOptionPanel optionsPanel;
 
     private Color graphColor = Color.BLACK;
     private final YAxis yAxis;
@@ -41,7 +40,7 @@ public class Band extends AbstractTimelineRenderable {
 
     public Band(BandType _bandType) {
         bandType = _bandType;
-        optionsPanel = new LineOptionPanel(this);
+        optionsPanel = new BandOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
         graphColor = BandColors.getNextColor();
     }
@@ -52,7 +51,7 @@ public class Band extends AbstractTimelineRenderable {
             throw new Exception("Bandtype not defined");
 
         bandType = new BandType(jbandType);
-        optionsPanel = new LineOptionPanel(this);
+        optionsPanel = new BandOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
 
         JSONObject jcolor = jo.optJSONObject("color");

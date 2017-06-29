@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.data;
+package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -11,6 +11,8 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 class BandCache {
 
