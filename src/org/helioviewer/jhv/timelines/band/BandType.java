@@ -93,10 +93,6 @@ public class BandType {
         return name;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
     public String getUnitLabel() {
         return unitLabel;
     }
@@ -123,7 +119,7 @@ public class BandType {
 
     @Override
     public String toString() {
-        return getName();
+        return label;
     }
 
     @Override
