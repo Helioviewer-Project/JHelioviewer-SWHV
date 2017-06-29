@@ -16,7 +16,7 @@ public class ZoomStatusPanel extends StatusPanel.StatusPlugin implements LazyCom
         update(Displayer.getCamera().getWidth(), Displayer.getCamera().getViewpoint().distance);
     }
 
-    private String formatFOV(double r) {
+    private static String formatFOV(double r) {
         if (r < 2 * 32 * Sun.Radius)
             return String.format("%5.2fR\u2299", r);
         else

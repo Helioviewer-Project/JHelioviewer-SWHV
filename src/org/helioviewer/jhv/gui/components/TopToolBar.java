@@ -83,13 +83,13 @@ public class TopToolBar extends JToolBar {
 
     private final LinkedHashMap<ButtonText, ActionListener> pluginButtons = new LinkedHashMap<>();
 
-    private JideButton toolButton(ButtonText text) {
+    private static JideButton toolButton(ButtonText text) {
         JideButton b = new JideButton(text.toString());
         b.setToolTipText(text.tip);
         return b;
     }
 
-    private JideToggleButton toolToggleButton(ButtonText text) {
+    private static JideToggleButton toolToggleButton(ButtonText text) {
         JideToggleButton b = new JideToggleButton(text.toString());
         b.setToolTipText(text.tip);
         return b;
@@ -261,7 +261,7 @@ public class TopToolBar extends JToolBar {
         }
     }
 
-    private void setActiveInteractionMode(InteractionMode mode) {
+    private static void setActiveInteractionMode(InteractionMode mode) {
         Settings.getSingletonInstance().setProperty("display.interaction", mode.toString());
         Settings.getSingletonInstance().save("display.interaction");
         ImageViewerGui.setCurrentInteraction(mode.interaction);
