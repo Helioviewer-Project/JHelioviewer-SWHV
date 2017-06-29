@@ -63,6 +63,13 @@ public class Band extends AbstractTimelineRenderable {
         }
     }
 
+    JSONObject save() {
+        JSONObject jo = new JSONObject();
+        bandCache.serialize(jo, 1.);
+        bandType.serialize(jo);
+        return jo;
+    }
+
     @Override
     public void serialize(JSONObject jo) {
         bandType.serialize(jo);
@@ -101,7 +108,7 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public String getName() {
-        return bandType.toString();
+        return bandType.getLabel();
     }
 
     @Override
