@@ -269,8 +269,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables = new ArrayList<>();
     }
 
-    private final String defaultState = JHVDirectory.HOME.getPath() + "test.json";
-
     public void saveCurrentScene() {
         JSONObject main = new JSONObject();
         main.put("time", Layers.getLastUpdatedTimestamp());
@@ -298,7 +296,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         JSONObject plugins = new JSONObject();
         PluginManager.getSingletonInstance().saveState(plugins);
         main.put("plugins", plugins);
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(defaultState), StandardCharsets.UTF_8)) {
+
+        String fileName = JHVDirectory.STATES.getPath() + "jhv_state__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json";
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
             main.write(writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -441,10 +441,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void loadScene() {
-        loadScene(defaultState);
     }
 
     private static class LoadState extends JHVWorker<Void, Void> {
