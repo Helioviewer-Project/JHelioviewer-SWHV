@@ -229,7 +229,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glPopMatrix();
     }
 
-    private void drawRadialGridText(GL2 gl, ArrayList<GridLabel> labels, double size, float[] labelPos) {
+    private static void drawRadialGridText(GL2 gl, ArrayList<GridLabel> labels, double size, float[] labelPos) {
         gl.glDisable(GL2.GL_CULL_FACE);
 
         float fuzz = 0.75f;

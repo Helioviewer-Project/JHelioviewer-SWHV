@@ -25,7 +25,7 @@ public class BandType {
     public static BandType getBandType(String name) {
         for (List<BandType> list : groups.values()) {
             for (BandType bt : list)
-                if (bt.getName().equals(name))
+                if (bt.name.equals(name))
                     return bt;
         }
         return new BandType(new JSONObject("{}"));
