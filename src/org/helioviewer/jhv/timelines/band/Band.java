@@ -63,9 +63,14 @@ public class Band extends AbstractTimelineRenderable {
         }
     }
 
-    JSONObject save() {
+    JSONObject toJson() {
         JSONObject jo = new JSONObject();
-        bandCache.serialize(jo, 1.);
+        jo.put("timeline", toString()); // to be removed
+
+        float[] bounds = bandCache.getBounds(DrawController.selectedAxis);
+        double multiplier = bounds[0] == 0 ? 1 : bounds[0];
+        jo.put("multiplier", multiplier);
+        bandCache.serialize(jo, 1 / multiplier);
         bandType.serialize(jo);
         return jo;
     }
