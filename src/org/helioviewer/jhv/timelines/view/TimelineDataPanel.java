@@ -13,8 +13,8 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.data.Band;
-import org.helioviewer.jhv.timelines.data.BandType;
+import org.helioviewer.jhv.timelines.band.Band;
+import org.helioviewer.jhv.timelines.band.BandType;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 

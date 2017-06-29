@@ -1,8 +1,8 @@
-package org.helioviewer.jhv.timelines.data;
+package org.helioviewer.jhv.timelines.band;
 
 import java.net.URI;
 
-public interface DataProvider {
+public interface BandDataProvider {
 
     void loadBand(URI uri);
 

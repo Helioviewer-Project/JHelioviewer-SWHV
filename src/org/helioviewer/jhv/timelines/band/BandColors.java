@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.data;
+package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Color;
 

@@ -5,8 +5,8 @@ import java.net.URI;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.data.Band;
-import org.helioviewer.jhv.timelines.data.BandType;
+import org.helioviewer.jhv.timelines.band.Band;
+import org.helioviewer.jhv.timelines.band.BandType;
 
 class DownloadThread extends JHVWorker<EVEResponse, Void> {
 
