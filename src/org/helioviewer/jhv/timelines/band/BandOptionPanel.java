@@ -25,7 +25,7 @@ import org.helioviewer.jhv.timelines.TimelineSettings;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class BandOptionPanel extends JPanel {
+class BandOptionPanel extends JPanel {
 
     public BandOptionPanel(Band band) {
         setLayout(new GridBagLayout());
@@ -60,7 +60,7 @@ public class BandOptionPanel extends JPanel {
         JideButton downloadButton = new JideButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
-            String fileName = JHVDirectory.REMOTEFILES.getPath() + band.getBandType() + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json";
+            String fileName = JHVDirectory.REMOTEFILES.getPath() + band.getBandType().getName() + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json";
             try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
                 band.toJson().write(writer);
             } catch (Exception ex) {
