@@ -97,13 +97,13 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
         return position.length > 0;
     }
 
-    public long interpolateTime(long time, long start, long end) {
+    public long interpolateTime(long time, long startTime, long endTime) {
         long pStart = position[0].time.milli;
         long pEnd = position[position.length - 1].time.milli;
-        if (start == end)
+        if (startTime == endTime)
             return pEnd;
         else {
-            double f = (time - start) / (double) (end - start); //!
+            double f = (time - startTime) / (double) (endTime - startTime); //!
             return (long) (pStart + f * (pEnd - pStart) + .5);
         }
     }

@@ -28,7 +28,7 @@ import org.helioviewer.jhv.view.View;
 @SuppressWarnings("serial")
 public class TimeSlider extends JSlider implements LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
 
-    private final TimeSliderUI ui;
+    private final TimeSliderUI sliderUI;
     private JLabel label;
     private boolean dirty;
     private boolean wasPlaying;
@@ -37,8 +37,8 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
         super(_orientation, min, max, value);
         setSnapToTicks(true);
 
-        ui = new TimeSliderUI(this);
-        setUI(ui);
+        sliderUI = new TimeSliderUI(this);
+        setUI(sliderUI);
         // remove all mouse listeners installed by BasicSliderUI.TrackListener
         for (MouseListener l : getMouseListeners())
             removeMouseListener(l);
@@ -90,7 +90,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        setValue(ui.valueForXPosition(e.getX()));
+        setValue(sliderUI.valueForXPosition(e.getX()));
     }
 
     @Override
