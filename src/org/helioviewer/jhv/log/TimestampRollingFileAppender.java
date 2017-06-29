@@ -61,8 +61,8 @@ public class TimestampRollingFileAppender extends FileAppender {
         return timeStampString;
     }
 
-    public void setDays(long days) {
-        this.days = days;
+    public void setDays(long _days) {
+        days = _days;
     }
 
     public long getDays() {
