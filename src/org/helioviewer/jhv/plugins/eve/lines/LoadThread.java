@@ -31,7 +31,7 @@ class LoadThread extends JHVWorker<EVEResponse, Void> {
             try {
                 EVEResponse r = get();
                 if (r != null) {
-                    Band band = new Band(BandType.getBandType(r.bandType));
+                    Band band = new Band(r.bandType == null ? BandType.getBandType(r.bandName) : r.bandType);
                     band.addToCache(r.values, r.dates);
                     Timelines.getModel().addLineData(band);
                 }

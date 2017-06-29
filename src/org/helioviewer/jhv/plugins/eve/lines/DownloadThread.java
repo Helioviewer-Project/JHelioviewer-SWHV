@@ -42,8 +42,8 @@ class DownloadThread extends JHVWorker<EVEResponse, Void> {
             try {
                 EVEResponse r = get();
                 if (r != null) {
-                    if (!r.bandType.equals(band.getBandType().getName()))
-                        throw new Exception("Expected " + band.getBandType().getName() + ", got " + r.bandType);
+                    if (!r.bandName.equals(band.getBandType().getName()))
+                        throw new Exception("Expected " + band.getBandType().getName() + ", got " + r.bandName);
                     band.addToCache(r.values, r.dates);
                 }
             } catch (Exception e) {

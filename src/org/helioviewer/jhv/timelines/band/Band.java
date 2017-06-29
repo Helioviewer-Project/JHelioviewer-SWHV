@@ -65,7 +65,7 @@ public class Band extends AbstractTimelineRenderable {
 
     JSONObject toJson() {
         JSONObject jo = new JSONObject();
-        jo.put("timeline", toString()); // to be removed
+        jo.put("timeline", toString());
 
         float[] bounds = bandCache.getBounds(DrawController.selectedAxis);
         double multiplier = bounds[0] == 0 ? 1 : bounds[0];
