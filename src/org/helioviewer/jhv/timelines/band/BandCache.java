@@ -133,6 +133,13 @@ class BandCache {
         return Float.MIN_VALUE;
     }
 
+    void serialize(JSONObject jo, double f) {
+        JSONArray ja = new JSONArray();
+        for (DataChunk chunk : cacheMap.values())
+            chunk.serialize(ja, f);
+        jo.put("data", ja);
+    }
+
     private static class DataChunk {
         private final float[][] values = new float[MAX_LEVEL][];
         private final long[][] dates = new long[MAX_LEVEL][];
@@ -175,6 +182,13 @@ class BandCache {
 
         long[] getDates(int level) {
             return dates[level];
+        }
+
+        void serialize(JSONArray ja, double f) {
+            long[] d = dates[0];
+            float[] v = values[0];
+            for (int i = 0; i < v.length; i++)
+                ja.put(new JSONArray().put(d[i]).put(f * v[i]));
         }
     }
 

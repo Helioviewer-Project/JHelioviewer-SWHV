@@ -89,6 +89,14 @@ public class BandType {
         jo.put("bandType", json);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
     public String getUnitLabel() {
         return unitLabel;
     }
@@ -105,10 +113,6 @@ public class BandType {
         return max;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public boolean isLogScale() {
         return isLog;
     }
@@ -119,10 +123,10 @@ public class BandType {
 
     @Override
     public String toString() {
-        return label;
+        return getName();
     }
 
-   @Override
+    @Override
     public boolean equals(Object o) {
         return o instanceof BandType && o.toString().equals(toString());
     }
