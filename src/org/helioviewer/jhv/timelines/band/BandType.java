@@ -52,7 +52,7 @@ public class BandType {
 
     private final JSONObject json;
 
-    BandType(JSONObject jo) {
+    public BandType(JSONObject jo) {
         json = jo;
 
         name = jo.optString("name", name);
