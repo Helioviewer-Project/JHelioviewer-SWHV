@@ -177,9 +177,9 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindColor(GL2 gl, float red, float green, float blue, float alpha) {
-        color[0] = red;
-        color[1] = green;
-        color[2] = blue;
+        color[0] = red * alpha;
+        color[1] = green * alpha;
+        color[2] = blue * alpha;
         color[3] = alpha;
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
