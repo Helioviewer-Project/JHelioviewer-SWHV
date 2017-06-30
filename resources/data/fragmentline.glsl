@@ -21,5 +21,5 @@ void main() {
         discard;
 
     gl_FragColor = frag_linecolor;
-    gl_FragColor.a = smoothpulse((frag_direction + 1.) / 2.);
+    // gl_FragColor.a = smoothpulse((frag_direction + 1.) / 2.);
 }
