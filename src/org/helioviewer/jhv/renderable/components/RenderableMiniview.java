@@ -66,10 +66,10 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
         {
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
 
-            gl.glColor4f(0, 1, 0, 0.2f);
+            gl.glColor4f(0, 1 * 0.2f, 0, 0.2f);
             GLHelper.drawRectangleFront(gl, -30, -30, 60, 60);
 
-            gl.glColor4f(1, 0, 0, 0.2f);
+            gl.glColor4f(1 * 0.2f, 0, 0, 0.2f);
             GLHelper.drawCircleFront(gl, 0, 0, 1, 100);
         }
         gl.glPopMatrix();

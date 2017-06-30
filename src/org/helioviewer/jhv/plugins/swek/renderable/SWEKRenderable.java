@@ -229,7 +229,8 @@ public class SWEKRenderable extends AbstractRenderable {
         if (pt != null) {
             bindTexture(gl, evtr.getSupplier().getGroup());
             Color color = evtr.getColor();
-            gl.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 0.6f);
+            float alpha = 0.6f;
+            gl.glColor4f(color.getRed() / 255f * alpha, color.getGreen() / 255f * alpha, color.getBlue() / 255f * alpha, alpha);
             if (evtr.isHighlighted()) {
                 drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
             } else {
