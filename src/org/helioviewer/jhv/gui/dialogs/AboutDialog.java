@@ -38,7 +38,7 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     public JComponent createContentPanel() {
         String text = "<center>This software was built using several components including:</center><ul>" +
             "<li>The <a href=\"http://www.kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, ©2015, <a href=Kakadu.txt>licensed</a> from NewSouth Innovations Ltd.</li>" +
-            "<li><a href=\"https://jogamp.org\">JogAmp</a>, the Java libraries for 3D Graphics, Multimedia and Processing.</li>" +
+            "<li>The <a href=\"https://jogamp.org\">JogAmp</a> libraries for Java 3D Graphics.</li>" +
             "<li>The <a href=\"https://github.com/stleary/JSON-java\">JSON in Java</a> library.</li>" +
             "<li>The JSON <a href=\"https://github.com/everit-org/json-schema\">Schema Validator</a> library.</li>" +
             "<li>The <a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
