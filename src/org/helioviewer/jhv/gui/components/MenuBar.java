@@ -36,6 +36,7 @@ public class MenuBar extends JMenuBar {
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(new NewLayerAction());
         fileMenu.add(new OpenLocalFileAction());
+        fileMenu.addSeparator();
         fileMenu.add(new SaveStateAction());
         fileMenu.add(new LoadStateAction());
 

@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -53,7 +54,10 @@ public class SpaceObjectContainer extends JScrollPane {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedRenderer());
+        if (exclusive)
+            grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedExclusiveRenderer());
+        else
+            grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedRenderer());
         grid.getColumnModel().getColumn(SELECTED_COL).setPreferredWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(SELECTED_COL).setMaxWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(OBJECT_COL).setCellRenderer(new ObjectRenderer());
@@ -164,6 +168,29 @@ public class SpaceObjectContainer extends JScrollPane {
             }
             checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             return checkBox;
+        }
+
+    }
+
+    private static class SelectedExclusiveRenderer extends JHVTableCellRenderer {
+
+        private final JRadioButton radio = new JRadioButton();
+
+        public SelectedExclusiveRenderer() {
+            setHorizontalAlignment(CENTER);
+            radio.putClientProperty("JComponent.sizeVariant", "small");
+            radio.setBorderPainted(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (value instanceof SpaceObjectElement) {
+                SpaceObjectElement element = (SpaceObjectElement) value;
+                radio.setSelected(element.isSelected());
+                radio.setBorder(element.getObject().getBorder());
+            }
+            radio.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+            return radio;
         }
 
     }
