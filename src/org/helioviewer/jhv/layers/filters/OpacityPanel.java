@@ -27,7 +27,7 @@ public class OpacityPanel implements FilterDetails {
 
     @Override
     public Component getTitle() {
-        return new JLabel("Opacity", JLabel.RIGHT);
+        return new JLabel("Blend", JLabel.RIGHT);
     }
 
     @Override
