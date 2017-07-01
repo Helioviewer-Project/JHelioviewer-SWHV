@@ -30,6 +30,7 @@ public class GLImage {
     private double brightOffset = 0;
     private double brightScale = 1;
     private double opacity = 1;
+    private double blend = .5;
     private double sharpen = 0;
     private boolean enhanced = false;
     private DifferenceMode diffMode = DifferenceMode.None;
@@ -61,7 +62,7 @@ public class GLImage {
         applyRegion(gl, imageData, prevImageData, baseImageData, shader);
 
         shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), imageData.getGamma());
-        shader.bindColor(gl, red, green, blue, opacity, 0.5);
+        shader.bindColor(gl, red, green, blue, opacity, blend);
         shader.bindEnhanced(gl, enhanced);
         shader.bindSharpen(gl, sharpen, 1. / imageData.getWidth(), 1. / imageData.getHeight(), 1);
 
@@ -158,6 +159,10 @@ public class GLImage {
         opacity = MathUtils.clip(_opacity, 0, 1);
     }
 
+    public void setBlend(double _blend) {
+        blend = MathUtils.clip(_blend, 0, 1);
+    }
+
     public void setSharpen(double _sharpen) {
         sharpen = MathUtils.clip(_sharpen, -1, 1);
     }
@@ -198,6 +203,10 @@ public class GLImage {
         return opacity;
     }
 
+    public double getBlend() {
+        return blend;
+    }
+
     public boolean getRed() {
         return red != 0;
     }
@@ -217,6 +226,7 @@ public class GLImage {
     public void fromJson(JSONObject jo) {
         setSharpen(jo.optDouble("sharpen", sharpen));
         setOpacity(jo.optDouble("opacity", opacity));
+        setBlend(jo.optDouble("blend", blend));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         enhanced = jo.optBoolean("enhanced", false);
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
@@ -237,6 +247,7 @@ public class GLImage {
         JSONObject jo = new JSONObject();
         jo.put("sharpen", sharpen);
         jo.put("opacity", opacity);
+        jo.put("blend", blend);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
         jo.put("enhanced", enhanced);

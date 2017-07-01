@@ -23,6 +23,7 @@ public class ImageLayerOptions extends JPanel {
 
         RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel(this);
         OpacityPanel opacityPanel = new OpacityPanel(this);
+        BlendPanel blendPanel = new BlendPanel(this);
         ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel(this);
         lutPanel = new LUTPanel(this);
         LevelsPanel levelsPanel = new LevelsPanel(this);
@@ -45,6 +46,8 @@ public class ImageLayerOptions extends JPanel {
         c.gridwidth = 1;
         c.gridy++;
         addToGridBag(c, opacityPanel);
+        c.gridy++;
+        addToGridBag(c, blendPanel);
         c.gridy++;
         addToGridBag(c, sharpenPanel);
         c.gridy++;
