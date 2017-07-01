@@ -194,15 +194,13 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public void arrangeMultiView(boolean multiview) {
-        int ct = 0;
-
         if (multiview) {
+            int ct = 0;
             for (Renderable r : renderables) {
                 if (r instanceof ImageLayer) {
                     ImageLayer l = (ImageLayer) r;
                     if (l.isEnabled()) {
                         l.setVisible(ct);
-                        l.setOpacity(1);
                         ct++;
                     }
                 }
@@ -213,14 +211,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
                     ImageLayer l = (ImageLayer) r;
                     if (l.isEnabled()) {
                         l.setVisible(0);
-                        float opacity;
-                        if (ImageLayer.isCor(l.getName()))
-                            opacity = 1;
-                        else {
-                            opacity = (float) (1. / (1. + ct));
-                            ct++;
-                        }
-                        l.setOpacity(opacity);
                     }
                 }
             }

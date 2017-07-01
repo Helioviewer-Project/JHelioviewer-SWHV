@@ -25,11 +25,6 @@ public class OpacityPanel implements FilterDetails {
         WheelSupport.installMouseWheelSupport(slider);
     }
 
-    // opacity must be within [0, 1]
-    public void setValue(float opacity) {
-        slider.setValue((int) (opacity * 100));
-    }
-
     @Override
     public Component getTitle() {
         return new JLabel("Opacity", JLabel.RIGHT);
