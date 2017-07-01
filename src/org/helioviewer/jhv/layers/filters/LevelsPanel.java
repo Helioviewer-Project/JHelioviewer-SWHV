@@ -41,8 +41,8 @@ public class LevelsPanel implements FilterDetails {
     }
 
     public LevelsPanel(ImageLayerOptions parent) {
-        float offset = parent.getGLImage().getBrightOffset();
-        float scale = parent.getGLImage().getBrightScale();
+        double offset = parent.getGLImage().getBrightOffset();
+        double scale = parent.getGLImage().getBrightScale();
         int high = (int) (100 * (offset + scale));
 
         slider = new RangeSlider(-101, 201, (int) (offset * 100), high);
@@ -60,7 +60,7 @@ public class LevelsPanel implements FilterDetails {
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
-            parent.getGLImage().setBrightness(lo / 100f, (hi - lo) / 100f);
+            parent.getGLImage().setBrightness(lo / 100., (hi - lo) / 100.);
             label.setText(format(lo, hi));
             Displayer.display();
         });
