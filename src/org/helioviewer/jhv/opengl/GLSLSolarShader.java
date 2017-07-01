@@ -184,10 +184,10 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
 
-    public void bindBrightness(GL2 gl, float offset, float scale, float gamma) {
-        bright[0] = offset;
-        bright[1] = scale;
-        bright[2] = gamma;
+    public void bindBrightness(GL2 gl, double offset, double scale, double gamma) {
+        bright[0] = (float) offset;
+        bright[1] = (float) scale;
+        bright[2] = (float) gamma;
         gl.glUniform3fv(brightRef, 1, bright, 0);
     }
 

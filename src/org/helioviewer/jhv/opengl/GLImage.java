@@ -27,8 +27,8 @@ public class GLImage {
     private float green = 1;
     private float blue = 1;
 
-    private float brightOffset = 0;
-    private float brightScale = 1;
+    private double brightOffset = 0;
+    private double brightScale = 1;
     private double opacity = 1;
     private double sharpen = 0;
     private boolean enhanced = false;
@@ -60,7 +60,7 @@ public class GLImage {
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader, int numLayers) {
         applyRegion(gl, imageData, prevImageData, baseImageData, shader);
 
-        shader.bindBrightness(gl, brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()), (float) imageData.getGamma());
+        shader.bindBrightness(gl, brightOffset, brightScale * imageData.getMetaData().getResponseFactor(), imageData.getGamma());
         shader.bindColor(gl, red, green, blue, opacity, numLayers);
         shader.bindEnhanced(gl, enhanced);
         shader.bindSharpen(gl, sharpen, 1. / imageData.getWidth(), 1. / imageData.getHeight(), 1);
@@ -135,16 +135,16 @@ public class GLImage {
             diffTex.delete(gl);
     }
 
-    public void setBrightness(float offset, float scale) {
-        brightOffset = offset;
-        brightScale = scale;
+    public void setBrightness(double offset, double scale) {
+        brightOffset = MathUtils.clip(offset, -1, 2);
+        brightScale = MathUtils.clip(scale, 0, 2 - brightOffset);
     }
 
-    public float getBrightOffset() {
+    public double getBrightOffset() {
         return brightOffset;
     }
 
-    public float getBrightScale() {
+    public double getBrightScale() {
         return brightScale;
     }
 
@@ -217,8 +217,7 @@ public class GLImage {
     public void fromJson(JSONObject jo) {
         setSharpen(jo.optDouble("sharpen", sharpen));
         setOpacity(jo.optDouble("opacity", opacity));
-        brightOffset = MathUtils.clip((float) jo.optDouble("brightOffset", 0), -1, 2);
-        brightScale = MathUtils.clip((float) jo.optDouble("brightScale", 0), 0, 2 - brightOffset);
+        setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         enhanced = jo.optBoolean("enhanced", false);
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
         try {
