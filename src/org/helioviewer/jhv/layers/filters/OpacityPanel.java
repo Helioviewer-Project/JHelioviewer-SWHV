@@ -18,7 +18,7 @@ public class OpacityPanel implements FilterDetails {
         slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (parent.getGLImage().getOpacity() * 100));
         label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
-            parent.getGLImage().setOpacity(slider.getValue() / 100f);
+            parent.getGLImage().setOpacity(slider.getValue() / 100.);
             label.setText(LevelsPanel.align3(slider.getValue()));
             Displayer.display();
         });
