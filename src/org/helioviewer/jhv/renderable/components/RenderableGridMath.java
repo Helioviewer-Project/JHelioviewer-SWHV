@@ -108,7 +108,7 @@ class RenderableGridMath {
     static void initRadialCircles(GL2 gl, GLLine radialCircleLine, GLLine radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
 
-        int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 1) + 4 * no_lines + 1;
+        int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + 4 * no_lines;
         FloatBuffer positionBuffer = BufferUtils.newFloatBuffer(no_points * 3);
         FloatBuffer colorBuffer = BufferUtils.newFloatBuffer(no_points * 4);
         FloatBuffer positionThick = BufferUtils.newFloatBuffer(TENS_RADIUS * (SUBDIVISIONS + 3) * 3);
@@ -132,14 +132,19 @@ class RenderableGridMath {
                         colorThick.put(BufferUtils.colorNull);
                     }
                 } else {
+                    if (j == 0) {
+                        BufferUtils.put3f(positionBuffer, v);
+                        colorBuffer.put(BufferUtils.colorNull);
+                    }
                     BufferUtils.put3f(positionBuffer, v);
                     colorBuffer.put(radialLineColor);
+                    if (j == SUBDIVISIONS) {
+                        BufferUtils.put3f(positionBuffer, v);
+                        colorBuffer.put(BufferUtils.colorNull);
+                    }
                 }
             }
         }
-
-        BufferUtils.put3f(positionBuffer, v);
-        colorBuffer.put(BufferUtils.colorNull);
 
         float i = 0;
         for (int j = 0; j < no_lines; j++) {
