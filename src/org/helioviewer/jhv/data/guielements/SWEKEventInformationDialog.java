@@ -136,7 +136,7 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
             gc.gridy = gridYPosition;
             gc.weighty = otherRelatedEventsPanel.isExpanded() ? 1 : 0;
             allTablePanel.add(otherRelatedEventsPanel, gc);
-            gridYPosition++;
+            //gridYPosition++;
         }
     }
 
