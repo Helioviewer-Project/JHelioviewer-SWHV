@@ -16,14 +16,13 @@ import org.helioviewer.jhv.view.View;
 public class ImageLayerOptions extends JPanel {
 
     private final ImageLayer imageLayer;
-    private final OpacityPanel opacityPanel;
     private final LUTPanel lutPanel;
 
     public ImageLayerOptions(ImageLayer _imageLayer) {
         imageLayer = _imageLayer;
 
         RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel(this);
-        opacityPanel = new OpacityPanel(this);
+        OpacityPanel opacityPanel = new OpacityPanel(this);
         ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel(this);
         lutPanel = new LUTPanel(this);
         LevelsPanel levelsPanel = new LevelsPanel(this);
@@ -80,10 +79,6 @@ public class ImageLayerOptions extends JPanel {
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.NONE;
         add(details.getLabel(), c);
-    }
-
-    void setOpacity(float opacity) {
-        opacityPanel.setValue(opacity);
     }
 
     void setLUT(LUT lut) {
