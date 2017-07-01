@@ -37,9 +37,9 @@ public class RenderableGrid extends AbstractRenderable {
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
-    private static final double thickness = 0.001;
-    private static final double thicknessEarth = 0.0015;
-    private static final double thicknessAxes = 0.003;
+    private static final double thickness = 0.002;
+    private static final double thicknessEarth = 0.003;
+    private static final double thicknessAxes = 0.005;
 
     private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
 
