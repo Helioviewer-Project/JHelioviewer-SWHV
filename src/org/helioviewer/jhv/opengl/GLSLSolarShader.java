@@ -176,11 +176,11 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1iv(isDiscRef, 1, isDisc, 0);
     }
 
-    public void bindColor(GL2 gl, float red, float green, float blue, double alpha, int numLayers) {
+    public void bindColor(GL2 gl, float red, float green, float blue, double alpha, double blend) {
         color[0] = (float) (red * alpha);
         color[1] = (float) (green * alpha);
         color[2] = (float) (blue * alpha);
-        color[3] = (float) (alpha / numLayers); // http://amindforeverprogramming.blogspot.be/2013/07/why-alpha-premultiplied-colour-blending.html
+        color[3] = (float) (alpha * blend); // http://amindforeverprogramming.blogspot.be/2013/07/why-alpha-premultiplied-colour-blending.html
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
 

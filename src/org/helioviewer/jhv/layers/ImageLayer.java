@@ -208,8 +208,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
         shader.bind(gl);
         {
-            int numLayers = imageData.getMetaData().getInnerCutOffRadius() > 1 ? 1 : Layers.getNumEnabledLayers(); // should be two groups
-            glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader, numLayers);
+            glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
             shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
 
             Position.Q viewpoint = imageData.getViewpoint();
