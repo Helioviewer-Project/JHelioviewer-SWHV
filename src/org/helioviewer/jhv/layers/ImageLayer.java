@@ -118,12 +118,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
     }
 
-    public static boolean isCor(String name) {
-        return name.contains("LASCO") || name.contains("COR");
-    }
-
-    private float opacity = -1;
-
     public void setView(View _view) {
         if (view != null)
             unsetView();
@@ -141,18 +135,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
         if (Displayer.multiview) {
             ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
-        } else if (opacity == -1) { // first time
-            if (isCor(view.getName()))
-                opacity = 1;
-            else {
-                int count = 0;
-                for (int i = 0; i < Layers.getNumLayers(); i++) {
-                    if (!isCor(Layers.getLayer(i).getName()))
-                        count++;
-                }
-                opacity = (float) (1. / (count == 0 ? 1 : count /* satisfy coverity */));
-            }
-            optionsPanel.setOpacity(opacity);
         }
         optionsPanel.setLUT(view.getDefaultLUT());
     }
@@ -226,7 +208,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
         shader.bind(gl);
         {
-            glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
+            int numLayers = imageData.getMetaData().getInnerCutOffRadius() > 1 ? 1 : Layers.getNumEnabledLayers(); // should be two groups
+            glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader, numLayers);
             shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
 
             Position.Q viewpoint = imageData.getViewpoint();
@@ -357,10 +340,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     @Override
     public boolean isDownloading() {
         return view != null && view.isDownloading();
-    }
-
-    public void setOpacity(float _opacity) { // deliberate, for multiview
-        optionsPanel.setOpacity(_opacity);
     }
 
     GLImage getGLImage() {

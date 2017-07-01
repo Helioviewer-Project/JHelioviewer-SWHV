@@ -121,7 +121,7 @@ public class Layers {
         }
     }
 
-    static View getLayer(int index) {
+    private static View getLayer(int index) {
         try {
             return layers.get(index);
         } catch (Exception e) {

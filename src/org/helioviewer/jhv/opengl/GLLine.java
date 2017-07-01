@@ -12,9 +12,9 @@ import com.jogamp.opengl.GL2;
 public class GLLine {
 
     private int[] vboAttribRefs;
-    private int[] vboAttribLens = { 3, 3, 3, 1, 4 };
+    private final int[] vboAttribLens = { 3, 3, 3, 1, 4 };
 
-    private VBO[] vbos = new VBO[5];
+    private final VBO[] vbos = new VBO[5];
     private VBO ivbo;
     private boolean hasPoints = false;
 

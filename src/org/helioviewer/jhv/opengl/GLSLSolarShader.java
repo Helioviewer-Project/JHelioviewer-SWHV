@@ -81,7 +81,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] viewport = new float[2];
     private final float[] viewportOffset = new float[2];
 
-    public GLSLSolarShader(String vertex, String fragment) {
+    private GLSLSolarShader(String vertex, String fragment) {
         super(vertex, fragment);
     }
 
@@ -176,11 +176,11 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1iv(isDiscRef, 1, isDisc, 0);
     }
 
-    public void bindColor(GL2 gl, float red, float green, float blue, float alpha) {
+    public void bindColor(GL2 gl, float red, float green, float blue, float alpha, int numLayers) {
         color[0] = red * alpha;
         color[1] = green * alpha;
         color[2] = blue * alpha;
-        color[3] = alpha;
+        color[3] = alpha / numLayers; // http://amindforeverprogramming.blogspot.be/2013/07/why-alpha-premultiplied-colour-blending.html
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
 

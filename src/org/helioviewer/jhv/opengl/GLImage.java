@@ -57,11 +57,11 @@ public class GLImage {
         }
     }
 
-    public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
+    public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader, int numLayers) {
         applyRegion(gl, imageData, prevImageData, baseImageData, shader);
 
         shader.bindBrightness(gl, brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()), (float) imageData.getGamma());
-        shader.bindColor(gl, red, green, blue, opacity);
+        shader.bindColor(gl, red, green, blue, opacity, numLayers);
         shader.bindEnhanced(gl, enhanced);
         shader.bindSharpen(gl, sharpen, 1f / imageData.getWidth(), 1f / imageData.getHeight(), 1f);
 
