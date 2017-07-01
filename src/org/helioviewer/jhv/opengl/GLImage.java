@@ -29,8 +29,8 @@ public class GLImage {
 
     private float brightOffset = 0;
     private float brightScale = 1;
-    private float opacity = 1;
-    private float sharpen = 0;
+    private double opacity = 1;
+    private double sharpen = 0;
     private boolean enhanced = false;
     private DifferenceMode diffMode = DifferenceMode.None;
 
@@ -63,7 +63,7 @@ public class GLImage {
         shader.bindBrightness(gl, brightOffset, (float) (brightScale * imageData.getMetaData().getResponseFactor()), (float) imageData.getGamma());
         shader.bindColor(gl, red, green, blue, opacity, numLayers);
         shader.bindEnhanced(gl, enhanced);
-        shader.bindSharpen(gl, sharpen, 1f / imageData.getWidth(), 1f / imageData.getHeight(), 1f);
+        shader.bindSharpen(gl, sharpen, 1. / imageData.getWidth(), 1. / imageData.getHeight(), 1);
 
         applyLUT(gl);
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
@@ -154,12 +154,12 @@ public class GLImage {
         blue = _blue;
     }
 
-    public void setOpacity(float _opacity) {
-        opacity = _opacity;
+    public void setOpacity(double _opacity) {
+        opacity = MathUtils.clip(_opacity, 0, 1);
     }
 
-    public void setSharpen(float _sharpen) {
-        sharpen = _sharpen;
+    public void setSharpen(double _sharpen) {
+        sharpen = MathUtils.clip(_sharpen, -1, 1);
     }
 
     public void setLUT(LUT newLUT, boolean invert) {
@@ -186,7 +186,7 @@ public class GLImage {
         return diffMode;
     }
 
-    public float getSharpen() {
+    public double getSharpen() {
         return sharpen;
     }
 
@@ -194,7 +194,7 @@ public class GLImage {
         return enhanced;
     }
 
-    public float getOpacity() {
+    public double getOpacity() {
         return opacity;
     }
 
@@ -215,8 +215,8 @@ public class GLImage {
     }
 
     public void fromJson(JSONObject jo) {
-        sharpen = MathUtils.clip((float) jo.optDouble("sharpen", 0), 0, 1);
-        opacity = MathUtils.clip((float) jo.optDouble("opacity", 0), 0, 1);
+        setSharpen(jo.optDouble("sharpen", sharpen));
+        setOpacity(jo.optDouble("opacity", opacity));
         brightOffset = MathUtils.clip((float) jo.optDouble("brightOffset", 0), -1, 2);
         brightScale = MathUtils.clip((float) jo.optDouble("brightScale", 0), 0, 2 - brightOffset);
         enhanced = jo.optBoolean("enhanced", false);

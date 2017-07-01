@@ -176,11 +176,11 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1iv(isDiscRef, 1, isDisc, 0);
     }
 
-    public void bindColor(GL2 gl, float red, float green, float blue, float alpha, int numLayers) {
-        color[0] = red * alpha;
-        color[1] = green * alpha;
-        color[2] = blue * alpha;
-        color[3] = alpha / numLayers; // http://amindforeverprogramming.blogspot.be/2013/07/why-alpha-premultiplied-colour-blending.html
+    public void bindColor(GL2 gl, float red, float green, float blue, double alpha, int numLayers) {
+        color[0] = (float) (red * alpha);
+        color[1] = (float) (green * alpha);
+        color[2] = (float) (blue * alpha);
+        color[3] = (float) (alpha / numLayers); // http://amindforeverprogramming.blogspot.be/2013/07/why-alpha-premultiplied-colour-blending.html
         gl.glUniform4fv(colorRef, 1, color, 0);
     }
 
@@ -191,10 +191,10 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(brightRef, 1, bright, 0);
     }
 
-    public void bindSharpen(GL2 gl, float weighting, float pixelWidth, float pixelHeight, float span) {
-        sharpen[0] = pixelWidth * span;
-        sharpen[1] = pixelHeight * span;
-        sharpen[2] = -weighting; // used for mix
+    public void bindSharpen(GL2 gl, double weighting, double pixelWidth, double pixelHeight, double span) {
+        sharpen[0] = (float) (pixelWidth * span);
+        sharpen[1] = (float) (pixelHeight * span);
+        sharpen[2] = (float) (-5 * weighting); // used for mix
         gl.glUniform3fv(sharpenRef, 1, sharpen, 0);
     }
 
