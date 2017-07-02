@@ -19,14 +19,14 @@ import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
-/*
+
 import java.util.HashMap;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.SampUtils;
-*/
+
 public class Layers {
 
     private static View activeView;
@@ -366,7 +366,7 @@ public class Layers {
         }
         return str.toString();
     }
-/*
+
     public static void getSAMPMessage(Message msg) {
         if (activeView == null)
             return;
@@ -380,9 +380,9 @@ public class Layers {
             return;
         HelioviewerMetaData hm = (HelioviewerMetaData) m;
 
-        msg.addParam("timestamp", hm.getViewpoint().time.toString().replace('-', '/') + ".000");
-        msg.addParam("start", activeView.getFirstTime().toString().replace('-', '/') + ".000");
-        msg.addParam("end", activeView.getFirstTime().toString().replace('-', '/') + ".000");
+        msg.addParam("timestamp", hm.getViewpoint().time.toString());
+        msg.addParam("start", activeView.getFirstTime().toString());
+        msg.addParam("end", activeView.getFirstTime().toString());
         msg.addParam("cadence", SampUtils.encodeLong(activeView.getImageLayer().getAPIRequest().cadence * 1000L));
         msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
 
@@ -393,7 +393,6 @@ public class Layers {
         msg.addParam("cutout.h", SampUtils.encodeFloat(region.height));
 
         ArrayList<HashMap<String, String>> layersData = new ArrayList<>();
-
         for (View v : layers) {
             if (v.getImageLayer().isEnabled()) {
                 id = v.getImageLayer().getImageData();
@@ -409,12 +408,12 @@ public class Layers {
                     layerMsg.put("instrument", hm.getInstrument());
                     layerMsg.put("detector", hm.getDetector());
                     layerMsg.put("measurement", hm.getMeasurement());
-                    layerMsg.put("timestamp", hm.getViewpoint().time.toString().replace('-', '/') + ".000");
+                    layerMsg.put("timestamp", hm.getViewpoint().time.toString());
                     layersData.add(layerMsg);
                 }
             }
         }
         msg.addParam("layers", layersData);
     }
-*/
+
 }
