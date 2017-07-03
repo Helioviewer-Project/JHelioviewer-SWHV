@@ -124,12 +124,15 @@ public class BandType {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof BandType && o.toString().equals(toString());
+        if (!(o instanceof BandType))
+            return false;
+        BandType t = (BandType) o;
+        return name.equals(t.name);
     }
 
     @Override
     public int hashCode() {
-        return toString().hashCode();
+        return name.hashCode();
     }
 
 }
