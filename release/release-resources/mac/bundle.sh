@@ -24,6 +24,6 @@ if [ -e "$BUILD/$NAME.dmg" ]
 fi
 
 # Build the disk image
-hdiutil create -srcfolder "$TEMP" -volname JHelioviewer -format UDZO -o "$BUILD/$NAME.dmg"
+hdiutil create -srcfolder "$TEMP" -volname JHelioviewer -format UDZO -fs HFS+ -o "$BUILD/$NAME.dmg"
 
 rm -rf "$TEMP"
