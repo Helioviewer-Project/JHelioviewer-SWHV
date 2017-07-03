@@ -35,9 +35,6 @@ class EVEResponse {
 
             JSONArray data = jo.getJSONArray("data");
             int length = data.length();
-            if (length == 0)
-                return null;
-
             float[] values = new float[length];
             long[] dates = new long[length];
             for (int i = 0; i < length; i++) {
