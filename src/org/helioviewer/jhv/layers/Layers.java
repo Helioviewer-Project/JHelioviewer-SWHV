@@ -9,6 +9,7 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
@@ -83,9 +84,10 @@ public class Layers {
 
     public static void setRender(Camera camera, double factor) {
         int i;
+        Viewport vp;
         for (View v : layers) {
-            if ((i = v.getImageLayer().isVisibleIdx()) != -1)
-                v.render(camera, Displayer.getViewports()[i], factor);
+            if ((i = v.getImageLayer().isVisibleIdx()) != -1 && (vp = Displayer.getViewports()[i]) != null)
+                v.render(camera, vp, factor);
         }
     }
 
