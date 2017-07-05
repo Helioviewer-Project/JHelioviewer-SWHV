@@ -219,6 +219,14 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         Displayer.render(1);
     }
 
+    public ImageLayer getImageLayerInViewport(int idx) {
+        for (Renderable r : renderables) {
+            if (r instanceof ImageLayer && r.isVisible(idx))
+                return (ImageLayer) r;
+        }
+        return null;
+    }
+
     @Override
     public int getRowCount() {
         return renderables.size();

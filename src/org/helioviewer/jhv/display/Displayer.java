@@ -109,7 +109,7 @@ public class Displayer implements JHVEventHighlightListener {
         int ct = 0;
         if (multiview) {
             for (int i = 0; i < viewports.length; ++i) {
-                if (Layers.getImageLayerInViewport(i) != null)
+                if (ImageViewerGui.getRenderableContainer().getImageLayerInViewport(i) != null)
                     ct++;
             }
         }

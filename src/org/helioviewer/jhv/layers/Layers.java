@@ -73,15 +73,6 @@ public class Layers {
         return activeView;
     }
 
-    public static ImageLayer getImageLayerInViewport(int idx) {
-        for (View v : layers) {
-            ImageLayer l = v.getImageLayer();
-            if (l.isVisible(idx))
-                return l;
-        }
-        return null;
-    }
-
     public static void setRender(Camera camera, double factor) {
         int i;
         Viewport vp;
