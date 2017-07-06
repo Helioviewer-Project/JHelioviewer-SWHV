@@ -132,10 +132,10 @@ public class HelioviewerMetaData extends AbstractMetaData {
             measurement = m.getString("DPC_OBSR").orElse("");
             fullName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase(Locale.ENGLISH);
         } else if (detector.equals("COR1") || detector.equals("COR2")) {
-            observatory = m.getString("OBSRVTRY").orElse("");
+            observatory = m.getString("OBSRVTRY").orElse("").replace('_', '-');
             fullName = observatory + ' ' + detector;
         } else if (detector.equals("EUVI")) {
-            observatory = m.getString("OBSRVTRY").orElse("");
+            observatory = m.getString("OBSRVTRY").orElse("").replace('_', '-');
             fullName = observatory + ' ' + detector + ' ' + measurement;
         } else if (instrument.equals("TRACE")) {
             measurement = m.getString("WAVE_LEN").orElse("");
