@@ -63,7 +63,7 @@ public class DataSourcesParser {
                     defaultNode = treeNode;
             } else {
                 if (str == null) { // show only top level, else flatten hierarchy
-                    DataSourcesTree.Item item = new DataSourcesTree.Item(name.replace('_', ' '), json.getString("description"));
+                    DataSourcesTree.Item item = new DataSourcesTree.Item(name.replace('_', '-'), json.getString("description"));
                     DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item);
                     parentNode.add(treeNode);
                     parse(treeNode, json.getJSONObject("children"), "");
