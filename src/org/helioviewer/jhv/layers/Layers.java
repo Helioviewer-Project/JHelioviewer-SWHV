@@ -11,22 +11,11 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
-import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.metadata.HelioviewerMetaData;
-import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
-
-import java.util.HashMap;
-
-import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.imagedata.ImageData;
-import org.astrogrid.samp.Message;
-import org.astrogrid.samp.SampUtils;
 
 public class Layers {
 
@@ -71,30 +60,6 @@ public class Layers {
         for (View v : layers) {
             if ((i = v.getImageLayer().isVisibleIdx()) != -1 && (vp = Displayer.getViewports()[i]) != null)
                 v.render(camera, vp, factor);
-        }
-    }
-
-    public static void syncLayersSpan() {
-        if (activeView != null) {
-            APIRequest areq = activeView.getImageLayer().getAPIRequest();
-            long startTime, endTime;
-            int cadence;
-            if (areq != null) {
-                startTime = areq.startTime;
-                endTime = areq.endTime;
-                cadence = areq.cadence;
-            } else {
-                startTime = activeView.getFirstTime().milli;
-                endTime = activeView.getLastTime().milli;
-                cadence = ObservationDialog.getInstance().getObservationPanel().getCadence();
-            }
-
-            for (View v : layers) {
-                APIRequest vreq = v.getAPIRequest();
-                if (v != activeView && vreq != null) {
-                    v.getImageLayer().load(new APIRequest(vreq.server, vreq.sourceId, startTime, endTime, cadence));
-                }
-            }
         }
     }
 
@@ -302,55 +267,6 @@ public class Layers {
 
     public static void setAnimationMode(AnimationMode mode) {
         animationMode = mode;
-    }
-
-    public static void getSAMPMessage(Message msg) {
-        if (activeView == null)
-            return;
-
-        if (!activeView.getImageLayer().isEnabled() || activeView.getImageLayer().getAPIRequest() == null || activeView.getImageLayer().getImageData() == null)
-            return;
-
-        ImageData id = activeView.getImageLayer().getImageData();
-        MetaData m = id.getMetaData();
-        if (!(m instanceof HelioviewerMetaData))
-            return;
-        HelioviewerMetaData hm = (HelioviewerMetaData) m;
-
-        msg.addParam("timestamp", hm.getViewpoint().time.toString());
-        msg.addParam("start", activeView.getFirstTime().toString());
-        msg.addParam("end", activeView.getFirstTime().toString());
-        msg.addParam("cadence", SampUtils.encodeLong(activeView.getImageLayer().getAPIRequest().cadence * 1000L));
-        msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
-
-        Region region = Region.scale(id.getRegion(), 1 / id.getMetaData().getUnitPerArcsec());
-        msg.addParam("cutout.x0", SampUtils.encodeFloat(region.llx + region.width / 2.));
-        msg.addParam("cutout.y0", SampUtils.encodeFloat(-(region.lly + region.height / 2.)));
-        msg.addParam("cutout.w", SampUtils.encodeFloat(region.width));
-        msg.addParam("cutout.h", SampUtils.encodeFloat(region.height));
-
-        ArrayList<HashMap<String, String>> layersData = new ArrayList<>();
-        for (View v : layers) {
-            if (v.getImageLayer().isEnabled()) {
-                id = v.getImageLayer().getImageData();
-                if (id == null)
-                    continue;
-
-                m = id.getMetaData();
-                if (m instanceof HelioviewerMetaData) {
-                    hm = (HelioviewerMetaData) m;
-
-                    HashMap<String, String> layerMsg = new HashMap<>();
-                    layerMsg.put("observatory", hm.getObservatory());
-                    layerMsg.put("instrument", hm.getInstrument());
-                    layerMsg.put("detector", hm.getDetector());
-                    layerMsg.put("measurement", hm.getMeasurement());
-                    layerMsg.put("timestamp", hm.getViewpoint().time.toString());
-                    layersData.add(layerMsg);
-                }
-            }
-        }
-        msg.addParam("layers", layersData);
     }
 
 }
