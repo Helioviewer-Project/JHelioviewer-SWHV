@@ -11,6 +11,7 @@ public interface Layer {
     void add(URI uri);
 
     Image image = new Image();
+    Request request = new Request();
     FITS fits = new FITS();
     Timeline timeline = new Timeline();
 
@@ -18,6 +19,13 @@ public interface Layer {
         @Override
         public void add(URI uri) {
             JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.create(null), uri));
+        }
+    }
+
+    class Request implements Layer {
+        @Override
+        public void add(URI uri) {
+            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.create(null), uri));
         }
     }
 
