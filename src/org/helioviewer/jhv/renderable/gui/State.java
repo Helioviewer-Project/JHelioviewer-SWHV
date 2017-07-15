@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.plugin.PluginManager;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -182,17 +181,16 @@ public class State {
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
-    public static void load(String stateFile) {
+    public static void load(JSONObject jo) {
         try {
-            JSONObject data = JSONUtils.getJSONFile(stateFile);
             // to be loaded before viewpoint
             try {
-                Displayer.DisplayMode.valueOf(data.optString("projection")).radio.doClick();
+                Displayer.DisplayMode.valueOf(jo.optString("projection")).radio.doClick();
             } catch (Exception ignore) {
             }
-            loadTimelines(data);
-            loadRenderables(data);
-            JSONObject plugins = data.optJSONObject("plugins");
+            loadTimelines(jo);
+            loadRenderables(jo);
+            JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
                 PluginManager.getSingletonInstance().loadState(plugins);
         } catch (Exception e) {

@@ -14,6 +14,7 @@ public interface Layer {
     Request request = new Request();
     FITS fits = new FITS();
     Timeline timeline = new Timeline();
+    State state = new State();
 
     class Image implements Layer {
         @Override
@@ -40,6 +41,13 @@ public interface Layer {
         @Override
         public void add(URI uri) {
             EVEPlugin.eveDataprovider.loadBand(uri);
+        }
+    }
+
+    class State implements Layer {
+        @Override
+        public void add(URI uri) {
+            JHVGlobals.getExecutorService().execute(new LoadStateTask(uri));
         }
     }
 

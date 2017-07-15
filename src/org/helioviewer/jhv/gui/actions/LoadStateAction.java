@@ -9,7 +9,7 @@ import javax.swing.AbstractAction;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.JsonFilenameFilter;
-import org.helioviewer.jhv.renderable.gui.State;
+import org.helioviewer.jhv.io.Layer;
 
 @SuppressWarnings("serial")
 public class LoadStateAction extends AbstractAction {
@@ -28,7 +28,7 @@ public class LoadStateAction extends AbstractAction {
 
         File[] fileNames = fileDialog.getFiles();
         if (fileNames.length > 0)
-            State.load(fileNames[0].getPath());
+            Layer.state.add(fileNames[0].toURI());
     }
 
 }

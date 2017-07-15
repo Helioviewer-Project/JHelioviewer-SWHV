@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.zip.GZIPOutputStream;
 
 import org.helioviewer.jhv.log.Log;
@@ -18,12 +16,6 @@ import org.json.JSONTokener;
 public class JSONUtils {
 
     private static final int BUFSIZ = 65536;
-
-    public static JSONObject getJSONFile(String file) throws IOException {
-        try (InputStream in = Files.newInputStream(Paths.get(file))) {
-            return getJSONStream(in);
-        }
-    }
 
     public static JSONObject getJSONStream(InputStream in) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8), BUFSIZ)) {
