@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.renderable.gui;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,8 +22,45 @@ import com.jogamp.opengl.GL2;
 @SuppressWarnings("serial")
 public class RenderableContainer extends AbstractTableModel implements Reorderable {
 
-    private ArrayList<Renderable> renderables = new ArrayList<>();
-    private ArrayList<Renderable> newRenderables = new ArrayList<>();
+    private class CompositeList extends AbstractList<Renderable> {
+
+        private final ArrayList<ImageLayer> list1 = new ArrayList<>();
+        private final ArrayList<Renderable> list2 = new ArrayList<>();
+
+        @Override
+        public Renderable get(int index) {
+            if (index < list1.size())
+                return list1.get(index);
+            return list2.get(index - list1.size());
+        }
+
+        @Override
+        public Renderable remove(int index) {
+            if (index < list1.size())
+                return list1.remove(index);
+            return list2.remove(index - list1.size());
+        }
+
+        @Override
+        public int size() {
+            return list1.size() + list2.size();
+        }
+
+        @Override
+        public boolean add(Renderable e) {
+            if (e instanceof ImageLayer)
+                return list1.add((ImageLayer) e);
+            return list2.add(e);
+        }
+
+        List<ImageLayer> getImageLayers() {
+            return list1;
+        }
+
+    }
+
+    private CompositeList renderables = new CompositeList();
+    private CompositeList newRenderables = new CompositeList();
     private final HashSet<Renderable> removedRenderables = new HashSet<>();
 
     private RenderableGrid renderableGrid;
@@ -48,21 +86,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         return renderableMiniview;
     }
 
-    public void addBeforeRenderable(Renderable renderable) {
-        int lastImagelayerIndex = -1;
-        int size = renderables.size();
-        for (int i = 0; i < size; i++) {
-            if (renderables.get(i) instanceof ImageLayer) {
-                lastImagelayerIndex = i;
-            }
-        }
-        renderables.add(lastImagelayerIndex + 1, renderable);
-        newRenderables.add(renderable);
-
-        int row = lastImagelayerIndex + 1;
-        fireTableRowsInserted(row, row);
-    }
-
     public void addRenderable(Renderable renderable) {
         renderables.add(renderable);
         newRenderables.add(renderable);
@@ -74,7 +97,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         else if (renderable instanceof RenderableMiniview)
             renderableMiniview = (RenderableMiniview) renderable;
 
-        int row = renderables.size() - 1;
+        int row = renderables.indexOf(renderable);
         fireTableRowsInserted(row, row);
         Displayer.display(); // e.g., PFSS renderable
     }
@@ -172,25 +195,19 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public void arrangeMultiView(boolean multiview) {
+        List<ImageLayer> layers = renderables.getImageLayers();
         if (multiview) {
             int ct = 0;
-            for (Renderable r : renderables) {
-                if (r instanceof ImageLayer) {
-                    ImageLayer l = (ImageLayer) r;
-                    if (l.isEnabled()) {
-                        l.setVisible(ct);
-                        ct++;
-                    }
+            for (ImageLayer layer : layers) {
+                if (layer.isEnabled()) {
+                    layer.setVisible(ct);
+                    ct++;
                 }
             }
         } else {
-            for (Renderable r : renderables) {
-                if (r instanceof ImageLayer) {
-                    ImageLayer l = (ImageLayer) r;
-                    if (l.isEnabled()) {
-                        l.setVisible(0);
-                    }
-                }
+            for (ImageLayer layer : layers) {
+                if (layer.isEnabled())
+                    layer.setVisible(0);
             }
         }
         Displayer.reshapeAll();
@@ -198,9 +215,9 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public ImageLayer getImageLayerInViewport(int idx) {
-        for (Renderable r : renderables) {
-            if (r instanceof ImageLayer && r.isVisible(idx))
-                return (ImageLayer) r;
+        for (ImageLayer layer : renderables.getImageLayers()) {
+            if (layer.isVisible(idx))
+                return layer;
         }
         return null;
     }
@@ -238,7 +255,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             renderable.dispose(gl);
         }
         newRenderables = renderables;
-        renderables = new ArrayList<>();
+        renderables = new CompositeList();
     }
 
     public List<Renderable> getRenderables() {
@@ -247,7 +264,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     public void removeAll() {
         removedRenderables.addAll(renderables);
-        renderables = new ArrayList<>();
+        renderables = new CompositeList();
     }
 
 }
