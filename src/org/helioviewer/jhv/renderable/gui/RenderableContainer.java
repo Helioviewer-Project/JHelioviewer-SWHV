@@ -194,34 +194,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
     }
 
-    public void arrangeMultiView(boolean multiview) {
-        List<ImageLayer> layers = renderables.getImageLayers();
-        if (multiview) {
-            int ct = 0;
-            for (ImageLayer layer : layers) {
-                if (layer.isEnabled()) {
-                    layer.setVisible(ct);
-                    ct++;
-                }
-            }
-        } else {
-            for (ImageLayer layer : layers) {
-                if (layer.isEnabled())
-                    layer.setVisible(0);
-            }
-        }
-        Displayer.reshapeAll();
-        Displayer.render(1);
-    }
-
-    public ImageLayer getImageLayerInViewport(int idx) {
-        for (ImageLayer layer : renderables.getImageLayers()) {
-            if (layer.isVisible(idx))
-                return layer;
-        }
-        return null;
-    }
-
     @Override
     public int getRowCount() {
         return renderables.size();
@@ -258,13 +230,50 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables = new CompositeList();
     }
 
-    public List<Renderable> getRenderables() {
+    List<Renderable> getRenderables() {
         return Collections.unmodifiableList(renderables);
     }
 
-    public void removeAll() {
+    void removeAll() {
         removedRenderables.addAll(renderables);
         renderables = new CompositeList();
+    }
+
+    public void arrangeMultiView(boolean multiview) {
+        List<ImageLayer> layers = renderables.getImageLayers();
+        if (multiview) {
+            int ct = 0;
+            for (ImageLayer layer : layers) {
+                if (layer.isEnabled()) {
+                    layer.setVisible(ct);
+                    ct++;
+                }
+            }
+        } else {
+            for (ImageLayer layer : layers) {
+                if (layer.isEnabled())
+                    layer.setVisible(0);
+            }
+        }
+        Displayer.reshapeAll();
+        Displayer.render(1);
+    }
+
+    public ImageLayer getImageLayerInViewport(int idx) {
+        for (ImageLayer layer : renderables.getImageLayers()) {
+            if (layer.isVisible(idx))
+                return layer;
+        }
+        return null;
+    }
+
+    public int getNumEnabledImageLayers() {
+        int ct = 0;
+        for (ImageLayer layer : renderables.getImageLayers()) {
+            if (layer.isEnabled())
+                ct++;
+        }
+        return ct;
     }
 
 }

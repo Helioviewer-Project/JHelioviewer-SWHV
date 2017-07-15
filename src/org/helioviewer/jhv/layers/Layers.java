@@ -61,14 +61,6 @@ public class Layers {
         return layers.size();
     }
 
-    public static int getNumEnabledLayers() {
-        int ct = 0;
-        for (View v : layers)
-            if (v.getImageLayer().isEnabled())
-                ct++;
-        return ct;
-    }
-
     public static View getActiveView() {
         return activeView;
     }
