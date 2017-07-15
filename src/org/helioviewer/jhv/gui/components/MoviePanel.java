@@ -318,7 +318,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
         private RecordMode mode = RecordMode.LOOP;
         private RecordSize size = RecordSize.ORIGINAL;
 
-        public RecordButton(float fontSize) {
+        private RecordButton(float fontSize) {
             super(Buttons.record);
             setFont(Buttons.getMaterialFont(fontSize));
             setForeground(Color.decode("#800000"));
@@ -431,7 +431,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
     private static class PlayPauseAction extends AbstractAction {
 
-        public PlayPauseAction() {
+        private PlayPauseAction() {
             super("Play/Pause Movie");
             KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
             putValue(ACCELERATOR_KEY, key);
@@ -448,7 +448,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
     private static class PreviousFrameAction extends AbstractAction {
 
-        public PreviousFrameAction() {
+        private PreviousFrameAction() {
             super("Step to Previous Frame");
             KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_DOWN_MASK);
             putValue(ACCELERATOR_KEY, key);
@@ -466,7 +466,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
     private static class NextFrameAction extends AbstractAction {
 
-        public NextFrameAction() {
+        private NextFrameAction() {
             super("Step to Next Frame");
             KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_DOWN_MASK);
             putValue(ACCELERATOR_KEY, key);

@@ -28,7 +28,7 @@ class PluginsListEntry extends JPanel implements MouseListener, HyperlinkListene
     private final JLabel enableLabel = new JLabel();
     private final JTextPane pane = new JTextPane();
 
-    public PluginsListEntry(PluginContainer _plugin, PluginsList _list) {
+    PluginsListEntry(PluginContainer _plugin, PluginsList _list) {
         plugin = _plugin;
         list = _list;
 

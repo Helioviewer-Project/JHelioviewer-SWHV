@@ -14,7 +14,7 @@ public class CancelTask extends FutureTask<Boolean> {
 
         private final Future<?> task;
 
-        public TaskCancel(Future<?> _task) {
+        private TaskCancel(Future<?> _task) {
             task = _task;
         }
 

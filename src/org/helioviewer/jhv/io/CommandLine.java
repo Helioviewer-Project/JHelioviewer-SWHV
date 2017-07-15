@@ -23,11 +23,11 @@ public class CommandLine {
 
     public static void load() {
         // -load
-        for (URI uri : getURIOptionValues("load")) {
+        for (URI uri : getURIOptionValues("-load")) {
             Load.image.get(uri);
         }
         // -state
-        for (URI uri : getURIOptionValues("state")) {
+        for (URI uri : getURIOptionValues("-state")) {
             Load.state.get(uri);
             break;
         }
@@ -36,7 +36,7 @@ public class CommandLine {
     // after DataSources is loaded
     public static void loadRequest() {
         // -request: works only for default server
-        for (URI uri : getURIOptionValues("request")) {
+        for (URI uri : getURIOptionValues("-request")) {
             Load.request.get(uri);
         }
     }
@@ -89,7 +89,6 @@ public class CommandLine {
      * @return the values associated to the option.
      * */
     private static List<String> getOptionValues(String param) {
-        param = '-' + param;
         LinkedList<String> values = new LinkedList<>();
         if (arguments != null) {
             for (int i = 0; i < arguments.length; i++) {

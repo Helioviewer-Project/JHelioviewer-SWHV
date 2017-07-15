@@ -15,7 +15,7 @@ import org.helioviewer.jhv.io.DataSources;
 @SuppressWarnings("serial")
 class RadioOptionsPanel extends JPanel {
 
-    public RadioOptionsPanel(String selected) {
+    RadioOptionsPanel(String selected) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();

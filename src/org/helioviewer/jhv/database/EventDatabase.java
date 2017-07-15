@@ -240,7 +240,7 @@ public class EventDatabase {
     private static class DumpAssociation2Db implements Callable<Integer> {
         private final Pair<String, String>[] assocs;
 
-        public DumpAssociation2Db(Pair<String, String>[] _assocs) {
+        private DumpAssociation2Db(Pair<String, String>[] _assocs) {
             assocs = _assocs;
         }
 
@@ -323,7 +323,7 @@ public class EventDatabase {
         private final SWEKSupplier type;
         private final ArrayList<Event2Db> event2db_list;
 
-        public DumpEvent2Db(ArrayList<Event2Db> _event2db_list, SWEKSupplier _type) {
+        private DumpEvent2Db(ArrayList<Event2Db> _event2db_list, SWEKSupplier _type) {
             event2db_list = _event2db_list;
             type = _type;
         }
@@ -509,7 +509,7 @@ public class EventDatabase {
         private final long start;
         private final long end;
 
-        public AddDateRange2db(long _start, long _end, SWEKSupplier _type) {
+        private AddDateRange2db(long _start, long _end, SWEKSupplier _type) {
             start = _start;
             end = _end;
             type = _type;
@@ -564,7 +564,7 @@ public class EventDatabase {
 
         private final SWEKSupplier type;
 
-        public Db2DateRange(SWEKSupplier _type) {
+        private Db2DateRange(SWEKSupplier _type) {
             type = _type;
         }
 
@@ -634,7 +634,7 @@ public class EventDatabase {
         public final long start;
         public final long end;
 
-        public JsonEvent(byte[] _json, SWEKSupplier _type, int _id, long _start, long _end) {
+        private JsonEvent(byte[] _json, SWEKSupplier _type, int _id, long _start, long _end) {
             start = _start;
             end = _end;
             type = _type;
@@ -660,7 +660,7 @@ public class EventDatabase {
         private final long end;
         private final List<SWEKParam> params;
 
-        public Events2Program(long _start, long _end, SWEKSupplier _type, List<SWEKParam> _params) {
+        private Events2Program(long _start, long _end, SWEKSupplier _type, List<SWEKParam> _params) {
             type = _type;
             start = _start;
             end = _end;
@@ -725,7 +725,7 @@ public class EventDatabase {
         private final long start;
         private final long end;
 
-        public Associations2Program(long _start, long _end, SWEKSupplier _type) {
+        private Associations2Program(long _start, long _end, SWEKSupplier _type) {
             type = _type;
             start = _start;
             end = _end;
@@ -834,7 +834,7 @@ public class EventDatabase {
 
         private final int event_id;
 
-        public Relations2Program(int _event_id, SWEKSupplier _type_left, SWEKSupplier _type_right, String _param_left, String _param_right) {
+        private Relations2Program(int _event_id, SWEKSupplier _type_left, SWEKSupplier _type_right, String _param_left, String _param_right) {
             type_left = _type_left;
             type_right = _type_right;
             param_left = _param_left;
@@ -878,7 +878,7 @@ public class EventDatabase {
     private static class Event2Program implements Callable<JsonEvent> {
         private final int event_id;
 
-        public Event2Program(int _event_id) {
+        private Event2Program(int _event_id) {
             event_id = _event_id;
         }
 

@@ -26,7 +26,7 @@ import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 @SuppressWarnings("serial")
 class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionListener {
 
-    public ParameterTablePanel(JHVEventParameter[] parameters) {
+    ParameterTablePanel(JHVEventParameter[] parameters) {
         setLayout(new BorderLayout());
 
         ParameterTableModel parameterModel = new ParameterTableModel(parameters);

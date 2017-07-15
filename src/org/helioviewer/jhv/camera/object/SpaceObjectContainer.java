@@ -153,7 +153,7 @@ public class SpaceObjectContainer extends JScrollPane {
 
         private final JCheckBox checkBox = new JCheckBox();
 
-        public SelectedRenderer() {
+        private SelectedRenderer() {
             setHorizontalAlignment(CENTER);
             checkBox.putClientProperty("JComponent.sizeVariant", "small");
             checkBox.setBorderPainted(true);
@@ -176,7 +176,7 @@ public class SpaceObjectContainer extends JScrollPane {
 
         private final JRadioButton radio = new JRadioButton();
 
-        public SelectedExclusiveRenderer() {
+        private SelectedExclusiveRenderer() {
             setHorizontalAlignment(CENTER);
             radio.putClientProperty("JComponent.sizeVariant", "small");
             radio.setBorderPainted(true);

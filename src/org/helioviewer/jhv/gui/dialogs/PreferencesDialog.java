@@ -148,7 +148,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
         final JTable grid;
         final TableModel model;
 
-        public DefaultsSelectionPanel() {
+        private DefaultsSelectionPanel() {
             super(new BorderLayout());
             setPreferredSize(new Dimension(0, 150));
 

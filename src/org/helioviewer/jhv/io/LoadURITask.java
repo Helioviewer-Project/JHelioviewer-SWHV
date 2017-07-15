@@ -15,7 +15,7 @@ class LoadURITask extends JHVWorker<View, Void> {
     private final ImageLayer imageLayer;
     private final URI uri;
 
-    public LoadURITask(ImageLayer _imageLayer, URI _uri) {
+    LoadURITask(ImageLayer _imageLayer, URI _uri) {
         uri = _uri;
         imageLayer = _imageLayer;
 

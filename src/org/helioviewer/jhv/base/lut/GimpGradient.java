@@ -54,7 +54,7 @@ class GimpGradient {
      * 
      * @param ggr
      */
-    public GimpGradient(BufferedReader ggr) throws Exception {
+    GimpGradient(BufferedReader ggr) throws Exception {
         String ln = ggr.readLine();
         if (!"GIMP Gradient".equals(ln))
             throw new Exception("Not a GIMP gradient file");

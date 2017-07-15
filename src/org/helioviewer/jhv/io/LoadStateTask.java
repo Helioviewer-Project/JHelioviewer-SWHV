@@ -14,7 +14,7 @@ class LoadStateTask extends JHVWorker<JSONObject, Void> {
 
     private final URI uri;
 
-    public LoadStateTask(URI _uri) {
+    LoadStateTask(URI _uri) {
         uri = _uri;
         setThreadName("MAIN--LoadState");
     }

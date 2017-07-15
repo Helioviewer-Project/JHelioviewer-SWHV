@@ -49,7 +49,7 @@ public class TimelinePanel extends JPanel {
 
     private static class TimelineTable extends JTable {
 
-        public TimelineTable(TableModel tm) {
+        private TimelineTable(TableModel tm) {
             super(tm);
         }
 

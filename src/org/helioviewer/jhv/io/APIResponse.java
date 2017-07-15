@@ -14,7 +14,7 @@ class APIResponse {
     private URI uri;
     private long[] frames;
 
-    public APIResponse(JSONObject data) throws IOException {
+    APIResponse(JSONObject data) throws IOException {
         try {
             err = data.optString("error", null);
             msg = data.optString("message", null);

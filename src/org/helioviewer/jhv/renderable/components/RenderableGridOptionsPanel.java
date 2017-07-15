@@ -27,7 +27,7 @@ class RenderableGridOptionsPanel extends JPanel {
     private JComboBox<RenderableGrid.GridType> gridTypeBox;
     private final RenderableGrid grid;
 
-    public RenderableGridOptionsPanel(RenderableGrid renderableGrid) {
+    RenderableGridOptionsPanel(RenderableGrid renderableGrid) {
         grid = renderableGrid;
         createGridResolutionX(grid);
         createGridResolutionY(grid);

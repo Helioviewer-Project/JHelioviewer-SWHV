@@ -38,7 +38,7 @@ class DownloadedJPXData implements ImageDataHandler {
     private Region region;
     private boolean downloadJPXFailed = false;
 
-    public DownloadedJPXData(JP2ViewCallisto _view, long start) {
+    DownloadedJPXData(JP2ViewCallisto _view, long start) {
         if (_view != null) { // null for empty
             try {
                 ResolutionSet.ResolutionLevel resLevel = _view.getResolutionLevel(0, 0);

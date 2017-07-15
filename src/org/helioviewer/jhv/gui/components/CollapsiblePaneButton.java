@@ -17,7 +17,7 @@ class CollapsiblePaneButton extends JToggleButton {
     private final Color bright;
     private final Color dark;
 
-    public CollapsiblePaneButton() {
+    CollapsiblePaneButton() {
         Color c = new JPanel().getBackground();
         if (c == null) // synth laf
             c = Color.GRAY;
