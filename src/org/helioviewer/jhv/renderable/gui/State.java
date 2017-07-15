@@ -37,14 +37,14 @@ public class State {
         main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
 
         JSONArray ja = new JSONArray();
-        for (Renderable renderable : ImageViewerGui.getRenderableContainer().getRenderables()) {
+        for (Renderable renderable : RenderableContainer.getRenderables()) {
             if (!(renderable instanceof ImageLayer))
                 ja.put(renderable2json(renderable, false));
         }
         main.put("renderables", ja);
 
         JSONArray ji = new JSONArray();
-        for (Renderable renderable : ImageViewerGui.getRenderableContainer().getRenderables()) {
+        for (Renderable renderable : RenderableContainer.getRenderables()) {
             if (renderable instanceof ImageLayer)
                 ji.put(renderable2json(renderable, ((ImageLayer) renderable).isActiveImageLayer()));
         }
@@ -129,7 +129,7 @@ public class State {
     }
 
     private static void loadRenderables(JSONObject data) {
-        ImageViewerGui.getRenderableContainer().removeAll();
+        RenderableContainer.removeAll();
 
         JSONArray rja = data.getJSONArray("renderables");
         for (Object o : rja) {

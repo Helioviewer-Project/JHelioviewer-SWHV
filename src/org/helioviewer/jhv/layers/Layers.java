@@ -10,12 +10,12 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
@@ -237,7 +237,7 @@ public class Layers {
         }
         Displayer.render(1);
 
-        ImageViewerGui.getRenderableContainer().getRenderableViewpoint().fireTimeUpdated(camera.getViewpoint().time); // !
+        RenderableContainer.getRenderableViewpoint().fireTimeUpdated(camera.getViewpoint().time); // !
         for (TimeListener listener : timeListeners) {
             listener.timeChanged(lastTimestamp.milli);
         }

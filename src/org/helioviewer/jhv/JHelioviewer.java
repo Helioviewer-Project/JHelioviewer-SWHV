@@ -23,6 +23,7 @@ import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.samp.SampPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMessageSystem;
 
 public class JHelioviewer {
@@ -112,11 +113,11 @@ public class JHelioviewer {
             }
 
             // set left pane width to fit the viewpoint options
-            ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(ImageViewerGui.getRenderableContainer().getRenderableViewpoint()); // nasty
+            ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(RenderableContainer.getRenderableViewpoint()); // nasty
             frame.pack();
             JComponent leftPane = ImageViewerGui.getLeftScrollPane();
             leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));
-            ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(ImageViewerGui.getRenderableContainer().getRenderableGrid()); // nasty
+            ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(RenderableContainer.getRenderableGrid()); // nasty
 
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);

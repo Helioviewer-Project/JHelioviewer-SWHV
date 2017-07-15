@@ -27,6 +27,7 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
@@ -88,7 +89,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     public void unload() {
         if (view == null) // not changing view
-            ImageViewerGui.getRenderableContainer().removeRenderable(this);
+            RenderableContainer.removeRenderable(this);
         else {
             worker = null;
             Displayer.display();
@@ -114,7 +115,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         super.setEnabled(_enabled);
 
         if (Displayer.multiview) {
-            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+            RenderableContainer.arrangeMultiView(true);
         }
     }
 
@@ -133,7 +134,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         Layers.addLayer(view);
 
         if (Displayer.multiview) {
-            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+            RenderableContainer.arrangeMultiView(true);
         }
         optionsPanel.setLUT(view.getDefaultLUT());
     }
@@ -157,7 +158,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
         unsetView();
         if (Displayer.multiview) {
-            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+            RenderableContainer.arrangeMultiView(true);
         }
         dispose(gl);
     }
