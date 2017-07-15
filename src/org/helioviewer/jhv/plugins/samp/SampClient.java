@@ -15,7 +15,7 @@ import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.io.Layer;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.renderable.gui.ImageLayers;
 
 class SampClient extends HubConnector {
 
@@ -78,7 +78,7 @@ class SampClient extends HubConnector {
 
     void notifyRequestData() {
         Message msg = new Message(MTYPE_VIEW_DATA);
-        Layers.getSAMPMessage(msg);
+        ImageLayers.getSAMPMessage(msg);
         try {
             HubConnection c = getConnection();
             if (c != null)

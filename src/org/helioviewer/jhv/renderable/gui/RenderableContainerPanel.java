@@ -33,7 +33,6 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererEnabled;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererLoading;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererName;
@@ -136,7 +135,7 @@ public class RenderableContainerPanel extends JPanel {
 
         JideButton syncSpanButton = new JideButton(Buttons.syncLayers);
         syncSpanButton.setToolTipText("Synchronize layers time span");
-        syncSpanButton.addActionListener(e -> Layers.syncLayersSpan());
+        syncSpanButton.addActionListener(e -> ImageLayers.syncLayersSpan());
 
         multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
