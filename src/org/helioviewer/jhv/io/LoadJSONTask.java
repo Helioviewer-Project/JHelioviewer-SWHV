@@ -8,7 +8,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;
 
-public class LoadJSONTask extends LoadURITask {
+class LoadJSONTask extends LoadURITask {
 
     private final URI uri;
 

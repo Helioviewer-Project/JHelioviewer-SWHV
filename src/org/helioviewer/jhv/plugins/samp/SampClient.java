@@ -110,6 +110,19 @@ class SampClient extends HubConnector {
                 return null;
             }
         });
+        addMessageHandler(new AbstractMessageHandler("jhv.load.state") {
+            @Override
+            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    Object url = msg.getParam("url");
+                    if (url != null)
+                        Load.state.get(new URI(url.toString()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
         declareSubscriptions(computeSubscriptions());
 
         setAutoconnect(10);
