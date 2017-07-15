@@ -136,7 +136,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
 
         private static final BasicStroke thickStroke = new BasicStroke(4);
 
-        private TimeSliderUI(JSlider component) {
+        TimeSliderUI(JSlider component) {
             super(component);
         }
 

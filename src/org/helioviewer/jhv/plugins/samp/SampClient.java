@@ -19,7 +19,7 @@ import org.helioviewer.jhv.renderable.gui.ImageLayers;
 
 class SampClient extends HubConnector {
 
-    private final static String MTYPE_VIEW_DATA = "jhv.vso.load";
+    private static final String MTYPE_VIEW_DATA = "jhv.vso.load";
 
     SampClient(ClientProfile _profile) {
         super(_profile);

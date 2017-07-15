@@ -33,7 +33,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
         private final ImageIcon imageIcon;
 
-        private TreeLabel(ImageIcon icon) {
+        TreeLabel(ImageIcon icon) {
             imageIcon = icon;
             int size = new JLabel("J").getPreferredSize().height;
             setPreferredSize(new Dimension(size, size));

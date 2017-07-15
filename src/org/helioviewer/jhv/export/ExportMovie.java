@@ -164,7 +164,7 @@ public class ExportMovie implements FrameListener {
         private BufferedImage eveImage;
         private final int movieLinePosition;
 
-        private FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
+        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
             eveImage = _eveImage == null ? null : ImageUtils.deepCopy(_eveImage);
@@ -191,7 +191,7 @@ public class ExportMovie implements FrameListener {
         private final MovieExporter movieExporter;
         private final boolean keep;
 
-        private CloseWriter(MovieExporter _movieExporter, boolean _keep) {
+        CloseWriter(MovieExporter _movieExporter, boolean _keep) {
             movieExporter = _movieExporter;
             keep = _keep;
         }

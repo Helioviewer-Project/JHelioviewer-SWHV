@@ -67,7 +67,7 @@ class DrawControllerOptionsPanel extends JPanel {
         final ZOOM zoom;
         final long number;
 
-        private ZoomComboboxItem(ZOOM _zoom, long _number) {
+        ZoomComboboxItem(ZOOM _zoom, long _number) {
             zoom = _zoom;
             number = _number;
         }

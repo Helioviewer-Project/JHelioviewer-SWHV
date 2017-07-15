@@ -130,7 +130,7 @@ public class RadioData extends AbstractTimelineRenderable {
 
         private final ArrayList<Long> toDownload;
 
-        private RadioJPXDownload(ArrayList<Long> _toDownload) {
+        RadioJPXDownload(ArrayList<Long> _toDownload) {
             isDownloading++;
             toDownload = _toDownload;
             Timelines.getModel().downloadStarted(RadioData.this);

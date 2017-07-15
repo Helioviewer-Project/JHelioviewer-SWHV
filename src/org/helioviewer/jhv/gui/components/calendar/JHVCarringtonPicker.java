@@ -141,7 +141,7 @@ public class JHVCarringtonPicker extends JPanel implements FocusListener {
 
         private final JComboBox<Integer> crCombo = new JComboBox<>(createCRList());
 
-        private JHVCarrington() {
+        JHVCarrington() {
             setLayout(new BorderLayout());
 
             crCombo.addActionListener(e -> {

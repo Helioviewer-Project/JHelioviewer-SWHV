@@ -27,7 +27,7 @@ public class Band extends AbstractTimelineRenderable {
 
     private static final BandDataProvider dataProvider = EVEPlugin.eveDataprovider;
 
-    private BandType bandType;
+    private final BandType bandType;
     private final BandOptionPanel optionsPanel;
 
     private Color graphColor = Color.BLACK;
