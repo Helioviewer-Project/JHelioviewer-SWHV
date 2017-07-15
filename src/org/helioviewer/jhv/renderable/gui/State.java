@@ -204,7 +204,7 @@ public class State {
         private final boolean tracking;
         private final boolean play;
 
-        private LoadState(ArrayList<ImageLayer> _newlist, JHVDate _time, boolean _tracking, boolean _play) {
+        LoadState(ArrayList<ImageLayer> _newlist, JHVDate _time, boolean _tracking, boolean _play) {
             newlist = _newlist;
             time = _time;
             tracking = _tracking;

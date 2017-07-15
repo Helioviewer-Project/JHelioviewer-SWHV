@@ -126,7 +126,7 @@ public abstract class GridScale {
 
     private static class GridScaleLogY extends GridScaleAbstract {
 
-        private GridScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
+        GridScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
             super(_xStart, _xStop, _yStart, _yStop, _transform);
         }
 
@@ -154,7 +154,7 @@ public abstract class GridScale {
 
     private static class GridScaleIdentity extends GridScaleAbstract {
 
-        private GridScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
+        GridScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
             super(_xStart, _xStop, _yStart, _yStop, _transform);
         }
 
@@ -180,7 +180,7 @@ public abstract class GridScale {
     }
 
     private static class GridScaleOrtho extends GridScaleIdentity {
-        private GridScaleOrtho(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
+        GridScaleOrtho(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
             super(_xStart, _xStop, _yStart, _yStop, _transform);
         }
 

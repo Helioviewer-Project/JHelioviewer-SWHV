@@ -66,7 +66,7 @@ public class RenderableContainerPanel extends JPanel {
 
     private static class RenderableContainerTable extends JTable implements LazyComponent {
 
-        private RenderableContainerTable(TableModel tm) {
+        RenderableContainerTable(TableModel tm) {
             super(tm);
         }
 

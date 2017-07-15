@@ -114,7 +114,7 @@ public class YAxis {
     private static class YAxisLogScale implements YAxisScale {
         private final String label;
 
-        private YAxisLogScale(String _label) {
+        YAxisLogScale(String _label) {
             label = "log(" + _label.replace("^2", "\u00B2") + ')';
         }
 
@@ -144,7 +144,7 @@ public class YAxis {
 
         private final String label;
 
-        private YAxisPositiveIdentityScale(String _label) {
+        YAxisPositiveIdentityScale(String _label) {
             label = _label.replace("^2", "\u00B2");
         }
 
