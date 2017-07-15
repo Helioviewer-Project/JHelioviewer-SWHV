@@ -6,9 +6,9 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 
-public interface Layer {
+public interface Load {
 
-    void add(URI uri);
+    void get(URI uri);
 
     Image image = new Image();
     Request request = new Request();
@@ -16,37 +16,37 @@ public interface Layer {
     Timeline timeline = new Timeline();
     State state = new State();
 
-    class Image implements Layer {
+    class Image implements Load {
         @Override
-        public void add(URI uri) {
+        public void get(URI uri) {
             JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.create(null), uri));
         }
     }
 
-    class Request implements Layer {
+    class Request implements Load {
         @Override
-        public void add(URI uri) {
+        public void get(URI uri) {
             JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.create(null), uri));
         }
     }
 
-    class FITS implements Layer {
+    class FITS implements Load {
         @Override
-        public void add(URI uri) {
+        public void get(URI uri) {
             JHVGlobals.getExecutorService().execute(new LoadFITSTask(ImageLayer.create(null), uri));
         }
     }
 
-    class Timeline implements Layer {
+    class Timeline implements Load {
         @Override
-        public void add(URI uri) {
+        public void get(URI uri) {
             EVEPlugin.eveDataprovider.loadBand(uri);
         }
     }
 
-    class State implements Layer {
+    class State implements Load {
         @Override
-        public void add(URI uri) {
+        public void get(URI uri) {
             JHVGlobals.getExecutorService().execute(new LoadStateTask(uri));
         }
     }

@@ -6,8 +6,6 @@ import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 
 public class CommandLine {
@@ -26,11 +24,11 @@ public class CommandLine {
     public static void load() {
         // -load
         for (URI uri : getURIOptionValues("load")) {
-            Layer.image.add(uri);
+            Load.image.get(uri);
         }
         // -state
         for (URI uri : getURIOptionValues("state")) {
-            Layer.state.add(uri);
+            Load.state.get(uri);
             break;
         }
     }
@@ -39,7 +37,7 @@ public class CommandLine {
     public static void loadRequest() {
         // -request: works only for default server
         for (URI uri : getURIOptionValues("request")) {
-            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.create(null), uri));
+            Load.request.get(uri);
         }
     }
 

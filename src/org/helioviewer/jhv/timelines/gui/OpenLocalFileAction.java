@@ -14,7 +14,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.JsonFilenameFilter;
 import org.helioviewer.jhv.input.KeyShortcuts;
-import org.helioviewer.jhv.io.Layer;
+import org.helioviewer.jhv.io.Load;
 
 @SuppressWarnings("serial")
 public class OpenLocalFileAction extends AbstractAction {
@@ -44,7 +44,7 @@ public class OpenLocalFileAction extends AbstractAction {
             Settings.getSingletonInstance().save("default.local.path");
             for (File fileName : fileNames) {
                 if (fileName.isFile())
-                    Layer.timeline.add(fileName.toURI());
+                    Load.timeline.get(fileName.toURI());
             }
         }
     }

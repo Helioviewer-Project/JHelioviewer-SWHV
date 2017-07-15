@@ -14,7 +14,7 @@ import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.io.Layer;
+import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.renderable.gui.ImageLayers;
 
 class SampClient extends HubConnector {
@@ -48,7 +48,7 @@ class SampClient extends HubConnector {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null)
-                        Layer.fits.add(new URI(url.toString()));
+                        Load.fits.get(new URI(url.toString()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -63,7 +63,7 @@ class SampClient extends HubConnector {
                     if ("SSA".equals(c.getMetadata(senderId).getName())) {
                         Object url = msg.getParam("url");
                         if (url != null)
-                            Layer.fits.add(new URI(url.toString()));
+                            Load.fits.get(new URI(url.toString()));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -77,7 +77,7 @@ class SampClient extends HubConnector {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null)
-                        Layer.image.add(new URI(url.toString()));
+                        Load.image.get(new URI(url.toString()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -90,7 +90,7 @@ class SampClient extends HubConnector {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null)
-                        Layer.request.add(new URI(url.toString()));
+                        Load.request.get(new URI(url.toString()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -103,7 +103,7 @@ class SampClient extends HubConnector {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null)
-                        Layer.timeline.add(new URI(url.toString()));
+                        Load.timeline.get(new URI(url.toString()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
