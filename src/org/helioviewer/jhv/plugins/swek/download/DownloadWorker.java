@@ -19,7 +19,7 @@ class DownloadWorker implements Runnable {
     private final List<SWEKParam> params;
     private final Interval requestInterval;
 
-    public DownloadWorker(SWEKSupplier _supplier, Interval _interval, List<SWEKParam> _params) {
+    DownloadWorker(SWEKSupplier _supplier, Interval _interval, List<SWEKParam> _params) {
         requestInterval = _interval;
         supplier = _supplier;
         params = _params;

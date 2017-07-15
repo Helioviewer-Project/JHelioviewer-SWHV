@@ -21,7 +21,7 @@ class PfssOptionsPanel extends JPanel {
     private int detail;
     private boolean fixedColor;
 
-    public PfssOptionsPanel(int _detail, boolean _fixedColor) {
+    PfssOptionsPanel(int _detail, boolean _fixedColor) {
         detail = _detail;
         fixedColor = _fixedColor;
         setLayout(new GridBagLayout());

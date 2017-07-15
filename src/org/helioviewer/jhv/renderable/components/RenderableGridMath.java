@@ -235,7 +235,7 @@ class RenderableGridMath {
         Vec3 v = new Vec3();
         double rotation;
         for (int j = 0; j < no_lon_steps; j++) {
-            for (int k = -1; k <= 1; k = k + 2) {
+            for (int k = -1; k <= 1; k += 2) {
                 rotation = lonstepDegrees * j * k;
                 Quat q = Quat.createRotation(Math.PI / 2 + Math.PI + (Math.PI / 180) * rotation, new Vec3(0, 1, 0));
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
@@ -263,7 +263,7 @@ class RenderableGridMath {
         }
 
         for (int j = 0; j < no_lat_steps; j++) {
-            for (int k = -1; k <= 1; k = k + 2) {
+            for (int k = -1; k <= 1; k += 2) {
                 rotation = latstepDegrees * j * k;
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
                     double scale = Math.cos(Math.PI / 180. * (90 - rotation));

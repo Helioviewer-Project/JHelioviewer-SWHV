@@ -27,7 +27,7 @@ import com.jidesoft.swing.JideButton;
 @SuppressWarnings("serial")
 class BandOptionPanel extends JPanel {
 
-    public BandOptionPanel(Band band) {
+    BandOptionPanel(Band band) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();

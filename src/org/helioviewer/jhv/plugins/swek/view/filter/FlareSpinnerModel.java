@@ -8,7 +8,7 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
     private String curval;
     private static final double incr = 0.1;
 
-    public FlareSpinnerModel(String _start, String _end, String startval, double _stepsize) {
+    FlareSpinnerModel(String _start, String _end, String startval, double _stepsize) {
         curval = startval;
     }
 

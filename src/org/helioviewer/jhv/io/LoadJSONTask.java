@@ -12,7 +12,7 @@ class LoadJSONTask extends LoadURITask {
 
     private final URI uri;
 
-    public LoadJSONTask(ImageLayer _imageLayer, URI _uri) {
+    LoadJSONTask(ImageLayer _imageLayer, URI _uri) {
         super(_imageLayer, null);
         uri = _uri;
         setThreadName("MAIN--LoadJSON");

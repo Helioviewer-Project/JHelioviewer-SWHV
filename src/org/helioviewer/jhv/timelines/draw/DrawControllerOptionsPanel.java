@@ -25,7 +25,7 @@ class DrawControllerOptionsPanel extends JPanel {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
     }
 
-    public DrawControllerOptionsPanel() {
+    DrawControllerOptionsPanel() {
         setLayout(new BorderLayout());
 
         ZoomComboboxItem[] items = {
@@ -67,7 +67,7 @@ class DrawControllerOptionsPanel extends JPanel {
         final ZOOM zoom;
         final long number;
 
-        public ZoomComboboxItem(ZOOM _zoom, long _number) {
+        private ZoomComboboxItem(ZOOM _zoom, long _number) {
             zoom = _zoom;
             number = _number;
         }

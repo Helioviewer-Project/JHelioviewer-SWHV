@@ -135,7 +135,7 @@ public class ImageDataPanel extends JPanel {
         private final JHVCarringtonPicker startCarrington = new JHVCarringtonPicker();
         private final JHVCarringtonPicker endCarrington = new JHVCarringtonPicker();
 
-        public TimeSelectionPanel() {
+        private TimeSelectionPanel() {
             long milli = (System.currentTimeMillis() / 1000L) * 1000L;
             setStartTime(milli - 2 * TimeUtils.DAY_IN_MILLIS);
             setEndTime(milli);
@@ -199,7 +199,7 @@ public class ImageDataPanel extends JPanel {
         private final JSpinner spinnerCadence = new JSpinner(new SpinnerNumberModel(1, 1, 1000000, 1));
         private final JComboBox<String> comboUnit = new JComboBox<>(timeStepUnitStrings);
 
-        public CadencePanel() {
+        private CadencePanel() {
             setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 0));
 
             setCadence(APIRequest.CADENCE_DEFAULT);

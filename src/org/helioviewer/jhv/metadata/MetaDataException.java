@@ -5,6 +5,6 @@ class MetaDataException extends RuntimeException {
 
     // public MetaDataException() { super(); }
 
-    public MetaDataException(String s) { super(s + " not found in metadata"); }
+    MetaDataException(String s) { super(s + " not found in metadata"); }
 
 }

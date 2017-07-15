@@ -21,7 +21,7 @@ abstract class ExtensionFileFilter extends FileFilter {
 
     static class JsonFilter extends ExtensionFileFilter {
 
-        public JsonFilter() {
+        JsonFilter() {
             extensions = new String[] { "json" };
         }
 
@@ -34,7 +34,7 @@ abstract class ExtensionFileFilter extends FileFilter {
 
     private static class FitsFilter extends ExtensionFileFilter {
 
-        public FitsFilter() {
+        private FitsFilter() {
             extensions = new String[] { "fits", "fts" };
         }
 
@@ -47,7 +47,7 @@ abstract class ExtensionFileFilter extends FileFilter {
 
     private static class JP2Filter extends ExtensionFileFilter {
 
-        public JP2Filter() {
+        private JP2Filter() {
             extensions = new String[] { "jp2", "jpx" };
         }
 
@@ -59,7 +59,7 @@ abstract class ExtensionFileFilter extends FileFilter {
 
     private static class JPGFilter extends ExtensionFileFilter {
 
-        public JPGFilter() {
+        private JPGFilter() {
             extensions = new String[] { "jpg", "jpeg" };
         }
 
@@ -72,7 +72,7 @@ abstract class ExtensionFileFilter extends FileFilter {
 
     private static class PNGFilter extends ExtensionFileFilter {
 
-        public PNGFilter() {
+        private PNGFilter() {
             extensions = new String[] { "png" };
         }
 

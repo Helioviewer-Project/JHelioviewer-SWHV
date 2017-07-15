@@ -56,7 +56,7 @@ class GimpGradientSegment {
      * @param blendingColor
      *            Blending function color
      */
-    public GimpGradientSegment(double leftStop, double midStop, double rightStop, double rl, double gl, double bl, double al, double rr, double gr, double br, double ar, int blendingType, int blendingColor/*, int blendingColorLeft, int blendingColorRight*/) {
+    GimpGradientSegment(double leftStop, double midStop, double rightStop, double rl, double gl, double bl, double al, double rr, double gr, double br, double ar, int blendingType, int blendingColor/*, int blendingColorLeft, int blendingColorRight*/) {
         this.leftStop = leftStop;
         this.midStop = midStop;
         this.rightStop = rightStop;

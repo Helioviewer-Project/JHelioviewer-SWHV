@@ -12,7 +12,7 @@ class LoadFITSTask extends LoadURITask {
 
     private final URI uri;
 
-    public LoadFITSTask(ImageLayer _imageLayer, URI _uri) {
+    LoadFITSTask(ImageLayer _imageLayer, URI _uri) {
         super(_imageLayer, null);
         uri = _uri;
         setThreadName("MAIN--LoadFITS");

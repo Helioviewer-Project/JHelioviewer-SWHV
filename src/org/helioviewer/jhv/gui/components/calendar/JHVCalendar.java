@@ -164,7 +164,7 @@ class JHVCalendar extends JPanel {
         private final JideButton backButton = new JideButton("<");
         private final JideButton selectButton = new JideButton();
 
-        public NavigationPanel() {
+        private NavigationPanel() {
             setLayout(new BorderLayout());
 
             JPanel forwardButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
@@ -284,7 +284,7 @@ class JHVCalendar extends JPanel {
         final JTable table;
         private final JPanel contentPane;
 
-        public SelectionPanel() {
+        private SelectionPanel() {
             setLayout(new BorderLayout());
             // create table
             table = new JTable();
@@ -440,7 +440,7 @@ class JHVCalendar extends JPanel {
      */
     private static class CenterTableCellRenderer extends DefaultTableCellRenderer {
 
-        public CenterTableCellRenderer() {
+        private CenterTableCellRenderer() {
             setHorizontalAlignment(CENTER);
         }
 
@@ -452,7 +452,7 @@ class JHVCalendar extends JPanel {
      */
     private class BottomPanel extends JPanel {
 
-        public BottomPanel() {
+        private BottomPanel() {
             // set basic layout
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
             // set up button

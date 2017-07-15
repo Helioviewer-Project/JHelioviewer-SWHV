@@ -27,7 +27,7 @@ class FITSImage {
     String xml;
     ImageData imageData;
 
-    public FITSImage(URI uri) throws Exception {
+    FITSImage(URI uri) throws Exception {
         try (Fits f = new Fits(new BufferedInputStream(new DownloadStream(uri.toURL()).getInput(), BUFSIZ))) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
