@@ -11,6 +11,7 @@ import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
+import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
@@ -73,7 +74,7 @@ public class GLListener implements GLEventListener {
     }
 
     private static void disposeImpl(GL2 gl) {
-        ImageViewerGui.getRenderableContainer().dispose(gl);
+        RenderableContainer.dispose(gl);
         GLSLSolarShader.dispose(gl);
         GLSLLineShader.dispose(gl);
     }
@@ -98,7 +99,7 @@ public class GLListener implements GLEventListener {
             reshaped = true;
             Displayer.setGLSize(x, y, width, height);
             Displayer.reshapeAll();
-            ImageViewerGui.getRenderableContainer().getRenderableMiniview().reshapeViewport();
+            RenderableContainer.getRenderableMiniview().reshapeViewport();
             Displayer.render(1);
         });
     }
@@ -110,7 +111,7 @@ public class GLListener implements GLEventListener {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 CameraHelper.applyPerspective(camera, vp, gl);
-                ImageViewerGui.getRenderableContainer().render(camera, vp, gl);
+                RenderableContainer.render(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
             }
         }
@@ -128,7 +129,7 @@ public class GLListener implements GLEventListener {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
-                ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl);
+                RenderableContainer.renderScale(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
             }
         }
@@ -138,7 +139,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Displayer.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                ImageViewerGui.getRenderableContainer().renderFloat(camera, vp, gl);
+                RenderableContainer.renderFloat(camera, vp, gl);
             }
         }
     }
@@ -146,11 +147,11 @@ public class GLListener implements GLEventListener {
     private static void renderFullFloatScene(Camera camera, GL2 gl) {
         Viewport vp = Displayer.fullViewport;
         gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        ImageViewerGui.getRenderableContainer().renderFullFloat(camera, vp, gl);
+        RenderableContainer.renderFullFloat(camera, vp, gl);
     }
 
     private static void renderMiniview(GL2 gl) {
-        RenderableMiniview miniview = ImageViewerGui.getRenderableContainer().getRenderableMiniview();
+        RenderableMiniview miniview = RenderableContainer.getRenderableMiniview();
         if (miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
             Camera miniCamera = Displayer.getMiniCamera();
@@ -158,7 +159,7 @@ public class GLListener implements GLEventListener {
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             CameraHelper.applyPerspective(miniCamera, vp, gl);
-            ImageViewerGui.getRenderableContainer().renderMiniview(miniCamera, vp, gl);
+            RenderableContainer.renderMiniview(miniCamera, vp, gl);
         }
     }
 
@@ -172,20 +173,18 @@ public class GLListener implements GLEventListener {
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(surface);
 
-        ImageViewerGui.getRenderableContainer().prerender(gl);
+        RenderableContainer.prerender(gl);
 
         Camera camera = Displayer.getCamera();
 
-        if (exporter != null) {
+        if (exporter != null)
             exporter.handleMovieExport(camera, gl);
-        }
 
         if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
             renderScene(camera, gl);
             renderMiniview(gl);
-        } else {
+        } else
             renderSceneScale(camera, gl);
-        }
 
         renderFloatScene(camera, gl);
         renderFullFloatScene(camera, gl);

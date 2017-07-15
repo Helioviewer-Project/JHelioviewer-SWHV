@@ -14,12 +14,12 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
@@ -55,7 +55,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
 
         String text = Layers.getLastUpdatedTimestamp().toString();
         if (Displayer.multiview) {
-            ImageLayer im = ImageViewerGui.getRenderableContainer().getImageLayerInViewport(vp.idx);
+            ImageLayer im = RenderableContainer.getImageLayerInViewport(vp.idx);
             if (im != null) {
                 text = im.getTimeString() + ' ' + im.getName();
             }

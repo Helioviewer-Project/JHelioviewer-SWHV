@@ -22,7 +22,7 @@ import com.jogamp.opengl.GL2;
 @SuppressWarnings("serial")
 public class RenderableContainer extends AbstractTableModel implements Reorderable {
 
-    private class CompositeList extends AbstractList<Renderable> {
+    private static class CompositeList extends AbstractList<Renderable> {
 
         private final ArrayList<ImageLayer> list1 = new ArrayList<>();
         private final ArrayList<Renderable> list2 = new ArrayList<>();
@@ -59,13 +59,13 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     }
 
-    private CompositeList renderables = new CompositeList();
-    private CompositeList newRenderables = new CompositeList();
-    private final HashSet<Renderable> removedRenderables = new HashSet<>();
+    private static CompositeList renderables = new CompositeList();
+    private static CompositeList newRenderables = new CompositeList();
+    private static final HashSet<Renderable> removedRenderables = new HashSet<>();
 
-    private RenderableGrid renderableGrid;
-    private RenderableViewpoint renderableViewpoint;
-    private RenderableMiniview renderableMiniview;
+    private static RenderableGrid renderableGrid;
+    private static RenderableViewpoint renderableViewpoint;
+    private static RenderableMiniview renderableMiniview;
 
     public RenderableContainer() {
         addRenderable(new RenderableGrid(null));
@@ -74,15 +74,15 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         addRenderable(new RenderableMiniview(null));
     }
 
-    public RenderableViewpoint getRenderableViewpoint() {
+    public static RenderableViewpoint getRenderableViewpoint() {
         return renderableViewpoint;
     }
 
-    public RenderableGrid getRenderableGrid() {
+    public static RenderableGrid getRenderableGrid() {
         return renderableGrid;
     }
 
-    public RenderableMiniview getRenderableMiniview() {
+    public static RenderableMiniview getRenderableMiniview() {
         return renderableMiniview;
     }
 
@@ -102,13 +102,13 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         Displayer.display(); // e.g., PFSS renderable
     }
 
-    public void removeRenderable(Renderable renderable) {
+    public static void removeRenderable(Renderable renderable) {
         renderables.remove(renderable);
         removedRenderables.add(renderable);
         Displayer.display();
     }
 
-    public void prerender(GL2 gl) {
+    public static void prerender(GL2 gl) {
         int count = removeRenderables(gl);
         initRenderables(gl);
         for (Renderable renderable : renderables) {
@@ -116,45 +116,45 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
     }
 
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public static void render(Camera camera, Viewport vp, GL2 gl) {
         for (Renderable renderable : renderables) {
             renderable.render(camera, vp, gl);
         }
     }
 
-    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
+    public static void renderScale(Camera camera, Viewport vp, GL2 gl) {
         for (Renderable renderable : renderables) {
             renderable.renderScale(camera, vp, gl);
         }
     }
 
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+    public static void renderFloat(Camera camera, Viewport vp, GL2 gl) {
         for (Renderable renderable : renderables) {
             renderable.renderFloat(camera, vp, gl);
         }
     }
 
-    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+    public static void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
         for (Renderable renderable : renderables) {
             renderable.renderFullFloat(camera, vp, gl);
         }
     }
 
-    public void renderMiniview(Camera camera, Viewport miniview, GL2 gl) {
+    public static void renderMiniview(Camera camera, Viewport miniview, GL2 gl) {
         RenderableMiniview.renderBackground(camera, miniview, gl);
         for (Renderable renderable : renderables) {
             renderable.renderMiniview(camera, miniview, gl);
         }
     }
 
-    private void initRenderables(GL2 gl) {
+    private static void initRenderables(GL2 gl) {
         for (Renderable renderable : newRenderables) {
             renderable.init(gl);
         }
         newRenderables.clear();
     }
 
-    private int removeRenderables(GL2 gl) {
+    private static int removeRenderables(GL2 gl) {
         int count = removedRenderables.size();
         for (Renderable renderable : removedRenderables) {
             renderable.remove(gl);
@@ -163,7 +163,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         return count;
     }
 
-    private void insertRow(int row, Renderable rowData) {
+    private static void insertRow(int row, Renderable rowData) {
         if (row > renderables.size()) {
             renderables.add(rowData);
         } else {
@@ -222,7 +222,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         updateCell(renderables.indexOf(renderable), RenderableContainerPanel.TIME_COL);
     }
 
-    public void dispose(GL2 gl) {
+    public static void dispose(GL2 gl) {
         for (Renderable renderable : renderables) {
             renderable.dispose(gl);
         }
@@ -230,16 +230,16 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables = new CompositeList();
     }
 
-    List<Renderable> getRenderables() {
+    static List<Renderable> getRenderables() {
         return Collections.unmodifiableList(renderables);
     }
 
-    void removeAll() {
+    static void removeAll() {
         removedRenderables.addAll(renderables);
         renderables = new CompositeList();
     }
 
-    public void arrangeMultiView(boolean multiview) {
+    public static void arrangeMultiView(boolean multiview) {
         List<ImageLayer> layers = renderables.getImageLayers();
         if (multiview) {
             int ct = 0;
@@ -259,7 +259,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         Displayer.render(1);
     }
 
-    public ImageLayer getImageLayerInViewport(int idx) {
+    public static ImageLayer getImageLayerInViewport(int idx) {
         for (ImageLayer layer : renderables.getImageLayers()) {
             if (layer.isVisible(idx))
                 return layer;
@@ -267,7 +267,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         return null;
     }
 
-    public int getNumEnabledImageLayers() {
+    public static int getNumEnabledImageLayers() {
         int ct = 0;
         for (ImageLayer layer : renderables.getImageLayers()) {
             if (layer.isEnabled())
