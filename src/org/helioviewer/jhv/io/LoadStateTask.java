@@ -10,7 +10,7 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.renderable.gui.State;
 import org.json.JSONObject;
 
-public class LoadStateTask extends JHVWorker<JSONObject, Void> {
+class LoadStateTask extends JHVWorker<JSONObject, Void> {
 
     private final URI uri;
 

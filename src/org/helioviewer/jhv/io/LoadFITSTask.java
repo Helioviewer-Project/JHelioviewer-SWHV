@@ -8,7 +8,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fitsview.FITSView;
 
-public class LoadFITSTask extends LoadURITask {
+class LoadFITSTask extends LoadURITask {
 
     private final URI uri;
 

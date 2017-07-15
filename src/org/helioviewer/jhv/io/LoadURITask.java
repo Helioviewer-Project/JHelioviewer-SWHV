@@ -10,7 +10,7 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.View;
 
-public class LoadURITask extends JHVWorker<View, Void> {
+class LoadURITask extends JHVWorker<View, Void> {
 
     private final ImageLayer imageLayer;
     private final URI uri;
