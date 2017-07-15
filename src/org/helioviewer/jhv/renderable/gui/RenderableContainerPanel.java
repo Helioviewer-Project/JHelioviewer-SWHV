@@ -136,10 +136,7 @@ public class RenderableContainerPanel extends JPanel {
 
         JideButton syncSpanButton = new JideButton(Buttons.syncLayers);
         syncSpanButton.setToolTipText("Synchronize layers time span");
-        syncSpanButton.addActionListener(e -> {
-            Layers.syncLayersSpan();
-            renderableContainer.refreshTable();
-        });
+        syncSpanButton.addActionListener(e -> Layers.syncLayersSpan());
 
         multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.setHorizontalTextPosition(SwingConstants.LEADING);
@@ -242,7 +239,6 @@ public class RenderableContainerPanel extends JPanel {
                     Displayer.render(1);
                 } else if (col == TITLE_COL && renderable instanceof ImageLayer) {
                     ((ImageLayer) renderable).setActiveImageLayer();
-                    renderableContainer.refreshTable();
                 } else if (col == REMOVE_COL && renderable.isDeletable()) {
                     renderableContainer.removeRenderable(renderable);
                     int idx = grid.getSelectedRow();

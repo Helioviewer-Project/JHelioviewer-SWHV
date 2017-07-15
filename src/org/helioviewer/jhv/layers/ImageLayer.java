@@ -131,7 +131,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         view.setImageLayer(this);
         view.setDataHandler(this);
         Layers.addLayer(view);
-        ImageViewerGui.getRenderableContainer().refreshTable();
 
         if (Displayer.multiview) {
             ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
@@ -146,7 +145,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             view.setImageLayer(null);
             view.abolish();
             view = null;
-            ImageViewerGui.getRenderableContainer().refreshTable();
         }
         imageData = prevImageData = baseImageData = null;
     }
