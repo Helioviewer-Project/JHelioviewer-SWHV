@@ -26,6 +26,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
         private final ArrayList<ImageLayer> list1 = new ArrayList<>();
         private final ArrayList<Renderable> list2 = new ArrayList<>();
+        final List<ImageLayer> imageLayers = Collections.unmodifiableList(list1);
 
         @Override
         public Renderable get(int index) {
@@ -58,10 +59,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             if (!(e instanceof ImageLayer)) // only for DnD
                 return;
             list1.add(index, (ImageLayer) e);
-        }
-
-        List<ImageLayer> getImageLayers() {
-            return list1;
         }
 
     }
@@ -197,7 +194,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
 
         if (Displayer.multiview) {
-            arrangeMultiView(true);
+            ImageLayers.arrangeMultiView(true);
         }
     }
 
@@ -237,6 +234,10 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables = new CompositeList();
     }
 
+    static List<ImageLayer> getImageLayers() {
+        return renderables.imageLayers;
+    }
+
     static List<Renderable> getRenderables() {
         return Collections.unmodifiableList(renderables);
     }
@@ -244,43 +245,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     static void removeAll() {
         removedRenderables.addAll(renderables);
         renderables = new CompositeList();
-    }
-
-    public static void arrangeMultiView(boolean multiview) {
-        List<ImageLayer> layers = renderables.getImageLayers();
-        if (multiview) {
-            int ct = 0;
-            for (ImageLayer layer : layers) {
-                if (layer.isEnabled()) {
-                    layer.setVisible(ct);
-                    ct++;
-                }
-            }
-        } else {
-            for (ImageLayer layer : layers) {
-                if (layer.isEnabled())
-                    layer.setVisible(0);
-            }
-        }
-        Displayer.reshapeAll();
-        Displayer.render(1);
-    }
-
-    public static ImageLayer getImageLayerInViewport(int idx) {
-        for (ImageLayer layer : renderables.getImageLayers()) {
-            if (layer.isVisible(idx))
-                return layer;
-        }
-        return null;
-    }
-
-    public static int getNumEnabledImageLayers() {
-        int ct = 0;
-        for (ImageLayer layer : renderables.getImageLayers()) {
-            if (layer.isEnabled())
-                ct++;
-        }
-        return ct;
     }
 
 }

@@ -9,6 +9,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.renderable.gui.ImageLayers;
 import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
@@ -36,7 +37,7 @@ public class SDOCutOutAction extends AbstractAction {
         url.append("&stopDate=").append(endDate);
         url.append("&stopTime=").append(endTime);
 
-        url.append("&wavelengths=").append(Layers.getSDOCutoutString());
+        url.append("&wavelengths=").append(ImageLayers.getSDOCutoutString());
         url.append("&cadence=").append(ObservationDialog.getInstance().getObservationPanel().getCadence()).append("&cadenceUnits=s");
 
         View v = Layers.getActiveView();

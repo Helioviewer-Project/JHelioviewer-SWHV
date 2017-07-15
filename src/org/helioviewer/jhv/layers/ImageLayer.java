@@ -27,6 +27,7 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.helioviewer.jhv.renderable.gui.ImageLayers;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.View;
@@ -115,7 +116,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         super.setEnabled(_enabled);
 
         if (Displayer.multiview) {
-            RenderableContainer.arrangeMultiView(true);
+            ImageLayers.arrangeMultiView(true);
         }
     }
 
@@ -134,7 +135,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         Layers.addLayer(view);
 
         if (Displayer.multiview) {
-            RenderableContainer.arrangeMultiView(true);
+            ImageLayers.arrangeMultiView(true);
         }
         optionsPanel.setLUT(view.getDefaultLUT());
     }
@@ -158,7 +159,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         }
         unsetView();
         if (Displayer.multiview) {
-            RenderableContainer.arrangeMultiView(true);
+            ImageLayers.arrangeMultiView(true);
         }
         dispose(gl);
     }
@@ -324,8 +325,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         return imageData;
     }
 
-    public MetaData getMetaData() {
-        return imageData == null ? view.getMetaData(new JHVDate(0)) : imageData.getMetaData();
+    public MetaData getMetaData() { //!
+        return view == null ? null : imageData == null ? view.getMetaData(new JHVDate(0)) : imageData.getMetaData();
     }
 
     @Override

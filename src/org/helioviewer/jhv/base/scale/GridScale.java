@@ -3,19 +3,19 @@ package org.helioviewer.jhv.base.scale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableGrid.GridType;
+import org.helioviewer.jhv.renderable.gui.ImageLayers;
 
 public abstract class GridScale {
 
-    public static final GridScale polar = new GridScaleIdentity(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
+    public static final GridScale polar = new GridScaleIdentity(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize(), Transform.transformpolar);
     public static final GridScale lati = new GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
-    public static final GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize(), Transform.transformpolar);
+    public static final GridScale logpolar = new GridScaleLogY(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize(), Transform.transformpolar);
     public static final GridScale ortho = new GridScaleOrtho(0, 0, 0, 0, Transform.transformlatitudinal);
 
     protected abstract double scaleX(double val);
