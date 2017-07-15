@@ -7,9 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
+import org.helioviewer.jhv.renderable.gui.State;
 
 public class CommandLine {
 
@@ -31,7 +31,7 @@ public class CommandLine {
         }
         // -state
         for (String file : getOptionValues("state")) {
-            ImageViewerGui.getRenderableContainer().loadScene(file);
+            State.loadState(file);
             break;
         }
     }

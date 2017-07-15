@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.renderable.gui.State;
 
 @SuppressWarnings("serial")
 public class SaveStateAction extends AbstractAction {
@@ -15,7 +15,7 @@ public class SaveStateAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ImageViewerGui.getRenderableContainer().saveCurrentScene();
+        State.saveState();
     }
 
 }
