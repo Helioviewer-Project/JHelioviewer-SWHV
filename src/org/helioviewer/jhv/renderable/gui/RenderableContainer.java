@@ -113,7 +113,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public static void prerender(GL2 gl) {
-        int count = removeRenderables(gl);
+        removeRenderables(gl);
         initRenderables(gl);
         for (Renderable renderable : renderables) {
             renderable.prerender(gl);
@@ -158,13 +158,11 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         newRenderables.clear();
     }
 
-    private static int removeRenderables(GL2 gl) {
-        int count = removedRenderables.size();
+    private static void removeRenderables(GL2 gl) {
         for (Renderable renderable : removedRenderables) {
             renderable.remove(gl);
         }
         removedRenderables.clear();
-        return count;
     }
 
     private static void insertRow(int row, Renderable rowData) {
