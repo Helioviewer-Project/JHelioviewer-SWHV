@@ -53,6 +53,13 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             return list2.add(e);
         }
 
+        @Override
+        public void add(int index, Renderable e) {
+            if (!(e instanceof ImageLayer)) // only for DnD
+                return;
+            list1.add(index, (ImageLayer) e);
+        }
+
         List<ImageLayer> getImageLayers() {
             return list1;
         }
