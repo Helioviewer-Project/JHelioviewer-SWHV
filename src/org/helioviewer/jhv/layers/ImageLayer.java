@@ -49,7 +49,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
-        ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
+        ImageViewerGui.getRenderableContainer().addRenderable(imageLayer);
         return imageLayer;
     }
 
