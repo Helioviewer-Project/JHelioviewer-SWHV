@@ -99,16 +99,12 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public void removeRenderable(Renderable renderable) {
         renderables.remove(renderable);
         removedRenderables.add(renderable);
-        // refreshTable(); display() will take care
         Displayer.display();
     }
 
     public void prerender(GL2 gl) {
         int count = removeRenderables(gl);
         initRenderables(gl);
-        if (count > 0)
-            refreshTable();
-
         for (Renderable renderable : renderables) {
             renderable.prerender(gl);
         }
@@ -186,7 +182,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         } else {
             insertRow(toIndex, toMove);
         }
-        refreshTable();
 
         if (Displayer.multiview) {
             arrangeMultiView(true);
@@ -244,10 +239,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         } catch (Exception e) {
             return null;
         }
-    }
-
-    public void refreshTable() {
-        fireTableDataChanged();
     }
 
     public void updateCell(int row, int col) {
