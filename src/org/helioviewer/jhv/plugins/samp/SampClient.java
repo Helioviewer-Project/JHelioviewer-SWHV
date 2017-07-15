@@ -71,6 +71,45 @@ class SampClient extends HubConnector {
                 return null;
             }
         });
+        addMessageHandler(new AbstractMessageHandler("jhv.load.image") {
+            @Override
+            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    Object url = msg.getParam("url");
+                    if (url != null)
+                        Layer.image.add(new URI(url.toString()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
+        addMessageHandler(new AbstractMessageHandler("jhv.load.request") {
+            @Override
+            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    Object url = msg.getParam("url");
+                    if (url != null)
+                        Layer.request.add(new URI(url.toString()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
+        addMessageHandler(new AbstractMessageHandler("jhv.load.timeline") {
+            @Override
+            public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
+                try {
+                    Object url = msg.getParam("url");
+                    if (url != null)
+                        Layer.timeline.add(new URI(url.toString()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
         declareSubscriptions(computeSubscriptions());
 
         setAutoconnect(10);
