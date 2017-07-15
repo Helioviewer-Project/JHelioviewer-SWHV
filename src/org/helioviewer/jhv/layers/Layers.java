@@ -304,54 +304,6 @@ public class Layers {
         animationMode = mode;
     }
 
-    public static double getLargestPhysicalHeight() {
-        double size = 0;
-
-        for (View v : layers) {
-            if (v.getImageLayer().isEnabled()) {
-                MetaData m = v.getImageLayer().getMetaData();
-                double newSize = m.getPhysicalRegion().height;
-                if (newSize > size) {
-                    size = newSize;
-                }
-            }
-        }
-        return size;
-    }
-
-    public static double getLargestPhysicalSize() {
-        double size = 0;
-
-        for (View v : layers) {
-            if (v.getImageLayer().isEnabled()) {
-                MetaData m = v.getImageLayer().getMetaData();
-                double h = m.getPhysicalRegion().height;
-                double w = m.getPhysicalRegion().width;
-                double newSize = Math.sqrt(h * h + w * w);
-                if (newSize > size) {
-                    size = newSize;
-                }
-            }
-        }
-        return size;
-    }
-
-    public static String getSDOCutoutString() {
-        StringBuilder str = new StringBuilder();
-
-        for (View v : layers) {
-            if (v.getImageLayer().isEnabled()) {
-                MetaData m = v.getImageLayer().getMetaData();
-                if (m instanceof HelioviewerMetaData) {
-                    HelioviewerMetaData hm = (HelioviewerMetaData) m;
-                    if (hm.getObservatory().contains("SDO") && hm.getInstrument().contains("AIA"))
-                        str.append(',').append(hm.getMeasurement());
-                }
-            }
-        }
-        return str.toString();
-    }
-
     public static void getSAMPMessage(Message msg) {
         if (activeView == null)
             return;

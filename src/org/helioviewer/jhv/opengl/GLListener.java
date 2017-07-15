@@ -11,6 +11,7 @@ import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
+import org.helioviewer.jhv.renderable.gui.ImageLayers;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 
 import com.jogamp.nativewindow.ScalableSurface;
@@ -119,9 +120,9 @@ public class GLListener implements GLEventListener {
 
     public static void renderSceneScale(Camera camera, GL2 gl) {
         if (Displayer.mode == Displayer.DisplayMode.Polar) {
-            GridScale.polar.set(0, 360, 0, 0.5 * Layers.getLargestPhysicalSize());
+            GridScale.polar.set(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
         } else if (Displayer.mode == Displayer.DisplayMode.LogPolar) {
-            GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * Layers.getLargestPhysicalSize()));
+            GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * ImageLayers.getLargestPhysicalSize()));
         }
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);

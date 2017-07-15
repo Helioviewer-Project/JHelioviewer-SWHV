@@ -15,7 +15,7 @@ import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.helioviewer.jhv.renderable.gui.RenderableContainer;
+import org.helioviewer.jhv.renderable.gui.ImageLayers;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -110,7 +110,7 @@ public class Displayer implements JHVEventHighlightListener {
         int ct = 0;
         if (multiview) {
             for (int i = 0; i < viewports.length; ++i) {
-                if (RenderableContainer.getImageLayerInViewport(i) != null)
+                if (ImageLayers.getImageLayerInViewport(i) != null)
                     ct++;
             }
         }
@@ -189,7 +189,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static void render(double f) {
-        if (Layers.getActiveView() == null || RenderableContainer.getNumEnabledImageLayers() == 0)
+        if (Layers.getActiveView() == null || ImageLayers.getNumEnabledImageLayers() == 0)
             toDisplay = true;
         else
             renderFactor = f;
