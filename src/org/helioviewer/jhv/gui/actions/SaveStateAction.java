@@ -15,7 +15,7 @@ public class SaveStateAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        State.saveState();
+        State.save();
     }
 
 }

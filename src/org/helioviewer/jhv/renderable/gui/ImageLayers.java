@@ -134,11 +134,8 @@ public class ImageLayers {
 
         ImageData id = activeLayer.getImageData();
         MetaData m = id.getMetaData();
-        if (!(m instanceof HelioviewerMetaData))
-            return;
-        HelioviewerMetaData hm = (HelioviewerMetaData) m;
 
-        msg.addParam("timestamp", hm.getViewpoint().time.toString());
+        msg.addParam("timestamp", m.getViewpoint().time.toString());
         msg.addParam("start", activeView.getFirstTime().toString());
         msg.addParam("end", activeView.getFirstTime().toString());
         msg.addParam("cadence", SampUtils.encodeLong(activeLayer.getAPIRequest().cadence * 1000L));
@@ -159,9 +156,9 @@ public class ImageLayers {
 
                 m = id.getMetaData();
                 if (m instanceof HelioviewerMetaData) {
-                    hm = (HelioviewerMetaData) m;
-
+                    HelioviewerMetaData hm = (HelioviewerMetaData) m;
                     HashMap<String, String> layerMsg = new HashMap<>();
+
                     layerMsg.put("observatory", hm.getObservatory());
                     layerMsg.put("instrument", hm.getInstrument());
                     layerMsg.put("detector", hm.getDetector());

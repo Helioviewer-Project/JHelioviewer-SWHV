@@ -27,9 +27,8 @@ public class LoadStateAction extends AbstractAction {
         fileDialog.setVisible(true);
 
         File[] fileNames = fileDialog.getFiles();
-        if (fileNames.length > 0) {
-            State.loadState(fileNames[0].getPath());
-        }
+        if (fileNames.length > 0)
+            State.load(fileNames[0].getPath());
     }
 
 }
