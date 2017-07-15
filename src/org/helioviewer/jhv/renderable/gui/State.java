@@ -27,7 +27,7 @@ import org.json.JSONObject;
 
 public class State {
 
-    public static void saveState() {
+    public static void save() {
         JSONObject main = new JSONObject();
         main.put("time", Layers.getLastUpdatedTimestamp());
         main.put("play", Layers.isMoviePlaying());
@@ -182,7 +182,7 @@ public class State {
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
-    public static void loadState(String stateFile) {
+    public static void load(String stateFile) {
         try {
             JSONObject data = JSONUtils.getJSONFile(stateFile);
             // to be loaded before viewpoint

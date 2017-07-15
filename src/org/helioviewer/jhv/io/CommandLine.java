@@ -31,7 +31,7 @@ public class CommandLine {
         }
         // -state
         for (String file : getOptionValues("state")) {
-            State.loadState(file);
+            State.load(file);
             break;
         }
     }
