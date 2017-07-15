@@ -11,12 +11,20 @@ public interface Layer {
     void add(URI uri);
 
     Image image = new Image();
+    FITS fits = new FITS();
     Timeline timeline = new Timeline();
 
     class Image implements Layer {
         @Override
         public void add(URI uri) {
             JHVGlobals.getExecutorService().execute(new LoadURITask(ImageLayer.create(null), uri));
+        }
+    }
+
+    class FITS implements Layer {
+        @Override
+        public void add(URI uri) {
+            JHVGlobals.getExecutorService().execute(new LoadFITSTask(ImageLayer.create(null), uri));
         }
     }
 

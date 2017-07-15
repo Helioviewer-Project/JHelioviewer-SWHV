@@ -48,7 +48,7 @@ class SampClient extends HubConnector {
                 try {
                     Object url = msg.getParam("url");
                     if (url != null)
-                        Layer.image.add(new URI(url.toString()));
+                        Layer.fits.add(new URI(url.toString()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -63,7 +63,7 @@ class SampClient extends HubConnector {
                     if ("SSA".equals(c.getMetadata(senderId).getName())) {
                         Object url = msg.getParam("url");
                         if (url != null)
-                            Layer.image.add(new URI(url.toString()));
+                            Layer.fits.add(new URI(url.toString()));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
