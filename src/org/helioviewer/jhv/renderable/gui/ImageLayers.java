@@ -117,7 +117,7 @@ public class ImageLayers {
 
         for (ImageLayer layer : RenderableContainer.getImageLayers()) {
             APIRequest vreq = layer.getAPIRequest();
-            if (!layer.isActiveImageLayer() && vreq != null) {
+            if (vreq != null && !layer.isActiveImageLayer()) {
                 layer.load(new APIRequest(vreq.server, vreq.sourceId, startTime, endTime, cadence));
             }
         }
