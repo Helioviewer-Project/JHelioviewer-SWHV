@@ -13,7 +13,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.AllFilenameFilter;
 import org.helioviewer.jhv.input.KeyShortcuts;
-import org.helioviewer.jhv.io.Layer;
+import org.helioviewer.jhv.io.Load;
 
 /**
  * Action to open a local file
@@ -49,7 +49,7 @@ public class OpenLocalFileAction extends AbstractAction {
             Settings.getSingletonInstance().save("default.local.path");
             for (File fileName : fileNames) {
                 if (fileName.isFile())
-                    Layer.image.add(fileName.toURI());
+                    Load.image.get(fileName.toURI());
             }
         }
     }
