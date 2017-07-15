@@ -9,7 +9,6 @@ import java.util.List;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.renderable.gui.State;
 
 public class CommandLine {
 
@@ -30,8 +29,8 @@ public class CommandLine {
             Layer.image.add(uri);
         }
         // -state
-        for (String file : getOptionValues("state")) {
-            State.load(file);
+        for (URI uri : getURIOptionValues("state")) {
+            Layer.state.add(uri);
             break;
         }
     }
