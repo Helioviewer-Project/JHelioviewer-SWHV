@@ -2,14 +2,9 @@ package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.awt.EventQueue;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.io.DownloadStream;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
@@ -45,43 +40,32 @@ class PfssDataLoader implements Runnable {
             remote = PfssSettings.baseURL + url;
         }
 
-        try (InputStream in = new BufferedInputStream(new DownloadStream(remote).getInput(), BUFSIZ)) {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            int nRead;
-            byte[] data = new byte[BUFSIZ];
-            while ((nRead = in.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, nRead);
-            }
-            buffer.flush();
-
-            PfssData pfssData = getPfssData(buffer.toByteArray(), time);
+        try (Fits fits = new Fits(new BufferedInputStream(new DownloadStream(remote).getInput(), BUFSIZ))) {
+            PfssData pfssData = getPfssData(fits, time);
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
 
             if (!loadFromFile)
-                try (OutputStream out = FileUtils.newBufferedOutputStream(f)) {
-                    buffer.writeTo(out);
-                }
+                fits.write(f);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static PfssData getPfssData(byte[] fitsFile, long time) throws Exception {
-        try (Fits fits = new Fits(new ByteArrayInputStream(fitsFile))) {
-            BasicHDU<?> hdus[] = fits.read();
-            if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))
-                throw new Exception("Could not read FITS");
+    private static PfssData getPfssData(Fits fits, long time) throws Exception {
+        BasicHDU<?> hdus[] = fits.read();
+        if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))
+            throw new Exception("Could not read FITS");
 
-            BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
-            short[] fieldlinex = (short[]) bhdu.getColumn("FIELDLINEx");
-            short[] fieldliney = (short[]) bhdu.getColumn("FIELDLINEy");
-            short[] fieldlinez = (short[]) bhdu.getColumn("FIELDLINEz");
-            short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
+        BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
+        short[] fieldlinex = (short[]) bhdu.getColumn("FIELDLINEx");
+        short[] fieldliney = (short[]) bhdu.getColumn("FIELDLINEy");
+        short[] fieldlinez = (short[]) bhdu.getColumn("FIELDLINEz");
+        short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
 
-            String dateFits = bhdu.getHeader().getStringValue("DATE-OBS");
-            if (dateFits == null)
-                throw new Exception("DATE-OBS not found");
-            return new PfssData(new JHVDate(dateFits), fieldlinex, fieldliney, fieldlinez, fieldlines, time);
-        }
+        String dateFits = bhdu.getHeader().getStringValue("DATE-OBS");
+        if (dateFits == null)
+            throw new Exception("DATE-OBS not found");
+        return new PfssData(new JHVDate(dateFits), fieldlinex, fieldliney, fieldlinez, fieldlines, time);
     }
+
 }
