@@ -34,6 +34,6 @@
     <classpathentry kind="lib" path="lib/sentry-log4j-1.3.0.jar"/>
     <classpathentry kind="lib" path="lib/slf4j-api-1.7.25.jar"/>
     <classpathentry kind="lib" path="lib/slf4j-nop-1.7.25.jar"/>
-    <classpathentry kind="lib" path="lib/sqlite-jdbc-3.19.3.jar"/>
+    <classpathentry kind="lib" path="lib/sqlite-jdbc-3.20.0.jar"/>
     <classpathentry kind="output" path="bin"/>
 </classpath>
