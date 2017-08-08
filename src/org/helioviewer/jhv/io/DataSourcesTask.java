@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
@@ -51,6 +52,9 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
                     schema.validate(json);
                 parser.parse(json);
                 return null;
+            } catch (ValidationException e) {
+                Log.error(e);
+                e.getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log::error);
             } catch (IOException e) {
                 try {
                     // Log.error(e);
