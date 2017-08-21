@@ -1,52 +1,55 @@
 {
-   "$schema": "http://json-schema.org/draft-06/schema#",
-   "title": "DataSources",
-   "description": "Helioviewer DataSources API response",
-   "type": "object",
-   "patternProperties": {
-       "^.*$": {
-           "oneOf": [
-             { "$ref": "#/definitions/tree_node" },
-             { "$ref": "#/definitions/tree_leaf" }
-           ]
-       }
-   },
-   "definitions": {
-       "root_part": {
-           "patternProperties": {
-               "^.*$": {
-                 "oneOf": [
-                   { "$ref": "#/definitions/tree_node" },
-                   { "$ref": "#/definitions/tree_leaf" }
-                 ]
-               }
-           }
-       },
-       "tree_node": {
-           "properties": {
-               "name": { "type":  "string" },
-               "description": { "type":  "string" },
-               "children": { "$ref": "#/definitions/root_part" },
-               "default": { "type" : "boolean" }
-           },
-           "required": [ "name", "description", "children" ]
-       },
-       "tree_leaf": {
-           "properties": {
-               "name": { "type":  "string" },
-               "description": { "type":  "string" },
-               "sourceId": { "type":  "integer" },
-               "start": {
-                   "type": "string",
-                   "format": "sql-date-time"
-               },
-               "end": {
-                   "type": "string",
-                   "format": "sql-date-time"
-               },
-               "default": { "type" : "boolean" }
-           },
-           "required": [ "name", "description", "sourceId", "start", "end" ]
-       }
-   }
+    "$schema" : "http://json-schema.org/draft-06/schema#",
+    "title" : "DataSources",
+    "description" : "Helioviewer DataSources API response",
+    "type" : "object",
+    "patternProperties" : {
+        "^.*$" : {
+            "oneOf" : [
+                { "$ref" : "#/definitions/tree_node" },
+                { "$ref" : "#/definitions/tree_leaf" }
+            ]
+        }
+    },
+    "definitions" : {
+        "root_part" : {
+            "patternProperties" : {
+                "^.*$" : {
+                    "oneOf" : [
+                        { "$ref" : "#/definitions/tree_node" },
+                        { "$ref" : "#/definitions/tree_leaf" }
+                    ]
+                }
+            }
+        },
+        "tree_node" : {
+            "properties" : {
+                "name" : { "type" : "string" },
+                "description" : { "type" : "string" },
+                "children" : { "$ref" : "#/definitions/root_part" },
+                "default" : { "type" : "boolean" }
+            },
+            "required" : [ "name", "description", "children" ]
+        },
+        "tree_leaf" : {
+            "properties" : {
+                "name" : { "type" : "string" },
+                "description" : { "type" : "string" },
+                "sourceId" : {
+                    "type" : "integer",
+                    "minimum" : 0
+                },
+                "start" : {
+                    "type" : "string",
+                    "format" : "sql-date-time"
+                },
+                "end" : {
+                    "type" : "string",
+                    "format" : "sql-date-time"
+                },
+                "default" : { "type" : "boolean" }
+            },
+            "required" : [ "name", "description", "sourceId", "start", "end" ]
+        }
+    }
 }
