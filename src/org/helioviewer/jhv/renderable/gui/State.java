@@ -56,7 +56,7 @@ public class State {
 
         String fileName = JHVDirectory.STATES.getPath() + "jhv_state__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".jhv";
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
-            main.write(writer);
+            new JSONObject().put("org.helioviewer.jhv.state", main).write(writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -181,8 +181,9 @@ public class State {
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
-    public static void load(JSONObject jo) {
+    public static void load(JSONObject obj) {
         try {
+            JSONObject jo = obj.getJSONObject("org.helioviewer.jhv.state");
             // to be loaded before viewpoint
             try {
                 Displayer.DisplayMode.valueOf(jo.optString("projection")).radio.doClick();
