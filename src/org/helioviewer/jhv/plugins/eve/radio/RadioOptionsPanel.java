@@ -15,6 +15,8 @@ import org.helioviewer.jhv.io.DataSources;
 @SuppressWarnings("serial")
 class RadioOptionsPanel extends JPanel {
 
+    private LUTComboBox lutCombo;
+
     RadioOptionsPanel(String selected) {
         setLayout(new GridBagLayout());
 
@@ -26,7 +28,7 @@ class RadioOptionsPanel extends JPanel {
         c.weighty = 1;
         c.fill = GridBagConstraints.NONE;
 
-        LUTComboBox lutCombo = new LUTComboBox(selected);
+        lutCombo = new LUTComboBox(selected);
         lutCombo.addActionListener(e -> RadioData.setLUT(lutCombo.getLUT()));
         add(lutCombo, c);
 
@@ -39,6 +41,10 @@ class RadioOptionsPanel extends JPanel {
         add(availabilityButton, c);
 
         ComponentUtils.smallVariant(this);
+    }
+
+    String getColormap() {
+        return lutCombo.getSelectedItem().toString();
     }
 
 }

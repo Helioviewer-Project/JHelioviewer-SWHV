@@ -44,19 +44,22 @@ public class RadioData extends AbstractTimelineRenderable {
     private static RadioOptionsPanel optionsPanel;
     private static IndexColorModel colorModel;
 
-    public RadioData() {
+    public RadioData(JSONObject jo) {
         String cm = "Spectral";
+        if (jo != null) {
+            cm = jo.optString("colormap", cm);
+            if (LUT.get(cm) == null)
+                cm = "Spectral";
+        }
+
         colorModel = createIndexColorModelFromLUT(LUT.get(cm));
         optionsPanel = new RadioOptionsPanel(cm);
         setEnabled(false);
     }
 
-    public RadioData(JSONObject jo) {
-        this();
-    }
-
     @Override
     public void serialize(JSONObject jo) {
+        jo.put("colormap", optionsPanel.getColormap());
     }
 
     private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {

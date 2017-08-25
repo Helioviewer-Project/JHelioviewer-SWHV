@@ -26,7 +26,7 @@ public class EVEPlugin implements Plugin {
     private final JMenuItem openItem = new JMenuItem(new OpenLocalFileAction());
 
     public EVEPlugin() {
-        Timelines.getModel().addLineData(new RadioData());
+        Timelines.getModel().addLineData(new RadioData(null));
     }
 
     @Override

@@ -54,7 +54,7 @@ public class State {
         PluginManager.getSingletonInstance().saveState(plugins);
         main.put("plugins", plugins);
 
-        String fileName = JHVDirectory.STATES.getPath() + "jhv_state__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".jhv";
+        String fileName = JHVDirectory.STATES.getPath() + "state__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".jhv";
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
             new JSONObject().put("org.helioviewer.jhv.state", main).write(writer);
         } catch (IOException e) {
