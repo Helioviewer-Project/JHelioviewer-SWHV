@@ -32,6 +32,19 @@ abstract class ExtensionFileFilter extends FileFilter {
 
     }
 
+    static class JhvFilter extends ExtensionFileFilter {
+
+        JhvFilter() {
+            extensions = new String[] { "jhv" };
+        }
+
+        @Override
+        public String getDescription() {
+            return "State files (\".jhv\")";
+        }
+
+    }
+
     private static class FitsFilter extends ExtensionFileFilter {
 
         private FitsFilter() {
