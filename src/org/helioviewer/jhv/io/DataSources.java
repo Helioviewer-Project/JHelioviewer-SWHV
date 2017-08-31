@@ -92,7 +92,7 @@ public class DataSources {
     public static void loadSources() {
         String server = Settings.getSingletonInstance().getProperty("default.server");
         if (server == null || getServerSetting(server, "API.getDataSources") == null)
-            server = "ROB";
+            server = "GSFC";
         Settings.getSingletonInstance().setProperty("default.server", server);
 
         DataSourcesDB.init();
