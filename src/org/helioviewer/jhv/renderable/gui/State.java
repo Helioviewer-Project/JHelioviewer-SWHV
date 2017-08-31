@@ -169,15 +169,13 @@ public class State {
             }
         }
 
-        if (masterLayer != null)
-            masterLayer.setActiveImageLayer();
         RenderableContainerPanel.multiview.setSelected(data.optBoolean("multiview", RenderableContainerPanel.multiview.isSelected()));
         ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected()));
 
         JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Layers.getLastUpdatedTimestamp().milli));
         boolean tracking = data.optBoolean("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
-        LoadState loadStateTask = new LoadState(newlist, time, tracking, play);
+        LoadState loadStateTask = new LoadState(newlist, masterLayer, time, tracking, play);
         JHVGlobals.getExecutorService().execute(loadStateTask);
     }
 
@@ -201,12 +199,14 @@ public class State {
 
     private static class LoadState extends JHVWorker<Void, Void> {
         private final ArrayList<ImageLayer> newlist;
+        private final ImageLayer masterLayer;
         private final JHVDate time;
         private final boolean tracking;
         private final boolean play;
 
-        LoadState(ArrayList<ImageLayer> _newlist, JHVDate _time, boolean _tracking, boolean _play) {
+        LoadState(ArrayList<ImageLayer> _newlist, ImageLayer _masterLayer, JHVDate _time, boolean _tracking, boolean _play) {
             newlist = _newlist;
+            masterLayer = _masterLayer;
             time = _time;
             tracking = _tracking;
             play = _play;
@@ -233,6 +233,8 @@ public class State {
 
             for (ImageLayer layer : newlist)
                 layer.unload(); // prune failed layers
+            if (masterLayer != null)
+                masterLayer.setActiveImageLayer();
             Layers.setTime(time);
             ImageViewerGui.getToolBar().getTrackingButton().setSelected(tracking);
             if (play)
