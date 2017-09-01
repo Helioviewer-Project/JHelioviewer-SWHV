@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.samp;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -38,11 +39,15 @@ class SampClient extends HubConnector {
         meta.put("samp.name", "JHelioviewer");
         meta.put("samp.description.text", JHVGlobals.userAgent);
         meta.put("samp.icon.url", "http://swhv.oma.be/user_manual/hvImage_160x160.png");
+        meta.put("samp.documentation.url", JHVGlobals.documentationURL);
         meta.put("author.mail", JHVGlobals.emailAddress);
         meta.put("author.name", "ESA JHelioviewer Team");
         declareMetadata(Metadata.asMetadata(meta));
 
-        addMessageHandler(new AbstractMessageHandler("image.load.fits") {
+        // allow samp message from web
+        Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1");
+
+        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("image.load.fits", harmless)) {
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -56,7 +61,7 @@ class SampClient extends HubConnector {
             }
         });
         // lie about support for FITS tables to get SSA to send us FITS
-        addMessageHandler(new AbstractMessageHandler("table.load.fits") {
+        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("table.load.fits", harmless)) {
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -71,7 +76,7 @@ class SampClient extends HubConnector {
                 return null;
             }
         });
-        addMessageHandler(new AbstractMessageHandler("jhv.load.image") {
+        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.image", harmless)) {
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -84,7 +89,7 @@ class SampClient extends HubConnector {
                 return null;
             }
         });
-        addMessageHandler(new AbstractMessageHandler("jhv.load.request") {
+        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.request", harmless)) {
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -97,7 +102,7 @@ class SampClient extends HubConnector {
                 return null;
             }
         });
-        addMessageHandler(new AbstractMessageHandler("jhv.load.timeline") {
+        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.timeline", harmless)) {
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {
@@ -110,7 +115,7 @@ class SampClient extends HubConnector {
                 return null;
             }
         });
-        addMessageHandler(new AbstractMessageHandler("jhv.load.state") {
+        addMessageHandler(new AbstractMessageHandler(Collections.singletonMap("jhv.load.state", harmless)) {
             @Override
             public Map<?,?> processCall(HubConnection c, String senderId, Message msg) {
                 try {

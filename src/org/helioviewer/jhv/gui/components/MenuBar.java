@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.actions.CheckUpdateAction;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
@@ -95,7 +96,7 @@ public class MenuBar extends JMenuBar {
             helpMenu.add(aboutAction);
         }
 
-        helpMenu.add(new OpenURLinBrowserAction("Open User Manual", "http://swhv.oma.be/user_manual/"));
+        helpMenu.add(new OpenURLinBrowserAction("Open User Manual", JHVGlobals.documentationURL));
         helpMenu.add(new OpenURLinBrowserAction("Open Website", "http://www.jhelioviewer.org"));
         helpMenu.add(new CheckUpdateAction());
         helpMenu.addSeparator();
