@@ -6,8 +6,11 @@ import org.helioviewer.jhv.gui.UIGlobals;
 
 public class Buttons {
 
-    private static String uc2ent(MaterialDesign uc) {
-        return String.valueOf(uc.code);
+    private static String uc2ent(MaterialDesign ...uc) {
+        StringBuilder out = new StringBuilder();
+        for (MaterialDesign c: uc)
+            out.append(String.valueOf(c.code));
+        return out.toString();
     }
 
     public static Font getMaterialFont(float size) {
@@ -61,7 +64,7 @@ public class Buttons {
 
     // toolbar
 
-    public static String toolBar(MaterialDesign uc) {
+    public static String toolBar(MaterialDesign ...uc) {
         return "<html><center><font face='Material Design Icons' size=5>" + uc2ent(uc) + "</font>";
     }
 
