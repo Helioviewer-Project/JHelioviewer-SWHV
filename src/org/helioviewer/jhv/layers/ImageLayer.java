@@ -44,6 +44,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private final VBO indexVBO = VBO.gen_index_VBO();
     private final ImageLayerOptions optionsPanel;
 
+    private boolean removed;
     private LoadRemoteTask worker;
     private View view;
 
@@ -121,6 +122,8 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     public void setView(View _view) {
+        if (removed) //!
+            return;
         if (view != null)
             unsetView();
 
@@ -162,6 +165,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             ImageLayers.arrangeMultiView(true);
         }
         dispose(gl);
+        removed = true;
     }
 
     @Override
