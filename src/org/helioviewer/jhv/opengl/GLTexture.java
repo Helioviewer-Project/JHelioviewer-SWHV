@@ -129,14 +129,17 @@ public class GLTexture {
      * @return OpenGL memory image format
      */
     private static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
-        if (imageFormat == ImageFormat.Single8)
-            return GL2.GL_LUMINANCE8;
-        else if (imageFormat == ImageFormat.Single16)
-            return GL2.GL_LUMINANCE16;
-        else if (imageFormat == ImageFormat.ARGB32 || imageFormat == ImageFormat.RGB24)
-            return GL2.GL_RGBA;
-        else
-            throw new IllegalArgumentException("Format is not supported");
+        switch (imageFormat) {
+            case Single8:
+                return GL2.GL_LUMINANCE8;
+            case Single16:
+                return GL2.GL_LUMINANCE16;
+            case ARGB32:
+            case RGB24:
+                return GL2.GL_RGBA;
+            default:
+                throw new IllegalArgumentException("Format is not supported");
+        }
     }
 
     /**
@@ -148,12 +151,16 @@ public class GLTexture {
      * @return OpenGL input image format
      */
     private static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
-        if (imageFormat == ImageFormat.Single8 || imageFormat == ImageFormat.Single16)
-            return GL2.GL_LUMINANCE;
-        else if (imageFormat == ImageFormat.ARGB32 || imageFormat == ImageFormat.RGB24)
-            return GL2.GL_BGRA;
-        else
-            throw new IllegalArgumentException("Format is not supported");
+        switch (imageFormat) {
+            case Single8:
+            case Single16:
+                return GL2.GL_LUMINANCE;
+            case ARGB32:
+            case RGB24:
+                return GL2.GL_BGRA;
+            default:
+                throw new IllegalArgumentException("Format is not supported");
+        }
     }
 
     /**
@@ -180,12 +187,17 @@ public class GLTexture {
      * @return OpenGL input image format
      */
     private static int mapTypeToInputGLFormat(int type) {
-        if (type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED)
-            return GL2.GL_LUMINANCE;
-        else if (type == BufferedImage.TYPE_4BYTE_ABGR || type == BufferedImage.TYPE_INT_BGR || type == BufferedImage.TYPE_INT_ARGB)
-            return GL2.GL_BGRA;
-        else
-            return GL2.GL_RGBA;
+        switch (type) {
+            case BufferedImage.TYPE_BYTE_GRAY:
+            case BufferedImage.TYPE_BYTE_INDEXED:
+                return GL2.GL_LUMINANCE;
+            case BufferedImage.TYPE_4BYTE_ABGR:
+            case BufferedImage.TYPE_INT_BGR:
+            case BufferedImage.TYPE_INT_ARGB:
+                return GL2.GL_BGRA;
+            default:
+                return GL2.GL_RGBA;
+        }
     }
 
     /**

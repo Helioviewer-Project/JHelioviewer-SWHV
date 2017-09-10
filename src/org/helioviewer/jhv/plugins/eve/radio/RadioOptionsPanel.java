@@ -15,7 +15,7 @@ import org.helioviewer.jhv.io.DataSources;
 @SuppressWarnings("serial")
 class RadioOptionsPanel extends JPanel {
 
-    private LUTComboBox lutCombo;
+    private final LUTComboBox lutCombo;
 
     RadioOptionsPanel(String selected) {
         setLayout(new GridBagLayout());

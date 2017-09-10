@@ -12,13 +12,13 @@ public class PNGExporter implements MovieExporter {
     private BufferedImage image;
 
     @Override
-    public void open(String _path, int w, int h, int fps) throws Exception {
+    public void open(String _path, int w, int h, int fps) {
         path = _path;
         height = h;
     }
 
     @Override
-    public void encode(BufferedImage _image) throws Exception {
+    public void encode(BufferedImage _image) {
         image = _image;
     }
 
