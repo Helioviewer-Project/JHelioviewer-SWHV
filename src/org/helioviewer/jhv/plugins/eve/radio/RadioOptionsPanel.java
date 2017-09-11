@@ -44,7 +44,7 @@ class RadioOptionsPanel extends JPanel {
     }
 
     String getColormap() {
-        return lutCombo.getSelectedItem().toString();
+        return lutCombo.getColormap();
     }
 
 }

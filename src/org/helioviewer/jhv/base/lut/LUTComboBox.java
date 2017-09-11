@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.base.lut;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
@@ -27,7 +28,11 @@ public class LUTComboBox extends JComboBox<String> {
     }
 
     public LUT getLUT() {
-        return lutMap.get(getSelectedItem());
+        return lutMap.get(Objects.requireNonNull(getSelectedItem()).toString());
+    }
+
+    public String getColormap() {
+        return Objects.requireNonNull(getSelectedItem()).toString();
     }
 
     public void setLUT(LUT lut) {

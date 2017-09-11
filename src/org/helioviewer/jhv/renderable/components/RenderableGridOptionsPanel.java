@@ -2,6 +2,7 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.Objects;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -112,7 +113,7 @@ class RenderableGridOptionsPanel extends JPanel {
         gridTypeBox = new JComboBox<>(RenderableGrid.GridType.values());
         gridTypeBox.setSelectedItem(grid.getGridType());
         gridTypeBox.addActionListener(e -> {
-            grid.setGridType((RenderableGrid.GridType) gridTypeBox.getSelectedItem());
+            grid.setGridType((RenderableGrid.GridType) Objects.requireNonNull(gridTypeBox.getSelectedItem()));
             Displayer.display();
         });
     }
