@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.draw;
 
 import java.awt.BorderLayout;
 import java.util.Calendar;
+import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -44,7 +45,7 @@ class DrawControllerOptionsPanel extends JPanel {
         };
         zoomCombo = new JComboBox<>(items);
         zoomCombo.addActionListener(e -> {
-            ZoomComboboxItem item = (ZoomComboboxItem) zoomCombo.getSelectedItem();
+            ZoomComboboxItem item = (ZoomComboboxItem) Objects.requireNonNull(zoomCombo.getSelectedItem());
             zoomTo(item.zoom, item.number);
         });
 

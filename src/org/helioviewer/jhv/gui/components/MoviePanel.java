@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -246,7 +247,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         animationModeComboBox = new JComboBox<>(new AnimationMode[]{AnimationMode.Loop, AnimationMode.Stop, AnimationMode.Swing});
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
-        animationModeComboBox.addActionListener(e -> Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem()));
+        animationModeComboBox.addActionListener(e -> Layers.setAnimationMode((AnimationMode) Objects.requireNonNull(animationModeComboBox.getSelectedItem())));
         modePanel.add(animationModeComboBox);
 
         // Record
@@ -287,7 +288,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         JComboBox<RecordSize> recordSizeCombo = new JComboBox<>(new RecordSize[]{RecordSize.ORIGINAL, RecordSize.H1080, RecordSize.H2160});
         recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
-        recordSizeCombo.addActionListener(e -> recordButton.setRecordSize((RecordSize) (recordSizeCombo.getSelectedItem())));
+        recordSizeCombo.addActionListener(e -> recordButton.setRecordSize((RecordSize) Objects.requireNonNull(recordSizeCombo.getSelectedItem())));
         c.gridx = 3;
         recordPanel.add(recordSizeCombo, c);
 
@@ -330,7 +331,8 @@ public class MoviePanel extends JPanel implements ChangeListener {
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
                 int fps = 20;
-                if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND)
+                SpeedUnit unit = (SpeedUnit) Objects.requireNonNull(speedUnitComboBox.getSelectedItem());
+                if (unit == SpeedUnit.FRAMESPERSECOND)
                     fps = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
                 ExportMovie.start(size.getSize().width, size.getSize().height, size.isInternal(), fps, mode);
             } else {
@@ -372,10 +374,11 @@ public class MoviePanel extends JPanel implements ChangeListener {
     // the speed of the animation or its unit.
     private static void updateMovieSpeed() {
         int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
-        if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
+        SpeedUnit unit = (SpeedUnit) Objects.requireNonNull(speedUnitComboBox.getSelectedItem());
+        if (unit == SpeedUnit.FRAMESPERSECOND) {
             Layers.setDesiredRelativeSpeed(speed);
         } else {
-            Layers.setDesiredAbsoluteSpeed(speed * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).secPerSecond);
+            Layers.setDesiredAbsoluteSpeed(speed * unit.secPerSecond);
         }
     }
 

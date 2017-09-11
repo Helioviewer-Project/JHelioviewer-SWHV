@@ -3,6 +3,7 @@ package org.helioviewer.jhv.layers.filters;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -59,7 +60,7 @@ public class RunningDifferencePanel {
         JComboBox<DifferenceModeChoice> comboBox = new JComboBox<>(DifferenceModeChoice.values());
         comboBox.setSelectedItem(DifferenceModeChoice.valueOf(parent.getGLImage().getDifferenceMode().toString()));
         comboBox.addActionListener(e -> {
-            parent.getGLImage().setDifferenceMode(((DifferenceModeChoice) comboBox.getSelectedItem()).mode);
+            parent.getGLImage().setDifferenceMode(((DifferenceModeChoice) Objects.requireNonNull(comboBox.getSelectedItem())).mode);
             Displayer.display();
         });
 
