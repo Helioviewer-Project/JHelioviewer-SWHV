@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.nio.ByteBuffer;
+import java.awt.image.DataBufferInt;
+import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
@@ -63,13 +63,13 @@ public class GLGrab {
 
         fbo.use(gl, fboTex);
 
-        BufferedImage screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-        byte[] array = ((DataBufferByte) screenshot.getRaster().getDataBuffer()).getData();
-        ByteBuffer fb = ByteBuffer.wrap(array);
+        BufferedImage screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_INT_RGB);
+        int[] array = ((DataBufferInt) screenshot.getRaster().getDataBuffer()).getData();
+        IntBuffer fb = IntBuffer.wrap(array);
 
         gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
-        gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
-        gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, fb);
+        gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 4);
+        gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, fb);
         gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
 
         fbo.unuse(gl);
