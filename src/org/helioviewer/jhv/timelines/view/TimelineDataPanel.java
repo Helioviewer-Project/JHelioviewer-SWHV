@@ -67,7 +67,7 @@ public class TimelineDataPanel extends JPanel {
 
     void updateGroupValues() {
         if (!userSet)
-            calendarStartDate.setTime(Layers.getStartTime().milli);
+            calendarStartDate.setTime(Layers.getStartTime());
 
         String selectedGroup = (String) comboBoxGroup.getSelectedItem();
         if (selectedGroup == null)
@@ -99,8 +99,8 @@ public class TimelineDataPanel extends JPanel {
         Timelines.getModel().addLineData(new Band(bandType));
 
         long time = calendarStartDate.getTime();
-        long movieStart = Layers.getStartTime().milli;
-        long movieEnd = Layers.getEndTime().milli;
+        long movieStart = Layers.getStartTime();
+        long movieEnd = Layers.getEndTime();
         if (time >= movieStart && time <= movieEnd) {
             DrawController.setSelectedInterval(movieStart, movieEnd);
         } else {

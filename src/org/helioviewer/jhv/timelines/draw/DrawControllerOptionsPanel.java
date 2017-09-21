@@ -124,7 +124,7 @@ class DrawControllerOptionsPanel extends JPanel {
             computeCarringtonInterval(selectedInterval.end, value);
             break;
         case Movie:
-            DrawController.setSelectedInterval(Layers.getStartTime().milli, Layers.getEndTime().milli);
+            DrawController.setSelectedInterval(Layers.getStartTime(), Layers.getEndTime());
             break;
         case CUSTOM:
         default:
