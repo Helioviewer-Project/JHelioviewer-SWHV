@@ -35,7 +35,6 @@ public class Timelines implements MainContentPanelPlugin {
 
         ImageViewerGui.getMainContentPanel().addPlugin(this);
 
-        Layers.addLayersListener(dc);
         Layers.addTimeListener(dc);
         Layers.addTimespanListener(dc);
         JHVRelatedEvents.addHighlightListener(dc);
@@ -45,7 +44,6 @@ public class Timelines implements MainContentPanelPlugin {
         JHVRelatedEvents.removeHighlightListener(dc);
         Layers.removeTimespanListener(dc);
         Layers.removeTimeListener(dc);
-        Layers.removeLayersListener(dc);
 
         ImageViewerGui.getMainContentPanel().removePlugin(this);
 
