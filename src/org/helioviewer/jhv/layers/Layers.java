@@ -22,15 +22,15 @@ public class Layers {
     private static View activeView;
     private static final ArrayList<View> layers = new ArrayList<>();
 
-    public static JHVDate getStartDate() {
+    public static JHVDate getStartTime() {
         return movieStart;
     }
 
-    public static JHVDate getEndDate() {
+    public static JHVDate getEndTime() {
         return movieEnd;
     }
 
-    private static JHVDate getStartTime() {
+    private static JHVDate getMovieStart() {
         JHVDate min = null;
         for (View view : layers) {
             JHVDate d = view.getFirstTime();
@@ -42,7 +42,7 @@ public class Layers {
         return min == null ? lastTimestamp : min;
     }
 
-    private static JHVDate getEndTime() {
+    private static JHVDate getMovieEnd() {
         JHVDate max = null;
         for (View view : layers) {
             JHVDate d = view.getLastTime();
@@ -103,8 +103,8 @@ public class Layers {
     }
 
     private static void timespanChanged() {
-        movieStart = getStartTime();
-        movieEnd = getEndTime();
+        movieStart = getMovieStart();
+        movieEnd = getMovieEnd();
         for (TimespanListener ll : timespanListeners) {
             ll.timespanChanged(movieStart.milli, movieEnd.milli);
         }

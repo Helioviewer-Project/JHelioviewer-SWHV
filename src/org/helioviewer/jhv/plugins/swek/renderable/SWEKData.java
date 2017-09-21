@@ -40,7 +40,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
 
     @Override
     public void cacheUpdated() {
-        requestEvents(true, Layers.getStartDate().milli, Layers.getEndDate().milli);
+        requestEvents(true, Layers.getStartTime().milli, Layers.getEndTime().milli);
     }
 
     static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
