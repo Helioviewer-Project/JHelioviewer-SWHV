@@ -8,16 +8,14 @@ import java.util.HashSet;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
-import org.helioviewer.jhv.view.View;
 
-public class DrawController implements JHVEventHighlightListener, LayersListener, TimeListener, TimespanListener {
+public class DrawController implements JHVEventHighlightListener, TimeListener, TimespanListener {
 
     public static final TimeAxis selectedAxis;
     public static final TimeAxis availableAxis;
@@ -259,19 +257,6 @@ public class DrawController implements JHVEventHighlightListener, LayersListener
     @Override
     public void timespanChanged(long start, long end) {
         setSelectedInterval(start, end);
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
-        if (view == null) {
-            timeChanged(Long.MIN_VALUE);
-            optionsPanel.lockButton.setEnabled(false);
-            long now = System.currentTimeMillis();
-            fireMovieIntervalChanged(now, now); // remove movie interval
-        } else {
-            optionsPanel.lockButton.setEnabled(true);
-            fireMovieIntervalChanged(view.getFirstTime().milli, view.getLastTime().milli);
-        }
     }
 
     public static void graphAreaChanged() {
