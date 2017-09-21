@@ -179,7 +179,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private static class ComparePriority<T extends DownloadWorker> implements Comparator<T> {
         @Override
         public int compare(T l1, T l2) {
-            long start = Layers.getStartDate().milli;
+            long start = Layers.getStartTime().milli;
             long d1 = l1.getRequestInterval().end - start;
             long d2 = l2.getRequestInterval().end - start;
             return d1 == d2 ? 0 : (d1 < d2 ? 1 : -1);

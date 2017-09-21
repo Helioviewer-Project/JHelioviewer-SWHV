@@ -25,13 +25,13 @@ public class SDOCutOutAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         StringBuilder url = new StringBuilder(baseURL);
 
-        String start = Layers.getStartDate().toString();
+        String start = Layers.getStartTime().toString();
         String startDate = start.substring(0, 10);
         String startTime = start.substring(11, 16);
         url.append("startDate=").append(startDate);
         url.append("&startTime=").append(startTime);
 
-        String end = Layers.getEndDate().toString();
+        String end = Layers.getEndTime().toString();
         String endDate = end.substring(0, 10);
         String endTime = end.substring(11, 16);
         url.append("&stopDate=").append(endDate);

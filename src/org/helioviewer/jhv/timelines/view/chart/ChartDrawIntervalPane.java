@@ -98,8 +98,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawMovieInterval(Graphics2D g, TimeAxis availableInterval) {
-        long movieStart = Layers.getStartDate().milli;
-        long movieEnd = Layers.getEndDate().milli;
+        long movieStart = Layers.getStartTime().milli;
+        long movieEnd = Layers.getEndTime().milli;
 
         if (movieEnd < availableInterval.start || movieStart > availableInterval.end) {
             return;
