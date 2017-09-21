@@ -28,7 +28,6 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.renderable.gui.ImageLayers;
-import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
@@ -91,7 +90,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     public void unload() {
         if (view == null) // not changing view
-            RenderableContainer.removeRenderable(this);
+            ImageViewerGui.getRenderableContainer().removeRenderable(this);
         else {
             worker = null;
             Displayer.display();

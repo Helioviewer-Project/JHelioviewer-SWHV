@@ -239,7 +239,7 @@ public class RenderableContainerPanel extends JPanel {
                 } else if (col == TITLE_COL && renderable instanceof ImageLayer) {
                     ((ImageLayer) renderable).setActiveImageLayer();
                 } else if (col == REMOVE_COL && renderable.isDeletable()) {
-                    RenderableContainer.removeRenderable(renderable);
+                    renderableContainer.removeRenderable(renderable);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
