@@ -157,17 +157,12 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     private static void setAvailableInterval() {
-        long availableStart = availableAxis.start;
-        long availableEnd = availableAxis.end;
-
-        if ((selectedAxis.start <= availableAxis.start || selectedAxis.end >= availableAxis.end)) {
-            availableStart = Math.min(selectedAxis.start, availableStart);
-            availableEnd = Math.max(selectedAxis.end, availableEnd);
-            Interval availableInterval = Interval.makeCompleteDay(availableStart, availableEnd);
-            availableAxis.start = availableInterval.start;
-            availableAxis.end = availableInterval.end;
-        }
-        optionsPanel.updateSelectedInterval();
+        long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
+        long availableStart = selectedAxis.start - selectedIntervalDiff;
+        long availableEnd = selectedAxis.end + selectedIntervalDiff;
+        Interval availableInterval = Interval.makeCompleteDay(availableStart, availableEnd);
+        availableAxis.start = availableInterval.start;
+        availableAxis.end = availableInterval.end;
 
         for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
             el.fetchData(selectedAxis);
