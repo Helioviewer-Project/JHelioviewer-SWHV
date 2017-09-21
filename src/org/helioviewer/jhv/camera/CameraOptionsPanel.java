@@ -49,10 +49,9 @@ public class CameraOptionsPanel extends JPanel {
     private static final String explanation = "<b>Observer</b>: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
                                               "<b>Earth</b>: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
                                               "<b>Equatorial</b>: view onto the solar equatorial plane.\nCamera time defined by timestamps of the master layer.\n" +
-                                              "Object positions are interpolated in the time interval of the master layer, unless " +
-                                              "\"Use master layer time interval\" is off.\nIn that case, the positions are interpolated in the configured time interval.\n\n" +
-                                              "<b>Other</b>: view from selected object.\nCamera time is interpolated in the time interval of the master layer, unless " +
-                                              "\"Use master layer time interval\" is off.\nIn that case, camera time is interpolated in the configured time interval.";
+                                              "If \"Use movie time interval\" is unselected, the positions of objects are interpolated in the configured time interval.\n\n" +
+                                              "<b>Other</b>: view from selected object.\n" +
+                                              "If \"Use movie time interval\" is unselected, the camera time is interpolated in the configured time interval.";
 
     public CameraOptionsPanel(JSONObject jo) {
         setLayout(new GridBagLayout());

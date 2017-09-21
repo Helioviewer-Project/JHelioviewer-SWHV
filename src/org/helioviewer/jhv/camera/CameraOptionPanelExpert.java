@@ -11,15 +11,14 @@ import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.view.View;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener {
+public class CameraOptionPanelExpert extends CameraOptionPanel implements TimespanListener {
 
     private final JCheckBox syncCheckBox;
     private final DateTimePanel startPanel = new DateTimePanel("Start");
@@ -55,7 +54,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
         c.gridy = 1;
         syncCheckBox = new JCheckBox("Use master layer time interval", sync);
-        syncCheckBox.addActionListener(e -> syncWithLayer());
+        syncCheckBox.addActionListener(e -> timespanChanged(Layers.getStartTime().milli, Layers.getEndTime().milli));
         add(syncCheckBox, c);
 
         c.gridy = 2;
@@ -74,18 +73,26 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     @Override
     void activate() {
-        Layers.addLayersListener(this);
-        syncWithLayer();
+        Layers.addTimespanListener(this);
+        timespanChanged(Layers.getStartTime().milli, Layers.getEndTime().milli);
     }
 
     @Override
     void deactivate() {
-        Layers.removeLayersListener(this);
+        Layers.removeTimespanListener(this);
     }
 
     @Override
-    public void activeLayerChanged(View view) {
-        syncWithLayer();
+    public void timespanChanged(long start, long end) {
+        boolean notSync = !syncCheckBox.isSelected();
+        startPanel.setVisible(notSync);
+        endPanel.setVisible(notSync);
+        if (notSync)
+            return;
+
+        startPanel.setTime(start);
+        endPanel.setTime(end);
+        request();
     }
 
     JSONObject toJson() {
@@ -98,22 +105,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         }
         jo.put("objects", container.toJson());
         return jo;
-    }
-
-    private void syncWithLayer() {
-        boolean notSync = !syncCheckBox.isSelected();
-        startPanel.setVisible(notSync);
-        endPanel.setVisible(notSync);
-        if (notSync)
-            return;
-
-        View view = Layers.getActiveView();
-        if (view == null)
-            return;
-
-        startPanel.setTime(view.getFirstTime().milli);
-        endPanel.setTime(view.getLastTime().milli);
-        request();
     }
 
     private void request() {

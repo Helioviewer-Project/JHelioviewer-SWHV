@@ -22,8 +22,8 @@ public class HTTPSocket {
     private final int lastUsedPort;
     private final String lastUsedHost;
 
-    protected InputStream inputStream;
-    protected OutputStream outputStream;
+    protected final InputStream inputStream;
+    protected final OutputStream outputStream;
 
     protected HTTPSocket(URI uri) throws IOException {
         socket = new Socket(ProxySettings.proxy);
