@@ -89,7 +89,11 @@ public class Layers {
 
     static void removeLayer(View view) {
         layers.remove(view);
-        timespanChanged();
+
+        movieStart = getMovieStart();
+        movieEnd = getMovieEnd();
+        // timespanChanged(movieStart.milli, movieEnd.milli);
+
         if (view == activeView) {
             setActiveView(getLayer(layers.size() - 1));
         }
@@ -97,16 +101,18 @@ public class Layers {
 
     static void addLayer(View view) {
         layers.add(view);
-        timespanChanged();
+
+        movieStart = getMovieStart();
+        movieEnd = getMovieEnd();
+        timespanChanged(movieStart.milli, movieEnd.milli);
+
         setActiveView(view);
         setFrame(0);
     }
 
-    private static void timespanChanged() {
-        movieStart = getMovieStart();
-        movieEnd = getMovieEnd();
+    private static void timespanChanged(long start, long end) {
         for (TimespanListener ll : timespanListeners) {
-            ll.timespanChanged(movieStart.milli, movieEnd.milli);
+            ll.timespanChanged(start, end);
         }
     }
 
