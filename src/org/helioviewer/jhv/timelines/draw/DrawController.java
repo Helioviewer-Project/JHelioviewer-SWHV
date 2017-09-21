@@ -21,7 +21,6 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     public static final TimeAxis availableAxis;
 
     private static final HashSet<DrawListener> listeners = new HashSet<>();
-    private static final HashSet<DrawMovieIntervalListener> movieIntervalListeners = new HashSet<>();
 
     private static final DrawControllerOptionsPanel optionsPanel;
 
@@ -53,14 +52,6 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     public static void removeDrawListener(DrawListener listener) {
         listeners.remove(listener);
-    }
-
-    public static void addDrawMovieIntervalListener(DrawMovieIntervalListener listener) {
-        movieIntervalListeners.add(listener);
-    }
-
-    public static void removeDrawMovieIntervalListener(DrawMovieIntervalListener listener) {
-        movieIntervalListeners.remove(listener);
     }
 
     public static void setSelectedInterval(long start, long end) {
@@ -267,12 +258,6 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     public static void drawRequest() {
         toDraw = true;
-    }
-
-    private static void fireMovieIntervalChanged(long start, long end) {
-        for (DrawMovieIntervalListener l : movieIntervalListeners) {
-            l.movieIntervalChanged(start, end);
-        }
     }
 
     private static boolean stopped;
