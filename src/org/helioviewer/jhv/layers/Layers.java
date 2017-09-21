@@ -76,7 +76,6 @@ public class Layers {
         if (view != activeView) {
             activeView = view;
             setMasterMovie(view);
-            fireActiveLayerChanged(view);
         }
     }
 
@@ -116,12 +115,6 @@ public class Layers {
     private static void timespanChanged(long start, long end) {
         for (TimespanListener ll : timespanListeners) {
             ll.timespanChanged(start, end);
-        }
-    }
-
-    private static void fireActiveLayerChanged(View view) {
-        for (LayersListener ll : layerListeners) {
-            ll.activeLayerChanged(view);
         }
     }
 
@@ -236,7 +229,6 @@ public class Layers {
     }
 
     private static final HashSet<FrameListener> frameListeners = new HashSet<>();
-    private static final HashSet<LayersListener> layerListeners = new HashSet<>();
     private static final HashSet<TimeListener> timeListeners = new HashSet<>();
     private static final HashSet<TimespanListener> timespanListeners = new HashSet<>();
 
@@ -246,14 +238,6 @@ public class Layers {
 
     public static void removeFrameListener(FrameListener listener) {
         frameListeners.remove(listener);
-    }
-
-    public static void addLayersListener(LayersListener listener) {
-        layerListeners.add(listener);
-    }
-
-    public static void removeLayersListener(LayersListener listener) {
-        layerListeners.remove(listener);
     }
 
     public static void addTimeListener(TimeListener listener) {
