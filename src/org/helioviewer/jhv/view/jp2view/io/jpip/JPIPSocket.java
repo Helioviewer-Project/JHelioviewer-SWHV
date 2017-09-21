@@ -58,7 +58,7 @@ public class JPIPSocket extends HTTPSocket {
 
     // Closes the JPIPSocket
     @Override
-    public synchronized void close() throws IOException {
+    public void close() throws IOException {
         if (isClosed())
             return;
 
@@ -81,14 +81,14 @@ public class JPIPSocket extends HTTPSocket {
         // Build request to send
         HTTPMessage req = new HTTPMessage();
         req.setHeader("User-Agent", JHVGlobals.userAgent);
-        req.setHeader("Connection", "Keep-Alive");
+        req.setHeader("Connection", "keep-alive");
         req.setHeader("Accept-Encoding", "gzip");
         req.setHeader("Cache-Control", "no-cache");
         req.setHeader("Host", getHost() + ':' + getPort());
         queryStr = "GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n";
 
         // Writes the result to the output stream
-        getOutputStream().write(queryStr.getBytes(StandardCharsets.UTF_8));
+        outputStream.write(queryStr.getBytes(StandardCharsets.UTF_8));
 
         if (cache == null) // not interested in response
             return null;
