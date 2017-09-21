@@ -52,85 +52,94 @@ class FITSImage {
         if (hdu.getHeader().getIntValue("NAXIS", 0) != 2)
             throw new Exception("Only 2D FITS files supported");
         int bitsPerPixel = hdu.getBitPix();
-        if (bitsPerPixel == BasicHDU.BITPIX_BYTE) {
-            byte[][] data2D = (byte[][]) hdu.getKernel();
-            int width = data2D[0].length;
-            int height = data2D.length;
+        switch (bitsPerPixel) {
+            case BasicHDU.BITPIX_BYTE: {
+                byte[][] data2D = (byte[][]) hdu.getKernel();
+                int width = data2D[0].length;
+                int height = data2D.length;
 
-            byte[] data = new byte[width * height];
-            for (int j = 0; j < height; j++) {
-                System.arraycopy(data2D[j], 0, data, width * (height - 1 - j), width);
-            }
-            imageData = new Single8ImageData(width, height, ByteBuffer.wrap(data));
-        } else if (bitsPerPixel == BasicHDU.BITPIX_SHORT) {
-            short[][] data2D = (short[][]) hdu.getKernel();
-            int width = data2D[0].length;
-            int height = data2D.length;
-
-            int min = Integer.MAX_VALUE;
-            int max = Integer.MIN_VALUE;
-            for (int j = 0; j < height; j++) {
-                for (int i = 0; i < width; i++) {
-                    int d = data2D[j][i];
-                    min = d < min ? d : min;
-                    max = d > max ? d : max;
+                byte[] data = new byte[width * height];
+                for (int j = 0; j < height; j++) {
+                    System.arraycopy(data2D[j], 0, data, width * (height - 1 - j), width);
                 }
+                imageData = new Single8ImageData(width, height, ByteBuffer.wrap(data));
+                break;
             }
+            case BasicHDU.BITPIX_SHORT: {
+                short[][] data2D = (short[][]) hdu.getKernel();
+                int width = data2D[0].length;
+                int height = data2D.length;
 
-            PixScale scale = new PowScale(min, max, GAMMA);
-            short[] data = new short[width * height];
-            for (int j = 0; j < height; j++) {
-                for (int i = 0; i < width; i++) {
-                    data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
+                int min = Integer.MAX_VALUE;
+                int max = Integer.MIN_VALUE;
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        int d = data2D[j][i];
+                        min = d < min ? d : min;
+                        max = d > max ? d : max;
+                    }
                 }
-            }
-            imageData = new Single16ImageData(width, height, scale.getGamma(), ShortBuffer.wrap(data));
-        } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
-            int[][] data2D = (int[][]) hdu.getKernel();
-            int width = data2D[0].length;
-            int height = data2D.length;
 
-            int min = Integer.MAX_VALUE;
-            int max = Integer.MIN_VALUE;
-            for (int j = 0; j < height; j++) {
-                for (int i = 0; i < width; i++) {
-                    int d = data2D[j][i];
-                    min = d < min ? d : min;
-                    max = d > max ? d : max;
+                PixScale scale = new PowScale(min, max, GAMMA);
+                short[] data = new short[width * height];
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
+                    }
                 }
+                imageData = new Single16ImageData(width, height, scale.getGamma(), ShortBuffer.wrap(data));
+                break;
             }
+            case BasicHDU.BITPIX_INT: {
+                int[][] data2D = (int[][]) hdu.getKernel();
+                int width = data2D[0].length;
+                int height = data2D.length;
 
-            PixScale scale = new PowScale(min, max, GAMMA);
-            short[] data = new short[width * height];
-            for (int j = 0; j < height; j++) {
-                for (int i = 0; i < width; i++) {
-                    data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
+                int min = Integer.MAX_VALUE;
+                int max = Integer.MIN_VALUE;
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        int d = data2D[j][i];
+                        min = d < min ? d : min;
+                        max = d > max ? d : max;
+                    }
                 }
-            }
-            imageData = new Single16ImageData(width, height, scale.getGamma(), ShortBuffer.wrap(data));
-        } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
-            float[][] data2D = (float[][]) hdu.getKernel();
-            int width = data2D[0].length;
-            int height = data2D.length;
 
-            double min = Double.MAX_VALUE;
-            double max = Double.MIN_VALUE;
-            for (int j = 0; j < height; j++) {
-                for (int i = 0; i < width; i++) {
-                    double d = data2D[j][i];
-                    min = d < min ? d : min;
-                    max = d > max ? d : max;
+                PixScale scale = new PowScale(min, max, GAMMA);
+                short[] data = new short[width * height];
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        data[width * (height - 1 - j) + i] = scale.get(data2D[j][i] - min);
+                    }
                 }
+                imageData = new Single16ImageData(width, height, scale.getGamma(), ShortBuffer.wrap(data));
+                break;
             }
+            case BasicHDU.BITPIX_FLOAT: {
+                float[][] data2D = (float[][]) hdu.getKernel();
+                int width = data2D[0].length;
+                int height = data2D.length;
 
-            double scale = 65535. / (max == min ? 1 : max - min);
-            short[] data = new short[width * height];
-            for (int j = 0; j < height; j++) {
-                for (int i = 0; i < width; i++) {
-                    data[width * (height - 1 - j) + i] = (short) (scale * Math.pow(data2D[j][i] - min, GAMMA));
+                double min = Double.MAX_VALUE;
+                double max = Double.MIN_VALUE;
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        double d = data2D[j][i];
+                        min = d < min ? d : min;
+                        max = d > max ? d : max;
+                    }
                 }
+
+                double scale = 65535. / (max == min ? 1 : max - min);
+                short[] data = new short[width * height];
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        data[width * (height - 1 - j) + i] = (short) (scale * Math.pow(data2D[j][i] - min, GAMMA));
+                    }
+                }
+                imageData = new Single16ImageData(width, height, 1, ShortBuffer.wrap(data));
+                break;
             }
-            imageData = new Single16ImageData(width, height, 1, ShortBuffer.wrap(data));
         }
     }
 
