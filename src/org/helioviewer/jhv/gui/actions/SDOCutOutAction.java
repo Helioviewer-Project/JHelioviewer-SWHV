@@ -10,6 +10,7 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.gui.ImageLayers;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
@@ -25,17 +26,13 @@ public class SDOCutOutAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         StringBuilder url = new StringBuilder(baseURL);
 
-        String start = Layers.getStartTime().toString();
-        String startDate = start.substring(0, 10);
-        String startTime = start.substring(11, 16);
-        url.append("startDate=").append(startDate);
-        url.append("&startTime=").append(startTime);
+        long start = Layers.getStartTime();
+        url.append("startDate=").append(TimeUtils.formatDate(start));
+        url.append("&startTime=").append(TimeUtils.formatTime(start));
 
-        String end = Layers.getEndTime().toString();
-        String endDate = end.substring(0, 10);
-        String endTime = end.substring(11, 16);
-        url.append("&stopDate=").append(endDate);
-        url.append("&stopTime=").append(endTime);
+        long end = Layers.getEndTime();
+        url.append("&stopDate=").append(TimeUtils.formatDate(end));
+        url.append("&stopTime=").append(TimeUtils.formatTime(end));
 
         url.append("&wavelengths=").append(ImageLayers.getSDOCutoutString());
         url.append("&cadence=").append(ObservationDialog.getInstance().getObservationPanel().getCadence()).append("&cadenceUnits=s");

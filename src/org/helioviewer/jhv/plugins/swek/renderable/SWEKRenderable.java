@@ -460,7 +460,6 @@ public class SWEKRenderable extends AbstractRenderable {
         super.setEnabled(_enabled);
 
         if (_enabled) {
-            controller.timeChanged(Layers.getLastUpdatedTimestamp().milli);
             Layers.addTimeListener(controller);
             ImageViewerGui.getInputController().addPlugin(controller);
         } else {

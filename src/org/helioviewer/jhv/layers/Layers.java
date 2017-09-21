@@ -23,12 +23,12 @@ public class Layers {
     private static View activeView;
     private static final ArrayList<View> layers = new ArrayList<>();
 
-    public static JHVDate getStartTime() {
-        return movieStart;
+    public static long getStartTime() {
+        return movieStart.milli;
     }
 
-    public static JHVDate getEndTime() {
-        return movieEnd;
+    public static long getEndTime() {
+        return movieEnd.milli;
     }
 
     private static JHVDate getMovieStart() {
@@ -240,6 +240,7 @@ public class Layers {
 
     public static void addTimeListener(TimeListener listener) {
         timeListeners.add(listener);
+        listener.timeChanged(lastTimestamp.milli);
     }
 
     public static void removeTimeListener(TimeListener listener) {
@@ -248,6 +249,7 @@ public class Layers {
 
     public static void addTimespanListener(TimespanListener listener) {
         timespanListeners.add(listener);
+        listener.timespanChanged(movieStart.milli, movieEnd.milli);
     }
 
     public static void removeTimespanListener(TimespanListener listener) {
