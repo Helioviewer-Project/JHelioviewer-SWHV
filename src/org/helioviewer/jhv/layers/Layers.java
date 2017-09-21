@@ -23,6 +23,14 @@ public class Layers {
     private static final ArrayList<View> layers = new ArrayList<>();
 
     public static JHVDate getStartDate() {
+        return movieStart;
+    }
+
+    public static JHVDate getEndDate() {
+        return movieEnd;
+    }
+
+    private static JHVDate getStartTime() {
         JHVDate min = null;
         for (View view : layers) {
             JHVDate d = view.getFirstTime();
@@ -34,7 +42,7 @@ public class Layers {
         return min == null ? lastTimestamp : min;
     }
 
-    public static JHVDate getEndDate() {
+    private static JHVDate getEndTime() {
         JHVDate max = null;
         for (View view : layers) {
             JHVDate d = view.getLastTime();
@@ -81,7 +89,7 @@ public class Layers {
 
     static void removeLayer(View view) {
         layers.remove(view);
-        // fireTimespanChanged();
+        timespanChanged();
         if (view == activeView) {
             setActiveView(getLayer(layers.size() - 1));
         }
@@ -89,16 +97,16 @@ public class Layers {
 
     static void addLayer(View view) {
         layers.add(view);
-        fireTimespanChanged();
+        timespanChanged();
         setActiveView(view);
         setFrame(0);
     }
 
-    private static void fireTimespanChanged() {
-        long start = getStartDate().milli;
-        long end = getEndDate().milli;
+    private static void timespanChanged() {
+        movieStart = getStartTime();
+        movieEnd = getEndTime();
         for (TimespanListener ll : timespanListeners) {
-            ll.timespanChanged(start, end);
+            ll.timespanChanged(movieStart.milli, movieEnd.milli);
         }
     }
 
@@ -187,6 +195,8 @@ public class Layers {
     }
 
     private static JHVDate lastTimestamp = TimeUtils.EPOCH;
+    private static JHVDate movieStart = TimeUtils.EPOCH;
+    private static JHVDate movieEnd = TimeUtils.EPOCH;
 
     public static JHVDate getLastUpdatedTimestamp() {
         return lastTimestamp;
