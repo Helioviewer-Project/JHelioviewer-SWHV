@@ -9,23 +9,19 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
-import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class RenderableMiniview extends AbstractRenderable implements LayersListener {
+public class RenderableMiniview extends AbstractRenderable {
 
     private static final int MIN_SCALE = 5;
     private static final int MAX_SCALE = 15;
@@ -103,17 +99,10 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     @Override
     public void init(GL2 gl) {
-        Layers.addLayersListener(this);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        Layers.removeLayersListener(this);
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
-        CameraHelper.zoomToFit(Displayer.getMiniCamera());
     }
 
     public Viewport getViewport() {
