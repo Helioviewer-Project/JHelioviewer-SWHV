@@ -12,7 +12,6 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.view.View;
 
 import com.jidesoft.swing.JideToggleButton;
 
@@ -125,28 +124,11 @@ class DrawControllerOptionsPanel extends JPanel {
             computeCarringtonInterval(selectedInterval.end, value);
             break;
         case Movie:
-            computeMovieInterval();
+            DrawController.setSelectedInterval(Layers.getStartTime().milli, Layers.getEndTime().milli);
             break;
         case CUSTOM:
         default:
             break;
-        }
-    }
-
-    private static void computeMovieInterval() {
-        View view = Layers.getActiveView();
-        long now = System.currentTimeMillis();
-        if (view == null) {
-            DrawController.setSelectedInterval(now - 2 * TimeUtils.DAY_IN_MILLIS, now);
-        } else {
-            if (view.isMultiFrame()) {
-                DrawController.setSelectedInterval(view.getFirstTime().milli, view.getLastTime().milli);
-            } else {
-                long end = view.getFirstTime().milli + TimeUtils.DAY_IN_MILLIS / 2;
-                if (end > now)
-                    end = now;
-                DrawController.setSelectedInterval(view.getFirstTime().milli - TimeUtils.DAY_IN_MILLIS / 2, end);
-            }
         }
     }
 
