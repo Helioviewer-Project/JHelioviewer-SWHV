@@ -14,7 +14,6 @@ import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
 import org.helioviewer.jhv.plugins.swek.view.EventPanel;
 import org.helioviewer.jhv.plugins.swek.view.EventTimelineRenderable;
-import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONObject;
 
@@ -48,7 +47,7 @@ public class SWEKPlugin implements Plugin {
     @Override
     public void uninstallPlugin() {
         Timelines.getModel().removeLineData(em);
-        RenderableContainer.removeRenderable(renderable);
+        ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         Layers.removeTimespanListener(swekData);
 
         ImageViewerGui.getLeftContentPane().remove(swekPanel);

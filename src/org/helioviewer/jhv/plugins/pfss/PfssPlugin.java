@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.pfss.data.PfssCache;
-import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONObject;
 
@@ -51,7 +50,7 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
-        RenderableContainer.removeRenderable(renderable);
+        ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
     }
 
     @Override

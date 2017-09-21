@@ -106,9 +106,12 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         Displayer.display(); // e.g., PFSS renderable
     }
 
-    public static void removeRenderable(Renderable renderable) {
+    public void removeRenderable(Renderable renderable) {
+        int row = renderables.indexOf(renderable);
         renderables.remove(renderable);
         removedRenderables.add(renderable);
+        if (row >= 0)
+            fireTableRowsDeleted(row, row);
         Displayer.display();
     }
 
