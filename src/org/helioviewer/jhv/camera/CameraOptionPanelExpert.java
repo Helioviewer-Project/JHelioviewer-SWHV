@@ -74,6 +74,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Timesp
     @Override
     void activate() {
         Layers.addTimespanListener(this);
+        timespanChanged(Layers.getStartTime(), Layers.getEndTime());
     }
 
     @Override
