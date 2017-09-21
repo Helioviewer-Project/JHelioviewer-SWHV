@@ -91,9 +91,7 @@ public class Layers {
         layers.remove(view);
 
         CameraHelper.zoomToFit(Displayer.getMiniCamera());
-        movieStart = getMovieStart();
-        movieEnd = getMovieEnd();
-        // timespanChanged(movieStart.milli, movieEnd.milli);
+        // timespanChanged();
 
         if (view == activeView) {
             setActiveView(getLayer(layers.size() - 1));
@@ -104,17 +102,17 @@ public class Layers {
         layers.add(view);
 
         CameraHelper.zoomToFit(Displayer.getMiniCamera());
-        movieStart = getMovieStart();
-        movieEnd = getMovieEnd();
-        timespanChanged(movieStart.milli, movieEnd.milli);
+        timespanChanged();
 
         setActiveView(view);
         setFrame(0);
     }
 
-    private static void timespanChanged(long start, long end) {
+    private static void timespanChanged() {
+        movieStart = getMovieStart();
+        movieEnd = getMovieEnd();
         for (TimespanListener ll : timespanListeners) {
-            ll.timespanChanged(start, end);
+            ll.timespanChanged(movieStart.milli, movieEnd.milli);
         }
     }
 
