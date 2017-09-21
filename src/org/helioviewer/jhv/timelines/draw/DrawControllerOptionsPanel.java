@@ -96,10 +96,6 @@ class DrawControllerOptionsPanel extends JPanel {
         }
     }
 
-    void updateSelectedInterval() {
-        zoomCombo.setSelectedItem(zoomCombo.getItemAt(0));
-    }
-
     private static void zoomTo(ZOOM zoom, long value) {
         TimeAxis selectedInterval = DrawController.selectedAxis;
         TimeAxis availableInterval = DrawController.availableAxis;
