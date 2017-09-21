@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -26,9 +27,6 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 @SuppressWarnings("serial")
 public class ChartDrawIntervalPane extends JComponent implements DrawListener, MouseListener, MouseMotionListener {
-
-    private long movieStart = System.currentTimeMillis();
-    private long movieEnd = System.currentTimeMillis();
 
     private boolean mouseOverInterval = true;
     private Point mousePressed;
@@ -100,6 +98,9 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawMovieInterval(Graphics2D g, TimeAxis availableInterval) {
+        long movieStart = Layers.getStartDate().milli;
+        long movieEnd = Layers.getEndDate().milli;
+
         if (movieEnd < availableInterval.start || movieStart > availableInterval.end) {
             return;
         }
