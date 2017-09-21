@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.jp2view.io.http;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.Socket;
@@ -11,31 +12,35 @@ import java.net.URI;
 import org.helioviewer.jhv.base.ProxySettings;
 import org.helioviewer.jhv.view.jp2view.io.LineRead;
 
-public class HTTPSocket extends Socket {
+public class HTTPSocket {
 
     private static final int TIMEOUT_CONNECT = 20000;
     private static final int TIMEOUT_READ = 20000;
     private static final int PORT = 80;
 
+    private final Socket socket;
     private final int lastUsedPort;
     private final String lastUsedHost;
 
     protected InputStream inputStream;
+    protected OutputStream outputStream;
 
     protected HTTPSocket(URI uri) throws IOException {
-        super(ProxySettings.proxy);
+        socket = new Socket(ProxySettings.proxy);
 
         int port = uri.getPort();
         lastUsedPort = port <= 0 ? PORT : port;
         lastUsedHost = uri.getHost();
 
-        setReceiveBufferSize(Math.max(262144 * 8, 2 * getReceiveBufferSize()));
-        setTrafficClass(0x10);
-        setSoTimeout(TIMEOUT_READ);
-        setKeepAlive(true);
-        setTcpNoDelay(true);
-        connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TIMEOUT_CONNECT);
-        inputStream = new BufferedInputStream(getInputStream(), 65536);
+        socket.setReceiveBufferSize(Math.max(262144 * 8, 2 * socket.getReceiveBufferSize()));
+        socket.setTrafficClass(0x10);
+        socket.setSoTimeout(TIMEOUT_READ);
+        socket.setKeepAlive(true);
+        socket.setTcpNoDelay(true);
+        socket.connect(new InetSocketAddress(lastUsedHost, lastUsedPort), TIMEOUT_CONNECT);
+
+        inputStream = new BufferedInputStream(socket.getInputStream(), 65536);
+        outputStream = socket.getOutputStream();
     }
 
     /**
@@ -81,13 +86,20 @@ public class HTTPSocket extends Socket {
         }
     }
 
-    @Override
-    public int getPort() {
+    protected int getPort() {
         return lastUsedPort;
     }
 
     protected String getHost() {
         return lastUsedHost;
+    }
+
+    protected void close() throws IOException {
+        socket.close();
+    }
+
+    public boolean isClosed() {
+        return socket.isClosed();
     }
 
 }
