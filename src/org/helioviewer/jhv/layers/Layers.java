@@ -8,6 +8,7 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -90,6 +91,7 @@ public class Layers {
     static void removeLayer(View view) {
         layers.remove(view);
 
+        CameraHelper.zoomToFit(Displayer.getMiniCamera());
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
         // timespanChanged(movieStart.milli, movieEnd.milli);
@@ -102,6 +104,7 @@ public class Layers {
     static void addLayer(View view) {
         layers.add(view);
 
+        CameraHelper.zoomToFit(Displayer.getMiniCamera());
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
         timespanChanged(movieStart.milli, movieEnd.milli);
