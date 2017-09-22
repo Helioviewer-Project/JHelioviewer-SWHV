@@ -49,21 +49,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     void interpolatedLineDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s, int subdivisions) {
-        if (Displayer.mode != Displayer.DisplayMode.Orthographic) {
-            gl.glBegin(GL2.GL_LINE_STRIP);
-
-            Vec2 previous = null;
-            for (double i = 0; i <= subdivisions; i++) {
-                double t = i / subdivisions;
-                double y0 = (1 - t) * p1s.y + t * p2s.y;
-                double z0 = (1 - t) * p1s.z + t * p2s.z;
-                Vec3 p0 = toCart(y0, z0);
-                p0.y = -p0.y;
-                previous = GLHelper.drawVertex(camera, vp, gl, p0, previous);
-            }
-
-            gl.glEnd();
-        } else {
+        if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
             gl.glBegin(GL2.GL_TRIANGLE_STRIP);
 
             for (double i = 0; i < subdivisions; i++) {
@@ -96,6 +82,20 @@ abstract class AbstractAnnotateable implements Annotateable {
                     p1minusv.normalize();
                     gl.glVertex3f((float) p1minusv.x, (float) p1minusv.y, (float) p1minusv.z);
                 }
+            }
+
+            gl.glEnd();
+        } else {
+            gl.glBegin(GL2.GL_LINE_STRIP);
+
+            Vec2 previous = null;
+            for (double i = 0; i <= subdivisions; i++) {
+                double t = i / subdivisions;
+                double y0 = (1 - t) * p1s.y + t * p2s.y;
+                double z0 = (1 - t) * p1s.z + t * p2s.z;
+                Vec3 p0 = toCart(y0, z0);
+                p0.y = -p0.y;
+                previous = GLHelper.drawVertex(camera, vp, gl, p0, previous);
             }
 
             gl.glEnd();

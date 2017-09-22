@@ -114,8 +114,8 @@ class GimpGradientSegment {
             float[] lHSV = Color.RGBtoHSB(appD(rl), appD(gl), appD(bl), null);
             float[] rHSV = Color.RGBtoHSB(appD(rr), appD(gr), appD(br), null);
             // Making lshv the new color
-            lHSV[1] = lHSV[1] + (rHSV[1] - lHSV[1]) * (float) f;
-            lHSV[2] = lHSV[2] + (rHSV[2] - lHSV[2]) * (float) f;
+            lHSV[1] += (rHSV[1] - lHSV[1]) * (float) f;
+            lHSV[2] += (rHSV[2] - lHSV[2]) * (float) f;
             if (blendingColor == 1) {
                 if (lHSV[0] < rHSV[0]) {
                     lHSV[0] += (rHSV[0] - lHSV[0]) * (float) f;
