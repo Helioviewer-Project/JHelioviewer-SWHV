@@ -3,13 +3,11 @@ package org.helioviewer.jhv.camera;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
-import com.jogamp.opengl.GL2;
 
 public class Interaction implements MouseListener, KeyListener {
 
@@ -21,9 +19,6 @@ public class Interaction implements MouseListener, KeyListener {
 
         wheelTimer = new Timer(1000/2, e -> Displayer.render(1));
         wheelTimer.setRepeats(false);
-    }
-
-    public void drawInteractionFeedback(Viewport vp, GL2 gl) {
     }
 
     @Override

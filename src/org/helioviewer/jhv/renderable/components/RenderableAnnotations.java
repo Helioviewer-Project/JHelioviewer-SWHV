@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.json.JSONObject;
 
@@ -20,6 +21,14 @@ public class RenderableAnnotations extends AbstractRenderable {
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
+       if (!isVisible[vp.idx])
+            return;
+        ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
+    }
+
+    @Override
+    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
+        render(camera, vp, gl);
     }
 
     @Override

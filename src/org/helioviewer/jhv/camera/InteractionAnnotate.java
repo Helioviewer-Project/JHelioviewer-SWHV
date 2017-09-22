@@ -39,8 +39,7 @@ public class InteractionAnnotate extends Interaction {
         super(_camera);
     }
 
-    @Override
-    public void drawInteractionFeedback(Viewport vp, GL2 gl) {
+    public void drawAnnotations(Viewport vp, GL2 gl) {
         Annotateable activeAnnotateable = null;
         if (activeIndex >= 0)
             activeAnnotateable = annotateables.get(activeIndex);
