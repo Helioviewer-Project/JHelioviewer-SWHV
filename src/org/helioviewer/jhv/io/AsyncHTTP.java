@@ -14,13 +14,15 @@ import org.asynchttpclient.HttpResponseHeaders;
 import org.asynchttpclient.HttpResponseStatus;
 import org.asynchttpclient.ListenableFuture;
 
+import org.helioviewer.jhv.JHVGlobals;
+
 public class AsyncHTTP {
 
     private static final AsyncHttpClientConfig config = new DefaultAsyncHttpClientConfig.Builder().setFollowRedirect(true).build();
     private static final AsyncHttpClient client = new DefaultAsyncHttpClient(config);
 
-    public static void get(String url) throws Exception {
-        ListenableFuture<String> f = client.prepareGet(url).execute(new AsyncHandler<String>() {
+    public static void get(String url) {
+        ListenableFuture<ByteArrayOutputStream> f = client.prepareGet(url).execute(new AsyncHandler<ByteArrayOutputStream>() {
             private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
             @Override
@@ -45,25 +47,32 @@ public class AsyncHTTP {
 
             @Override
             public State onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
-                stream.write(bodyPart.getBodyPartBytes());
+                stream.write(bodyPart.getBodyByteBuffer().array());
                 return State.CONTINUE;
             }
 
             @Override
-            public String onCompleted() throws Exception {
+            public ByteArrayOutputStream onCompleted() throws Exception {
                 // Will be invoked once the response has been fully read or a ResponseComplete exception
                 // has been thrown.
                 // NOTE: should probably use Content-Encoding from headers
-                return stream.toString("UTF-8");
+                return stream;
             }
 
             @Override
             public void onThrowable(Throwable t) {
+                System.out.println(">>>> onThrowable");
             }
         });
 
-        String bodyResponse = f.get();
-        System.out.println(">>> " + bodyResponse);
+        f.addListener(() -> {
+            try {
+                String response = f.get().toString("UTF-8");
+                System.out.println(">>> " + Thread.currentThread().getName() + " : " + response);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, JHVGlobals.getExecutorService());
     }
 
 }
