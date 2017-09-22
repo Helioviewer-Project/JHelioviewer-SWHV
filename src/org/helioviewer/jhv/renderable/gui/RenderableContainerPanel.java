@@ -53,7 +53,7 @@ public class RenderableContainerPanel extends JPanel {
     private static final int REMOVE_COL = 4;
 
     public static final int NUMBER_COLUMNS = 5;
-    private static final int NUMBEROFVISIBLEROWS = 8;
+    private static final int NUMBEROFVISIBLEROWS = 7;
 
     private final RenderableContainerTable grid;
     private final JPanel optionsPanelWrapper;

@@ -113,6 +113,7 @@ public class GLListener implements GLEventListener {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 CameraHelper.applyPerspective(camera, vp, gl);
                 RenderableContainer.render(camera, vp, gl);
+                ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }
         }
     }
@@ -130,6 +131,7 @@ public class GLListener implements GLEventListener {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
                 RenderableContainer.renderScale(camera, vp, gl);
+                ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }
         }
     }
