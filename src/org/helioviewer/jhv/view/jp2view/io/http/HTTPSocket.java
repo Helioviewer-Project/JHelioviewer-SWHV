@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import org.helioviewer.jhv.base.ProxySettings;
 import org.helioviewer.jhv.view.jp2view.io.LineRead;
@@ -23,7 +24,7 @@ public class HTTPSocket {
     private final String lastUsedHost;
 
     protected final InputStream inputStream;
-    protected final OutputStream outputStream;
+    private final OutputStream outputStream;
 
     protected HTTPSocket(URI uri) throws IOException {
         socket = new Socket(ProxySettings.proxy);
@@ -92,6 +93,10 @@ public class HTTPSocket {
 
     protected String getHost() {
         return lastUsedHost;
+    }
+
+    protected void write(String str) throws IOException {
+        outputStream.write(str.getBytes(StandardCharsets.UTF_8));
     }
 
     protected void close() throws IOException {
