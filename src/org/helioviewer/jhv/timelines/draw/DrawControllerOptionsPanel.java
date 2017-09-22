@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.timelines.draw;
 
 import java.awt.BorderLayout;
-import java.util.Calendar;
 import java.util.Objects;
 
 import javax.swing.JComboBox;
@@ -18,7 +17,7 @@ import com.jidesoft.swing.JideToggleButton;
 @SuppressWarnings("serial")
 class DrawControllerOptionsPanel extends JPanel {
 
-    private final JComboBox<ZoomComboboxItem> zoomCombo;
+    private final JComboBox<ZoomItem> zoomCombo;
 
     private enum ZOOM {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
@@ -27,23 +26,23 @@ class DrawControllerOptionsPanel extends JPanel {
     DrawControllerOptionsPanel() {
         setLayout(new BorderLayout());
 
-        ZoomComboboxItem[] items = {
-            new ZoomComboboxItem(ZOOM.CUSTOM, 0),
-            new ZoomComboboxItem(ZOOM.All, 0),
-            new ZoomComboboxItem(ZOOM.Movie, 0),
-            new ZoomComboboxItem(ZOOM.Year, 1),
-            new ZoomComboboxItem(ZOOM.Month, 6),
-            new ZoomComboboxItem(ZOOM.Month, 3),
-            new ZoomComboboxItem(ZOOM.Carrington, 1),
-            new ZoomComboboxItem(ZOOM.Day, 7),
-            new ZoomComboboxItem(ZOOM.Day, 3),
-            new ZoomComboboxItem(ZOOM.Hour, 12),
-            new ZoomComboboxItem(ZOOM.Hour, 6),
-            new ZoomComboboxItem(ZOOM.Hour, 1)
+        ZoomItem[] items = {
+            new ZoomItem(ZOOM.CUSTOM, 0),
+            new ZoomItem(ZOOM.All, 0),
+            new ZoomItem(ZOOM.Movie, 0),
+            new ZoomItem(ZOOM.Year, 1),
+            new ZoomItem(ZOOM.Month, 6),
+            new ZoomItem(ZOOM.Month, 3),
+            new ZoomItem(ZOOM.Carrington, 1),
+            new ZoomItem(ZOOM.Day, 7),
+            new ZoomItem(ZOOM.Day, 3),
+            new ZoomItem(ZOOM.Hour, 12),
+            new ZoomItem(ZOOM.Hour, 6),
+            new ZoomItem(ZOOM.Hour, 1)
         };
         zoomCombo = new JComboBox<>(items);
         zoomCombo.addActionListener(e -> {
-            ZoomComboboxItem item = (ZoomComboboxItem) Objects.requireNonNull(zoomCombo.getSelectedItem());
+            ZoomItem item = (ZoomItem) Objects.requireNonNull(zoomCombo.getSelectedItem());
             zoomTo(item.zoom, item.number);
         });
 
@@ -60,12 +59,12 @@ class DrawControllerOptionsPanel extends JPanel {
         ComponentUtils.smallVariant(this);
     }
 
-    private static class ZoomComboboxItem {
+    private static class ZoomItem {
 
         final ZOOM zoom;
         final long number;
 
-        ZoomComboboxItem(ZOOM _zoom, long _number) {
+        ZoomItem(ZOOM _zoom, long _number) {
             zoom = _zoom;
             number = _number;
         }
@@ -105,19 +104,19 @@ class DrawControllerOptionsPanel extends JPanel {
             DrawController.setSelectedInterval(availableInterval.start, availableInterval.end);
             break;
         case Day:
-            computeZoomInterval(selectedInterval.end, Calendar.DAY_OF_MONTH, value);
+            computeZoomInterval(selectedInterval.end, TimeUtils.DAY_IN_MILLIS * value);
             break;
         case Hour:
-            computeZoomInterval(selectedInterval.end, Calendar.HOUR, value);
+            computeZoomInterval(selectedInterval.end, 60 * 60 * 1000L * value);
             break;
         case Month:
-            computeZoomInterval(selectedInterval.end, Calendar.MONTH, value);
+            computeZoomInterval(selectedInterval.end, (long) (30.6001 * TimeUtils.DAY_IN_MILLIS * value));
             break;
         case Year:
-            computeZoomInterval(selectedInterval.end, Calendar.YEAR, value);
+            computeZoomInterval(selectedInterval.end, (long) (365.25 * TimeUtils.DAY_IN_MILLIS * value));
             break;
         case Carrington:
-            computeCarringtonInterval(selectedInterval.end, value);
+            computeZoomInterval(selectedInterval.end, (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
             break;
         case Movie:
             DrawController.setSelectedInterval(Layers.getStartTime(), Layers.getEndTime());
@@ -128,48 +127,12 @@ class DrawControllerOptionsPanel extends JPanel {
         }
     }
 
-    private static void computeCarringtonInterval(long end, long value) {
-        computeZoomForMilliSeconds(end, (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
-    }
-
-    private static void computeZoomInterval(long end, int calendarField, long difference) {
-        computeZoomForMilliSeconds(end, differenceInMilliseconds(calendarField, difference));
-    }
-
-    private static void computeZoomForMilliSeconds(long end, long differenceMilli) {
-        long endDate = end;
+    private static void computeZoomInterval(long end, long differenceMilli) {
         long now = System.currentTimeMillis();
-        if (endDate > now) {
-            endDate = now;
-        }
-
-        long startDate = endDate - differenceMilli;
-        DrawController.setSelectedInterval(startDate, endDate);
-    }
-
-    private static long differenceInMilliseconds(int calendarField, long value) {
-        switch (calendarField) {
-        case Calendar.YEAR:
-            return value * 365 * TimeUtils.DAY_IN_MILLIS;
-        case Calendar.MONTH:
-            return value * 30 * TimeUtils.DAY_IN_MILLIS;
-        case Calendar.DAY_OF_MONTH:
-        case Calendar.DAY_OF_WEEK:
-        case Calendar.DAY_OF_WEEK_IN_MONTH:
-        case Calendar.DAY_OF_YEAR:
-            return value * TimeUtils.DAY_IN_MILLIS;
-        case Calendar.HOUR:
-        case Calendar.HOUR_OF_DAY:
-            return value * 60 * 60 * 1000L;
-        case Calendar.MINUTE:
-            return value * 60 * 1000L;
-        case Calendar.SECOND:
-            return value * 1000L;
-        case Calendar.MILLISECOND:
-            return value;
-        default:
-            return 0;
-        }
+        if (end > now)
+            end = now;
+        long start = end - differenceMilli;
+        DrawController.setSelectedInterval(start, end);
     }
 
 }
