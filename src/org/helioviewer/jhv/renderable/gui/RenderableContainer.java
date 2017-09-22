@@ -12,7 +12,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.renderable.components.RenderableAnnotations;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
@@ -75,7 +74,6 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     public RenderableContainer() {
         addRenderable(new RenderableGrid(null));
         addRenderable(new RenderableViewpoint(null));
-        addRenderable(new RenderableAnnotations(null));
         addRenderable(new RenderableTimeStamp(null));
         addRenderable(new RenderableMiniview(null));
     }
