@@ -15,6 +15,7 @@ import org.asynchttpclient.HttpResponseStatus;
 import org.asynchttpclient.ListenableFuture;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.log.Log;
 
 public class AsyncHTTP {
 
@@ -61,7 +62,7 @@ public class AsyncHTTP {
 
             @Override
             public void onThrowable(Throwable t) {
-                System.out.println(">>>> onThrowable");
+                Log.error(t);
             }
         });
 
@@ -70,7 +71,7 @@ public class AsyncHTTP {
                 String response = f.get().toString("UTF-8");
                 System.out.println(">>> " + Thread.currentThread().getName() + " : " + response);
             } catch (Exception e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }, JHVGlobals.getExecutorService());
     }
