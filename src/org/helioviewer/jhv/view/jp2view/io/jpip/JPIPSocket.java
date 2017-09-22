@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view.jp2view.io.jpip;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
@@ -86,9 +85,7 @@ public class JPIPSocket extends HTTPSocket {
         req.setHeader("Cache-Control", "no-cache");
         req.setHeader("Host", getHost() + ':' + getPort());
         queryStr = "GET " + jpipPath + '?' + queryStr + " HTTP/1.1\r\n" + req + "\r\n";
-
-        // Writes the result to the output stream
-        outputStream.write(queryStr.getBytes(StandardCharsets.UTF_8));
+        write(queryStr);
 
         if (cache == null) // not interested in response
             return null;
