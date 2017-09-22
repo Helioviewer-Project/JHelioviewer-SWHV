@@ -127,12 +127,11 @@ class DrawControllerOptionsPanel extends JPanel {
         }
     }
 
-    private static void computeZoomInterval(long end, long differenceMilli) {
+    private static void computeZoomInterval(long end, long diff) {
         long now = System.currentTimeMillis();
         if (end > now)
             end = now;
-        long start = end - differenceMilli;
-        DrawController.setSelectedInterval(start, end);
+        DrawController.setSelectedInterval(end - diff, end);
     }
 
 }

@@ -22,23 +22,20 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     private static final HashSet<DrawListener> listeners = new HashSet<>();
 
-    private static final DrawControllerOptionsPanel optionsPanel;
-
-    private static Rectangle graphSize;
+    private static Rectangle graphArea = new Rectangle();
+    private static Rectangle graphSize = new Rectangle();
+    private static long latestMovieTime = Long.MIN_VALUE;
     private static boolean isLocked;
-    private static long latestMovieTime;
-    private static Rectangle graphArea;
+
+    private static DrawControllerOptionsPanel optionsPanel;
 
     static {
-        graphSize = new Rectangle();
-
         long d = System.currentTimeMillis();
         availableAxis = new TimeAxis(d - 2 * TimeUtils.DAY_IN_MILLIS, d);
         selectedAxis = new TimeAxis(availableAxis.start, availableAxis.end);
+    }
 
-        isLocked = false;
-        latestMovieTime = Long.MIN_VALUE;
-
+    public DrawController() {
         optionsPanel = new DrawControllerOptionsPanel();
     }
 
@@ -105,7 +102,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     public static void resetAxis(Point p) {
-        boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
+        boolean yAxisVerticalCondition = p.y > graphArea.y && p.y <= graphArea.y + graphArea.height;
         boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
         int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
@@ -132,8 +129,8 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     public static void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
-        boolean inGraphArea = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
-        boolean inXAxisOrAboveGraph = (p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height));
+        boolean inGraphArea = p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height;
+        boolean inXAxisOrAboveGraph = p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height);
 
         if (inGraphArea || inXAxisOrAboveGraph) {
             double zoomTimeFactor = 10;
@@ -157,9 +154,9 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     private static void setAvailableInterval() {
-        long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
-        long availableStart = selectedAxis.start - selectedIntervalDiff;
-        long availableEnd = selectedAxis.end + selectedIntervalDiff;
+        long diff = selectedAxis.end - selectedAxis.start;
+        long availableStart = selectedAxis.start - diff;
+        long availableEnd = selectedAxis.end + diff;
         Interval availableInterval = Interval.makeCompleteDay(availableStart, availableEnd);
         availableAxis.start = availableInterval.start;
         availableAxis.end = availableInterval.end;
@@ -172,8 +169,8 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     private static void centraliseSelected(long time) {
         if (time != Long.MIN_VALUE && isLocked && availableAxis.start <= time && availableAxis.end >= time) {
-            long selectedIntervalDiff = selectedAxis.end - selectedAxis.start;
-            selectedAxis.set(time - (long) (0.5 * selectedIntervalDiff), time + (long) (0.5 * selectedIntervalDiff), false);
+            long halfDiff = (selectedAxis.end - selectedAxis.start) / 2;
+            selectedAxis.set(time - halfDiff, time + halfDiff, false);
             drawRequest();
             for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
                 el.fetchData(selectedAxis);
