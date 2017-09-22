@@ -53,7 +53,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Timesp
         add(container, c);
 
         c.gridy = 1;
-        syncCheckBox = new JCheckBox("Use master layer time interval", sync);
+        syncCheckBox = new JCheckBox("Use movie time interval", sync);
         syncCheckBox.addActionListener(e -> timespanChanged(Layers.getStartTime(), Layers.getEndTime()));
         add(syncCheckBox, c);
 
