@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.io;
 
 import java.io.ByteArrayOutputStream;
+//import java.util.Map;
 
 //import io.netty.handler.codec.http.HttpHeaders;
 import org.asynchttpclient.AsyncHandler;
@@ -19,7 +20,11 @@ import org.helioviewer.jhv.log.Log;
 
 public class AsyncHTTP {
 
-    private static final AsyncHttpClientConfig config = new DefaultAsyncHttpClientConfig.Builder().setFollowRedirect(true).build();
+    private static final AsyncHttpClientConfig config = new DefaultAsyncHttpClientConfig.Builder().
+        setFollowRedirect(true).
+        setCompressionEnforced(true).
+        setUserAgent(JHVGlobals.userAgent).
+        build();
     private static final AsyncHttpClient client = new DefaultAsyncHttpClient(config);
 
     public static void get(String url) {
@@ -43,6 +48,9 @@ public class AsyncHTTP {
                 // The headers have been read
                 // If you don't want to read the body, or stop processing the response
                 // return State.ABORT;
+                // for (Map.Entry<String,String> entry : h.getHeaders().entries()) {
+                //    System.out.println(">>> " + entry);
+                // }
                 return State.CONTINUE;
             }
 
@@ -62,16 +70,15 @@ public class AsyncHTTP {
 
             @Override
             public void onThrowable(Throwable t) {
-                Log.error(t);
             }
         });
 
         f.addListener(() -> {
             try {
                 String response = f.get().toString("UTF-8");
-                System.out.println(">>> " + Thread.currentThread().getName() + " : " + response);
+                System.out.println(">>> " + Thread.currentThread().getName() + " : " + response.length());
             } catch (Exception e) {
-                // e.printStackTrace();
+                Log.error(e);
             }
         }, JHVGlobals.getExecutorService());
     }
