@@ -19,7 +19,7 @@ void get_polar_texcoord(const float cr, const vec4 scrpos, const vec4 rect, out 
     clamp_texcoord(texcoord);
     radius = 1.;
     if (interpolated > 1.) {
-        radius = interpolated * interpolated;
+        radius = interpolated;
     }
 }
 
