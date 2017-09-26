@@ -12,10 +12,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.log.Log;
-import org.jetbrains.annotations.NotNull;
 
 public class JHVThread {
 
@@ -49,7 +50,7 @@ public class JHVThread {
         }
 
         @Override
-        public Thread newThread(@NotNull Runnable r) {
+        public Thread newThread(@Nonnull Runnable r) {
             Thread thread = new Thread(r, name);
             thread.setDaemon(true);
             return thread;
@@ -153,7 +154,7 @@ public class JHVThread {
         }
 
         @Override
-        public ConnectionThread newThread(@NotNull Runnable r) {
+        public ConnectionThread newThread(@Nonnull Runnable r) {
             JHVThread.ConnectionThread thread = new JHVThread.ConnectionThread(r, name);
             thread.setDaemon(true);
             return thread;

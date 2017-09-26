@@ -1,11 +1,12 @@
 package org.helioviewer.jhv.astronomy;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JulianDay;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.jetbrains.annotations.NotNull;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -43,7 +44,7 @@ public class Sun {
     private static final LoadingCache<JHVDate, Position.L> cache = CacheBuilder.newBuilder().maximumSize(10000).
         build(new CacheLoader<JHVDate, Position.L>() {
             @Override
-            public Position.L load(@NotNull JHVDate time) {
+            public Position.L load(@Nonnull JHVDate time) {
                 return getEarthInternal(time);
             }
         });

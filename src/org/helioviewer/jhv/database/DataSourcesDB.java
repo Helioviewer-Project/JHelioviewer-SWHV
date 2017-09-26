@@ -8,9 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.log.Log;
-import org.jetbrains.annotations.NotNull;
 
 public class DataSourcesDB {
 
@@ -61,7 +62,7 @@ public class DataSourcesDB {
         }
     }
 
-    public static ArrayList<Pair<Integer, String>> doSelect(@NotNull String server, @NotNull String observatory, @NotNull String dataset) {
+    public static ArrayList<Pair<Integer, String>> doSelect(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
         ArrayList<Pair<Integer, String>> res = new ArrayList<>();
         try {
             select.setString(1, server);
