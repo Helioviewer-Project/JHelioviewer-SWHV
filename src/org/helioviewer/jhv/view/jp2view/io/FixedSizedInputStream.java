@@ -3,7 +3,7 @@ package org.helioviewer.jhv.view.jp2view.io;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * Input stream with a fixed size. After reading the expected number of bytes
@@ -35,7 +35,7 @@ public class FixedSizedInputStream extends TransferInputStream {
     }
 
     @Override
-    public int read(@NotNull byte[] b, int off, int len) throws IOException {
+    public int read(@Nonnull byte[] b, int off, int len) throws IOException {
         if (remainingBytes > 0) {
             int bytesRead = in.read(b, off, remainingBytes < len ? remainingBytes : len);
             remainingBytes -= bytesRead;
@@ -45,7 +45,7 @@ public class FixedSizedInputStream extends TransferInputStream {
     }
 
     @Override
-    public int read(@NotNull byte[] b) throws IOException {
+    public int read(@Nonnull byte[] b) throws IOException {
         if (remainingBytes > 0) {
             int bytesRead = in.read(b, 0, remainingBytes < b.length ? remainingBytes : b.length);
             remainingBytes -= bytesRead;

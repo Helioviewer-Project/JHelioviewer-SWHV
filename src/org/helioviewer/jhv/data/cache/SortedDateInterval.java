@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.data.cache;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 public class SortedDateInterval implements Comparable<SortedDateInterval> {
 
@@ -27,7 +27,7 @@ public class SortedDateInterval implements Comparable<SortedDateInterval> {
     }
 
     @Override
-    public int compareTo(@NotNull SortedDateInterval o2) {
+    public int compareTo(@Nonnull SortedDateInterval o2) {
         if (start < o2.start) {
             return -1;
         }
