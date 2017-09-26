@@ -45,7 +45,7 @@ float fetch(sampler2D tex, vec2 coord, vec3 bright) {
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     vec3 b = brightness;
     if (enhanced == 1) {
-        b.y *= factor;
+        b.y *= factor * factor * factor;
     }
 
     float v;

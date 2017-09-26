@@ -1,20 +1,20 @@
 void main(void)
 {
-    vec2 normalizedScreenpos = 2.*(((gl_FragCoord.xy-viewportOffset)/viewport)-0.5);
+    vec2 normalizedScreenpos = 2. * ((gl_FragCoord.xy - viewportOffset) / viewport - 0.5);
     vec4 up1 =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 texcoord;
     vec2 difftexcoord;
-    vec3 hitPoint = vec3(up1.x, up1.y, sqrt(1.-dot(up1.xy, up1.xy)));
+    vec3 hitPoint = vec3(up1.x, up1.y, sqrt(1. - dot(up1.xy, up1.xy)));
     vec3 rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     float radius2 = dot(up1.xy, up1.xy);
-    if (radius2 >= 1. || dot(rotatedHitPoint.xyz, vec3(0.,0.,1.)) <= 0.) {
+    if (radius2 >= 1. || dot(rotatedHitPoint.xyz, vec3(0., 0., 1.)) <= 0.) {
         hitPoint = vec3(up1.x, up1.y, intersectPlane(up1));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     }
 
     float factor = 1.;
     if (radius2 >= 1.) {
-        factor = radius2;
+        factor = sqrt(radius2);
     }
 
     float geometryFlatDist = abs(dot(rotatedHitPoint, cutOffDirection));
