@@ -44,23 +44,21 @@ public class Buttons {
     public static final String unlock = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
         uc2ent(MaterialDesign.MDI_LOCK_OPEN) + "</font>&nbsp;";
 
-    public static final String info = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_INFORMATION_VARIANT) + "</font>&nbsp;";
-    public static final String download = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_DOWNLOAD) + "</font>&nbsp;";
+    public static final String info = button(MaterialDesign.MDI_INFORMATION_VARIANT);
+    public static final String download = button(MaterialDesign.MDI_DOWNLOAD);
 
-    public static final String invert = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_INVERT_COLORS) + "</font>&nbsp;";
-    public static final String corona = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_WHITE_BALANCE_SUNNY) + "</font>&nbsp;";
+    public static final String brightness = button(MaterialDesign.MDI_BRIGHTNESS_AUTO);
+    public static final String invert = button(MaterialDesign.MDI_INVERT_COLORS);
+    public static final String corona = button(MaterialDesign.MDI_WHITE_BALANCE_SUNNY);
 
-    public static final String calendar = "<html>&nbsp;<font face='Material Design Icons' size=4>" +
-        uc2ent(MaterialDesign.MDI_CALENDAR) + "</font>&nbsp;";
+    public static final String calendar = button(MaterialDesign.MDI_CALENDAR);
 
-    public static final String plugOn = "<html>&nbsp;<font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_POWER_PLUG) + "</font>&nbsp;";
-    public static final String plugOff = "<html>&nbsp;<font face='Material Design Icons' size=5>" +
-        uc2ent(MaterialDesign.MDI_POWER_PLUG_OFF) + "</font>&nbsp;";
+    public static final String plugOn = button(MaterialDesign.MDI_POWER_PLUG);
+    public static final String plugOff = button(MaterialDesign.MDI_POWER_PLUG_OFF);
+
+    private static String button(MaterialDesign uc) {
+        return "<html><span style='font-size:12px'>&nbsp;<font face='Material Design Icons'>" + uc2ent(uc) + "</font>&nbsp;";
+    }
 
     // toolbar
 

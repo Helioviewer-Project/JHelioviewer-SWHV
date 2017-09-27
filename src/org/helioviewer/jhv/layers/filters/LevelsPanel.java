@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 
@@ -66,7 +67,7 @@ public class LevelsPanel implements FilterDetails {
         });
         WheelSupport.installMouseWheelSupport(slider);
 
-        autoButton = new JideButton("Auto");
+        autoButton = new JideButton(Buttons.brightness);
         autoButton.setToolTipText("Auto brightness");
         autoButton.addActionListener(e -> {
             slider.setLowValue(0);
