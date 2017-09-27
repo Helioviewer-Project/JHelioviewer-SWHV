@@ -26,6 +26,8 @@ import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMessageSystem;
 
+import nom.tam.fits.FitsFactory;
+
 public class JHelioviewer {
 
     public static void main(String[] args) {
@@ -67,6 +69,8 @@ public class JHelioviewer {
         // Set the platform system properties
         SystemProperties.setPlatform();
         System.setProperty("newt.window.icons", "null,null");
+
+        FitsFactory.setUseHierarch(true);
 
         try {
             JHVLoader.loadKDULibs();

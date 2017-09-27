@@ -21,6 +21,7 @@ public class PfssData {
     }
 
     private final JHVDate dateObs;
+    private final int pointsPerLine;
     private final short[] fieldlinex;
     private final short[] fieldliney;
     private final short[] fieldlinez;
@@ -37,19 +38,20 @@ public class PfssData {
     final long time;
 
     public PfssData(JHVDate _dateObs, short[] _fieldlinex, short[] _fieldliney, short[] _fieldlinez,
-            short[] _fieldlines, long _time) {
+            short[] _fieldlines, int _pointsPerLine, long _time) {
         dateObs = _dateObs;
         fieldlinex = _fieldlinex;
         fieldliney = _fieldliney;
         fieldlinez = _fieldlinez;
         fieldlines = _fieldlines;
+        pointsPerLine = _pointsPerLine;
         time = _time;
 
         Position.L p = Sun.getEarth(dateObs);
         cphi = Math.cos(p.lon);
         sphi = Math.sin(p.lon);
 
-        int numberOfLines = fieldlinex.length / PfssSettings.POINTS_PER_LINE;
+        int numberOfLines = fieldlinex.length / pointsPerLine;
         vertices = BufferUtils.newFloatBuffer(3 * (fieldlinex.length + 2 * numberOfLines));
         colors = BufferUtils.newFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
     }
@@ -78,7 +80,7 @@ public class PfssData {
 
         FieldLineColor type = FieldLineColor.LOOPCOLOR;
         for (int i = 0; i < fieldlinex.length; i++) {
-            if (i / PfssSettings.POINTS_PER_LINE % 9 <= detail) {
+            if (i / pointsPerLine % 9 <= detail) {
                 double x = 3. * decode(fieldlinex[i]);
                 double y = 3. * decode(fieldliney[i]);
                 double z = 3. * decode(fieldlinez[i]);
@@ -89,16 +91,16 @@ public class PfssData {
                 x = helpx;
                 y = helpy;
 
-                if (i % PfssSettings.POINTS_PER_LINE == 0) {
+                if (pointsPerLine == 0) {
                     // start line
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     colors.put(BufferUtils.colorNull);
 
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     if (fixedColor) {
-                        double xo = 3. * decode(fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1]);
-                        double yo = 3. * decode(fieldliney[i + PfssSettings.POINTS_PER_LINE - 1]);
-                        double zo = 3. * decode(fieldlinez[i + PfssSettings.POINTS_PER_LINE - 1]);
+                        double xo = 3. * decode(fieldlinex[i + pointsPerLine - 1]);
+                        double yo = 3. * decode(fieldliney[i + pointsPerLine - 1]);
+                        double zo = 3. * decode(fieldlinez[i + pointsPerLine - 1]);
                         double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
                         double r = Math.sqrt(x * x + y * y + z * z);
 
@@ -119,7 +121,7 @@ public class PfssData {
                     else
                         addColor(bright);
                     // end line
-                    if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
+                    if (i % pointsPerLine == pointsPerLine - 1) {
                         BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                         colors.put(BufferUtils.colorNull);
                     }
