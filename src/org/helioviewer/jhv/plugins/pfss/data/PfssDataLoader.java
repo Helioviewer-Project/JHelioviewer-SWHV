@@ -13,6 +13,7 @@ import org.helioviewer.jhv.time.JHVDate;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
+import nom.tam.fits.Header;
 
 class PfssDataLoader implements Runnable {
 
@@ -57,15 +58,20 @@ class PfssDataLoader implements Runnable {
             throw new Exception("Could not read FITS");
 
         BinaryTableHDU bhdu = (BinaryTableHDU) hdus[1];
+        Header header = bhdu.getHeader();
+        String dateFits = header.getStringValue("DATE-OBS");
+        if (dateFits == null)
+            throw new Exception("DATE-OBS not found");
+        int points = header.getIntValue("HIERARCH.POINTS_PER_LINE");
+        if (points == 0)
+            throw new Exception("POINTS_PER_LINE not found");
+
         short[] fieldlinex = (short[]) bhdu.getColumn("FIELDLINEx");
         short[] fieldliney = (short[]) bhdu.getColumn("FIELDLINEy");
         short[] fieldlinez = (short[]) bhdu.getColumn("FIELDLINEz");
         short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
 
-        String dateFits = bhdu.getHeader().getStringValue("DATE-OBS");
-        if (dateFits == null)
-            throw new Exception("DATE-OBS not found");
-        return new PfssData(new JHVDate(dateFits), fieldlinex, fieldliney, fieldlinez, fieldlines, time);
+        return new PfssData(new JHVDate(dateFits), fieldlinex, fieldliney, fieldlinez, fieldlines, points, time);
     }
 
 }
