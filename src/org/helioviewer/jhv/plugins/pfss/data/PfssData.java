@@ -5,7 +5,6 @@ import java.nio.FloatBuffer;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 import org.helioviewer.jhv.time.JHVDate;
 
 public class PfssData {
