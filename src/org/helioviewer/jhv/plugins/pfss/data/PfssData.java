@@ -90,7 +90,7 @@ public class PfssData {
                 x = helpx;
                 y = helpy;
 
-                if (pointsPerLine == 0) {
+                if (i % pointsPerLine == 0) {
                     // start line
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     colors.put(BufferUtils.colorNull);
