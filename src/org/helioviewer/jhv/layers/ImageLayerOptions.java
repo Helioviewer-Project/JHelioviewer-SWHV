@@ -36,14 +36,13 @@ public class ImageLayerOptions extends JPanel {
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
 
+        c.gridwidth = 1;
         c.weightx = 1;
         c.weighty = 1;
         c.gridx = 0;
 
-        c.gridwidth = 3;
         c.gridy = 0;
-        add(runningDifferencePanel.getComponent(), c);
-        c.gridwidth = 1;
+        addToGridBag(c, runningDifferencePanel);
         c.gridy++;
         addToGridBag(c, opacityPanel);
         c.gridy++;
