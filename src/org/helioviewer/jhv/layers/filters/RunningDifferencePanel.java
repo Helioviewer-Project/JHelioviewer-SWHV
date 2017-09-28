@@ -20,26 +20,7 @@ import com.jidesoft.swing.JideButton;
 @SuppressWarnings("serial")
 public class RunningDifferencePanel implements FilterDetails {
 
-    private enum DifferenceModeChoice {
-        None("None", GLImage.DifferenceMode.None),
-        Running("Running", GLImage.DifferenceMode.Running),
-        Base("Base", GLImage.DifferenceMode.Base);
-
-        private final String str;
-        final GLImage.DifferenceMode mode;
-
-        DifferenceModeChoice(String s, GLImage.DifferenceMode m) {
-            str = s;
-            mode = m;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
-
-    private final JComboBox<DifferenceModeChoice> comboBox;
+    private final JComboBox<GLImage.DifferenceMode> comboBox;
     private final JPanel buttonPanel;
 
     public RunningDifferencePanel(ImageLayerOptions parent) {
@@ -57,10 +38,10 @@ public class RunningDifferencePanel implements FilterDetails {
             JHVGlobals.getExecutorService().execute(downloadTask);
         });
 
-        comboBox = new JComboBox<>(DifferenceModeChoice.values());
-        comboBox.setSelectedItem(DifferenceModeChoice.valueOf(parent.getGLImage().getDifferenceMode().toString()));
+        comboBox = new JComboBox<>(GLImage.DifferenceMode.values());
+        comboBox.setSelectedItem(parent.getGLImage().getDifferenceMode());
         comboBox.addActionListener(e -> {
-            parent.getGLImage().setDifferenceMode(((DifferenceModeChoice) Objects.requireNonNull(comboBox.getSelectedItem())).mode);
+            parent.getGLImage().setDifferenceMode((GLImage.DifferenceMode) Objects.requireNonNull(comboBox.getSelectedItem()));
             Displayer.display();
         });
 
