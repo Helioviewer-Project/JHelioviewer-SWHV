@@ -1,11 +1,12 @@
 package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
-import java.util.Objects;
+import java.awt.GridLayout;
 
-import javax.swing.JComboBox;
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
@@ -20,10 +21,23 @@ import com.jidesoft.swing.JideButton;
 @SuppressWarnings("serial")
 public class RunningDifferencePanel implements FilterDetails {
 
-    private final JComboBox<GLImage.DifferenceMode> comboBox;
-    private final JPanel buttonPanel;
+    private final JPanel modePanel = new JPanel(new GridLayout(1, 3));
+    private final JPanel buttonPanel = new JPanel();
 
     public RunningDifferencePanel(ImageLayerOptions parent) {
+        ButtonGroup modeGroup = new ButtonGroup();
+        for (GLImage.DifferenceMode mode : GLImage.DifferenceMode.values()) {
+            JRadioButton item = new JRadioButton(mode.toString());
+            if (mode == parent.getGLImage().getDifferenceMode())
+                item.setSelected(true);
+            item.addActionListener(e -> {
+                parent.getGLImage().setDifferenceMode(mode);
+                Displayer.display();
+            });
+            modeGroup.add(item);
+            modePanel.add(item);
+        }
+
         JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
         metaButton.addActionListener(e -> {
@@ -38,14 +52,6 @@ public class RunningDifferencePanel implements FilterDetails {
             JHVGlobals.getExecutorService().execute(downloadTask);
         });
 
-        comboBox = new JComboBox<>(GLImage.DifferenceMode.values());
-        comboBox.setSelectedItem(parent.getGLImage().getDifferenceMode());
-        comboBox.addActionListener(e -> {
-            parent.getGLImage().setDifferenceMode((GLImage.DifferenceMode) Objects.requireNonNull(comboBox.getSelectedItem()));
-            Displayer.display();
-        });
-
-        buttonPanel = new JPanel();
         buttonPanel.add(metaButton);
         buttonPanel.add(downloadButton);
     }
@@ -57,7 +63,7 @@ public class RunningDifferencePanel implements FilterDetails {
 
     @Override
     public Component getComponent() {
-        return comboBox;
+        return modePanel;
     }
 
     @Override
