@@ -55,6 +55,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
             } catch (ValidationException e) {
                 Log.error(e);
                 e.getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log::error);
+                break;
             } catch (IOException e) {
                 try {
                     // Log.error(e);
