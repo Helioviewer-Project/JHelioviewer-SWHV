@@ -32,9 +32,9 @@ public class DataSources {
             });
             put("IAS", new HashMap<String, String>() {
                 {
-                    put("API.getDataSources", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
-                    put("API.getJP2Image", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJP2Image&");
-                    put("API.getJPX", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php?action=getJPX&");
+                    put("API.getDataSources", "https://helioviewer-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=[TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2]");
+                    put("API.getJP2Image", "https://helioviewer-api.ias.u-psud.fr/v2/getJP2Image/?");
+                    put("API.getJPX", "https://helioviewer-api.ias.u-psud.fr/v2/getJPX/?");
                     put("label", "Institut d'Astrophysique Spatiale");
                     put("schema", "/data/sources_v1.0.json");
                 }
