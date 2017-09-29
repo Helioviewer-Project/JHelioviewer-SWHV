@@ -1,4 +1,6 @@
 # eclipse files
+.classpath
+.project
 .metadata
 bin/
 tmp/
