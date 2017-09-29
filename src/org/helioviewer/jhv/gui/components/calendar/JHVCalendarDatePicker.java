@@ -37,7 +37,7 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener {
     private final HashSet<JHVCalendarListener> listeners = new HashSet<>();
     private final Calendar calendar = new GregorianCalendar();
 
-    private final JHVCalendar jhvCalendar = new JHVCalendar(true);
+    private final JHVCalendar jhvCalendar = new JHVCalendar();
     private final JTextField textField = new JTextField();
     private final JideButton calPopupButton = new JideButton(Buttons.calendar);
     private Popup calPopup = null;

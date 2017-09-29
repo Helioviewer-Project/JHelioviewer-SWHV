@@ -50,25 +50,13 @@ class JHVCalendar extends JPanel {
     private DisplayMode displayMode = DisplayMode.DAYS;
     private CalendarViewController calendarViewController = new DayViewController();
 
-    /**
-     * Constructor where to choose if the current date should be displayed at
-     * the bottom or not.
-     *
-     * @param showToday
-     *            True if the date of the current date should be displayed at
-     *            the bottom; false if not.
-     */
-    JHVCalendar(boolean showToday) {
-        // set basic layout
+    JHVCalendar() {
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(250, 200));
         // add sub components
         add(navigationPanel, BorderLayout.NORTH);
         add(selectionPanel, BorderLayout.CENTER);
-
-        if (showToday)
-            add(new BottomPanel(), BorderLayout.SOUTH);
-
+        add(new BottomPanel(), BorderLayout.SOUTH);
         // show data in visual components
         updateDateDisplay();
     }
