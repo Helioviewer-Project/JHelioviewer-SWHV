@@ -56,14 +56,6 @@ public class PfssData {
         colors = BufferUtils.newFloatBuffer(4 * (fieldlinex.length + 2 * numberOfLines));
     }
 
-    private void addColor(double bright) {
-        if (bright > 0) {
-            BufferUtils.put4f(colors, 1, (float) (1. - bright), (float) (1. - bright), 1);
-        } else {
-            BufferUtils.put4f(colors, (float) (1. + bright), (float) (1. + bright), 1, 1);
-        }
-    }
-
     public boolean needsUpdate(int detail, boolean fixedColor, double radius) {
         return lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius;
     }
@@ -72,7 +64,19 @@ public class PfssData {
         return (f + 32768.) * (2. / 65535.) - 1.;
     }
 
-    public void calculatePositions(int detail, boolean fixedColor) {
+    private void computeColor(float[] color, double b) {
+        if (b > 0) {
+            color[0] = 1;
+            color[1] = (float) (1. - b);
+            color[2] = (float) (1. - b);
+        } else {
+            color[0] = (float) (1. + b);
+            color[1] = (float) (1. + b);
+            color[2] = 1;
+        }
+        color[3] = 1;
+    }
+
     public void calculatePositions(int detail, boolean fixedColor, double radius) {
         lastDetail = detail;
         lastFixedColor = fixedColor;
@@ -80,53 +84,49 @@ public class PfssData {
         vertices.clear();
         colors.clear();
 
-        FieldLineColor type = FieldLineColor.LOOPCOLOR;
+        float[] oneColor = FieldLineColor.LOOPCOLOR.color;
+        float[] brightColor = new float[4];
+
         for (int i = 0; i < fieldlinex.length; i++) {
             if (i / pointsPerLine % 9 <= detail) {
                 double x = 3. * decode(fieldlinex[i]);
                 double y = 3. * decode(fieldliney[i]);
                 double z = 3. * decode(fieldlinez[i]);
-                double bright = decode(fieldlines[i]);
+                double b = decode(fieldlines[i]);
+                computeColor(brightColor, b);
 
                 double helpx = cphi * x + sphi * y;
                 double helpy = -sphi * x + cphi * y;
                 x = helpx;
                 y = helpy;
+                double r = Math.sqrt(x * x + y * y + z * z);
 
-                if (i % pointsPerLine == 0) {
-                    // start line
+                if (i % pointsPerLine == 0) { // start line
                     BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     colors.put(BufferUtils.colorNull);
 
-                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
                     if (fixedColor) {
                         double xo = 3. * decode(fieldlinex[i + pointsPerLine - 1]);
                         double yo = 3. * decode(fieldliney[i + pointsPerLine - 1]);
                         double zo = 3. * decode(fieldlinez[i + pointsPerLine - 1]);
                         double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
-                        double r = Math.sqrt(x * x + y * y + z * z);
 
                         if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
-                            type = FieldLineColor.LOOPCOLOR;
-                        } else if (bright < 0) {
-                            type = FieldLineColor.INSIDEFIELDCOLOR;
+                            oneColor = FieldLineColor.LOOPCOLOR.color;
+                        } else if (b < 0) {
+                            oneColor = FieldLineColor.INSIDEFIELDCOLOR.color;
                         } else {
-                            type = FieldLineColor.OPENFIELDCOLOR;
+                            oneColor = FieldLineColor.OPENFIELDCOLOR.color;
                         }
-                        colors.put(type.color);
-                    } else
-                        addColor(bright);
-                } else {
-                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                    if (fixedColor)
-                        colors.put(type.color);
-                    else
-                        addColor(bright);
-                    // end line
-                    if (i % pointsPerLine == pointsPerLine - 1) {
-                        BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
-                        colors.put(BufferUtils.colorNull);
                     }
+                }
+
+                BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
+                colors.put(r > radius ? BufferUtils.colorNull : (fixedColor ? oneColor : brightColor));
+
+                if (i % pointsPerLine == pointsPerLine - 1) { // end line
+                    BufferUtils.put3f(vertices, (float) x, (float) z, (float) -y);
+                    colors.put(BufferUtils.colorNull);
                 }
             }
         }
