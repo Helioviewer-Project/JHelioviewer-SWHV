@@ -20,15 +20,24 @@ class PfssOptionsPanel extends JPanel {
 
     private int detail;
     private boolean fixedColor;
+    private double radius;
 
-    PfssOptionsPanel(int _detail, boolean _fixedColor) {
+    PfssOptionsPanel(int _detail, boolean _fixedColor, double _radius) {
         detail = _detail;
         fixedColor = _fixedColor;
+        radius = _radius;
         setLayout(new GridBagLayout());
 
         JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(detail, 0, PfssSettings.MAX_DETAIL, 1));
         levelSpinner.addChangeListener(e -> {
             detail = (Integer) levelSpinner.getValue();
+            Displayer.display();
+        });
+        WheelSupport.installMouseWheelSupport(levelSpinner);
+
+        JSpinner radiusSpinner = new JSpinner(new SpinnerNumberModel(radius, 1.099999999999999, PfssSettings.MAX_RADIUS, 0.1));
+        radiusSpinner.addChangeListener(e -> {
+            radius = (Double) radiusSpinner.getValue();
             Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(levelSpinner);
@@ -46,13 +55,21 @@ class PfssOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.WEST;
         add(levelSpinner, c0);
 
+        c0.gridx = 2;
+        c0.anchor = GridBagConstraints.EAST;
+        add(new JLabel("Radius", JLabel.RIGHT), c0);
+
+        c0.gridx = 3;
+        c0.anchor = GridBagConstraints.WEST;
+        add(radiusSpinner, c0);
+
         JCheckBox fixedColors = new JCheckBox("Fixed colors", fixedColor);
         fixedColors.addActionListener(e -> {
             fixedColor = fixedColors.isSelected();
             Displayer.display();
         });
 
-        c0.gridx = 2;
+        c0.gridx = 4;
         c0.anchor = GridBagConstraints.WEST;
         add(fixedColors, c0);
 
@@ -61,7 +78,7 @@ class PfssOptionsPanel extends JPanel {
         availabilityButton.addActionListener(e -> JHVGlobals.openURL(PfssSettings.availabilityURL));
 
         c0.anchor = GridBagConstraints.EAST;
-        c0.gridx = 3;
+        c0.gridx = 5;
         add(availabilityButton, c0);
 
         ComponentUtils.smallVariant(this);
@@ -73,6 +90,10 @@ class PfssOptionsPanel extends JPanel {
 
     boolean getFixedColor() {
         return fixedColor;
+    }
+
+    double getRadius() {
+        return radius;
     }
 
 }

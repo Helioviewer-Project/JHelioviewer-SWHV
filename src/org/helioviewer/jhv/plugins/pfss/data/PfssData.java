@@ -33,6 +33,7 @@ public class PfssData {
 
     private int lastDetail;
     private boolean lastFixedColor;
+    private double lastRadius;
 
     final long time;
 
@@ -63,8 +64,8 @@ public class PfssData {
         }
     }
 
-    public boolean needsUpdate(int detail, boolean fixedColor) {
-        return lastDetail != detail || lastFixedColor != fixedColor;
+    public boolean needsUpdate(int detail, boolean fixedColor, double radius) {
+        return lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius;
     }
 
     private static double decode(short f) {
@@ -72,8 +73,10 @@ public class PfssData {
     }
 
     public void calculatePositions(int detail, boolean fixedColor) {
+    public void calculatePositions(int detail, boolean fixedColor, double radius) {
         lastDetail = detail;
         lastFixedColor = fixedColor;
+        lastRadius = radius;
         vertices.clear();
         colors.clear();
 
