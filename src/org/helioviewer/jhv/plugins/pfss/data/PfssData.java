@@ -9,15 +9,9 @@ import org.helioviewer.jhv.time.JHVDate;
 
 public class PfssData {
 
-    private enum FieldLineColor {
-        OPENFIELDCOLOR(BufferUtils.colorRed), LOOPCOLOR(BufferUtils.colorWhite), INSIDEFIELDCOLOR(BufferUtils.colorBlue);
-
-        final float[] color;
-
-        FieldLineColor(float[] _color) {
-            color = _color;
-        }
-    }
+    private static final float[] openFieldColor = BufferUtils.colorRed;
+    private static final float[] loopColor = BufferUtils.colorWhite;
+    private static final float[] insideFieldColor = BufferUtils.colorBlue;
 
     private final JHVDate dateObs;
     private final int pointsPerLine;
@@ -84,7 +78,7 @@ public class PfssData {
         vertices.clear();
         colors.clear();
 
-        float[] oneColor = FieldLineColor.LOOPCOLOR.color;
+        float[] oneColor = loopColor;
         float[] brightColor = new float[4];
 
         for (int i = 0; i < fieldlinex.length; i++) {
@@ -112,11 +106,11 @@ public class PfssData {
                         double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
 
                         if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
-                            oneColor = FieldLineColor.LOOPCOLOR.color;
+                            oneColor = loopColor;
                         } else if (b < 0) {
-                            oneColor = FieldLineColor.INSIDEFIELDCOLOR.color;
+                            oneColor = insideFieldColor;
                         } else {
-                            oneColor = FieldLineColor.OPENFIELDCOLOR.color;
+                            oneColor = openFieldColor;
                         }
                     }
                 }
