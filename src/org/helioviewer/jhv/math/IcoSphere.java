@@ -9,7 +9,7 @@ import org.helioviewer.jhv.base.Pair;
 
 public class IcoSphere {
 
-    public static final Pair<FloatBuffer, IntBuffer> IcoSphere = makeIcoSphere(2);
+    public static final Pair<FloatBuffer, IntBuffer> IcoSphere = makeIcoSphere(3);
 
     private static Pair<FloatBuffer, IntBuffer> makeIcoSphere(int level) {
         float t = (float) ((Math.sqrt(5) - 1) / 2);
