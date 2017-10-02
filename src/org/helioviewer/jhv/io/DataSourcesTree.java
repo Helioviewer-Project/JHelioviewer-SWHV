@@ -25,8 +25,8 @@ public class DataSourcesTree extends JTree {
 
     public static class Item {
 
-        public final String name;
-        public final String description;
+        final String name;
+        final String description;
 
         public Item(String _name, String _description) {
             name = _name;

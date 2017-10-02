@@ -32,7 +32,7 @@ public class AsyncHTTP {
             private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
             @Override
-            public State onStatusReceived(HttpResponseStatus status) throws Exception {
+            public State onStatusReceived(HttpResponseStatus status) {
                 int statusCode = status.getStatusCode();
                 // The Status have been read
                 // If you don't want to read the headers, body or stop processing the response
@@ -43,7 +43,7 @@ public class AsyncHTTP {
             }
 
             @Override
-            public State onHeadersReceived(HttpResponseHeaders h) throws Exception {
+            public State onHeadersReceived(HttpResponseHeaders h) {
                 // HttpHeaders headers = h.getHeaders();
                 // The headers have been read
                 // If you don't want to read the body, or stop processing the response
@@ -61,7 +61,7 @@ public class AsyncHTTP {
             }
 
             @Override
-            public ByteArrayOutputStream onCompleted() throws Exception {
+            public ByteArrayOutputStream onCompleted() {
                 // Will be invoked once the response has been fully read or a ResponseComplete exception
                 // has been thrown.
                 // NOTE: should probably use Content-Encoding from headers
