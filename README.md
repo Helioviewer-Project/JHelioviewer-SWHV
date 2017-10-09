@@ -2,6 +2,7 @@ JHelioviewer
 ============
 
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/9940/badge.svg)](https://scan.coverity.com/projects/9940)
+[![GitHub release](https://img.shields.io/github/release/Helioviewer-Project/JHelioviewer-SWHV.svg)](https://github.com/Helioviewer-Project/JHelioviewer-SWHV/releases)
 [![DOI](https://zenodo.org/badge/50179170.svg)](https://zenodo.org/badge/latestdoi/50179170)
 
 Website: http://www.jhelioviewer.org/
