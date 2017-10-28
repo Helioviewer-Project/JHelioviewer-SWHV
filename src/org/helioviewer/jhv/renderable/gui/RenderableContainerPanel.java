@@ -220,10 +220,11 @@ public class RenderableContainerPanel extends JPanel {
                 Point pt = e.getPoint();
                 int row = grid.rowAtPoint(pt);
                 int col = grid.columnAtPoint(pt);
-                if (row < 0 || col < 0)
+                Object obj = grid.getValueAt(row, col);
+                if (!(obj instanceof Renderable))
                     return;
 
-                Renderable renderable = (Renderable) grid.getValueAt(row, col);
+                Renderable renderable = (Renderable) obj;
 
                 if ((col == TITLE_COL || col == TIME_COL) && renderable instanceof ImageLayer && e.getClickCount() == 2) {
                     ObservationDialog.getInstance().showDialog(false, (ImageLayer) renderable);
