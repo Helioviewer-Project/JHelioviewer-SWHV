@@ -62,8 +62,7 @@ class SSLCert {
     private static KeyStore newEmptyKeyStore(char[] password) throws GeneralSecurityException {
         try {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            InputStream in = null; // By convention, 'null' creates an empty key store
-            keyStore.load(in, password);
+            keyStore.load(null, password); // By convention, 'null' creates an empty key store
             return keyStore;
         } catch (IOException e) {
             throw new AssertionError(e);
