@@ -19,10 +19,10 @@ import org.helioviewer.jhv.data.event.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.helioviewer.jhv.data.gui.SWEKTreeModel;
 import org.helioviewer.jhv.data.gui.filter.FilterManager;
 import org.helioviewer.jhv.data.gui.filter.FilterManagerListener;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.threads.JHVThread;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })

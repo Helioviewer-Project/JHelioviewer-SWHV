@@ -7,12 +7,12 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.data.event.SWEKGroup;
+import org.helioviewer.jhv.data.gui.EventPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
-import org.helioviewer.jhv.plugins.swek.view.EventPanel;
 import org.helioviewer.jhv.plugins.swek.view.EventTimelineRenderable;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONObject;

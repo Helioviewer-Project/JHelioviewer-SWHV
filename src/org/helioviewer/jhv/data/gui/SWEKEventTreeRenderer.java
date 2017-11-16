@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.view;
+package org.helioviewer.jhv.data.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
