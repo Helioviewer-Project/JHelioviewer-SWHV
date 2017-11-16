@@ -40,7 +40,6 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
         }
     };
     private static final Map<SWEKSupplier, ArrayList<DownloadWorker>> supplierMap = new HashMap<>();
-    private static final ArrayList<SWEKSupplier> activeEventTypes = new ArrayList<>();
 
     private static final SWEKDownloadManager instance = new SWEKDownloadManager();
 
@@ -85,13 +84,10 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     }
 
     public static void activateSupplier(SWEKSupplier supplier, boolean active) {
-        if (active) {
-            addEventTypeToActiveEventTypeMap(supplier);
+        if (active)
             JHVEventCache.eventTypeActivated(supplier);
-        } else {
-            removeEventTypeFromActiveEventTypeMap(supplier);
+        else
             stopDownloadingEventType(supplier, false);
-        }
     }
 
     @Override
@@ -117,14 +113,6 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
         workerList.add(worker);
     }
 
-    private static void addEventTypeToActiveEventTypeMap(SWEKSupplier jhvType) {
-        activeEventTypes.add(jhvType);
-    }
-
-    private static void removeEventTypeFromActiveEventTypeMap(SWEKSupplier jhvType) {
-        activeEventTypes.remove(jhvType);
-    }
-
     private static List<SWEKParam> defineParameters(SWEKGroup group, SWEKSupplier supplier) {
         List<SWEKParam> params = new ArrayList<>();
         params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
@@ -136,9 +124,9 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     }
 
     private static void downloadSelectedSuppliers(SWEKGroup group) {
-        for (SWEKSupplier jhvType : activeEventTypes) {
-            if (jhvType.getGroup() == group)
-                downloadForAllDates(jhvType);
+        for (SWEKSupplier supplier : group.getSuppliers()) {
+            if (supplier.isSelected())
+                downloadForAllDates(supplier);
         }
     }
 

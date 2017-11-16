@@ -24,7 +24,7 @@ public class FilterManager {
     }
 
     public static void addFilter(SWEKGroup group, SWEKParameter parameter, SWEKParam filter) {
-        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = filters.containsKey(group) ? filters.get(group) : new HashMap<>();
+        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = getFilterForGroup(group);
         filters.put(group, filteredParameterPerEventType);
         if (!filteredParameterPerEventType.containsKey(parameter)) {
             filteredParameterPerEventType.put(parameter, new ArrayList<>());
@@ -37,24 +37,17 @@ public class FilterManager {
     }
 
     public static void fireFilters(SWEKGroup group) {
-        fireFilterChanged(group);
+        for (FilterManagerListener fml : listeners) {
+            fml.filtersChanged(group);
+        }
     }
 
     public static Map<SWEKParameter, List<SWEKParam>> getFilterForGroup(SWEKGroup group) {
-        if (filters.containsKey(group)) {
-            return filters.get(group);
-        }
-        return new HashMap<>();
+        return filters.containsKey(group) ? filters.get(group) : new HashMap<>();
     }
 
     public static boolean isFiltered(SWEKGroup group, SWEKParameter parameter) {
         return filters.containsKey(group) && filters.get(group).containsKey(parameter);
-    }
-
-    private static void fireFilterChanged(SWEKGroup group) {
-        for (FilterManagerListener fml : listeners) {
-            fml.filtersChanged(group);
-        }
     }
 
 }
