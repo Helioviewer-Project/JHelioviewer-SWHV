@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.model;
+package org.helioviewer.jhv.data.gui;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -7,11 +7,11 @@ import javax.swing.tree.TreePath;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 
-public class EventTypePanelModel implements TreeModel {
+class EventPanelModel implements TreeModel {
 
     private final SWEKGroup group;
 
-    public EventTypePanelModel(SWEKGroup _group) {
+    EventPanelModel(SWEKGroup _group) {
         group = _group;
     }
 
