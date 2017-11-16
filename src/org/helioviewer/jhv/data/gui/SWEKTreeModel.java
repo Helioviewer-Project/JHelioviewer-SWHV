@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.model;
+package org.helioviewer.jhv.data.gui;
 
 import java.util.HashSet;
 
