@@ -35,7 +35,7 @@ public class EventTypePanelModel implements TreeModel {
 
             for (SWEKSupplier supplier : suppliers) {
                 supplier.setSelected(selected);
-                SWEKDownloadManager.activateGroupAndSupplier(group, supplier, selected);
+                SWEKDownloadManager.activateSupplier(supplier, selected);
             }
         } else if (row > 0 && row <= suppliers.size()) {
             SWEKSupplier supplier = suppliers.get(row - 1);
@@ -55,7 +55,7 @@ public class EventTypePanelModel implements TreeModel {
             // SWEKTreeModel.setStopLoading(group);
             group.setSelected(groupSelected);
         }
-        SWEKDownloadManager.activateGroupAndSupplier(group, supplier, selected);
+        SWEKDownloadManager.activateSupplier(supplier, selected);
     }
 
     @Override
