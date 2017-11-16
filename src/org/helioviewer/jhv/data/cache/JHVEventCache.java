@@ -14,7 +14,6 @@ import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -200,11 +199,9 @@ public class JHVEventCache {
         return downloadedCache.get(eventType).getAllRequestIntervals();
     }
 
-    public static void reset(SWEKGroup group) {
-        for (SWEKSupplier supplier : group.getSuppliers()) {
-            downloadedCache.remove(supplier);
-            downloadedCache.put(supplier, new RequestCache());
-        }
+    public static void reset(SWEKSupplier supplier) {
+        downloadedCache.remove(supplier);
+        downloadedCache.put(supplier, new RequestCache());
     }
 
 }
