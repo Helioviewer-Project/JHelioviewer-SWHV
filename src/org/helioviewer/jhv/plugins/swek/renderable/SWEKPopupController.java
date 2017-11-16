@@ -12,7 +12,7 @@ import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVPositionInformation;
-import org.helioviewer.jhv.data.gui.SWEKEventInformationDialog;
+import org.helioviewer.jhv.data.gui.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.TimeListener;

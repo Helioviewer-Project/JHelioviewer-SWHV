@@ -1,8 +1,8 @@
-package org.helioviewer.jhv.data.gui.model;
+package org.helioviewer.jhv.data.gui.info;
 
 import java.util.HashSet;
 
-public class DataCollapsiblePanelModel {
+class DataCollapsiblePanelModel {
 
     private final HashSet<DataCollapsiblePanelModelListener> listeners = new HashSet<>();
 
