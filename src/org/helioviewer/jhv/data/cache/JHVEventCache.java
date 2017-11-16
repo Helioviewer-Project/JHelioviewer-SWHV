@@ -171,16 +171,12 @@ public class JHVEventCache {
 
     public static void removeSupplier(SWEKSupplier supplier, boolean keepActive) {
         downloadedCache.put(supplier, new RequestCache());
-        if (keepActive)
-            deleteFromCache(supplier);
-        else
-            activeEventTypes.remove(supplier);
-        fireEventCacheChanged();
-    }
-
-    private static void deleteFromCache(SWEKSupplier supplier) {
         events.remove(supplier);
         relEvents.entrySet().removeIf(entry -> entry.getValue().getSupplier() == supplier);
+
+        if (!keepActive)
+            activeEventTypes.remove(supplier);
+        fireEventCacheChanged();
     }
 
     public static Collection<Interval> getAllRequestIntervals(SWEKSupplier eventType) {
