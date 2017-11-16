@@ -22,19 +22,18 @@ import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.data.event.SWEKTreeModelElement;
 import org.helioviewer.jhv.data.gui.filter.FilterDialog;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
-    private final EventTypePanelModel model;
     private final JTree tree;
+    private final EventPanel panel;
 
-    public SWEKEventTreeRenderer(JTree _tree, EventTypePanelModel _model) {
+    public SWEKEventTreeRenderer(JTree _tree, EventPanel _panel) {
         tree = _tree;
-        model = _model;
+        panel = _panel;
     }
 
     @Override
@@ -68,12 +67,12 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
     }
 
     private JPanel createLeaf(SWEKTreeModelElement element, Color back) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
+        JPanel leaf = new JPanel(new BorderLayout());
+        leaf.setOpaque(false);
 
         ImageIcon icon = element.getIcon();
         if (icon != null) {
-            panel.add(new TreeLabel(icon), BorderLayout.LINE_START);
+            leaf.add(new TreeLabel(icon), BorderLayout.LINE_START);
         }
 
         JCheckBox checkBox = new JCheckBox(element.getName());
@@ -82,12 +81,12 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         checkBox.addActionListener(e -> {
             boolean selected = checkBox.isSelected();
             if (element instanceof SWEKGroup)
-                model.selectGroup((SWEKGroup) element, selected);
+                panel.selectGroup((SWEKGroup) element, selected);
             else
-                model.selectSupplier((SWEKSupplier) element, selected);
+                panel.selectSupplier((SWEKSupplier) element, selected);
             tree.repaint();
         });
-        panel.add(checkBox, BorderLayout.CENTER);
+        leaf.add(checkBox, BorderLayout.CENTER);
 
         FilterDialog filterDialog = element.getFilterDialog();
         if (filterDialog != null) {
@@ -101,11 +100,11 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
                     filterDialog.setLocation(windowLocation);
                 }
             });
-            panel.add(filterButton, BorderLayout.LINE_END);
+            leaf.add(filterButton, BorderLayout.LINE_END);
         }
 
-        ComponentUtils.smallVariant(panel);
-        return panel;
+        ComponentUtils.smallVariant(leaf);
+        return leaf;
     }
 
 }
