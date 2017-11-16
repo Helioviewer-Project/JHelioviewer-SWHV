@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.download;
+package org.helioviewer.jhv.data.event;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,10 +15,6 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.cache.JHVEventCacheRequestHandler;
-import org.helioviewer.jhv.data.event.SWEKOperand;
-import org.helioviewer.jhv.data.event.SWEKParam;
-import org.helioviewer.jhv.data.event.SWEKParameter;
-import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.data.gui.SWEKTreeModel;
 import org.helioviewer.jhv.data.gui.filter.FilterManager;
 import org.helioviewer.jhv.data.gui.filter.FilterManagerListener;
@@ -40,7 +36,7 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
             JHVThread.afterExecute(r, t);
         }
     };
-    private static final Map<SWEKSupplier, ArrayList<DownloadWorker>> supplierMap = new HashMap<>();
+    private static final Map<SWEKSupplier, ArrayList<SWEKDownloadWorker>> supplierMap = new HashMap<>();
 
     private static final SWEKDownloadManager instance = new SWEKDownloadManager();
 
@@ -50,10 +46,10 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     }
 
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
-        ArrayList<DownloadWorker> workerList = supplierMap.get(supplier);
+        ArrayList<SWEKDownloadWorker> workerList = supplierMap.get(supplier);
         if (workerList != null) {
-            for (Iterator<DownloadWorker> it = workerList.iterator(); it.hasNext();) {
-                DownloadWorker worker = it.next();
+            for (Iterator<SWEKDownloadWorker> it = workerList.iterator(); it.hasNext();) {
+                SWEKDownloadWorker worker = it.next();
                 if (worker.getSupplier() == supplier) {
                     worker.stopWorker();
                     JHVEventCache.intervalsNotDownloaded(supplier, worker.getRequestInterval());
@@ -68,12 +64,12 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
         JHVEventCache.removeSupplier(supplier, keepActive);
     }
 
-    public static void workerForcedToStop(DownloadWorker worker) {
+    public static void workerForcedToStop(SWEKDownloadWorker worker) {
         removeFromDownloaderMap(worker);
         JHVEventCache.intervalsNotDownloaded(worker.getSupplier(), worker.getRequestInterval());
     }
 
-    public static void workerFinished(DownloadWorker worker) {
+    public static void workerFinished(SWEKDownloadWorker worker) {
         removeFromDownloaderMap(worker);
     }
 
@@ -91,16 +87,16 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
             downloadForAllDates(supplier);
     }
 
-    private static void removeFromDownloaderMap(DownloadWorker worker) {
-        ArrayList<DownloadWorker> workerList = supplierMap.get(worker.getSupplier());
+    private static void removeFromDownloaderMap(SWEKDownloadWorker worker) {
+        ArrayList<SWEKDownloadWorker> workerList = supplierMap.get(worker.getSupplier());
         if (workerList != null)
             workerList.remove(worker);
         if (workerList == null || workerList.isEmpty())
             SWEKTreeModel.setStopLoading(worker.getSupplier().getGroup());
     }
 
-    private static void addToDownloaderMap(DownloadWorker worker) {
-        ArrayList<DownloadWorker> workerList = supplierMap.computeIfAbsent(worker.getSupplier(), k -> new ArrayList<>());
+    private static void addToDownloaderMap(SWEKDownloadWorker worker) {
+        ArrayList<SWEKDownloadWorker> workerList = supplierMap.computeIfAbsent(worker.getSupplier(), k -> new ArrayList<>());
         workerList.add(worker);
     }
 
@@ -130,7 +126,7 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
         List<SWEKParam> params = defineParameters(supplier);
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {
-                DownloadWorker worker = new DownloadWorker(supplier, intt, params);
+                SWEKDownloadWorker worker = new SWEKDownloadWorker(supplier, intt, params);
                 SWEKTreeModel.setStartLoading(supplier.getGroup());
                 addToDownloaderMap(worker);
                 downloadEventPool.execute(worker);
@@ -138,7 +134,7 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
         }
     }
 
-    private static class ComparePriority<T extends DownloadWorker> implements Comparator<T> {
+    private static class ComparePriority<T extends SWEKDownloadWorker> implements Comparator<T> {
         @Override
         public int compare(T l1, T l2) {
             long start = Layers.getStartTime();
