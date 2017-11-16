@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.guielements.model;
+package org.helioviewer.jhv.data.gui.model;
 
 import javax.swing.table.AbstractTableModel;
 

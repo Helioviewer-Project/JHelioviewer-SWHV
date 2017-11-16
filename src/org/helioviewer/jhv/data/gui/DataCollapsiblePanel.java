@@ -1,9 +1,9 @@
-package org.helioviewer.jhv.data.guielements;
+package org.helioviewer.jhv.data.gui;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
-import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
+import org.helioviewer.jhv.data.gui.model.DataCollapsiblePanelModel;
 import org.helioviewer.jhv.gui.components.CollapsiblePane;
 
 @SuppressWarnings("serial")
