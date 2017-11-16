@@ -6,13 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 
 public class FilterManager {
 
-    private static final Map<SWEKGroup, Map<SWEKParameter, List<SWEKParam>>> filters = new HashMap<>();
+    private static final Map<SWEKSupplier, Map<SWEKParameter, List<SWEKParam>>> filters = new HashMap<>();
     private static final HashSet<FilterManagerListener> listeners = new HashSet<>();
 
     public static void addFilterManagerListener(FilterManagerListener listener) {
@@ -23,31 +23,31 @@ public class FilterManager {
         listeners.remove(listener);
     }
 
-    public static void addFilter(SWEKGroup group, SWEKParameter parameter, SWEKParam filter) {
-        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = getFilterForGroup(group);
-        filters.put(group, filteredParameterPerEventType);
+    public static void addFilter(SWEKSupplier supplier, SWEKParameter parameter, SWEKParam filter) {
+        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = getFilter(supplier);
+        filters.put(supplier, filteredParameterPerEventType);
         if (!filteredParameterPerEventType.containsKey(parameter)) {
             filteredParameterPerEventType.put(parameter, new ArrayList<>());
         }
         filteredParameterPerEventType.get(parameter).add(filter);
     }
 
-    public static void removeFilters(SWEKGroup group) {
-        filters.remove(group);
+    public static void removeFilters(SWEKSupplier supplier) {
+        filters.remove(supplier);
     }
 
-    public static void fireFilters(SWEKGroup group) {
+    public static void fireFilters(SWEKSupplier supplier) {
         for (FilterManagerListener fml : listeners) {
-            fml.filtersChanged(group);
+            fml.filtersChanged(supplier);
         }
     }
 
-    public static Map<SWEKParameter, List<SWEKParam>> getFilterForGroup(SWEKGroup group) {
-        return filters.containsKey(group) ? filters.get(group) : new HashMap<>();
+    public static Map<SWEKParameter, List<SWEKParam>> getFilter(SWEKSupplier supplier) {
+        return filters.containsKey(supplier) ? filters.get(supplier) : new HashMap<>();
     }
 
-    public static boolean isFiltered(SWEKGroup group, SWEKParameter parameter) {
-        return filters.containsKey(group) && filters.get(group).containsKey(parameter);
+    public static boolean isFiltered(SWEKSupplier supplier, SWEKParameter parameter) {
+        return filters.containsKey(supplier) && filters.get(supplier).containsKey(parameter);
     }
 
 }

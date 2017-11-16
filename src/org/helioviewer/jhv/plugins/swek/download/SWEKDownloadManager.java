@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
 import org.helioviewer.jhv.data.cache.JHVEventCacheRequestHandler;
-import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
@@ -84,12 +83,10 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     }
 
     @Override
-    public void filtersChanged(SWEKGroup group) {
-        for (SWEKSupplier supplier : group.getSuppliers()) {
-            stopDownloadSupplier(supplier, true);
-            if (supplier.isSelected())
-                downloadForAllDates(supplier);
-        }
+    public void filtersChanged(SWEKSupplier supplier) {
+        stopDownloadSupplier(supplier, true);
+        if (supplier.isSelected())
+            downloadForAllDates(supplier);
     }
 
     private static void removeFromDownloaderMap(DownloadWorker worker) {
@@ -105,10 +102,10 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
         workerList.add(worker);
     }
 
-    private static List<SWEKParam> defineParameters(SWEKGroup group, SWEKSupplier supplier) {
+    private static List<SWEKParam> defineParameters(SWEKSupplier supplier) {
         List<SWEKParam> params = new ArrayList<>();
         params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
-        Map<SWEKParameter, List<SWEKParam>> paramsPerEventParameter = FilterManager.getFilterForGroup(group);
+        Map<SWEKParameter, List<SWEKParam>> paramsPerEventParameter = FilterManager.getFilter(supplier);
         for (List<SWEKParam> paramPerParameter : paramsPerEventParameter.values()) {
             params.addAll(paramPerParameter);
         }
@@ -128,12 +125,11 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     }
 
     private static void startDownloadSupplier(SWEKSupplier supplier, Interval interval) {
-        SWEKGroup group = supplier.getGroup();
-        List<SWEKParam> params = defineParameters(group, supplier);
+        List<SWEKParam> params = defineParameters(supplier);
         for (Interval intt : Interval.splitInterval(interval, 2)) {
             if (intt.start < System.currentTimeMillis() + SIXHOURS) {
                 DownloadWorker worker = new DownloadWorker(supplier, intt, params);
-                SWEKTreeModel.setStartLoading(group);
+                SWEKTreeModel.setStartLoading(supplier.getGroup());
                 addToDownloaderMap(worker);
                 downloadEventPool.execute(worker);
             }

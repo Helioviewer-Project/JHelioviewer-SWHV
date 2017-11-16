@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
-import org.helioviewer.jhv.data.event.SWEKGroup;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 
 interface FilterManagerListener {
 
-    void filtersChanged(SWEKGroup group);
+    void filtersChanged(SWEKSupplier supplier);
 
 }
