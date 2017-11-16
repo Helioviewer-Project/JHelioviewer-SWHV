@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.event.filter;
+package org.helioviewer.jhv.data.gui.filter;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.event.filter;
+package org.helioviewer.jhv.data.gui.filter;
 
 import java.awt.GridLayout;
 import java.awt.event.FocusEvent;

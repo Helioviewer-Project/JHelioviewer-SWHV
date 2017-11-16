@@ -2,7 +2,7 @@ package org.helioviewer.jhv.data.event;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.data.event.filter.FilterDialog;
+import org.helioviewer.jhv.data.gui.filter.FilterDialog;
 
 public class SWEKTreeModelElement {
 
