@@ -1,12 +1,11 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.EventObject;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -16,6 +15,8 @@ import javax.swing.JLayer;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.Timer;
+import javax.swing.tree.DefaultTreeCellEditor;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.gui.UITimer;
@@ -23,8 +24,6 @@ import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 import org.json.JSONObject;
-
-import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionListener {
@@ -46,18 +45,11 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         eventPanelModel = new EventTypePanelModel(group);
 
         JTree eventTypeTree = new JTree(eventPanelModel);
+        eventTypeTree.setEditable(true);
         eventTypeTree.setShowsRootHandles(true);
         eventTypeTree.setSelectionModel(null);
-        eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
-        eventTypeTree.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int clickedOnRow = eventTypeTree.getRowForLocation(e.getX(), e.getY());
-                eventPanelModel.rowClicked(clickedOnRow);
-                // eventTypeTree.revalidate();
-                eventTypeTree.repaint();
-            }
-        });
+        eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer(eventTypeTree, eventPanelModel));
+        eventTypeTree.setCellEditor(new MyTreeCellEditor(eventTypeTree, (DefaultTreeCellRenderer) eventTypeTree.getCellRenderer()));
 
         // workaround for Win HiDpi
         if (System.getProperty("jhv.os").equals("windows")) {
@@ -69,21 +61,6 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         JPanel filterPanel = new JPanel(new FlowLayout());
         filterPanel.setBackground(eventTypeTree.getBackground());
         filterPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
-
-        if (group.containsFilter()) {
-            FilterDialog filterDialog = new FilterDialog(group);
-            JideButton filterButton = new JideButton("Filter");
-            filterButton.addActionListener(e -> filterDialog.setVisible(true));
-            filterButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    Point pressedLocation = e.getLocationOnScreen();
-                    Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
-                    filterDialog.setLocation(windowLocation);
-                }
-            });
-            filterPanel.add(filterButton);
-        }
         filterPanel.add(layer);
         add(filterPanel, BorderLayout.LINE_END);
     }
@@ -115,6 +92,24 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
 
     public void deserialize(JSONObject jo) {
         eventPanelModel.deserialize(jo);
+    }
+
+    private class MyTreeCellEditor extends DefaultTreeCellEditor  {
+
+        public MyTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
+            super(tree, renderer);
+        }
+
+        @Override
+        public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
+            return renderer.getTreeCellRendererComponent(tree, value, true, expanded, leaf, row, true);
+        }
+
+        @Override
+        public boolean isCellEditable(EventObject anEvent) {
+            return true;
+        }
+
     }
 
 }

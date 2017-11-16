@@ -43,7 +43,15 @@ public class EventTypePanelModel implements TreeModel {
         }
     }
 
-    private void selectSupplier(SWEKSupplier supplier, boolean selected) {
+    public void selectGroup(SWEKGroup group, boolean selected) {
+        group.setSelected(selected);
+        for (SWEKSupplier supplier : group.getSuppliers()) {
+            supplier.setSelected(selected);
+            SWEKDownloadManager.activateSupplier(supplier, selected);
+        }
+    }
+
+    public void selectSupplier(SWEKSupplier supplier, boolean selected) {
         supplier.setSelected(selected);
         if (selected) {
             group.setSelected(true);

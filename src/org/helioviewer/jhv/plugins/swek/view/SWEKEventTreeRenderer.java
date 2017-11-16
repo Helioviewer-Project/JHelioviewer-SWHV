@@ -6,6 +6,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -14,11 +17,24 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.helioviewer.jhv.data.event.SWEKGroup;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.data.event.SWEKTreeModelElement;
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
+
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
+
+    private final EventTypePanelModel model;
+    private final JTree tree;
+
+    public SWEKEventTreeRenderer(JTree _tree, EventTypePanelModel _model) {
+        tree = _tree;
+        model = _model;
+    }
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object obj, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -50,7 +66,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         }
     }
 
-    private static JPanel createLeaf(SWEKTreeModelElement element, Color back) {
+    private JPanel createLeaf(SWEKTreeModelElement element, Color back) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
@@ -62,7 +78,30 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         JCheckBox checkBox = new JCheckBox(element.getName());
         checkBox.setSelected(element.isSelected());
         checkBox.setBackground(back);
+        checkBox.addActionListener(e -> {
+            boolean selected = checkBox.isSelected();
+            if (element instanceof SWEKGroup)
+                model.selectGroup((SWEKGroup) element, selected);
+            else
+                model.selectSupplier((SWEKSupplier) element, selected);
+            tree.repaint();
+        });
         panel.add(checkBox, BorderLayout.CENTER);
+
+        if (element instanceof SWEKSupplier && ((SWEKSupplier) element).getGroup().containsFilter()) {
+            FilterDialog filterDialog = new FilterDialog((SWEKSupplier) element);
+            JideButton filterButton = new JideButton("Filter");
+            filterButton.addActionListener(e -> filterDialog.setVisible(true));
+            filterButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    Point pressedLocation = e.getLocationOnScreen();
+                    Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
+                    filterDialog.setLocation(windowLocation);
+                }
+            });
+            panel.add(filterButton, BorderLayout.LINE_END);
+        }
 
         ComponentUtils.smallVariant(panel);
         return panel;
