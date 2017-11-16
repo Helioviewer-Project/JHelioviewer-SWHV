@@ -54,11 +54,6 @@ public class JHVEventCache {
         handler.newEventsReceived();
     }
 
-    public static void removeEvents(SWEKSupplier eventType, boolean keepActive) {
-        removeEventType(eventType, keepActive);
-        fireEventCacheChanged();
-    }
-
     public static void fireEventCacheChanged() {
         for (JHVEventHandler handler : cacheEventHandlers) {
             handler.cacheUpdated();
@@ -174,26 +169,26 @@ public class JHVEventCache {
         return new JHVEventCacheResult(eventsResult, missingIntervals);
     }
 
-    private static void removeEventType(SWEKSupplier eventType, boolean keepActive) {
+    public static void removeSupplier(SWEKSupplier supplier, boolean keepActive) {
         if (keepActive)
-            deleteFromCache(eventType);
+            deleteFromCache(supplier);
         else
-            activeEventTypes.remove(eventType);
+            activeEventTypes.remove(supplier);
+        fireEventCacheChanged();
     }
 
-    private static void deleteFromCache(SWEKSupplier eventType) {
-        downloadedCache.put(eventType, new RequestCache());
-        events.remove(eventType);
-        relEvents.entrySet().removeIf(entry -> entry.getValue().getSupplier() == eventType);
+    private static void deleteFromCache(SWEKSupplier supplier) {
+        downloadedCache.put(supplier, new RequestCache());
+        events.remove(supplier);
+        relEvents.entrySet().removeIf(entry -> entry.getValue().getSupplier() == supplier);
+    }
+
+    public static void reset(SWEKSupplier supplier) {
+        downloadedCache.put(supplier, new RequestCache());
     }
 
     public static Collection<Interval> getAllRequestIntervals(SWEKSupplier eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
-    }
-
-    public static void reset(SWEKSupplier supplier) {
-        downloadedCache.remove(supplier);
-        downloadedCache.put(supplier, new RequestCache());
     }
 
 }

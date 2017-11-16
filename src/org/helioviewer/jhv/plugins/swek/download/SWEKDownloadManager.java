@@ -48,13 +48,6 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
         FilterManager.addFilterManagerListener(this);
     }
 
-    private static void stopDownloadingGroup(SWEKGroup group, boolean keepActive) {
-        for (SWEKSupplier supplier : group.getSuppliers()) {
-            stopDownloadSupplier(supplier, keepActive);
-            JHVEventCache.reset(supplier);
-        }
-    }
-
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
         ArrayList<DownloadWorker> workerList = supplierMap.get(supplier);
         if (workerList != null) {
@@ -71,7 +64,7 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
                 supplierMap.remove(supplier);
             }
         }
-        JHVEventCache.removeEvents(supplier, keepActive);
+        JHVEventCache.removeSupplier(supplier, keepActive);
     }
 
     public static void workerForcedToStop(DownloadWorker worker) {
@@ -92,8 +85,12 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
 
     @Override
     public void filtersChanged(SWEKGroup group) {
-        stopDownloadingGroup(group, true);
-        downloadSelectedSuppliers(group);
+        for (SWEKSupplier supplier : group.getSuppliers()) {
+            stopDownloadSupplier(supplier, true);
+            JHVEventCache.reset(supplier);
+            if (supplier.isSelected())
+                downloadForAllDates(supplier);
+        }
     }
 
     private static void removeFromDownloaderMap(DownloadWorker worker) {
@@ -121,13 +118,6 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
             params.addAll(paramPerParameter);
         }
         return params;
-    }
-
-    private static void downloadSelectedSuppliers(SWEKGroup group) {
-        for (SWEKSupplier supplier : group.getSuppliers()) {
-            if (supplier.isSelected())
-                downloadForAllDates(supplier);
-        }
     }
 
     private static void downloadForAllDates(SWEKSupplier supplier) {
