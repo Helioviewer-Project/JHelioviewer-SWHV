@@ -101,11 +101,7 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     }
 
     private static void addToDownloaderMap(DownloadWorker worker) {
-        ArrayList<DownloadWorker> workerList = supplierMap.get(worker.getSupplier());
-        if (workerList == null) {
-            workerList = new ArrayList<>();
-            supplierMap.put(worker.getSupplier(), workerList);
-        }
+        ArrayList<DownloadWorker> workerList = supplierMap.computeIfAbsent(worker.getSupplier(), k -> new ArrayList<>());
         workerList.add(worker);
     }
 
