@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
-import java.util.List;
-
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -25,22 +23,6 @@ public class EventTypePanelModel implements TreeModel {
 
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
-    }
-
-    public void rowClicked(int row) {
-        List<SWEKSupplier> suppliers = group.getSuppliers();
-        if (row == 0) {
-            group.setSelected(!group.isSelected());
-            boolean selected = group.isSelected();
-
-            for (SWEKSupplier supplier : suppliers) {
-                supplier.setSelected(selected);
-                SWEKDownloadManager.activateSupplier(supplier, selected);
-            }
-        } else if (row > 0 && row <= suppliers.size()) {
-            SWEKSupplier supplier = suppliers.get(row - 1);
-            selectSupplier(supplier, !supplier.isSelected());
-        }
     }
 
     public void selectGroup(SWEKGroup group, boolean selected) {
