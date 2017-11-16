@@ -20,6 +20,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.data.event.SWEKTreeModelElement;
+import org.helioviewer.jhv.data.event.filter.FilterDialog;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 
@@ -88,8 +89,8 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         });
         panel.add(checkBox, BorderLayout.CENTER);
 
-        if (element instanceof SWEKSupplier && ((SWEKSupplier) element).getGroup().containsFilter()) {
-            FilterDialog filterDialog = new FilterDialog((SWEKSupplier) element);
+        FilterDialog filterDialog = element.getFilterDialog();
+        if (filterDialog != null) {
             JideButton filterButton = new JideButton("Filter");
             filterButton.addActionListener(e -> filterDialog.setVisible(true));
             filterButton.addMouseListener(new MouseAdapter() {
