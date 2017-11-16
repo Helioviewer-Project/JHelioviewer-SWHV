@@ -78,10 +78,10 @@ public class JHVEventCache {
         get(interval.start, interval.end, interval.start, interval.end);
     }
 
-    public static void eventTypeActivated(SWEKSupplier eventType) {
-        activeEventTypes.add(eventType);
-        if (!downloadedCache.containsKey(eventType)) {
-            downloadedCache.put(eventType, new RequestCache());
+    public static void supplierActivated(SWEKSupplier supplier) {
+        activeEventTypes.add(supplier);
+        if (!downloadedCache.containsKey(supplier)) {
+            downloadedCache.put(supplier, new RequestCache());
         }
         fireEventCacheChanged();
     }
