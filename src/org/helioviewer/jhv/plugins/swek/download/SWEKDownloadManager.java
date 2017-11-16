@@ -50,12 +50,12 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
 
     private static void stopDownloadingGroup(SWEKGroup group, boolean keepActive) {
         for (SWEKSupplier supplier : group.getSuppliers()) {
-            stopDownloadingEventType(supplier, keepActive);
+            stopDownloadSupplier(supplier, keepActive);
             JHVEventCache.reset(supplier);
         }
     }
 
-    private static void stopDownloadingEventType(SWEKSupplier supplier, boolean keepActive) {
+    private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
         ArrayList<DownloadWorker> workerList = supplierMap.get(supplier);
         if (workerList != null) {
             for (Iterator<DownloadWorker> it = workerList.iterator(); it.hasNext();) {
@@ -85,9 +85,9 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
 
     public static void activateSupplier(SWEKSupplier supplier, boolean active) {
         if (active)
-            JHVEventCache.eventTypeActivated(supplier);
+            JHVEventCache.supplierActivated(supplier);
         else
-            stopDownloadingEventType(supplier, false);
+            stopDownloadSupplier(supplier, false);
     }
 
     @Override
@@ -130,19 +130,19 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
         }
     }
 
-    private static void downloadForAllDates(SWEKSupplier jhvType) {
-        Collection<Interval> allIntervals = JHVEventCache.getAllRequestIntervals(jhvType);
+    private static void downloadForAllDates(SWEKSupplier supplier) {
+        Collection<Interval> allIntervals = JHVEventCache.getAllRequestIntervals(supplier);
         for (Interval interval : allIntervals) {
-            startDownloadEventType(jhvType, interval);
+            startDownloadSupplier(supplier, interval);
         }
     }
 
     @Override
-    public void handleRequestForInterval(SWEKSupplier jhvType, Interval interval) {
-        startDownloadEventType(jhvType, interval);
+    public void handleRequestForInterval(SWEKSupplier supplier, Interval interval) {
+        startDownloadSupplier(supplier, interval);
     }
 
-    private static void startDownloadEventType(SWEKSupplier supplier, Interval interval) {
+    private static void startDownloadSupplier(SWEKSupplier supplier, Interval interval) {
         SWEKGroup group = supplier.getGroup();
         List<SWEKParam> params = defineParameters(group, supplier);
         for (Interval intt : Interval.splitInterval(interval, 2)) {
