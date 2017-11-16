@@ -19,7 +19,6 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
@@ -45,7 +44,6 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         SWEKTreeModel.addSWEKTreeModelListener(this);
 
         eventPanelModel = new EventTypePanelModel(group);
-        eventPanelModel.addEventPanelModelListener(SWEKDownloadManager.getSingletonInstance());
 
         JTree eventTypeTree = new JTree(eventPanelModel);
         eventTypeTree.setShowsRootHandles(true);
