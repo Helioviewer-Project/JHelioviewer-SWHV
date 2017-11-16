@@ -87,7 +87,6 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     public void filtersChanged(SWEKGroup group) {
         for (SWEKSupplier supplier : group.getSuppliers()) {
             stopDownloadSupplier(supplier, true);
-            JHVEventCache.reset(supplier);
             if (supplier.isSelected())
                 downloadForAllDates(supplier);
         }
