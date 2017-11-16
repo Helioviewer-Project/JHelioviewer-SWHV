@@ -21,12 +21,11 @@ import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModelListener;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.threads.JHVThread;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class SWEKDownloadManager implements EventTypePanelModelListener, FilterManagerListener, JHVEventCacheRequestHandler {
+public class SWEKDownloadManager implements FilterManagerListener, JHVEventCacheRequestHandler {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
@@ -44,10 +43,6 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private static final ArrayList<SWEKSupplier> activeEventTypes = new ArrayList<>();
 
     private static final SWEKDownloadManager instance = new SWEKDownloadManager();
-
-    public static SWEKDownloadManager getSingletonInstance() {
-        return instance;
-    }
 
     private SWEKDownloadManager() {
         JHVEventCache.registerHandler(this);
@@ -88,8 +83,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         removeFromDownloaderMap(worker);
     }
 
-    @Override
-    public void activateGroupAndSupplier(SWEKGroup group, SWEKSupplier supplier, boolean active) {
+    public static void activateGroupAndSupplier(SWEKGroup group, SWEKSupplier supplier, boolean active) {
         if (active) {
             addEventTypeToActiveEventTypeMap(supplier);
             JHVEventCache.eventTypeActivated(supplier);

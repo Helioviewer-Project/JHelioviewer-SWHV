@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
-import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.event.TreeModelListener;
@@ -9,13 +8,12 @@ import javax.swing.tree.TreePath;
 
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
+import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.json.JSONObject;
 
 public class EventTypePanelModel implements TreeModel {
 
     private final SWEKGroup group;
-
-    private final HashSet<EventTypePanelModelListener> panelModelListeners = new HashSet<>();
 
     public EventTypePanelModel(SWEKGroup _group) {
         group = _group;
@@ -29,14 +27,6 @@ public class EventTypePanelModel implements TreeModel {
     public void removeTreeModelListener(TreeModelListener l) {
     }
 
-    public void addEventPanelModelListener(EventTypePanelModelListener listener) {
-        panelModelListeners.add(listener);
-    }
-
-    public void removeEventPanelModelListener(EventTypePanelModelListener listener) {
-        panelModelListeners.remove(listener);
-    }
-
     public void rowClicked(int row) {
         List<SWEKSupplier> suppliers = group.getSuppliers();
         if (row == 0) {
@@ -45,7 +35,7 @@ public class EventTypePanelModel implements TreeModel {
 
             for (SWEKSupplier supplier : suppliers) {
                 supplier.setSelected(selected);
-                fireActivateGroupAndSupplier(group, supplier, selected);
+                SWEKDownloadManager.activateGroupAndSupplier(group, supplier, selected);
             }
         } else if (row > 0 && row <= suppliers.size()) {
             SWEKSupplier supplier = suppliers.get(row - 1);
@@ -65,7 +55,7 @@ public class EventTypePanelModel implements TreeModel {
             // SWEKTreeModel.setStopLoading(group);
             group.setSelected(groupSelected);
         }
-        fireActivateGroupAndSupplier(group, supplier, selected);
+        SWEKDownloadManager.activateGroupAndSupplier(group, supplier, selected);
     }
 
     @Override
@@ -98,12 +88,6 @@ public class EventTypePanelModel implements TreeModel {
 
     @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
-    }
-
-    private void fireActivateGroupAndSupplier(SWEKGroup swekGroup, SWEKSupplier swekSupplier, boolean active) {
-        for (EventTypePanelModelListener l : panelModelListeners) {
-            l.activateGroupAndSupplier(swekGroup, swekSupplier, active);
-        }
     }
 
     public void serialize(JSONObject jo) {
