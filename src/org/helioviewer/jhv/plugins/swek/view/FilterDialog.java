@@ -11,7 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.data.event.SWEKGroup;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanel;
 import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
@@ -21,12 +21,12 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
 
     private final JButton applyButton = new JButton("Apply");
 
-    public FilterDialog(SWEKGroup group) {
+    public FilterDialog(SWEKSupplier supplier) {
         setUndecorated(true);
         addFocusListener(this);
         addWindowFocusListener(this);
 
-        List<FilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(group, this);
+        List<FilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(supplier, this);
         JPanel filterPanel = new JPanel(new GridLayout(filterPanels.size() + 1, 1));
         for (FilterPanel afp : filterPanels) {
             filterPanel.add(afp);

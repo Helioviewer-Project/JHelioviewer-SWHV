@@ -9,10 +9,10 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
 import org.helioviewer.jhv.base.conversion.GOESLevel;
-import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
+import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.download.FilterManager;
 import org.helioviewer.jhv.plugins.swek.view.FilterDialog;
 
@@ -25,17 +25,17 @@ public class FilterPanel extends JPanel {
     private boolean enabled = false;
 
     private final SWEKParameter parameter;
-    private final SWEKGroup group;
+    private final SWEKSupplier supplier;
 
     private final FilterDialog filterDialog;
     private final SWEKOperand operand;
 
-    public FilterPanel(SWEKGroup _group, SWEKParameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEKOperand _operand) {
+    public FilterPanel(SWEKSupplier _supplier, SWEKParameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEKOperand _operand) {
         operand = _operand;
         filterDialog = _filterDialog;
         spinner = _spinner;
         parameter = _parameter;
-        group = _group;
+        supplier = _supplier;
 
         JCheckBox enableButton = new JCheckBox();
         enableButton.addActionListener(e -> toggleEnabled());
@@ -58,11 +58,11 @@ public class FilterPanel extends JPanel {
     }
 
     public void removeFilter() {
-        FilterManager.removeFilters(group);
+        FilterManager.removeFilters(supplier);
     }
 
     public void fireFilter() {
-        FilterManager.fireFilters(group);
+        FilterManager.fireFilters(supplier);
     }
 
     public void addFilter() {
@@ -70,7 +70,7 @@ public class FilterPanel extends JPanel {
             Object oval = spinner.getValue();
             String pval = oval instanceof String ? String.valueOf(GOESLevel.getFloatValue((String) oval)) : String.valueOf(oval);
             SWEKParam param = new SWEKParam(parameter.getParameterName(), pval, operand);
-            FilterManager.addFilter(group, parameter, param);
+            FilterManager.addFilter(supplier, parameter, param);
         }
     }
 
