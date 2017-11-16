@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.gui;
+package org.helioviewer.jhv.data.gui.info;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
