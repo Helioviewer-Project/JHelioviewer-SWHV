@@ -2,11 +2,14 @@ package org.helioviewer.jhv.data.event;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.data.event.filter.FilterDialog;
+
 public class SWEKTreeModelElement {
 
     private boolean selected;
     protected ImageIcon icon;
     protected String name;
+    protected FilterDialog filterDialog;
 
     public boolean isSelected() {
         return selected;
@@ -22,6 +25,10 @@ public class SWEKTreeModelElement {
 
     public String getName() {
         return name;
+    }
+
+    public FilterDialog getFilterDialog() {
+        return filterDialog;
     }
 
 }

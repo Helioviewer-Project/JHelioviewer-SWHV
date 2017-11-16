@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.view.filter;
+package org.helioviewer.jhv.data.event.filter;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,11 +13,9 @@ import org.helioviewer.jhv.data.event.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
-import org.helioviewer.jhv.plugins.swek.download.FilterManager;
-import org.helioviewer.jhv.plugins.swek.view.FilterDialog;
 
 @SuppressWarnings("serial")
-public class FilterPanel extends JPanel {
+class FilterPanel extends JPanel {
 
     private final JLabel label;
     private final JSpinner spinner;

@@ -2,6 +2,8 @@ package org.helioviewer.jhv.data.event;
 
 import java.util.HashMap;
 
+import org.helioviewer.jhv.data.event.filter.FilterDialog;
+
 public class SWEKSupplier extends SWEKTreeModelElement {
 
     private final String supplierName;
@@ -27,6 +29,8 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         suppliers.put(key, this);
 
         isCactus = name == "CACTus" && source.getName() == "HEK"; // interned
+        if (group.containsFilter())
+            filterDialog = new FilterDialog(this);
     }
 
     public static SWEKSupplier getSupplier(String name) {

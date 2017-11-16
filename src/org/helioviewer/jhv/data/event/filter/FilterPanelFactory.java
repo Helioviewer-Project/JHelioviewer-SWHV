@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.view.filter;
+package org.helioviewer.jhv.data.event.filter;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -13,9 +13,8 @@ import org.helioviewer.jhv.data.event.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.plugins.swek.view.FilterDialog;
 
-public class FilterPanelFactory {
+class FilterPanelFactory {
 
     private static String getSpinnerFormat(double minimumValue, double maximumValue) {
         StringBuilder spinnerFormat = new StringBuilder("0");

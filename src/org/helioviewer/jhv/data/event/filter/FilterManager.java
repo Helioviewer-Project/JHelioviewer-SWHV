@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.download;
+package org.helioviewer.jhv.data.event.filter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
