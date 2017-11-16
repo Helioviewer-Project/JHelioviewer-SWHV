@@ -52,6 +52,7 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     private static void stopDownloadingGroup(SWEKGroup group, boolean keepActive) {
         for (SWEKSupplier supplier : group.getSuppliers()) {
             stopDownloadingEventType(supplier, keepActive);
+            JHVEventCache.reset(supplier);
         }
     }
 
@@ -96,7 +97,6 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     @Override
     public void filtersChanged(SWEKGroup group) {
         stopDownloadingGroup(group, true);
-        JHVEventCache.reset(group);
         downloadSelectedSuppliers(group);
     }
 
