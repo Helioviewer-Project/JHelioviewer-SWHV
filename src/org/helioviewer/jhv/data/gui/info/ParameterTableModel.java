@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.gui.model;
+package org.helioviewer.jhv.data.gui.info;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -6,7 +6,7 @@ import org.helioviewer.jhv.data.event.JHVEventParameter;
 
 // The model for parameter table panel
 @SuppressWarnings("serial")
-public class ParameterTableModel extends AbstractTableModel {
+class ParameterTableModel extends AbstractTableModel {
 
     private final JHVEventParameter[] parameters;
 

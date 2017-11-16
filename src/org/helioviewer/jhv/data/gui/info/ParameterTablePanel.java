@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.gui;
+package org.helioviewer.jhv.data.gui.info;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -21,7 +21,6 @@ import javax.swing.table.TableRowSorter;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
-import org.helioviewer.jhv.data.gui.model.ParameterTableModel;
 
 @SuppressWarnings("serial")
 class ParameterTablePanel extends JPanel implements MouseListener, MouseMotionListener {

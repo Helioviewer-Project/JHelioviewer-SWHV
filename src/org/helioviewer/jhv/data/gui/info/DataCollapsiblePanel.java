@@ -1,13 +1,12 @@
-package org.helioviewer.jhv.data.gui;
+package org.helioviewer.jhv.data.gui.info;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
-import org.helioviewer.jhv.data.gui.model.DataCollapsiblePanelModel;
 import org.helioviewer.jhv.gui.components.CollapsiblePane;
 
 @SuppressWarnings("serial")
-public class DataCollapsiblePanel extends CollapsiblePane {
+class DataCollapsiblePanel extends CollapsiblePane {
 
     private boolean isExpanded;
 
