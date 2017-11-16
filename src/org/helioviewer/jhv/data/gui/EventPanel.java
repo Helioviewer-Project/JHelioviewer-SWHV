@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.view;
+package org.helioviewer.jhv.data.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -20,8 +20,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
-import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
-import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
