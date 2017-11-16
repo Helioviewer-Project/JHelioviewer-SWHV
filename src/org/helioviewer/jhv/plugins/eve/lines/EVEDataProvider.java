@@ -60,7 +60,7 @@ public class EVEDataProvider implements BandDataProvider {
         return intervals;
     }
 
-    private static void addFutureJobs(List<Future<?>> newFutureJobs, Band band) {
+    private static void addFutureJobs(Band band, List<Future<?>> newFutureJobs) {
         List<Future<?>> fl = futureJobs.get(band);
         if (fl == null)
             futureJobs.put(band, newFutureJobs);
@@ -80,7 +80,7 @@ public class EVEDataProvider implements BandDataProvider {
             dl.add(interval);
             fj.add(EVEPlugin.executorService.submit(new DownloadThread(band, interval)));
         }
-        addFutureJobs(fj, band);
+        addFutureJobs(band, fj);
     }
 
     static void downloadFinished(Band band, Interval interval) {
