@@ -18,14 +18,6 @@ class DownloadThread extends JHVWorker<EVEResponse, Void> {
         band = _band;
     }
 
-    Interval getInterval() {
-        return interval;
-    }
-
-    Band getBand() {
-        return band;
-    }
-
     @Override
     protected EVEResponse backgroundWork() {
         try {

@@ -44,13 +44,7 @@ public class EVEDataProvider implements BandDataProvider {
                 return;
             }
 
-            DownloadThread[] jobs = new DownloadThread[n];
-            int i = 0;
-            for (Interval interval : intervals) {
-                jobs[i] = new DownloadThread(band, interval);
-                ++i;
-            }
-            addFutureJobs(addDownloads(jobs), band);
+            addFutureJobs(addDownloads(band, intervals), band);
         }
     }
 
@@ -75,21 +69,18 @@ public class EVEDataProvider implements BandDataProvider {
         return intervals;
     }
 
-    private static List<Future<?>> addDownloads(DownloadThread[] jobs) {
-        List<Future<?>> futureJobs = new ArrayList<>();
-        for (DownloadThread job : jobs) {
-            Band band = job.getBand();
-            Interval interval = job.getInterval();
-
+    private static List<Future<?>> addDownloads(Band band, List<Interval> intervals) {
+        List<Future<?>> fj = new ArrayList<>();
+        for (Interval interval : intervals) {
             List<Interval> list = downloadMap.get(band);
             if (list == null)
                 list = new ArrayList<>();
             list.add(interval);
 
             downloadMap.put(band, list);
-            futureJobs.add(EVEPlugin.executorService.submit(job));
+            fj.add(EVEPlugin.executorService.submit(new DownloadThread(band, interval)));
         }
-        return futureJobs;
+        return fj;
     }
 
     static void downloadFinished(Band band, Interval interval) {

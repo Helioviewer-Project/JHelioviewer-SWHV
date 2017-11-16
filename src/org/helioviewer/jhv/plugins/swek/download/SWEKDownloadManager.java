@@ -65,7 +65,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
             ArrayList<DownloadWorker> dwMapOnDate = dwMap.get(group);
             for (Iterator<DownloadWorker> it = dwMapOnDate.iterator(); it.hasNext();) {
                 DownloadWorker dw = it.next();
-                if (dw.getSupplier().equals(supplier)) {
+                if (dw.getSupplier() == supplier) {
                     dw.stopWorker();
                     JHVEventCache.intervalsNotDownloaded(dw.getSupplier(), dw.getRequestInterval());
                     it.remove();
