@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
@@ -22,10 +20,10 @@ public class JHVEventCache {
     private static final double factor = 0.2;
 
     private static final HashSet<JHVEventHandler> cacheEventHandlers = new HashSet<>();
-    private static final Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
-    private static final Map<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
-    private static final Set<SWEKSupplier> activeEventTypes = new HashSet<>();
-    private static final Map<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
+    private static final HashMap<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = new HashMap<>();
+    private static final HashMap<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
+    private static final HashSet<SWEKSupplier> activeEventTypes = new HashSet<>();
+    private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
     private static final ArrayList<JHVAssociation> assocs = new ArrayList<>();
 
     private static JHVEventCacheRequestHandler incomingRequestManager;
@@ -150,8 +148,8 @@ public class JHVEventCache {
     }
 
     public static JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
-        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<>();
-        Map<SWEKSupplier, List<Interval>> missingIntervals = new HashMap<>();
+        HashMap<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<>();
+        HashMap<SWEKSupplier, List<Interval>> missingIntervals = new HashMap<>();
 
         for (SWEKSupplier evt : activeEventTypes) {
             SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
