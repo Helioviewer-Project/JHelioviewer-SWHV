@@ -51,6 +51,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
 
     private SWEKDownloadManager() {
         JHVEventCache.registerHandler(this);
+        FilterManager.addFilterManagerListener(this);
     }
 
     private static void stopDownloadingGroup(SWEKGroup group, boolean keepActive) {
