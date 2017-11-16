@@ -44,17 +44,8 @@ public class EVEDataProvider implements BandDataProvider {
                 return;
             }
 
-            addFutureJobs(addDownloads(band, intervals), band);
+            addDownloads(band, intervals);
         }
-    }
-
-    private static void addFutureJobs(List<Future<?>> newFutureJobs, Band band) {
-        List<Future<?>> fj = new ArrayList<>();
-        if (futureJobs.containsKey(band)) {
-            fj = futureJobs.get(band);
-        }
-        fj.addAll(newFutureJobs);
-        futureJobs.put(band, fj);
     }
 
     private static ArrayList<Interval> getIntervals(Band band, long start, long end) {
@@ -69,18 +60,27 @@ public class EVEDataProvider implements BandDataProvider {
         return intervals;
     }
 
-    private static List<Future<?>> addDownloads(Band band, List<Interval> intervals) {
-        List<Future<?>> fj = new ArrayList<>();
-        for (Interval interval : intervals) {
-            List<Interval> list = downloadMap.get(band);
-            if (list == null)
-                list = new ArrayList<>();
-            list.add(interval);
+    private static void addFutureJobs(List<Future<?>> newFutureJobs, Band band) {
+        List<Future<?>> fl = futureJobs.get(band);
+        if (fl == null)
+            futureJobs.put(band, newFutureJobs);
+        else
+            fl.addAll(newFutureJobs);
+    }
 
-            downloadMap.put(band, list);
+    private static void addDownloads(Band band, List<Interval> intervals) {
+        List<Future<?>> fj = new ArrayList<>();
+        List<Interval> dl = downloadMap.get(band);
+        if (dl == null) {
+            dl = new ArrayList<>();
+            downloadMap.put(band, dl);
+        }
+
+        for (Interval interval : intervals) {
+            dl.add(interval);
             fj.add(EVEPlugin.executorService.submit(new DownloadThread(band, interval)));
         }
-        return fj;
+        addFutureJobs(fj, band);
     }
 
     static void downloadFinished(Band band, Interval interval) {
