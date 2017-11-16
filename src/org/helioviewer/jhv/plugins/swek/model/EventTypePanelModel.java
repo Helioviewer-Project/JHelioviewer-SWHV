@@ -4,10 +4,8 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import org.helioviewer.jhv.data.event.SWEKDownloadManager;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
-import org.json.JSONObject;
 
 public class EventTypePanelModel implements TreeModel {
 
@@ -23,29 +21,6 @@ public class EventTypePanelModel implements TreeModel {
 
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
-    }
-
-    public void selectGroup(SWEKGroup group, boolean selected) {
-        group.setSelected(selected);
-        for (SWEKSupplier supplier : group.getSuppliers()) {
-            supplier.setSelected(selected);
-            SWEKDownloadManager.activateSupplier(supplier, selected);
-        }
-    }
-
-    public void selectSupplier(SWEKSupplier supplier, boolean selected) {
-        supplier.setSelected(selected);
-        if (selected) {
-            group.setSelected(true);
-        } else {
-            boolean groupSelected = false;
-            for (SWEKSupplier stms : group.getSuppliers()) {
-                groupSelected |= stms.isSelected();
-            }
-            // SWEKTreeModel.setStopLoading(group);
-            group.setSelected(groupSelected);
-        }
-        SWEKDownloadManager.activateSupplier(supplier, selected);
     }
 
     @Override
@@ -78,22 +53,6 @@ public class EventTypePanelModel implements TreeModel {
 
     @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
-    }
-
-    public void serialize(JSONObject jo) {
-        JSONObject go = new JSONObject();
-        for (SWEKSupplier supplier : group.getSuppliers()) {
-            go.put(supplier.getName(), supplier.isSelected());
-        }
-        jo.put(group.getName(), go);
-    }
-
-    public void deserialize(JSONObject jo) {
-        JSONObject go = jo.optJSONObject(group.getName());
-        if (go != null)
-            for (SWEKSupplier supplier : group.getSuppliers()) {
-                selectSupplier(supplier, go.optBoolean(supplier.getName(), false));
-            }
     }
 
 }
