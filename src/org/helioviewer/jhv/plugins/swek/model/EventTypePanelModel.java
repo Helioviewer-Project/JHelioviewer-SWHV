@@ -4,9 +4,9 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import org.helioviewer.jhv.data.event.SWEKDownloadManager;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
-import org.helioviewer.jhv.plugins.swek.download.SWEKDownloadManager;
 import org.json.JSONObject;
 
 public class EventTypePanelModel implements TreeModel {
