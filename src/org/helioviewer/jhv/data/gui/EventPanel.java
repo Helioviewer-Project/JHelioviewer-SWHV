@@ -21,7 +21,6 @@ import org.helioviewer.jhv.data.event.SWEKDownloadManager;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModel;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
@@ -40,7 +39,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         setLayout(new BorderLayout());
         SWEKTreeModel.addSWEKTreeModelListener(this);
 
-        JTree eventTypeTree = new JTree(new EventTypePanelModel(group));
+        JTree eventTypeTree = new JTree(new EventPanelModel(group));
         eventTypeTree.setEditable(true);
         eventTypeTree.setShowsRootHandles(true);
         eventTypeTree.setSelectionModel(null);
@@ -122,7 +121,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
 
     private class MyTreeCellEditor extends DefaultTreeCellEditor  {
 
-        public MyTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
+        MyTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
             super(tree, renderer);
         }
 
