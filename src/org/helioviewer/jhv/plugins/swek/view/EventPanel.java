@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EventObject;
@@ -58,11 +57,11 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
 
         add(eventTypeTree, BorderLayout.CENTER);
 
-        JPanel filterPanel = new JPanel(new FlowLayout());
-        filterPanel.setBackground(eventTypeTree.getBackground());
-        filterPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
-        filterPanel.add(layer);
-        add(filterPanel, BorderLayout.LINE_END);
+        JPanel busyPanel = new JPanel();
+        busyPanel.setBackground(eventTypeTree.getBackground());
+        busyPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
+        busyPanel.add(layer);
+        add(busyPanel, BorderLayout.LINE_END);
     }
 
     @Override
