@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.download;
+package org.helioviewer.jhv.data.event;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
@@ -6,20 +6,15 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.cache.JHVEventCache;
-import org.helioviewer.jhv.data.event.JHVAssociation;
-import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.SWEKParam;
-import org.helioviewer.jhv.data.event.SWEKSource;
-import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 
-class DownloadWorker implements Runnable {
+class SWEKDownloadWorker implements Runnable {
 
     private final SWEKSupplier supplier;
     private final List<SWEKParam> params;
     private final Interval requestInterval;
 
-    DownloadWorker(SWEKSupplier _supplier, Interval _interval, List<SWEKParam> _params) {
+    SWEKDownloadWorker(SWEKSupplier _supplier, Interval _interval, List<SWEKParam> _params) {
         requestInterval = _interval;
         supplier = _supplier;
         params = _params;
