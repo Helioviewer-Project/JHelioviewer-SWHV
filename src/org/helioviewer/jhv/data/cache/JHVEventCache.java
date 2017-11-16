@@ -47,15 +47,11 @@ public class JHVEventCache {
         for (SWEKSupplier eventType : result.getMissingIntervals().keySet()) {
             List<Interval> missingList = result.getMissingIntervals().get(eventType);
             for (Interval missing : missingList) {
-                requestEvents(eventType, missing);
+                incomingRequestManager.handleRequestForInterval(eventType, missing);
             }
         }
 
         handler.newEventsReceived();
-    }
-
-    public static void finishedDownload() {
-        fireEventCacheChanged();
     }
 
     public static void removeEvents(SWEKSupplier eventType, boolean keepActive) {
@@ -63,11 +59,7 @@ public class JHVEventCache {
         fireEventCacheChanged();
     }
 
-    private static void requestEvents(SWEKSupplier eventType, Interval interval) {
-        incomingRequestManager.handleRequestForInterval(eventType, interval);
-    }
-
-    private static void fireEventCacheChanged() {
+    public static void fireEventCacheChanged() {
         for (JHVEventHandler handler : cacheEventHandlers) {
             handler.cacheUpdated();
         }
