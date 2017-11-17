@@ -101,6 +101,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
                 }
             });
             leaf.add(filterButton, BorderLayout.LINE_END);
+            leaf.setPreferredSize(new Dimension(250, -1)); //!
         }
 
         ComponentUtils.smallVariant(leaf);
