@@ -231,7 +231,6 @@ public class SWEKEventInformationDialog extends JDialog implements DataCollapsib
                     repaint();
                 } catch (InterruptedException | ExecutionException ignore) {
                 }
-
             }
         };
         JHVGlobals.getExecutorService().execute(worker);

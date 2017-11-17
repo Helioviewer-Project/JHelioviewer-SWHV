@@ -12,7 +12,7 @@ class DataCollapsiblePanel extends CollapsiblePane {
 
     private final DataCollapsiblePanelModel model;
 
-    public DataCollapsiblePanel(String title, Component component, boolean startExpanded, DataCollapsiblePanelModel _model) {
+    DataCollapsiblePanel(String title, Component component, boolean startExpanded, DataCollapsiblePanelModel _model) {
         super(title, component, startExpanded);
         isExpanded = startExpanded;
         model = _model;
@@ -25,7 +25,7 @@ class DataCollapsiblePanel extends CollapsiblePane {
         model.repackCollapsiblePanels();
     }
 
-    public boolean isExpanded() {
+    boolean isExpanded() {
         return isExpanded;
     }
 
