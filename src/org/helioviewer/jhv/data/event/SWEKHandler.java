@@ -47,4 +47,6 @@ public abstract class SWEKHandler {
 
     protected abstract String createURL(SWEKGroup group, long start, long end, List<SWEKParam> params, int page);
 
+    public abstract JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException;
+
 }

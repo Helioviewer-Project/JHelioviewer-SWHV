@@ -13,6 +13,7 @@ import java.util.Map;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
+import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKHandler;
 import org.helioviewer.jhv.data.event.SWEKParam;
@@ -22,6 +23,7 @@ import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 @SuppressWarnings("unchecked")
@@ -79,7 +81,7 @@ public class HEKHandler extends SWEKHandler {
                         }
                     }
                 }
-            } catch (Exception e) {
+            } catch (JSONException e) {
                 return false;
             }
 
@@ -134,6 +136,16 @@ public class HEKHandler extends SWEKHandler {
             }
         }
         return baseURL;
+    }
+
+    @Override
+    public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
+        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
+
+        HEKParser.parseResult(json, currentEvent, full);
+        currentEvent.finishParams();
+
+        return currentEvent;
     }
 
 }

@@ -4,25 +4,13 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import org.helioviewer.jhv.data.event.JHVEvent;
-import org.helioviewer.jhv.data.event.SWEKParser;
-import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ComesepParser implements SWEKParser {
+public class ComesepParser {
 
-    @Override
-    public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
-        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
-
-        parseResult(json, currentEvent);
-        currentEvent.finishParams();
-
-        return currentEvent;
-    }
-
-    private static void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
+    static void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
         Iterator<String> keys = result.keys();
         while (keys.hasNext()) {
             String key = keys.next();

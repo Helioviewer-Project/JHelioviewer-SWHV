@@ -27,7 +27,6 @@ import org.helioviewer.jhv.data.event.JHVAssociation;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKParam;
-import org.helioviewer.jhv.data.event.SWEKParser;
 import org.helioviewer.jhv.data.event.SWEKRelatedEvents;
 import org.helioviewer.jhv.data.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
@@ -426,8 +425,7 @@ public class EventDatabase {
     }
 
     private static JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) {
-        SWEKParser parser = jsonEvent.type.getSource().getParser();
-        return parser.parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
+        return jsonEvent.type.getSource().getHandler().parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
     }
 
     private static ArrayList<JHVEvent> createUniqueList(ArrayList<JHVEvent> events) {
