@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.view;
+package org.helioviewer.jhv.plugins.swek.renderable;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -34,7 +34,6 @@ public class EventTimelineRenderable extends AbstractTimelineRenderable implemen
     private static int highlightedEventPosition = -1;
 
     public EventTimelineRenderable() {
-
     }
 
     public EventTimelineRenderable(JSONObject jo) {
