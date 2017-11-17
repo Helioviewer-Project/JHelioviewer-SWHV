@@ -12,9 +12,9 @@ import org.helioviewer.jhv.log.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public abstract class SWEKDownloader {
+public abstract class SWEKHandler {
 
-    public boolean extern2db(SWEKSupplier supplier, long start, long end, List<SWEKParam> params) {
+    public boolean remote2db(SWEKSupplier supplier, long start, long end, List<SWEKParam> params) {
         ArrayList<Interval> range = EventDatabase.db2daterange(supplier);
         for (Interval interval : range) {
             if (interval.start <= start && interval.end >= end) {
@@ -29,7 +29,7 @@ public abstract class SWEKDownloader {
             while (overmax && success) {
                 JSONObject eventJSON = JSONUtils.getJSONStream(new DownloadStream(createURL(supplier.getGroup(), start, end, params, page)).getInput());
                 overmax = eventJSON.optBoolean("overmax", false);
-                success = parseEvents(eventJSON, supplier) && parseAssociations(eventJSON);
+                success = parseRemote(eventJSON, supplier) && parseAssociations(eventJSON);
                 page++;
             }
             return success;
@@ -41,7 +41,7 @@ public abstract class SWEKDownloader {
         return false;
     }
 
-    protected abstract boolean parseEvents(JSONObject eventJSON, SWEKSupplier supplier);
+    protected abstract boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier);
 
     protected abstract boolean parseAssociations(JSONObject eventJSON);
 

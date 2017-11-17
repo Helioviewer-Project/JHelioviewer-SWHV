@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.data.event.SWEKDownloader;
 import org.helioviewer.jhv.data.event.SWEKGroup;
+import org.helioviewer.jhv.data.event.SWEKHandler;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -18,12 +18,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 @SuppressWarnings("unchecked")
-public class ComesepDownloader extends SWEKDownloader {
+public class ComesepHandler extends SWEKHandler {
 
     private static final String _baseurl = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
-    protected boolean parseEvents(JSONObject eventJSON, SWEKSupplier supplier) {
+    protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
         JSONArray results = eventJSON.getJSONArray("results");
         try {
             ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();

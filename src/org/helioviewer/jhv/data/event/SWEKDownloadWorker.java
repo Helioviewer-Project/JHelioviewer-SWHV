@@ -27,7 +27,7 @@ class SWEKDownloadWorker implements Runnable {
     @Override
     public void run() {
         SWEKSource swekSource = supplier.getSource();
-        boolean success = swekSource.getDownloader().extern2db(supplier, requestInterval.start, requestInterval.end, params);
+        boolean success = swekSource.getHandler().remote2db(supplier, requestInterval.start, requestInterval.end, params);
         if (success) {
             ArrayList<JHVAssociation> assocList = EventDatabase.associations2Program(requestInterval.start, requestInterval.end, supplier);
             ArrayList<JHVEvent> eventList = EventDatabase.events2Program(requestInterval.start, requestInterval.end, supplier, params);

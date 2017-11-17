@@ -13,8 +13,8 @@ import java.util.Map;
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.conversion.GOESLevel;
-import org.helioviewer.jhv.data.event.SWEKDownloader;
 import org.helioviewer.jhv.data.event.SWEKGroup;
+import org.helioviewer.jhv.data.event.SWEKHandler;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -25,12 +25,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 @SuppressWarnings("unchecked")
-public class HEKDownloader extends SWEKDownloader {
+public class HEKHandler extends SWEKHandler {
 
     private static final String _baseURL = "http://www.lmsal.com/hek/her?";
 
     @Override
-    protected boolean parseEvents(JSONObject eventJSON, SWEKSupplier supplier) {
+    protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
         JSONArray results = eventJSON.getJSONArray("result");
         ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
 
