@@ -37,9 +37,7 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
             for (FilterPanel afp : filterPanels) {
                 afp.addFilter();
             }
-            for (FilterPanel afp : filterPanels) {
-                afp.fireFilter();
-            }
+            FilterManager.fireFilters(supplier);
             applyButton.setEnabled(false);
         });
         filterPanel.add(applyButton);
