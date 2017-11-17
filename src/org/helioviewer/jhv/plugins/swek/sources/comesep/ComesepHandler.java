@@ -11,7 +11,6 @@ import org.helioviewer.jhv.data.event.SWEKHandler;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,8 +24,8 @@ public class ComesepHandler extends SWEKHandler {
     @Override
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
         JSONArray results = eventJSON.getJSONArray("results");
+        ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
         try {
-            ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
             for (int i = 0; i < results.length(); i++) {
                 JSONObject result = results.getJSONObject(i);
                 byte[] compressed = JSONUtils.compressJSON(result);
@@ -42,13 +41,7 @@ public class ComesepHandler extends SWEKHandler {
                 String uid = result.getString("alertid");
                 event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, new ArrayList<>()));
             }
-
-            int[] ids = EventDatabase.dump_event2db(event2db_list, supplier);
-            for (int id : ids) {
-                if (id == -1) {
-                    Log.error("failed to dump to database");
-                }
-            }
+            EventDatabase.dump_event2db(event2db_list, supplier);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

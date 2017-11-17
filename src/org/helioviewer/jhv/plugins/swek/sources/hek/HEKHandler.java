@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +19,6 @@ import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,31 +33,20 @@ public class HEKHandler extends SWEKHandler {
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
         JSONArray results = eventJSON.getJSONArray("result");
         ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
+        try {
+            for (int i = 0; i < results.length(); i++) {
+                JSONObject result = results.getJSONObject(i);
+                byte[] compressed = JSONUtils.compressJSON(result);
 
-        for (int i = 0; i < results.length(); i++) {
-            JSONObject result = results.getJSONObject(i);
-            byte[] compressed;
-            try {
-                compressed = JSONUtils.compressJSON(result);
-            } catch (IOException e) {
-                Log.error("compression error");
-                return false;
-            }
+                if (result.has("fl_goescls"))
+                    result.put("JHV_GOESClass", GOESLevel.getFloatValue(result.getString("fl_goescls")));
 
-            if (result.has("fl_goescls"))
-                result.put("JHV_GOESClass", GOESLevel.getFloatValue(result.getString("fl_goescls")));
+                long start = TimeUtils.parse(result.getString("event_starttime"));
+                long end = TimeUtils.parse(result.getString("event_endtime"));
+                long archiv = TimeUtils.parse(result.getString("kb_archivdate"));
+                String uid = result.getString("kb_archivid");
 
-            String uid;
-            long start;
-            long end;
-            long archiv;
-            ArrayList<JHVDatabaseParam> paramList = new ArrayList<>();
-            try {
-                start = TimeUtils.parse(result.getString("event_starttime"));
-                end = TimeUtils.parse(result.getString("event_endtime"));
-                archiv = TimeUtils.parse(result.getString("kb_archivdate"));
-                uid = result.getString("kb_archivid");
-
+                ArrayList<JHVDatabaseParam> paramList = new ArrayList<>();
                 HashMap<String, String> dbFields = supplier.getGroup().getAllDatabaseFields();
                 for (Map.Entry<String, String> entry : dbFields.entrySet()) {
                     String dbType = entry.getValue();
@@ -81,15 +68,12 @@ public class HEKHandler extends SWEKHandler {
                         }
                     }
                 }
-            } catch (Exception e) {
-                return false;
+                event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, paramList));
             }
-
-            event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, paramList));
+            EventDatabase.dump_event2db(event2db_list, supplier);
+        } catch (Exception e) {
+            return false;
         }
-
-        EventDatabase.dump_event2db(event2db_list, supplier);
-
         return true;
     }
 
