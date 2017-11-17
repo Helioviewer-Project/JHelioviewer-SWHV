@@ -425,7 +425,8 @@ public class EventDatabase {
     }
 
     private static JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) {
-        return jsonEvent.type.getSource().getHandler().parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
+        return jsonEvent.type.getSource().getHandler().parseEventJSON(JSONUtils.getJSONStream(GZIPUtils.decompress(jsonEvent.json)),
+            jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
     }
 
     private static ArrayList<JHVEvent> createUniqueList(ArrayList<JHVEvent> events) {

@@ -81,7 +81,7 @@ public class HEKHandler extends SWEKHandler {
                         }
                     }
                 }
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 return false;
             }
 
