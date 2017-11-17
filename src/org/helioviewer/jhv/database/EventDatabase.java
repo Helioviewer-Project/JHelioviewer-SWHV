@@ -627,11 +627,11 @@ public class EventDatabase {
     }
 
     private static class JsonEvent {
-        public final int id;
-        public final byte[] json;
-        public final SWEKSupplier type;
-        public final long start;
-        public final long end;
+        final int id;
+        final byte[] json;
+        final SWEKSupplier type;
+        final long start;
+        final long end;
 
         JsonEvent(byte[] _json, SWEKSupplier _type, int _id, long _start, long _end) {
             start = _start;

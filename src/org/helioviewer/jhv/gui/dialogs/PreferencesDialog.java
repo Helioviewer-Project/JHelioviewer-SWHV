@@ -231,7 +231,7 @@ public class PreferencesDialog extends StandardDialog implements ShowableDialog 
             add(scrollPane, BorderLayout.CENTER);
         }
 
-        public void saveSettings() {
+        void saveSettings() {
             Settings settings = Settings.getSingletonInstance();
             if (model.getValueAt(0, 1) instanceof String)
                 settings.setProperty("default.save.path", (String) model.getValueAt(0, 1));

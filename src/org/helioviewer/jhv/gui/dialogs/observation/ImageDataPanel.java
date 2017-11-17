@@ -213,7 +213,7 @@ public class ImageDataPanel extends JPanel {
         }
 
         // Returns the number of seconds of the selected cadence
-        public int getCadence() {
+        int getCadence() {
             int value = (Integer) spinnerCadence.getValue();
 
             switch (comboUnit.getSelectedIndex()) {
@@ -230,7 +230,7 @@ public class ImageDataPanel extends JPanel {
             }
         }
 
-        public void setCadence(int value) {
+        void setCadence(int value) {
             if (value == APIRequest.CADENCE_ANY)
                 comboUnit.setSelectedItem(timeStepUnitStrings[4]);
             else if (value / 86400 != 0) {

@@ -52,7 +52,7 @@ public class SpaceObject {
         return objectMap.get(obj);
     }
 
-    SpaceObject(String _urlName, String _name, double _radius, float[] _color, Border _border) {
+    private SpaceObject(String _urlName, String _name, double _radius, float[] _color, Border _border) {
         urlName = _urlName;
         name = _name;
         radius = _radius;

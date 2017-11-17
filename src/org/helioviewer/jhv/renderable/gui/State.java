@@ -35,7 +35,7 @@ public class State {
         }
     }
 
-    public static JSONObject toJson() {
+    private static JSONObject toJson() {
         JSONObject main = new JSONObject();
         main.put("time", Layers.getLastUpdatedTimestamp());
         main.put("play", Layers.isMoviePlaying());
