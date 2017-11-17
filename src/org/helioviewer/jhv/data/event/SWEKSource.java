@@ -6,23 +6,16 @@ public class SWEKSource {
 
     private final String name;
     private final List<SWEKParameter> generalParameters;
-
-    private final SWEKParser parser;
     private final SWEKHandler handler;
 
-    public SWEKSource(String _name, List<SWEKParameter> _generalParameters, SWEKParser _parser, SWEKHandler _handler) {
+    public SWEKSource(String _name, List<SWEKParameter> _generalParameters, SWEKHandler _handler) {
         name = _name.intern();
         generalParameters = _generalParameters;
-        parser = _parser;
         handler = _handler;
     }
 
     public String getName() {
         return name;
-    }
-
-    public SWEKParser getParser() {
-        return parser;
     }
 
     public SWEKHandler getHandler() {

@@ -14,8 +14,6 @@ import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.event.SWEKParameter;
-import org.helioviewer.jhv.data.event.SWEKParser;
-import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVDate;
@@ -23,21 +21,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class HEKParser implements SWEKParser {
+public class HEKParser {
 
     private static final ThreadLocal<DecimalFormat> formatter1 = ThreadLocal.withInitial(() -> MathUtils.numberFormatter("0", 1));
 
-    @Override
-    public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
-        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
-
-        parseResult(json, currentEvent, full);
-        currentEvent.finishParams();
-
-        return currentEvent;
-    }
-
-    private static void parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
+    static void parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
         List<Vec3> hgsBoundedBox = null;
         List<Vec3> hgsBoundCC = null;
         Vec3 hgsCentralPoint = null;

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.Pair;
+import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKHandler;
 import org.helioviewer.jhv.data.event.SWEKParam;
@@ -93,6 +94,16 @@ public class ComesepHandler extends SWEKHandler {
             }
         }
         return baseURL.append("model=").append(model);
+    }
+
+    @Override
+    public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
+        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
+
+        ComesepParser.parseResult(json, currentEvent);
+        currentEvent.finishParams();
+
+        return currentEvent;
     }
 
 }
