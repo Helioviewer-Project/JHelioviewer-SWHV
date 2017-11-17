@@ -31,10 +31,11 @@ public class HEKHandler extends SWEKHandler {
 
     @Override
     protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
-        JSONArray results = eventJSON.getJSONArray("result");
-        ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
         try {
-            for (int i = 0; i < results.length(); i++) {
+            JSONArray results = eventJSON.getJSONArray("result");
+            int len = results.length();
+            ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>(len);
+            for (int i = 0; i < len; i++) {
                 JSONObject result = results.getJSONObject(i);
                 byte[] compressed = JSONUtils.compressJSON(result);
 
