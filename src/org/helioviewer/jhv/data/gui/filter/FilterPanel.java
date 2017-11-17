@@ -55,10 +55,6 @@ class FilterPanel extends JPanel {
         add(spinner, c);
     }
 
-    void removeFilter() {
-        FilterManager.removeFilters(supplier);
-    }
-
     void addFilter() {
         if (enabled) {
             Object oval = spinner.getValue();
