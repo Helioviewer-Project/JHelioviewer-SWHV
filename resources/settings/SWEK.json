@@ -8,176 +8,132 @@
                     "source"                    : "HEK",
                     "parameter_name"            : "event_description",
                     "parameter_display_name"    : "Event Description",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "event_title",
                     "parameter_display_name"    : "Event Title",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_PeakTime",
                     "parameter_display_name"    : "Event Peak Time",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_MeanWavel",
                     "parameter_display_name"    : "Mean Wavelength",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_Type",
-                    "parameter_display_name"    : "Event Type",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Type"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_CoordSys",
-                    "parameter_display_name"    : "Coordinate System",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Coordinate System"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_CoordUnit",
-                    "parameter_display_name"    : "Coordinate Unit",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Coordinate Unit"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_Coord1",
-                    "parameter_display_name"    : "Coordinate 1",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Coordinate 1"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_Coord2",
-                    "parameter_display_name"    : "Coordinate 2",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Coordinate 2"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_Coord3",
-                    "parameter_display_name"    : "Coordinate 3",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Coordinate 3"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_ClippedSpatial",
-                    "parameter_display_name"    : "Clipped Spatial",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Clipped Spatial"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_ClippedTemporal",
-                    "parameter_display_name"    : "Clipped Temporal",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Clipped Temporal"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_TestFlag",
-                    "parameter_display_name"    : "Test Flag",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Test Flag"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FRM_Institute",
-                    "parameter_display_name"    : "Institute",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Institute"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FRM_Name",
-                    "parameter_display_name"    : "From Name",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "From Name"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Bound_CCNsteps",
-                    "parameter_display_name"    : "CCN Steps",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "CCN Steps"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Bound_CCStartC1",
-                    "parameter_display_name"    : "CC Start C1",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "CC Start C1"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Bound_CCStartC2",
-                    "parameter_display_name"    : "CC Start C2",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "CC Start C2"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Bound_ChainCode",
-                    "parameter_display_name"    : "Chain Code",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Chain Code"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "BoundBox_C1LL",
-                    "parameter_display_name"    : "Bound Box C1LL",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Bound Box C1LL"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "BoundBox_C2LL",
-                    "parameter_display_name"    : "Bound Box C2LL",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Bound Box C2LL"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Bound Box",
-                    "parameter_display_name"    : "Bound Box",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Bound Box"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "GS_ImageURL",
                     "parameter_display_name"    : "Context Image",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "GS_MovieURL",
                     "parameter_display_name"    : "Context Movie",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "GS_ThumbURL",
-                    "parameter_display_name"    : "Context Thumbnail",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Context Thumbnail"
                 }
             ]
         },{
@@ -188,78 +144,62 @@
                     "source"                    : "COMESEP",
                     "parameter_name"            : "atearliest",
                     "parameter_display_name"    : "Event Time at Earliest",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "atstrongest",
                     "parameter_display_name"    : "Event Time at Strongest",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "atlatest",
                     "parameter_display_name"    : "Event Time at Latest",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "emitter",
                     "parameter_display_name"    : "Emitter",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "emitter_href",
-                    "parameter_display_name"    : "Emitter URL",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Emitter URL"
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "emitter_verion",
-                    "parameter_display_name"    : "Emitter Version",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Emitter Version"
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "subject",
                     "parameter_display_name"    : "Subject",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "target",
                     "parameter_display_name"    : "Target",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "action",
-                    "parameter_display_name"    : "Action",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Action"
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "alertid",
-                    "parameter_display_name"    : "Alert ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Alert ID"
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "alert_version",
-                    "parameter_display_name"    : "Alert Version",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Alert Version"
                 }
             ]
         }
@@ -286,43 +226,34 @@
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_NOAANum",
                     "parameter_display_name"    : "NOAA Number",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_McIntoshCls",
                     "parameter_display_name"    : "McIntosh Classification",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_MtWilsonCls",
                     "parameter_display_name"    : "Mount Wilson Classification",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_CompactnessCls",
-                    "parameter_display_name"    : "Compactness Classification",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Compactness Classification"
                 }
             ],
             "icon" : "iconbank://ActiveRegion"
@@ -341,43 +272,34 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVel",
                     "parameter_display_name"    : "Radial Linear Velocity",
-                    "filter"                    : 
+                    "filter"                    :
                         {
                             "filter_type"   : "doubleminmaxfilter",
                             "min"           : 0,
@@ -393,64 +315,48 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVelUncert",
-                    "parameter_display_name"    : "Radial Linear Velocity Uncertainty",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Radial Linear Velocity Uncertainty"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVelMin",
-                    "parameter_display_name"    : "Minimum Radial Linear Velocity",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Minimum Radial Linear Velocity"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVelMax",
-                    "parameter_display_name"    : "Maximum Radial Linear Velocity",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Maximum Radial Linear Velocity"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVelStddev",
-                    "parameter_display_name"    : "Radial Linear Velocity Standard Deviation",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Radial Linear Velocity Standard Deviation"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_Accel",
-                    "parameter_display_name"    : "Acceleration",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Acceleration"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_AccelUncert",
-                    "parameter_display_name"    : "Acceleration Uncertainty",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Acceleration Uncertainty"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_Mass",
-                    "parameter_display_name"    : "Mass",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Mass"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_AngularWidth",
                     "parameter_display_name"    : "Angular Width",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_Coord1",
                     "parameter_display_name"    : "Principal Angle",
-                    "filter"                    : null,
                     "default_visible"           : true
                 }
             ],
@@ -476,50 +382,39 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CD_Area",
                     "parameter_display_name"    : "Area",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CD_Volume",
                     "parameter_display_name"    : "Volume",
-                    "filter"                    : null,
                     "default_visible"           : true
                 }
             ],
@@ -539,37 +434,28 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 }
             ],
             "icon" : "iconbank://CoronalHole"
@@ -588,37 +474,28 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 }
             ],
             "icon" : "iconbank://CoronalWave"
@@ -637,57 +514,45 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FI_Length",
                     "parameter_display_name"    : "Length",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FI_Tilt",
                     "parameter_display_name"    : "Tilt",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FI_Chirality",
                     "parameter_display_name"    : "Chirality",
-                    "filter"                    : null,
                     "default_visible"           : true
                 }
             ],
@@ -707,37 +572,28 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 }
             ],
             "icon" : "iconbank://FilamentEruption"
@@ -757,63 +613,49 @@
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_NOAANum",
                     "parameter_display_name"    : "NOAA Number",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FL_GOESCLs",
                     "parameter_display_name"    : "GOES Classification",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FL_PeakFlux",
                     "parameter_display_name"    : "Peak Flux",
-                    "filter"                    : null,
                     "default_visible"           : true
                 }
             ],
@@ -834,56 +676,43 @@
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_NOAANum",
                     "parameter_display_name"    : "NOAA Number",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FL_GOESCLs",
                     "parameter_display_name"    : "GOES Classification",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
@@ -899,14 +728,12 @@
                             "step_size"     : 0.2,
                             "units"         : "W/m^2",
                             "dbtype"        : "REAL"
-                        },
-                   "default_visible"           : false
+                        }
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FL_PeakFlux",
                     "parameter_display_name"    : "Peak Flux",
-                    "filter"                    : null,
                     "default_visible"           : true
                 }
             ],
@@ -927,43 +754,33 @@
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_NumSpot",
                     "parameter_display_name"    : "Number of Sunspots",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 }
             ],
             "icon" : "iconbank://SunSpot"
@@ -982,37 +799,28 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 }
             ],
             "icon" : "iconbank://EmergingFlux"
@@ -1031,37 +839,28 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Channel ID"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Instrument",
                     "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
                     "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Observatory"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event End Time"
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible"           : false
+                    "parameter_display_name"    : "Event Start Time"
                 }],
             "icon" : "iconbank://Eruption"
         },
