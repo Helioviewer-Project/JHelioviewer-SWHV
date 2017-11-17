@@ -8,7 +8,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ComesepParser {
+class ComesepParser {
 
     static void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
         Iterator<String> keys = result.keys();
