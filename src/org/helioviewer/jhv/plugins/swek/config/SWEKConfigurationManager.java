@@ -200,7 +200,7 @@ public class SWEKConfigurationManager {
     }
 
     private static boolean parseDefaultVisible(JSONObject obj) {
-        return obj.getBoolean("default_visible");
+        return obj.optBoolean("default_visible");
     }
 
     private static SWEKRelatedEvents parseRelatedEvent(JSONObject obj) {
