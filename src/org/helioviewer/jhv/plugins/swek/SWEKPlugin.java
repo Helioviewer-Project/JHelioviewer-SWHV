@@ -11,9 +11,9 @@ import org.helioviewer.jhv.data.gui.EventPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
+import org.helioviewer.jhv.plugins.swek.renderable.EventTimelineRenderable;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
 import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
-import org.helioviewer.jhv.plugins.swek.view.EventTimelineRenderable;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONObject;
 
