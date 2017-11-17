@@ -7,31 +7,21 @@ public class JHVDatabaseParam {
     public static final String DBDOUBLETYPE = "REAL";
 
     private final Object value;
-
-    private final String dbType;
     private final String paramName;
 
-    public JHVDatabaseParam(String _dbType, int _value, String _paramName) {
-        dbType = _dbType;
-        value = _value;
-        paramName = _paramName;
-
-    }
-
-    public JHVDatabaseParam(String _dbType, String _value, String _paramName) {
-        dbType = _dbType;
+    public JHVDatabaseParam(int _value, String _paramName) {
         value = _value;
         paramName = _paramName;
     }
 
-    public JHVDatabaseParam(String _dbType, double _value, String _paramName) {
-        dbType = _dbType;
+    public JHVDatabaseParam(String _value, String _paramName) {
         value = _value;
         paramName = _paramName;
     }
 
-    public String getDbTyp() {
-        return dbType;
+    public JHVDatabaseParam(double _value, String _paramName) {
+        value = _value;
+        paramName = _paramName;
     }
 
     public String getStringValue() {
@@ -61,4 +51,5 @@ public class JHVDatabaseParam {
     public boolean isDouble() {
         return value instanceof Double;
     }
+
 }

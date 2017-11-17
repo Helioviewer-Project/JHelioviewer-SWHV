@@ -66,13 +66,13 @@ public class HEKDownloader extends SWEKDownloader {
                     if (!result.isNull(lfieldName)) {
                         switch (dbType) {
                             case JHVDatabaseParam.DBINTTYPE:
-                                paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBINTTYPE, result.getInt(lfieldName), fieldName));
+                                paramList.add(new JHVDatabaseParam(result.getInt(lfieldName), fieldName));
                                 break;
                             case JHVDatabaseParam.DBSTRINGTYPE:
-                                paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBSTRINGTYPE, result.getString(lfieldName), fieldName));
+                                paramList.add(new JHVDatabaseParam(result.getString(lfieldName), fieldName));
                                 break;
                             case JHVDatabaseParam.DBDOUBLETYPE:
-                                paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBDOUBLETYPE, result.getDouble(lfieldName), fieldName));
+                                paramList.add(new JHVDatabaseParam(result.getDouble(lfieldName), fieldName));
                                 break;
                             default:
                                 break;
