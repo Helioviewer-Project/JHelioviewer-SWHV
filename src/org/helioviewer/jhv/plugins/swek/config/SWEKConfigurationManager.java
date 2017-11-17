@@ -21,9 +21,9 @@ import org.helioviewer.jhv.data.event.SWEKSource;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader;
+import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepHandler;
 import org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser;
-import org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader;
+import org.helioviewer.jhv.plugins.swek.sources.hek.HEKHandler;
 import org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,9 +62,9 @@ public class SWEKConfigurationManager {
         String name = obj.getString("name");
         switch (name) {
             case "HEK":
-                return new SWEKSource(name, parseGeneralParameters(obj), new HEKParser(), new HEKDownloader());
+                return new SWEKSource(name, parseGeneralParameters(obj), new HEKParser(), new HEKHandler());
             case "COMESEP":
-                return new SWEKSource(name, parseGeneralParameters(obj), new ComesepParser(), new ComesepDownloader());
+                return new SWEKSource(name, parseGeneralParameters(obj), new ComesepParser(), new ComesepHandler());
             default:
                 return null;
         }

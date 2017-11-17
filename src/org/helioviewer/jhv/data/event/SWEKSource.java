@@ -8,13 +8,13 @@ public class SWEKSource {
     private final List<SWEKParameter> generalParameters;
 
     private final SWEKParser parser;
-    private final SWEKDownloader downloader;
+    private final SWEKHandler handler;
 
-    public SWEKSource(String _name, List<SWEKParameter> _generalParameters, SWEKParser _parser, SWEKDownloader _downloader) {
+    public SWEKSource(String _name, List<SWEKParameter> _generalParameters, SWEKParser _parser, SWEKHandler _handler) {
         name = _name.intern();
         generalParameters = _generalParameters;
         parser = _parser;
-        downloader = _downloader;
+        handler = _handler;
     }
 
     public String getName() {
@@ -25,8 +25,8 @@ public class SWEKSource {
         return parser;
     }
 
-    public SWEKDownloader getDownloader() {
-        return downloader;
+    public SWEKHandler getHandler() {
+        return handler;
     }
 
     public SWEKParameter getParameter(String _name) {
