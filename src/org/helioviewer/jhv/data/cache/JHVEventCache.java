@@ -65,9 +65,7 @@ public class JHVEventCache {
 
     public static void supplierActivated(SWEKSupplier supplier) {
         activeEventTypes.add(supplier);
-        if (!downloadedCache.containsKey(supplier)) {
-            downloadedCache.put(supplier, new RequestCache());
-        }
+        downloadedCache.putIfAbsent(supplier, new RequestCache());
         fireEventCacheChanged();
     }
 

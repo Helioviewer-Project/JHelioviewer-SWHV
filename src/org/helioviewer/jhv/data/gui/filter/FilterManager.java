@@ -26,9 +26,8 @@ public class FilterManager {
     public static void addFilter(SWEKSupplier supplier, SWEKParameter parameter, SWEKParam filter) {
         Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = getFilter(supplier);
         filters.put(supplier, filteredParameterPerEventType);
-        if (!filteredParameterPerEventType.containsKey(parameter)) {
-            filteredParameterPerEventType.put(parameter, new ArrayList<>());
-        }
+
+        filteredParameterPerEventType.putIfAbsent(parameter, new ArrayList<>());
         filteredParameterPerEventType.get(parameter).add(filter);
     }
 
