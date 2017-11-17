@@ -2,14 +2,14 @@ package org.helioviewer.jhv.opengl;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLLineShader extends GLSLShader {
+class GLSLLineShader extends GLSLShader {
 
-    public static final GLSLLineShader line = new GLSLLineShader("/data/vertexline.glsl", "/data/fragmentline.glsl");
-    public static int previousLineRef = 0;
-    public static int lineRef = 1;
-    public static int nextLineRef = 2;
-    public static int directionRef = 3;
-    public static int linecolorRef = 4;
+    static final GLSLLineShader line = new GLSLLineShader("/data/vertexline.glsl", "/data/fragmentline.glsl");
+    static int previousLineRef = 0;
+    static int lineRef = 1;
+    static int nextLineRef = 2;
+    static int directionRef = 3;
+    static int linecolorRef = 4;
 
     // private int miterRef;
     private int thicknessRef;
@@ -66,10 +66,6 @@ public class GLSLLineShader extends GLSLShader {
 
     public void setThickness(double _thickness) {
         thickness[0] = (float) _thickness;
-    }
-
-    @Override
-    protected void bindAttribs(GL2 gl) {
     }
 
 }

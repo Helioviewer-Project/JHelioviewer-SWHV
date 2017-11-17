@@ -67,7 +67,7 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
         setVisible(false);
     }
 
-    public void filterParameterChanged() {
+    void filterParameterChanged() {
         applyButton.setEnabled(true);
     }
 

@@ -62,7 +62,7 @@ class FilterPanelFactory {
         return spinner;
     }
 
-    public static List<FilterPanel> createFilterPanel(SWEKSupplier supplier, FilterDialog filterDialog) {
+    static List<FilterPanel> createFilterPanel(SWEKSupplier supplier, FilterDialog filterDialog) {
         List<FilterPanel> panels = new ArrayList<>();
         for (SWEKParameter parameter : supplier.getGroup().getParameterList()) {
             if (parameter.getParameterFilter() != null) {

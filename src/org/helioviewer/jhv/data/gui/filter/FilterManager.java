@@ -23,7 +23,7 @@ public class FilterManager {
         listeners.remove(listener);
     }
 
-    public static void addFilter(SWEKSupplier supplier, SWEKParameter parameter, SWEKParam filter) {
+    static void addFilter(SWEKSupplier supplier, SWEKParameter parameter, SWEKParam filter) {
         Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = getFilter(supplier);
         filters.put(supplier, filteredParameterPerEventType);
 
@@ -31,11 +31,11 @@ public class FilterManager {
         filteredParameterPerEventType.get(parameter).add(filter);
     }
 
-    public static void removeFilters(SWEKSupplier supplier) {
+    static void removeFilters(SWEKSupplier supplier) {
         filters.remove(supplier);
     }
 
-    public static void fireFilters(SWEKSupplier supplier) {
+    static void fireFilters(SWEKSupplier supplier) {
         for (FilterManagerListener fml : listeners) {
             fml.filtersChanged(supplier);
         }
@@ -44,9 +44,10 @@ public class FilterManager {
     public static Map<SWEKParameter, List<SWEKParam>> getFilter(SWEKSupplier supplier) {
         return filters.containsKey(supplier) ? filters.get(supplier) : new HashMap<>();
     }
-
+/*
     public static boolean isFiltered(SWEKSupplier supplier, SWEKParameter parameter) {
         return filters.containsKey(supplier) && filters.get(supplier).containsKey(parameter);
     }
+*/
 
 }
