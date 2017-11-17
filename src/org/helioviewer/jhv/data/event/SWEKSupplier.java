@@ -61,4 +61,19 @@ public class SWEKSupplier extends SWEKTreeModelElement {
         return isCactus;
     }
 
+    @Override
+    public void activate(boolean activate) {
+        setSelected(activate);
+        if (activate) {
+            group.setSelected(true);
+        } else {
+            boolean groupSelected = false;
+            for (SWEKSupplier stms : group.getSuppliers()) {
+                groupSelected |= stms.isSelected();
+            }
+            group.setSelected(groupSelected);
+        }
+        SWEKDownloadManager.activateSupplier(this, activate);
+    }
+
 }

@@ -100,4 +100,13 @@ public class SWEKGroup extends SWEKTreeModelElement {
         return false;
     }
 
+    @Override
+    public void activate(boolean activate) {
+        setSelected(activate);
+        for (SWEKSupplier supplier : suppliers) {
+            supplier.setSelected(activate);
+            SWEKDownloadManager.activateSupplier(supplier, activate);
+        }
+    }
+
 }
