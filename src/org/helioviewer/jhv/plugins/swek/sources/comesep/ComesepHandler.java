@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,20 +29,13 @@ public class ComesepHandler extends SWEKHandler {
             ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>();
             for (int i = 0; i < results.length(); i++) {
                 JSONObject result = results.getJSONObject(i);
+                byte[] compressed = JSONUtils.compressJSON(result);
 
                 long start = result.getLong("atearliest") * 1000;
                 long end = result.getLong("atlatest") * 1000;
                 if (result.has("liftoffduration_value")) {
                     long cactusLiftOff = result.getLong("liftoffduration_value");
                     end += cactusLiftOff * 60000;
-                }
-
-                byte[] compressed;
-                try {
-                    compressed = JSONUtils.compressJSON(result);
-                } catch (IOException e) {
-                    Log.error("compression error");
-                    return false;
                 }
 
                 long archiv = start;
@@ -57,7 +49,7 @@ public class ComesepHandler extends SWEKHandler {
                     Log.error("failed to dump to database");
                 }
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
