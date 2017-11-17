@@ -15,7 +15,7 @@ public abstract class SWEKTreeModelElement {
         return selected;
     }
 
-    public void setSelected(boolean _selected) {
+    void setSelected(boolean _selected) {
         selected = _selected;
     }
 
