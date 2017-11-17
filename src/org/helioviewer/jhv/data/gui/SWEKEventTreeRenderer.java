@@ -17,8 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import org.helioviewer.jhv.data.event.SWEKGroup;
-import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.data.event.SWEKTreeModelElement;
 import org.helioviewer.jhv.data.gui.filter.FilterDialog;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -29,11 +27,9 @@ import com.jidesoft.swing.JideButton;
 class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
     private final JTree tree;
-    private final EventPanel panel;
 
-    public SWEKEventTreeRenderer(JTree _tree, EventPanel _panel) {
+    public SWEKEventTreeRenderer(JTree _tree) {
         tree = _tree;
-        panel = _panel;
     }
 
     @Override
@@ -79,11 +75,7 @@ class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         checkBox.setSelected(element.isSelected());
         checkBox.setBackground(back);
         checkBox.addActionListener(e -> {
-            boolean selected = checkBox.isSelected();
-            if (element instanceof SWEKGroup)
-                panel.selectGroup((SWEKGroup) element, selected);
-            else
-                panel.selectSupplier((SWEKSupplier) element, selected);
+            element.activate(checkBox.isSelected());
             tree.repaint();
         });
         leaf.add(checkBox, BorderLayout.CENTER);

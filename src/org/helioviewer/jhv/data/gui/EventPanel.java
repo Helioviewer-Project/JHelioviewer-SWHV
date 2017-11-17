@@ -17,7 +17,6 @@ import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import org.helioviewer.jhv.data.event.SWEKDownloadManager;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.UITimer;
@@ -43,7 +42,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         eventTypeTree.setEditable(true);
         eventTypeTree.setShowsRootHandles(true);
         eventTypeTree.setSelectionModel(null);
-        eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer(eventTypeTree, this));
+        eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer(eventTypeTree));
         eventTypeTree.setCellEditor(new MyTreeCellEditor(eventTypeTree, (DefaultTreeCellRenderer) eventTypeTree.getCellRenderer()));
 
         // workaround for Win HiDpi
@@ -81,28 +80,6 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         layer.repaint();
     }
 
-    public void selectGroup(SWEKGroup group, boolean selected) {
-        group.setSelected(selected);
-        for (SWEKSupplier supplier : group.getSuppliers()) {
-            supplier.setSelected(selected);
-            SWEKDownloadManager.activateSupplier(supplier, selected);
-        }
-    }
-
-    public void selectSupplier(SWEKSupplier supplier, boolean selected) {
-        supplier.setSelected(selected);
-        if (selected) {
-            group.setSelected(true);
-        } else {
-            boolean groupSelected = false;
-            for (SWEKSupplier stms : group.getSuppliers()) {
-                groupSelected |= stms.isSelected();
-            }
-            group.setSelected(groupSelected);
-        }
-        SWEKDownloadManager.activateSupplier(supplier, selected);
-    }
-
     public void serialize(JSONObject jo) {
         JSONObject go = new JSONObject();
         for (SWEKSupplier supplier : group.getSuppliers()) {
@@ -115,11 +92,11 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         JSONObject go = jo.optJSONObject(group.getName());
         if (go != null)
             for (SWEKSupplier supplier : group.getSuppliers()) {
-                selectSupplier(supplier, go.optBoolean(supplier.getName(), false));
+                supplier.activate(go.optBoolean(supplier.getName(), false));
             }
     }
 
-    private class MyTreeCellEditor extends DefaultTreeCellEditor  {
+    private static class MyTreeCellEditor extends DefaultTreeCellEditor  {
 
         MyTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
             super(tree, renderer);
@@ -131,7 +108,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         }
 
         @Override
-        public boolean isCellEditable(EventObject anEvent) {
+        public boolean isCellEditable(EventObject e) {
             return true;
         }
 

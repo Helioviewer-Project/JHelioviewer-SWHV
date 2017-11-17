@@ -4,7 +4,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.gui.filter.FilterDialog;
 
-public class SWEKTreeModelElement {
+public abstract class SWEKTreeModelElement {
 
     private boolean selected;
     protected ImageIcon icon;
@@ -30,5 +30,7 @@ public class SWEKTreeModelElement {
     public FilterDialog getFilterDialog() {
         return filterDialog;
     }
+
+    public abstract void activate(boolean _activate);
 
 }
