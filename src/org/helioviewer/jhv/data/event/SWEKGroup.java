@@ -87,7 +87,7 @@ public class SWEKGroup extends SWEKTreeModelElement {
         return null;
     }
 
-    public boolean containsFilter() {
+    boolean containsFilter() {
         return containsParameterFilter;
     }
 
