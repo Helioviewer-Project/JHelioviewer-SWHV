@@ -67,7 +67,7 @@ public class EVEDataProvider implements BandDataProvider {
 
     private static void addDownloads(Band band, List<Interval> intervals) {
         List<Interval> dl = downloadMap.computeIfAbsent(band, k -> new ArrayList<>());
-        List<Future<?>> fl = new ArrayList<>();
+        List<Future<?>> fl = new ArrayList<>(intervals.size());
         for (Interval interval : intervals) {
             dl.add(interval);
             fl.add(EVEPlugin.executorService.submit(new DownloadThread(band, interval)));

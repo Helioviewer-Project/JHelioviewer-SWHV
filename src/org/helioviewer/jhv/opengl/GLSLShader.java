@@ -18,7 +18,7 @@ public class GLSLShader {
     private final String vertex;
     private final String fragment;
 
-    public GLSLShader(String _vertex, String _fragment) {
+    GLSLShader(String _vertex, String _fragment) {
         vertex = _vertex;
         fragment = _fragment;
     }
@@ -58,7 +58,7 @@ public class GLSLShader {
         gl.glUseProgram(0);
     }
 
-    public final void setTextureUnit(GL2 gl, String texname, int texunit) {
+    protected final void setTextureUnit(GL2 gl, String texname, int texunit) {
         int[] params = { 0 };
         gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {

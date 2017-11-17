@@ -28,7 +28,7 @@ class FilterPanel extends JPanel {
     private final FilterDialog filterDialog;
     private final SWEKOperand operand;
 
-    public FilterPanel(SWEKSupplier _supplier, SWEKParameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEKOperand _operand) {
+    FilterPanel(SWEKSupplier _supplier, SWEKParameter _parameter, JSpinner _spinner, FilterDialog _filterDialog, SWEKOperand _operand) {
         operand = _operand;
         filterDialog = _filterDialog;
         spinner = _spinner;
@@ -55,15 +55,15 @@ class FilterPanel extends JPanel {
         add(spinner, c);
     }
 
-    public void removeFilter() {
+    void removeFilter() {
         FilterManager.removeFilters(supplier);
     }
 
-    public void fireFilter() {
+    void fireFilter() {
         FilterManager.fireFilters(supplier);
     }
 
-    public void addFilter() {
+    void addFilter() {
         if (enabled) {
             Object oval = spinner.getValue();
             String pval = oval instanceof String ? String.valueOf(GOESLevel.getFloatValue((String) oval)) : String.valueOf(oval);
