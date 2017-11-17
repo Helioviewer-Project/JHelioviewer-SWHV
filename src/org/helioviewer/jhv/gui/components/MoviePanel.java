@@ -340,11 +340,11 @@ public class MoviePanel extends JPanel implements ChangeListener {
             }
         }
 
-        public void setRecordMode(RecordMode _mode) {
+        void setRecordMode(RecordMode _mode) {
             mode = _mode;
         }
 
-        public void setRecordSize(RecordSize _size) {
+        void setRecordSize(RecordSize _size) {
             size = _size;
         }
 

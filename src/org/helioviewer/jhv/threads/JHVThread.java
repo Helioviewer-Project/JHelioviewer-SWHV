@@ -62,7 +62,7 @@ public class JHVThread {
         private static final int CURRENT_VERSION_SCHEMA = 7;
         private static Connection connection;
 
-        public ConnectionThread(Runnable r, String name) {
+        ConnectionThread(Runnable r, String name) {
             super(r, name);
         }
 
