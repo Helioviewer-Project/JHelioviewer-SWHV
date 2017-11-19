@@ -34,25 +34,14 @@ public class EVEDataProvider implements BandDataProvider {
             end += 7 * TimeUtils.DAY_IN_MILLIS;
 
             ArrayList<Interval> intervals = getIntervals(band, start, end);
-            if (intervals == null) {
+            if (intervals.size() == 0)
                 return;
-            }
-
-            int n = intervals.size();
-            if (n == 0) {
-                Timelines.getModel().downloadStarted(band);
-                return;
-            }
-
             addDownloads(band, intervals);
         }
     }
 
     private static ArrayList<Interval> getIntervals(Band band, long start, long end) {
         List<Interval> missingIntervals = band.addRequest(start, end);
-        if (missingIntervals.isEmpty())
-            return null;
-
         ArrayList<Interval> intervals = new ArrayList<>();
         for (Interval i : missingIntervals) {
             intervals.addAll(Interval.splitInterval(i, DOWNLOADER_MAX_DAYS_PER_BLOCK));
