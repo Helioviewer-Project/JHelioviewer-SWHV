@@ -60,20 +60,14 @@ public class EVEDataProvider implements BandDataProvider {
         return intervals;
     }
 
-    private static void addFutureJobs(Band band, List<Future<?>> newFutureJobs) {
-        List<Future<?>> fl = futureJobs.computeIfAbsent(band, k -> new ArrayList<>(newFutureJobs.size()));
-        fl.addAll(newFutureJobs);
-    }
-
     private static void addDownloads(Band band, List<Interval> intervals) {
         int size = intervals.size();
         List<Interval> dl = downloadMap.computeIfAbsent(band, k -> new ArrayList<>(size));
-        List<Future<?>> fl = new ArrayList<>(size);
+        List<Future<?>> fl = futureJobs.computeIfAbsent(band, k -> new ArrayList<>(size));
         for (Interval interval : intervals) {
             dl.add(interval);
             fl.add(EVEPlugin.executorService.submit(new DownloadThread(band, interval)));
         }
-        addFutureJobs(band, fl);
     }
 
     static void downloadFinished(Band band, Interval interval) {
