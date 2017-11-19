@@ -12,13 +12,12 @@ public class RequestCache {
 
     public List<Interval> adaptRequestCache(long start, long end) {
         ArrayList<Interval> missingIntervals = new ArrayList<>();
-        Interval interval = new Interval(start, end);
-
         if (cache.isEmpty()) {
+            Interval interval = new Interval(start, end);
             missingIntervals.add(interval);
             cache.add(interval);
         } else {
-            missingIntervals = getMissingIntervals(interval.start, interval.end);
+            missingIntervals = getMissingIntervals(start, end);
             updateRequestCache(start, end);
         }
         return missingIntervals;
