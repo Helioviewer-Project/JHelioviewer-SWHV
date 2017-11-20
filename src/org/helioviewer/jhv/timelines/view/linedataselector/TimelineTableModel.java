@@ -97,5 +97,4 @@ public class TimelineTableModel extends AbstractTableModel {
         return ct;
     }
 
-
 }
