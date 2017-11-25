@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
-import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -24,7 +23,6 @@ import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.renderable.gui.ImageLayers;
@@ -34,7 +32,6 @@ import org.json.JSONObject;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
@@ -46,8 +43,6 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private boolean removed;
     private LoadRemoteTask worker;
     private View view;
-
-    private static final String loading = "Loading...";
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
@@ -254,26 +249,13 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
-        if (imageData == null || worker != null) { // loading something
-            int delta = (int) (vp.height * 0.01);
-            TextRenderer renderer = GLText.getRenderer(GLText.TEXT_SIZE_LARGE);
-            Rectangle2D rect = renderer.getBounds(loading);
-
-            renderer.beginRendering(vp.width, vp.height, true);
-            renderer.draw(loading, (int) (vp.width - rect.getWidth() - delta), (int) (vp.height - rect.getHeight() - delta));
-            renderer.endRendering();
-        }
-    }
-
-    @Override
     public Component getOptionsPanel() {
         return optionsPanel;
     }
 
     @Override
     public String getName() {
-        return view == null || worker != null ? loading : view.getName();
+        return view == null || worker != null ? "Loading..." : view.getName();
     }
 
     @Override
@@ -341,7 +323,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     @Override
     public boolean isDownloading() {
-        return view != null && view.isDownloading();
+        return view == null || worker != null || view.isDownloading();
     }
 
     GLImage getGLImage() {
