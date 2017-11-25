@@ -134,7 +134,7 @@ public class RenderableContainerPanel extends JPanel {
         addLayerButton.addActionListener(e -> new NewLayerAction().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
         JideButton syncSpanButton = new JideButton(Buttons.syncLayers);
-        syncSpanButton.setToolTipText("Synchronize layers time span");
+        syncSpanButton.setToolTipText("Synchronize time span to master layer");
         syncSpanButton.addActionListener(e -> ImageLayers.syncLayersSpan());
 
         multiview = new JCheckBox("Multiview", Displayer.multiview);
