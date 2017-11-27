@@ -153,7 +153,7 @@ public class RadioData extends AbstractTimelineRenderable {
                         jpList.add(new DownloadedJPXData(null, req.startTime));
                     } else {
                         remotes.add(uri);
-                        jpList.add(new DownloadedJPXData(new JP2ViewCallisto(uri), req.startTime));
+                        jpList.add(new DownloadedJPXData(new JP2ViewCallisto(uri, req), req.startTime));
                     }
                 } catch (Exception e) {
                     Log.error("An error occured while opening the remote file: " + e.getMessage());

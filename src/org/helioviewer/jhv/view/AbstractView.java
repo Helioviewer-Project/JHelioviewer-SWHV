@@ -20,16 +20,11 @@ public abstract class AbstractView implements View {
     protected ImageData imageData = null;
     protected MetaData _metaData;
 
-    private APIRequest apiRequest;
+    protected APIRequest apiRequest;
 
     @Override
     public APIRequest getAPIRequest() {
         return apiRequest;
-    }
-
-    @Override
-    public void setAPIRequest(APIRequest _apiRequest) {
-        apiRequest = _apiRequest;
     }
 
     @Override

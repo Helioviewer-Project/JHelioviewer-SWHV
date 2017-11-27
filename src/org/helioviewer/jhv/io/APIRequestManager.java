@@ -11,7 +11,6 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fitsview.FITSView;
 import org.helioviewer.jhv.view.jp2view.JP2View;
-import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.view.simpleimageview.SimpleImageView;
 
 public class APIRequestManager {
@@ -75,14 +74,7 @@ public class APIRequestManager {
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
                  return new SimpleImageView(uri);
             } else {
-                JP2View view;
-                if (req == null || req.sourceId != APIRequest.CallistoID) {
-                    view = new JP2View(uri);
-                } else {
-                    view = new JP2ViewCallisto(uri);
-                }
-                view.setAPIRequest(req);
-                return view;
+                return new JP2View(uri, req);
             }
         } catch (InterruptedException ignore) {
             // nothing

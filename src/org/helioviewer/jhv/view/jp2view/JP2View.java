@@ -18,6 +18,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.SubImage;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -67,8 +68,9 @@ public class JP2View extends AbstractView {
 
     private JPIPSocket socket;
 
-    public JP2View(URI _uri) throws Exception {
+    public JP2View(URI _uri, APIRequest _apiRequest) throws Exception {
         uri = _uri;
+        apiRequest = _apiRequest;
 
         String name = uri.getPath().toLowerCase();
         boolean supported = false;
