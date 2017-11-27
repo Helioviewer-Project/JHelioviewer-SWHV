@@ -48,7 +48,7 @@ public class RunningDifferencePanel implements FilterDetails {
         JideButton downloadButton = new JideButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
-            DownloadViewTask downloadTask = new DownloadViewTask(parent.getView());
+            DownloadViewTask downloadTask = new DownloadViewTask(parent.getView().getImageLayer(), parent.getView());
             JHVGlobals.getExecutorService().execute(downloadTask);
         });
 

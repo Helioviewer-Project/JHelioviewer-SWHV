@@ -3,10 +3,12 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.net.URI;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
+import org.helioviewer.jhv.view.ProxyView;
 import org.helioviewer.jhv.view.View;
 
 class LoadURITask extends JHVWorker<View, Void> {
@@ -14,9 +16,18 @@ class LoadURITask extends JHVWorker<View, Void> {
     private final ImageLayer imageLayer;
     private final URI uri;
 
+    static void get(URI _uri) {
+        String scheme = _uri.getScheme();
+        ImageLayer layer = ImageLayer.create(null);
+        if ("http".equals(scheme) || "https".equals(scheme))
+            JHVGlobals.getExecutorService().execute(new DownloadViewTask(layer, new ProxyView(_uri)));
+        else
+            JHVGlobals.getExecutorService().execute(new LoadURITask(layer, _uri));
+    }
+
     LoadURITask(ImageLayer _imageLayer, URI _uri) {
         uri = _uri;
-        imageLayer = _imageLayer == null ? ImageLayer.create(null) : _imageLayer;
+        imageLayer = _imageLayer;
         setThreadName("MAIN--LoadURI");
     }
 

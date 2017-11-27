@@ -3,6 +3,7 @@ package org.helioviewer.jhv.io;
 import java.net.URI;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 
 public interface Load {
@@ -18,28 +19,21 @@ public interface Load {
     class Image implements Load {
         @Override
         public void get(URI uri) {
-            JHVGlobals.getExecutorService().execute(new LoadURITask(null, uri));
+            LoadURITask.get(uri);
         }
     }
 
     class Request implements Load {
         @Override
         public void get(URI uri) {
-            JHVGlobals.getExecutorService().execute(new LoadJSONTask(null, uri));
+            JHVGlobals.getExecutorService().execute(new LoadJSONTask(ImageLayer.create(null), uri));
         }
     }
 
     class FITS implements Load {
         @Override
         public void get(URI uri) {
-            JHVGlobals.getExecutorService().execute(new LoadFITSTask(null, uri));
-        }
-    }
-
-    class Timeline implements Load {
-        @Override
-        public void get(URI uri) {
-            EVEPlugin.eveDataprovider.loadBand(uri);
+            JHVGlobals.getExecutorService().execute(new LoadFITSTask(ImageLayer.create(null), uri));
         }
     }
 
@@ -47,6 +41,13 @@ public interface Load {
         @Override
         public void get(URI uri) {
             JHVGlobals.getExecutorService().execute(new LoadStateTask(uri));
+        }
+    }
+
+    class Timeline implements Load {
+        @Override
+        public void get(URI uri) {
+            EVEPlugin.eveDataprovider.loadBand(uri);
         }
     }
 
