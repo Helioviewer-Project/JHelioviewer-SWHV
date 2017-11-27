@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view;
 
+import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.base.lut.LUT;
@@ -17,10 +18,22 @@ public abstract class AbstractView implements View {
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
 
     private ImageLayer imageLayer;
-    protected ImageData imageData = null;
+
+    protected URI uri;
+    protected APIRequest apiRequest;
+    protected ImageData imageData;
     protected MetaData _metaData;
 
-    protected APIRequest apiRequest;
+    @Override
+    public URI getURI() {
+        return uri;
+    }
+
+    @Override
+    public String getName() {
+        String name = uri.getPath();
+        return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
+    }
 
     @Override
     public APIRequest getAPIRequest() {

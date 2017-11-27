@@ -56,7 +56,6 @@ public class JP2View extends AbstractView {
     private long fpsTime = System.currentTimeMillis();
 
     private final RenderExecutor executor = new RenderExecutor();
-    private final URI uri;
     private final int maxFrame;
     private final int[] builtinLUT;
     private final MetaData[] metaData;
@@ -328,17 +327,7 @@ public class JP2View extends AbstractView {
     @Override
     public String getName() {
         MetaData m = metaData[0];
-        if (m instanceof HelioviewerMetaData) {
-            return ((HelioviewerMetaData) m).getFullName();
-        } else {
-            String name = uri.getPath();
-            return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
-        }
-    }
-
-    @Override
-    public URI getURI() {
-        return uri;
+        return m instanceof HelioviewerMetaData ? ((HelioviewerMetaData) m).getFullName() : super.getName();
     }
 
     @Override

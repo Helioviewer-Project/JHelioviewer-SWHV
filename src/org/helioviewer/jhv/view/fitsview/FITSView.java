@@ -11,7 +11,6 @@ import org.helioviewer.jhv.view.AbstractView;
 public class FITSView extends AbstractView {
 
     private final String xml;
-    private final URI uri;
 
     public FITSView(URI _uri) throws Exception {
         uri = _uri;
@@ -41,17 +40,7 @@ public class FITSView extends AbstractView {
 
     @Override
     public String getName() {
-        if (_metaData instanceof HelioviewerMetaData) {
-            return ((HelioviewerMetaData) _metaData).getFullName();
-        } else {
-            String name = uri.getPath();
-            return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
-        }
-    }
-
-    @Override
-    public URI getURI() {
-        return uri;
+        return _metaData instanceof HelioviewerMetaData ? ((HelioviewerMetaData) _metaData).getFullName() : super.getName();
     }
 
     @Override
