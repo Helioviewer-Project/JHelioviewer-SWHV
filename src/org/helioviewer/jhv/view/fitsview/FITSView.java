@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.SubImage;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.view.AbstractView;
@@ -12,8 +13,9 @@ public class FITSView extends AbstractView {
 
     private final String xml;
 
-    public FITSView(URI _uri) throws Exception {
-        uri = _uri;
+    public FITSView(URI _uri, APIRequest _req) throws Exception {
+        super(_uri, _req);
+
         FITSImage fits = new FITSImage(uri);
         if (fits.imageData == null)
             throw new Exception("Could not read FITS: " + uri);

@@ -13,16 +13,21 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVDate;
 
-public abstract class AbstractView implements View {
+public class AbstractView implements View {
 
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
 
     private ImageLayer imageLayer;
 
     protected URI uri;
-    protected APIRequest apiRequest;
+    protected APIRequest req;
     protected ImageData imageData;
     protected MetaData _metaData;
+
+    public AbstractView(URI _uri, APIRequest _req) {
+        uri = _uri;
+        req = _req;
+    }
 
     @Override
     public URI getURI() {
@@ -37,7 +42,7 @@ public abstract class AbstractView implements View {
 
     @Override
     public APIRequest getAPIRequest() {
-        return apiRequest;
+        return req;
     }
 
     @Override
@@ -141,6 +146,11 @@ public abstract class AbstractView implements View {
     @Override
     public boolean isDownloading() {
         return false;
+    }
+
+    @Override
+    public String getXMLMetaData() throws Exception {
+        return "<meta/>";
     }
 
 }
