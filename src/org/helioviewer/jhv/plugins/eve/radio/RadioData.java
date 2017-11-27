@@ -8,7 +8,6 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +28,6 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
-import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
 import org.json.JSONObject;
 
@@ -155,12 +153,9 @@ public class RadioData extends AbstractTimelineRenderable {
                         jpList.add(new DownloadedJPXData(null, req.startTime));
                     } else {
                         remotes.add(uri);
-                        View v = APIRequestManager.loadView(uri, req);
-                        if (v instanceof JP2ViewCallisto) {
-                            jpList.add(new DownloadedJPXData((JP2ViewCallisto) v, req.startTime));
-                        }
+                        jpList.add(new DownloadedJPXData(new JP2ViewCallisto(uri), req.startTime));
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     Log.error("An error occured while opening the remote file: " + e.getMessage());
                 }
             }
