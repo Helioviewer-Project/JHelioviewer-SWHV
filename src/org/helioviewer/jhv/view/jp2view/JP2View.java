@@ -21,7 +21,6 @@ import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.time.JHVDate;
@@ -57,8 +56,6 @@ public class JP2View extends AbstractView {
 
     private final RenderExecutor executor = new RenderExecutor();
     private final int maxFrame;
-    private final int[] builtinLUT;
-    private final MetaData[] metaData;
     private final CacheStatus cacheStatus;
 
     private J2KReader reader;
@@ -103,14 +100,16 @@ public class JP2View extends AbstractView {
             jpx.Count_compositing_layers(tempVar);
             maxFrame = tempVar[0] - 1;
 
-            builtinLUT = KakaduHelper.getLUT(jpx);
-
             metaData = new MetaData[maxFrame + 1];
             KakaduMeta.cacheMetaData(kduReader.getFamilySrc(), metaData);
             for (int i = 0; i <= maxFrame; i++) {
                 if (metaData[i] == null)
                     metaData[i] = new PixelBasedMetaData(256, 256, i); // tbd real size
             }
+
+            int[] lut = KakaduHelper.getLUT(jpx);
+            if (lut != null)
+                builtinLUT = new LUT(getName() + " built-in", lut);
 
             if (cacheReader != null) { // remote
                 cacheStatus = new CacheStatusRemote(kduReader, maxFrame);
@@ -321,25 +320,6 @@ public class JP2View extends AbstractView {
     @Override
     public MetaData getMetaData(JHVDate time) {
         return metaData[getFrameNumber(time)];
-    }
-
-    @Override
-    public String getName() {
-        MetaData m = metaData[0];
-        return m instanceof HelioviewerMetaData ? ((HelioviewerMetaData) m).getFullName() : super.getName();
-    }
-
-    @Override
-    public LUT getDefaultLUT() {
-        if (builtinLUT != null) {
-            return new LUT(getName() + " built-in", builtinLUT/* , builtinLUT */);
-        }
-
-        MetaData m = metaData[0];
-        if (m instanceof HelioviewerMetaData) {
-            return LUT.get((HelioviewerMetaData) m);
-        }
-        return null;
     }
 
     private volatile boolean isDownloading;
