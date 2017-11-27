@@ -29,58 +29,18 @@ public class FileUtils {
         return new BufferedInputStream(Files.newInputStream(src.toPath()), BUFSIZ);
     }
 
-    /**
-     * Method copies a file from src to dst.
-     *
-     * @param src
-     *            Source file
-     * @param dst
-     *            Destination file
-     * @throws IOException
-     */
-    public static void copy(File src, File dst) throws IOException {
-        try (InputStream in = newBufferedInputStream(src); OutputStream out = newBufferedOutputStream(dst)) {
-            // Transfer bytes from in to out
-            byte[] buf = new byte[BUFSIZ];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-        }
-    }
-
-    /**
-     * Method saving a stream to dst.
-     *
-     * @param in
-     *            Input stream, will be closed if finished
-     * @param dst
-     *            Destination file
-     * @throws IOException
-     */
     public static void save(InputStream in, File dst) throws IOException {
-        // Transfer bytes from in to out
-        try (OutputStream out = newBufferedOutputStream(dst)) {
-            byte[] buf = new byte[BUFSIZ];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-        }
+        Path path = dst.toPath();
+        Files.createDirectories(path.getParent());
+        Files.copy(in, path);
     }
 
-    /**
-     * Returns an input stream to a resource. This function can be used even if
-     * the whole program and resources are within a JAR file. The path must
-     * begin with a slash and contain all subfolders, e.g.: /images/sample_image.png
-     * The class loader used is the same which was used to load FileUtils.
-     *
-     * @param resourcePath
-     *            The path to the resource
-     * @return An InputStream to the resource
-     */
     public static InputStream getResourceInputStream(String resourcePath) {
         return FileUtils.class.getResourceAsStream(resourcePath);
+    }
+
+    public static URL getResourceUrl(String resourcePath) {
+        return FileUtils.class.getResource(resourcePath);
     }
 
     public static String convertStreamToString(InputStream is) {
@@ -88,20 +48,6 @@ public class FileUtils {
             s.useDelimiter("\\A");
             return s.hasNext() ? s.next() : "";
         }
-    }
-
-    /**
-     * Returns an URL to a resource. This function can be used even if the whole
-     * program and resources are within a JAR file. The path must begin with a
-     * slash and contain all subfolders, e.g.: /images/sample_image.png
-     * The class loader used is the same which was used to load FileUtils.
-     *
-     * @param resourcePath
-     *            The path to the resource
-     * @return An URL to the resource
-     */
-    public static URL getResourceUrl(String resourcePath) {
-        return FileUtils.class.getResource(resourcePath);
     }
 
     private static final SimpleFileVisitor<Path> nukeVisitor = new SimpleFileVisitor<Path>() {
