@@ -108,7 +108,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
             try {
                 if (failed || isCancelled())
                     dstFile.delete();
-                else { // reload JPX from disk
+                else { // reload from disk
                     LoadURITask uriTask = new LoadURITask(layer, dstFile.toURI());
                     JHVGlobals.getExecutorService().execute(uriTask);
                 }

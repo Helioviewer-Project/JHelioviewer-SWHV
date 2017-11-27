@@ -81,7 +81,6 @@ public class JP2View extends AbstractView {
         try {
             String scheme = uri.getScheme().toLowerCase();
             switch (scheme) {
-                case "http":
                 case "jpip":
                     cacheReader = new JHV_Kdu_cache();
                     cacheRender = new Kdu_cache();
