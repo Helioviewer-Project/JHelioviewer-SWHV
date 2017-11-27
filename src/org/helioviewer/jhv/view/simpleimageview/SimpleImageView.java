@@ -13,8 +13,6 @@ import org.helioviewer.jhv.view.AbstractView;
 
 public class SimpleImageView extends AbstractView {
 
-    private final URI uri;
-
     public SimpleImageView(URI _uri) throws Exception {
         uri = _uri;
 
@@ -33,17 +31,6 @@ public class SimpleImageView extends AbstractView {
         _metaData = new PixelBasedMetaData(image.getWidth(), image.getHeight(), 0);
         imageData.setRegion(_metaData.getPhysicalRegion());
         imageData.setMetaData(_metaData);
-    }
-
-    @Override
-    public String getName() {
-        String name = uri.getPath();
-        return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
-    }
-
-    @Override
-    public URI getURI() {
-        return uri;
     }
 
     @Override
