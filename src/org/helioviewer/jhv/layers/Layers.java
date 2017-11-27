@@ -65,10 +65,10 @@ public class Layers {
 
     public static void setRender(Camera camera, double factor) {
         int i;
-        Viewport vp;
+        Viewport[] vp = Displayer.getViewports();
         for (View v : layers) {
-            if ((i = v.getImageLayer().isVisibleIdx()) != -1 && (vp = Displayer.getViewports()[i]) != null)
-                v.render(camera, vp, factor);
+            if ((i = v.getImageLayer().isVisibleIdx()) != -1 && vp[i] != null)
+                v.render(camera, vp[i], factor);
         }
     }
 
