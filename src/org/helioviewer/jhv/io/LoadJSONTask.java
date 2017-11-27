@@ -22,7 +22,7 @@ class LoadJSONTask extends LoadURITask {
     protected View backgroundWork() {
         try {
             APIRequest req = APIRequest.fromRequestJson(JSONUtils.getJSONStream(new DownloadStream(uri.toURL()).getInput()));
-            return APIRequestManager.requestAndOpenRemoteFile(req);
+            return requestAndOpenRemoteFile(req);
         } catch (Exception e) {
             Log.error("An error occured while opening the remote file: ", e);
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);

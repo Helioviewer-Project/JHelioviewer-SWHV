@@ -3,15 +3,10 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.util.Locale;
 
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.fitsview.FITSView;
-import org.helioviewer.jhv.view.jp2view.JP2View;
-import org.helioviewer.jhv.view.simpleimageview.SimpleImageView;
 
 public class APIRequestManager {
 
@@ -51,36 +46,6 @@ public class APIRequestManager {
             Message.err("Socket timeout", "Socket timeout while requesting JPIP URL", false);
         } catch (Exception e) {
             throw new IOException("Invalid response for " + req.jpipRequest, e);
-        }
-
-        return null;
-    }
-
-    static View requestAndOpenRemoteFile(APIRequest req) throws IOException {
-        URI uri = requestRemoteFile(req);
-        return uri == null ? null : loadView(uri, req);
-    }
-
-    static View loadView(URI uri, APIRequest req) throws IOException {
-        String scheme;
-        if (uri == null || (scheme = uri.getScheme()) == null) {
-            throw new IOException("Invalid URI: " + uri);
-        }
-
-        try {
-            String loc = uri.toString().toLowerCase(Locale.ENGLISH);
-            if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
-                return new FITSView(uri);
-            } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
-                 return new SimpleImageView(uri);
-            } else {
-                return new JP2View(uri, req);
-            }
-        } catch (InterruptedException ignore) {
-            // nothing
-        } catch (Exception e) {
-            Log.debug("APIRequestManager.loadView(\"" + uri + "\") ", e);
-            throw new IOException(e);
         }
         return null;
     }
