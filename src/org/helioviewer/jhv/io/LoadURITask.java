@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Locale;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.message.Message;
@@ -10,6 +11,9 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.ProxyView;
 import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.fitsview.FITSView;
+import org.helioviewer.jhv.view.jp2view.JP2View;
+import org.helioviewer.jhv.view.simpleimageview.SimpleImageView;
 
 class LoadURITask extends JHVWorker<View, Void> {
 
@@ -34,7 +38,7 @@ class LoadURITask extends JHVWorker<View, Void> {
     @Override
     protected View backgroundWork() {
         try {
-            return APIRequestManager.loadView(uri, null);
+            return loadView(uri, null);
         } catch (IOException e) {
             Log.error("An error occurred while opening the remote file: ", e);
             Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);
@@ -56,6 +60,34 @@ class LoadURITask extends JHVWorker<View, Void> {
             }
             imageLayer.unload();
         }
+    }
+
+    private static View loadView(URI uri, APIRequest req) throws IOException {
+        if (uri == null || uri.getScheme() == null) {
+            throw new IOException("Invalid URI: " + uri);
+        }
+
+        try {
+            String loc = uri.toString().toLowerCase(Locale.ENGLISH);
+            if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
+                return new FITSView(uri);
+            } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
+                 return new SimpleImageView(uri);
+            } else {
+                return new JP2View(uri, req);
+            }
+        } catch (InterruptedException ignore) {
+            // nothing
+        } catch (Exception e) {
+            Log.debug("loadView(\"" + uri + "\") ", e);
+            throw new IOException(e);
+        }
+        return null;
+    }
+
+    protected static View requestAndOpenRemoteFile(APIRequest req) throws IOException {
+        URI uri = APIRequestManager.requestRemoteFile(req);
+        return uri == null ? null : loadView(uri, req);
     }
 
 }
