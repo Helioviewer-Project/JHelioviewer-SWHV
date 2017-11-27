@@ -67,9 +67,8 @@ public class JP2View extends AbstractView {
 
     private JPIPSocket socket;
 
-    public JP2View(URI _uri, APIRequest _apiRequest) throws Exception {
-        uri = _uri;
-        apiRequest = _apiRequest;
+    public JP2View(URI _uri, APIRequest _req) throws Exception {
+        super(_uri, _req);
 
         String name = uri.getPath().toLowerCase();
         boolean supported = false;

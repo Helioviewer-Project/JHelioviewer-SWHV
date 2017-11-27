@@ -9,7 +9,7 @@ import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
-import org.helioviewer.jhv.view.ProxyView;
+import org.helioviewer.jhv.view.AbstractView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.fitsview.FITSView;
 import org.helioviewer.jhv.view.jp2view.JP2View;
@@ -24,7 +24,7 @@ class LoadURITask extends JHVWorker<View, Void> {
         String scheme = _uri.getScheme();
         ImageLayer layer = ImageLayer.create(null);
         if ("http".equals(scheme) || "https".equals(scheme))
-            JHVGlobals.getExecutorService().execute(new DownloadViewTask(layer, new ProxyView(_uri)));
+            JHVGlobals.getExecutorService().execute(new DownloadViewTask(layer, new AbstractView(_uri, null)));
         else
             JHVGlobals.getExecutorService().execute(new LoadURITask(layer, _uri));
     }
@@ -70,9 +70,9 @@ class LoadURITask extends JHVWorker<View, Void> {
         try {
             String loc = uri.toString().toLowerCase(Locale.ENGLISH);
             if (loc.endsWith(".fits") || loc.endsWith(".fts")) {
-                return new FITSView(uri);
+                return new FITSView(uri, req);
             } else if (loc.endsWith(".png") || loc.endsWith(".jpg") || loc.endsWith(".jpeg")) {
-                 return new SimpleImageView(uri);
+                 return new SimpleImageView(uri, req);
             } else {
                 return new JP2View(uri, req);
             }

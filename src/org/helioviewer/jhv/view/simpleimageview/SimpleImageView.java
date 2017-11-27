@@ -8,13 +8,14 @@ import javax.imageio.ImageIO;
 import org.helioviewer.jhv.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.imagedata.Single8ImageData;
 import org.helioviewer.jhv.imagedata.Single16ImageData;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.view.AbstractView;
 
 public class SimpleImageView extends AbstractView {
 
-    public SimpleImageView(URI _uri) throws Exception {
-        uri = _uri;
+    public SimpleImageView(URI _uri, APIRequest _req) throws Exception {
+        super(_uri, _req);
 
         BufferedImage image = ImageIO.read(uri.toURL());
         if (image == null)
@@ -31,11 +32,6 @@ public class SimpleImageView extends AbstractView {
         _metaData = new PixelBasedMetaData(image.getWidth(), image.getHeight(), 0);
         imageData.setRegion(_metaData.getPhysicalRegion());
         imageData.setMetaData(_metaData);
-    }
-
-    @Override
-    public String getXMLMetaData() {
-        return "<meta/>";
     }
 
 }
