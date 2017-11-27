@@ -10,6 +10,7 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVDate;
 
@@ -19,10 +20,11 @@ public class AbstractView implements View {
 
     private ImageLayer imageLayer;
 
-    protected URI uri;
-    protected APIRequest req;
+    protected final URI uri;
+    protected final APIRequest req;
     protected ImageData imageData;
-    protected MetaData _metaData;
+    protected LUT builtinLUT;
+    protected MetaData metaData[] = new MetaData[] { null };
 
     public AbstractView(URI _uri, APIRequest _req) {
         uri = _uri;
@@ -36,8 +38,13 @@ public class AbstractView implements View {
 
     @Override
     public String getName() {
-        String name = uri.getPath();
-        return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
+        MetaData m = metaData[0];
+        if (m instanceof HelioviewerMetaData)
+            return ((HelioviewerMetaData) m).getFullName();
+        else {
+            String name = uri.getPath();
+            return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
+        }
     }
 
     @Override
@@ -103,7 +110,7 @@ public class AbstractView implements View {
 
     @Override
     public JHVDate getFirstTime() {
-        return _metaData.getViewpoint().time;
+        return metaData[0].getViewpoint().time;
     }
 
     @Override
@@ -118,12 +125,15 @@ public class AbstractView implements View {
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return _metaData;
+        return metaData[0];
     }
 
     @Override
     public LUT getDefaultLUT() {
-        return null;
+        if (builtinLUT != null)
+            return builtinLUT;
+        MetaData m = metaData[0];
+        return m instanceof HelioviewerMetaData ? LUT.get((HelioviewerMetaData) m) : null;
     }
 
     @Override
