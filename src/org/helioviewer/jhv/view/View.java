@@ -19,7 +19,6 @@ public interface View {
     }
 
     APIRequest getAPIRequest();
-    void setAPIRequest(APIRequest apiRequest);
 
     void abolish();
 
