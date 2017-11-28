@@ -27,8 +27,7 @@ public class APIRequestManager {
             if (uri == null) {
                 // We did not get a reply to load data or no reply at all
                 if (message != null) {
-                    Log.error("No data to load returned from " + req.jpipRequest);
-                    Log.error("Server message: " + message);
+                    Log.error("Server message for " + req.jpipRequest + " : " + message);
                     Message.err("Server could not return data", Message.formatMessageString(message), false);
                 } else {
                     Log.error("Did not find URI in response to " + req.jpipRequest);

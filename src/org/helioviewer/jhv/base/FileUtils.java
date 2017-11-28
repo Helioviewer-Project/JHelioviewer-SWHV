@@ -29,12 +29,6 @@ public class FileUtils {
         return new BufferedInputStream(Files.newInputStream(src.toPath()), BUFSIZ);
     }
 
-    public static void save(InputStream in, File dst) throws IOException {
-        Path path = dst.toPath();
-        Files.createDirectories(path.getParent());
-        Files.copy(in, path);
-    }
-
     public static InputStream getResourceInputStream(String resourcePath) {
         return FileUtils.class.getResourceAsStream(resourcePath);
     }

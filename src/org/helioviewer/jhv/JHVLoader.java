@@ -53,9 +53,9 @@ class JHVLoader {
         lock.deleteOnExit();
 
         for (String kduLib : kduLibs) {
-            try (InputStream is = FileUtils.getResourceInputStream("/natives/" + pathlib + kduLib)) {
+            try (InputStream in = FileUtils.getResourceInputStream("/natives/" + pathlib + kduLib)) {
                 File f = new File(tempDir, kduLib);
-                FileUtils.save(is, f);
+                Files.copy(in, f.toPath());
                 System.load(f.getAbsolutePath());
             }
         }
