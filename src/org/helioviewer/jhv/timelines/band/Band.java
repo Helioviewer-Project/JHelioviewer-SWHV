@@ -261,7 +261,7 @@ public class Band extends AbstractTimelineRenderable {
 
     @Override
     public int hashCode() {
-        return toString().hashCode();
+        return super.hashCode();
     }
 
 }
