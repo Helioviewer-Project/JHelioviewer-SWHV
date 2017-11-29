@@ -26,6 +26,8 @@ public class TimelineTableModel extends AbstractTableModel {
     }
 
     public void addLineData(TimelineRenderable element) {
+        if (elements.contains(element)) // avoid band duplication via file load
+            return;
         elements.add(element);
 
         int row = elements.size() - 1;
