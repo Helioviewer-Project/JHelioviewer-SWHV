@@ -21,6 +21,7 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.gui.NewLayerAction;
 import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererColor;
@@ -45,9 +46,14 @@ public class TimelinePanel extends JPanel {
     static final int NUMBEROFCOLUMNS = 5;
     private static final int NUMBEROFVISIBLEROWS = 4;
 
+    private final TimelineTable grid;
     private final JPanel optionsPanelWrapper;
 
-    private static class TimelineTable extends JTable {
+    public void lazyRepaint() {
+        grid.lazyRepaint();
+    }
+
+    private static class TimelineTable extends JTable implements LazyComponent {
 
         TimelineTable(TableModel tm) {
             super(tm);
@@ -74,6 +80,26 @@ public class TimelinePanel extends JPanel {
             }
         }
 
+        @Override
+        public void repaint() {
+            dirty = true;
+        }
+
+        @Override
+        public void repaint(int x, int y, int width, int height) {
+            dirty = true;
+        }
+
+        private boolean dirty = false;
+
+        @Override
+        public void lazyRepaint() {
+            if (dirty) {
+                super.repaint();
+                dirty = false;
+            }
+        }
+
     }
 
     public TimelinePanel(TimelineTableModel model) {
@@ -86,7 +112,7 @@ public class TimelinePanel extends JPanel {
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
 
-        TimelineTable grid = new TimelineTable(model);
+        grid = new TimelineTable(model);
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));

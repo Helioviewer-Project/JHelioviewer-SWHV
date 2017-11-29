@@ -8,6 +8,7 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
 public class UITimer {
@@ -39,6 +40,7 @@ public class UITimer {
             }
             MoviePanel.getTimeSlider().lazyRepaint();
             ImageViewerGui.getRenderableContainerPanel().lazyRepaint();
+            Timelines.getTimelinePanel().lazyRepaint();
             ImageViewerGui.getCarringtonStatusPanel().lazyRepaint();
             ImageViewerGui.getZoomStatusPanel().lazyRepaint();
 
