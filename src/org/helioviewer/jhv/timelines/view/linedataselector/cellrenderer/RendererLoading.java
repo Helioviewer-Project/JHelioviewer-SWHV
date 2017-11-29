@@ -24,7 +24,7 @@ public class RendererLoading extends JHVTableCellRenderer {
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof TimelineRenderable && ((TimelineRenderable) value).isDownloading()) {
-            table.repaint();
+            table.repaint(); // lazy
 
             layer.setForeground(label.getForeground());
             layer.setView(label);

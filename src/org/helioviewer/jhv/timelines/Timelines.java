@@ -27,6 +27,10 @@ public class Timelines implements MainContentPanelPlugin {
         return tableModel;
     }
 
+    public static TimelinePanel getTimelinePanel() {
+        return timelinePanel;
+    }
+
     public void installTimelines() {
         pluginPanes.add(plotOne);
 
