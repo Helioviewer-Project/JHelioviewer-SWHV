@@ -31,17 +31,12 @@ public class JHVUpdate implements Runnable {
         verbose = _verbose;
     }
 
-    /**
-     * Checks for update in a new thread
-     */
     public void check() {
         Thread t = new Thread(this, "JHV Update Checker");
         t.start();
     }
 
-    /**
-     * Checks for update and show a dialog box
-     */
+    @Override
     public void run() {
         if (!verbose) {
             try {
