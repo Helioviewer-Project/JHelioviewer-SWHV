@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.fitsview;
 
 import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -28,7 +29,8 @@ class FITSImage {
     ImageData imageData;
 
     FITSImage(URI uri) throws Exception {
-        try (Fits f = new Fits(new BufferedInputStream(new DownloadStream(uri.toURL()).getInput(), BUFSIZ))) {
+        try (InputStream is = new DownloadStream(uri.toURL()).getInput();
+             Fits f = new Fits(new BufferedInputStream(is, BUFSIZ))) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {

@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
@@ -26,13 +27,13 @@ public class JSONUtils {
         }
     }
 
-    public static byte[] compressJSON(JSONObject json) throws IOException {
+    public static ByteArrayOutputStream compressJSON(JSONObject json) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (OutputStreamWriter out = new OutputStreamWriter(new GZIPOutputStream(baos, BUFSIZ), StandardCharsets.UTF_8)) {
+        try (GZIPOutputStream gz = new GZIPOutputStream(baos, BUFSIZ);
+             OutputStreamWriter out = new OutputStreamWriter(gz, StandardCharsets.UTF_8)) {
             json.write(out);
         }
-
-        return baos.toByteArray();
+        return baos;
     }
 
 }

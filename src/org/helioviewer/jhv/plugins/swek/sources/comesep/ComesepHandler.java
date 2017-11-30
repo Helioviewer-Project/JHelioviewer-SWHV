@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,6 @@ public class ComesepHandler extends SWEKHandler {
             ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>(len);
             for (int i = 0; i < len; i++) {
                 JSONObject result = results.getJSONObject(i);
-                byte[] compressed = JSONUtils.compressJSON(result);
 
                 long start = result.getLong("atearliest") * 1000;
                 long end = result.getLong("atlatest") * 1000;
@@ -40,7 +40,9 @@ public class ComesepHandler extends SWEKHandler {
 
                 long archiv = start;
                 String uid = result.getString("alertid");
-                event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, new ArrayList<>()));
+                try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
+                    event2db_list.add(new EventDatabase.Event2Db(baos.toByteArray(), start, end, archiv, uid, new ArrayList<>()));
+                }
             }
             EventDatabase.dump_event2db(event2db_list, supplier);
         } catch (Exception e) {
