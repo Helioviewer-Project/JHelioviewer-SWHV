@@ -805,15 +805,14 @@ public class EventDatabase {
 
                 String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList + ") AND events.id != " + event_id + ";";
                 ArrayList<JsonEvent> ret = new ArrayList<>();
-                try (Statement statement = connection.createStatement()) {
-                    try (ResultSet rs = statement.executeQuery(query)) {
-                        while (rs.next()) {
-                            int id = rs.getInt(1);
-                            long start = rs.getLong(2);
-                            long end = rs.getLong(3);
-                            byte[] json = rs.getBytes(4);
-                            ret.add(new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end));
-                        }
+                try (Statement statement = connection.createStatement();
+                     ResultSet rs = statement.executeQuery(query)) {
+                    while (rs.next()) {
+                        int id = rs.getInt(1);
+                        long start = rs.getLong(2);
+                        long end = rs.getLong(3);
+                        byte[] json = rs.getBytes(4);
+                        ret.add(new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end));
                     }
                 }
                 return ret;
