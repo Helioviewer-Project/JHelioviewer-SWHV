@@ -101,6 +101,7 @@ public class HTTPSocket {
 
     protected void close() throws IOException {
         socket.close();
+        inputStream.close();
     }
 
     public boolean isClosed() {
