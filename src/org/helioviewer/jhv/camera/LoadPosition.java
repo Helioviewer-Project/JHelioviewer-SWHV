@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -45,9 +46,9 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
         if (span / deltat > max)
             deltat = span / max;
 
-        try {
-            DownloadStream ds = new DownloadStream(new PositionRequest(target, frame, start, end, deltat).url, true);
-            JSONObject result = JSONUtils.getJSONStream(ds.getInput());
+        DownloadStream ds = new DownloadStream(new PositionRequest(target, frame, start, end, deltat).url, true);
+        try (InputStream is = ds.getInput()) {
+            JSONObject result = JSONUtils.getJSONStream(is);
             if (ds.isResponse400()) {
                 report = result.optString("faultstring", "Invalid network response");
             } else {
