@@ -12,7 +12,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.io.DownloadStream;
+import org.helioviewer.jhv.io.NetStream;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
@@ -57,8 +57,8 @@ public class PfssNewDataLoader implements Runnable {
                 String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
                 String url = PfssSettings.baseURL + startYear + '/' + m + "/list.txt";
 
-                try (InputStream is = new DownloadStream(url).getInput();
-                     BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                try (NetStream ns = new NetStream(url);
+                     BufferedReader in = new BufferedReader(new InputStreamReader(ns.getInput(), StandardCharsets.UTF_8))) {
                     String inputLine;
                     while ((inputLine = in.readLine()) != null) {
                         String[] splitted = inputLine.split(" ");
