@@ -1,51 +1,48 @@
 package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
+import java.util.List;
+import java.util.Map;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.log.Log;
 
 public class DownloadStream {
 
     private InputStream in;
 
-    private int contentLength = -1;
-    private boolean response400 = false;
-
-    // Timeouts in ms
-    private final int readTimeout;
-    private final int connectTimeout;
-
-    // URL to connect
-    private final URL url;
+    private boolean response400;
     private final boolean ignore400;
 
-    private DownloadStream(URL _url, int _connectTimeout, int _readTimeout, boolean _ignore400) {
-        url = _url;
-        readTimeout = _readTimeout;
-        connectTimeout = _connectTimeout;
+    private final URLConnection conn;
+
+    private DownloadStream(URL url, int connectTimeout, int readTimeout, boolean _ignore400) throws IOException {
         ignore400 = _ignore400;
+
+        conn = url.openConnection();
+        conn.setConnectTimeout(connectTimeout);
+        conn.setReadTimeout(readTimeout);
+        conn.setRequestProperty("Accept-Encoding", "gzip,deflate");
+        conn.setRequestProperty("User-Agent", JHVGlobals.userAgent);
     }
 
-    public DownloadStream(URL _url, boolean _ignore400) {
-        this(_url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), _ignore400);
+    public DownloadStream(URL url, boolean _ignore400) throws IOException {
+        this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), _ignore400);
     }
 
-    public DownloadStream(URL _url) {
-        this(_url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), false);
+    public DownloadStream(URL url) throws IOException {
+        this(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout(), false);
     }
 
-    public DownloadStream(String _url) throws MalformedURLException {
-        this(new URL(_url));
+    public DownloadStream(String url) throws IOException {
+        this(new URL(url));
     }
 
     public boolean isResponse400() {
@@ -68,30 +65,16 @@ public class DownloadStream {
         if (EventQueue.isDispatchThread())
             throw new IOException("Don't do that");
 
-        //Log.debug("Connect to " + url);
-        URLConnection connection = url.openConnection();
-        connection.setConnectTimeout(connectTimeout);
-        connection.setReadTimeout(readTimeout);
-
-        if (connection instanceof HttpURLConnection) {
-            HttpURLConnection httpC = (HttpURLConnection) connection;
-            httpC.setRequestProperty("Accept-Encoding", "gzip,deflate");
-            httpC.setRequestProperty("User-Agent", JHVGlobals.userAgent);
-
-            try {
-                httpC.connect();
-            } catch (IOException e) {
-                Log.warn("HTTP connection failed: " + url + " " + e);
-            }
-
+        if (conn instanceof HttpURLConnection) {
+            HttpURLConnection httpC = (HttpURLConnection) conn;
             // Check the connection code
             int code = httpC.getResponseCode();
             if (code > 400) {
-                throw new IOException("Error opening HTTP connection to " + url + " Response code: " + code);
+                throw new IOException("Error opening HTTP connection to " + conn.getURL() + " Response code: " + code);
             }
 
             if (!ignore400 && code == 400) {
-                throw new IOException("Error opening HTTP connection to " + url + " Response code: " + code);
+                throw new IOException("Error opening HTTP connection to " + conn.getURL() + " Response code: " + code);
             }
 
             InputStream strm;
@@ -106,9 +89,8 @@ public class DownloadStream {
 
             in = getEncodedStream(httpC.getContentEncoding(), strm);
         } else { // Not a HTTP connection
-            in = connection.getInputStream();
+            in = conn.getInputStream();
         }
-        contentLength = connection.getContentLength();
     }
 
     public InputStream getInput() throws IOException {
@@ -118,7 +100,15 @@ public class DownloadStream {
     }
 
     public int getContentLength() {
-        return contentLength;
+        return conn.getContentLength();
+    }
+
+    public Map<String, List<String>> getHeader() {
+        return conn.getHeaderFields();
+    }
+
+    public void setHeader(String key, String value) {
+        conn.setRequestProperty(key, value);
     }
 
 }

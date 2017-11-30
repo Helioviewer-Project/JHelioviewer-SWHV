@@ -46,13 +46,15 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
         if (span / deltat > max)
             deltat = span / max;
 
-        DownloadStream ds = new DownloadStream(new PositionRequest(target, frame, start, end, deltat).url, true);
-        try (InputStream is = ds.getInput()) {
-            JSONObject result = JSONUtils.getJSONStream(is);
-            if (ds.isResponse400()) {
-                report = result.optString("faultstring", "Invalid network response");
-            } else {
-                return PositionRequest.parseResponse(result);
+        try {
+            DownloadStream ds = new DownloadStream(new PositionRequest(target, frame, start, end, deltat).url, true);
+            try (InputStream is = ds.getInput()) {
+                JSONObject result = JSONUtils.getJSONStream(is);
+                if (ds.isResponse400()) {
+                    report = result.optString("faultstring", "Invalid network response");
+                } else {
+                    return PositionRequest.parseResponse(result);
+                }
             }
         } catch (UnknownHostException e) {
             Log.debug("Unknown host, network down?", e);
