@@ -30,7 +30,8 @@ class FITSImage {
 
     FITSImage(URI uri) throws Exception {
         try (InputStream is = new DownloadStream(uri.toURL()).getInput();
-             Fits f = new Fits(new BufferedInputStream(is, BUFSIZ))) {
+             BufferedInputStream in = new BufferedInputStream(is, BUFSIZ);
+             Fits f = new Fits(in)) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {
