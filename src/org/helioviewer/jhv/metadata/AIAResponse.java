@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.metadata;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -72,24 +72,22 @@ public class AIAResponse {
         return FileUtils.getResourceUrl(intPath + dataFile);
     }
 
-    private static JSONObject getResponseData(URL url) throws IOException {
-        return JSONUtils.getJSONStream(new DownloadStream(url).getInput());
-    }
-
     public static void load() throws Exception {
-        JSONObject data = getResponseData(getInternalURL());
-        String[] keys = JSONObject.getNames(data);
-        Arrays.sort(keys);
+        try (InputStream is = new DownloadStream(getInternalURL()).getInput()) {
+            JSONObject data = JSONUtils.getJSONStream(is);
+            String[] keys = JSONObject.getNames(data);
+            Arrays.sort(keys);
 
-        firstDate = keys[0];
-        lastDate = keys[keys.length - 1];
-        responseData = data;
-        referenceData = data.getJSONObject("2010-05-01");
+            firstDate = keys[0];
+            lastDate = keys[keys.length - 1];
+            responseData = data;
+            referenceData = data.getJSONObject("2010-05-01");
 
-//        for (String key : STANDARD_INT.keySet())
-//            LMSAL_MAX.put(key, MAX.get(key) / STANDARD_INT.get(key));
+            // for (String key : STANDARD_INT.keySet())
+            // LMSAL_MAX.put(key, MAX.get(key) / STANDARD_INT.get(key));
 
-        loaded = true;
+            loaded = true;
+        }
     }
 
     static double get(String date, String pass) {
