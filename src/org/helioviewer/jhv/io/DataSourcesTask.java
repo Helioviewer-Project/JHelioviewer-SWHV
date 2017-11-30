@@ -39,8 +39,8 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
                 Log.error("Could not load the JSON schema: ", e);
             }
 
-            try (InputStream is = new DownloadStream(url).getInput()) {
-                JSONObject json = JSONUtils.getJSONStream(is);
+            try (NetStream ns = new NetStream(url)) {
+                JSONObject json = JSONUtils.getJSONStream(ns.getInput());
 /*
                 if (url.contains("helioviewer.org")) {
                     json.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").remove("174");

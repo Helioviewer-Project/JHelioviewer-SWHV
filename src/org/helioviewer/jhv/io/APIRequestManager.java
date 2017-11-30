@@ -12,8 +12,8 @@ import org.helioviewer.jhv.log.Log;
 public class APIRequestManager {
 
     public static URI requestRemoteFile(APIRequest req) throws IOException {
-        try (InputStream is = new DownloadStream(req.jpipRequest).getInput()) {
-            APIResponse response = new APIResponse(JSONUtils.getJSONStream(is));
+        try (NetStream ns = new NetStream(req.jpipRequest)) {
+            APIResponse response = new APIResponse(JSONUtils.getJSONStream(ns.getInput()));
             // Just some error from the server
             String error = response.getError();
             if (error != null) {

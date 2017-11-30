@@ -22,8 +22,8 @@ class LoadStateTask extends JHVWorker<JSONObject, Void> {
 
     @Override
     protected JSONObject backgroundWork() {
-        try (InputStream is = new DownloadStream(uri.toURL()).getInput()) {
-            return JSONUtils.getJSONStream(is);
+        try (NetStream ns = new NetStream(uri.toURL())) {
+            return JSONUtils.getJSONStream(ns.getInput());
         } catch (IOException e) {
             Log.error("An error occurred while opening the remote file: ", e);
             Message.err("An error occurred while opening the remote file: ", e.getMessage(), false);
