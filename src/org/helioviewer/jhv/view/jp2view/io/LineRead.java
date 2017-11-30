@@ -11,15 +11,15 @@ public class LineRead {
     private static final int LF = 10;
 
     private static byte[] readRawLine(InputStream in) throws IOException {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream(64);
-        int ch;
-        while ((ch = in.read()) >= 0) {
-            buf.write(ch);
-            if (ch == LF) {
-                break;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64)) {
+            int ch;
+            while ((ch = in.read()) >= 0) {
+                baos.write(ch);
+                if (ch == LF)
+                    break;
             }
+            return baos.toByteArray();
         }
-        return buf.toByteArray();
     }
 
     public static String readAsciiLine(InputStream in) throws IOException {
