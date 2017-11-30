@@ -78,7 +78,8 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
         boolean failed = false;
         DownloadStream ds = new DownloadStream(downloadURL);
-        try (InputStream in = new BufferedInputStream(ds.getInput(), BUFSIZ)) {
+        try (InputStream is = ds.getInput();
+             InputStream in = new BufferedInputStream(is, BUFSIZ)) {
             int contentLength = ds.getContentLength();
             if (contentLength > 0) {
                 EventQueue.invokeLater(() -> {

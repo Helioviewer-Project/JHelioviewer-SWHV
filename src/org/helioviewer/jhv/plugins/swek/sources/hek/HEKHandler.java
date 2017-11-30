@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
+import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -37,8 +38,6 @@ public class HEKHandler extends SWEKHandler {
             ArrayList<EventDatabase.Event2Db> event2db_list = new ArrayList<>(len);
             for (int i = 0; i < len; i++) {
                 JSONObject result = results.getJSONObject(i);
-                byte[] compressed = JSONUtils.compressJSON(result);
-
                 if (result.has("fl_goescls"))
                     result.put("JHV_GOESClass", GOESLevel.getFloatValue(result.getString("fl_goescls")));
 
@@ -69,7 +68,9 @@ public class HEKHandler extends SWEKHandler {
                         }
                     }
                 }
-                event2db_list.add(new EventDatabase.Event2Db(compressed, start, end, archiv, uid, paramList));
+                try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
+                    event2db_list.add(new EventDatabase.Event2Db(baos.toByteArray(), start, end, archiv, uid, paramList));
+                }
             }
             EventDatabase.dump_event2db(event2db_list, supplier);
         } catch (Exception e) {

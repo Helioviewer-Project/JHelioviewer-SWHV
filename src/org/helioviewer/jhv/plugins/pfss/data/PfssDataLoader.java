@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugins.pfss.data;
 import java.awt.EventQueue;
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.InputStream;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.io.DownloadStream;
@@ -41,7 +42,8 @@ class PfssDataLoader implements Runnable {
             remote = PfssSettings.baseURL + url;
         }
 
-        try (Fits fits = new Fits(new BufferedInputStream(new DownloadStream(remote).getInput(), BUFSIZ))) {
+        try (InputStream is = new DownloadStream(remote).getInput();
+             Fits fits = new Fits(new BufferedInputStream(is, BUFSIZ))) {
             PfssData pfssData = getPfssData(fits, time);
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
 

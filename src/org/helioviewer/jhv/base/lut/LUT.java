@@ -118,7 +118,8 @@ public class LUT {
     }
 
     private static void readColors() {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(FileUtils.getResourceInputStream("/settings/colors.js"), StandardCharsets.UTF_8))) {
+        try (InputStream is = FileUtils.getResourceInputStream("/settings/colors.js");
+             BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             colorRules = new JSONArray(new JSONTokener(in));
         } catch (IOException | JSONException e) {
             Log.warn("Error reading the configuration for the default color tables", e);
