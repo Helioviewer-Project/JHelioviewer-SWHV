@@ -14,7 +14,7 @@ import nom.tam.fits.ImageHDU;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
-import org.helioviewer.jhv.io.DownloadStream;
+import org.helioviewer.jhv.io.NetStream;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.Single8ImageData;
 import org.helioviewer.jhv.imagedata.Single16ImageData;
@@ -29,8 +29,8 @@ class FITSImage {
     ImageData imageData;
 
     FITSImage(URI uri) throws Exception {
-        try (InputStream is = new DownloadStream(uri.toURL()).getInput();
-             BufferedInputStream in = new BufferedInputStream(is, BUFSIZ);
+        try (NetStream ns = new NetStream(uri.toURL());
+             BufferedInputStream in = new BufferedInputStream(ns.getInput(), BUFSIZ);
              Fits f = new Fits(in)) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome

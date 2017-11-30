@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
-import java.util.List;
-import java.util.Map;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,14 +99,6 @@ public class DownloadStream {
 
     public int getContentLength() {
         return conn.getContentLength();
-    }
-
-    public Map<String, List<String>> getHeader() {
-        return conn.getHeaderFields();
-    }
-
-    public void setHeader(String key, String value) {
-        conn.setRequestProperty(key, value);
     }
 
 }
