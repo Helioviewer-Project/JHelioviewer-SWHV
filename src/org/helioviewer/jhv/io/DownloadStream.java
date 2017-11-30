@@ -70,13 +70,11 @@ public class DownloadStream {
 
         //Log.debug("Connect to " + url);
         URLConnection connection = url.openConnection();
-        // Set timeouts
         connection.setConnectTimeout(connectTimeout);
         connection.setReadTimeout(readTimeout);
 
         if (connection instanceof HttpURLConnection) {
             HttpURLConnection httpC = (HttpURLConnection) connection;
-            // get compression if supported
             httpC.setRequestProperty("Accept-Encoding", "gzip,deflate");
             httpC.setRequestProperty("User-Agent", JHVGlobals.userAgent);
 
@@ -107,8 +105,7 @@ public class DownloadStream {
             }
 
             in = getEncodedStream(httpC.getContentEncoding(), strm);
-        } else {
-            // Not a HTTP connection
+        } else { // Not a HTTP connection
             in = connection.getInputStream();
         }
         contentLength = connection.getContentLength();

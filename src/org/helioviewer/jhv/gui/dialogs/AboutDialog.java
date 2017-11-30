@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
+import java.io.InputStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -96,9 +97,11 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
-                TextDialog textDialog = new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')),
-                                                       FileUtils.URL2String(ImageViewerGui.class.getResource("/licenses/" + e.getDescription())), true);
-                textDialog.showDialog();
+                try (InputStream is = FileUtils.getResourceInputStream("/licenses/" + e.getDescription())) {
+                    new TextDialog("License - " + e.getDescription().substring(0, e.getDescription().indexOf('.')), FileUtils.convertStreamToString(is), true).showDialog();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             } else {
                 JHVGlobals.openURL(e.getURL().toString());
             }
