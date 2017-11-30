@@ -77,27 +77,29 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         }
 
         boolean failed = false;
-        DownloadStream ds = new DownloadStream(downloadURL);
-        try (InputStream is = ds.getInput();
-             InputStream in = new BufferedInputStream(is, BUFSIZ)) {
-            int contentLength = ds.getContentLength();
-            if (contentLength > 0) {
-                EventQueue.invokeLater(() -> {
-                    progressBar.setIndeterminate(false);
-                    progressBar.setMaximum(contentLength);
-                });
-            }
+        try {
+            DownloadStream ds = new DownloadStream(downloadURL);
+            try (InputStream is = ds.getInput();
+                 InputStream in = new BufferedInputStream(is, BUFSIZ)) {
+                int contentLength = ds.getContentLength();
+                if (contentLength > 0) {
+                    EventQueue.invokeLater(() -> {
+                        progressBar.setIndeterminate(false);
+                        progressBar.setMaximum(contentLength);
+                    });
+                }
 
-            try (OutputStream out = FileUtils.newBufferedOutputStream(dstFile)) {
-                byte[] buffer = new byte[BUFSIZ];
-                int numTotalRead = 0, numCurrentRead;
-                while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, numCurrentRead);
-                    numTotalRead += numCurrentRead;
+                try (OutputStream out = FileUtils.newBufferedOutputStream(dstFile)) {
+                    byte[] buffer = new byte[BUFSIZ];
+                    int numTotalRead = 0, numCurrentRead;
+                    while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, numCurrentRead);
+                        numTotalRead += numCurrentRead;
 
-                    if (contentLength > 0) {
-                        int finalTotalRead = numTotalRead;
-                        EventQueue.invokeLater(() -> progressBar.setValue(finalTotalRead));
+                        if (contentLength > 0) {
+                            int finalTotalRead = numTotalRead;
+                            EventQueue.invokeLater(() -> progressBar.setValue(finalTotalRead));
+                        }
                     }
                 }
             }
