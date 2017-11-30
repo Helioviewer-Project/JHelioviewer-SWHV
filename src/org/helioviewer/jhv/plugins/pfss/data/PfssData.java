@@ -58,7 +58,7 @@ public class PfssData {
         return (f + 32768.) * (2. / 65535.) - 1.;
     }
 
-    private void computeColor(float[] color, double b) {
+    private static void computeColor(float[] color, double b) {
         if (b > 0) {
             color[0] = 1;
             color[1] = (float) (1. - b);
