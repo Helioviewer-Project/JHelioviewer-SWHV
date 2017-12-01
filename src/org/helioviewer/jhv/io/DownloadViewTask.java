@@ -88,7 +88,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
             try (OutputStream out = FileUtils.newBufferedOutputStream(dstFile)) {
                 byte[] buffer = new byte[BUFSIZ];
                 int numTotalRead = 0, numCurrentRead;
-                InputStream in = ns.getInput();
+                InputStream in = ns.getStream();
                 while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
                     out.write(buffer, 0, numCurrentRead);
                     numTotalRead += numCurrentRead;

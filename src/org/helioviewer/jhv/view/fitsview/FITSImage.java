@@ -27,7 +27,7 @@ class FITSImage {
 
     FITSImage(URI uri) throws Exception {
         try (NetStream ns = new NetStream(uri.toURL());
-             Fits f = new Fits(ns.getInput())) {
+             Fits f = new Fits(ns.getStream())) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {
