@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.io;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.Settings;
@@ -25,7 +23,7 @@ public class APIRequest {
     public final long endTime;
     public final int cadence;
 
-    final URL jpipRequest;
+    final String jpipRequest;
     final URI fileRequest;
 
     public APIRequest(String _server, int _sourceId, long _startTime, long _endTime, int _cadence) {
@@ -35,27 +33,19 @@ public class APIRequest {
         endTime = _endTime;
         cadence = _cadence;
 
-        String jpipReq, fileReq;
+        String fileReq;
         if (startTime == endTime) {
             fileReq = DataSources.getServerSetting(server, "API.getJP2Image") + "sourceId=" + Integer.toString(sourceId) +
                                                    "&date=" + TimeUtils.formatZ(startTime) + "&json=true";
-            jpipReq = fileReq + "&jpip=true";
+            jpipRequest = fileReq + "&jpip=true";
         } else {
             fileReq = DataSources.getServerSetting(server, "API.getJPX") + "sourceId=" + Integer.toString(sourceId) +
                                                    "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
             if (cadence != CADENCE_ANY) {
                 fileReq += "&cadence=" + Integer.toString(cadence);
             }
-            jpipReq = fileReq + "&jpip=true&verbose=true&linked=true";
+            jpipRequest = fileReq + "&jpip=true&verbose=true&linked=true";
         }
-
-        URL url = null;
-        try {
-            url = new URL(jpipReq);
-        } catch (MalformedURLException e) {
-            Log.error("Malformed JPIP request URL: " + jpipReq);
-        }
-        jpipRequest = url;
 
         URI uri = null;
         try {
