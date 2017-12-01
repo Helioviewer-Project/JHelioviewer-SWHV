@@ -12,7 +12,7 @@ import nom.tam.fits.ImageHDU;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
-import org.helioviewer.jhv.io.NetStream;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.Single8ImageData;
 import org.helioviewer.jhv.imagedata.Single16ImageData;
@@ -26,7 +26,7 @@ class FITSImage {
     ImageData imageData;
 
     FITSImage(URI uri) throws Exception {
-        try (NetStream ns = new NetStream(uri.toURL());
+        try (NetClient ns = new NetClient(uri.toURL());
              Fits f = new Fits(ns.getStream())) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
