@@ -27,8 +27,8 @@ public abstract class SWEKHandler {
             boolean success = true;
             boolean overmax = true;
             while (overmax && success) {
-                try (NetClient ns = new NetClient(createURL(supplier.getGroup(), start, end, params, page))) {
-                    JSONObject eventJSON = JSONUtils.decodeJSON(ns.getReader());
+                try (NetClient nc = new NetClient(createURL(supplier.getGroup(), start, end, params, page))) {
+                    JSONObject eventJSON = JSONUtils.decodeJSON(nc.getReader());
                     overmax = eventJSON.optBoolean("overmax", false);
                     success = parseRemote(eventJSON, supplier) && parseAssociations(eventJSON);
                     page++;

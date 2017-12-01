@@ -1,14 +1,11 @@
 package org.helioviewer.jhv.metadata;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.JSONUtils;
-import org.helioviewer.jhv.io.DownloadStream;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
@@ -53,10 +50,7 @@ public class AIAResponse {
     };
 
 //    private static final HashMap<String, Double> LMSAL_MAX = new HashMap<>();
-
-    private static final String extPath = "https://raw.githubusercontent.com/mjpauly/aia/master/";
-    private static final String intPath = "/data/";
-    private static final String dataFile = "aia_rescaling_data.json";
+//    private static final String extPath = "https://raw.githubusercontent.com/mjpauly/aia/master/aia_rescaling_data.json";
 
     private static boolean loaded;
     private static JSONObject responseData;
@@ -64,16 +58,8 @@ public class AIAResponse {
     private static String firstDate;
     private static String lastDate;
 
-    private static URL getExternalURL() throws MalformedURLException {
-        return new URL(extPath + dataFile);
-    }
-
-    private static URL getInternalURL() {
-        return FileUtils.getResourceUrl(intPath + dataFile);
-    }
-
     public static void load() throws Exception {
-        try (InputStream is = new DownloadStream(getInternalURL()).getInput()) {
+        try (InputStream is = FileUtils.getResourceInputStream("/data/aia_rescaling_data.json")) {
             JSONObject data = JSONUtils.getJSONStream(is);
             String[] keys = JSONObject.getNames(data);
             Arrays.sort(keys);
