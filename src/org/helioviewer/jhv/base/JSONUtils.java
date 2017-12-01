@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
@@ -20,6 +21,15 @@ public class JSONUtils {
     public static JSONObject getJSONStream(InputStream in) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8), BUFSIZ)) {
             return new JSONObject(new JSONTokener(reader));
+        } catch (Exception e) {
+            Log.error("Invalid JSON response " + e);
+            return new JSONObject();
+        }
+    }
+
+    public static JSONObject decodeJSON(Reader in) {
+        try {
+            return new JSONObject(new JSONTokener(in));
         } catch (Exception e) {
             Log.error("Invalid JSON response " + e);
             return new JSONObject();

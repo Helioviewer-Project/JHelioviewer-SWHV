@@ -40,7 +40,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
             }
 
             try (NetStream ns = new NetStream(url)) {
-                JSONObject json = JSONUtils.getJSONStream(ns.getInput());
+                JSONObject json = JSONUtils.decodeJSON(ns.getReader());
 /*
                 if (url.contains("helioviewer.org")) {
                     json.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").remove("174");

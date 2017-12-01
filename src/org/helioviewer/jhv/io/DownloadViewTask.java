@@ -2,7 +2,6 @@ package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -77,29 +76,26 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         }
 
         boolean failed = false;
-        try {
-            DownloadStream ds = new DownloadStream(downloadURL);
-            try (InputStream is = ds.getInput();
-                 InputStream in = new BufferedInputStream(is, BUFSIZ)) {
-                int contentLength = ds.getContentLength();
-                if (contentLength > 0) {
-                    EventQueue.invokeLater(() -> {
-                        progressBar.setIndeterminate(false);
-                        progressBar.setMaximum(contentLength);
-                    });
-                }
+        try (NetStream ns = new NetStream(downloadURL)) {
+            int contentLength = (int) ns.getContentLength();
+            if (contentLength > 0) {
+                EventQueue.invokeLater(() -> {
+                    progressBar.setIndeterminate(false);
+                    progressBar.setMaximum(contentLength);
+                });
+            }
 
-                try (OutputStream out = FileUtils.newBufferedOutputStream(dstFile)) {
-                    byte[] buffer = new byte[BUFSIZ];
-                    int numTotalRead = 0, numCurrentRead;
-                    while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
-                        out.write(buffer, 0, numCurrentRead);
-                        numTotalRead += numCurrentRead;
+            try (OutputStream out = FileUtils.newBufferedOutputStream(dstFile)) {
+                byte[] buffer = new byte[BUFSIZ];
+                int numTotalRead = 0, numCurrentRead;
+                InputStream in = ns.getInput();
+                while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, numCurrentRead);
+                    numTotalRead += numCurrentRead;
 
-                        if (contentLength > 0) {
-                            int finalTotalRead = numTotalRead;
-                            EventQueue.invokeLater(() -> progressBar.setValue(finalTotalRead));
-                        }
+                    if (contentLength > 0) {
+                        int finalTotalRead = numTotalRead;
+                        EventQueue.invokeLater(() -> progressBar.setValue(finalTotalRead));
                     }
                 }
             }

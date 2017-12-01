@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
 
 import okhttp3.OkHttpClient;
@@ -28,6 +29,14 @@ public class NetStream implements AutoCloseable {
 
     public InputStream getInput() {
         return response.body().byteStream();
+    }
+
+    public Reader getReader() {
+        return response.body().charStream();
+    }
+
+    public long getContentLength() {
+        return response.body().contentLength();
     }
 
     @Override
