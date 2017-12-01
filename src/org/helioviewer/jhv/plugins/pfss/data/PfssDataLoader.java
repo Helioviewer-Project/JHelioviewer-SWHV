@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 import java.io.File;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.io.NetStream;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 import org.helioviewer.jhv.time.JHVDate;
@@ -39,7 +39,7 @@ class PfssDataLoader implements Runnable {
             remote = PfssSettings.baseURL + url;
         }
 
-        try (NetStream ns = new NetStream(remote);
+        try (NetClient ns = new NetClient(remote);
              Fits fits = new Fits(ns.getStream())) {
             PfssData pfssData = getPfssData(fits, time);
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));

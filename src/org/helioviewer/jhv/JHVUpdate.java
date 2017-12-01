@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
-import org.helioviewer.jhv.io.NetStream;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 
 public class JHVUpdate implements Runnable {
@@ -53,7 +53,7 @@ public class JHVUpdate implements Runnable {
             }
         }
 
-        try (NetStream ns = new NetStream(JHVGlobals.downloadURL + "VERSION")) {
+        try (NetClient ns = new NetClient(JHVGlobals.downloadURL + "VERSION")) {
             String version = ns.getSource().readUtf8Line();
             if (version == null || version.isEmpty()) {
                 throw new IOException("JHVUpdate: Empty version string");

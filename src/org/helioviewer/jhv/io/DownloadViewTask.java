@@ -76,7 +76,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         }
 
         boolean failed = false;
-        try (NetStream ns = new NetStream(downloadURL)) {
+        try (NetClient ns = new NetClient(downloadURL)) {
             int contentLength = (int) ns.getContentLength();
             if (contentLength > 0) {
                 EventQueue.invokeLater(() -> {

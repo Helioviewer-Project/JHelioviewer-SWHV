@@ -39,7 +39,7 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
                 Log.error("Could not load the JSON schema: ", e);
             }
 
-            try (NetStream ns = new NetStream(url)) {
+            try (NetClient ns = new NetClient(url)) {
                 JSONObject json = JSONUtils.decodeJSON(ns.getReader());
 /*
                 if (url.contains("helioviewer.org")) {
