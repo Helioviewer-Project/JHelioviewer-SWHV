@@ -29,14 +29,11 @@ public class NetClient implements AutoCloseable {
     private Response response;
 
     public NetClient(String url) throws IOException {
-        call(requestBuilder.url(url).build());
+        this(new URL(url));
     }
 
     public NetClient(URL url) throws IOException {
-        call(requestBuilder.url(url).build());
-    }
-
-    private void call(Request request) throws IOException {
+        Request request = requestBuilder.url(url).build();
         response = client.newCall(request).execute();
         if (!response.isSuccessful())
             throw new IOException(response.toString());
