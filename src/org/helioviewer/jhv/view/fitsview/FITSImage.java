@@ -26,8 +26,8 @@ class FITSImage {
     ImageData imageData;
 
     FITSImage(URI uri) throws Exception {
-        try (NetClient ns = new NetClient(uri.toURL());
-             Fits f = new Fits(ns.getStream())) {
+        try (NetClient nc = new NetClient(uri.toURL());
+             Fits f = new Fits(nc.getStream())) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {

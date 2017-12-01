@@ -55,8 +55,8 @@ public class PfssNewDataLoader implements Runnable {
                 String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
                 String url = PfssSettings.baseURL + startYear + '/' + m + "/list.txt";
 
-                try (NetClient ns = new NetClient(url)) {
-                    BufferedSource source = ns.getSource();
+                try (NetClient nc = new NetClient(url)) {
+                    BufferedSource source = nc.getSource();
                     String inputLine;
                     while ((inputLine = source.readUtf8Line()) != null) {
                         String[] splitted = inputLine.split(" ");
