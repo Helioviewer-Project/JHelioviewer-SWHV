@@ -1,15 +1,19 @@
 package org.helioviewer.jhv.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
 import okhttp3.Interceptor;
@@ -31,6 +35,7 @@ public class NetClient implements AutoCloseable {
         .build();
 
     private final Response response;
+    private final InputStream stream;
 
     public NetClient(String url) throws IOException {
         this(new URL(url), false);
@@ -45,10 +50,17 @@ public class NetClient implements AutoCloseable {
     }
 
     public NetClient(URL url, boolean allowError) throws IOException {
+        if ("file".equals(url.getProtocol())) {
+            stream = FileUtils.newBufferedInputStream(new File(url.getPath()));
+            response = null;
+            return;
+        }
+
         Request request = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url).build();
         response = client.newCall(request).execute();
         if (!allowError && !response.isSuccessful())
             throw new IOException(response.toString());
+        stream = null;
     }
 
     public boolean isSuccessful() {
@@ -56,11 +68,11 @@ public class NetClient implements AutoCloseable {
     }
 
     public InputStream getStream() {
-        return response.body().byteStream();
+        return stream == null ? response.body().byteStream() : stream;
     }
 
     public Reader getReader() {
-        return response.body().charStream();
+        return stream == null ? response.body().charStream() : new InputStreamReader(stream, StandardCharsets.UTF_8);
     }
 
     public BufferedSource getSource() {
@@ -72,7 +84,9 @@ public class NetClient implements AutoCloseable {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
+        if (stream != null)
+            stream.close();
         if (response != null)
             response.close();
     }
