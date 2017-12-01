@@ -53,8 +53,8 @@ public class JHVUpdate implements Runnable {
             }
         }
 
-        try (NetClient ns = new NetClient(JHVGlobals.downloadURL + "VERSION")) {
-            String version = ns.getSource().readUtf8Line();
+        try (NetClient nc = new NetClient(JHVGlobals.downloadURL + "VERSION")) {
+            String version = nc.getSource().readUtf8Line();
             if (version == null || version.isEmpty()) {
                 throw new IOException("JHVUpdate: Empty version string");
             }
