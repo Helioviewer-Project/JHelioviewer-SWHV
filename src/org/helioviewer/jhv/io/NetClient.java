@@ -6,6 +6,9 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
+
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.log.Log;
 
@@ -16,6 +19,10 @@ import okhttp3.Response;
 import okio.BufferedSource;
 
 public class NetClient implements AutoCloseable {
+
+    //static {
+    //    Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+    //}
 
     private static final OkHttpClient client = new OkHttpClient.Builder()
         .connectTimeout(JHVGlobals.getStdConnectTimeout(), TimeUnit.MILLISECONDS)
@@ -57,7 +64,8 @@ public class NetClient implements AutoCloseable {
 
     @Override
     public void close() {
-        response.close();
+        if (response != null)
+            response.close();
     }
 
     private static class LoggingInterceptor implements Interceptor {
