@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -17,6 +14,8 @@ import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 import org.helioviewer.jhv.threads.CancelTask;
 import org.helioviewer.jhv.time.TimeUtils;
+
+import okio.BufferedSource;
 
 public class PfssNewDataLoader implements Runnable {
 
@@ -56,15 +55,15 @@ public class PfssNewDataLoader implements Runnable {
                 String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
                 String url = PfssSettings.baseURL + startYear + '/' + m + "/list.txt";
 
-                try (NetStream ns = new NetStream(url);
-                     BufferedReader in = new BufferedReader(new InputStreamReader(ns.getInput(), StandardCharsets.UTF_8))) {
+                try (NetStream ns = new NetStream(url)) {
+                    BufferedSource source = ns.getSource();
                     String inputLine;
-                    while ((inputLine = in.readLine()) != null) {
+                    while ((inputLine = source.readUtf8Line()) != null) {
                         String[] splitted = inputLine.split(" ");
                         urls.add(new Pair<>(splitted[1], TimeUtils.parse(splitted[0])));
                     }
                 } catch (Exception e) {
-                    Log.warn("Could not read PFSS entries: " + url + " " + e);
+                    Log.warn("Could not read PFSS entries: " + e);
                 }
             }
 

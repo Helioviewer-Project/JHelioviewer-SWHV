@@ -40,7 +40,7 @@ class PfssDataLoader implements Runnable {
         }
 
         try (NetStream ns = new NetStream(remote);
-             Fits fits = new Fits(ns.getInput())) {
+             Fits fits = new Fits(ns.getStream())) {
             PfssData pfssData = getPfssData(fits, time);
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
 

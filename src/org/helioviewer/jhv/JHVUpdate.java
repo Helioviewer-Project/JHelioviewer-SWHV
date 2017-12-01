@@ -1,10 +1,7 @@
 package org.helioviewer.jhv;
 
 import java.awt.EventQueue;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 import javax.swing.JOptionPane;
 
@@ -56,13 +53,11 @@ public class JHVUpdate implements Runnable {
             }
         }
 
-        try (NetStream ns = new NetStream(JHVGlobals.downloadURL + "VERSION");
-             BufferedReader in = new BufferedReader(new InputStreamReader(ns.getInput(), StandardCharsets.UTF_8))) {
-            String version = in.readLine();
+        try (NetStream ns = new NetStream(JHVGlobals.downloadURL + "VERSION")) {
+            String version = ns.getSource().readUtf8Line();
             if (version == null || version.isEmpty()) {
                 throw new IOException("JHVUpdate: Empty version string");
             }
-           // String message = in.readLine(); - extra
 
             EventQueue.invokeLater(() -> {
                 String runningVersion = JHVGlobals.version + '.' + JHVGlobals.revision;
