@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eve.lines;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 import org.helioviewer.jhv.base.JSONUtils;
@@ -28,7 +27,7 @@ class EVEResponse {
 
     static EVEResponse get(URI uri) {
         try (NetStream ns = new NetStream(uri.toURL())) {
-            JSONObject jo = JSONUtils.getJSONStream(ns.getInput());
+            JSONObject jo = JSONUtils.decodeJSON(ns.getReader());
 
             String bandName = jo.optString("timeline", "");
             double multiplier = jo.optDouble("multiplier", 1);

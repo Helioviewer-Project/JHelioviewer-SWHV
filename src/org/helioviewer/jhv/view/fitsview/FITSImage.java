@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.view.fitsview;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -22,7 +20,6 @@ import org.helioviewer.jhv.log.Log;
 
 class FITSImage {
 
-    private static final int BUFSIZ = 65536;
     private static final double GAMMA = 1 / 2.2;
 
     String xml;
@@ -30,8 +27,7 @@ class FITSImage {
 
     FITSImage(URI uri) throws Exception {
         try (NetStream ns = new NetStream(uri.toURL());
-             BufferedInputStream in = new BufferedInputStream(ns.getInput(), BUFSIZ);
-             Fits f = new Fits(in)) {
+             Fits f = new Fits(ns.getInput())) {
             BasicHDU<?>[] hdus = f.read();
             // this is cumbersome
             for (BasicHDU<?> hdu : hdus) {
