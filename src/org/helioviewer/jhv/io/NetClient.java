@@ -10,17 +10,17 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okio.BufferedSource;
 
-public class NetStream implements AutoCloseable {
+public class NetClient implements AutoCloseable {
 
     private static final OkHttpClient client = new OkHttpClient();
 
     private Response response;
 
-    public NetStream(String url) throws IOException {
+    public NetClient(String url) throws IOException {
         call(new Request.Builder().url(url).build());
     }
 
-    public NetStream(URL url) throws IOException {
+    public NetClient(URL url) throws IOException {
         call(new Request.Builder().url(url).build());
     }
 

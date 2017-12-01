@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.helioviewer.jhv.base.JSONUtils;
-import org.helioviewer.jhv.io.NetStream;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.timelines.band.BandType;
 import org.json.JSONArray;
@@ -26,7 +26,7 @@ class EVEResponse {
     }
 
     static EVEResponse get(URI uri) {
-        try (NetStream ns = new NetStream(uri.toURL())) {
+        try (NetClient ns = new NetClient(uri.toURL())) {
             JSONObject jo = JSONUtils.decodeJSON(ns.getReader());
 
             String bandName = jo.optString("timeline", "");

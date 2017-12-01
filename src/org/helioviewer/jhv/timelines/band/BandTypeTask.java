@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import org.helioviewer.jhv.base.JSONUtils;
-import org.helioviewer.jhv.io.NetStream;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -19,7 +19,7 @@ public class BandTypeTask extends JHVWorker<Void, Void> {
 
     @Override
     protected Void backgroundWork() {
-       try (NetStream ns = new NetStream(TimelineSettings.baseURL)) {
+       try (NetClient ns = new NetClient(TimelineSettings.baseURL)) {
             BandType.loadBandTypes(JSONUtils.decodeJSON(ns.getReader()).getJSONArray("objects"));
         } catch (UnknownHostException e) {
             Log.debug("Unknown host, network down?", e);
