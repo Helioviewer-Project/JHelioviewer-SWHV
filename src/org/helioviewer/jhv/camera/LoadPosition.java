@@ -1,14 +1,13 @@
 package org.helioviewer.jhv.camera;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.UnknownHostException;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.JSONUtils;
-import org.helioviewer.jhv.io.DownloadStream;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.PositionRequest;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.math.MathUtils;
@@ -46,16 +45,12 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
         if (span / deltat > max)
             deltat = span / max;
 
-        try {
-            DownloadStream ds = new DownloadStream(new PositionRequest(target, frame, start, end, deltat).url, true);
-            try (InputStream is = ds.getInput()) {
-                JSONObject result = JSONUtils.getJSONStream(is);
-                if (ds.isResponse400()) {
-                    report = result.optString("faultstring", "Invalid network response");
-                } else {
-                    return PositionRequest.parseResponse(result);
-                }
-            }
+        try (NetClient nc = new NetClient(new PositionRequest(target, frame, start, end, deltat).url, true)) {
+            JSONObject result = JSONUtils.decodeJSON(nc.getReader());
+            if (nc.isSuccessful())
+                return PositionRequest.parseResponse(result);
+            else
+                report = result.optString("faultstring", "Invalid network response");
         } catch (UnknownHostException e) {
             Log.debug("Unknown host, network down?", e);
         } catch (IOException e) {

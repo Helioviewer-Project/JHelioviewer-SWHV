@@ -30,20 +30,29 @@ public class NetClient implements AutoCloseable {
         //.addInterceptor(new LoggingInterceptor())
         .build();
 
-    private final Request.Builder requestBuilder = new Request.Builder()
-        .header("User-Agent", JHVGlobals.userAgent);
-
-    private Response response;
+    private final Response response;
 
     public NetClient(String url) throws IOException {
-        this(new URL(url));
+        this(new URL(url), false);
     }
 
     public NetClient(URL url) throws IOException {
-        Request request = requestBuilder.url(url).build();
+        this(url, false);
+    }
+
+    public NetClient(String url, boolean allowError) throws IOException {
+        this(new URL(url), allowError);
+    }
+
+    public NetClient(URL url, boolean allowError) throws IOException {
+        Request request = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url).build();
         response = client.newCall(request).execute();
-        if (!response.isSuccessful())
+        if (!allowError && !response.isSuccessful())
             throw new IOException(response.toString());
+    }
+
+    public boolean isSuccessful() {
+        return response.isSuccessful();
     }
 
     public InputStream getStream() {

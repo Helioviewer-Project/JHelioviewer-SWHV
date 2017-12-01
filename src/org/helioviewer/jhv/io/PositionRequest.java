@@ -1,13 +1,10 @@
 package org.helioviewer.jhv.io;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Iterator;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
@@ -24,7 +21,7 @@ public class PositionRequest {
     private final long endTime;
     private final long deltat;
 
-    public final URL url;
+    public final String url;
 
     public PositionRequest(SpaceObject _target, String _frame, long _startTime, long _endTime, long _deltat) {
         target = _target;
@@ -33,16 +30,8 @@ public class PositionRequest {
         endTime = _endTime;
         deltat = _deltat;
 
-        String req = baseURL + "ref=" + frame + "&kind=latitudinal" + "&observer=" + observer + "&target=" + target.getUrlName() +
-                    "&utc=" + TimeUtils.format(startTime) + "&utc_end=" + TimeUtils.format(endTime) + "&deltat=" + deltat;
-
-        URL _url = null;
-        try {
-            _url = new URL(req);
-        } catch (MalformedURLException e) {
-            Log.error("Malformed request URL: " + req);
-        }
-        url = _url;
+        url = baseURL + "ref=" + frame + "&kind=latitudinal" + "&observer=" + observer + "&target=" + target.getUrlName() +
+              "&utc=" + TimeUtils.format(startTime) + "&utc_end=" + TimeUtils.format(endTime) + "&deltat=" + deltat;
     }
 
     @Override
