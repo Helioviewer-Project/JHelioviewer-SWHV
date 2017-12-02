@@ -20,7 +20,7 @@ public class BandTypeTask extends JHVWorker<Void, Void> {
     @Override
     protected Void backgroundWork() {
        try (NetClient nc = new NetClient(TimelineSettings.baseURL)) {
-            BandType.loadBandTypes(JSONUtils.decodeJSON(nc.getReader()).getJSONArray("objects"));
+            BandType.loadBandTypes(JSONUtils.readJSON(nc.getReader()).getJSONArray("objects"));
         } catch (UnknownHostException e) {
             Log.debug("Unknown host, network down?", e);
         } catch (IOException e) {

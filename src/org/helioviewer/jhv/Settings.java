@@ -1,9 +1,11 @@
 package org.helioviewer.jhv;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Properties;
 
 import org.helioviewer.jhv.base.FileUtils;
@@ -34,8 +36,8 @@ public class Settings {
             }
 
             if (propFile.canRead()) {
-                try (InputStream is = FileUtils.newBufferedInputStream(propFile)) {
-                    userProperties.load(is);
+                try (BufferedReader reader = Files.newBufferedReader(propFile.toPath(), StandardCharsets.UTF_8)) {
+                    userProperties.load(reader);
                 }
             }
 
@@ -55,9 +57,9 @@ public class Settings {
     }
 
     private void save(Properties props) {
-        try (OutputStream os = FileUtils.newBufferedOutputStream(propFile)) {
-            props.store(os, null);
-        } catch (IOException e) {
+        try (BufferedWriter writer = Files.newBufferedWriter(propFile.toPath(), StandardCharsets.UTF_8)) {
+            props.store(writer, null);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -71,8 +73,8 @@ public class Settings {
     private Properties loadCopyUser() {
         Properties props = new Properties();
         if (propFile.canRead()) {
-            try (InputStream is = FileUtils.newBufferedInputStream(propFile)) {
-                props.load(is);
+            try (BufferedReader reader = Files.newBufferedReader(propFile.toPath(), StandardCharsets.UTF_8)) {
+                props.load(reader);
             } catch (Exception e) {
                 e.printStackTrace();
             }
