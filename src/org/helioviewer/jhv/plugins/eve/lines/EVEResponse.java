@@ -27,7 +27,7 @@ class EVEResponse {
 
     static EVEResponse get(URI uri) {
         try (NetClient nc = new NetClient(uri.toURL())) {
-            JSONObject jo = JSONUtils.decodeJSON(nc.getReader());
+            JSONObject jo = JSONUtils.readJSON(nc.getReader());
 
             String bandName = jo.optString("timeline", "");
             double multiplier = jo.optDouble("multiplier", 1);

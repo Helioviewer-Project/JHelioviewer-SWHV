@@ -46,7 +46,7 @@ public class LoadPosition extends JHVWorker<Position.L[], Void> {
             deltat = span / max;
 
         try (NetClient nc = new NetClient(new PositionRequest(target, frame, start, end, deltat).url, true)) {
-            JSONObject result = JSONUtils.decodeJSON(nc.getReader());
+            JSONObject result = JSONUtils.readJSON(nc.getReader());
             if (nc.isSuccessful())
                 return PositionRequest.parseResponse(result);
             else

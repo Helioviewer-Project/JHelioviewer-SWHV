@@ -127,7 +127,6 @@ public class HEKHandler extends SWEKHandler {
     @Override
     public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
         JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
-
         HEKParser.parseResult(json, currentEvent, full);
         currentEvent.finishParams();
 

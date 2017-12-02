@@ -12,7 +12,7 @@ public class APIRequestManager {
 
     public static URI requestRemoteFile(APIRequest req) throws IOException {
         try (NetClient nc = new NetClient(req.jpipRequest)) {
-            APIResponse response = new APIResponse(JSONUtils.decodeJSON(nc.getReader()));
+            APIResponse response = new APIResponse(JSONUtils.readJSON(nc.getReader()));
             // Just some error from the server
             String error = response.getError();
             if (error != null) {
