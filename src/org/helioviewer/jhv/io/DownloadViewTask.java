@@ -5,9 +5,7 @@ import java.awt.FlowLayout;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -67,16 +65,8 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         if (downloadURI.equals(dstFile.toURI())) // avoid self-destruction
             return null;
 
-        URL downloadURL;
-        try {
-            downloadURL = downloadURI.toURL();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        }
-
         boolean failed = false;
-        try (NetClient nc = new NetClient(downloadURL)) {
+        try (NetClient nc = new NetClient(downloadURI.toString())) {
             int contentLength = (int) nc.getContentLength();
             if (contentLength > 0) {
                 EventQueue.invokeLater(() -> {

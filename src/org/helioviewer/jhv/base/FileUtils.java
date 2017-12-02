@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -29,10 +28,6 @@ public class FileUtils {
 
     public static InputStream getResourceInputStream(String resourcePath) {
         return FileUtils.class.getResourceAsStream(resourcePath);
-    }
-
-    public static URL getResourceUrl(String resourcePath) {
-        return FileUtils.class.getResource(resourcePath);
     }
 
     public static String convertStreamToString(InputStream is) {
