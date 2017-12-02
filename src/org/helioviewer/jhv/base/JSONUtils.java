@@ -22,16 +22,16 @@ public class JSONUtils {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8), BUFSIZ)) {
             return new JSONObject(new JSONTokener(reader));
         } catch (Exception e) {
-            Log.error("Invalid JSON response " + e);
+            Log.error("Error reading JSON: " + e);
             return new JSONObject();
         }
     }
 
-    public static JSONObject decodeJSON(Reader in) {
+    public static JSONObject readJSON(Reader in) {
         try {
             return new JSONObject(new JSONTokener(in));
         } catch (Exception e) {
-            Log.error("Invalid JSON response " + e);
+            Log.error("Error reading JSON: " + e);
             return new JSONObject();
         }
     }

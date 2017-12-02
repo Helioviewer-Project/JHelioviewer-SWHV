@@ -87,7 +87,6 @@ public class ComesepHandler extends SWEKHandler {
     @Override
     public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
         JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
-
         ComesepParser.parseResult(json, currentEvent);
         currentEvent.finishParams();
 

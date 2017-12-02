@@ -40,17 +40,17 @@ public class DataSourcesTask extends JHVWorker<Void, Void> {
             }
 
             try (NetClient nc = new NetClient(url)) {
-                JSONObject json = JSONUtils.decodeJSON(nc.getReader());
+                JSONObject jo = JSONUtils.readJSON(nc.getReader());
 /*
                 if (url.contains("helioviewer.org")) {
-                    json.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").remove("174");
+                    jo.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").remove("174");
                     JSONObject o = new JSONObject( "{\"sourceId\":32,\"layeringOrder\":1,\"name\":\"174\u205fÅ\",\"nickname\":\"SWAP 174\",\"start\":\"2010-01-04 17:00:50\",\"description\":\"174 Ångström extreme ultraviolet\",\"end\":\"2017-03-21 10:23:31\",\"label\":\"Measurement\"} ");
-                    json.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").put("174", o);
+                    jo.getJSONObject("PROBA2").getJSONObject("children").getJSONObject("SWAP").getJSONObject("children").put("174", o);
                 }
 */
                 if (schema != null)
-                    schema.validate(json);
-                parser.parse(json);
+                    schema.validate(jo);
+                parser.parse(jo);
                 return null;
             } catch (ValidationException e) {
                 Log.error("Server " + url + " " + e);

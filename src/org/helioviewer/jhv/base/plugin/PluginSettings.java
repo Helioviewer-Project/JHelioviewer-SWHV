@@ -1,7 +1,11 @@
 package org.helioviewer.jhv.base.plugin;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -11,7 +15,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.helioviewer.jhv.base.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -156,10 +159,8 @@ public class PluginSettings {
 
     // Saves the internal XML document to the settings file
     public void savePluginSettings() {
-        try {
-            DOMSource source = new DOMSource(xmlDocument);
-            StreamResult result = new StreamResult(FileUtils.newBufferedOutputStream(new File(settingsFileName)));
-            TransformerFactory.newInstance().newTransformer().transform(source, result);
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(settingsFileName), StandardCharsets.UTF_8)) {
+            TransformerFactory.newInstance().newTransformer().transform(new DOMSource(xmlDocument), new StreamResult(writer));
         } catch (TransformerFactoryConfigurationError | TransformerException | IOException e) {
             e.printStackTrace();
         }
