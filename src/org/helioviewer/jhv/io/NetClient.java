@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 //import java.util.logging.Logger;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
 import okhttp3.Interceptor;
@@ -21,6 +20,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okio.BufferedSource;
+import okio.Okio;
 
 public class NetClient implements AutoCloseable {
 
@@ -34,8 +34,8 @@ public class NetClient implements AutoCloseable {
         //.addInterceptor(new LoggingInterceptor())
         .build();
 
-    private final Response response;
-    private final InputStream stream;
+    private final Response remote;
+    private final BufferedSource local;
 
     public NetClient(String url) throws IOException {
         this(new URL(url), false);
@@ -51,44 +51,44 @@ public class NetClient implements AutoCloseable {
 
     public NetClient(URL url, boolean allowError) throws IOException {
         if ("file".equals(url.getProtocol())) {
-            stream = FileUtils.newBufferedInputStream(new File(url.getPath()));
-            response = null;
+            local = Okio.buffer(Okio.source(new File(url.getPath())));
+            remote = null;
             return;
         }
 
         Request request = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url).build();
-        response = client.newCall(request).execute();
-        if (!allowError && !response.isSuccessful())
-            throw new IOException(response.toString());
-        stream = null;
+        remote = client.newCall(request).execute();
+        if (!allowError && !remote.isSuccessful())
+            throw new IOException(remote.toString());
+        local = null;
     }
 
     public boolean isSuccessful() {
-        return response.isSuccessful();
+        return remote.isSuccessful();
     }
 
     public InputStream getStream() {
-        return stream == null ? response.body().byteStream() : stream;
+        return local == null ? remote.body().byteStream() : local.inputStream();
     }
 
     public Reader getReader() {
-        return stream == null ? response.body().charStream() : new InputStreamReader(stream, StandardCharsets.UTF_8);
+        return local == null ? remote.body().charStream() : new InputStreamReader(local.inputStream(), StandardCharsets.UTF_8);
     }
 
     public BufferedSource getSource() {
-        return response.body().source();
+        return local == null ? remote.body().source() : local;
     }
 
     public long getContentLength() {
-        return response.body().contentLength();
+        return remote.body().contentLength();
     }
 
     @Override
     public void close() throws IOException {
-        if (stream != null)
-            stream.close();
-        if (response != null)
-            response.close();
+        if (local != null)
+            local.close();
+        if (remote != null)
+            remote.close();
     }
 
     private static class LoggingInterceptor implements Interceptor {
