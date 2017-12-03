@@ -3,8 +3,6 @@ package org.helioviewer.jhv.io;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 
 import javax.swing.BorderFactory;
@@ -15,15 +13,19 @@ import javax.swing.JWindow;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.view.View;
 
+import okio.Okio;
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.BufferedSource;
+
 public class DownloadViewTask extends JHVWorker<Void, Void> {
 
-    private static final int BUFSIZ = 65536;
+    private static final int BUFSIZ = 1024 * 1024;
 
     private final JWindow dialog;
     private final JProgressBar progressBar;
@@ -68,24 +70,18 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
         boolean failed = false;
         try (NetClient nc = new NetClient(downloadURI.toString())) {
             int contentLength = (int) nc.getContentLength();
-            if (contentLength > 0) {
-                EventQueue.invokeLater(() -> {
-                    progressBar.setIndeterminate(false);
-                    progressBar.setMaximum(contentLength);
-                });
-            }
+            if (contentLength > 0)
+                EventQueue.invokeLater(() -> progressBar.setIndeterminate(false));
 
-            try (OutputStream out = FileUtils.newBufferedOutputStream(dstFile)) {
-                byte[] buffer = new byte[BUFSIZ];
-                int numTotalRead = 0, numCurrentRead;
-                InputStream in = nc.getStream();
-                while (!Thread.interrupted() && (numCurrentRead = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, numCurrentRead);
-                    numTotalRead += numCurrentRead;
-
+            BufferedSource source = nc.getSource();
+            try (BufferedSink sink = Okio.buffer(Okio.sink(dstFile))) {
+                long bytesRead, totalRead = 0;
+                Buffer sinkBuffer = sink.buffer();
+                while ((bytesRead = source.read(sinkBuffer, BUFSIZ)) != -1) {
+                    totalRead += bytesRead;
                     if (contentLength > 0) {
-                        int finalTotalRead = numTotalRead;
-                        EventQueue.invokeLater(() -> progressBar.setValue(finalTotalRead));
+                        int percent = (int) ((totalRead * 100.) / contentLength);
+                        EventQueue.invokeLater(() -> progressBar.setValue(percent));
                     }
                 }
             }
@@ -104,7 +100,6 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
                 e.printStackTrace();
             }
         }
-
         return null;
     }
 
