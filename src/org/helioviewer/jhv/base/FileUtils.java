@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.base;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +12,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Scanner;
 
 public class FileUtils {
-
-    private static final int BUFSIZ = 65536;
-
-    public static InputStream newBufferedInputStream(File src) throws IOException {
-        return new BufferedInputStream(Files.newInputStream(src.toPath()), BUFSIZ);
-    }
 
     public static InputStream getResourceInputStream(String resourcePath) {
         return FileUtils.class.getResourceAsStream(resourcePath);
