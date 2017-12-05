@@ -68,7 +68,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
             return null;
 
         boolean failed = false;
-        try (NetClient nc = new NetClient(downloadURI.toString())) {
+        try (NetClient nc = NetClient.of(downloadURI.toString())) {
             int contentLength = (int) nc.getContentLength();
             if (contentLength > 0)
                 EventQueue.invokeLater(() -> progressBar.setIndeterminate(false));
