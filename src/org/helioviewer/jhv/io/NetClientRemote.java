@@ -62,11 +62,6 @@ class NetClientRemote implements NetClient {
     }
 
     @Override
-    public long getContentLength() {
-        return response.body().contentLength();
-    }
-
-    @Override
     public void close() {
         response.close();
     }

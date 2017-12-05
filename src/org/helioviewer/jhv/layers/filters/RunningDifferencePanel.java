@@ -30,9 +30,9 @@ public class RunningDifferencePanel implements FilterDetails, ActionListener {
     private final Timer loadingTimer = new Timer(500, this);
     private final JLayer<JComponent> busyLayer = new JLayer<>(new JLabel("    "), UITimer.busyIndicator);
 
+    private final JideButton downloadButton = new JideButton(Buttons.download);
     private final JPanel modePanel = new JPanel(new GridLayout(1, 3));
     private final JPanel buttonPanel = new JPanel();
-    private final JideButton downloadButton = new JideButton(Buttons.download);
 
     public RunningDifferencePanel(ImageLayerOptions parent) {
         ButtonGroup modeGroup = new ButtonGroup();
