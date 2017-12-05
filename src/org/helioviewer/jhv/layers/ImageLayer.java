@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -249,7 +248,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public Component getOptionsPanel() {
+    public ImageLayerOptions getOptionsPanel() {
         return optionsPanel;
     }
 
