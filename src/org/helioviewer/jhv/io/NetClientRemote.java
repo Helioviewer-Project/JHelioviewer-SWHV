@@ -68,8 +68,7 @@ class NetClientRemote implements NetClient {
 
     @Override
     public void close() {
-        if (response != null)
-            response.close();
+        response.close();
     }
 
     private static class LoggingInterceptor implements Interceptor {
