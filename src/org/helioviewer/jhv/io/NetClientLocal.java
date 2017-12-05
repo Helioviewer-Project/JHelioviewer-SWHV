@@ -46,8 +46,7 @@ class NetClientLocal implements NetClient {
 
     @Override
     public void close() throws IOException {
-        if (response != null)
-            response.close();
+        response.close();
     }
 
 }
