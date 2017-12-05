@@ -17,11 +17,12 @@ public class ImageLayerOptions extends JPanel {
 
     private final ImageLayer imageLayer;
     private final LUTPanel lutPanel;
+    private final RunningDifferencePanel runningDifferencePanel;
 
     public ImageLayerOptions(ImageLayer _imageLayer) {
         imageLayer = _imageLayer;
 
-        RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel(this);
+        runningDifferencePanel = new RunningDifferencePanel(this);
         OpacityPanel opacityPanel = new OpacityPanel(this);
         BlendPanel blendPanel = new BlendPanel(this);
         ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel(this);
@@ -84,6 +85,10 @@ public class ImageLayerOptions extends JPanel {
 
     void setLUT(LUT lut) {
         lutPanel.setLUT(lut);
+    }
+
+    public RunningDifferencePanel getRunningDifferencePanel() {
+        return runningDifferencePanel;
     }
 
     public GLImage getGLImage() {
