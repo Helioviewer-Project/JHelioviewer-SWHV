@@ -139,6 +139,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     private void unsetView() {
         if (view != null) {
             Layers.removeLayer(view);
+            view.stopDownload();
             view.setDataHandler(null);
             view.setImageLayer(null);
             view.abolish();

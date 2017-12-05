@@ -13,12 +13,10 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
-import org.helioviewer.jhv.io.DownloadViewTask;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.opengl.GLImage;
 
@@ -62,8 +60,7 @@ public class RunningDifferencePanel implements FilterDetails, ActionListener {
             buttonPanel.add(busyLayer);
             buttonPanel.revalidate();
 
-            DownloadViewTask downloadTask = new DownloadViewTask(parent.getView().getImageLayer(), parent.getView());
-            JHVGlobals.getExecutorService().execute(downloadTask);
+            parent.getView().startDownload();
         });
 
         buttonPanel.add(metaButton);
