@@ -57,4 +57,7 @@ public interface View {
 
     String getXMLMetaData() throws Exception;
 
+    void startDownload();
+    void stopDownload();
+
 }

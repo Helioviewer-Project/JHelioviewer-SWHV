@@ -3,12 +3,14 @@ package org.helioviewer.jhv.view;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DownloadViewTask;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -161,6 +163,25 @@ public class AbstractView implements View {
     @Override
     public String getXMLMetaData() throws Exception {
         return "<meta/>";
+    }
+
+
+    private DownloadViewTask downloadTask;
+
+    @Override
+    public void startDownload() {
+        if (downloadTask == null) {
+            downloadTask = new DownloadViewTask(this);
+            JHVGlobals.getExecutorService().execute(downloadTask);
+        }
+    }
+
+    @Override
+    public void stopDownload() {
+        if (downloadTask != null) {
+            downloadTask.cancel(true);
+            downloadTask = null;
+        }
     }
 
 }

@@ -18,8 +18,8 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
     private final URI downloadURI;
     private final ImageLayer layer;
 
-    public DownloadViewTask(ImageLayer _layer, View view) {
-        layer = _layer;
+    public DownloadViewTask(View view) {
+        layer = view.getImageLayer();
         uri = view.getURI();
 
         APIRequest req = view.getAPIRequest();
