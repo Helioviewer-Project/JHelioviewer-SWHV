@@ -40,11 +40,6 @@ class NetClientLocal implements NetClient {
     }
 
     @Override
-    public long getContentLength() {
-        return -1;
-    }
-
-    @Override
     public void close() throws IOException {
         response.close();
     }
