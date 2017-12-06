@@ -165,15 +165,14 @@ public class AbstractView implements View {
         return "<meta/>";
     }
 
-
     private DownloadViewTask downloadTask;
 
     @Override
     public void startDownload() {
-        if (downloadTask == null) {
-            downloadTask = new DownloadViewTask(this);
-            JHVGlobals.getExecutorService().execute(downloadTask);
-        }
+        if (downloadTask != null)
+            downloadTask.cancel(true);
+        downloadTask = new DownloadViewTask(this);
+        JHVGlobals.getExecutorService().execute(downloadTask);
     }
 
     @Override

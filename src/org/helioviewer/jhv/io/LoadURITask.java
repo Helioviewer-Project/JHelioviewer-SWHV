@@ -23,12 +23,12 @@ class LoadURITask extends JHVWorker<View, Void> {
     static void get(URI _uri) {
         String scheme = _uri.getScheme();
         ImageLayer layer = ImageLayer.create(null);
-        if ("http".equals(scheme) || "https".equals(scheme)) {
+/*        if ("http".equals(scheme) || "https".equals(scheme)) {
             View view = new AbstractView(_uri, null);
             layer.setView(view);
             JHVGlobals.getExecutorService().execute(new DownloadViewTask(view));
         } else
-            JHVGlobals.getExecutorService().execute(new LoadURITask(layer, _uri));
+*/            JHVGlobals.getExecutorService().execute(new LoadURITask(layer, _uri));
     }
 
     LoadURITask(ImageLayer _imageLayer, URI _uri) {
