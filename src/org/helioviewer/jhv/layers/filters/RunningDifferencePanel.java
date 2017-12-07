@@ -1,38 +1,36 @@
 package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Insets;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JLayer;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
-import javax.swing.Timer;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.layers.ImageLayerOptions;
 import org.helioviewer.jhv.opengl.GLImage;
 
 import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class RunningDifferencePanel implements FilterDetails, ActionListener {
+public class RunningDifferencePanel implements FilterDetails {
 
-    private final Timer loadingTimer = new Timer(500, this);
-    private final JLayer<JComponent> busyLayer = new JLayer<>(new JLabel("    "), UITimer.busyIndicator);
-
-    private final JideButton downloadButton = new JideButton(Buttons.download);
+    private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
+    private final JProgressBar progressBar = new JProgressBar();
     private final JPanel modePanel = new JPanel(new GridLayout(1, 3));
     private final JPanel buttonPanel = new JPanel();
 
     public RunningDifferencePanel(ImageLayerOptions parent) {
+
         ButtonGroup modeGroup = new ButtonGroup();
         for (GLImage.DifferenceMode mode : GLImage.DifferenceMode.values()) {
             JRadioButton item = new JRadioButton(mode.toString());
@@ -55,13 +53,21 @@ public class RunningDifferencePanel implements FilterDetails, ActionListener {
 
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
-            loadingTimer.start();
-            buttonPanel.remove(downloadButton);
-            buttonPanel.add(busyLayer);
-            buttonPanel.revalidate();
+            if (downloadButton.isSelected()) {
+                Insets margin = downloadButton.getMargin();
+                Dimension size = downloadButton.getSize(null);
+                progressBar.setPreferredSize(new Dimension(size.width - margin.left - margin.right, size.height - margin.top - margin.bottom));
 
-            parent.getView().startDownload();
+                downloadButton.setText(null);
+                downloadButton.add(progressBar);
+
+                parent.getView().startDownload();
+            } else
+                parent.getView().stopDownload();
         });
+
+        progressBar.setUI(new CircularProgressUI());
+        progressBar.setForeground(downloadButton.getForeground());
 
         buttonPanel.add(metaButton);
         buttonPanel.add(downloadButton);
@@ -82,16 +88,14 @@ public class RunningDifferencePanel implements FilterDetails, ActionListener {
         return buttonPanel;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        busyLayer.repaint();
+    public void setValue(int value) {
+        progressBar.setValue(value);
     }
 
     public void done() {
-        loadingTimer.stop();
-        buttonPanel.remove(busyLayer);
-        buttonPanel.add(downloadButton);
-        buttonPanel.revalidate();
+        downloadButton.remove(progressBar);
+        downloadButton.setText(Buttons.download);
+        downloadButton.setSelected(false);
     }
 
 }
