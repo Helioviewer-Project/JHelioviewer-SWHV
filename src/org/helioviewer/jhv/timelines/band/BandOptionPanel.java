@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.awt.EventQueue;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -21,6 +22,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineSettings;
+import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
 
@@ -61,13 +63,16 @@ class BandOptionPanel extends JPanel {
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
             String fileName = JHVDirectory.REMOTEFILES.getPath() + band.getBandType().getName() + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json";
-            try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
-                band.toJson().write(writer);
-            } catch (Exception ex) {
-                Log.error("Failed to write JSON: " + ex);
-                return; // try with resources
-            }
-            JHVGlobals.displayNotification(fileName);
+            JSONObject jo = band.toJson();
+
+            new Thread(() -> {
+                try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
+                    jo.write(writer);
+                    EventQueue.invokeLater(() -> JHVGlobals.displayNotification(fileName));
+                } catch (Exception ex) {
+                    Log.error("Failed to write JSON: " + ex);
+                }
+            }).run();
         });
         add(downloadButton, c);
 
