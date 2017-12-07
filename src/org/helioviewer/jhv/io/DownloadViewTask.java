@@ -66,6 +66,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
                 else { // reload from disk
                     LoadURITask uriTask = new LoadURITask(layer, dstFile.toURI());
                     JHVGlobals.getExecutorService().execute(uriTask);
+                    EventQueue.invokeLater(() -> JHVGlobals.displayNotification(dstFile.toString()));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
