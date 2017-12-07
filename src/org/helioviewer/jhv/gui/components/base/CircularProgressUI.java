@@ -44,25 +44,16 @@ public class CircularProgressUI extends BasicProgressBarUI {
     private static final double THICK_FACTOR = 1 / 8.;
 
     private void doPaint(Graphics g1, JComponent c, double degree) {
-/*
-        Insets b = progressBar.getInsets();
-        int barRectWidth  = progressBar.getWidth()  - b.right - b.left;
-        int barRectHeight = progressBar.getHeight() - b.top - b.bottom;
-        if (barRectWidth <= 0 || barRectHeight <= 0) {
-            return;
-        }
-*/
         Rectangle r = progressBar.getBounds();
-
-        Graphics2D g = (Graphics2D) g1.create();
-        g.setPaint(progressBar.getForeground());
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
         double sz = Math.min(r.width, r.height) * (1 - 3 * THICK_FACTOR);
         double cx = r.width  * .5;
         double cy = r.height * .5;
         double or = sz * .5;
         double ir = or * .5;
+
+        Graphics2D g = (Graphics2D) g1.create();
+        g.setPaint(progressBar.getForeground());
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         Rectangle2D in = new Rectangle2D.Double(cx - ir, cy - ir, or, or);
         g.fill(in);
