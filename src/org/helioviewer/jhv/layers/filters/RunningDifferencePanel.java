@@ -60,6 +60,7 @@ public class RunningDifferencePanel implements FilterDetails {
 
                 downloadButton.setText(null);
                 downloadButton.add(progressBar);
+                downloadButton.setToolTipText("Stop download");
 
                 parent.getView().startDownload();
             } else
@@ -94,6 +95,7 @@ public class RunningDifferencePanel implements FilterDetails {
 
     public void done() {
         downloadButton.remove(progressBar);
+        downloadButton.setToolTipText("Download selected layer");
         downloadButton.setText(Buttons.download);
         downloadButton.setSelected(false);
     }
