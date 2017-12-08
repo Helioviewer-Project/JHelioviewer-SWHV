@@ -10,31 +10,31 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.layers.ImageLayerOptions;
+import org.helioviewer.jhv.layers.ImageLayer;
 
 public class ChannelMixerPanel implements FilterDetails {
 
     private final JPanel boxPanel;
 
-    public ChannelMixerPanel(ImageLayerOptions parent) {
+    public ChannelMixerPanel(ImageLayer layer) {
         boxPanel = new JPanel(new GridLayout(1, 3));
 
-        JCheckBox redCheckBox = new JCheckBox("Red", parent.getGLImage().getRed());
+        JCheckBox redCheckBox = new JCheckBox("Red", layer.getGLImage().getRed());
         redCheckBox.setToolTipText("Toggle red channel");
         boxPanel.add(redCheckBox, BorderLayout.WEST);
 
-        JCheckBox greenCheckBox = new JCheckBox("Green", parent.getGLImage().getGreen());
+        JCheckBox greenCheckBox = new JCheckBox("Green", layer.getGLImage().getGreen());
         greenCheckBox.setToolTipText("Toggle green channel");
         boxPanel.add(greenCheckBox, BorderLayout.CENTER);
 
-        JCheckBox blueCheckBox = new JCheckBox("Blue", parent.getGLImage().getBlue());
+        JCheckBox blueCheckBox = new JCheckBox("Blue", layer.getGLImage().getBlue());
         blueCheckBox.setToolTipText("Toggle blue channel");
         boxPanel.add(blueCheckBox, BorderLayout.EAST);
 
         ActionListener listener = e -> {
-            parent.getGLImage().setColor(redCheckBox.isSelected() ? 1 : 0,
-                                         greenCheckBox.isSelected() ? 1 : 0,
-                                         blueCheckBox.isSelected() ? 1 : 0);
+            layer.getGLImage().setColor(redCheckBox.isSelected() ? 1 : 0,
+                                        greenCheckBox.isSelected() ? 1 : 0,
+                                        blueCheckBox.isSelected() ? 1 : 0);
             Displayer.display();
         };
         redCheckBox.addActionListener(listener);

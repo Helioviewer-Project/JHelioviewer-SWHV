@@ -15,7 +15,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
-import org.helioviewer.jhv.layers.ImageLayerOptions;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.opengl.GLImage;
 
 import com.jidesoft.swing.JideButton;
@@ -29,15 +29,14 @@ public class RunningDifferencePanel implements FilterDetails {
     private final JPanel modePanel = new JPanel(new GridLayout(1, 3));
     private final JPanel buttonPanel = new JPanel();
 
-    public RunningDifferencePanel(ImageLayerOptions parent) {
-
+    public RunningDifferencePanel(ImageLayer layer) {
         ButtonGroup modeGroup = new ButtonGroup();
         for (GLImage.DifferenceMode mode : GLImage.DifferenceMode.values()) {
             JRadioButton item = new JRadioButton(mode.toString());
-            if (mode == parent.getGLImage().getDifferenceMode())
+            if (mode == layer.getGLImage().getDifferenceMode())
                 item.setSelected(true);
             item.addActionListener(e -> {
-                parent.getGLImage().setDifferenceMode(mode);
+                layer.getGLImage().setDifferenceMode(mode);
                 Displayer.display();
             });
             modeGroup.add(item);
@@ -47,7 +46,7 @@ public class RunningDifferencePanel implements FilterDetails {
         JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
         metaButton.addActionListener(e -> {
-            MetaDataDialog dialog = new MetaDataDialog(parent.getView());
+            MetaDataDialog dialog = new MetaDataDialog(layer.getView());
             dialog.showDialog();
         });
 
@@ -62,9 +61,9 @@ public class RunningDifferencePanel implements FilterDetails {
                 downloadButton.add(progressBar);
                 downloadButton.setToolTipText("Stop download");
 
-                parent.getView().startDownload();
+                layer.getView().startDownload();
             } else
-                parent.getView().stopDownload();
+                layer.getView().stopDownload();
         });
 
         progressBar.setUI(new CircularProgressUI());
