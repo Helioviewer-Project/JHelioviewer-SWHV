@@ -7,18 +7,18 @@ import javax.swing.JSlider;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.layers.ImageLayerOptions;
+import org.helioviewer.jhv.layers.ImageLayer;
 
 public class BlendPanel implements FilterDetails {
 
     private final JSlider slider;
     private final JLabel label;
 
-    public BlendPanel(ImageLayerOptions parent) {
-        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (parent.getGLImage().getBlend() * 100));
+    public BlendPanel(ImageLayer layer) {
+        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (layer.getGLImage().getBlend() * 100));
         label = new JLabel(LevelsPanel.align3(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
-            parent.getGLImage().setBlend(slider.getValue() / 100.);
+            layer.getGLImage().setBlend(slider.getValue() / 100.);
             label.setText(LevelsPanel.align3(100 - slider.getValue())); // additivity
             Displayer.display();
         });

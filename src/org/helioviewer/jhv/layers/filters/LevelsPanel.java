@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.layers.ImageLayerOptions;
+import org.helioviewer.jhv.layers.ImageLayer;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.RangeSlider;
@@ -41,9 +41,9 @@ public class LevelsPanel implements FilterDetails {
         return "<html>" + align3(low) + "<br/>" + align3(high);
     }
 
-    public LevelsPanel(ImageLayerOptions parent) {
-        double offset = parent.getGLImage().getBrightOffset();
-        double scale = parent.getGLImage().getBrightScale();
+    public LevelsPanel(ImageLayer layer) {
+        double offset = layer.getGLImage().getBrightOffset();
+        double scale = layer.getGLImage().getBrightScale();
         int high = (int) (100 * (offset + scale));
 
         slider = new RangeSlider(-101, 201, (int) (offset * 100), high);
@@ -61,7 +61,7 @@ public class LevelsPanel implements FilterDetails {
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
-            parent.getGLImage().setBrightness(lo / 100., (hi - lo) / 100.);
+            layer.getGLImage().setBrightness(lo / 100., (hi - lo) / 100.);
             label.setText(format(lo, hi));
             Displayer.display();
         });
@@ -71,7 +71,7 @@ public class LevelsPanel implements FilterDetails {
         autoButton.setToolTipText("Auto brightness");
         autoButton.addActionListener(e -> {
             slider.setLowValue(0);
-            slider.setHighValue((int) (parent.getAutoBrightness() * 100));
+            slider.setHighValue((int) (layer.getAutoBrightness() * 100));
         });
 
         buttonPanel = new JPanel(new BorderLayout());

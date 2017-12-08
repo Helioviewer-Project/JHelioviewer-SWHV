@@ -9,26 +9,21 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.layers.filters.*;
-import org.helioviewer.jhv.opengl.GLImage;
-import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 public class ImageLayerOptions extends JPanel {
 
-    private final ImageLayer imageLayer;
     private final LUTPanel lutPanel;
     private final RunningDifferencePanel runningDifferencePanel;
 
-    public ImageLayerOptions(ImageLayer _imageLayer) {
-        imageLayer = _imageLayer;
-
-        runningDifferencePanel = new RunningDifferencePanel(this);
-        OpacityPanel opacityPanel = new OpacityPanel(this);
-        BlendPanel blendPanel = new BlendPanel(this);
-        ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel(this);
-        lutPanel = new LUTPanel(this);
-        LevelsPanel levelsPanel = new LevelsPanel(this);
-        SharpenPanel sharpenPanel = new SharpenPanel(this);
+    public ImageLayerOptions(ImageLayer layer) {
+        runningDifferencePanel = new RunningDifferencePanel(layer);
+        OpacityPanel opacityPanel = new OpacityPanel(layer);
+        BlendPanel blendPanel = new BlendPanel(layer);
+        ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel(layer);
+        lutPanel = new LUTPanel(layer);
+        LevelsPanel levelsPanel = new LevelsPanel(layer);
+        SharpenPanel sharpenPanel = new SharpenPanel(layer);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -89,18 +84,6 @@ public class ImageLayerOptions extends JPanel {
 
     public RunningDifferencePanel getRunningDifferencePanel() {
         return runningDifferencePanel;
-    }
-
-    public GLImage getGLImage() {
-        return imageLayer.getGLImage();
-    }
-
-    public View getView() {
-        return imageLayer.getView();
-    }
-
-    public double getAutoBrightness() {
-        return imageLayer.getAutoBrightness();
     }
 
 }

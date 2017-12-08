@@ -10,7 +10,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.lut.LUTComboBox;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.layers.ImageLayerOptions;
+import org.helioviewer.jhv.layers.ImageLayer;
 
 import com.jidesoft.swing.JideToggleButton;
 
@@ -19,22 +19,22 @@ public class LUTPanel implements FilterDetails {
     private final LUTComboBox lutCombo;
     private final JPanel buttonPanel;
 
-    public LUTPanel(ImageLayerOptions parent) {
+    public LUTPanel(ImageLayer layer) {
         lutCombo = new LUTComboBox();
-        JideToggleButton invertButton = new JideToggleButton(Buttons.invert, parent.getGLImage().getInvertLUT());
+        JideToggleButton invertButton = new JideToggleButton(Buttons.invert, layer.getGLImage().getInvertLUT());
         invertButton.setToolTipText("Invert color table");
 
         ActionListener listener = e -> {
-            parent.getGLImage().setLUT(lutCombo.getLUT(), invertButton.isSelected());
+            layer.getGLImage().setLUT(lutCombo.getLUT(), invertButton.isSelected());
             Displayer.display();
         };
         lutCombo.addActionListener(listener);
         invertButton.addActionListener(listener);
 
-        JideToggleButton enhanceButton = new JideToggleButton(Buttons.corona, parent.getGLImage().getEnhanced());
+        JideToggleButton enhanceButton = new JideToggleButton(Buttons.corona, layer.getGLImage().getEnhanced());
         enhanceButton.setToolTipText("Enhance off-disk corona");
         enhanceButton.addActionListener(e -> {
-            parent.getGLImage().setEnhanced(enhanceButton.isSelected());
+            layer.getGLImage().setEnhanced(enhanceButton.isSelected());
             Displayer.display();
         });
 

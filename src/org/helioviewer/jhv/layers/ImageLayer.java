@@ -326,11 +326,11 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         return view == null || worker != null || view.isDownloading();
     }
 
-    GLImage getGLImage() {
+    public GLImage getGLImage() {
         return glImage;
     }
 
-    View getView() {
+    public View getView() {
         return view;
     }
 
@@ -338,7 +338,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         return view == null ? null : view.getAPIRequest();
     }
 
-    double getAutoBrightness() {
+    public double getAutoBrightness() {
         return imageData.getAutoBrightness();
     }
 
