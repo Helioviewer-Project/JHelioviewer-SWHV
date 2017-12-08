@@ -20,8 +20,10 @@ public class AbstractView implements View {
 
     private ImageLayer imageLayer;
 
+    private final APIRequest req;
+    private final boolean isLocal;
     protected final URI uri;
-    protected final APIRequest req;
+
     protected ImageData imageData;
     protected LUT builtinLUT;
     protected MetaData metaData[] = new MetaData[] { null };
@@ -29,11 +31,17 @@ public class AbstractView implements View {
     public AbstractView(URI _uri, APIRequest _req) {
         uri = _uri;
         req = _req;
+        isLocal = "file".equals(uri.getScheme());
     }
 
     @Override
     public URI getURI() {
         return uri;
+    }
+
+    @Override
+    public boolean isLocal() {
+        return isLocal;
     }
 
     @Override

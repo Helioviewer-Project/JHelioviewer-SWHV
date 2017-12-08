@@ -5,6 +5,7 @@ public enum MaterialDesign {
     // https://github.com/aalmiray/ikonli
     MDI_BRIGHTNESS_AUTO("mdi-brightness-auto", '\uf0e1'),
     MDI_CALENDAR("mdi-calendar", '\uf0ed'),
+    MDI_CHECK("mdi-check", '\uf12c'),
     MDI_CHEVRON_DOWN("mdi-chevron-down", '\uf140'),
     MDI_CHEVRON_RIGHT("mdi-chevron-right", '\uf142'),
     MDI_CLOSE("mdi-close", '\uf156'),

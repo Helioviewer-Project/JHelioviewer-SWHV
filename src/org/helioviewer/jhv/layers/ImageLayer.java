@@ -125,6 +125,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
         view = _view;
         worker = null; // drop reference
 
+        optionsPanel.getRunningDifferencePanel().downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel
         ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(this);
 
@@ -326,6 +327,11 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     @Override
     public boolean isDownloading() {
         return view == null || worker != null || view.isDownloading();
+    }
+
+    @Override
+    public boolean isLocal() {
+        return view != null && view.isLocal();
     }
 
     public GLImage getGLImage() {
