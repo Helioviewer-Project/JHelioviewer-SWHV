@@ -25,6 +25,7 @@ public interface View {
     void render(Camera camera, Viewport vp, double factor);
 
     URI getURI();
+    boolean isLocal();
     String getName();
 
     LUT getDefaultLUT();

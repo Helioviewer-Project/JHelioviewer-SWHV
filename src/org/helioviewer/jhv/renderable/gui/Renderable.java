@@ -44,6 +44,8 @@ public interface Renderable {
 
     boolean isDownloading();
 
+    boolean isLocal();
+
     void init(GL2 gl);
 
     void dispose(GL2 gl);

@@ -11,7 +11,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.layers.filters.*;
 
 @SuppressWarnings("serial")
-public class ImageLayerOptions extends JPanel {
+class ImageLayerOptions extends JPanel {
 
     private final LUTPanel lutPanel;
     private final RunningDifferencePanel runningDifferencePanel;

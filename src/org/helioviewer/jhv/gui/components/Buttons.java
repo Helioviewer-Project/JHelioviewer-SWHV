@@ -23,6 +23,7 @@ public class Buttons {
     public static final String backward = String.valueOf(MaterialDesign.MDI_STEP_BACKWARD.code);
     public static final String forward = String.valueOf(MaterialDesign.MDI_STEP_FORWARD.code);
     public static final String record = String.valueOf(MaterialDesign.MDI_RECORD.code);
+    public static final String check = String.valueOf(MaterialDesign.MDI_CHECK.code);
 
     public static final String chevronRight = "<html><font face='Material Design Icons' size=4>" +
         uc2ent(MaterialDesign.MDI_CHEVRON_RIGHT) + "</font>&nbsp;";

@@ -50,6 +50,11 @@ public abstract class AbstractRenderable implements Renderable {
     }
 
     @Override
+    public boolean isLocal() {
+        return false;
+    }
+
+    @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
     }
 

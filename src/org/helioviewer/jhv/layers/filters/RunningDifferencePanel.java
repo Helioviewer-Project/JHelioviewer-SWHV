@@ -102,4 +102,8 @@ public class RunningDifferencePanel implements FilterDetails {
         downloadButton.setSelected(false);
     }
 
+    public void downloadVisible(boolean visible) {
+        downloadButton.setVisible(visible);
+    }
+
 }
