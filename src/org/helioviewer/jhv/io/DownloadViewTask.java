@@ -52,7 +52,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
                 count++;
 
                 if (count % 128 == 0) { // approx 1MB
-                    int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : 0;
+                    int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : -1;
                     EventQueue.invokeLater(() -> layer.progressDownloadView(percent));
                 }
             }

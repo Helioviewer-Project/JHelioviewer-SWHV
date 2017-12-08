@@ -89,7 +89,10 @@ public class RunningDifferencePanel implements FilterDetails {
     }
 
     public void setValue(int value) {
-        progressBar.setValue(value);
+        if (value < 0)
+            progressBar.setIndeterminate(true);
+        else
+            progressBar.setValue(value);
     }
 
     public void done() {
