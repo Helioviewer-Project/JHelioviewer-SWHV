@@ -16,10 +16,9 @@
         <classpath path="${resources}/mac/lib/appbundler-1.0.jar"/>
     </taskdef>
 
-    <taskdef name="nsis" classname="net.sf.nsisant.Task">
-        <classpath location="${resources}/windows/nsisant-1.2.jar"/>
+    <taskdef name="nsis" classname="com.danielreese.nsisant.Task">
+        <classpath location="${resources}/windows/nsisant-1.3.jar"/>
     </taskdef>
-    <property name="nsis.path" value="${tmp}/windows/nsis-2.46/"/>
 
     <loadfile property="version" srcFile="../VERSION"/>
     <exec executable="git" outputproperty="revision">
@@ -55,51 +54,16 @@
         </jar>
     </target>
 
-    <target name="init-nsis">
-        <untar src="${resources}/windows/nsis-2.46.tar.bz2" dest="${tmp}/windows" overwrite="false" compression="bzip2"/>
-        <if>
-            <contains string="${os.name}" substring="linux" casesensitive="false"/>
-            <then>
-                <property name="makensis.executable" value="makensis-linux"/>
-                <property name="nsis.argument.prefix" value="-"/>
-            </then>
-            <elseif>
-                <and>
-                    <contains string="${os.name}" substring="mac" casesensitive="false"/>
-                </and>
-                <then>
-                    <property name="makensis.executable" value="makensis-mac-x86"/>
-                    <property name="nsis.argument.prefix" value="-"/>
-                </then>
-            </elseif>
-            <else>
-                <property name="makensis.executable" value="makensis.exe"/>
-                <property name="nsis.argument.prefix" value="/"/>
-            </else>
-        </if>
-        <if>
-            <not>
-                <contains string="${os.name}" substring="windows" casesensitive="false"/>
-            </not>
-            <then>
-                <exec executable="chmod" dir="${nsis.path}">
-                    <arg value="u+x"/>
-                    <arg value="${makensis.executable}"/>
-                </exec>
-            </then>
-        </if>
-    </target>
-
-   <target name="release-windows" depends="init,init-nsis,jar-bundle">
-        <exec executable="${nsis.path}/${makensis.executable}" dir="${nsis.path}">
-            <arg value="${nsis.argument.prefix}DJHV_VERSION=${version}"/>
-            <arg value="${nsis.argument.prefix}DJHV_REVISION=${revision}"/>
-            <arg value="${nsis.argument.prefix}DRESOURCE_PATH=${basedir}/${resources}/windows"/>
-            <arg value="${nsis.argument.prefix}DBUILD_PATH=${bin}"/>
-            <arg value="${nsis.argument.prefix}DFILE_NAME=${pkg.name}"/>
-            <arg value="${nsis.argument.prefix}DREADME_FILE=${bin}/README.md"/>
-            <arg value="${nsis.argument.prefix}DCOPYING_FILE=${bin}/LICENSE"/>
-            <arg value="${nsis.argument.prefix}DVERSION_FILE=${bin}/VERSION"/>
+   <target name="release-windows" depends="init,jar-bundle">
+        <exec executable="makensis">
+            <arg value="-DJHV_VERSION=${version}"/>
+            <arg value="-DJHV_REVISION=${revision}"/>
+            <arg value="-DRESOURCE_PATH=${basedir}/${resources}/windows"/>
+            <arg value="-DBUILD_PATH=${bin}"/>
+            <arg value="-DFILE_NAME=${pkg.name}"/>
+            <arg value="-DREADME_FILE=${bin}/README.md"/>
+            <arg value="-DCOPYING_FILE=${bin}/LICENSE"/>
+            <arg value="-DVERSION_FILE=${bin}/VERSION"/>
             <arg value="${basedir}/${resources}/windows/windows-setup.nsi"/>
         </exec>
     </target>
