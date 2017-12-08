@@ -142,7 +142,7 @@ public class JHVGlobals {
 
         if (System.getProperty("jhv.os").equals("mac")) {
             try {
-                String msg = "Export of " + moviePath + " finished.";
+                String msg = "File " + moviePath + " is ready.";
                 File jarParent = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getCanonicalFile().getParentFile();
                 if (jarParent != null) {
                     String[] cmd = {
@@ -162,7 +162,7 @@ public class JHVGlobals {
             }
         }
         // otherwise
-        new TextDialog("Export Ready", "Export of <a href=\"" + openURL + "\">" + moviePath + "</a> finished.", false).showDialog();
+        new TextDialog("Ready", "File <a href=\"" + openURL + "\">" + moviePath + "</a> is ready.", false).showDialog();
     }
 
 }

@@ -23,8 +23,8 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
     private final URI downloadURI;
     private final ImageLayer layer;
 
-    public DownloadViewTask(View view) {
-        layer = view.getImageLayer();
+    public DownloadViewTask(ImageLayer _layer, View view) {
+        layer = _layer;
         uri = view.getURI();
 
         APIRequest req = view.getAPIRequest();
@@ -53,7 +53,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
                 if (count % 128 == 0) { // approx 1MB
                     int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : 0;
-                    EventQueue.invokeLater(() -> layer.getOptionsPanel().getRunningDifferencePanel().setValue(percent));
+                    EventQueue.invokeLater(() -> layer.progressDownloadView(percent));
                 }
             }
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
 
     @Override
     protected void done() {
-        layer.getOptionsPanel().getRunningDifferencePanel().done();
+        layer.doneDownloadView();
     }
 
 }

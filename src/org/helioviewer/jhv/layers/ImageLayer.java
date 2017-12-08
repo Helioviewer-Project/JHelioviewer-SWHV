@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -250,7 +251,7 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     }
 
     @Override
-    public ImageLayerOptions getOptionsPanel() {
+    public Component getOptionsPanel() {
         return optionsPanel;
     }
 
@@ -354,8 +355,10 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
     public void startDownloadView() {
         if (downloadTask != null)
             downloadTask.cancel(true);
-//        downloadTask = new DownloadViewTask(this);
-//        JHVGlobals.getExecutorService().execute(downloadTask);
+        if (view != null) {
+            downloadTask = new DownloadViewTask(this, view);
+            JHVGlobals.getExecutorService().execute(downloadTask);
+        }
     }
 
     public void stopDownloadView() {
@@ -363,6 +366,14 @@ public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
             downloadTask.cancel(true);
             downloadTask = null;
         }
+    }
+
+    public void doneDownloadView() {
+        optionsPanel.getRunningDifferencePanel().done();
+    }
+
+    public void progressDownloadView(int percent) {
+        optionsPanel.getRunningDifferencePanel().setValue(percent);
     }
 
 }
