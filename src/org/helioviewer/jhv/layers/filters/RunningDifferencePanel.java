@@ -61,9 +61,9 @@ public class RunningDifferencePanel implements FilterDetails {
                 downloadButton.add(progressBar);
                 downloadButton.setToolTipText("Stop download");
 
-                layer.getView().startDownload();
+                layer.startDownloadView();
             } else
-                layer.getView().stopDownload();
+                layer.stopDownloadView();
         });
 
         progressBar.setUI(new CircularProgressUI());
