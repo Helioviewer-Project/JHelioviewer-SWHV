@@ -82,7 +82,7 @@ public class ImageLayerOptions extends JPanel {
         lutPanel.setLUT(lut);
     }
 
-    public RunningDifferencePanel getRunningDifferencePanel() {
+    RunningDifferencePanel getRunningDifferencePanel() {
         return runningDifferencePanel;
     }
 
