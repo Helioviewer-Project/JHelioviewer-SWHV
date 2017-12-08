@@ -54,18 +54,17 @@
         </jar>
     </target>
 
-   <target name="release-windows" depends="init,jar-bundle">
-        <exec executable="makensis">
-            <arg value="-DJHV_VERSION=${version}"/>
-            <arg value="-DJHV_REVISION=${revision}"/>
-            <arg value="-DRESOURCE_PATH=${basedir}/${resources}/windows"/>
-            <arg value="-DBUILD_PATH=${bin}"/>
-            <arg value="-DFILE_NAME=${pkg.name}"/>
-            <arg value="-DREADME_FILE=${bin}/README.md"/>
-            <arg value="-DCOPYING_FILE=${bin}/LICENSE"/>
-            <arg value="-DVERSION_FILE=${bin}/VERSION"/>
-            <arg value="${basedir}/${resources}/windows/windows-setup.nsi"/>
-        </exec>
+    <target name="release-windows" depends="init,jar-bundle">
+        <nsis script="${basedir}/${resources}/windows/windows-setup.nsi" noconfig="yes">
+            <define name="JHV_VERSION" value="${version}"/>
+            <define name="JHV_REVISION" value="${revision}"/>
+            <define name="RESOURCE_PATH" value="${basedir}/${resources}/windows"/>
+            <define name="BUILD_PATH" value="${bin}"/>
+            <define name="FILE_NAME" value="${pkg.name}"/>
+            <define name="README_FILE" value="${bin}/README.md"/>
+            <define name="COPYING_FILE" value="${bin}/LICENSE"/>
+            <define name="VERSION_FILE" value="${bin}/VERSION"/>
+        </nsis>
     </target>
 
     <target name="release-mac" depends="init,jar-bundle">
