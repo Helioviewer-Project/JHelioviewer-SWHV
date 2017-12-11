@@ -33,17 +33,17 @@ public class CircularProgressUI extends BasicProgressBarUI {
 
     @Override
     protected void paintDeterminate(Graphics g, JComponent c) {
-        doPaint(g, c, 360. * progressBar.getPercentComplete());
+        doPaint(g, 360. * progressBar.getPercentComplete());
     }
 
     @Override
     protected void paintIndeterminate(Graphics g, JComponent c) {
-        doPaint(g, c, 360. * getAnimationIndex() / getFrameCount());
+        doPaint(g, 360. * getAnimationIndex() / getFrameCount());
     }
 
     private static final double THICK_FACTOR = 1 / 8.;
 
-    private void doPaint(Graphics g1, JComponent c, double degree) {
+    private void doPaint(Graphics g1, double degree) {
         Rectangle r = progressBar.getBounds();
         double sz = Math.min(r.width, r.height) * (1 - 3 * THICK_FACTOR);
         double cx = r.width  * .5;

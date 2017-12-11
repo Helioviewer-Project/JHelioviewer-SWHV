@@ -176,17 +176,9 @@ public class TimelinePanel extends JPanel {
                 }
             }
 
-            /**
-             * Handle with right-click menus
-             *
-             * @param e
-             */
-            public void handlePopup(MouseEvent e) {
+            private void handlePopup(MouseEvent e) {
             }
 
-            /**
-             * Handle with clicks on hide/show/remove layer icons
-             */
             @Override
             public void mouseClicked(MouseEvent e) {
                 Point pt = e.getPoint();
