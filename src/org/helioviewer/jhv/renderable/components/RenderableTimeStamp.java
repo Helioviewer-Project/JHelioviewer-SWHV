@@ -17,6 +17,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.renderable.gui.ImageLayers;
@@ -27,7 +28,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableTimeStamp extends AbstractRenderable {
 
-    private static final int MIN_SCALE = 100;
+    private static final int MIN_SCALE = 50;
     private static final int MAX_SCALE = 200;
     private int scale = 100;
 
@@ -62,8 +63,12 @@ public class RenderableTimeStamp extends AbstractRenderable {
         }
 
         int delta = (int) (vp.height * 0.01);
-        TextRenderer renderer = GLText.getRenderer(Math.min(GLText.TEXT_SIZE_LARGE, (int) (vp.height * 0.02 * scale * 0.01)));
+        int size = (int) (vp.height * (scale * 0.01 * 0.015));
 
+        if (GLInfo.pixelScale[1] == 1) //! nasty
+            size *= 2;
+
+        TextRenderer renderer = GLText.getRenderer(size);
         renderer.beginRendering(vp.width, vp.height, true);
         renderer.setColor(Color.BLACK);
         renderer.draw(text, delta, delta);

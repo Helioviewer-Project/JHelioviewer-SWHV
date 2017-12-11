@@ -49,7 +49,6 @@ public class GLText {
     }
 
     public static final int TEXT_SIZE_NORMAL = 12;
-    public static final int TEXT_SIZE_LARGE = 16;
 
     private static final int LEFT_MARGIN_TEXT = 10;
     private static final int RIGHT_MARGIN_TEXT = 10;
