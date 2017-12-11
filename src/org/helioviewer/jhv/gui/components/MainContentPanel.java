@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 
@@ -32,7 +33,7 @@ public class MainContentPanel extends JPanel {
 
     public MainContentPanel(Component mainComponent) {
         pluginContainer = new JPanel(new BorderLayout());
-        collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
+        collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, !"false".equals(Settings.getSingletonInstance().getProperty("display.plugins")));
         collapsiblePane.toggleButton.addActionListener(e -> updateLayout());
 
         // nest in a container to avoid crash of GL drawables inside JSplitPane
@@ -63,7 +64,7 @@ public class MainContentPanel extends JPanel {
         if (plugin == null || pluginList.contains(plugin)) {
             return;
         }
-        ComponentUtils.setVisible(plugin.getVisualInterfaces().get(0), true);
+        ComponentUtils.setVisible(plugin.getVisualInterfaces().get(0), collapsiblePane.toggleButton.isSelected());
         pluginList.add(plugin);
         updateLayout();
     }
@@ -98,18 +99,19 @@ public class MainContentPanel extends JPanel {
             return;
         }
 
+        boolean onePlugin = pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 1;
+        collapsiblePane.setTitle(onePlugin ? pluginList.get(0).getTabName() : "Plugins");
+
         if (collapsiblePane.toggleButton.isSelected()) {
             pluginContainer.removeAll();
 
-            if (pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 1) {
+            if (onePlugin) {
                 pluginContainer.add(pluginList.get(0).getVisualInterfaces().get(0), BorderLayout.CENTER);
-                collapsiblePane.setTitle(pluginList.get(0).getTabName());
 
                 splitPane.setBottomComponent(collapsiblePane);
                 splitPane.setDividerSize(DIVIDER_SIZE);
-            } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().isEmpty()) && !pluginList.isEmpty()) {
+            } else if (!pluginList.isEmpty()) {
                 JTabbedPane tabbedPane = new JTabbedPane();
-
                 for (MainContentPanelPlugin plugin : pluginList) {
                     for (JComponent component : plugin.getVisualInterfaces()) {
                         tabbedPane.addTab(plugin.getTabName(), component);
@@ -117,7 +119,6 @@ public class MainContentPanel extends JPanel {
                 }
 
                 pluginContainer.add(tabbedPane, BorderLayout.CENTER);
-                collapsiblePane.setTitle("Plugins");
 
                 splitPane.setBottomComponent(collapsiblePane);
                 splitPane.setDividerSize(DIVIDER_SIZE);
@@ -125,6 +126,10 @@ public class MainContentPanel extends JPanel {
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);
         }
+
+        Settings.getSingletonInstance().setProperty("display.plugins", Boolean.toString(collapsiblePane.toggleButton.isSelected()));
+        Settings.getSingletonInstance().save("display.plugins");
+
         revalidate();
         repaint();
     }
