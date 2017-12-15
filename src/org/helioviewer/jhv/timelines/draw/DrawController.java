@@ -17,9 +17,10 @@ import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 public class DrawController implements JHVEventHighlightListener, TimeListener, TimespanListener {
 
-    public static final TimeAxis selectedAxis;
-    public static final TimeAxis availableAxis;
+    public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
+    public static final TimeAxis availableAxis = new TimeAxis(0, 0);
 
+    private static final DrawControllerOptionsPanel optionsPanel = new DrawControllerOptionsPanel();
     private static final HashSet<DrawListener> listeners = new HashSet<>();
 
     private static Rectangle graphArea = new Rectangle();
@@ -27,16 +28,9 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     private static long latestMovieTime = Long.MIN_VALUE;
     private static boolean isLocked;
 
-    private static DrawControllerOptionsPanel optionsPanel;
-
-    static {
-        long d = System.currentTimeMillis();
-        availableAxis = new TimeAxis(d - 2 * TimeUtils.DAY_IN_MILLIS, d);
-        selectedAxis = new TimeAxis(availableAxis.start, availableAxis.end);
-    }
-
     public DrawController() {
-        optionsPanel = new DrawControllerOptionsPanel();
+        long d = System.currentTimeMillis();
+        setSelectedInterval(d - 2 * TimeUtils.DAY_IN_MILLIS, d);
     }
 
     public static Component getOptionsPanel() {
