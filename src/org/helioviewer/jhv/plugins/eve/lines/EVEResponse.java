@@ -26,7 +26,7 @@ class EVEResponse {
     }
 
     static EVEResponse get(URI uri) {
-        try (NetClient nc = NetClient.of(uri.toURL())) {
+        try (NetClient nc = NetClient.of(uri)) {
             JSONObject jo = JSONUtils.readJSON(nc.getReader());
 
             String bandName = jo.optString("timeline", "");

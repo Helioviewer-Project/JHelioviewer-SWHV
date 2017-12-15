@@ -20,7 +20,7 @@ class LoadJSONTask extends LoadURITask {
 
     @Override
     protected View backgroundWork() {
-        try (NetClient nc = NetClient.of(uri.toURL())) {
+        try (NetClient nc = NetClient.of(uri)) {
             APIRequest req = APIRequest.fromRequestJson(JSONUtils.readJSON(nc.getReader()));
             return requestAndOpenRemoteFile(req);
         } catch (Exception e) {

@@ -40,7 +40,7 @@ public class DownloadViewTask extends JHVWorker<Void, Void> {
             return null;
 
         boolean failed = false;
-        try (NetClient nc = NetClient.of(downloadURI.toURL());
+        try (NetClient nc = NetClient.of(downloadURI);
              BufferedSink sink = Okio.buffer(Okio.sink(dstFile))) {
             long count = 0, contentLength = nc.getContentLength();
 

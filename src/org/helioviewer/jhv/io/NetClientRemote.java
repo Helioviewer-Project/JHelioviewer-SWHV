@@ -3,7 +3,7 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.net.URL;
+import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 //import java.util.logging.Level;
@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.log.Log;
 
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -32,7 +33,11 @@ class NetClientRemote implements NetClient {
 
     private final Response response;
 
-    NetClientRemote(URL url, boolean allowError) throws IOException {
+    NetClientRemote(URI uri, boolean allowError) throws IOException {
+        HttpUrl url = HttpUrl.get(uri);
+        if (url == null)
+            throw new IOException("Could not parse " + uri);
+
         Request request = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url).build();
         response = client.newCall(request).execute();
         if (!allowError && !response.isSuccessful()) {
