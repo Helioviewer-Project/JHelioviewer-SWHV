@@ -3,7 +3,8 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import okio.BufferedSource;
 
 public interface NetClient extends AutoCloseable {
@@ -15,20 +16,28 @@ public interface NetClient extends AutoCloseable {
     long getContentLength();
     void close() throws IOException;
 
-    static NetClient of(String url) throws IOException {
-        return of(new URL(url), false);
+    static NetClient of(String uri) throws IOException {
+        try {
+            return of(new URI(uri), false);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
     }
 
-    static NetClient of(URL url) throws IOException {
-        return of(url, false);
+    static NetClient of(URI uri) throws IOException {
+        return of(uri, false);
     }
 
-    static NetClient of(String url, boolean allowError) throws IOException {
-        return of(new URL(url), allowError);
+    static NetClient of(String uri, boolean allowError) throws IOException {
+        try {
+            return of(new URI(uri), allowError);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
     }
 
-    static NetClient of(URL url, boolean allowError) throws IOException {
-        return "file".equals(url.getProtocol()) ? new NetClientLocal(url) : new NetClientRemote(url, allowError);
+    static NetClient of(URI uri, boolean allowError) throws IOException {
+        return "file".equals(uri.getScheme()) ? new NetClientLocal(uri) : new NetClientRemote(uri, allowError);
     }
 
 }

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
@@ -15,9 +15,9 @@ class NetClientLocal implements NetClient {
 
     private final BufferedSource response;
 
-    NetClientLocal(URL url) throws IOException {
+    NetClientLocal(URI uri) throws IOException {
         try {
-            response = Okio.buffer(Okio.source(Paths.get(url.toURI())));
+            response = Okio.buffer(Okio.source(Paths.get(uri.getPath())));
         } catch (Exception e) {
             throw new IOException(e);
         }
