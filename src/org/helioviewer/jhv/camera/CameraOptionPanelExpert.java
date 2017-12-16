@@ -41,8 +41,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Timesp
             ja = jo.optJSONArray("objects");
             sync = jo.optBoolean("syncInterval", sync);
             if (!sync) {
-                start = TimeUtils.optParse(jo.optString("startTime"), System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS);
-                end = TimeUtils.optParse(jo.optString("endTime"), System.currentTimeMillis());
+                long t = System.currentTimeMillis();
+                start = TimeUtils.optParse(jo.optString("startTime"), t - 2 * TimeUtils.DAY_IN_MILLIS);
+                end = TimeUtils.optParse(jo.optString("endTime"), t);
             }
         }
         if (ja == null)
