@@ -85,15 +85,20 @@ public class APIRequest {
     public static APIRequest fromJson(JSONObject jo) {
         String _server = jo.optString("server", Settings.getSingletonInstance().getProperty("default.server"));
         int _sourceId = jo.optInt("sourceId", 10);
-        long _startTime = TimeUtils.optParse(jo.optString("startTime"), System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS);
-        long _endTime = TimeUtils.optParse(jo.optString("endTime"), System.currentTimeMillis());
+
+        long t = System.currentTimeMillis();
+        long _startTime = TimeUtils.optParse(jo.optString("startTime"), t - 2 * TimeUtils.DAY_IN_MILLIS);
+        long _endTime = TimeUtils.optParse(jo.optString("endTime"), t);
+
         int _cadence = jo.optInt("cadence", (int) Math.max(1, (_endTime - _startTime) / 1000 / MAX_FRAMES));
         return new APIRequest(_server, _sourceId, _startTime, _endTime, _cadence);
     }
 
     public static APIRequest fromRequestJson(JSONObject jo) throws Exception {
-        long _startTime = TimeUtils.optParse(jo.optString("startTime"), System.currentTimeMillis() - 2 * TimeUtils.DAY_IN_MILLIS);
-        long _endTime = TimeUtils.optParse(jo.optString("startTime"), System.currentTimeMillis());
+        long t = System.currentTimeMillis();
+        long _startTime = TimeUtils.optParse(jo.optString("startTime"), t - 2 * TimeUtils.DAY_IN_MILLIS);
+        long _endTime = TimeUtils.optParse(jo.optString("endTime"), t);
+
         int _cadence = jo.optInt("cadence", (int) Math.max(1, (_endTime - _startTime) / 1000 / MAX_FRAMES));
 
         String observatory = jo.optString("observatory", "");
