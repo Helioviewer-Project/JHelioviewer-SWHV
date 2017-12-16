@@ -13,6 +13,7 @@ import org.helioviewer.jhv.timelines.view.TimelineDialog;
 import org.helioviewer.jhv.timelines.view.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelinePanel;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
+import org.json.JSONObject;
 
 public class Timelines implements MainContentPanelPlugin {
 
@@ -64,6 +65,14 @@ public class Timelines implements MainContentPanelPlugin {
     @Override
     public LinkedList<JComponent> getVisualInterfaces() {
         return pluginPanes;
+    }
+
+    public void saveState(JSONObject jo) {
+        dc.saveState(jo);
+    }
+
+    public void loadState(JSONObject jo) {
+        dc.loadState(jo);
     }
 
 }

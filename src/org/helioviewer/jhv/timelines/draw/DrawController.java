@@ -14,6 +14,7 @@ import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
+import org.json.JSONObject;
 
 public class DrawController implements JHVEventHighlightListener, TimeListener, TimespanListener {
 
@@ -29,8 +30,25 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     private static boolean isLocked;
 
     public DrawController() {
-        long d = System.currentTimeMillis();
-        setSelectedInterval(d - 2 * TimeUtils.DAY_IN_MILLIS, d);
+        long t = System.currentTimeMillis();
+        setSelectedInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
+    }
+
+    public void saveState(JSONObject jo) {
+        JSONObject js = new JSONObject();
+        js.put("start", TimeUtils.format(selectedAxis.start));
+        js.put("end", TimeUtils.format(selectedAxis.end));
+        jo.put("selectedAxis", js);
+    }
+
+    public void loadState(JSONObject jo) {
+        JSONObject js = jo.optJSONObject("selectedAxis");
+        if (js != null) {
+            long t = System.currentTimeMillis();
+            long start = TimeUtils.optParse(js.optString("start"), t - 2 * TimeUtils.DAY_IN_MILLIS);
+            long end = TimeUtils.optParse(js.optString("end"), t);
+            setSelectedInterval(start, end);
+        }
     }
 
     public static Component getOptionsPanel() {
@@ -192,7 +210,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         return graphSize;
     }
 
-    public static void setLocked(boolean _isLocked) {
+    static void setLocked(boolean _isLocked) {
         isLocked = _isLocked;
         if (isLocked && latestMovieTime != Long.MIN_VALUE) {
             centraliseSelected(latestMovieTime);
