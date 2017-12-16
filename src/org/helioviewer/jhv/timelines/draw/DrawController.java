@@ -36,19 +36,21 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     public void saveState(JSONObject jo) {
         JSONObject js = new JSONObject();
-        js.put("start", TimeUtils.format(selectedAxis.start));
-        js.put("end", TimeUtils.format(selectedAxis.end));
+        js.put("startTime", TimeUtils.format(selectedAxis.start));
+        js.put("endTime", TimeUtils.format(selectedAxis.end));
         jo.put("selectedAxis", js);
+        jo.put("locked", isLocked);
     }
 
     public void loadState(JSONObject jo) {
         JSONObject js = jo.optJSONObject("selectedAxis");
         if (js != null) {
             long t = System.currentTimeMillis();
-            long start = TimeUtils.optParse(js.optString("start"), t - 2 * TimeUtils.DAY_IN_MILLIS);
-            long end = TimeUtils.optParse(js.optString("end"), t);
+            long start = TimeUtils.optParse(js.optString("startTime"), t - 2 * TimeUtils.DAY_IN_MILLIS);
+            long end = TimeUtils.optParse(js.optString("endTime"), t);
             setSelectedInterval(start, end);
         }
+        optionsPanel.setLocked(jo.optBoolean("locked", false));
     }
 
     public static Component getOptionsPanel() {

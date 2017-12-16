@@ -18,6 +18,7 @@ import com.jidesoft.swing.JideToggleButton;
 class DrawControllerOptionsPanel extends JPanel {
 
     private final JComboBox<ZoomItem> zoomCombo;
+    private final JideToggleButton lockButton;
 
     private enum ZOOM {
         CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
@@ -46,7 +47,7 @@ class DrawControllerOptionsPanel extends JPanel {
             zoomTo(item.zoom, item.number);
         });
 
-        JideToggleButton lockButton = new JideToggleButton(Buttons.unlock);
+        lockButton = new JideToggleButton(Buttons.unlock);
         lockButton.setToolTipText("Synchronize time series with movie");
         lockButton.addActionListener(e -> {
             DrawController.setLocked(lockButton.isSelected());
@@ -132,6 +133,11 @@ class DrawControllerOptionsPanel extends JPanel {
         if (end > now)
             end = now;
         DrawController.setSelectedInterval(end - diff, end);
+    }
+
+    void setLocked(boolean locked) {
+        if (lockButton.isSelected() != locked)
+            lockButton.doClick();
     }
 
 }
