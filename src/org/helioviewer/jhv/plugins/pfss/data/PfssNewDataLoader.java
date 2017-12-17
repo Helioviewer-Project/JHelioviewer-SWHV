@@ -75,7 +75,7 @@ public class PfssNewDataLoader implements Runnable {
                 Long dd = pair.b;
                 String url = pair.a;
                 if (dd > start - TimeUtils.DAY_IN_MILLIS && dd < end + TimeUtils.DAY_IN_MILLIS) {
-                    FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(url, dd), null);
+                    FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(url), null);
                     PfssPlugin.pfssDataPool.execute(dataLoaderTask);
                     PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
                 }
