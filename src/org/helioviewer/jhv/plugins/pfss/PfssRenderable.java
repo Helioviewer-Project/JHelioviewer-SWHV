@@ -10,7 +10,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -21,9 +20,8 @@ import com.jogamp.opengl.GL2;
 
 public class PfssRenderable extends AbstractRenderable implements TimespanListener {
 
-    private static final double thickness = 0.004;
     private final PfssOptionsPanel optionsPanel;
-    private final GLLine line = new GLLine();
+    private final PfssLine line = new PfssLine();
     private PfssData previousPfssData;
 
     public PfssRenderable(JSONObject jo) {
@@ -131,13 +129,12 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
             lastFixedColor = fixedColor;
             lastRadius = radius;
 
-            PfssLine.calculatePositions(data, detail, fixedColor, radius);
-            line.setData(gl, PfssLine.vertices, PfssLine.colors);
+            line.calculatePositions(gl, data, detail, fixedColor, radius);
 
             timeString = data.dateObs.toString();
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
         }
-        line.render(gl, aspect, thickness);
+        line.render(gl, aspect);
     }
 
 }

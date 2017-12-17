@@ -3,22 +3,39 @@ package org.helioviewer.jhv.plugins.pfss;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
+
+import com.jogamp.opengl.GL2;
 
 class PfssLine {
 
+    private static final double thickness = 0.004;
     private static final float[] openFieldColor = BufferUtils.colorRed;
     private static final float[] loopColor = BufferUtils.colorWhite;
     private static final float[] insideFieldColor = BufferUtils.colorBlue;
 
-    static FloatBuffer vertices = BufferUtils.newFloatBuffer(0);
-    static FloatBuffer colors = BufferUtils.newFloatBuffer(0);
+    private final GLLine line = new GLLine();
+    private FloatBuffer vertices = BufferUtils.newFloatBuffer(0);
+    private FloatBuffer colors = BufferUtils.newFloatBuffer(0);
 
-    private static double decode(short f) {
+    void init(GL2 gl) {
+        line.init(gl);
+    }
+
+    void dispose(GL2 gl) {
+        line.dispose(gl);
+    }
+
+    void render(GL2 gl, double aspect) {
+        line.render(gl, aspect, thickness);
+    }
+
+    private double decode(short f) {
         return (f + 32768.) * (2. / 65535.) - 1.;
     }
 
-    private static void computeColor(float[] color, double b) {
+    private void computeColor(float[] color, double b) {
         if (b > 0) {
             color[0] = 1;
             color[1] = (float) (1. - b);
@@ -31,7 +48,7 @@ class PfssLine {
         color[3] = 1;
     }
 
-    public static void calculatePositions(PfssData data, int detail, boolean fixedColor, double radius) {
+    public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius) {
         vertices.clear();
         colors.clear();
 
@@ -99,6 +116,7 @@ class PfssLine {
         }
         vertices.flip();
         colors.flip();
+        line.setData(gl, vertices, colors);
     }
 
 }
