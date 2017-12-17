@@ -87,7 +87,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
         if (!_enabled)
             timeString = null;
         else if (previousPfssData != null)
-            timeString = previousPfssData.getDateObs().toString();
+            timeString = previousPfssData.dateObs.toString();
     }
 
     @Override
@@ -117,16 +117,24 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
         line.dispose(gl);
     }
 
+    private int lastDetail;
+    private boolean lastFixedColor;
+    private double lastRadius;
+
     private void renderData(GL2 gl, PfssData data, double aspect) {
         int detail = optionsPanel.getDetail();
         boolean fixedColor = optionsPanel.getFixedColor();
         double radius = optionsPanel.getRadius();
 
-        if (data != previousPfssData || data.needsUpdate(detail, fixedColor, radius)) {
-            data.calculatePositions(detail, fixedColor, radius);
-            line.setData(gl, data.vertices, data.colors);
+        if (data != previousPfssData || lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius) {
+            lastDetail = detail;
+            lastFixedColor = fixedColor;
+            lastRadius = radius;
 
-            timeString = data.getDateObs().toString();
+            PfssLine.calculatePositions(data, detail, fixedColor, radius);
+            line.setData(gl, PfssLine.vertices, PfssLine.colors);
+
+            timeString = data.dateObs.toString();
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
         }
         line.render(gl, aspect, thickness);
