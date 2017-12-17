@@ -16,6 +16,7 @@ class PfssLine {
     private static final float[] insideFieldColor = BufferUtils.colorBlue;
 
     private final GLLine line = new GLLine();
+    private final float[] brightColor = new float[4];
     private FloatBuffer vertices = BufferUtils.newFloatBuffer(0);
     private FloatBuffer colors = BufferUtils.newFloatBuffer(0);
 
@@ -31,21 +32,21 @@ class PfssLine {
         line.render(gl, aspect, thickness);
     }
 
-    private double decode(short f) {
-        return (f + 32768.) * (2. / 65535.) - 1.;
+    private void computeBrightColor(double b) {
+        if (b > 0) {
+            brightColor[0] = 1;
+            brightColor[1] = (float) (1. - b);
+            brightColor[2] = (float) (1. - b);
+        } else {
+            brightColor[0] = (float) (1. + b);
+            brightColor[1] = (float) (1. + b);
+            brightColor[2] = 1;
+        }
+        brightColor[3] = 1;
     }
 
-    private void computeColor(float[] color, double b) {
-        if (b > 0) {
-            color[0] = 1;
-            color[1] = (float) (1. - b);
-            color[2] = (float) (1. - b);
-        } else {
-            color[0] = (float) (1. + b);
-            color[1] = (float) (1. + b);
-            color[2] = 1;
-        }
-        color[3] = 1;
+    private double decode(short f) {
+        return (f + 32768.) * (2. / 65535.) - 1.;
     }
 
     public void calculatePositions(GL2 gl, PfssData data, int detail, boolean fixedColor, double radius) {
@@ -69,15 +70,13 @@ class PfssLine {
             colors = BufferUtils.newFloatBuffer(clength);
 
         float[] oneColor = loopColor;
-        float[] brightColor = new float[4];
-
         for (int i = 0; i < flinex.length; i++) {
             if (i / pointsPerLine % 9 <= detail) {
                 double x = 3. * decode(flinex[i]);
                 double y = 3. * decode(fliney[i]);
                 double z = 3. * decode(flinez[i]);
                 double b = decode(flines[i]);
-                computeColor(brightColor, b);
+                computeBrightColor(b);
 
                 double helpx = cphi * x + sphi * y;
                 double helpy = -sphi * x + cphi * y;
@@ -116,6 +115,7 @@ class PfssLine {
         }
         vertices.flip();
         colors.flip();
+
         line.setData(gl, vertices, colors);
     }
 
