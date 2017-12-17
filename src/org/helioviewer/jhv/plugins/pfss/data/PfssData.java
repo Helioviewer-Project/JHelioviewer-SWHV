@@ -8,25 +8,21 @@ public class PfssData {
 
     public final JHVDate dateObs;
     public final int pointsPerLine;
-    public final short[] fieldlinex;
-    public final short[] fieldliney;
-    public final short[] fieldlinez;
-    public final short[] fieldlines;
+    public final short[] flinex;
+    public final short[] fliney;
+    public final short[] flinez;
+    public final short[] flines;
 
     public final double cphi;
     public final double sphi;
 
-    final long time;
-
-    public PfssData(JHVDate _dateObs, short[] _fieldlinex, short[] _fieldliney, short[] _fieldlinez,
-            short[] _fieldlines, int _pointsPerLine, long _time) {
+    public PfssData(JHVDate _dateObs, short[] _flinex, short[] _fliney, short[] _flinez, short[] _flines, int _pointsPerLine) {
         dateObs = _dateObs;
-        fieldlinex = _fieldlinex;
-        fieldliney = _fieldliney;
-        fieldlinez = _fieldlinez;
-        fieldlines = _fieldlines;
+        flinex = _flinex;
+        fliney = _fliney;
+        flinez = _flinez;
+        flines = _flines;
         pointsPerLine = _pointsPerLine;
-        time = _time;
 
         Position.L p = Sun.getEarth(dateObs);
         cphi = Math.cos(p.lon);

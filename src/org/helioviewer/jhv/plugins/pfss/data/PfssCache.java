@@ -23,7 +23,7 @@ public class PfssCache {
             swapped = false;
             j++;
             for (int i = 0; i < numberOfElementsInCache - j; i++) {
-                if (data[i].time > data[i + 1].time) {
+                if (data[i].dateObs.milli > data[i + 1].dateObs.milli) {
                     PfssData tmp = data[i];
                     data[i] = data[i + 1];
                     data[i + 1] = tmp;
@@ -45,8 +45,8 @@ public class PfssCache {
             return data[numberOfElementsInCache - 1];
 
         if (-found - 1 >= 0) {
-            long diff1 = Math.abs(data[-found - 1].time - timestamp);
-            long diff2 = Math.abs(data[-found].time - timestamp);
+            long diff1 = Math.abs(data[-found - 1].dateObs.milli - timestamp);
+            long diff2 = Math.abs(data[-found].dateObs.milli - timestamp);
             if (diff1 < diff2) {
                 return data[-found - 1];
             }
@@ -60,7 +60,7 @@ public class PfssCache {
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
-            long midVal = data[mid].time;
+            long midVal = data[mid].dateObs.milli;
 
             if (midVal < timestamp)
                 low = mid + 1;

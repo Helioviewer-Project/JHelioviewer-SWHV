@@ -17,11 +17,9 @@ import nom.tam.fits.Header;
 class PfssDataLoader implements Runnable {
 
     private final String url;
-    private final long time;
 
-    PfssDataLoader(String _url, long _time) {
+    PfssDataLoader(String _url) {
         url = _url;
-        time = _time;
     }
 
     @Override
@@ -41,7 +39,7 @@ class PfssDataLoader implements Runnable {
 
         try (NetClient nc = NetClient.of(remote);
              Fits fits = new Fits(nc.getStream())) {
-            PfssData pfssData = getPfssData(fits, time);
+            PfssData pfssData = getPfssData(fits);
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
 
             if (!loadFromFile)
@@ -51,7 +49,7 @@ class PfssDataLoader implements Runnable {
         }
     }
 
-    private static PfssData getPfssData(Fits fits, long time) throws Exception {
+    private static PfssData getPfssData(Fits fits) throws Exception {
         BasicHDU<?> hdus[] = fits.read();
         if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))
             throw new Exception("Could not read FITS");
@@ -65,12 +63,14 @@ class PfssDataLoader implements Runnable {
         if (points == 0)
             throw new Exception("POINTS_PER_LINE not found");
 
-        short[] fieldlinex = (short[]) bhdu.getColumn("FIELDLINEx");
-        short[] fieldliney = (short[]) bhdu.getColumn("FIELDLINEy");
-        short[] fieldlinez = (short[]) bhdu.getColumn("FIELDLINEz");
-        short[] fieldlines = (short[]) bhdu.getColumn("FIELDLINEs");
+        short[] flinex = (short[]) bhdu.getColumn("FIELDLINEx");
+        short[] fliney = (short[]) bhdu.getColumn("FIELDLINEy");
+        short[] flinez = (short[]) bhdu.getColumn("FIELDLINEz");
+        short[] flines = (short[]) bhdu.getColumn("FIELDLINEs");
+        if (flinex.length != fliney.length || flinex.length != flinez.length || flinex.length != flines.length)
+            throw new Exception("Fieldline arrays not equal " + flinex.length + " " + fliney.length + " " + flinez.length + " " + flinex.length);
 
-        return new PfssData(new JHVDate(dateFits), fieldlinex, fieldliney, fieldlinez, fieldlines, points, time);
+        return new PfssData(new JHVDate(dateFits), flinex, fliney, flinez, flines, points);
     }
 
 }

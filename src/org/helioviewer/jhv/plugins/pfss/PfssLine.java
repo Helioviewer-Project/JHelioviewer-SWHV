@@ -55,28 +55,28 @@ class PfssLine {
         int pointsPerLine = data.pointsPerLine;
         double cphi = data.cphi;
         double sphi = data.sphi;
-        short[] fieldlinex = data.fieldlinex;
-        short[] fieldliney = data.fieldliney;
-        short[] fieldlinez = data.fieldlinez;
-        short[] fieldlines = data.fieldlines;
+        short[] flinex = data.flinex;
+        short[] fliney = data.fliney;
+        short[] flinez = data.flinez;
+        short[] flines = data.flines;
 
-        int numberOfLines = fieldlinex.length / pointsPerLine;
-        int vlength = 3 * (fieldlinex.length + 2 * numberOfLines);
+        int numberOfLines = flinex.length / pointsPerLine;
+        int vlength = 3 * (flinex.length + 2 * numberOfLines);
         if (vlength != vertices.capacity())
             vertices = BufferUtils.newFloatBuffer(vlength);
-        int clength = 4 * (fieldlinex.length + 2 * numberOfLines);
+        int clength = 4 * (flinex.length + 2 * numberOfLines);
         if (clength != colors.capacity())
             colors = BufferUtils.newFloatBuffer(clength);
 
         float[] oneColor = loopColor;
         float[] brightColor = new float[4];
 
-        for (int i = 0; i < fieldlinex.length; i++) {
+        for (int i = 0; i < flinex.length; i++) {
             if (i / pointsPerLine % 9 <= detail) {
-                double x = 3. * decode(fieldlinex[i]);
-                double y = 3. * decode(fieldliney[i]);
-                double z = 3. * decode(fieldlinez[i]);
-                double b = decode(fieldlines[i]);
+                double x = 3. * decode(flinex[i]);
+                double y = 3. * decode(fliney[i]);
+                double z = 3. * decode(flinez[i]);
+                double b = decode(flines[i]);
                 computeColor(brightColor, b);
 
                 double helpx = cphi * x + sphi * y;
@@ -90,9 +90,9 @@ class PfssLine {
                     colors.put(BufferUtils.colorNull);
 
                     if (fixedColor) {
-                        double xo = 3. * decode(fieldlinex[i + pointsPerLine - 1]);
-                        double yo = 3. * decode(fieldliney[i + pointsPerLine - 1]);
-                        double zo = 3. * decode(fieldlinez[i + pointsPerLine - 1]);
+                        double xo = 3. * decode(flinex[i + pointsPerLine - 1]);
+                        double yo = 3. * decode(fliney[i + pointsPerLine - 1]);
+                        double zo = 3. * decode(flinez[i + pointsPerLine - 1]);
                         double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
 
                         if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
