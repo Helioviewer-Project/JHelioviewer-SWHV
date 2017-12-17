@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 
 import okio.BufferedSource;
 import okio.Okio;
@@ -17,7 +17,7 @@ class NetClientLocal implements NetClient {
 
     NetClientLocal(URI uri) throws IOException {
         try {
-            response = Okio.buffer(Okio.source(Paths.get(uri.getPath())));
+            response = Okio.buffer(Okio.source(new File(uri.getPath())));
         } catch (Exception e) {
             throw new IOException(e);
         }
