@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -9,9 +10,12 @@ import java.util.concurrent.TimeUnit;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.log.Log;
 
+import okhttp3.Cache;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -21,15 +25,21 @@ import okio.BufferedSource;
 
 class NetClientRemote implements NetClient {
 
-    //static {
-    //    Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
-    //}
+    private static final int cacheSize = 256 * 1024 * 1024;
+    private static OkHttpClient client;
 
-    private static final OkHttpClient client = new OkHttpClient.Builder()
-        .connectTimeout(JHVGlobals.getStdConnectTimeout(), TimeUnit.MILLISECONDS)
-        .readTimeout(JHVGlobals.getStdReadTimeout(), TimeUnit.MILLISECONDS)
-        //.addInterceptor(new LoggingInterceptor())
-        .build();
+    private static void init() throws IOException {
+        if (client != null)
+            return;
+
+        // Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+        client = new OkHttpClient.Builder()
+            .connectTimeout(JHVGlobals.getStdConnectTimeout(), TimeUnit.MILLISECONDS)
+            .readTimeout(JHVGlobals.getStdReadTimeout(), TimeUnit.MILLISECONDS)
+            .cache(new Cache(new File(FileUtils.tempDir(JHVDirectory.CACHE.getFile(), "remote")), cacheSize))
+            //.addInterceptor(new LoggingInterceptor())
+            .build();
+    }
 
     private final Response response;
 
@@ -38,12 +48,16 @@ class NetClientRemote implements NetClient {
         if (url == null)
             throw new IOException("Could not parse " + uri);
 
+        init();
         Request request = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url).build();
         response = client.newCall(request).execute();
         if (!allowError && !response.isSuccessful()) {
             response.close();
             throw new IOException(response.toString());
         }
+
+        //if (response.cacheResponse() != null)
+        //    System.out.println(">>> cached response: " + url);
     }
 
     @Override
