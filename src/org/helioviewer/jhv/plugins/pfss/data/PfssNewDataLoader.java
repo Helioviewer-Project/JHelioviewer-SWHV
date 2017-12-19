@@ -57,31 +57,28 @@ public class PfssNewDataLoader implements Runnable {
 
                 try (NetClient nc = NetClient.of(url)) {
                     BufferedSource source = nc.getSource();
-                    String inputLine;
-                    while ((inputLine = source.readUtf8Line()) != null) {
-                        String[] splitted = inputLine.split(" ");
+                    String line;
+                    while ((line = source.readUtf8Line()) != null) {
+                        String[] splitted = line.split(" ");
                         urls.add(new Pair<>(splitted[1], TimeUtils.parse(splitted[0])));
                     }
                 } catch (Exception e) {
                     Log.warn("Could not read PFSS entries: " + e);
                 }
-            }
 
-            synchronized (parsedCache) {
-                parsedCache.put(cacheKey, urls);
+                synchronized (parsedCache) {
+                    parsedCache.put(cacheKey, urls);
+                }
             }
 
             ArrayList<Pair<String, Long>> furls = urls;
             EventQueue.invokeLater(() -> {
                 for (Pair<String, Long> pair : furls) {
-                    Long time = pair.b;
-                    String url = pair.a;
-                    if (time > start - TimeUtils.DAY_IN_MILLIS && time < end + TimeUtils.DAY_IN_MILLIS) {
-                        if (PfssPlugin.getPfsscache().getData(time) == null) {
-                            FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(time, PfssSettings.baseURL + url), null);
-                            PfssPlugin.pfssDataPool.execute(dataLoaderTask);
-                            PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);
-                        }
+                    long time = pair.b;
+                    if (time > start - TimeUtils.DAY_IN_MILLIS && time < end + TimeUtils.DAY_IN_MILLIS && PfssPlugin.getPfsscache().getData(time) == null) {
+                        FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(time, PfssSettings.baseURL + pair.a), null);
+                        PfssPlugin.pfssDataPool.execute(dataLoaderTask);
+                        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);
                     }
                 }
             });
