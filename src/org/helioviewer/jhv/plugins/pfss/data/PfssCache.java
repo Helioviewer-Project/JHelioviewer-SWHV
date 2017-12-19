@@ -8,9 +8,9 @@ public class PfssCache {
 
     private final TreeMap<Long, PfssData> map = new TreeMap<>();
 
-    public void addData(PfssData data) {
+    public void addData(long time, PfssData data) {
         assert map.size() < PfssSettings.CACHE_SIZE;
-        map.put(data.dateObs.milli, data);
+        map.put(time, data);
     }
 
     public PfssData getNearestData(long time) {

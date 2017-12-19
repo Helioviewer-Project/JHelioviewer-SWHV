@@ -13,9 +13,11 @@ import nom.tam.fits.Header;
 
 class PfssDataLoader implements Runnable {
 
+    private final long time;
     private final String url;
 
-    PfssDataLoader(String _url) {
+    PfssDataLoader(long _time, String _url) {
+        time = _time;
         url = _url;
     }
 
@@ -32,6 +34,9 @@ class PfssDataLoader implements Runnable {
             String dateFits = header.getStringValue("DATE-OBS");
             if (dateFits == null)
                 throw new Exception("DATE-OBS not found");
+            JHVDate date = new JHVDate(dateFits);
+            if (time != date.milli)
+                throw new Exception("Inconsistent DATE-OBS. Expected " + new JHVDate(time) + ", got " + date);
 
             int points = header.getIntValue("HIERARCH.POINTS_PER_LINE");
             if (points == 0)
@@ -44,8 +49,8 @@ class PfssDataLoader implements Runnable {
             if (flinex.length != fliney.length || flinex.length != flinez.length || flinex.length != flines.length)
                 throw new Exception("Fieldline arrays not equal " + flinex.length + " " + fliney.length + " " + flinez.length + " " + flinex.length);
 
-            PfssData pfssData = new PfssData(new JHVDate(dateFits), flinex, fliney, flinez, flines, points);
-            EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
+            PfssData pfssData = new PfssData(date, flinex, fliney, flinez, flines, points);
+            EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(time, pfssData));
         } catch (Exception e) {
             e.printStackTrace();
         }
