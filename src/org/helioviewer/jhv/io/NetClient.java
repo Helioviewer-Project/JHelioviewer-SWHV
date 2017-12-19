@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.EventQueue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -37,6 +39,9 @@ public interface NetClient extends AutoCloseable {
     }
 
     static NetClient of(URI uri, boolean allowError) throws IOException {
+        if (EventQueue.isDispatchThread())
+            throw new IOException("Don't do that");
+
         return "file".equals(uri.getScheme()) ? new NetClientLocal(uri) : new NetClientRemote(uri, allowError);
     }
 
