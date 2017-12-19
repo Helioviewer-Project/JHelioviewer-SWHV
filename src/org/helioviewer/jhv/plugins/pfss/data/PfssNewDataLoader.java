@@ -19,8 +19,6 @@ import okio.BufferedSource;
 
 public class PfssNewDataLoader implements Runnable {
 
-    private static final int TIMEOUT_DOWNLOAD_SECONDS = 120;
-
     private final long start;
     private final long end;
     private static final TreeMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<>();
@@ -75,9 +73,9 @@ public class PfssNewDataLoader implements Runnable {
                 Long dd = pair.b;
                 String url = pair.a;
                 if (dd > start - TimeUtils.DAY_IN_MILLIS && dd < end + TimeUtils.DAY_IN_MILLIS) {
-                    FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(url), null);
+                    FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(PfssSettings.baseURL + url), null);
                     PfssPlugin.pfssDataPool.execute(dataLoaderTask);
-                    PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
+                    PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);
                 }
             }
 
