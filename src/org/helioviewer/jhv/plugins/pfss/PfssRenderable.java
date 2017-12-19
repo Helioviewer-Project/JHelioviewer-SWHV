@@ -49,7 +49,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
         if (!isVisible[vp.idx])
             return;
 
-        PfssData pfssData = PfssPlugin.getPfsscache().getData(Layers.getLastUpdatedTimestamp().milli);
+        PfssData pfssData = PfssPlugin.getPfsscache().getNearestData(Layers.getLastUpdatedTimestamp().milli);
         if (pfssData != null) {
             renderData(gl, pfssData, vp.aspect);
             previousPfssData = pfssData;
@@ -90,8 +90,6 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
 
     @Override
     public void timespanChanged(long start, long end) {
-        PfssPlugin.getPfsscache().clear();
-
         FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssNewDataLoader(start, end), null);
         PfssPlugin.pfssNewLoadPool.execute(dataLoaderTask);
         PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);

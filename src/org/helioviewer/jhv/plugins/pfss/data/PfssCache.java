@@ -13,12 +13,12 @@ public class PfssCache {
         map.put(data.dateObs.milli, data);
     }
 
-    public PfssData getData(long timestamp) {
-        Long c = map.ceilingKey(timestamp);
-        Long f = map.floorKey(timestamp);
+    public PfssData getNearestData(long time) {
+        Long c = map.ceilingKey(time);
+        Long f = map.floorKey(time);
 
         if (c != null && f != null) {
-            if (Math.abs(f - timestamp) < Math.abs(timestamp - c))
+            if (Math.abs(f - time) < Math.abs(time - c))
                 return map.get(f);
             else
                 return map.get(c);
@@ -32,6 +32,10 @@ public class PfssCache {
         }
 
         return null;
+    }
+
+    public PfssData getData(long time) {
+        return map.get(time);
     }
 
     public void clear() {
