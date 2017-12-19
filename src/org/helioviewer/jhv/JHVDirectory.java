@@ -37,11 +37,10 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The shared library directory. */
-    LIBS_LAST_CONFIG {
+    CACHE {
         @Override
         public String getPath() {
-            return HOME.getPath() + "Libs" + File.separator + "LastConfig" + File.separator;
+            return HOME.getPath() + "Cache" + File.separator;
         }
 
         @Override
@@ -133,18 +132,6 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The plugins directory. */
-    PLUGINS_LAST_CONFIG {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Plugins" + File.separator + "LastConfig" + File.separator;
-        }
-
-        @Override
-        public File getFile() {
-            return new File(getPath());
-        }
-    },
     /** Directory of automatically loaded GIMP gradient files. */
     COLOR_PLUGINS {
         @Override
@@ -157,38 +144,10 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** temp directory for the Cg-compiler */
     TEMP {
         @Override
         public String getPath() {
             return HOME.getPath() + "Temp" + File.separator;
-        }
-
-        @Override
-        public File getFile() {
-            return new File(getPath());
-        }
-    },
-    /** The remote files directory. */
-    VSO_DOWNLOAD {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "VSOData" + File.separator;
-        }
-
-        @Override
-        public File getFile() {
-            return new File(getPath());
-        }
-    },
-    /**
-     * Resources needed by plugins to operate. These can be jars and could not
-     * be added in the Plugins directory where they are considered as Plugins.
-     */
-    PLUGIN_RESOURCES {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "PluginResources" + File.separator;
         }
 
         @Override
