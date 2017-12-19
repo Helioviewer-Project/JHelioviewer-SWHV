@@ -94,7 +94,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
 
         FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssNewDataLoader(start, end), null);
         PfssPlugin.pfssNewLoadPool.execute(dataLoaderTask);
-        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), 60 * 5, TimeUnit.SECONDS);
+        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);
     }
 
     @Override
