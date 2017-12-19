@@ -51,6 +51,7 @@ public class PfssPlugin implements Plugin {
     @Override
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
+        pfssCache.clear();
     }
 
     @Override

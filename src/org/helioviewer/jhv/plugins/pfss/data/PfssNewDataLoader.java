@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
+import java.awt.EventQueue;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -69,15 +71,20 @@ public class PfssNewDataLoader implements Runnable {
                 parsedCache.put(cacheKey, urls);
             }
 
-            for (Pair<String, Long> pair : urls) {
-                Long dd = pair.b;
-                String url = pair.a;
-                if (dd > start - TimeUtils.DAY_IN_MILLIS && dd < end + TimeUtils.DAY_IN_MILLIS) {
-                    FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(PfssSettings.baseURL + url), null);
-                    PfssPlugin.pfssDataPool.execute(dataLoaderTask);
-                    PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);
+            ArrayList<Pair<String, Long>> furls = urls;
+            EventQueue.invokeLater(() -> {
+                for (Pair<String, Long> pair : furls) {
+                    Long time = pair.b;
+                    String url = pair.a;
+                    if (time > start - TimeUtils.DAY_IN_MILLIS && time < end + TimeUtils.DAY_IN_MILLIS) {
+                        if (PfssPlugin.getPfsscache().getData(time) == null) {
+                            FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(PfssSettings.baseURL + url), null);
+                            PfssPlugin.pfssDataPool.execute(dataLoaderTask);
+                            PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);
+                        }
+                    }
                 }
-            }
+            });
 
             if (startMonth == 11) {
                 startMonth = 0;
