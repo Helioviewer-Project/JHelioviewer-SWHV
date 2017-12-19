@@ -8,7 +8,6 @@ import java.util.TimeZone;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.ProxySettings;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.plugin.PluginManager;
@@ -78,13 +77,6 @@ public class JHelioviewer {
         } catch (Exception e) {
             Message.err("Failed to setup Kakadu", e.getMessage(), true);
             return;
-        }
-
-        try {
-            FileUtils.deleteDir(JHVDirectory.PLUGINSCACHE.getFile()); // clean PFSS cache
-            JHVDirectory.PLUGINSCACHE.getFile().mkdirs();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         ProxySettings.init();
