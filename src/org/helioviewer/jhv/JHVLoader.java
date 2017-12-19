@@ -1,7 +1,6 @@
 package org.helioviewer.jhv;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -33,25 +32,7 @@ class JHVLoader {
         kduLibs.add(System.mapLibraryName("kdu_a77R"));
         kduLibs.add(System.mapLibraryName("kdu_jni"));
 
-        String prefix = "kdulibs";
-        String suffix = ".lock";
-        // delete all kdulibs directories without a lock file
-        FileFilter filter = p -> p.getName().startsWith(prefix) && !p.getName().endsWith(suffix);
-        File[] dirs = JHVDirectory.LIBS.getFile().listFiles(filter);
-        if (dirs == null)
-            throw new IOException("I/O error or not a directory");
-
-        for (File dir : dirs) {
-            if (new File(dir + suffix).exists())
-                continue;
-            FileUtils.deleteDir(dir);
-        }
-
-        String tempDir = Files.createTempDirectory(JHVDirectory.LIBS.getFile().toPath(), prefix).toString();
-        File lock = new File(tempDir + suffix);
-        lock.createNewFile();
-        lock.deleteOnExit();
-
+        String tempDir = FileUtils.tempDir(JHVDirectory.LIBS.getFile(), "kdulibs");
         for (String kduLib : kduLibs) {
             try (InputStream in = FileUtils.getResourceInputStream("/natives/" + pathlib + kduLib)) {
                 File f = new File(tempDir, kduLib);

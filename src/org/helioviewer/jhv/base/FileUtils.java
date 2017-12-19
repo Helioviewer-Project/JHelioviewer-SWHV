@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.base;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +51,28 @@ public class FileUtils {
 
     public static void deleteDir(File dir) throws IOException {
         Files.walkFileTree(dir.toPath(), nukeVisitor);
+    }
+
+    public static String tempDir(File parent, String name) throws IOException {
+        String suffix = ".lock";
+        // delete all directories without a lock file
+        FileFilter filter = p -> p.getName().startsWith(name) && !p.getName().endsWith(suffix);
+        File[] dirs = parent.listFiles(filter);
+        if (dirs == null)
+            throw new IOException("I/O error or not a directory: " + parent);
+
+        for (File dir : dirs) {
+            if (new File(dir + suffix).exists())
+                continue;
+            deleteDir(dir);
+        }
+
+        String tempDir = Files.createTempDirectory(parent.toPath(), name).toString();
+        File lock = new File(tempDir + suffix);
+        lock.createNewFile();
+        lock.deleteOnExit();
+
+        return tempDir;
     }
 
 }
