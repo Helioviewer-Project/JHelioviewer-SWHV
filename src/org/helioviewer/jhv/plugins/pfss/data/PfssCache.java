@@ -1,82 +1,41 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
+import java.util.TreeMap;
+
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
-// Datastructure to cache the Pfss-Data with preload function
 public class PfssCache {
 
-    private final PfssData[] data = new PfssData[PfssSettings.CACHE_SIZE];
-    private int numberOfElementsInCache = 0;
+    private final TreeMap<Long, PfssData> map = new TreeMap<>();
 
-    public void addData(PfssData pfssData) {
-        if (numberOfElementsInCache < PfssSettings.CACHE_SIZE) {
-            data[numberOfElementsInCache] = pfssData;
-            numberOfElementsInCache++;
-            bubbleSort();
-        }
-    }
-
-    private void bubbleSort() {
-        boolean swapped = true;
-        int j = 0;
-        while (swapped) {
-            swapped = false;
-            j++;
-            for (int i = 0; i < numberOfElementsInCache - j; i++) {
-                if (data[i].dateObs.milli > data[i + 1].dateObs.milli) {
-                    PfssData tmp = data[i];
-                    data[i] = data[i + 1];
-                    data[i + 1] = tmp;
-                    swapped = true;
-                }
-            }
-        }
+    public void addData(PfssData data) {
+        assert map.size() < PfssSettings.CACHE_SIZE;
+        map.put(data.dateObs.milli, data);
     }
 
     public PfssData getData(long timestamp) {
-        if (numberOfElementsInCache <= 0)
-            return null;
+        Long c = map.ceilingKey(timestamp);
+        Long f = map.floorKey(timestamp);
 
-        int found = binarySearch(timestamp);
-        if (found >= 0)
-            return data[found];
-
-        if (-found >= numberOfElementsInCache)
-            return data[numberOfElementsInCache - 1];
-
-        if (-found - 1 >= 0) {
-            long diff1 = Math.abs(data[-found - 1].dateObs.milli - timestamp);
-            long diff2 = Math.abs(data[-found].dateObs.milli - timestamp);
-            if (diff1 < diff2) {
-                return data[-found - 1];
-            }
-        }
-        return data[-found];
-    }
-
-    private int binarySearch(long timestamp) {
-        int low = 0;
-        int high = numberOfElementsInCache - 1;
-
-        while (low <= high) {
-            int mid = (low + high) >>> 1;
-            long midVal = data[mid].dateObs.milli;
-
-            if (midVal < timestamp)
-                low = mid + 1;
-            else if (midVal > timestamp)
-                high = mid - 1;
+        if (c != null && f != null) {
+            if (Math.abs(f - timestamp) < Math.abs(timestamp - c))
+                return map.get(f);
             else
-                return mid;
+                return map.get(c);
         }
-        return -(low + 1);
+
+        try {
+            if (f == null)
+                return map.get(c);
+            return map.get(f);
+        } catch (Exception ignore) {
+        }
+
+        return null;
     }
 
     public void clear() {
-        numberOfElementsInCache = 0;
-        for (int i = 0; i < data.length; i++) {
-            data[i] = null;
-        }
+        map.clear();
     }
 
 }
