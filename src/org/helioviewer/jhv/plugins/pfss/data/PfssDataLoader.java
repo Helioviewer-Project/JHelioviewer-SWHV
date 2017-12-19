@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
 import java.awt.EventQueue;
-import java.io.File;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
@@ -24,26 +22,10 @@ class PfssDataLoader implements Runnable {
 
     @Override
     public void run() {
-        String cacheFileName = JHVDirectory.PLUGINSCACHE.getPath() + url.replace('/', '_');
-        File f = new File(cacheFileName);
-
-        String remote;
-        boolean loadFromFile;
-        if (f.canRead() && !f.isDirectory()) {
-            loadFromFile = true;
-            remote = f.toURI().toString();
-        } else {
-            loadFromFile = false;
-            remote = PfssSettings.baseURL + url;
-        }
-
-        try (NetClient nc = NetClient.of(remote);
+        try (NetClient nc = NetClient.of(PfssSettings.baseURL + url);
              Fits fits = new Fits(nc.getStream())) {
             PfssData pfssData = getPfssData(fits);
             EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(pfssData));
-
-            if (!loadFromFile)
-                fits.write(f);
         } catch (Exception e) {
             e.printStackTrace();
         }
