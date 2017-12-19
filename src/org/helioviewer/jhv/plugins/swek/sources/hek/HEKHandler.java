@@ -16,6 +16,7 @@ import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.event.SWEKHandler;
+import org.helioviewer.jhv.data.event.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKParam;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -97,7 +98,8 @@ public class HEKHandler extends SWEKHandler {
         baseURL.append("cmd=search&type=column&");
         baseURL.append("event_type=").append(HEKEventEnum.getHEKEventAbbreviation(group.getName())).append('&');
         baseURL.append("event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2&");
-        baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.format(end)).append('&');
+        baseURL.append("param0=event_starttime&op0=").append(SWEKOperand.SMALLER_OR_EQUAL.encodedRepresentation).append('&');
+        baseURL.append("value0=").append(TimeUtils.format(end)).append('&');
         baseURL = appendParams(baseURL, params);
         baseURL.append("event_starttime=").append(TimeUtils.format(start)).append('&');
         long max = Math.max(System.currentTimeMillis(), end);
