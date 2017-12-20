@@ -35,6 +35,7 @@ import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.LayersContainer;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererEnabled;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererLoading;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererName;
@@ -44,7 +45,7 @@ import org.helioviewer.jhv.layers.selector.cellrenderer.RendererTime;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public class RenderableContainerPanel extends JPanel {
+public class LayersPanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
 
@@ -57,7 +58,7 @@ public class RenderableContainerPanel extends JPanel {
     public static final int NUMBER_COLUMNS = 5;
     private static final int NUMBEROFVISIBLEROWS = 7;
 
-    private final RenderableContainerTable grid;
+    private final LayersTable grid;
     private final JPanel optionsPanelWrapper;
 
     static JCheckBox multiview;
@@ -66,9 +67,9 @@ public class RenderableContainerPanel extends JPanel {
         grid.lazyRepaint();
     }
 
-    private static class RenderableContainerTable extends JTable implements LazyComponent {
+    private static class LayersTable extends JTable implements LazyComponent {
 
-        RenderableContainerTable(TableModel tm) {
+        LayersTable(TableModel tm) {
             super(tm);
         }
 
@@ -116,7 +117,7 @@ public class RenderableContainerPanel extends JPanel {
 
     }
 
-    public RenderableContainerPanel(RenderableContainer renderableContainer) {
+    public LayersPanel(LayersContainer layersContainer) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -126,7 +127,7 @@ public class RenderableContainerPanel extends JPanel {
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
 
-        grid = new RenderableContainerTable(renderableContainer);
+        grid = new LayersTable(layersContainer);
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
@@ -227,14 +228,14 @@ public class RenderableContainerPanel extends JPanel {
 
                 if (col == ENABLED_COL) {
                     layer.setEnabled(!layer.isEnabled());
-                    renderableContainer.updateCell(row, col);
+                    layersContainer.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
                         setOptionsPanel(layer);
                     Displayer.render(1);
                 } else if (col == TITLE_COL && layer instanceof ImageLayer) {
                     ((ImageLayer) layer).setActiveImageLayer();
                 } else if (col == REMOVE_COL && layer.isDeletable()) {
-                    renderableContainer.removeLayer(layer);
+                    layersContainer.removeLayer(layer);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);

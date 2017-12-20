@@ -45,7 +45,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
-        ImageViewerGui.getRenderableContainer().addLayer(imageLayer);
+        ImageViewerGui.getLayersContainer().addLayer(imageLayer);
         return imageLayer;
     }
 
@@ -84,7 +84,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     public void unload() {
         if (view == null) // not changing view
-            ImageViewerGui.getRenderableContainer().removeLayer(this);
+            ImageViewerGui.getLayersContainer().removeLayer(this);
         else {
             worker = null;
             Displayer.display();
@@ -125,7 +125,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         optionsPanel.getRunningDifferencePanel().downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel
-        ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(this);
+        ImageViewerGui.getLayersPanel().setOptionsPanel(this);
 
         view.setImageLayer(this);
         view.setDataHandler(this);
@@ -318,7 +318,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     @Override
     public void handleData(ImageData newImageData) {
         setImageData(newImageData);
-        ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
+        ImageViewerGui.getLayersContainer().fireTimeUpdated(this);
         Displayer.display();
     }
 

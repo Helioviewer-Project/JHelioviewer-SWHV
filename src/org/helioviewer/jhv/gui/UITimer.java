@@ -39,7 +39,7 @@ public class UITimer {
                 MoviePanel.getTimeSlider().repaint();
             }
             MoviePanel.getTimeSlider().lazyRepaint();
-            ImageViewerGui.getRenderableContainerPanel().lazyRepaint();
+            ImageViewerGui.getLayersPanel().lazyRepaint();
             Timelines.getTimelinePanel().lazyRepaint();
             ImageViewerGui.getCarringtonStatusPanel().lazyRepaint();
             ImageViewerGui.getZoomStatusPanel().lazyRepaint();

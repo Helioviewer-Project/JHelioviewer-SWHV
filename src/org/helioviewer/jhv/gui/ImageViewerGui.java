@@ -34,8 +34,8 @@ import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.NEWTKeyAdapter;
 import org.helioviewer.jhv.input.NEWTMouseAdapter;
-import org.helioviewer.jhv.layers.selector.RenderableContainer;
-import org.helioviewer.jhv.layers.selector.RenderableContainerPanel;
+import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
@@ -61,8 +61,8 @@ public class ImageViewerGui {
     private static CarringtonStatusPanel carringtonStatus;
     private static FramerateStatusPanel framerateStatus;
 
-    private static RenderableContainerPanel renderableContainerPanel;
-    private static RenderableContainer renderableContainer;
+    private static LayersPanel layersPanel;
+    private static LayersContainer layersContainer;
 
     private static InteractionRotate rotationInteraction;
     private static InteractionPan panInteraction;
@@ -88,14 +88,14 @@ public class ImageViewerGui {
         MoviePanel.setAdvanced(false);
 
         // Layer control
-        renderableContainer = new RenderableContainer();
-        renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
+        layersContainer = new LayersContainer();
+        layersPanel = new LayersPanel(layersContainer);
 
-        leftPane.add("Image Layers", renderableContainerPanel, true);
+        leftPane.add("Image Layers", layersPanel, true);
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
         leftScrollPane.setBorder(null);
-        leftScrollPane.getVerticalScrollBar().setUnitIncrement(renderableContainerPanel.getGridRowHeight());
+        leftScrollPane.getVerticalScrollBar().setUnitIncrement(layersPanel.getGridRowHeight());
 
         glWindow = GLHelper.createGLWindow();
         glWindow.setTitle(mainFrame.getTitle());
@@ -220,12 +220,12 @@ public class ImageViewerGui {
         return framerateStatus;
     }
 
-    public static RenderableContainer getRenderableContainer() {
-        return renderableContainer;
+    public static LayersContainer getLayersContainer() {
+        return layersContainer;
     }
 
-    public static RenderableContainerPanel getRenderableContainerPanel() {
-        return renderableContainerPanel;
+    public static LayersPanel getLayersPanel() {
+        return layersPanel;
     }
 
     public static void setCurrentInteraction(Interaction _currentInteraction) {

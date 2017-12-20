@@ -45,12 +45,12 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
-        ImageViewerGui.getRenderableContainer().addLayer(layer);
+        ImageViewerGui.getLayersContainer().addLayer(layer);
     }
 
     @Override
     public void uninstallPlugin() {
-        ImageViewerGui.getRenderableContainer().removeLayer(layer);
+        ImageViewerGui.getLayersContainer().removeLayer(layer);
         pfssCache.clear();
     }
 

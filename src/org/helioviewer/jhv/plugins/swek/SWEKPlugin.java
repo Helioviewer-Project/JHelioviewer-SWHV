@@ -37,13 +37,13 @@ public class SWEKPlugin implements Plugin {
         etl.cacheUpdated();
         swekData.cacheUpdated();
         Layers.addTimespanListener(swekData);
-        ImageViewerGui.getRenderableContainer().addLayer(layer);
+        ImageViewerGui.getLayersContainer().addLayer(layer);
     }
 
     @Override
     public void uninstallPlugin() {
         Timelines.getModel().removeLayer(etl);
-        ImageViewerGui.getRenderableContainer().removeLayer(layer);
+        ImageViewerGui.getLayersContainer().removeLayer(layer);
         Layers.removeTimespanListener(swekData);
 
         ImageViewerGui.getLeftContentPane().remove(swekPanel);

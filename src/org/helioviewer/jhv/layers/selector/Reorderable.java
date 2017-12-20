@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.layers.selector;
 
-interface Reorderable {
+public interface Reorderable {
 
     void reorder(int fromIndex, int toIndex);
 

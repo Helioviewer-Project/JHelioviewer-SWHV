@@ -16,6 +16,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.LayersContainer;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -40,20 +41,20 @@ public class State {
         JSONObject main = new JSONObject();
         main.put("time", Layers.getLastUpdatedTimestamp());
         main.put("play", Layers.isMoviePlaying());
-        main.put("multiview", RenderableContainerPanel.multiview.isSelected());
+        main.put("multiview", LayersPanel.multiview.isSelected());
         main.put("projection", Displayer.mode);
         main.put("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
         main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
 
         JSONArray ja = new JSONArray();
-        for (Layer layer : RenderableContainer.getLayers()) {
+        for (Layer layer : LayersContainer.getLayers()) {
             if (!(layer instanceof ImageLayer))
                 ja.put(layer2json(layer, false));
         }
         main.put("layers", ja);
 
         JSONArray ji = new JSONArray();
-        for (ImageLayer imageLayer : RenderableContainer.getImageLayers()) {
+        for (ImageLayer imageLayer : LayersContainer.getImageLayers()) {
             ji.put(layer2json(imageLayer, imageLayer.isActiveImageLayer()));
         }
         main.put("imageLayers", ji);
@@ -131,7 +132,7 @@ public class State {
     }
 
     private static void loadLayers(JSONObject data) {
-        RenderableContainer.removeAll();
+        LayersContainer.removeAll();
 
         JSONArray rja = data.getJSONArray("layers");
         for (Object o : rja) {
@@ -141,7 +142,7 @@ public class State {
                     Object obj = json2Object(jo);
                     if (obj instanceof Layer) {
                         Layer layer = (Layer) obj;
-                        ImageViewerGui.getRenderableContainer().addLayer(layer);
+                        ImageViewerGui.getLayersContainer().addLayer(layer);
                         layer.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
@@ -172,7 +173,7 @@ public class State {
             }
         }
 
-        RenderableContainerPanel.multiview.setSelected(data.optBoolean("multiview", RenderableContainerPanel.multiview.isSelected()));
+        LayersPanel.multiview.setSelected(data.optBoolean("multiview", LayersPanel.multiview.isSelected()));
         ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected()));
 
         JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Layers.getLastUpdatedTimestamp().milli));
