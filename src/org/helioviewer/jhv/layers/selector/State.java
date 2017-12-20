@@ -14,6 +14,7 @@ import org.helioviewer.jhv.base.plugin.PluginManager;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
@@ -45,11 +46,11 @@ public class State {
         main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
 
         JSONArray ja = new JSONArray();
-        for (Renderable renderable : RenderableContainer.getLayers()) {
-            if (!(renderable instanceof ImageLayer))
-                ja.put(layer2json(renderable, false));
+        for (Layer layer : RenderableContainer.getLayers()) {
+            if (!(layer instanceof ImageLayer))
+                ja.put(layer2json(layer, false));
         }
-        main.put("renderables", ja);
+        main.put("layers", ja);
 
         JSONArray ji = new JSONArray();
         for (ImageLayer imageLayer : RenderableContainer.getImageLayers()) {
@@ -65,7 +66,7 @@ public class State {
         return new JSONObject().put("org.helioviewer.jhv.state", main);
     }
 
-    private static JSONObject layer2json(Renderable layer, boolean master) {
+    private static JSONObject layer2json(Layer layer, boolean master) {
         JSONObject jo = new JSONObject().put("className", layer.getClass().getName()).put("name", layer.getName());
         JSONObject dataObject = new JSONObject();
         layer.serialize(dataObject);
@@ -129,19 +130,19 @@ public class State {
         }
     }
 
-    private static void loadRenderables(JSONObject data) {
+    private static void loadLayers(JSONObject data) {
         RenderableContainer.removeAll();
 
-        JSONArray rja = data.getJSONArray("renderables");
+        JSONArray rja = data.getJSONArray("layers");
         for (Object o : rja) {
             if (o instanceof JSONObject) {
                 JSONObject jo = (JSONObject) o;
                 try {
                     Object obj = json2Object(jo);
-                    if (obj instanceof Renderable) {
-                        Renderable renderable = (Renderable) obj;
-                        ImageViewerGui.getRenderableContainer().addRenderable(renderable);
-                        renderable.setEnabled(jo.optBoolean("enabled", false));
+                    if (obj instanceof Layer) {
+                        Layer layer = (Layer) obj;
+                        ImageViewerGui.getRenderableContainer().addLayer(layer);
+                        layer.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
@@ -190,7 +191,7 @@ public class State {
             } catch (Exception ignore) {
             }
             loadTimelines(jo);
-            loadRenderables(jo);
+            loadLayers(jo);
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
                 PluginManager.getSingletonInstance().loadState(plugins);
