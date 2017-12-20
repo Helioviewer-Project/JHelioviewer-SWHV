@@ -240,7 +240,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         return renderables.imageLayers;
     }
 
-    static List<Renderable> getRenderables() {
+    static List<Renderable> getLayers() {
         return Collections.unmodifiableList(renderables);
     }
 
