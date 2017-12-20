@@ -28,6 +28,7 @@ import javax.swing.table.TableModel;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
@@ -63,14 +64,11 @@ public class LayersPanel extends JPanel {
 
     static JCheckBox multiview;
 
-    public void lazyRepaint() {
-        grid.lazyRepaint();
-    }
-
     private static class LayersTable extends JTable implements LazyComponent {
 
         LayersTable(TableModel tm) {
             super(tm);
+            UITimer.register(this);
         }
 
         @Override

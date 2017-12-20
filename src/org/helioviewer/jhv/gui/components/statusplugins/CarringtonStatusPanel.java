@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
 import org.helioviewer.jhv.astronomy.Carrington;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Layers;
@@ -14,6 +15,7 @@ public class CarringtonStatusPanel extends StatusPanel.StatusPlugin implements L
 
     public CarringtonStatusPanel() {
         update(Layers.getLastUpdatedTimestamp());
+        UITimer.register(this);
     }
 
     public void update(JHVDate _time) {
