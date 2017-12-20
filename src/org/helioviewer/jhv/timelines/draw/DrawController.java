@@ -13,7 +13,7 @@ import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
-import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.json.JSONObject;
 
 public class DrawController implements JHVEventHighlightListener, TimeListener, TimespanListener {
@@ -92,7 +92,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
         int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         int ct = -1;
-        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
                     if (move) {
@@ -121,7 +121,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
         int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         int ct = -1;
-        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
                     tl.resetAxis();
@@ -160,7 +160,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     public static void moveAllAxes(double distanceY) {
-        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
                 tl.getYAxis().shiftDownPixels(distanceY, graphArea.height);
             }
@@ -175,7 +175,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         availableAxis.start = availableInterval.start;
         availableAxis.end = availableInterval.end;
 
-        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             tl.fetchData(selectedAxis);
         }
         drawRequest();
@@ -186,7 +186,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
             long halfDiff = (selectedAxis.end - selectedAxis.start) / 2;
             selectedAxis.set(time - halfDiff, time + halfDiff, false);
             drawRequest();
-            for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+            for (TimelineLayer tl : TimelineLayers.get()) {
                 tl.fetchData(selectedAxis);
             }
         }
@@ -199,7 +199,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
 
     private static void createGraphArea() {
         int height = graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE);
-        int noRightAxes = Math.max(0, Timelines.getModel().getNumberOfAxes() - 1);
+        int noRightAxes = Math.max(0, TimelineLayers.getNumberOfAxes() - 1);
         int width = graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + noRightAxes * DrawConstants.RIGHT_AXIS_WIDTH);
         graphArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, width, height);
     }

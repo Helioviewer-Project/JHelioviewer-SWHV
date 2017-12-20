@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
@@ -20,6 +19,7 @@ import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
+import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -79,7 +79,7 @@ public class State {
 
     private static void saveTimelineState(JSONObject main) {
         JSONArray ja = new JSONArray();
-        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             JSONObject jo = new JSONObject().put("className", tl.getClass().getName()).put("name", tl.getName());
             JSONObject dataObject = new JSONObject();
             tl.serialize(dataObject);

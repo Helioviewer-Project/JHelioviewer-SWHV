@@ -13,6 +13,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
+import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.band.BandType;
@@ -77,7 +78,7 @@ public class TimelineDataPanel extends JPanel {
         model.removeAllElements();
 
         HashSet<BandType> bandTypesInSelectorModel = new HashSet<>();
-        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl instanceof Band)
                 bandTypesInSelectorModel.add(((Band) tl).getBandType());
         }
