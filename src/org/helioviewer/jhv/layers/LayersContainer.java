@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers.selector;
+package org.helioviewer.jhv.layers;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -11,18 +11,14 @@ import javax.swing.table.AbstractTableModel;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.GridLayer;
-import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.Layer;
-import org.helioviewer.jhv.layers.MiniviewLayer;
-import org.helioviewer.jhv.layers.TimestampLayer;
-import org.helioviewer.jhv.layers.ViewpointLayer;
+import org.helioviewer.jhv.layers.selector.Reorderable;
+import org.helioviewer.jhv.layers.selector.LayersPanel;
 
 import com.jogamp.opengl.GL2;
 
+// to be merged with Layers
 @SuppressWarnings("serial")
-public class RenderableContainer extends AbstractTableModel implements Reorderable {
+public class LayersContainer extends AbstractTableModel implements Reorderable {
 
     private static class CompositeList extends AbstractList<Layer> {
 
@@ -73,7 +69,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     private static ViewpointLayer viewpointLayer;
     private static MiniviewLayer miniviewLayer;
 
-    public RenderableContainer() {
+    public LayersContainer() {
         addLayer(new GridLayer(null));
         addLayer(new ViewpointLayer(null));
         addLayer(new TimestampLayer(null));
@@ -208,7 +204,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     @Override
     public int getColumnCount() {
-        return RenderableContainerPanel.NUMBER_COLUMNS;
+        return LayersPanel.NUMBER_COLUMNS;
     }
 
     @Override
@@ -226,7 +222,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public void fireTimeUpdated(Layer layer) {
-        updateCell(layers.indexOf(layer), RenderableContainerPanel.TIME_COL);
+        updateCell(layers.indexOf(layer), LayersPanel.TIME_COL);
     }
 
     public static void dispose(GL2 gl) {
@@ -237,15 +233,15 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         layers = new CompositeList();
     }
 
-    public /*temp*/ static List<ImageLayer> getImageLayers() {
+    public static List<ImageLayer> getImageLayers() {
         return layers.imageLayers;
     }
 
-    static List<Layer> getLayers() {
+    public static List<Layer> getLayers() {
         return Collections.unmodifiableList(layers);
     }
 
-    static void removeAll() {
+    public static void removeAll() {
         removedLayers.addAll(layers);
         layers = new CompositeList();
     }

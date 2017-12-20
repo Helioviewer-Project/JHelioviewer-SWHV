@@ -11,8 +11,8 @@ import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.LayersContainer;
 import org.helioviewer.jhv.layers.MiniviewLayer;
-import org.helioviewer.jhv.layers.selector.RenderableContainer;
 
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
@@ -75,7 +75,7 @@ public class GLListener implements GLEventListener {
     }
 
     private static void disposeImpl(GL2 gl) {
-        RenderableContainer.dispose(gl);
+        LayersContainer.dispose(gl);
         GLSLSolarShader.dispose(gl);
         GLSLLineShader.dispose(gl);
     }
@@ -100,7 +100,7 @@ public class GLListener implements GLEventListener {
             reshaped = true;
             Displayer.setGLSize(x, y, width, height);
             Displayer.reshapeAll();
-            RenderableContainer.getMiniviewLayer().reshapeViewport();
+            LayersContainer.getMiniviewLayer().reshapeViewport();
             Displayer.render(1);
         });
     }
@@ -112,7 +112,7 @@ public class GLListener implements GLEventListener {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 CameraHelper.applyPerspective(camera, vp, gl);
-                RenderableContainer.render(camera, vp, gl);
+                LayersContainer.render(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }
         }
@@ -130,7 +130,7 @@ public class GLListener implements GLEventListener {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
-                RenderableContainer.renderScale(camera, vp, gl);
+                LayersContainer.renderScale(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawAnnotations(vp, gl);
             }
         }
@@ -140,7 +140,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Displayer.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-                RenderableContainer.renderFloat(camera, vp, gl);
+                LayersContainer.renderFloat(camera, vp, gl);
             }
         }
     }
@@ -148,11 +148,11 @@ public class GLListener implements GLEventListener {
     private static void renderFullFloatScene(Camera camera, GL2 gl) {
         Viewport vp = Displayer.fullViewport;
         gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        RenderableContainer.renderFullFloat(camera, vp, gl);
+        LayersContainer.renderFullFloat(camera, vp, gl);
     }
 
     private static void renderMiniview(GL2 gl) {
-        MiniviewLayer miniview = RenderableContainer.getMiniviewLayer();
+        MiniviewLayer miniview = LayersContainer.getMiniviewLayer();
         if (miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
             Camera miniCamera = Displayer.getMiniCamera();
@@ -160,7 +160,7 @@ public class GLListener implements GLEventListener {
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             CameraHelper.applyPerspective(miniCamera, vp, gl);
-            RenderableContainer.renderMiniview(miniCamera, vp, gl);
+            LayersContainer.renderMiniview(miniCamera, vp, gl);
         }
     }
 
@@ -174,7 +174,7 @@ public class GLListener implements GLEventListener {
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(surface);
 
-        RenderableContainer.prerender(gl);
+        LayersContainer.prerender(gl);
 
         Camera camera = Displayer.getCamera();
 

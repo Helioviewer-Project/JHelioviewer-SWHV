@@ -12,7 +12,6 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.layers.selector.RenderableContainer;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
@@ -212,7 +211,7 @@ public class Layers {
         }
         Displayer.render(1);
 
-        RenderableContainer.getViewpointLayer().fireTimeUpdated(camera.getViewpoint().time); // !
+        LayersContainer.getViewpointLayer().fireTimeUpdated(camera.getViewpoint().time); // !
         for (TimeListener listener : timeListeners) {
             listener.timeChanged(lastTimestamp.milli);
         }
