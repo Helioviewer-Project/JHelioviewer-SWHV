@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.view.linedataselector;
+package org.helioviewer.jhv.timelines;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -7,7 +7,7 @@ import java.awt.Rectangle;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
-public abstract class AbstractTimelineRenderable implements TimelineRenderable {
+public abstract class AbstractTimelineLayer implements TimelineLayer {
 
     protected boolean enabled = true;
 

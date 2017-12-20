@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer;
+package org.helioviewer.jhv.timelines.view.selector.cellrenderer;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")
 public class RendererName extends JHVTableCellRenderer {
@@ -19,10 +19,10 @@ public class RendererName extends JHVTableCellRenderer {
         label.setText(null);
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-        if (value instanceof TimelineRenderable) {
-            TimelineRenderable ldse = (TimelineRenderable) value;
-            String layerName = ldse.getName();
-            if (ldse.hasData()) {
+        if (value instanceof TimelineLayer) {
+            TimelineLayer tl = (TimelineLayer) value;
+            String layerName = tl.getName();
+            if (tl.hasData()) {
                 label.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
                 label.setToolTipText(layerName);
             } else {

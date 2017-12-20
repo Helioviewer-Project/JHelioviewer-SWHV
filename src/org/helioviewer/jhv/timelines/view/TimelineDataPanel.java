@@ -12,11 +12,11 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.band.BandType;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 
 @SuppressWarnings("serial")
 public class TimelineDataPanel extends JPanel {
@@ -77,9 +77,9 @@ public class TimelineDataPanel extends JPanel {
         model.removeAllElements();
 
         HashSet<BandType> bandTypesInSelectorModel = new HashSet<>();
-        for (TimelineRenderable el : Timelines.getModel().getAllLineDataSelectorElements()) {
-            if (el instanceof Band)
-                bandTypesInSelectorModel.add(((Band) el).getBandType());
+        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+            if (tl instanceof Band)
+                bandTypesInSelectorModel.add(((Band) tl).getBandType());
         }
 
         for (BandType value : BandType.getBandTypes(selectedGroup)) {

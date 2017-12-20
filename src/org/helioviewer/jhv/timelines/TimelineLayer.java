@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.view.linedataselector;
+package org.helioviewer.jhv.timelines;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -11,7 +11,7 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONObject;
 
-public interface TimelineRenderable {
+public interface TimelineLayer {
 
     void remove();
 

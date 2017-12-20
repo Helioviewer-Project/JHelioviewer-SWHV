@@ -11,8 +11,8 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.TimelineDialog;
 import org.helioviewer.jhv.timelines.view.chart.PlotPanel;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelinePanel;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineTableModel;
+import org.helioviewer.jhv.timelines.view.selector.TimelinePanel;
+import org.helioviewer.jhv.timelines.view.selector.TimelineTableModel;
 import org.json.JSONObject;
 
 public class Timelines implements MainContentPanelPlugin {

@@ -28,7 +28,7 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     private final SWEKGroup group;
 
     private final JLabel loadingLabel = new JLabel("    ");
-    private final JLayer<JComponent> layer = new JLayer<>(null, UITimer.busyIndicator);
+    private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
 
     // The timer handling the loading animation
     private final Timer loadingTimer = new Timer(500, this);
@@ -55,14 +55,14 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
         JPanel busyPanel = new JPanel();
         busyPanel.setBackground(eventTypeTree.getBackground());
         busyPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
-        busyPanel.add(layer);
+        busyPanel.add(over);
         add(busyPanel, BorderLayout.LINE_END);
     }
 
     @Override
     public void startedDownloadingGroup(SWEKGroup _group) {
         if (group.equals(_group) && !loadingTimer.isRunning()) {
-            layer.setView(loadingLabel);
+            over.setView(loadingLabel);
             loadingTimer.start();
         }
     }
@@ -71,13 +71,13 @@ public class EventPanel extends JPanel implements SWEKTreeModelListener, ActionL
     public void stoppedDownloadingGroup(SWEKGroup _group) {
         if (group.equals(_group) && loadingTimer.isRunning()) {
             loadingTimer.stop();
-            layer.setView(null);
+            over.setView(null);
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        layer.repaint();
+        over.repaint();
     }
 
     public void serialize(JSONObject jo) {
