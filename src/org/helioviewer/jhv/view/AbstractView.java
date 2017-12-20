@@ -12,6 +12,7 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.time.JHVDate;
 
 public class AbstractView implements View {
@@ -26,12 +27,15 @@ public class AbstractView implements View {
 
     protected ImageData imageData;
     protected LUT builtinLUT;
-    protected MetaData metaData[] = new MetaData[] { null };
+    protected MetaData metaData[] = new MetaData[] { new PixelBasedMetaData(0, 0, 0) };
 
     public AbstractView(URI _uri, APIRequest _req) {
         uri = _uri;
         req = _req;
-        isLocal = "file".equals(uri.getScheme());
+        if (uri == null)
+            isLocal = false;
+        else
+            isLocal = "file".equals(uri.getScheme());
     }
 
     @Override
@@ -49,6 +53,8 @@ public class AbstractView implements View {
         MetaData m = metaData[0];
         if (m instanceof HelioviewerMetaData)
             return ((HelioviewerMetaData) m).getFullName();
+        else if (uri == null)
+            return "Loading...";
         else {
             String name = uri.getPath();
             return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));

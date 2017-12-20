@@ -26,6 +26,7 @@ import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.VBO;
 import org.helioviewer.jhv.time.JHVDate;
+import org.helioviewer.jhv.view.AbstractView;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
 
@@ -41,7 +42,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private boolean removed;
     private LoadRemoteTask worker;
-    private View view;
+    private View view = new AbstractView(null, null);
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
@@ -256,7 +257,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     @Override
     public String getName() {
-        return view == null || worker != null ? "Loading..." : view.getName();
+        return worker != null ? "Loading..." : view.getName();
     }
 
     @Override
@@ -312,7 +313,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public MetaData getMetaData() { //!
-        return view == null ? null : imageData == null ? view.getMetaData(new JHVDate(0)) : imageData.getMetaData();
+        return imageData == null ? view.getMetaData(new JHVDate(0)) : imageData.getMetaData();
     }
 
     @Override
@@ -324,7 +325,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     @Override
     public boolean isDownloading() {
-        return view == null || worker != null || view.isDownloading();
+        return worker != null || view.isDownloading();
     }
 
     @Override
@@ -341,7 +342,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public APIRequest getAPIRequest() {
-        return view == null ? null : view.getAPIRequest();
+        return view.getAPIRequest();
     }
 
     public double getAutoBrightness() {
@@ -349,8 +350,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public boolean isLoadedForState() {
-        if (view == null)
-            return worker == null;
         return view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
     }
 
