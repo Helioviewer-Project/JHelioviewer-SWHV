@@ -23,15 +23,15 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
 import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
 import org.json.JSONObject;
 
-public class RadioData extends AbstractTimelineRenderable {
+public class RadioData extends AbstractTimelineLayer {
 
     private static final YAxis yAxis = new YAxis(400, 20, "Mhz", false);
 

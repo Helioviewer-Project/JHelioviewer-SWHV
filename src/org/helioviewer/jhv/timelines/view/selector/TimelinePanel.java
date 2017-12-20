@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.view.linedataselector;
+package org.helioviewer.jhv.timelines.view.selector;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,13 +22,14 @@ import javax.swing.table.TableModel;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.gui.NewLayerAction;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererColor;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererEnabled;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererLoading;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererName;
-import org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer.RendererRemove;
+import org.helioviewer.jhv.timelines.view.selector.cellrenderer.RendererColor;
+import org.helioviewer.jhv.timelines.view.selector.cellrenderer.RendererEnabled;
+import org.helioviewer.jhv.timelines.view.selector.cellrenderer.RendererLoading;
+import org.helioviewer.jhv.timelines.view.selector.cellrenderer.RendererName;
+import org.helioviewer.jhv.timelines.view.selector.cellrenderer.RendererRemove;
 
 import com.jidesoft.swing.JideButton;
 
@@ -157,7 +158,7 @@ public class TimelinePanel extends JPanel {
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                setOptionsPanel((TimelineRenderable) grid.getValueAt(grid.getSelectedRow(), 0));
+                setOptionsPanel((TimelineLayer) grid.getValueAt(grid.getSelectedRow(), 0));
             }
         });
 
@@ -188,7 +189,7 @@ public class TimelinePanel extends JPanel {
                     return;
                 }
 
-                TimelineRenderable timeline = (TimelineRenderable) grid.getValueAt(row, col);
+                TimelineLayer timeline = (TimelineLayer) grid.getValueAt(row, col);
 
                 if (col == ENABLED_COL) {
                     timeline.setEnabled(!timeline.isEnabled());
@@ -224,7 +225,7 @@ public class TimelinePanel extends JPanel {
         return rowHeight;
     }
 
-    private void setOptionsPanel(TimelineRenderable timeline) {
+    private void setOptionsPanel(TimelineLayer timeline) {
         optionsPanelWrapper.removeAll();
         Component optionsPanel = timeline == null ? null : timeline.getOptionsPanel();
         if (optionsPanel != null) {

@@ -17,7 +17,7 @@ import org.helioviewer.jhv.renderable.gui.Renderable;
 public class RendererLoading extends JHVTableCellRenderer {
 
     private final Font font = Buttons.getMaterialFont(getFont().getSize2D());
-    private final JLayer<JComponent> layer = new JLayer<>(null, UITimer.busyIndicator);
+    private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -30,9 +30,9 @@ public class RendererLoading extends JHVTableCellRenderer {
             if (renderable.isDownloading()) {
                 table.repaint(); // lazy
 
-                layer.setForeground(label.getForeground());
-                layer.setView(label);
-                return layer;
+                over.setForeground(label.getForeground());
+                over.setView(label);
+                return over;
             } else if (renderable.isLocal()) {
                 label.setFont(font);
                 label.setText(Buttons.check);

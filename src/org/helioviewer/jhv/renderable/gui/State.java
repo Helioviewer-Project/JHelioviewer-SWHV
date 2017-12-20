@@ -19,8 +19,8 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -79,13 +79,12 @@ public class State {
 
     private static void saveTimelineState(JSONObject main) {
         JSONArray ja = new JSONArray();
-        List<TimelineRenderable> lds = Timelines.getModel().getAllLineDataSelectorElements();
-        for (TimelineRenderable renderable : lds) {
-            JSONObject jo = new JSONObject().put("className", renderable.getClass().getName()).put("name", renderable.getName());
+        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+            JSONObject jo = new JSONObject().put("className", tl.getClass().getName()).put("name", tl.getName());
             JSONObject dataObject = new JSONObject();
-            renderable.serialize(dataObject);
+            tl.serialize(dataObject);
             jo.put("data", dataObject);
-            jo.put("enabled", renderable.isEnabled());
+            jo.put("enabled", tl.isEnabled());
             ja.put(jo);
         }
         main.put("timelines", ja);
@@ -107,7 +106,7 @@ public class State {
     }
 
     private static void loadTimelines(JSONObject data) {
-        ArrayList<TimelineRenderable> newlist = new ArrayList<>();
+        ArrayList<TimelineLayer> newlist = new ArrayList<>();
 
         JSONArray rja = data.getJSONArray("timelines");
         for (Object o : rja) {
@@ -115,10 +114,10 @@ public class State {
                 JSONObject jo = (JSONObject) o;
                 try {
                     Object obj = json2Object(jo);
-                    if (obj instanceof TimelineRenderable) {
-                        TimelineRenderable renderable = (TimelineRenderable) obj;
-                        newlist.add(renderable);
-                        renderable.setEnabled(jo.optBoolean("enabled", true));
+                    if (obj instanceof TimelineLayer) {
+                        TimelineLayer tl = (TimelineLayer) obj;
+                        newlist.add(tl);
+                        tl.setEnabled(jo.optBoolean("enabled", true));
                     }
                 } catch (Exception e) { // don't stop for a broken one
                     e.printStackTrace();
@@ -126,8 +125,8 @@ public class State {
             }
         }
         Timelines.getModel().clear();
-        for (TimelineRenderable tr : newlist) {
-            Timelines.getModel().addLineData(tr);
+        for (TimelineLayer tl : newlist) {
+            Timelines.getModel().addLineData(tl);
         }
     }
 

@@ -1,31 +1,32 @@
-package org.helioviewer.jhv.timelines.view.linedataselector;
+package org.helioviewer.jhv.timelines.view.selector;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
 @SuppressWarnings("serial")
 public class TimelineTableModel extends AbstractTableModel {
 
-    private ArrayList<TimelineRenderable> elements = new ArrayList<>();
+    private ArrayList<TimelineLayer> elements = new ArrayList<>();
 
-    public List<TimelineRenderable> getAllLineDataSelectorElements() {
+    public List<TimelineLayer> getAllLineDataSelectorElements() {
         return elements;
     }
 
-    public void downloadStarted(TimelineRenderable element) {
+    public void downloadStarted(TimelineLayer element) {
         updateCell(elements.indexOf(element), TimelinePanel.LOADING_COL);
     }
 
-    public void downloadFinished(TimelineRenderable element) {
+    public void downloadFinished(TimelineLayer element) {
         updateCell(elements.indexOf(element), TimelinePanel.LOADING_COL);
     }
 
-    public void addLineData(TimelineRenderable element) {
+    public void addLineData(TimelineLayer element) {
         if (elements.contains(element)) // avoid band duplication via file load
             return;
         elements.add(element);
@@ -35,7 +36,7 @@ public class TimelineTableModel extends AbstractTableModel {
         DrawController.graphAreaChanged();
     }
 
-    public void removeLineData(TimelineRenderable element) {
+    public void removeLineData(TimelineLayer element) {
         element.remove();
         int row = elements.indexOf(element);
         if (row == -1)
@@ -47,7 +48,7 @@ public class TimelineTableModel extends AbstractTableModel {
     }
 
     public void clear() {
-        for (TimelineRenderable element : elements) {
+        for (TimelineLayer element : elements) {
             element.remove();
         }
         elements = new ArrayList<>();
@@ -80,8 +81,8 @@ public class TimelineTableModel extends AbstractTableModel {
     }
 
     public ClickableDrawable getDrawableUnderMouse() {
-        for (TimelineRenderable el : elements) {
-            ClickableDrawable elUnderMouse = el.getDrawableUnderMouse();
+        for (TimelineLayer tl : elements) {
+            ClickableDrawable elUnderMouse = tl.getDrawableUnderMouse();
             if (elUnderMouse != null) {
                 return elUnderMouse;
             }
@@ -91,8 +92,8 @@ public class TimelineTableModel extends AbstractTableModel {
 
     public int getNumberOfAxes() {
         int ct = 0;
-        for (TimelineRenderable el : elements) {
-            if (el.showYAxis()) {
+        for (TimelineLayer tl : elements) {
+            if (tl.showYAxis()) {
                 ct++;
             }
         }

@@ -18,26 +18,20 @@ import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.view.linedataselector.AbstractTimelineRenderable;
 import org.json.JSONObject;
 
-public class EventTimelineRenderable extends AbstractTimelineRenderable implements JHVEventHandler {
+public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEventHandler {
 
     private final YAxis yAxis = new YAxis(0, 0, "Events", false);
     private static EventPlotConfiguration eventUnderMouse;
     private static JHVRelatedEvents highlightedEvent = null;
     private static int highlightedEventPosition = -1;
-
-    public EventTimelineRenderable() {
-    }
-
-    public EventTimelineRenderable(JSONObject jo) {
-    }
 
     @Override
     public void serialize(JSONObject jo) {

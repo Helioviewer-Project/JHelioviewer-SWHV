@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.view.linedataselector.cellrenderer;
+package org.helioviewer.jhv.timelines.view.selector.cellrenderer;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
-import org.helioviewer.jhv.timelines.view.linedataselector.TimelineRenderable;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")
 public class RendererColor extends JHVTableCellRenderer {
@@ -22,10 +22,10 @@ public class RendererColor extends JHVTableCellRenderer {
         lineColorPanel.setBackground(back);
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-        if (value instanceof TimelineRenderable) {
-            TimelineRenderable ldse = (TimelineRenderable) value;
-            if (ldse.hasDataColor()) {
-                lineColorPanel.setLineColor(ldse.getDataColor());
+        if (value instanceof TimelineLayer) {
+            TimelineLayer tl = (TimelineLayer) value;
+            if (tl.hasDataColor()) {
+                lineColorPanel.setLineColor(tl.getDataColor());
             }
         }
         return lineColorPanel;
