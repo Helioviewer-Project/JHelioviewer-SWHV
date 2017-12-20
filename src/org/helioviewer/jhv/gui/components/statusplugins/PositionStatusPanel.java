@@ -5,6 +5,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ClipBoardCopier;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.layers.selector.RenderableContainer;
 import org.helioviewer.jhv.math.Vec2;
@@ -104,6 +105,8 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON3)
+            ClipBoardCopier.getSingletonInstance().setString(getText());
     }
 
 }
