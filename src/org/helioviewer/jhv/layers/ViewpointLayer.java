@@ -17,7 +17,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.time.JHVDate;
 import org.json.JSONObject;
 
@@ -25,7 +24,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 
-public class ViewpointLayer extends AbstractRenderable implements MouseListener {
+public class ViewpointLayer extends AbstractLayer implements MouseListener {
 
     private final CameraOptionsPanel optionsPanel;
     private static final double epsilon = 0.01;

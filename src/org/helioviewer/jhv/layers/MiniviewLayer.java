@@ -16,12 +16,11 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class MiniviewLayer extends AbstractRenderable {
+public class MiniviewLayer extends AbstractLayer {
 
     private static final int MIN_SCALE = 5;
     private static final int MAX_SCALE = 15;

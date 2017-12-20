@@ -16,13 +16,12 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLLine;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class GridLayer extends AbstractRenderable {
+public class GridLayer extends AbstractLayer {
 
     public enum GridType {
         Viewpoint, Stonyhurst, Carrington, HCI

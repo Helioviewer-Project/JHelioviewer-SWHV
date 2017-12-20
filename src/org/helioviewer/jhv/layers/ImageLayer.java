@@ -25,7 +25,6 @@ import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.VBO;
-import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
@@ -33,7 +32,7 @@ import org.json.JSONObject;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-public class ImageLayer extends AbstractRenderable implements ImageDataHandler {
+public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private final GLImage glImage = new GLImage();
     private final VBO positionVBO = VBO.gen_float_VBO(GLSLSolarShader.positionRef, 3);
