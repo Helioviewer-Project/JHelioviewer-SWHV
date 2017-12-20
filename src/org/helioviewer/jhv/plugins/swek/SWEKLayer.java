@@ -41,7 +41,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class SWEKRenderable extends AbstractRenderable {
+public class SWEKLayer extends AbstractRenderable {
 
     private static final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
     private final JPanel optionsPanel;
@@ -57,7 +57,7 @@ public class SWEKRenderable extends AbstractRenderable {
 
     private boolean icons = true;
 
-    public SWEKRenderable(JSONObject jo) {
+    public SWEKLayer(JSONObject jo) {
         if (jo != null)
             icons = jo.optBoolean("icons", icons);
         else

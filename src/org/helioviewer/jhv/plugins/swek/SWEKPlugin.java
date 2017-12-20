@@ -18,7 +18,7 @@ public class SWEKPlugin implements Plugin {
     private static final JPanel swekPanel = new JPanel();
 
     private static final SWEKData swekData = new SWEKData();
-    private static final SWEKRenderable renderable = new SWEKRenderable(null);
+    private static final SWEKLayer layer = new SWEKLayer(null);
     private static final EventTimelineRenderable em = new EventTimelineRenderable();
 
     public SWEKPlugin() {
@@ -37,13 +37,13 @@ public class SWEKPlugin implements Plugin {
         em.cacheUpdated();
         swekData.cacheUpdated();
         Layers.addTimespanListener(swekData);
-        ImageViewerGui.getRenderableContainer().addRenderable(renderable);
+        ImageViewerGui.getRenderableContainer().addRenderable(layer);
     }
 
     @Override
     public void uninstallPlugin() {
         Timelines.getModel().removeLineData(em);
-        ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
+        ImageViewerGui.getRenderableContainer().removeRenderable(layer);
         Layers.removeTimespanListener(swekData);
 
         ImageViewerGui.getLeftContentPane().remove(swekPanel);

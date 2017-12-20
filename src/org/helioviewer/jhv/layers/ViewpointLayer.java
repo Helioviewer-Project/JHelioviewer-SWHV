@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components;
+package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 
-public class RenderableViewpoint extends AbstractRenderable implements MouseListener {
+public class ViewpointLayer extends AbstractRenderable implements MouseListener {
 
     private final CameraOptionsPanel optionsPanel;
     private static final double epsilon = 0.01;
@@ -37,7 +37,7 @@ public class RenderableViewpoint extends AbstractRenderable implements MouseList
 
     private String timeString = null;
 
-    public RenderableViewpoint(JSONObject jo) {
+    public ViewpointLayer(JSONObject jo) {
         optionsPanel = new CameraOptionsPanel(jo);
     }
 
