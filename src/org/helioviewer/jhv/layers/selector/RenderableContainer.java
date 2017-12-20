@@ -14,6 +14,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.TimestampLayer;
 import org.helioviewer.jhv.layers.ViewpointLayer;
@@ -23,21 +24,21 @@ import com.jogamp.opengl.GL2;
 @SuppressWarnings("serial")
 public class RenderableContainer extends AbstractTableModel implements Reorderable {
 
-    private static class CompositeList extends AbstractList<Renderable> {
+    private static class CompositeList extends AbstractList<Layer> {
 
         private final ArrayList<ImageLayer> list1 = new ArrayList<>();
-        private final ArrayList<Renderable> list2 = new ArrayList<>();
+        private final ArrayList<Layer> list2 = new ArrayList<>();
         final List<ImageLayer> imageLayers = Collections.unmodifiableList(list1);
 
         @Override
-        public Renderable get(int index) {
+        public Layer get(int index) {
             if (index < list1.size())
                 return list1.get(index);
             return list2.get(index - list1.size());
         }
 
         @Override
-        public Renderable remove(int index) {
+        public Layer remove(int index) {
             if (index < list1.size())
                 return list1.remove(index);
             return list2.remove(index - list1.size());
@@ -49,14 +50,14 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         }
 
         @Override
-        public boolean add(Renderable e) {
+        public boolean add(Layer e) {
             if (e instanceof ImageLayer)
                 return list1.add((ImageLayer) e);
             return list2.add(e);
         }
 
         @Override
-        public void add(int index, Renderable e) {
+        public void add(int index, Layer e) {
             if (!(e instanceof ImageLayer)) // only for DnD
                 return;
             list1.add(index, (ImageLayer) e);
@@ -64,19 +65,19 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     }
 
-    private static CompositeList renderables = new CompositeList();
-    private static CompositeList newRenderables = new CompositeList();
-    private static final HashSet<Renderable> removedRenderables = new HashSet<>();
+    private static CompositeList layers = new CompositeList();
+    private static CompositeList newLayers = new CompositeList();
+    private static final HashSet<Layer> removedLayers = new HashSet<>();
 
     private static GridLayer gridLayer;
     private static ViewpointLayer viewpointLayer;
     private static MiniviewLayer miniviewLayer;
 
     public RenderableContainer() {
-        addRenderable(new GridLayer(null));
-        addRenderable(new ViewpointLayer(null));
-        addRenderable(new TimestampLayer(null));
-        addRenderable(new MiniviewLayer(null));
+        addLayer(new GridLayer(null));
+        addLayer(new ViewpointLayer(null));
+        addLayer(new TimestampLayer(null));
+        addLayer(new MiniviewLayer(null));
     }
 
     public static GridLayer getGridLayer() {
@@ -91,104 +92,104 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         return miniviewLayer;
     }
 
-    public void addRenderable(Renderable renderable) {
-        renderables.add(renderable);
-        newRenderables.add(renderable);
+    public void addLayer(Layer layer) {
+        layers.add(layer);
+        newLayers.add(layer);
 
-        if (renderable instanceof GridLayer)
-            gridLayer = (GridLayer) renderable;
-        else if (renderable instanceof ViewpointLayer)
-            viewpointLayer = (ViewpointLayer) renderable;
-        else if (renderable instanceof MiniviewLayer)
-            miniviewLayer = (MiniviewLayer) renderable;
+        if (layer instanceof GridLayer)
+            gridLayer = (GridLayer) layer;
+        else if (layer instanceof ViewpointLayer)
+            viewpointLayer = (ViewpointLayer) layer;
+        else if (layer instanceof MiniviewLayer)
+            miniviewLayer = (MiniviewLayer) layer;
 
-        int row = renderables.indexOf(renderable);
+        int row = layers.indexOf(layer);
         fireTableRowsInserted(row, row);
-        Displayer.display(); // e.g., PFSS renderable
+        Displayer.display(); // e.g., PFSS layer
     }
 
-    public void removeRenderable(Renderable renderable) {
-        int row = renderables.indexOf(renderable);
-        renderables.remove(renderable);
-        removedRenderables.add(renderable);
+    public void removeLayer(Layer layer) {
+        int row = layers.indexOf(layer);
+        layers.remove(layer);
+        removedLayers.add(layer);
         if (row >= 0)
             fireTableRowsDeleted(row, row);
         Displayer.display();
     }
 
     public static void prerender(GL2 gl) {
-        removeRenderables(gl);
-        initRenderables(gl);
-        for (Renderable renderable : renderables) {
-            renderable.prerender(gl);
+        removeLayers(gl);
+        initLayers(gl);
+        for (Layer layer : layers) {
+            layer.prerender(gl);
         }
     }
 
     public static void render(Camera camera, Viewport vp, GL2 gl) {
-        for (Renderable renderable : renderables) {
-            renderable.render(camera, vp, gl);
+        for (Layer layer : layers) {
+            layer.render(camera, vp, gl);
         }
     }
 
     public static void renderScale(Camera camera, Viewport vp, GL2 gl) {
-        for (Renderable renderable : renderables) {
-            renderable.renderScale(camera, vp, gl);
+        for (Layer layer : layers) {
+            layer.renderScale(camera, vp, gl);
         }
     }
 
     public static void renderFloat(Camera camera, Viewport vp, GL2 gl) {
-        for (Renderable renderable : renderables) {
-            renderable.renderFloat(camera, vp, gl);
+        for (Layer layer : layers) {
+            layer.renderFloat(camera, vp, gl);
         }
     }
 
     public static void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
-        for (Renderable renderable : renderables) {
-            renderable.renderFullFloat(camera, vp, gl);
+        for (Layer layer : layers) {
+            layer.renderFullFloat(camera, vp, gl);
         }
     }
 
     public static void renderMiniview(Camera camera, Viewport miniview, GL2 gl) {
         MiniviewLayer.renderBackground(camera, miniview, gl);
-        for (Renderable renderable : renderables) {
-            renderable.renderMiniview(camera, miniview, gl);
+        for (Layer layer : layers) {
+            layer.renderMiniview(camera, miniview, gl);
         }
     }
 
-    private static void initRenderables(GL2 gl) {
-        for (Renderable renderable : newRenderables) {
-            renderable.init(gl);
+    private static void initLayers(GL2 gl) {
+        for (Layer layer : newLayers) {
+            layer.init(gl);
         }
-        newRenderables.clear();
+        newLayers.clear();
     }
 
-    private static void removeRenderables(GL2 gl) {
-        for (Renderable renderable : removedRenderables) {
-            renderable.remove(gl);
+    private static void removeLayers(GL2 gl) {
+        for (Layer layer : removedLayers) {
+            layer.remove(gl);
         }
-        removedRenderables.clear();
+        removedLayers.clear();
     }
 
-    private static void insertRow(int row, Renderable rowData) {
-        if (row > renderables.size()) {
-            renderables.add(rowData);
+    private static void insertRow(int row, Layer rowData) {
+        if (row > layers.size()) {
+            layers.add(rowData);
         } else {
-            renderables.add(row, rowData);
+            layers.add(row, rowData);
         }
     }
 
     @Override
     public void reorder(int fromIndex, int toIndex) {
-        if (toIndex > renderables.size()) {
+        if (toIndex > layers.size()) {
             return;
         }
-        Renderable toMove = renderables.get(fromIndex);
-        Renderable moveTo = renderables.get(Math.max(0, toIndex - 1));
+        Layer toMove = layers.get(fromIndex);
+        Layer moveTo = layers.get(Math.max(0, toIndex - 1));
 
         if (!(toMove instanceof ImageLayer) || !(moveTo instanceof ImageLayer)) {
             return;
         }
-        renderables.remove(fromIndex);
+        layers.remove(fromIndex);
         if (fromIndex < toIndex) {
             insertRow(toIndex - 1, toMove);
         } else {
@@ -202,7 +203,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
     @Override
     public int getRowCount() {
-        return renderables.size();
+        return layers.size();
     }
 
     @Override
@@ -213,7 +214,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     @Override
     public Object getValueAt(int row, int col) {
         try {
-            return renderables.get(row);
+            return layers.get(row);
         } catch (Exception e) {
             return null;
         }
@@ -224,29 +225,29 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
             fireTableCellUpdated(row, col);
     }
 
-    public void fireTimeUpdated(Renderable renderable) {
-        updateCell(renderables.indexOf(renderable), RenderableContainerPanel.TIME_COL);
+    public void fireTimeUpdated(Layer layer) {
+        updateCell(layers.indexOf(layer), RenderableContainerPanel.TIME_COL);
     }
 
     public static void dispose(GL2 gl) {
-        for (Renderable renderable : renderables) {
-            renderable.dispose(gl);
+        for (Layer layer : layers) {
+            layer.dispose(gl);
         }
-        newRenderables = renderables;
-        renderables = new CompositeList();
+        newLayers = layers;
+        layers = new CompositeList();
     }
 
     public /*temp*/ static List<ImageLayer> getImageLayers() {
-        return renderables.imageLayers;
+        return layers.imageLayers;
     }
 
-    static List<Renderable> getLayers() {
-        return Collections.unmodifiableList(renderables);
+    static List<Layer> getLayers() {
+        return Collections.unmodifiableList(layers);
     }
 
     static void removeAll() {
-        removedRenderables.addAll(renderables);
-        renderables = new CompositeList();
+        removedLayers.addAll(layers);
+        layers = new CompositeList();
     }
 
 }

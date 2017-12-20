@@ -45,7 +45,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
-        ImageViewerGui.getRenderableContainer().addRenderable(imageLayer);
+        ImageViewerGui.getRenderableContainer().addLayer(imageLayer);
         return imageLayer;
     }
 
@@ -84,7 +84,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     public void unload() {
         if (view == null) // not changing view
-            ImageViewerGui.getRenderableContainer().removeRenderable(this);
+            ImageViewerGui.getRenderableContainer().removeLayer(this);
         else {
             worker = null;
             Displayer.display();

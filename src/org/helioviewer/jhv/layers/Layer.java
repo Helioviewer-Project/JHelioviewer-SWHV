@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers.selector;
+package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 
@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public interface Renderable {
+public interface Layer {
 
     void render(Camera camera, Viewport vp, GL2 gl);
 

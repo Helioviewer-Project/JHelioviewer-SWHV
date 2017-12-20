@@ -11,7 +11,7 @@ import javax.swing.JTable;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
-import org.helioviewer.jhv.layers.selector.Renderable;
+import org.helioviewer.jhv.layers.Layer;
 
 @SuppressWarnings("serial")
 public class RendererLoading extends JHVTableCellRenderer {
@@ -25,15 +25,15 @@ public class RendererLoading extends JHVTableCellRenderer {
         label.setBorder(cellBorder);
 
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
-        if (value instanceof Renderable) {
-            Renderable renderable = (Renderable) value;
-            if (renderable.isDownloading()) {
+        if (value instanceof Layer) {
+            Layer layer = (Layer) value;
+            if (layer.isDownloading()) {
                 table.repaint(); // lazy
 
                 over.setForeground(label.getForeground());
                 over.setView(label);
                 return over;
-            } else if (renderable.isLocal()) {
+            } else if (layer.isLocal()) {
                 label.setFont(font);
                 label.setText(Buttons.check);
             } else

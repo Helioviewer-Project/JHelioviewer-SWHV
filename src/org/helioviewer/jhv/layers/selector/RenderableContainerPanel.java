@@ -34,6 +34,7 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererEnabled;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererLoading;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererName;
@@ -186,7 +187,7 @@ public class RenderableContainerPanel extends JPanel {
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                setOptionsPanel((Renderable) grid.getValueAt(grid.getSelectedRow(), 0));
+                setOptionsPanel((Layer) grid.getValueAt(grid.getSelectedRow(), 0));
             }
         });
 
@@ -214,26 +215,26 @@ public class RenderableContainerPanel extends JPanel {
                 int row = grid.rowAtPoint(pt);
                 int col = grid.columnAtPoint(pt);
                 Object obj = grid.getValueAt(row, col);
-                if (!(obj instanceof Renderable))
+                if (!(obj instanceof Layer))
                     return;
 
-                Renderable renderable = (Renderable) obj;
+                Layer layer = (Layer) obj;
 
-                if ((col == TITLE_COL || col == TIME_COL) && renderable instanceof ImageLayer && e.getClickCount() == 2) {
-                    ObservationDialog.getInstance().showDialog(false, (ImageLayer) renderable);
+                if ((col == TITLE_COL || col == TIME_COL) && layer instanceof ImageLayer && e.getClickCount() == 2) {
+                    ObservationDialog.getInstance().showDialog(false, (ImageLayer) layer);
                     return;
                 }
 
                 if (col == ENABLED_COL) {
-                    renderable.setEnabled(!renderable.isEnabled());
+                    layer.setEnabled(!layer.isEnabled());
                     renderableContainer.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
-                        setOptionsPanel(renderable);
+                        setOptionsPanel(layer);
                     Displayer.render(1);
-                } else if (col == TITLE_COL && renderable instanceof ImageLayer) {
-                    ((ImageLayer) renderable).setActiveImageLayer();
-                } else if (col == REMOVE_COL && renderable.isDeletable()) {
-                    renderableContainer.removeRenderable(renderable);
+                } else if (col == TITLE_COL && layer instanceof ImageLayer) {
+                    ((ImageLayer) layer).setActiveImageLayer();
+                } else if (col == REMOVE_COL && layer.isDeletable()) {
+                    renderableContainer.removeLayer(layer);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
@@ -275,11 +276,11 @@ public class RenderableContainerPanel extends JPanel {
         return rowHeight;
     }
 
-    public void setOptionsPanel(Renderable renderable) {
+    public void setOptionsPanel(Layer layer) {
         optionsPanelWrapper.removeAll();
-        Component optionsPanel = renderable == null ? null : renderable.getOptionsPanel();
+        Component optionsPanel = layer == null ? null : layer.getOptionsPanel();
         if (optionsPanel != null) {
-            ComponentUtils.setEnabled(optionsPanel, renderable.isEnabled());
+            ComponentUtils.setEnabled(optionsPanel, layer.isEnabled());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         }
         revalidate();
