@@ -212,7 +212,7 @@ public class Layers {
         }
         Displayer.render(1);
 
-        RenderableContainer.getRenderableViewpoint().fireTimeUpdated(camera.getViewpoint().time); // !
+        RenderableContainer.getViewpointLayer().fireTimeUpdated(camera.getViewpoint().time); // !
         for (TimeListener listener : timeListeners) {
             listener.timeChanged(lastTimestamp.milli);
         }

@@ -18,13 +18,13 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class PfssRenderable extends AbstractRenderable implements TimespanListener {
+public class PfssLayer extends AbstractRenderable implements TimespanListener {
 
-    private final PfssOptionsPanel optionsPanel;
+    private final PfssLayerOptions optionsPanel;
     private final PfssLine line = new PfssLine();
     private PfssData previousPfssData;
 
-    public PfssRenderable(JSONObject jo) {
+    public PfssLayer(JSONObject jo) {
         int detail = 0;
         boolean fixedColor = false;
         double radius = PfssSettings.MAX_RADIUS;
@@ -34,7 +34,7 @@ public class PfssRenderable extends AbstractRenderable implements TimespanListen
             fixedColor = jo.optBoolean("fixedColor", fixedColor);
             radius = MathUtils.clip(jo.optDouble("radius", radius), 1.1, PfssSettings.MAX_RADIUS);
         }
-        optionsPanel = new PfssOptionsPanel(detail, fixedColor, radius);
+        optionsPanel = new PfssLayerOptions(detail, fixedColor, radius);
     }
 
     @Override

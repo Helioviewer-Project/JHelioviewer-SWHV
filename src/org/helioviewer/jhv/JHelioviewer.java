@@ -109,7 +109,7 @@ public class JHelioviewer {
             }
 
             // set left pane width to fit the viewpoint options
-            ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(RenderableContainer.getRenderableViewpoint()); // nasty
+            ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(RenderableContainer.getViewpointLayer()); // nasty
             frame.pack();
             JComponent leftPane = ImageViewerGui.getLeftScrollPane();
             leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));

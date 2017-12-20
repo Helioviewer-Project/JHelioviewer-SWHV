@@ -16,13 +16,13 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-class PfssOptionsPanel extends JPanel {
+class PfssLayerOptions extends JPanel {
 
     private int detail;
     private boolean fixedColor;
     private double radius;
 
-    PfssOptionsPanel(int _detail, boolean _fixedColor, double _radius) {
+    PfssLayerOptions(int _detail, boolean _fixedColor, double _radius) {
         detail = _detail;
         fixedColor = _fixedColor;
         radius = _radius;

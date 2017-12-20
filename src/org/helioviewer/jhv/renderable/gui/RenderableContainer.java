@@ -13,9 +13,9 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.renderable.components.RenderableMiniview;
-import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
-import org.helioviewer.jhv.renderable.components.RenderableViewpoint;
+import org.helioviewer.jhv.layers.MiniviewLayer;
+import org.helioviewer.jhv.layers.TimestampLayer;
+import org.helioviewer.jhv.layers.ViewpointLayer;
 
 import com.jogamp.opengl.GL2;
 
@@ -68,26 +68,26 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     private static final HashSet<Renderable> removedRenderables = new HashSet<>();
 
     private static GridLayer gridLayer;
-    private static RenderableViewpoint renderableViewpoint;
-    private static RenderableMiniview renderableMiniview;
+    private static ViewpointLayer viewpointLayer;
+    private static MiniviewLayer miniviewLayer;
 
     public RenderableContainer() {
         addRenderable(new GridLayer(null));
-        addRenderable(new RenderableViewpoint(null));
-        addRenderable(new RenderableTimeStamp(null));
-        addRenderable(new RenderableMiniview(null));
-    }
-
-    public static RenderableViewpoint getRenderableViewpoint() {
-        return renderableViewpoint;
+        addRenderable(new ViewpointLayer(null));
+        addRenderable(new TimestampLayer(null));
+        addRenderable(new MiniviewLayer(null));
     }
 
     public static GridLayer getGridLayer() {
         return gridLayer;
     }
 
-    public static RenderableMiniview getRenderableMiniview() {
-        return renderableMiniview;
+    public static ViewpointLayer getViewpointLayer() {
+        return viewpointLayer;
+    }
+
+    public static MiniviewLayer getMiniviewLayer() {
+        return miniviewLayer;
     }
 
     public void addRenderable(Renderable renderable) {
@@ -96,10 +96,10 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
 
         if (renderable instanceof GridLayer)
             gridLayer = (GridLayer) renderable;
-        else if (renderable instanceof RenderableViewpoint)
-            renderableViewpoint = (RenderableViewpoint) renderable;
-        else if (renderable instanceof RenderableMiniview)
-            renderableMiniview = (RenderableMiniview) renderable;
+        else if (renderable instanceof ViewpointLayer)
+            viewpointLayer = (ViewpointLayer) renderable;
+        else if (renderable instanceof MiniviewLayer)
+            miniviewLayer = (MiniviewLayer) renderable;
 
         int row = renderables.indexOf(renderable);
         fireTableRowsInserted(row, row);
@@ -148,7 +148,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     }
 
     public static void renderMiniview(Camera camera, Viewport miniview, GL2 gl) {
-        RenderableMiniview.renderBackground(camera, miniview, gl);
+        MiniviewLayer.renderBackground(camera, miniview, gl);
         for (Renderable renderable : renderables) {
             renderable.renderMiniview(camera, miniview, gl);
         }

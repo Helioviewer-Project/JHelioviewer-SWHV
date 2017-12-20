@@ -1,6 +1,5 @@
-package org.helioviewer.jhv.renderable.components;
+package org.helioviewer.jhv.layers;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -10,75 +9,67 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
-import org.helioviewer.jhv.renderable.gui.ImageLayers;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class RenderableTimeStamp extends AbstractRenderable {
+public class MiniviewLayer extends AbstractRenderable {
 
-    private static final int MIN_SCALE = 50;
-    private static final int MAX_SCALE = 200;
-    private int scale = 100;
+    private static final int MIN_SCALE = 5;
+    private static final int MAX_SCALE = 15;
+    private int scale = 10;
 
     private final JPanel optionsPanel;
+    private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
 
     @Override
     public void serialize(JSONObject jo) {
         jo.put("scale", scale);
     }
 
-    public RenderableTimeStamp(JSONObject jo) {
+    public MiniviewLayer(JSONObject jo) {
         if (jo != null)
             scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
+        else
+            setEnabled(true);
         optionsPanel = optionsPanel();
+        reshapeViewport();
+    }
+
+    public void reshapeViewport() {
+        int vpw = Displayer.fullViewport.width;
+        int offset = (int) (vpw * 0.01);
+        int size = (int) (vpw * 0.01 * scale);
+        miniViewport = new Viewport(0, offset, offset, size, size);
     }
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
     }
 
-    @Override
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
-        if (!isVisible[vp.idx])
-            return;
+    public static void renderBackground(Camera camera, Viewport vp, GL2 gl) {
+        Mat4 cameraMatrix = camera.getViewpoint().orientation.toMatrix();
+        gl.glDepthRange(0, 0);
+        gl.glPushMatrix();
+        {
+            gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
 
-        String text = Layers.getLastUpdatedTimestamp().toString();
-        if (Displayer.multiview) {
-            ImageLayer im = ImageLayers.getImageLayerInViewport(vp.idx);
-            if (im != null) {
-                text = im.getTimeString() + ' ' + im.getName();
-            }
+            gl.glColor4f(0, 1 * 0.2f, 0, 0.2f);
+            GLHelper.drawRectangleFront(gl, -30, -30, 60, 60);
+
+            gl.glColor4f(1 * 0.2f, 0, 0, 0.2f);
+            GLHelper.drawCircleFront(gl, 0, 0, 1, 100);
         }
-
-        int delta = (int) (vp.height * 0.01);
-        int size = (int) (vp.height * (scale * 0.01 * 0.015));
-
-        if (GLInfo.pixelScale[1] == 1) //! nasty
-            size *= 2;
-
-        TextRenderer renderer = GLText.getRenderer(size);
-        renderer.beginRendering(vp.width, vp.height, true);
-        renderer.setColor(Color.BLACK);
-        renderer.draw(text, delta, delta);
-        renderer.setColor(Color.WHITE);
-        renderer.draw(text, delta + 1, delta + 1);
-        renderer.endRendering();
-    }
-
-    @Override
-    public void init(GL2 gl) {
+        gl.glPopMatrix();
+        gl.glDepthRange(0, 1);
     }
 
     @Override
@@ -93,7 +84,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
 
     @Override
     public String getName() {
-        return "Timestamp";
+        return "Miniview";
     }
 
     @Override
@@ -107,7 +98,15 @@ public class RenderableTimeStamp extends AbstractRenderable {
     }
 
     @Override
+    public void init(GL2 gl) {
+    }
+
+    @Override
     public void dispose(GL2 gl) {
+    }
+
+    public Viewport getViewport() {
+        return miniViewport;
     }
 
     private JPanel optionsPanel() {
@@ -115,6 +114,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
         JSlider slider = new JSlider(JSlider.HORIZONTAL, MIN_SCALE, MAX_SCALE, scale);
         slider.addChangeListener(e -> {
             scale = slider.getValue();
+            reshapeViewport();
             Displayer.display();
         });
         WheelSupport.installMouseWheelSupport(slider);
