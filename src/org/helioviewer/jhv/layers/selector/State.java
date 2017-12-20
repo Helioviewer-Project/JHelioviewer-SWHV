@@ -45,16 +45,15 @@ public class State {
         main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
 
         JSONArray ja = new JSONArray();
-        for (Renderable renderable : RenderableContainer.getRenderables()) {
+        for (Renderable renderable : RenderableContainer.getLayers()) {
             if (!(renderable instanceof ImageLayer))
-                ja.put(renderable2json(renderable, false));
+                ja.put(layer2json(renderable, false));
         }
         main.put("renderables", ja);
 
         JSONArray ji = new JSONArray();
-        for (Renderable renderable : RenderableContainer.getRenderables()) {
-            if (renderable instanceof ImageLayer)
-                ji.put(renderable2json(renderable, ((ImageLayer) renderable).isActiveImageLayer()));
+        for (ImageLayer imageLayer : RenderableContainer.getImageLayers()) {
+            ji.put(layer2json(imageLayer, imageLayer.isActiveImageLayer()));
         }
         main.put("imageLayers", ji);
 
@@ -66,12 +65,12 @@ public class State {
         return new JSONObject().put("org.helioviewer.jhv.state", main);
     }
 
-    private static JSONObject renderable2json(Renderable renderable, boolean master) {
-        JSONObject jo = new JSONObject().put("className", renderable.getClass().getName()).put("name", renderable.getName());
+    private static JSONObject layer2json(Renderable layer, boolean master) {
+        JSONObject jo = new JSONObject().put("className", layer.getClass().getName()).put("name", layer.getName());
         JSONObject dataObject = new JSONObject();
-        renderable.serialize(dataObject);
+        layer.serialize(dataObject);
         jo.put("data", dataObject);
-        jo.put("enabled", renderable.isEnabled());
+        jo.put("enabled", layer.isEnabled());
         if (master)
             jo.put("master", true);
         return jo;
