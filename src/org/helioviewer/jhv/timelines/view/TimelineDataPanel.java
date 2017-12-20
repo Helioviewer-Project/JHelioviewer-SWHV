@@ -77,7 +77,7 @@ public class TimelineDataPanel extends JPanel {
         model.removeAllElements();
 
         HashSet<BandType> bandTypesInSelectorModel = new HashSet<>();
-        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
             if (tl instanceof Band)
                 bandTypesInSelectorModel.add(((Band) tl).getBandType());
         }
@@ -96,7 +96,7 @@ public class TimelineDataPanel extends JPanel {
         if (bandType == null)
             return;
 
-        Timelines.getModel().addLineData(new Band(bandType));
+        Timelines.getModel().addTimelineLayer(new Band(bandType));
 
         long time = calendarStartDate.getTime();
         long movieStart = Layers.getStartTime();

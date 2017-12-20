@@ -12,20 +12,19 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.view.TimelineDialog;
 import org.helioviewer.jhv.timelines.view.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.view.selector.TimelinePanel;
-import org.helioviewer.jhv.timelines.view.selector.TimelineTableModel;
 import org.json.JSONObject;
 
 public class Timelines implements MainContentPanelPlugin {
 
-    private static final TimelineTableModel tableModel = new TimelineTableModel();
+    private static final TimelineLayers layers = new TimelineLayers();
     private static final DrawController dc = new DrawController();
     public static final TimelineDialog td = new TimelineDialog();
     private final LinkedList<JComponent> pluginPanes = new LinkedList<>();
     private final PlotPanel plotOne = new PlotPanel();
-    private static final TimelinePanel timelinePanel = new TimelinePanel(tableModel);
+    private static final TimelinePanel timelinePanel = new TimelinePanel(layers);
 
-    public static TimelineTableModel getModel() {
-        return tableModel;
+    public static TimelineLayers getModel() {
+        return layers;
     }
 
     public static TimelinePanel getTimelinePanel() {

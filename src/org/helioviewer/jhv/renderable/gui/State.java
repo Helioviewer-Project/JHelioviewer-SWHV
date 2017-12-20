@@ -79,7 +79,7 @@ public class State {
 
     private static void saveTimelineState(JSONObject main) {
         JSONArray ja = new JSONArray();
-        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
             JSONObject jo = new JSONObject().put("className", tl.getClass().getName()).put("name", tl.getName());
             JSONObject dataObject = new JSONObject();
             tl.serialize(dataObject);
@@ -126,7 +126,7 @@ public class State {
         }
         Timelines.getModel().clear();
         for (TimelineLayer tl : newlist) {
-            Timelines.getModel().addLineData(tl);
+            Timelines.getModel().addTimelineLayer(tl);
         }
     }
 

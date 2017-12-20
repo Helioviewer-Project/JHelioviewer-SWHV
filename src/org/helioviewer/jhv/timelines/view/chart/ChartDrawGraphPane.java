@@ -98,7 +98,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         boolean toggled = false;
         int ct = -1;
-        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
             if (tl.showYAxis()) {
                 if ((inRightYAxes && rightYAxisNumber == ct) || (inLeftYAxis && ct == -1)) {
                     toggled = toggled || !tl.getYAxis().isHighlighted();
@@ -172,7 +172,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, TimeAxis xAxis) {
-        List<TimelineLayer> list = Timelines.getModel().getAllLineDataSelectorElements();
+        List<TimelineLayer> list = Timelines.getModel().getTimelineLayers();
         for (TimelineLayer tl : list) {
             tl.draw(plotG, graphArea, xAxis, mousePosition);
         }
@@ -194,7 +194,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawHorizontalLabels(g, graphArea, xAxis);
 
             int ct = -1;
-            for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+            for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
                 if (tl.showYAxis()) {
                     drawVerticalLabels(g, graphArea, tl, ct, tl.getYAxis().isHighlighted());
                     ct++;
@@ -217,7 +217,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         currWidth += (int) tickTextBounds.getWidth();
 
         String value;
-        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
             if (tl.isEnabled() && (value = tl.getStringValue(ts)) != null) {
                 lbl = ", ";
                 g.setColor(Color.BLACK);
@@ -472,7 +472,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (mousePosition == null) {
             return false;
         }
-        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
             if (tl.highLightChanged(mousePosition)) {
                 return true;
             }
