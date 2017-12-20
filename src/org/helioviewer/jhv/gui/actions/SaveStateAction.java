@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.jhv.renderable.gui.State;
+import org.helioviewer.jhv.layers.selector.State;
 
 @SuppressWarnings("serial")
 public class SaveStateAction extends AbstractAction {

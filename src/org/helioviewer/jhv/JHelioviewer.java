@@ -15,6 +15,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.layers.selector.RenderableContainer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.log.LogSettings;
 import org.helioviewer.jhv.metadata.AIAResponse;
@@ -22,7 +23,6 @@ import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.samp.SampPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.view.jp2view.kakadu.KakaduMessageSystem;
 
 import nom.tam.fits.FitsFactory;

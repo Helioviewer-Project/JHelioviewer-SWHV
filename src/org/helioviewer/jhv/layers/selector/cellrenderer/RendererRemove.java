@@ -1,10 +1,10 @@
-package org.helioviewer.jhv.renderable.gui.cellrenderer;
+package org.helioviewer.jhv.layers.selector.cellrenderer;
 
 import java.awt.Font;
 
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.layers.selector.Renderable;
 
 @SuppressWarnings("serial")
 public class RendererRemove extends JHVTableCellRenderer {

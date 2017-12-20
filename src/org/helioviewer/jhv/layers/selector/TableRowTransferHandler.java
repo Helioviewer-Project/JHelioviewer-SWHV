@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.gui;
+package org.helioviewer.jhv.layers.selector;
 
 import java.awt.AlphaComposite;
 import java.awt.Cursor;

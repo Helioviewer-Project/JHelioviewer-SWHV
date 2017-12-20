@@ -5,8 +5,8 @@ import java.net.URI;
 
 import org.helioviewer.jhv.base.JSONUtils;
 import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.log.Log;
-import org.helioviewer.jhv.renderable.gui.State;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONObject;
 

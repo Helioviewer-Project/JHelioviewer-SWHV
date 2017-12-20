@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.gui.cellrenderer;
+package org.helioviewer.jhv.layers.selector.cellrenderer;
 
 import java.awt.Component;
 import java.awt.Font;
@@ -11,7 +11,7 @@ import javax.swing.JTable;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.layers.selector.Renderable;
 
 @SuppressWarnings("serial")
 public class RendererLoading extends JHVTableCellRenderer {
