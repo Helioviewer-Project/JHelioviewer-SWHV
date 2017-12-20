@@ -2,19 +2,30 @@ package org.helioviewer.jhv.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashSet;
 
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
+import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
 public class UITimer {
 
     static {
         new Timer(1000 / 10, new UIListener()).start();
+    }
+
+    private static final HashSet<LazyComponent> lazyComponents = new HashSet<>();
+
+    public static void register(LazyComponent lazy) {
+        lazyComponents.add(lazy);
+    }
+
+    public static void unregister(LazyComponent lazy) {
+        lazyComponents.remove(lazy);
     }
 
     public static final BusyIndicator busyIndicator = new BusyIndicator();
@@ -38,11 +49,9 @@ public class UITimer {
                 cacheChanged = false;
                 MoviePanel.getTimeSlider().repaint();
             }
-            MoviePanel.getTimeSlider().lazyRepaint();
-            ImageViewerGui.getLayersPanel().lazyRepaint();
-            Timelines.getTimelinePanel().lazyRepaint();
-            ImageViewerGui.getCarringtonStatusPanel().lazyRepaint();
-            ImageViewerGui.getZoomStatusPanel().lazyRepaint();
+
+            for (LazyComponent lazy : lazyComponents)
+                lazy.lazyRepaint();
 
             int f = 0;
             if (Layers.isMoviePlaying()) {

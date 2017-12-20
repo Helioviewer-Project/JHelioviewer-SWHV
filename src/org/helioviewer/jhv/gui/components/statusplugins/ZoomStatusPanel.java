@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.components.statusplugins;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 
@@ -14,6 +15,7 @@ public class ZoomStatusPanel extends StatusPanel.StatusPlugin implements LazyCom
 
     public ZoomStatusPanel() {
         update(Displayer.getCamera().getWidth(), Displayer.getCamera().getViewpoint().distance);
+        UITimer.register(this);
     }
 
     private static String formatFOV(double r) {

@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.view.View;
@@ -50,6 +51,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
+        UITimer.register(this);
     }
 
     void setLabel(JLabel _label) {

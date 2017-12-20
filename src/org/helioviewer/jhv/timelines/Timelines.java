@@ -32,16 +32,10 @@ public class Timelines implements MainContentPanelPlugin {
         return layers;
     }
 
-    public static TimelinePanel getTimelinePanel() {
-        return timelinePanel;
-    }
-
     public void installTimelines() {
         pluginPanes.add(plotOne);
-
         ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
-
         ImageViewerGui.getMainContentPanel().addPlugin(this);
 
         Layers.addTimeListener(dc);
@@ -55,7 +49,6 @@ public class Timelines implements MainContentPanelPlugin {
         Layers.removeTimeListener(dc);
 
         ImageViewerGui.getMainContentPanel().removePlugin(this);
-
         ImageViewerGui.getLeftContentPane().remove(timelinePanel);
         ImageViewerGui.getLeftContentPane().revalidate();
         pluginPanes.remove(plotOne);
