@@ -23,6 +23,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.timelines.TimelineLayer;
+import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.gui.NewLayerAction;
 import org.helioviewer.jhv.timelines.view.selector.cellrenderer.RendererColor;
@@ -40,11 +41,11 @@ public class TimelinePanel extends JPanel {
 
     private static final int ENABLED_COL = 0;
     private static final int TITLE_COL = 1;
-    static final int LOADING_COL = 2;
+    public static final int LOADING_COL = 2;
     private static final int LINECOLOR_COL = 3;
     private static final int REMOVE_COL = 4;
 
-    static final int NUMBEROFCOLUMNS = 5;
+    public static final int NUMBEROFCOLUMNS = 5;
     private static final int NUMBEROFVISIBLEROWS = 4;
 
     private final TimelineTable grid;
@@ -103,7 +104,7 @@ public class TimelinePanel extends JPanel {
 
     }
 
-    public TimelinePanel(TimelineTableModel model) {
+    public TimelinePanel(TimelineLayers model) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -198,7 +199,7 @@ public class TimelinePanel extends JPanel {
                         setOptionsPanel(timeline);
                     DrawController.graphAreaChanged();
                 } else if (col == REMOVE_COL && timeline.isDeletable()) {
-                    model.removeLineData(timeline);
+                    model.removeTimelineLayer(timeline);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);

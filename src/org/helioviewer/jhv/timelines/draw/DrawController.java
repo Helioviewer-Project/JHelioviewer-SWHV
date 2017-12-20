@@ -92,7 +92,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
         int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         int ct = -1;
-        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
             if (tl.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
                     if (move) {
@@ -121,7 +121,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
         int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
         int ct = -1;
-        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
             if (tl.showYAxis()) {
                 if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
                     tl.resetAxis();
@@ -160,7 +160,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     public static void moveAllAxes(double distanceY) {
-        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
             if (tl.showYAxis()) {
                 tl.getYAxis().shiftDownPixels(distanceY, graphArea.height);
             }
@@ -175,7 +175,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         availableAxis.start = availableInterval.start;
         availableAxis.end = availableInterval.end;
 
-        for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
             tl.fetchData(selectedAxis);
         }
         drawRequest();
@@ -186,7 +186,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
             long halfDiff = (selectedAxis.end - selectedAxis.start) / 2;
             selectedAxis.set(time - halfDiff, time + halfDiff, false);
             drawRequest();
-            for (TimelineLayer tl : Timelines.getModel().getAllLineDataSelectorElements()) {
+            for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
                 tl.fetchData(selectedAxis);
             }
         }
