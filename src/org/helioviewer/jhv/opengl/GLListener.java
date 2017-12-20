@@ -9,9 +9,9 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
-import org.helioviewer.jhv.renderable.gui.ImageLayers;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 
 import com.jogamp.nativewindow.ScalableSurface;

@@ -1,10 +1,10 @@
-package org.helioviewer.jhv.renderable.gui;
+package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 
 ///
 
@@ -16,7 +16,6 @@ import org.astrogrid.samp.SampUtils;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.view.View;
 
 public class ImageLayers {

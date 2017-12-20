@@ -16,7 +16,7 @@ import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.io.Load;
-import org.helioviewer.jhv.renderable.gui.ImageLayers;
+import org.helioviewer.jhv.layers.ImageLayers;
 
 class SampClient extends HubConnector {
 

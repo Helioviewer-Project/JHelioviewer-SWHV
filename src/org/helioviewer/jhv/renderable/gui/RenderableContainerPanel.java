@@ -33,6 +33,7 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererEnabled;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererLoading;
 import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererName;
