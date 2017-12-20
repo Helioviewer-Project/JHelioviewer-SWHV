@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.timelines;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -12,10 +13,11 @@ import org.helioviewer.jhv.timelines.view.selector.TimelinePanel;
 @SuppressWarnings("serial")
 public class TimelineLayers extends AbstractTableModel {
 
-    private ArrayList<TimelineLayer> layers = new ArrayList<>();
+    private static final ArrayList<TimelineLayer> layers = new ArrayList<>();
+    private static final List<TimelineLayer> extLayers = Collections.unmodifiableList(layers);
 
-    public List<TimelineLayer> getTimelineLayers() {
-        return layers;
+    public static List<TimelineLayer> get() {
+        return extLayers;
     }
 
     public void downloadStarted(TimelineLayer tl) {
@@ -48,10 +50,9 @@ public class TimelineLayers extends AbstractTableModel {
     }
 
     public void clear() {
-        for (TimelineLayer tl : layers) {
+        for (TimelineLayer tl : layers)
             tl.remove();
-        }
-        layers = new ArrayList<>();
+        layers.clear();
         fireTableDataChanged();
         DrawController.graphAreaChanged();
     }
@@ -80,7 +81,7 @@ public class TimelineLayers extends AbstractTableModel {
         }
     }
 
-    public ClickableDrawable getDrawableUnderMouse() {
+    public static ClickableDrawable getDrawableUnderMouse() {
         for (TimelineLayer tl : layers) {
             ClickableDrawable tlUnderMouse = tl.getDrawableUnderMouse();
             if (tlUnderMouse != null) {
@@ -90,7 +91,7 @@ public class TimelineLayers extends AbstractTableModel {
         return null;
     }
 
-    public int getNumberOfAxes() {
+    public static int getNumberOfAxes() {
         int ct = 0;
         for (TimelineLayer tl : layers) {
             if (tl.showYAxis()) {

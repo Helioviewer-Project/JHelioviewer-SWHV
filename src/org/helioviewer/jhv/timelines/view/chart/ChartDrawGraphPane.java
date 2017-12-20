@@ -31,7 +31,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
-import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -98,7 +98,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         boolean toggled = false;
         int ct = -1;
-        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
                 if ((inRightYAxes && rightYAxisNumber == ct) || (inLeftYAxis && ct == -1)) {
                     toggled = toggled || !tl.getYAxis().isHighlighted();
@@ -172,7 +172,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, TimeAxis xAxis) {
-        List<TimelineLayer> list = Timelines.getModel().getTimelineLayers();
+        List<TimelineLayer> list = TimelineLayers.get();
         for (TimelineLayer tl : list) {
             tl.draw(plotG, graphArea, xAxis, mousePosition);
         }
@@ -194,7 +194,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             drawHorizontalLabels(g, graphArea, xAxis);
 
             int ct = -1;
-            for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+            for (TimelineLayer tl : TimelineLayers.get()) {
                 if (tl.showYAxis()) {
                     drawVerticalLabels(g, graphArea, tl, ct, tl.getYAxis().isHighlighted());
                     ct++;
@@ -217,7 +217,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         currWidth += (int) tickTextBounds.getWidth();
 
         String value;
-        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.isEnabled() && (value = tl.getStringValue(ts)) != null) {
                 lbl = ", ";
                 g.setColor(Color.BLACK);
@@ -382,7 +382,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
 
-        ClickableDrawable element = Timelines.getModel().getDrawableUnderMouse();
+        ClickableDrawable element = TimelineLayers.getDrawableUnderMouse();
         if (element != null) {
             Rectangle graphArea = DrawController.getGraphArea();
             element.clicked(e.getLocationOnScreen(), DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x));
@@ -472,7 +472,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (mousePosition == null) {
             return false;
         }
-        for (TimelineLayer tl : Timelines.getModel().getTimelineLayers()) {
+        for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.highLightChanged(mousePosition)) {
                 return true;
             }
@@ -486,7 +486,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         mousePosition = e.getPoint();
         if (overMovieLine(mousePosition)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-        } else if (Timelines.getModel().getDrawableUnderMouse() != null) {
+        } else if (TimelineLayers.getDrawableUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         } else if (mousePosition.x >= graphArea.x && mousePosition.x <= graphArea.x + graphArea.width && mousePosition.y >= graphArea.y && mousePosition.y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
