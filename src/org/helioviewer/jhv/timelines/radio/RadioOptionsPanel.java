@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eve.radio;
+package org.helioviewer.jhv.timelines.radio;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

@@ -19,7 +19,7 @@ public class SWEKPlugin implements Plugin {
 
     private static final SWEKData swekData = new SWEKData();
     private static final SWEKLayer layer = new SWEKLayer(null);
-    private static final EventTimelineLayer etl = new EventTimelineLayer();
+    private static final EventTimelineLayer etl = new EventTimelineLayer(null);
 
     public SWEKPlugin() {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
@@ -30,7 +30,7 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
-        Timelines.getModel().addTimelineLayer(etl);
+        Timelines.getModel().addLayer(etl);
         ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
 
@@ -42,7 +42,7 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
-        Timelines.getModel().removeTimelineLayer(etl);
+        Timelines.getModel().removeLayer(etl);
         ImageViewerGui.getRenderableContainer().removeLayer(layer);
         Layers.removeTimespanListener(swekData);
 

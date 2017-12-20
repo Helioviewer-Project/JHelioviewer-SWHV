@@ -9,6 +9,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.radio.RadioData;
 import org.helioviewer.jhv.timelines.view.TimelineDialog;
 import org.helioviewer.jhv.timelines.view.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.view.selector.TimelinePanel;
@@ -22,6 +23,10 @@ public class Timelines implements MainContentPanelPlugin {
     private final LinkedList<JComponent> pluginPanes = new LinkedList<>();
     private final PlotPanel plotOne = new PlotPanel();
     private static final TimelinePanel timelinePanel = new TimelinePanel(layers);
+
+    public Timelines() {
+        layers.addLayer(new RadioData(null));
+    }
 
     public static TimelineLayers getModel() {
         return layers;

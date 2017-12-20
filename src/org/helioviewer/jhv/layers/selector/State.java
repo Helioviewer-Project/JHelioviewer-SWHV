@@ -126,7 +126,7 @@ public class State {
         }
         Timelines.getModel().clear();
         for (TimelineLayer tl : newlist) {
-            Timelines.getModel().addTimelineLayer(tl);
+            Timelines.getModel().addLayer(tl);
         }
     }
 
