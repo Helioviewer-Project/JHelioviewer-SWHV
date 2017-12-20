@@ -97,7 +97,7 @@ public class TimelineDataPanel extends JPanel {
         if (bandType == null)
             return;
 
-        Timelines.getModel().addTimelineLayer(new Band(bandType));
+        Timelines.getModel().addLayer(new Band(bandType));
 
         long time = calendarStartDate.getTime();
         long movieStart = Layers.getStartTime();

@@ -33,9 +33,6 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
     private static JHVRelatedEvents highlightedEvent = null;
     private static int highlightedEventPosition = -1;
 
-    public EventTimelineLayer() {
-    }
-
     public EventTimelineLayer(JSONObject jo) {
     }
 

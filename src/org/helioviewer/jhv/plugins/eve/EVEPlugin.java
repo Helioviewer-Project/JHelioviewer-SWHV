@@ -7,7 +7,6 @@ import javax.swing.JMenuItem;
 import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.eve.lines.EVEDataProvider;
-import org.helioviewer.jhv.plugins.eve.radio.RadioData;
 import org.helioviewer.jhv.threads.JHVExecutor;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandTypeTask;
@@ -24,10 +23,6 @@ public class EVEPlugin implements Plugin {
     private final Timelines tl = new Timelines();
     private final JMenuItem newItem = new JMenuItem(new NewLayerAction());
     private final JMenuItem openItem = new JMenuItem(new OpenLocalFileAction());
-
-    public EVEPlugin() {
-        Timelines.getModel().addTimelineLayer(new RadioData(null));
-    }
 
     @Override
     public void installPlugin() {
