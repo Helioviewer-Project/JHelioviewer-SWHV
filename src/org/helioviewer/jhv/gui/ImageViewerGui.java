@@ -34,11 +34,11 @@ import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.NEWTKeyAdapter;
 import org.helioviewer.jhv.input.NEWTMouseAdapter;
+import org.helioviewer.jhv.layers.selector.RenderableContainer;
+import org.helioviewer.jhv.layers.selector.RenderableContainerPanel;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLListener;
-import org.helioviewer.jhv.renderable.gui.RenderableContainer;
-import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;

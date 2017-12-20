@@ -6,9 +6,9 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.StatusPanel;
+import org.helioviewer.jhv.layers.selector.RenderableContainer;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;

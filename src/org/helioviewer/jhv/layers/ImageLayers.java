@@ -2,9 +2,9 @@ package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.selector.RenderableContainer;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 
 ///
 

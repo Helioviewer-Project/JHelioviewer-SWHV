@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.gui.cellrenderer;
+package org.helioviewer.jhv.layers.selector.cellrenderer;
 
 import java.awt.Component;
 
@@ -6,7 +6,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JTable;
 
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.layers.selector.Renderable;
 
 @SuppressWarnings("serial")
 public class RendererEnabled extends JHVTableCellRenderer {

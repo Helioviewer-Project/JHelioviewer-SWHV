@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.gui;
+package org.helioviewer.jhv.layers.selector;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,11 +34,11 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererEnabled;
-import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererLoading;
-import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererName;
-import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererRemove;
-import org.helioviewer.jhv.renderable.gui.cellrenderer.RendererTime;
+import org.helioviewer.jhv.layers.selector.cellrenderer.RendererEnabled;
+import org.helioviewer.jhv.layers.selector.cellrenderer.RendererLoading;
+import org.helioviewer.jhv.layers.selector.cellrenderer.RendererName;
+import org.helioviewer.jhv.layers.selector.cellrenderer.RendererRemove;
+import org.helioviewer.jhv.layers.selector.cellrenderer.RendererTime;
 
 import com.jidesoft.swing.JideButton;
 

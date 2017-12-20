@@ -12,7 +12,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
-import org.helioviewer.jhv.renderable.gui.RenderableContainer;
+import org.helioviewer.jhv.layers.selector.RenderableContainer;
 
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;

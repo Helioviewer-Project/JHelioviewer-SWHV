@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.gui;
+package org.helioviewer.jhv.layers.selector;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

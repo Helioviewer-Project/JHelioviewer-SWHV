@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.gui;
+package org.helioviewer.jhv.layers.selector;
 
 interface Reorderable {
 
