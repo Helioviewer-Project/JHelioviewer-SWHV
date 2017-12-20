@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components;
+package org.helioviewer.jhv.layers;
 
 import java.nio.FloatBuffer;
 
@@ -10,7 +10,7 @@ import org.helioviewer.jhv.opengl.GLLine;
 
 import com.jogamp.opengl.GL2;
 
-class RenderableGridMath {
+class GridMath {
 
     private static final int SUBDIVISIONS = 360;
 

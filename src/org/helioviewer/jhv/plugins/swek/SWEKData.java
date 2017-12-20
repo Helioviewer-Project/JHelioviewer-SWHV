@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.renderable;
+package org.helioviewer.jhv.plugins.swek;
 
 import java.util.ArrayList;
 import java.util.Map;

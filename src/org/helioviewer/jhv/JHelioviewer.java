@@ -113,7 +113,7 @@ public class JHelioviewer {
             frame.pack();
             JComponent leftPane = ImageViewerGui.getLeftScrollPane();
             leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));
-            ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(RenderableContainer.getRenderableGrid()); // nasty
+            ImageViewerGui.getRenderableContainerPanel().setOptionsPanel(RenderableContainer.getGridLayer()); // nasty
 
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);

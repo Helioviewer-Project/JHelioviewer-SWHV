@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.config;
+package org.helioviewer.jhv.plugins.swek;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -26,13 +26,13 @@ import org.helioviewer.jhv.plugins.swek.sources.hek.HEKHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class SWEKConfigurationManager {
+class SWEKConfig {
 
     private static final HashMap<String, SWEKSource> sources = new HashMap<>();
     private static final HashMap<String, SWEKGroup> groups = new HashMap<>();
     private static final List<SWEKGroup> orderedGroups = new ArrayList<>();
 
-    public static List<SWEKGroup> loadConfig() {
+    static List<SWEKGroup> load() {
         SWEKIconBank.init();
         try (InputStream in = FileUtils.getResourceInputStream("/settings/SWEK.json")) {
             JSONObject jo = JSONUtils.getJSONStream(in);
