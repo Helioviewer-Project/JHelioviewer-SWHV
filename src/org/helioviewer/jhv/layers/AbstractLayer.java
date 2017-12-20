@@ -1,11 +1,12 @@
-package org.helioviewer.jhv.renderable.gui;
+package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.renderable.gui.Renderable;
 
 import com.jogamp.opengl.GL2;
 
-public abstract class AbstractRenderable implements Renderable {
+public abstract class AbstractLayer implements Renderable {
 
     private boolean enabled;
     protected final boolean[] isVisible = { false, false, false, false };

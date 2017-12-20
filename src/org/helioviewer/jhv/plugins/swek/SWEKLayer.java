@@ -27,6 +27,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
@@ -36,12 +37,11 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
-import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class SWEKLayer extends AbstractRenderable {
+public class SWEKLayer extends AbstractLayer {
 
     private static final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
     private final JPanel optionsPanel;

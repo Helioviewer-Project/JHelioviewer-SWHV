@@ -17,13 +17,12 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class TimestampLayer extends AbstractRenderable {
+public class TimestampLayer extends AbstractLayer {
 
     private static final int MIN_SCALE = 50;
     private static final int MAX_SCALE = 200;

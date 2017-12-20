@@ -7,18 +7,18 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
 import org.helioviewer.jhv.plugins.pfss.data.PfssNewDataLoader;
-import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.CancelTask;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class PfssLayer extends AbstractRenderable implements TimespanListener {
+public class PfssLayer extends AbstractLayer implements TimespanListener {
 
     private final PfssLayerOptions optionsPanel;
     private final PfssLine line = new PfssLine();
