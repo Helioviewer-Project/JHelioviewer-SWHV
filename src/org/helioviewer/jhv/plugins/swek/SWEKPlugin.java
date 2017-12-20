@@ -10,10 +10,6 @@ import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.gui.EventPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
-import org.helioviewer.jhv.plugins.swek.renderable.EventTimelineRenderable;
-import org.helioviewer.jhv.plugins.swek.renderable.SWEKData;
-import org.helioviewer.jhv.plugins.swek.renderable.SWEKRenderable;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONObject;
 
@@ -27,7 +23,7 @@ public class SWEKPlugin implements Plugin {
 
     public SWEKPlugin() {
         swekPanel.setLayout(new BoxLayout(swekPanel, BoxLayout.Y_AXIS));
-        for (SWEKGroup group : SWEKConfigurationManager.loadConfig()) {
+        for (SWEKGroup group : SWEKConfig.load()) {
             swekPanel.add(new EventPanel(group));
         }
     }

@@ -11,8 +11,8 @@ import javax.swing.table.AbstractTableModel;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
 import org.helioviewer.jhv.renderable.components.RenderableViewpoint;
@@ -67,12 +67,12 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
     private static CompositeList newRenderables = new CompositeList();
     private static final HashSet<Renderable> removedRenderables = new HashSet<>();
 
-    private static RenderableGrid renderableGrid;
+    private static GridLayer gridLayer;
     private static RenderableViewpoint renderableViewpoint;
     private static RenderableMiniview renderableMiniview;
 
     public RenderableContainer() {
-        addRenderable(new RenderableGrid(null));
+        addRenderable(new GridLayer(null));
         addRenderable(new RenderableViewpoint(null));
         addRenderable(new RenderableTimeStamp(null));
         addRenderable(new RenderableMiniview(null));
@@ -82,8 +82,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         return renderableViewpoint;
     }
 
-    public static RenderableGrid getRenderableGrid() {
-        return renderableGrid;
+    public static GridLayer getGridLayer() {
+        return gridLayer;
     }
 
     public static RenderableMiniview getRenderableMiniview() {
@@ -94,8 +94,8 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables.add(renderable);
         newRenderables.add(renderable);
 
-        if (renderable instanceof RenderableGrid)
-            renderableGrid = (RenderableGrid) renderable;
+        if (renderable instanceof GridLayer)
+            gridLayer = (GridLayer) renderable;
         else if (renderable instanceof RenderableViewpoint)
             renderableViewpoint = (RenderableViewpoint) renderable;
         else if (renderable instanceof RenderableMiniview)

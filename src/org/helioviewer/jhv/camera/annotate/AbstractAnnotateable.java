@@ -6,10 +6,10 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.renderable.components.RenderableGrid;
 
 import com.jogamp.opengl.GL2;
 
@@ -44,7 +44,7 @@ abstract class AbstractAnnotateable implements Annotateable {
         if (Displayer.mode == Displayer.DisplayMode.Orthographic) {
             return CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), x, y, camera.getViewpoint().orientation, true);
         } else {
-            return Displayer.mode.scale.transformInverse(Displayer.mode.scale.mouseToGrid(x, y, Displayer.getActiveViewport(), camera, RenderableGrid.GridType.Viewpoint));
+            return Displayer.mode.scale.transformInverse(Displayer.mode.scale.mouseToGrid(x, y, Displayer.getActiveViewport(), camera, GridLayer.GridType.Viewpoint));
         }
     }
 

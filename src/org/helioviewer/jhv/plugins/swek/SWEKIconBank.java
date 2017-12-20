@@ -1,10 +1,8 @@
-package org.helioviewer.jhv.plugins.swek.config;
+package org.helioviewer.jhv.plugins.swek;
 
 import java.util.HashMap;
 
 import javax.swing.ImageIcon;
-
-import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 
 class SWEKIconBank {
 

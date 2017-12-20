@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components;
+package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
 import java.text.DecimalFormat;
@@ -22,7 +22,7 @@ import org.json.JSONObject;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class RenderableGrid extends AbstractRenderable {
+public class GridLayer extends AbstractRenderable {
 
     public enum GridType {
         Viewpoint, Stonyhurst, Carrington, HCI
@@ -93,12 +93,12 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    public RenderableGrid(JSONObject jo) {
+    public GridLayer(JSONObject jo) {
         if (jo != null)
             deserialize(jo);
         else
             setEnabled(true);
-        optionsPanel = new RenderableGridOptionsPanel(this);
+        optionsPanel = new GridLayerOptions(this);
 
         latLabels = GridLabel.makeLatLabels(latStep);
         lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
@@ -129,7 +129,7 @@ public class RenderableGrid extends AbstractRenderable {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
-            RenderableGridMath.initGrid(gl, gridLine, lonStep, latStep);
+            GridMath.initGrid(gl, gridLine, lonStep, latStep);
             gridNeedsInit = false;
         }
 
@@ -191,7 +191,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     private void drawGridFlat(GL2 gl, Viewport vp) {
         if (previousAspect != vp.aspect) {
-            RenderableGridMath.initFlatGrid(gl, flatLine, vp.aspect);
+            GridMath.initFlatGrid(gl, flatLine, vp.aspect);
             previousAspect = vp.aspect;
         }
         flatLine.render(gl, vp.aspect, thickness);
@@ -205,17 +205,17 @@ public class RenderableGrid extends AbstractRenderable {
 
         renderer.begin3DRendering();
         {
-            for (int i = 0; i <= RenderableGridMath.FLAT_STEPS_THETA; i++) {
-                if (i == RenderableGridMath.FLAT_STEPS_THETA / 2) {
+            for (int i = 0; i <= GridMath.FLAT_STEPS_THETA; i++) {
+                if (i == GridMath.FLAT_STEPS_THETA / 2) {
                     continue;
                 }
-                float start = -w / 2 + i * w / RenderableGridMath.FLAT_STEPS_THETA;
-                String label = formatter2.format(scale.getInterpolatedXValue(1. / RenderableGridMath.FLAT_STEPS_THETA * i));
+                float start = -w / 2 + i * w / GridMath.FLAT_STEPS_THETA;
+                String label = formatter2.format(scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i));
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
-            for (int i = 0; i <= RenderableGridMath.FLAT_STEPS_RADIAL; i++) {
-                String label = formatter2.format(scale.getInterpolatedYValue(1. / RenderableGridMath.FLAT_STEPS_RADIAL * i));
-                float start = -h / 2 + i * h / RenderableGridMath.FLAT_STEPS_RADIAL;
+            for (int i = 0; i <= GridMath.FLAT_STEPS_RADIAL; i++) {
+                String label = formatter2.format(scale.getInterpolatedYValue(1. / GridMath.FLAT_STEPS_RADIAL * i));
+                float start = -h / 2 + i * h / GridMath.FLAT_STEPS_RADIAL;
                 renderer.draw3D(label, 0, start, 0, textScaleFactor);
             }
         }
@@ -277,21 +277,21 @@ public class RenderableGrid extends AbstractRenderable {
     @Override
     public void init(GL2 gl) {
         gridLine.init(gl);
-        RenderableGridMath.initGrid(gl, gridLine, lonStep, latStep);
+        GridMath.initGrid(gl, gridLine, lonStep, latStep);
         gridNeedsInit = false;
 
         axesLine.init(gl);
-        RenderableGridMath.initAxes(gl, axesLine);
+        GridMath.initAxes(gl, axesLine);
 
         earthCircleLine.init(gl);
-        RenderableGridMath.initEarthCircles(gl, earthCircleLine);
+        GridMath.initEarthCircles(gl, earthCircleLine);
 
         radialCircleLine.init(gl);
         radialThickLine.init(gl);
-        RenderableGridMath.initRadialCircles(gl, radialCircleLine, radialThickLine, RADIAL_UNIT, RADIAL_STEP);
+        GridMath.initRadialCircles(gl, radialCircleLine, radialThickLine, RADIAL_UNIT, RADIAL_STEP);
         radialCircleLineFar.init(gl);
         radialThickLineFar.init(gl);
-        RenderableGridMath.initRadialCircles(gl, radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
+        GridMath.initRadialCircles(gl, radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
 
         flatLine.init(gl);
     }

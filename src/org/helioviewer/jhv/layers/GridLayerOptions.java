@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.components;
+package org.helioviewer.jhv.layers;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,19 +19,19 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-class RenderableGridOptionsPanel extends JPanel {
+class GridLayerOptions extends JPanel {
 
     private static final double min = 5, max = 90;
 
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
-    private JComboBox<RenderableGrid.GridType> gridTypeBox;
-    private final RenderableGrid grid;
+    private JComboBox<GridLayer.GridType> gridTypeBox;
+    private final GridLayer grid;
 
-    RenderableGridOptionsPanel(RenderableGrid renderableGrid) {
-        grid = renderableGrid;
-        createGridResolutionX(grid);
-        createGridResolutionY(grid);
+    GridLayerOptions(GridLayer _grid) {
+        grid = _grid;
+        createGridResolutionX();
+        createGridResolutionY();
 
         setLayout(new GridBagLayout());
 
@@ -110,16 +110,16 @@ class RenderableGridOptionsPanel extends JPanel {
     }
 
     private void createGridTypeBox() {
-        gridTypeBox = new JComboBox<>(RenderableGrid.GridType.values());
+        gridTypeBox = new JComboBox<>(GridLayer.GridType.values());
         gridTypeBox.setSelectedItem(grid.getGridType());
         gridTypeBox.addActionListener(e -> {
-            grid.setGridType((RenderableGrid.GridType) Objects.requireNonNull(gridTypeBox.getSelectedItem()));
+            grid.setGridType((GridLayer.GridType) Objects.requireNonNull(gridTypeBox.getSelectedItem()));
             Displayer.display();
         });
     }
 
-    private void createGridResolutionX(RenderableGrid renderableGrid) {
-        gridResolutionXSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLonStep()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
+    private void createGridResolutionX() {
+        gridResolutionXSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(grid.getLonStep()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionXSpinner.addChangeListener(e -> {
             grid.setLonStep((Double) gridResolutionXSpinner.getValue());
             Displayer.display();
@@ -127,8 +127,8 @@ class RenderableGridOptionsPanel extends JPanel {
         WheelSupport.installMouseWheelSupport(gridResolutionXSpinner);
     }
 
-    private void createGridResolutionY(RenderableGrid renderableGrid) {
-        gridResolutionYSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLatStep()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
+    private void createGridResolutionY() {
+        gridResolutionYSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(grid.getLatStep()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionYSpinner.addChangeListener(e -> {
             grid.setLatStep((Double) gridResolutionYSpinner.getValue());
             Displayer.display();
