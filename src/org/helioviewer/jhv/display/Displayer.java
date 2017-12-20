@@ -13,9 +13,9 @@ import org.helioviewer.jhv.camera.UpdateViewpoint;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
-import org.helioviewer.jhv.renderable.gui.ImageLayers;
 
 public class Displayer implements JHVEventHighlightListener {
 

@@ -13,6 +13,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.TimestampLayer;
 import org.helioviewer.jhv.layers.ViewpointLayer;
@@ -235,7 +236,7 @@ public class RenderableContainer extends AbstractTableModel implements Reorderab
         renderables = new CompositeList();
     }
 
-    static List<ImageLayer> getImageLayers() {
+    public /*temp*/ static List<ImageLayer> getImageLayers() {
         return renderables.imageLayers;
     }
 
