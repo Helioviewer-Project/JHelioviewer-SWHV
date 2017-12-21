@@ -118,9 +118,8 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     public void setView(View _view) {
         if (removed) //!
             return;
-        if (view != null)
-            unsetView();
 
+        unsetView();
         view = _view;
         worker = null; // drop reference
 
@@ -140,13 +139,11 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private void unsetView() {
         stopDownloadView();
-        if (view != null) {
-            Layers.removeLayer(view);
-            view.setDataHandler(null);
-            view.setImageLayer(null);
-            view.abolish();
-            view = null;
-        }
+        Layers.removeLayer(view);
+        view.setDataHandler(null);
+        view.setImageLayer(null);
+        view.abolish();
+
         imageData = prevImageData = baseImageData = null;
     }
 
@@ -285,8 +282,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public void setActiveImageLayer() {
-        if (view != null)
-            Layers.setActiveView(view);
+        Layers.setActiveView(view);
     }
 
     private ImageData imageData;
@@ -330,7 +326,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     @Override
     public boolean isLocal() {
-        return view != null && view.isLocal();
+        return view.isLocal();
     }
 
     public GLImage getGLImage() {
@@ -358,10 +354,8 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     public void startDownloadView() {
         if (downloadTask != null)
             downloadTask.cancel(true);
-        if (view != null) {
-            downloadTask = new DownloadViewTask(this, view);
-            JHVGlobals.getExecutorService().execute(downloadTask);
-        }
+        downloadTask = new DownloadViewTask(this, view);
+        JHVGlobals.getExecutorService().execute(downloadTask);
     }
 
     public void stopDownloadView() {

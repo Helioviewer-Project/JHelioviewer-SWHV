@@ -8,10 +8,11 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.LayersContainer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 public class SDOCutOutAction extends AbstractAction {
@@ -37,16 +38,14 @@ public class SDOCutOutAction extends AbstractAction {
         url.append("&wavelengths=").append(ImageLayers.getSDOCutoutString());
         url.append("&cadence=").append(ObservationDialog.getInstance().getObservationPanel().getCadence()).append("&cadenceUnits=s");
 
-        View v = Layers.getActiveView();
-        if (v != null) {
-            ImageData imd = v.getImageLayer().getImageData();
-            if (imd != null) {
-                Region region = Region.scale(imd.getRegion(), 1 / imd.getMetaData().getUnitPerArcsec());
-                url.append(String.format("&width=%.1f", region.width));
-                url.append(String.format("&height=%.1f", region.height));
-                url.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
-                url.append(String.format("&yCen=%.1f", -(region.lly + region.height / 2.)));
-            }
+        ImageData id;
+        ImageLayer layer = LayersContainer.getActiveLayer();
+        if (layer != null && (id = layer.getImageData()) != null) {
+            Region region = Region.scale(id.getRegion(), 1 / id.getMetaData().getUnitPerArcsec());
+            url.append(String.format("&width=%.1f", region.width));
+            url.append(String.format("&height=%.1f", region.height));
+            url.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
+            url.append(String.format("&yCen=%.1f", -(region.lly + region.height / 2.)));
         }
 
         JHVGlobals.openURL(url.toString());

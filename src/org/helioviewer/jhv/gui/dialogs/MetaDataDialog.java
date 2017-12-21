@@ -23,11 +23,11 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.view.View;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -53,11 +53,11 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
     private final StringBuilder basicSB = new StringBuilder();
     private final StringBuilder hvSB = new StringBuilder();
 
-    public MetaDataDialog(View view) {
+    public MetaDataDialog(ImageLayer layer) {
         super(ImageViewerGui.getMainFrame(), "Image Information");
 
         exportFitsButton.setEnabled(false);
-        setMetaData(view);
+        setMetaData(layer);
 
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(fitsModel);
         JTable fitsTable = new JTable(fitsModel);
@@ -117,8 +117,8 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         setVisible(true);
     }
 
-    private void setMetaData(View v) {
-        MetaData metaData = v.getImageLayer().getMetaData();
+    private void setMetaData(ImageLayer layer) {
+        MetaData metaData = layer.getMetaData();
         if (!(metaData instanceof HelioviewerMetaData)) {
             basicSB.append("No Helioviewer metadata available");
             return;
@@ -132,7 +132,7 @@ public class MetaDataDialog extends StandardDialog implements ShowableDialog {
         basicSB.append("Observation Date: ").append(m.getViewpoint().time).append('\n');
 
         try {
-            String xml = v.getXMLMetaData();
+            String xml = layer.getView().getXMLMetaData();
             InputStream in = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
 
