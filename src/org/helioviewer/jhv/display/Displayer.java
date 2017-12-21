@@ -14,7 +14,6 @@ import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.LayersContainer;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 public class Displayer implements JHVEventHighlightListener {
@@ -208,7 +207,7 @@ public class Displayer implements JHVEventHighlightListener {
                 toDisplay = false;
             }
             if (renderFactor != -1) {
-                LayersContainer.setRender(camera, renderFactor);
+                ImageLayers.setRender(camera, renderFactor);
                 renderFactor = -1;
             }
         }

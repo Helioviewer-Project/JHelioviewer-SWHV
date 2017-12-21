@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 
@@ -18,6 +20,15 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.view.View;
 
 public class ImageLayers {
+
+    public static void setRender(Camera camera, double factor) {
+        int i;
+        Viewport[] vp = Displayer.getViewports();
+        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+            if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null)
+                layer.getView().render(camera, vp[i], factor);
+        }
+    }
 
     public static void arrangeMultiView(boolean multiview) {
         if (multiview) {
@@ -148,8 +159,7 @@ public class ImageLayers {
         ArrayList<HashMap<String, String>> layersData = new ArrayList<>();
         for (ImageLayer layer : LayersContainer.getImageLayers()) {
             if (layer.isEnabled()) {
-                id = layer.getImageData();
-                if (id == null)
+                if ((id = layer.getImageData()) == null)
                     continue;
 
                 m = id.getMetaData();

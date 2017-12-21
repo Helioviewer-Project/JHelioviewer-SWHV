@@ -84,12 +84,12 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public void unload() {
-        if (view == null) // not changing view
+        if (view.getURI() == null) // not changing view
             ImageViewerGui.getLayersContainer().removeLayer(this);
-        else {
-            worker = null;
-            Displayer.display();
-        }
+//        else {
+//            worker = null;
+//            Displayer.display();
+//        }
     }
 
     @Override
@@ -109,7 +109,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
-
         if (Displayer.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
@@ -346,7 +345,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public boolean isLoadedForState() {
-        return view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
+        return worker == null && view.getFrameCacheStatus(view.getMaximumFrameNumber()) != null;
     }
 
     private DownloadViewTask downloadTask;
