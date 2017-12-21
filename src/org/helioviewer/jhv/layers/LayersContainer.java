@@ -67,15 +67,6 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
         return view == null ? null : view.getImageLayer();
     }
 
-    public static void setRender(Camera camera, double factor) {
-        int i;
-        Viewport[] vp = Displayer.getViewports();
-        for (ImageLayer layer : getImageLayers()) {
-            if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null)
-                layer.getView().render(camera, vp[i], factor);
-        }
-    }
-
     private static CompositeList layers = new CompositeList();
     private static CompositeList newLayers = new CompositeList();
     private static final HashSet<Layer> removedLayers = new HashSet<>();
