@@ -10,7 +10,6 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -60,15 +59,6 @@ public class Layers {
 
     public static View getActiveView() {
         return activeView;
-    }
-
-    public static void setRender(Camera camera, double factor) {
-        int i;
-        Viewport[] vp = Displayer.getViewports();
-        for (View v : layers) {
-            if ((i = v.getImageLayer().isVisibleIdx()) != -1 && vp[i] != null)
-                v.render(camera, vp[i], factor);
-        }
     }
 
     static void setActiveView(View view) {

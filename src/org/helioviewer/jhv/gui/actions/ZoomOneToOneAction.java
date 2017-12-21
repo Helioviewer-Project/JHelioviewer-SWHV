@@ -10,9 +10,9 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.input.KeyShortcuts;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.LayersContainer;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 public class ZoomOneToOneAction extends AbstractAction {
@@ -28,8 +28,8 @@ public class ZoomOneToOneAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         MetaData m;
-        View view = Layers.getActiveView();
-        if (view != null && (m = view.getImageLayer().getMetaData()) != null) {
+        ImageLayer layer = LayersContainer.getActiveLayer();
+        if (layer != null && (m = layer.getMetaData()) != null) {
             Camera camera = Displayer.getCamera();
             double imageFraction = Displayer.getActiveViewport().height / (double) m.getPixelHeight();
             double fov = 2. * Math.atan2(0.5 * m.getPhysicalRegion().height * imageFraction, camera.getViewpoint().distance);

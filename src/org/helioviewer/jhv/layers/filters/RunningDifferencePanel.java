@@ -46,7 +46,7 @@ public class RunningDifferencePanel implements FilterDetails {
         JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
         metaButton.addActionListener(e -> {
-            MetaDataDialog dialog = new MetaDataDialog(layer.getView());
+            MetaDataDialog dialog = new MetaDataDialog(layer);
             dialog.showDialog();
         });
 
