@@ -231,7 +231,7 @@ public class LayersPanel extends JPanel {
                         setOptionsPanel(layer);
                     Displayer.render(1);
                 } else if (col == TITLE_COL && layer instanceof ImageLayer) {
-                    ((ImageLayer) layer).setActiveImageLayer();
+                    ImageLayers.setActiveImageLayer((ImageLayer) layer);
                 } else if (col == REMOVE_COL && layer.isDeletable()) {
                     layersContainer.removeLayer(layer);
                     int idx = grid.getSelectedRow();
