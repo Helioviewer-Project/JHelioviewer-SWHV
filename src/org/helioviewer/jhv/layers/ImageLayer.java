@@ -126,7 +126,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         setEnabled(true); // enable optionsPanel
         ImageViewerGui.getLayersPanel().setOptionsPanel(this);
 
-        view.setImageLayer(this);
         view.setDataHandler(this);
         Layers.addLayer(view);
 
@@ -140,7 +139,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         stopDownloadView();
         Layers.removeLayer(view);
         view.setDataHandler(null);
-        view.setImageLayer(null);
         view.abolish();
 
         imageData = prevImageData = baseImageData = null;

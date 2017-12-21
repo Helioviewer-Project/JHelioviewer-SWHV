@@ -21,15 +21,6 @@ import org.helioviewer.jhv.io.APIRequest;
 
 public class ImageLayers {
 
-    public static ImageLayer getActiveImageLayer() {
-        View view = Layers.getActiveView();
-        return view == null ? null : view.getImageLayer();
-    }
-
-    public static void setActiveImageLayer(ImageLayer layer) {
-        Layers.setActiveView(layer.getView());
-    }
-
     public static void setRender(Camera camera, double factor) {
         int i;
         Viewport[] vp = Displayer.getViewports();
@@ -116,7 +107,7 @@ public class ImageLayers {
     }
 
     public static void syncLayersSpan() {
-        ImageLayer activeLayer = getActiveImageLayer();
+        ImageLayer activeLayer = LayersContainer.getActiveImageLayer();
         if (activeLayer == null)
             return;
 
@@ -144,7 +135,7 @@ public class ImageLayers {
 
     public static void getSAMPMessage(Message msg) {
         ImageData id;
-        ImageLayer activeLayer = getActiveImageLayer();
+        ImageLayer activeLayer = LayersContainer.getActiveImageLayer();
         if (activeLayer == null || activeLayer.getAPIRequest() == null || (id = activeLayer.getImageData()) == null)
             return;
 

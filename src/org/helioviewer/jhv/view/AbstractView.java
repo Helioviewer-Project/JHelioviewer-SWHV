@@ -9,7 +9,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
@@ -18,8 +17,6 @@ import org.helioviewer.jhv.time.JHVDate;
 public class AbstractView implements View {
 
     private static final AtomicBoolean fullCache = new AtomicBoolean(true);
-
-    private ImageLayer imageLayer;
 
     private final APIRequest req;
     private final boolean isLocal;
@@ -150,16 +147,6 @@ public class AbstractView implements View {
             return builtinLUT;
         MetaData m = metaData[0];
         return m instanceof HelioviewerMetaData ? LUT.get((HelioviewerMetaData) m) : null;
-    }
-
-    @Override
-    public void setImageLayer(ImageLayer _imageLayer) {
-        imageLayer = _imageLayer;
-    }
-
-    @Override
-    public ImageLayer getImageLayer() {
-        return imageLayer;
     }
 
     protected ImageDataHandler dataHandler;

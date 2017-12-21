@@ -8,7 +8,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVDate;
 
@@ -34,9 +33,6 @@ public interface View {
     int getCurrentFrameNumber();
     int getMaximumFrameNumber();
     int getCurrentFramerate();
-
-    void setImageLayer(ImageLayer imageLayer);
-    ImageLayer getImageLayer();
 
     void setDataHandler(ImageDataHandler dataHandler);
 
