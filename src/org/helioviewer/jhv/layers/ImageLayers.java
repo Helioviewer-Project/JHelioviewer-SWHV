@@ -6,6 +6,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.view.View;
 
 ///
 
@@ -17,9 +18,17 @@ import org.astrogrid.samp.SampUtils;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.view.View;
 
 public class ImageLayers {
+
+    public static ImageLayer getActiveImageLayer() {
+        View view = Layers.getActiveView();
+        return view == null ? null : view.getImageLayer();
+    }
+
+    public static void setActiveImageLayer(ImageLayer layer) {
+        Layers.setActiveView(layer.getView());
+    }
 
     public static void setRender(Camera camera, double factor) {
         int i;
@@ -107,11 +116,11 @@ public class ImageLayers {
     }
 
     public static void syncLayersSpan() {
-        View activeView = Layers.getActiveView();
-        if (activeView == null)
+        ImageLayer activeLayer = getActiveImageLayer();
+        if (activeLayer == null)
             return;
 
-        APIRequest areq = activeView.getImageLayer().getAPIRequest();
+        APIRequest areq = activeLayer.getAPIRequest();
         long startTime, endTime;
         int cadence;
         if (areq != null) {
@@ -119,34 +128,31 @@ public class ImageLayers {
             endTime = areq.endTime;
             cadence = areq.cadence;
         } else {
-            startTime = activeView.getFirstTime().milli;
-            endTime = activeView.getLastTime().milli;
+            View view = activeLayer.getView();
+            startTime = view.getFirstTime().milli;
+            endTime = view.getLastTime().milli;
             cadence = ObservationDialog.getInstance().getObservationPanel().getCadence();
         }
 
         for (ImageLayer layer : LayersContainer.getImageLayers()) {
             APIRequest vreq = layer.getAPIRequest();
-            if (vreq != null && !layer.isActiveImageLayer()) {
+            if (vreq != null && layer != activeLayer) {
                 layer.load(new APIRequest(vreq.server, vreq.sourceId, startTime, endTime, cadence));
             }
         }
     }
 
     public static void getSAMPMessage(Message msg) {
-        View activeView = Layers.getActiveView();
-        if (activeView == null)
+        ImageData id;
+        ImageLayer activeLayer = getActiveImageLayer();
+        if (activeLayer == null || activeLayer.getAPIRequest() == null || (id = activeLayer.getImageData()) == null)
             return;
 
-        ImageLayer activeLayer = activeView.getImageLayer();
-        if (activeLayer.getAPIRequest() == null || activeLayer.getImageData() == null)
-            return;
-
-        ImageData id = activeLayer.getImageData();
+        View view = activeLayer.getView();
         MetaData m = id.getMetaData();
-
         msg.addParam("timestamp", m.getViewpoint().time.toString());
-        msg.addParam("start", activeView.getFirstTime().toString());
-        msg.addParam("end", activeView.getFirstTime().toString());
+        msg.addParam("start", view.getFirstTime().toString());
+        msg.addParam("end", view.getFirstTime().toString());
         msg.addParam("cadence", SampUtils.encodeLong(activeLayer.getAPIRequest().cadence * 1000L));
         msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
 

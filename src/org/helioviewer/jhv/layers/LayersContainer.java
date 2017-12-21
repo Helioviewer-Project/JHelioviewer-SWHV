@@ -13,7 +13,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.selector.Reorderable;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
-import org.helioviewer.jhv.view.View;
 
 import com.jogamp.opengl.GL2;
 
@@ -60,11 +59,6 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
             list1.add(index, (ImageLayer) e);
         }
 
-    }
-
-    public static ImageLayer getActiveLayer() {
-        View view = Layers.getActiveView();
-        return view == null ? null : view.getImageLayer();
     }
 
     private static CompositeList layers = new CompositeList();

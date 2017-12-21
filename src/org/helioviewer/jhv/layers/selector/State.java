@@ -14,6 +14,7 @@ import org.helioviewer.jhv.base.plugin.PluginManager;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersContainer;
@@ -55,7 +56,7 @@ public class State {
 
         JSONArray ji = new JSONArray();
         for (ImageLayer imageLayer : LayersContainer.getImageLayers()) {
-            ji.put(layer2json(imageLayer, imageLayer.isActiveImageLayer()));
+            ji.put(layer2json(imageLayer, imageLayer == ImageLayers.getActiveImageLayer()));
         }
         main.put("imageLayers", ji);
 
@@ -238,7 +239,7 @@ public class State {
             for (ImageLayer layer : newlist)
                 layer.unload(); // prune failed layers
             if (masterLayer != null)
-                masterLayer.setActiveImageLayer();
+                ImageLayers.setActiveImageLayer(masterLayer);
             Layers.setTime(time);
             ImageViewerGui.getToolBar().getTrackingButton().setSelected(tracking);
             if (play)

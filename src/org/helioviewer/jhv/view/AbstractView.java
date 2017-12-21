@@ -72,9 +72,11 @@ public class AbstractView implements View {
 
     @Override
     public void render(Camera camera, Viewport vp, double factor) {
-        imageData.setViewpoint(camera.getViewpoint());
-        if (dataHandler != null) {
-            dataHandler.handleData(imageData);
+        if (imageData != null) {
+            imageData.setViewpoint(camera.getViewpoint());
+            if (dataHandler != null) {
+                dataHandler.handleData(imageData);
+            }
         }
     }
 

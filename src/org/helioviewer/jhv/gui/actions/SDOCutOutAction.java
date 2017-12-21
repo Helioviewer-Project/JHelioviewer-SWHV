@@ -10,7 +10,6 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.LayersContainer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -39,7 +38,7 @@ public class SDOCutOutAction extends AbstractAction {
         url.append("&cadence=").append(ObservationDialog.getInstance().getObservationPanel().getCadence()).append("&cadenceUnits=s");
 
         ImageData id;
-        ImageLayer layer = LayersContainer.getActiveLayer();
+        ImageLayer layer = ImageLayers.getActiveImageLayer();
         if (layer != null && (id = layer.getImageData()) != null) {
             Region region = Region.scale(id.getRegion(), 1 / id.getMetaData().getUnitPerArcsec());
             url.append(String.format("&width=%.1f", region.width));

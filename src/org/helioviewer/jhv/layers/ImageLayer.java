@@ -276,14 +276,6 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         glImage.dispose(gl);
     }
 
-    public boolean isActiveImageLayer() {
-        return Layers.getActiveView() == view;
-    }
-
-    public void setActiveImageLayer() {
-        Layers.setActiveView(view);
-    }
-
     private ImageData imageData;
     private ImageData prevImageData;
     private ImageData baseImageData;
