@@ -11,7 +11,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.metadata.MetaData;
 
 @SuppressWarnings("serial")
@@ -28,7 +28,7 @@ public class ZoomOneToOneAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         MetaData m;
-        ImageLayer layer = LayersContainer.getActiveImageLayer();
+        ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null && (m = layer.getMetaData()) != null) {
             Camera camera = Displayer.getCamera();
             double imageFraction = Displayer.getActiveViewport().height / (double) m.getPixelHeight();

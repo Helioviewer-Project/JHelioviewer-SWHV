@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
@@ -57,7 +57,7 @@ public class UITimer {
 
             int f = 0;
             ImageLayer layer;
-            if (Movie.isPlaying() && (layer = LayersContainer.getActiveImageLayer()) != null) {
+            if (Movie.isPlaying() && (layer = Layers.getActiveImageLayer()) != null) {
                 f = layer.getView().getCurrentFramerate();
             }
 

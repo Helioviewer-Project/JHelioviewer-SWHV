@@ -34,7 +34,7 @@ import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.NEWTKeyAdapter;
 import org.helioviewer.jhv.input.NEWTMouseAdapter;
-import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -62,7 +62,7 @@ public class ImageViewerGui {
     private static FramerateStatusPanel framerateStatus;
 
     private static LayersPanel layersPanel;
-    private static LayersContainer layersContainer;
+    private static Layers layers;
 
     private static InteractionRotate rotationInteraction;
     private static InteractionPan panInteraction;
@@ -88,8 +88,8 @@ public class ImageViewerGui {
         MoviePanel.setAdvanced(false);
 
         // Layer control
-        layersContainer = new LayersContainer();
-        layersPanel = new LayersPanel(layersContainer);
+        layers = new Layers();
+        layersPanel = new LayersPanel(layers);
 
         leftPane.add("Image Layers", layersPanel, true);
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -220,8 +220,8 @@ public class ImageViewerGui {
         return framerateStatus;
     }
 
-    public static LayersContainer getLayersContainer() {
-        return layersContainer;
+    public static Layers getLayers() {
+        return layers;
     }
 
     public static LayersPanel getLayersPanel() {

@@ -34,7 +34,7 @@ class LoadThread extends JHVWorker<EVEResponse, Void> {
                 if (r != null) {
                     Band band = new Band(r.bandType == null ? BandType.getBandType(r.bandName) : r.bandType);
                     band.addToCache(r.values, r.dates);
-                    Timelines.getModel().addLayer(band);
+                    Timelines.getLayers().add(band);
                     if (r.dates.length > 0)
                         DrawController.setSelectedInterval(r.dates[0], r.dates[r.dates.length - 1]);
                 }

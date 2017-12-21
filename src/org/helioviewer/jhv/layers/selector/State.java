@@ -15,7 +15,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
-import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
@@ -47,15 +47,15 @@ public class State {
         main.put("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected());
 
         JSONArray ja = new JSONArray();
-        for (Layer layer : LayersContainer.getLayers()) {
+        for (Layer layer : Layers.getLayers()) {
             if (!(layer instanceof ImageLayer))
                 ja.put(layer2json(layer, false));
         }
         main.put("layers", ja);
 
         JSONArray ji = new JSONArray();
-        for (ImageLayer imageLayer : LayersContainer.getImageLayers()) {
-            ji.put(layer2json(imageLayer, imageLayer == LayersContainer.getActiveImageLayer()));
+        for (ImageLayer imageLayer : Layers.getImageLayers()) {
+            ji.put(layer2json(imageLayer, imageLayer == Layers.getActiveImageLayer()));
         }
         main.put("imageLayers", ji);
 
@@ -125,14 +125,14 @@ public class State {
                 }
             }
         }
-        Timelines.getModel().clear();
+        Timelines.getLayers().clear();
         for (TimelineLayer tl : newlist) {
-            Timelines.getModel().addLayer(tl);
+            Timelines.getLayers().add(tl);
         }
     }
 
     private static void loadLayers(JSONObject data) {
-        LayersContainer.removeAll();
+        Layers.clear();
 
         JSONArray rja = data.getJSONArray("layers");
         for (Object o : rja) {
@@ -142,7 +142,7 @@ public class State {
                     Object obj = json2Object(jo);
                     if (obj instanceof Layer) {
                         Layer layer = (Layer) obj;
-                        ImageViewerGui.getLayersContainer().addLayer(layer);
+                        ImageViewerGui.getLayers().add(layer);
                         layer.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
@@ -238,7 +238,7 @@ public class State {
             for (ImageLayer layer : newlist)
                 layer.unload(); // prune failed layers
             if (masterLayer != null)
-                LayersContainer.setActiveImageLayer(masterLayer);
+                Layers.setActiveImageLayer(masterLayer);
             Movie.setTime(time);
             ImageViewerGui.getToolBar().getTrackingButton().setSelected(tracking);
             if (play)

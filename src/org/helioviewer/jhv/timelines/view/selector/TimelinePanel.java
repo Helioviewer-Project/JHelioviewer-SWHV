@@ -197,7 +197,7 @@ public class TimelinePanel extends JPanel {
                         setOptionsPanel(timeline);
                     DrawController.graphAreaChanged();
                 } else if (col == REMOVE_COL && timeline.isDeletable()) {
-                    model.removeLayer(timeline);
+                    model.remove(timeline);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);

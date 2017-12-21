@@ -30,20 +30,20 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
-        Timelines.getModel().addLayer(etl);
+        Timelines.getLayers().add(etl);
         ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
 
         etl.cacheUpdated();
         swekData.cacheUpdated();
         Movie.addTimespanListener(swekData);
-        ImageViewerGui.getLayersContainer().addLayer(layer);
+        ImageViewerGui.getLayers().add(layer);
     }
 
     @Override
     public void uninstallPlugin() {
-        Timelines.getModel().removeLayer(etl);
-        ImageViewerGui.getLayersContainer().removeLayer(layer);
+        Timelines.getLayers().remove(etl);
+        ImageViewerGui.getLayers().remove(layer);
         Movie.removeTimespanListener(swekData);
 
         ImageViewerGui.getLeftContentPane().remove(swekPanel);

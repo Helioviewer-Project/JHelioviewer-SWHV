@@ -243,7 +243,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     public void fireTimeUpdated(JHVDate time) {
         timeString = time.toString();
         ImageViewerGui.getCarringtonStatusPanel().update(time);
-        ImageViewerGui.getLayersContainer().fireTimeUpdated(this);
+        ImageViewerGui.getLayers().fireTimeUpdated(this);
     }
 
     @Override

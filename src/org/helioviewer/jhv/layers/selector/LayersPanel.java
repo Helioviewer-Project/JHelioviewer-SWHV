@@ -36,7 +36,7 @@ import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
-import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererEnabled;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererLoading;
 import org.helioviewer.jhv.layers.selector.cellrenderer.RendererName;
@@ -115,7 +115,7 @@ public class LayersPanel extends JPanel {
 
     }
 
-    public LayersPanel(LayersContainer layersContainer) {
+    public LayersPanel(Layers model) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -125,7 +125,7 @@ public class LayersPanel extends JPanel {
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
 
-        grid = new LayersTable(layersContainer);
+        grid = new LayersTable(model);
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
@@ -226,14 +226,14 @@ public class LayersPanel extends JPanel {
 
                 if (col == ENABLED_COL) {
                     layer.setEnabled(!layer.isEnabled());
-                    layersContainer.updateCell(row, col);
+                    model.updateCell(row, col);
                     if (grid.getSelectedRow() == row)
                         setOptionsPanel(layer);
                     Displayer.render(1);
                 } else if (col == TITLE_COL && layer instanceof ImageLayer) {
-                    LayersContainer.setActiveImageLayer((ImageLayer) layer);
+                    Layers.setActiveImageLayer((ImageLayer) layer);
                 } else if (col == REMOVE_COL && layer.isDeletable()) {
-                    layersContainer.removeLayer(layer);
+                    model.remove(layer);
                     int idx = grid.getSelectedRow();
                     if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
