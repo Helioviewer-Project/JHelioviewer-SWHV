@@ -130,7 +130,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
             line.calculatePositions(gl, data, detail, fixedColor, radius);
 
             timeString = data.dateObs.toString();
-            ImageViewerGui.getLayersContainer().fireTimeUpdated(this);
+            ImageViewerGui.getLayers().fireTimeUpdated(this);
         }
         line.render(gl, aspect);
     }

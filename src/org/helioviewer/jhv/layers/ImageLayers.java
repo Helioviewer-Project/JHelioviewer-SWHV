@@ -24,7 +24,7 @@ public class ImageLayers {
     public static void setRender(Camera camera, double factor) {
         int i;
         Viewport[] vp = Displayer.getViewports();
-        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
             if ((i = layer.isVisibleIdx()) != -1 && vp[i] != null)
                 layer.getView().render(camera, vp[i], factor);
         }
@@ -33,14 +33,14 @@ public class ImageLayers {
     public static void arrangeMultiView(boolean multiview) {
         if (multiview) {
             int ct = 0;
-            for (ImageLayer layer : LayersContainer.getImageLayers()) {
+            for (ImageLayer layer : Layers.getImageLayers()) {
                 if (layer.isEnabled()) {
                     layer.setVisible(ct);
                     ct++;
                 }
             }
         } else {
-            for (ImageLayer layer : LayersContainer.getImageLayers()) {
+            for (ImageLayer layer : Layers.getImageLayers()) {
                 if (layer.isEnabled())
                     layer.setVisible(0);
             }
@@ -50,7 +50,7 @@ public class ImageLayers {
     }
 
     public static ImageLayer getImageLayerInViewport(int idx) {
-        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isVisible(idx))
                 return layer;
         }
@@ -59,7 +59,7 @@ public class ImageLayers {
 
     public static int getNumEnabledImageLayers() {
         int ct = 0;
-        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled())
                 ct++;
         }
@@ -69,7 +69,7 @@ public class ImageLayers {
     public static double getLargestPhysicalHeight() {
         double size = 0;
         MetaData m;
-        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled() && (m = layer.getMetaData()) != null) {
                 double newSize = m.getPhysicalRegion().height;
                 if (newSize > size)
@@ -82,7 +82,7 @@ public class ImageLayers {
     public static double getLargestPhysicalSize() {
         double size = 0;
         MetaData m;
-        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled() && (m = layer.getMetaData()) != null) {
                 Region r = m.getPhysicalRegion();
                 double newSize = Math.sqrt(r.height * r.height + r.width * r.width);
@@ -96,7 +96,7 @@ public class ImageLayers {
     public static String getSDOCutoutString() {
         StringBuilder str = new StringBuilder();
         MetaData m;
-        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled() && (m = layer.getMetaData()) instanceof HelioviewerMetaData) {
                 HelioviewerMetaData hm = (HelioviewerMetaData) m;
                 if (hm.getObservatory().contains("SDO") && hm.getInstrument().contains("AIA"))
@@ -107,7 +107,7 @@ public class ImageLayers {
     }
 
     public static void syncLayersSpan() {
-        ImageLayer activeLayer = LayersContainer.getActiveImageLayer();
+        ImageLayer activeLayer = Layers.getActiveImageLayer();
         if (activeLayer == null)
             return;
 
@@ -125,7 +125,7 @@ public class ImageLayers {
             cadence = ObservationDialog.getInstance().getObservationPanel().getCadence();
         }
 
-        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
             APIRequest vreq = layer.getAPIRequest();
             if (vreq != null && layer != activeLayer) {
                 layer.load(new APIRequest(vreq.server, vreq.sourceId, startTime, endTime, cadence));
@@ -135,7 +135,7 @@ public class ImageLayers {
 
     public static void getSAMPMessage(Message msg) {
         ImageData id;
-        ImageLayer activeLayer = LayersContainer.getActiveImageLayer();
+        ImageLayer activeLayer = Layers.getActiveImageLayer();
         if (activeLayer == null || activeLayer.getAPIRequest() == null || (id = activeLayer.getImageData()) == null)
             return;
 
@@ -154,7 +154,7 @@ public class ImageLayers {
         msg.addParam("cutout.h", SampUtils.encodeFloat(region.height));
 
         ArrayList<HashMap<String, String>> layersData = new ArrayList<>();
-        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+        for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled()) {
                 if ((id = layer.getImageData()) == null)
                     continue;

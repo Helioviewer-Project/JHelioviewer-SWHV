@@ -134,7 +134,7 @@ public class RadioData extends AbstractTimelineLayer {
         RadioJPXDownload(ArrayList<Long> _toDownload) {
             isDownloading++;
             toDownload = _toDownload;
-            Timelines.getModel().downloadStarted(RadioData.this);
+            Timelines.getLayers().downloadStarted(RadioData.this);
         }
 
         @Override
@@ -170,7 +170,7 @@ public class RadioData extends AbstractTimelineLayer {
                 for (DownloadedJPXData jp2Data : jpList) {
                     cache.put(jp2Data.getStartDate(), jp2Data);
                 }
-                Timelines.getModel().downloadFinished(RadioData.this);
+                Timelines.getLayers().downloadFinished(RadioData.this);
                 // DrawController.fireRedrawRequest();
                 requestForData();
             } catch (InterruptedException | ExecutionException e) {

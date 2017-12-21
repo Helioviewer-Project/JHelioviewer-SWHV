@@ -47,7 +47,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
-        ImageViewerGui.getLayersContainer().addLayer(imageLayer);
+        ImageViewerGui.getLayers().add(imageLayer);
         return imageLayer;
     }
 
@@ -86,7 +86,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     public void unload() {
         if (view.getURI() == null) // not changing view
-            ImageViewerGui.getLayersContainer().removeLayer(this);
+            ImageViewerGui.getLayers().remove(this);
 //        else {
 //            worker = null;
 //            Displayer.display();
@@ -129,7 +129,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
         view.setDataHandler(this);
         CameraHelper.zoomToFit(Displayer.getMiniCamera());
-        LayersContainer.setActiveImageLayer(this);
+        Layers.setActiveImageLayer(this);
         Movie.timespanChanged();
 
         if (Displayer.multiview) {
@@ -308,7 +308,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     @Override
     public void handleData(ImageData newImageData) {
         setImageData(newImageData);
-        ImageViewerGui.getLayersContainer().fireTimeUpdated(this);
+        ImageViewerGui.getLayers().fireTimeUpdated(this);
         Displayer.display();
     }
 

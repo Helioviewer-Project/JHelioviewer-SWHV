@@ -28,7 +28,7 @@ public class TimelineLayers extends AbstractTableModel {
         updateCell(layers.indexOf(tl), TimelinePanel.LOADING_COL);
     }
 
-    public void addLayer(TimelineLayer tl) {
+    public void add(TimelineLayer tl) {
         if (layers.contains(tl)) // avoid band duplication via file load
             return;
         layers.add(tl);
@@ -38,7 +38,7 @@ public class TimelineLayers extends AbstractTableModel {
         DrawController.graphAreaChanged();
     }
 
-    public void removeLayer(TimelineLayer tl) {
+    public void remove(TimelineLayer tl) {
         tl.remove();
         int row = layers.indexOf(tl);
         if (row == -1)

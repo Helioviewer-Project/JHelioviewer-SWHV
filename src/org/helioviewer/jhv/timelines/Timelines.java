@@ -25,10 +25,10 @@ public class Timelines implements MainContentPanelPlugin {
     private static final TimelinePanel timelinePanel = new TimelinePanel(layers);
 
     public Timelines() {
-        layers.addLayer(new RadioData(null));
+        layers.add(new RadioData(null));
     }
 
-    public static TimelineLayers getModel() {
+    public static TimelineLayers getLayers() {
         return layers;
     }
 

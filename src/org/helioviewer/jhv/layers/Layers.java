@@ -16,9 +16,8 @@ import org.helioviewer.jhv.layers.selector.LayersPanel;
 
 import com.jogamp.opengl.GL2;
 
-// to be merged with Layers
 @SuppressWarnings("serial")
-public class LayersContainer extends AbstractTableModel implements Reorderable {
+public class Layers extends AbstractTableModel implements Reorderable {
 
     private static class CompositeList extends AbstractList<Layer> {
 
@@ -88,11 +87,11 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
     private static ViewpointLayer viewpointLayer;
     private static MiniviewLayer miniviewLayer;
 
-    public LayersContainer() {
-        addLayer(new GridLayer(null));
-        addLayer(new ViewpointLayer(null));
-        addLayer(new TimestampLayer(null));
-        addLayer(new MiniviewLayer(null));
+    public Layers() {
+        add(new GridLayer(null));
+        add(new ViewpointLayer(null));
+        add(new TimestampLayer(null));
+        add(new MiniviewLayer(null));
     }
 
     public static GridLayer getGridLayer() {
@@ -107,7 +106,7 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
         return miniviewLayer;
     }
 
-    public void addLayer(Layer layer) {
+    public void add(Layer layer) {
         layers.add(layer);
         newLayers.add(layer);
 
@@ -123,7 +122,7 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
         Displayer.display(); // e.g., PFSS layer
     }
 
-    public void removeLayer(Layer layer) {
+    public void remove(Layer layer) {
         int row = layers.indexOf(layer);
         layers.remove(layer);
         removedLayers.add(layer);
@@ -260,7 +259,7 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
         return Collections.unmodifiableList(layers);
     }
 
-    public static void removeAll() {
+    public static void clear() {
         removedLayers.addAll(layers);
         layers = new CompositeList();
     }

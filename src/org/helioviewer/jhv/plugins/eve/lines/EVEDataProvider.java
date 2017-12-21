@@ -66,7 +66,7 @@ public class EVEDataProvider implements BandDataProvider {
             if (list.isEmpty())
                 downloadMap.remove(band);
         }
-        Timelines.getModel().downloadFinished(band);
+        Timelines.getLayers().downloadFinished(band);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class EVEDataProvider implements BandDataProvider {
             fj.cancel(true);
         }
         futureJobs.remove(band);
-        Timelines.getModel().downloadFinished(band);
+        Timelines.getLayers().downloadFinished(band);
     }
 
     @Override
