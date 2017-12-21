@@ -8,6 +8,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -127,7 +128,9 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         ImageViewerGui.getLayersPanel().setOptionsPanel(this);
 
         view.setDataHandler(this);
-        Layers.addLayer(view);
+        CameraHelper.zoomToFit(Displayer.getMiniCamera());
+        LayersContainer.setActiveImageLayer(this);
+        Layers.timespanChanged();
 
         if (Displayer.multiview) {
             ImageLayers.arrangeMultiView(true);
@@ -137,7 +140,8 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
 
     private void unsetView() {
         stopDownloadView();
-        Layers.removeLayer(view);
+
+        CameraHelper.zoomToFit(Displayer.getMiniCamera());
         view.setDataHandler(null);
         view.abolish();
 

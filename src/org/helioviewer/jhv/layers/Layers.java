@@ -2,7 +2,6 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.swing.Timer;
@@ -18,8 +17,6 @@ import org.helioviewer.jhv.view.View.AnimationMode;
 
 public class Layers {
 
-    private static final ArrayList<View> layers = new ArrayList<>();
-
     public static long getStartTime() {
         return movieStart.milli;
     }
@@ -30,8 +27,8 @@ public class Layers {
 
     private static JHVDate getMovieStart() {
         JHVDate min = null;
-        for (View view : layers) {
-            JHVDate d = view.getFirstTime();
+        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+            JHVDate d = layer.getView().getFirstTime();
             if (min == null || d.milli < min.milli) {
                 min = d;
             }
@@ -41,8 +38,8 @@ public class Layers {
 
     private static JHVDate getMovieEnd() {
         JHVDate max = null;
-        for (View view : layers) {
-            JHVDate d = view.getLastTime();
+        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+            JHVDate d = layer.getView().getLastTime();
             if (max == null || d.milli > max.milli) {
                 max = d;
             }
@@ -50,22 +47,7 @@ public class Layers {
         return max == null ? lastTimestamp : max;
     }
 
-    static void removeLayer(View view) {
-        layers.remove(view);
-
-        CameraHelper.zoomToFit(Displayer.getMiniCamera());
-        // timespanChanged();
-    }
-
-    static void addLayer(View view) {
-        layers.add(view);
-
-        CameraHelper.zoomToFit(Displayer.getMiniCamera());
-        timespanChanged();
-        setFrame(0);
-    }
-
-    private static void timespanChanged() {
+    static void timespanChanged() {
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
         for (TimespanListener ll : timespanListeners) {
@@ -162,8 +144,9 @@ public class Layers {
 
         Camera camera = Displayer.getCamera();
         camera.timeChanged(lastTimestamp);
-        for (View view : layers) {
-            view.setFrame(dateTime);
+
+        for (ImageLayer layer : LayersContainer.getImageLayers()) {
+            layer.getView().setFrame(dateTime);
         }
         Displayer.render(1);
 

@@ -55,7 +55,6 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
         @Override
         public boolean add(Layer e) {
             if (e instanceof ImageLayer) {
-                setActiveImageLayer((ImageLayer) e);
                 return list1.add((ImageLayer) e);
             }
             return list2.add(e);
