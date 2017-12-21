@@ -11,8 +11,10 @@ import javax.swing.table.AbstractTableModel;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.selector.Reorderable;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
+import org.helioviewer.jhv.view.View;
 
 import com.jogamp.opengl.GL2;
 
@@ -28,16 +30,21 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
 
         @Override
         public Layer get(int index) {
-            if (index < list1.size())
+            int size = list1.size();
+            if (index < size)
                 return list1.get(index);
-            return list2.get(index - list1.size());
+            return list2.get(index - size);
         }
 
         @Override
         public Layer remove(int index) {
-            if (index < list1.size())
+            int size = list1.size();
+            if (index < size) {
+                if (activeLayer == list1.get(index))
+                    setActiveImageLayer(size - 1 < 0 ? null : list1.get(size - 1));
                 return list1.remove(index);
-            return list2.remove(index - list1.size());
+            }
+            return list2.remove(index - size);
         }
 
         @Override
@@ -47,8 +54,10 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
 
         @Override
         public boolean add(Layer e) {
-            if (e instanceof ImageLayer)
+            if (e instanceof ImageLayer) {
+                setActiveImageLayer((ImageLayer) e);
                 return list1.add((ImageLayer) e);
+            }
             return list2.add(e);
         }
 
@@ -59,6 +68,28 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
             list1.add(index, (ImageLayer) e);
         }
 
+    }
+
+    private static ImageLayer activeLayer;
+
+    static void setMasterMovie(ImageLayer layer) {
+        View view;
+        if (layer == null || !(view = layer.getView()).isMultiFrame()) {
+            Layers.pauseMovie();
+            MoviePanel.unsetMovie();
+        } else
+            MoviePanel.setMovie(view);
+    }
+
+    public static ImageLayer getActiveImageLayer() {
+        return activeLayer;
+    }
+
+    public static void setActiveImageLayer(ImageLayer layer) {
+        if (layer != activeLayer) {
+            activeLayer = layer;
+            setMasterMovie(activeLayer);
+        }
     }
 
     private static CompositeList layers = new CompositeList();

@@ -2,8 +2,8 @@ package org.helioviewer.jhv.layers.selector.cellrenderer;
 
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.JHVTableCellRenderer;
-import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.LayersContainer;
 
 @SuppressWarnings("serial")
 public class RendererName extends JHVTableCellRenderer {
@@ -14,7 +14,7 @@ public class RendererName extends JHVTableCellRenderer {
             Layer layer = (Layer) value;
             String layerName = layer.getName();
             setText(layerName);
-            if (layer == ImageLayers.getActiveImageLayer()) {
+            if (layer == LayersContainer.getActiveImageLayer()) {
                 setToolTipText(layerName + " (master)");
                 setFont(UIGlobals.UIFontBold);
             } else {

@@ -18,7 +18,6 @@ import org.helioviewer.jhv.view.View.AnimationMode;
 
 public class Layers {
 
-    private static View activeView;
     private static final ArrayList<View> layers = new ArrayList<>();
 
     public static long getStartTime() {
@@ -37,7 +36,6 @@ public class Layers {
                 min = d;
             }
         }
-
         return min == null ? lastTimestamp : min;
     }
 
@@ -49,31 +47,7 @@ public class Layers {
                 max = d;
             }
         }
-
         return max == null ? lastTimestamp : max;
-    }
-
-    public static int getNumLayers() {
-        return layers.size();
-    }
-
-    static View getActiveView() {
-        return activeView;
-    }
-
-    static void setActiveView(View view) {
-        if (view != activeView) {
-            activeView = view;
-            setMasterMovie(view);
-        }
-    }
-
-    private static View getLayer(int index) {
-        try {
-            return layers.get(index);
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     static void removeLayer(View view) {
@@ -81,10 +55,6 @@ public class Layers {
 
         CameraHelper.zoomToFit(Displayer.getMiniCamera());
         // timespanChanged();
-
-        if (view == activeView) {
-            setActiveView(getLayer(layers.size() - 1));
-        }
     }
 
     static void addLayer(View view) {
@@ -92,8 +62,6 @@ public class Layers {
 
         CameraHelper.zoomToFit(Displayer.getMiniCamera());
         timespanChanged();
-
-        setActiveView(view);
         setFrame(0);
     }
 
@@ -116,8 +84,9 @@ public class Layers {
     private static class FrameTimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (activeView != null) {
-                JHVDate nextTime = activeView.getNextTime(animationMode, deltaT);
+            ImageLayer layer = LayersContainer.getActiveImageLayer();
+            if (layer != null) {
+                JHVDate nextTime = layer.getView().getNextTime(animationMode, deltaT);
                 if (nextTime == null)
                     pauseMovie();
                 else
@@ -126,20 +95,13 @@ public class Layers {
         }
     }
 
-    private static void setMasterMovie(View view) {
-        if (view == null || !view.isMultiFrame()) {
-            pauseMovie();
-            MoviePanel.unsetMovie();
-        } else
-            MoviePanel.setMovie(view);
-    }
-
     public static boolean isMoviePlaying() {
         return frameTimer.isRunning();
     }
 
     public static void playMovie() {
-        if (activeView != null && activeView.isMultiFrame()) {
+        ImageLayer layer = LayersContainer.getActiveImageLayer();
+        if (layer != null && layer.getView().isMultiFrame()) {
             frameTimer.restart();
             MoviePanel.setPlayState(true);
         }
@@ -160,26 +122,30 @@ public class Layers {
     }
 
     public static void setTime(JHVDate dateTime) {
-        if (activeView != null) {
-            syncTime(activeView.getFrameTime(dateTime));
+        ImageLayer layer = LayersContainer.getActiveImageLayer();
+        if (layer != null) {
+            syncTime(layer.getView().getFrameTime(dateTime));
         }
     }
 
     public static void setFrame(int frame) {
-        if (activeView != null) {
-            syncTime(activeView.getFrameTime(frame));
+        ImageLayer layer = LayersContainer.getActiveImageLayer();
+        if (layer != null) {
+            syncTime(layer.getView().getFrameTime(frame));
         }
     }
 
     public static void nextFrame() {
-        if (activeView != null) {
-            setFrame(activeView.getCurrentFrameNumber() + 1);
+        ImageLayer layer = LayersContainer.getActiveImageLayer();
+        if (layer != null) {
+            setFrame(layer.getView().getCurrentFrameNumber() + 1);
         }
     }
 
     public static void previousFrame() {
-        if (activeView != null) {
-            setFrame(activeView.getCurrentFrameNumber() - 1);
+        ImageLayer layer = LayersContainer.getActiveImageLayer();
+        if (layer != null) {
+            setFrame(layer.getView().getCurrentFrameNumber() - 1);
         }
     }
 
@@ -206,8 +172,9 @@ public class Layers {
             listener.timeChanged(lastTimestamp.milli);
         }
 
-        int activeFrame = activeView.getCurrentFrameNumber();
-        boolean last = activeFrame == activeView.getMaximumFrameNumber();
+        View view = LayersContainer.getActiveImageLayer().getView(); // should be not null
+        int activeFrame = view.getCurrentFrameNumber();
+        boolean last = activeFrame == view.getMaximumFrameNumber();
         for (FrameListener listener : frameListeners) {
             listener.frameChanged(activeFrame, last);
         }
