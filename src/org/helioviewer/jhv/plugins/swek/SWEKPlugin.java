@@ -9,7 +9,7 @@ import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.gui.EventPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONObject;
 
@@ -36,7 +36,7 @@ public class SWEKPlugin implements Plugin {
 
         etl.cacheUpdated();
         swekData.cacheUpdated();
-        Layers.addTimespanListener(swekData);
+        Movie.addTimespanListener(swekData);
         ImageViewerGui.getLayersContainer().addLayer(layer);
     }
 
@@ -44,7 +44,7 @@ public class SWEKPlugin implements Plugin {
     public void uninstallPlugin() {
         Timelines.getModel().removeLayer(etl);
         ImageViewerGui.getLayersContainer().removeLayer(layer);
-        Layers.removeTimespanListener(swekData);
+        Movie.removeTimespanListener(swekData);
 
         ImageViewerGui.getLeftContentPane().remove(swekPanel);
         ImageViewerGui.getLeftContentPane().revalidate();

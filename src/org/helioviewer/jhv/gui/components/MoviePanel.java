@@ -34,7 +34,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.input.KeyShortcuts;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
@@ -247,7 +247,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         animationModeComboBox = new JComboBox<>(new AnimationMode[]{AnimationMode.Loop, AnimationMode.Stop, AnimationMode.Swing});
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
-        animationModeComboBox.addActionListener(e -> Layers.setAnimationMode((AnimationMode) Objects.requireNonNull(animationModeComboBox.getSelectedItem())));
+        animationModeComboBox.addActionListener(e -> Movie.setAnimationMode((AnimationMode) Objects.requireNonNull(animationModeComboBox.getSelectedItem())));
         modePanel.add(animationModeComboBox);
 
         // Record
@@ -376,9 +376,9 @@ public class MoviePanel extends JPanel implements ChangeListener {
         int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
         SpeedUnit unit = (SpeedUnit) Objects.requireNonNull(speedUnitComboBox.getSelectedItem());
         if (unit == SpeedUnit.FRAMESPERSECOND) {
-            Layers.setDesiredRelativeSpeed(speed);
+            Movie.setDesiredRelativeSpeed(speed);
         } else {
-            Layers.setDesiredAbsoluteSpeed(speed * unit.secPerSecond);
+            Movie.setDesiredAbsoluteSpeed(speed * unit.secPerSecond);
         }
     }
 
@@ -392,7 +392,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
     @Override
     public void stateChanged(ChangeEvent e) {
         if (!timeSlider.getValueIsAdjusting())
-            Layers.setFrame(timeSlider.getValue());
+            Movie.setFrame(timeSlider.getValue());
     }
 
     // only for Layers
@@ -443,7 +443,7 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Layers.toggleMovie();
+            Movie.toggle();
             putValue(NAME, playButton.getToolTipText());
         }
 
@@ -460,9 +460,9 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (Layers.isMoviePlaying())
-                Layers.pauseMovie();
-            Layers.previousFrame();
+            if (Movie.isPlaying())
+                Movie.pause();
+            Movie.previousFrame();
         }
 
     }
@@ -478,9 +478,9 @@ public class MoviePanel extends JPanel implements ChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (Layers.isMoviePlaying())
-                Layers.pauseMovie();
-            Layers.nextFrame();
+            if (Movie.isPlaying())
+                Movie.pause();
+            Movie.nextFrame();
         }
 
     }

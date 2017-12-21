@@ -2,7 +2,7 @@ package org.helioviewer.jhv.base.scale;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -19,7 +19,7 @@ public interface Transform {
     class TransformPolar implements Transform {
         @Override
         public Vec2 transform(Vec3 pt, GridScale scale) {
-            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+            Position.L p = Sun.getEarth(Movie.getTime());
             Quat q = new Quat(p.lat, 0);
             pt = q.rotateInverseVector(pt);
             double r = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
@@ -38,7 +38,7 @@ public interface Transform {
             double y = r * Math.cos(theta);
             double x = r * Math.sin(theta);
             double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
-            Quat q = Sun.getEarthQuat(Layers.getLastUpdatedTimestamp()).orientation;
+            Quat q = Sun.getEarthQuat(Movie.getTime()).orientation;
             return q.rotateInverseVector(new Vec3(x, y, z));
         }
     }
@@ -48,7 +48,7 @@ public interface Transform {
         public Vec2 transform(Vec3 pt, GridScale scale) {
             double theta = Math.PI / 2 - Math.acos(-pt.y);
             double phi = Math.atan2(pt.x, pt.z);
-            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+            Position.L p = Sun.getEarth(Movie.getTime());
             phi -= Math.PI + p.lon;
             phi += 6 * Math.PI;
             phi %= 2 * Math.PI;

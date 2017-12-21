@@ -130,7 +130,7 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
         view.setDataHandler(this);
         CameraHelper.zoomToFit(Displayer.getMiniCamera());
         LayersContainer.setActiveImageLayer(this);
-        Layers.timespanChanged();
+        Movie.timespanChanged();
 
         if (Displayer.multiview) {
             ImageLayers.arrangeMultiView(true);

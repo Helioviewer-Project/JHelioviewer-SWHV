@@ -18,8 +18,8 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.view.View;
 
 /**
@@ -87,9 +87,9 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getWheelRotation() < 0)
-            Layers.nextFrame();
+            Movie.nextFrame();
         else if (e.getWheelRotation() > 0)
-            Layers.previousFrame();
+            Movie.previousFrame();
     }
 
     @Override
@@ -116,16 +116,16 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
 
     @Override
     public void mousePressed(MouseEvent e) {
-        wasPlaying = Layers.isMoviePlaying();
+        wasPlaying = Movie.isPlaying();
         if (wasPlaying)
-            Layers.pauseMovie();
+            Movie.pause();
         mouseDragged(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if (wasPlaying)
-            Layers.playMovie();
+            Movie.play();
     }
 
     /**

@@ -15,8 +15,8 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -39,8 +39,8 @@ public class State {
 
     private static JSONObject toJson() {
         JSONObject main = new JSONObject();
-        main.put("time", Layers.getLastUpdatedTimestamp());
-        main.put("play", Layers.isMoviePlaying());
+        main.put("time", Movie.getTime());
+        main.put("play", Movie.isPlaying());
         main.put("multiview", LayersPanel.multiview.isSelected());
         main.put("projection", Displayer.mode);
         main.put("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
@@ -176,7 +176,7 @@ public class State {
         LayersPanel.multiview.setSelected(data.optBoolean("multiview", LayersPanel.multiview.isSelected()));
         ImageViewerGui.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", ImageViewerGui.getToolBar().getShowCoronaButton().isSelected()));
 
-        JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Layers.getLastUpdatedTimestamp().milli));
+        JHVDate time = new JHVDate(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
         boolean tracking = data.optBoolean("tracking", ImageViewerGui.getToolBar().getTrackingButton().isSelected());
         boolean play = data.optBoolean("play", false);
         LoadState loadStateTask = new LoadState(newlist, masterLayer, time, tracking, play);
@@ -239,10 +239,10 @@ public class State {
                 layer.unload(); // prune failed layers
             if (masterLayer != null)
                 LayersContainer.setActiveImageLayer(masterLayer);
-            Layers.setTime(time);
+            Movie.setTime(time);
             ImageViewerGui.getToolBar().getTrackingButton().setSelected(tracking);
             if (play)
-                Layers.playMovie();
+                Movie.play();
         }
     }
 

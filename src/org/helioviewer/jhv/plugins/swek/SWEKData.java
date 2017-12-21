@@ -12,12 +12,12 @@ import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimespanListener;
 
 public class SWEKData implements TimespanListener, JHVEventHandler {
 
-    private static long startTime = Layers.getLastUpdatedTimestamp().milli;
+    private static long startTime = Movie.getTime().milli;
     private static long endTime = startTime;
 
     private void requestEvents(boolean force, long start, long end) {
@@ -40,7 +40,7 @@ public class SWEKData implements TimespanListener, JHVEventHandler {
 
     @Override
     public void cacheUpdated() {
-        requestEvents(true, Layers.getStartTime(), Layers.getEndTime());
+        requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
     }
 
     static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {

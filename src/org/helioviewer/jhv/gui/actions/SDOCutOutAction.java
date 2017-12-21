@@ -10,8 +10,8 @@ import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
@@ -27,11 +27,11 @@ public class SDOCutOutAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         StringBuilder url = new StringBuilder(baseURL);
 
-        long start = Layers.getStartTime();
+        long start = Movie.getStartTime();
         url.append("startDate=").append(TimeUtils.formatDate(start));
         url.append("&startTime=").append(TimeUtils.formatTime(start));
 
-        long end = Layers.getEndTime();
+        long end = Movie.getEndTime();
         url.append("&stopDate=").append(TimeUtils.formatDate(end));
         url.append("&stopTime=").append(TimeUtils.formatTime(end));
 

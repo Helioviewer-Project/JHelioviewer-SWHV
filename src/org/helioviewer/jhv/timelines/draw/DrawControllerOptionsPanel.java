@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.swing.JideToggleButton;
@@ -120,7 +120,7 @@ class DrawControllerOptionsPanel extends JPanel {
             computeZoomInterval(selectedInterval.end, (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
             break;
         case Movie:
-            DrawController.setSelectedInterval(Layers.getStartTime(), Layers.getEndTime());
+            DrawController.setSelectedInterval(Movie.getStartTime(), Movie.getEndTime());
             break;
         case CUSTOM:
         default:
