@@ -85,12 +85,8 @@ public class ImageLayer extends AbstractLayer implements ImageDataHandler {
     }
 
     public void unload() {
-        if (view.getURI() == null) // not changing view
+        if (view.getURI() == null)
             ImageViewerGui.getLayers().remove(this);
-//        else {
-//            worker = null;
-//            Displayer.display();
-//        }
     }
 
     @Override
