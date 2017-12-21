@@ -39,4 +39,9 @@ public class FITSView extends AbstractView {
         return xml;
     }
 
+    @Override
+    public boolean isComplete() {
+        return true;
+    }
+
 }

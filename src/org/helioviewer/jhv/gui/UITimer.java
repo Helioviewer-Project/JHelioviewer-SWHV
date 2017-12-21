@@ -9,6 +9,8 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
@@ -54,8 +56,9 @@ public class UITimer {
                 lazy.lazyRepaint();
 
             int f = 0;
-            if (Layers.isMoviePlaying()) {
-                f = Layers.getActiveView().getCurrentFramerate();
+            ImageLayer layer;
+            if (Layers.isMoviePlaying() && (layer = ImageLayers.getActiveImageLayer()) != null) {
+                f = layer.getView().getCurrentFramerate();
             }
 
             if (f != frameRate) {
