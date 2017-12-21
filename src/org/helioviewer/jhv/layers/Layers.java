@@ -57,7 +57,7 @@ public class Layers {
         return layers.size();
     }
 
-    public static View getActiveView() {
+    static View getActiveView() {
         return activeView;
     }
 

@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVDate;
@@ -39,8 +41,8 @@ public interface UpdateViewpoint {
 
         @Override
         public Position.Q update(JHVDate time) {
-            View view = Layers.getActiveView();
-            return view == null ? Sun.getEarthQuat(time) : view.getMetaData(time).getViewpoint();
+            ImageLayer layer = ImageLayers.getActiveImageLayer();
+            return layer == null ? Sun.getEarthQuat(time) : layer.getView().getMetaData(time).getViewpoint();
         }
     }
 
@@ -112,8 +114,9 @@ public interface UpdateViewpoint {
         public Position.Q update(JHVDate time) {
             long layerStart = 0, layerEnd = 0;
             // Active layer times
-            View view = Layers.getActiveView();
-            if (view != null) {
+            ImageLayer layer = ImageLayers.getActiveImageLayer();
+            if (layer != null) {
+                View view = layer.getView();
                 layerStart = view.getFirstTime().milli;
                 layerEnd = view.getLastTime().milli;
             }
@@ -154,8 +157,9 @@ public interface UpdateViewpoint {
 
             long layerStart = 0, layerEnd = 0;
             // Active layer times
-            View view = Layers.getActiveView();
-            if (view != null) {
+            ImageLayer layer = ImageLayers.getActiveImageLayer();
+            if (layer != null) {
+                View view = layer.getView();
                 layerStart = view.getFirstTime().milli;
                 layerEnd = view.getLastTime().milli;
             }
