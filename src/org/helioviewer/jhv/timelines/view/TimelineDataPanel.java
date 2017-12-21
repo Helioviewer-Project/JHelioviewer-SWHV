@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
@@ -68,7 +68,7 @@ public class TimelineDataPanel extends JPanel {
 
     void updateGroupValues() {
         if (!userSet)
-            calendarStartDate.setTime(Layers.getStartTime());
+            calendarStartDate.setTime(Movie.getStartTime());
 
         String selectedGroup = (String) comboBoxGroup.getSelectedItem();
         if (selectedGroup == null)
@@ -100,8 +100,8 @@ public class TimelineDataPanel extends JPanel {
         Timelines.getModel().addLayer(new Band(bandType));
 
         long time = calendarStartDate.getTime();
-        long movieStart = Layers.getStartTime();
-        long movieEnd = Layers.getEndTime();
+        long movieStart = Movie.getStartTime();
+        long movieEnd = Movie.getEndTime();
         if (time >= movieStart && time <= movieEnd) {
             DrawController.setSelectedInterval(movieStart, movieEnd);
         } else {

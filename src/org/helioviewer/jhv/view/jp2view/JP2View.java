@@ -19,7 +19,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.SubImage;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
@@ -249,13 +249,13 @@ public class JP2View extends AbstractView {
             break;
         case Swing:
             if (targetFrame == maxFrame) {
-                Layers.setAnimationMode(AnimationMode.SwingDown);
+                Movie.setAnimationMode(AnimationMode.SwingDown);
                 return metaData[targetFrame - 1].getViewpoint().time;
             }
             break;
         case SwingDown:
             if (targetFrame == 0) {
-                Layers.setAnimationMode(AnimationMode.Swing);
+                Movie.setAnimationMode(AnimationMode.Swing);
                 return metaData[1].getViewpoint().time;
             }
             return metaData[targetFrame - 1].getViewpoint().time;
@@ -404,7 +404,7 @@ public class JP2View extends AbstractView {
 
         int maxDim = Math.max(subImage.width, subImage.height);
         double adj = 1;
-        if (maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying() && !ImageViewerGui.getGLListener().isRecording()) {
+        if (maxDim > JHVGlobals.hiDpiCutoff && Movie.isPlaying() && !ImageViewerGui.getGLListener().isRecording()) {
             adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
             if (adj > 0.5)
                 adj = 1;
@@ -422,7 +422,7 @@ public class JP2View extends AbstractView {
         int level = res.level;
         AtomicBoolean status = cacheStatus.getFrameStatus(frame, level);
         boolean frameLevelComplete = status != null && status.get();
-        boolean priority = !frameLevelComplete && !Layers.isMoviePlaying();
+        boolean priority = !frameLevelComplete && !Movie.isPlaying();
 
         ImageParams params = new ImageParams(camera.getViewpoint(), subImage, res, frame, factor, priority);
         if (priority || (!frameLevelComplete && level < currentLevel)) {

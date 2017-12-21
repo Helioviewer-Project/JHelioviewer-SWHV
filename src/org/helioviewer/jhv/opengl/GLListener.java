@@ -10,9 +10,9 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersContainer;
 import org.helioviewer.jhv.layers.MiniviewLayer;
+import org.helioviewer.jhv.layers.Movie;
 
 import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
@@ -156,7 +156,7 @@ public class GLListener implements GLEventListener {
         if (miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
             Camera miniCamera = Displayer.getMiniCamera();
-            miniCamera.timeChanged(Layers.getLastUpdatedTimestamp());
+            miniCamera.timeChanged(Movie.getTime());
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             CameraHelper.applyPerspective(miniCamera, vp, gl);

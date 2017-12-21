@@ -10,8 +10,8 @@ import javax.swing.JCheckBox;
 import org.helioviewer.jhv.camera.object.SpaceObjectContainer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.DateTimePanel;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.TimespanListener;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
@@ -36,7 +36,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Timesp
 
         boolean sync = true;
         JSONArray ja = null;
-        long start = Layers.getLastUpdatedTimestamp().milli, end = start;
+        long start = Movie.getTime().milli, end = start;
         if (jo != null) {
             ja = jo.optJSONArray("objects");
             sync = jo.optBoolean("syncInterval", sync);
@@ -55,7 +55,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Timesp
 
         c.gridy = 1;
         syncCheckBox = new JCheckBox("Use movie time interval", sync);
-        syncCheckBox.addActionListener(e -> timespanChanged(Layers.getStartTime(), Layers.getEndTime()));
+        syncCheckBox.addActionListener(e -> timespanChanged(Movie.getStartTime(), Movie.getEndTime()));
         add(syncCheckBox, c);
 
         c.gridy = 2;
@@ -74,13 +74,13 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Timesp
 
     @Override
     void activate() {
-        Layers.addTimespanListener(this);
-        timespanChanged(Layers.getStartTime(), Layers.getEndTime());
+        Movie.addTimespanListener(this);
+        timespanChanged(Movie.getStartTime(), Movie.getEndTime());
     }
 
     @Override
     void deactivate() {
-        Layers.removeTimespanListener(this);
+        Movie.removeTimespanListener(this);
     }
 
     @Override

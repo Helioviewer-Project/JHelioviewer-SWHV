@@ -7,7 +7,7 @@ import javax.swing.JComponent;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.radio.RadioData;
 import org.helioviewer.jhv.timelines.view.TimelineDialog;
@@ -38,15 +38,15 @@ public class Timelines implements MainContentPanelPlugin {
         ImageViewerGui.getLeftContentPane().revalidate();
         ImageViewerGui.getMainContentPanel().addPlugin(this);
 
-        Layers.addTimeListener(dc);
-        Layers.addTimespanListener(dc);
+        Movie.addTimeListener(dc);
+        Movie.addTimespanListener(dc);
         JHVRelatedEvents.addHighlightListener(dc);
     }
 
     public void uninstallTimelines() {
         JHVRelatedEvents.removeHighlightListener(dc);
-        Layers.removeTimespanListener(dc);
-        Layers.removeTimeListener(dc);
+        Movie.removeTimespanListener(dc);
+        Movie.removeTimeListener(dc);
 
         ImageViewerGui.getMainContentPanel().removePlugin(this);
         ImageViewerGui.getLeftContentPane().remove(timelinePanel);

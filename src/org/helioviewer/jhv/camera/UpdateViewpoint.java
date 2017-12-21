@@ -7,8 +7,8 @@ import java.util.Set;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersContainer;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVDate;
 import org.helioviewer.jhv.view.View;
@@ -101,7 +101,7 @@ public interface UpdateViewpoint {
 
         @Override
         public void setLoadPosition(LoadPosition loadPosition) {
-            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+            Position.L p = Sun.getEarth(Movie.getTime());
             loadMap.put(loadPosition, new Position.L(p.time, p.rad, 0, /* -? */ p.lat));
         }
 

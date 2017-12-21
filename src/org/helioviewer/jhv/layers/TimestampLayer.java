@@ -50,7 +50,7 @@ public class TimestampLayer extends AbstractLayer {
         if (!isVisible[vp.idx])
             return;
 
-        String text = Layers.getLastUpdatedTimestamp().toString();
+        String text = Movie.getTime().toString();
         if (Displayer.multiview) {
             ImageLayer im = ImageLayers.getImageLayerInViewport(vp.idx);
             if (im != null) {

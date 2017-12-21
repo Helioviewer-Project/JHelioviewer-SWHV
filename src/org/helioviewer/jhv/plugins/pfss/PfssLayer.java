@@ -8,7 +8,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.AbstractLayer;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.plugins.pfss.data.PfssData;
@@ -49,7 +49,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
         if (!isVisible[vp.idx])
             return;
 
-        PfssData pfssData = PfssPlugin.getPfsscache().getNearestData(Layers.getLastUpdatedTimestamp().milli);
+        PfssData pfssData = PfssPlugin.getPfsscache().getNearestData(Movie.getTime().milli);
         if (pfssData != null) {
             renderData(gl, pfssData, vp.aspect);
             previousPfssData = pfssData;
@@ -103,12 +103,12 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     @Override
     public void init(GL2 gl) {
         line.init(gl);
-        Layers.addTimespanListener(this);
+        Movie.addTimespanListener(this);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        Layers.removeTimespanListener(this);
+        Movie.removeTimespanListener(this);
         previousPfssData = null;
         line.dispose(gl);
     }

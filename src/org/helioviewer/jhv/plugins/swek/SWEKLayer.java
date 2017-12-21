@@ -28,7 +28,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.AbstractLayer;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
@@ -460,12 +460,12 @@ public class SWEKLayer extends AbstractLayer {
         super.setEnabled(_enabled);
 
         if (_enabled) {
-            Layers.addTimeListener(controller);
-            controller.timeChanged(Layers.getLastUpdatedTimestamp().milli);
+            Movie.addTimeListener(controller);
+            controller.timeChanged(Movie.getTime().milli);
             ImageViewerGui.getInputController().addPlugin(controller);
         } else {
             ImageViewerGui.getInputController().removePlugin(controller);
-            Layers.removeTimeListener(controller);
+            Movie.removeTimeListener(controller);
         }
     }
 
@@ -486,7 +486,7 @@ public class SWEKLayer extends AbstractLayer {
     @Override
     public void dispose(GL2 gl) {
         ImageViewerGui.getInputController().removePlugin(controller);
-        Layers.removeTimeListener(controller);
+        Movie.removeTimeListener(controller);
 
         for (GLTexture el : iconCacheId.values())
             el.delete(gl);

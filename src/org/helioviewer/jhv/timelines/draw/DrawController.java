@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.event.JHVEventHighlightListener;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.time.JHVDate;
@@ -239,11 +239,9 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
     }
 
     public static void setMovieFrame(Point point) {
-        if (latestMovieTime == Long.MIN_VALUE || !graphArea.contains(point)) {
+        if (latestMovieTime == Long.MIN_VALUE || !graphArea.contains(point))
             return;
-        }
-        long millis = selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x);
-        Layers.setTime(new JHVDate(millis));
+        Movie.setTime(new JHVDate(selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x)));
     }
 
     @Override

@@ -11,10 +11,8 @@ import javax.swing.table.AbstractTableModel;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.selector.Reorderable;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
-import org.helioviewer.jhv.view.View;
 
 import com.jogamp.opengl.GL2;
 
@@ -71,15 +69,6 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
 
     private static ImageLayer activeLayer;
 
-    static void setMasterMovie(ImageLayer layer) {
-        View view;
-        if (layer == null || !(view = layer.getView()).isMultiFrame()) {
-            Layers.pauseMovie();
-            MoviePanel.unsetMovie();
-        } else
-            MoviePanel.setMovie(view);
-    }
-
     public static ImageLayer getActiveImageLayer() {
         return activeLayer;
     }
@@ -87,7 +76,7 @@ public class LayersContainer extends AbstractTableModel implements Reorderable {
     public static void setActiveImageLayer(ImageLayer layer) {
         if (layer != activeLayer) {
             activeLayer = layer;
-            setMasterMovie(activeLayer);
+            Movie.setMaster(activeLayer);
         }
     }
 

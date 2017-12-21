@@ -4,7 +4,7 @@ import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVDate;
 
 @SuppressWarnings("serial")
@@ -14,7 +14,7 @@ public class CarringtonStatusPanel extends StatusPanel.StatusPlugin implements L
     private JHVDate time;
 
     public CarringtonStatusPanel() {
-        update(Layers.getLastUpdatedTimestamp());
+        update(Movie.getTime());
         UITimer.register(this);
     }
 

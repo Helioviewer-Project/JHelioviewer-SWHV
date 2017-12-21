@@ -7,7 +7,6 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.time.JHVDate;
@@ -15,7 +14,16 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.View.AnimationMode;
 
-public class Layers {
+public class Movie {
+
+    static void setMaster(ImageLayer layer) {
+        View view;
+        if (layer == null || !(view = layer.getView()).isMultiFrame()) {
+            pause();
+            MoviePanel.unsetMovie();
+        } else
+            MoviePanel.setMovie(view);
+    }
 
     public static long getStartTime() {
         return movieStart.milli;
@@ -70,18 +78,18 @@ public class Layers {
             if (layer != null) {
                 JHVDate nextTime = layer.getView().getNextTime(animationMode, deltaT);
                 if (nextTime == null)
-                    pauseMovie();
+                    pause();
                 else
                     setTime(nextTime);
             }
         }
     }
 
-    public static boolean isMoviePlaying() {
+    public static boolean isPlaying() {
         return frameTimer.isRunning();
     }
 
-    public static void playMovie() {
+    public static void play() {
         ImageLayer layer = LayersContainer.getActiveImageLayer();
         if (layer != null && layer.getView().isMultiFrame()) {
             frameTimer.restart();
@@ -89,18 +97,17 @@ public class Layers {
         }
     }
 
-    public static void pauseMovie() {
+    public static void pause() {
         frameTimer.stop();
         MoviePanel.setPlayState(false);
         Displayer.render(1); /* ! force update for on the fly resolution change */
     }
 
-    public static void toggleMovie() {
-        if (isMoviePlaying()) {
-            pauseMovie();
-        } else {
-            playMovie();
-        }
+    public static void toggle() {
+        if (isPlaying())
+            pause();
+        else
+            play();
     }
 
     public static void setTime(JHVDate dateTime) {
@@ -135,7 +142,7 @@ public class Layers {
     private static JHVDate movieStart = TimeUtils.EPOCH;
     private static JHVDate movieEnd = TimeUtils.EPOCH;
 
-    public static JHVDate getLastUpdatedTimestamp() {
+    public static JHVDate getTime() {
         return lastTimestamp;
     }
 

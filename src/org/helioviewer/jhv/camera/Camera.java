@@ -3,7 +3,7 @@ package org.helioviewer.jhv.camera;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVDate;
@@ -41,7 +41,7 @@ public class Camera {
     }
 
     public void refresh() {
-        updateCamera(Layers.getLastUpdatedTimestamp());
+        updateCamera(Movie.getTime());
         Displayer.render(1);
     }
 
@@ -49,7 +49,7 @@ public class Camera {
         currentTranslation.clear();
         currentDragRotation = Quat.ZERO;
 
-        updateCamera(Layers.getLastUpdatedTimestamp());
+        updateCamera(Movie.getTime());
         CameraHelper.zoomToFit(this);
         Displayer.render(1);
     }

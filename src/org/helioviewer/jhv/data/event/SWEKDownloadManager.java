@@ -18,7 +18,7 @@ import org.helioviewer.jhv.data.cache.JHVEventCacheRequestHandler;
 import org.helioviewer.jhv.data.gui.SWEKTreeModel;
 import org.helioviewer.jhv.data.gui.filter.FilterManager;
 import org.helioviewer.jhv.data.gui.filter.FilterManagerListener;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.threads.JHVThread;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -137,7 +137,7 @@ public class SWEKDownloadManager implements FilterManagerListener, JHVEventCache
     private static class ComparePriority<T extends SWEKDownloadWorker> implements Comparator<T> {
         @Override
         public int compare(T l1, T l2) {
-            long start = Layers.getStartTime();
+            long start = Movie.getStartTime();
             long d1 = l1.getRequestInterval().end - start;
             long d2 = l2.getRequestInterval().end - start;
             return d1 == d2 ? 0 : (d1 < d2 ? 1 : -1);

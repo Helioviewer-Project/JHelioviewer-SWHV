@@ -18,7 +18,7 @@ import java.util.GregorianCalendar;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -98,8 +98,8 @@ public class ChartDrawIntervalPane extends JComponent implements DrawListener, M
     }
 
     private void drawMovieInterval(Graphics2D g, TimeAxis availableInterval) {
-        long movieStart = Layers.getStartTime();
-        long movieEnd = Layers.getEndTime();
+        long movieStart = Movie.getStartTime();
+        long movieEnd = Movie.getEndTime();
 
         if (movieEnd < availableInterval.start || movieStart > availableInterval.end) {
             return;

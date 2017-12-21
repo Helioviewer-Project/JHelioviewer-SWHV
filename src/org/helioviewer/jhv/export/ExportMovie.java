@@ -16,7 +16,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
 import org.helioviewer.jhv.layers.FrameListener;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -131,9 +131,9 @@ public class ExportMovie implements FrameListener {
             }
 
             if (mode == RecordMode.LOOP) {
-                Layers.addFrameListener(instance);
-                Layers.setFrame(0);
-                Layers.playMovie();
+                Movie.addFrameListener(instance);
+                Movie.setFrame(0);
+                Movie.play();
             }
         }
     }
@@ -143,7 +143,7 @@ public class ExportMovie implements FrameListener {
             stopped = true;
 
             if (mode == RecordMode.LOOP)
-                Layers.removeFrameListener(instance);
+                Movie.removeFrameListener(instance);
             if (mode != RecordMode.FREE)
                 MoviePanel.clickRecordButton();
             Displayer.display(); // force detach
