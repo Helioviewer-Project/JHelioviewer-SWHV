@@ -23,7 +23,7 @@ public class TimeUtils {
     public static final long DAY_IN_MILLIS = 86400000;
     public static final long MINUTE_IN_MILLIS = 60000;
 
-    public static final JHVDate EPOCH = new JHVDate("2000-01-01T00:00:00");
+    public static final JHVDate START = new JHVDate(System.currentTimeMillis());
     public static final JHVDate MINIMAL_DATE = new JHVDate("1970-01-01T00:00:00");
     public static final JHVDate MAXIMAL_DATE = new JHVDate("2050-01-01T00:00:00");
 

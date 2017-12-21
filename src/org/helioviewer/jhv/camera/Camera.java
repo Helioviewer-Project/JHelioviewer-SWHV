@@ -24,7 +24,7 @@ public class Camera {
 
     private boolean tracking;
 
-    private Position.Q viewpoint = Sun.EpochEarthQ;
+    private Position.Q viewpoint = Sun.StartEarthQ;
 
     private void updateCamera(JHVDate time) {
         viewpoint = Displayer.getUpdateViewpoint().update(time);

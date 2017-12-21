@@ -138,9 +138,9 @@ public class Movie {
         }
     }
 
-    private static JHVDate lastTimestamp = TimeUtils.EPOCH;
-    private static JHVDate movieStart = TimeUtils.EPOCH;
-    private static JHVDate movieEnd = TimeUtils.EPOCH;
+    private static JHVDate lastTimestamp = TimeUtils.START;
+    private static JHVDate movieStart = TimeUtils.START;
+    private static JHVDate movieEnd = TimeUtils.START;
 
     public static JHVDate getTime() {
         return lastTimestamp;

@@ -16,8 +16,8 @@ public abstract class AbstractMetaData implements MetaData {
     double unitPerArcsec = Double.NaN;
     double responseFactor = 1;
 
-    Position.L viewpointL = Sun.EpochEarthL;
-    Position.Q viewpoint = Sun.EpochEarthQ;
+    Position.L viewpointL = Sun.StartEarthL;
+    Position.Q viewpoint = Sun.StartEarthQ;
     double innerRadius = 0;
     double outerRadius = Double.MAX_VALUE;
     double crota;

@@ -38,8 +38,11 @@ public class Sun {
     public static final double RadiusFactor_6173 = MeanEarthDistance * Math.tan(959.57 / 3600 * Math.PI / 180);
     public static final double RadiusFactor_6562 = MeanEarthDistance * Math.tan(960.017 / 3600 * Math.PI / 180);
 
-    public static final Position.L EpochEarthL;
-    public static final Position.Q EpochEarthQ;
+    private static final JHVDate EPOCH = new JHVDate("2000-01-01T00:00:00");
+    private static final Position.L EpochEarthL;
+
+    public static final Position.L StartEarthL;
+    public static final Position.Q StartEarthQ;
 
     private static final LoadingCache<JHVDate, Position.L> cache = CacheBuilder.newBuilder().maximumSize(10000).
         build(new CacheLoader<JHVDate, Position.L>() {
@@ -50,8 +53,9 @@ public class Sun {
         });
 
     static {
-        EpochEarthL = getEarth(TimeUtils.EPOCH);
-        EpochEarthQ = getEarthQuat(TimeUtils.EPOCH);
+        EpochEarthL = getEarth(EPOCH);
+        StartEarthL = getEarth(TimeUtils.START);
+        StartEarthQ = getEarthQuat(TimeUtils.START);
     }
 
     public static Position.L getEarth(JHVDate time) {
@@ -110,7 +114,7 @@ public class Sun {
         return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / Carrington.CR_SIDEREAL); // rad
     }
 
-    private static final double theta0 = sunRot(JulianDay.milli2mjd(TimeUtils.EPOCH.milli));
+    private static final double theta0 = sunRot(JulianDay.milli2mjd(EPOCH.milli));
 
     public static Quat getHCI(JHVDate time) {
         // 1.7381339560109783
