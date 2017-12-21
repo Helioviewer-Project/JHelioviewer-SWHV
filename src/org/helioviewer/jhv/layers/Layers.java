@@ -37,9 +37,12 @@ public class Layers extends AbstractTableModel implements Reorderable {
         public Layer remove(int index) {
             int size = list1.size();
             if (index < size) {
-                if (activeLayer == list1.get(index))
-                    setActiveImageLayer(size - 1 < 0 ? null : list1.get(size - 1));
-                return list1.remove(index);
+                Layer ret = list1.remove(index);
+                if (ret == activeLayer) {
+                    size = list1.size();
+                    setActiveImageLayer(size == 0 ? null : list1.get(size - 1));
+                }
+                return ret;
             }
             return list2.remove(index - size);
         }
