@@ -17,6 +17,8 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.interfaces.LazyComponent;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.view.View;
 
@@ -158,11 +160,12 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
             g.setStroke(thickStroke);
 
             int y = slider.getSize().height / 2;
-            View view = Layers.getActiveView();
-            if (view == null) {
+            View view;
+            ImageLayer layer = ImageLayers.getActiveImageLayer();
+            if (layer == null) {
                 g.setColor(notCachedColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
-            } else if (view.isComplete()){
+            } else if ((view = layer.getView()).isComplete()){
                 g.setColor(completeCachedColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else {

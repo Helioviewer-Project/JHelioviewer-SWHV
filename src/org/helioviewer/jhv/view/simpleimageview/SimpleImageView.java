@@ -34,4 +34,9 @@ public class SimpleImageView extends AbstractView {
         imageData.setMetaData(metaData[0]);
     }
 
+    @Override
+    public boolean isComplete() {
+        return true;
+    }
+
 }
