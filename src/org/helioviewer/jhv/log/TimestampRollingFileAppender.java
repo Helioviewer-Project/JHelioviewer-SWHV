@@ -73,6 +73,7 @@ public class TimestampRollingFileAppender extends FileAppender {
      * Deletes old log files older than the specified maximum age and calls
      * underlying org.apache.log4j.FileAppender.activateOptions()
      */
+    @Override
     public void activateOptions() {
         Date timeStamp;
         try {
@@ -113,7 +114,6 @@ public class TimestampRollingFileAppender extends FileAppender {
             new File(getFile()).delete();
             closeFile();
         }
-
     }
 
 }

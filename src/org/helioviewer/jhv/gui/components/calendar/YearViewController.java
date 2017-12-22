@@ -20,6 +20,7 @@ public class YearViewController implements CalendarViewController {
      * <p>
      * A period of 10 years will be added to the current date.
      */
+    @Override
     public Date moveForward() {
         calendar.add(Calendar.YEAR, 10);
         return calendar.getTime();
@@ -30,6 +31,7 @@ public class YearViewController implements CalendarViewController {
      * <p>
      * A period of 10 years will be removed from the current date.
      */
+    @Override
     public Date moveBack() {
         calendar.add(Calendar.YEAR, -10);
         return calendar.getTime();
@@ -38,6 +40,7 @@ public class YearViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getSelectionButtonText() {
         int currentYear = calendar.get(Calendar.YEAR);
         return Integer.toString(currentYear - 6) + " - " + Integer.toString(currentYear + 5);
@@ -46,6 +49,7 @@ public class YearViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getDate() {
         return calendar.getTime();
     }
@@ -56,6 +60,7 @@ public class YearViewController implements CalendarViewController {
      * The column headers are numbered serially but this numbers represent no
      * special meaning (except uniqueness).
      */
+    @Override
     public String[] getGridColumnHeader() {
         String[] names = new String[4];
 
@@ -71,6 +76,7 @@ public class YearViewController implements CalendarViewController {
      * Returns a 2 dimensional array where all years of the 12 years time period
      * are placed.
      */
+    @Override
     public Object[][] getGridData() {
         Object[][] data = new Object[3][4];
         int year = calendar.get(Calendar.YEAR) - 6;
@@ -85,6 +91,7 @@ public class YearViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Point getCorrespondingCellOfCurrentDate() {
         return new Point(1, 2);
     }
@@ -92,6 +99,7 @@ public class YearViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDateOfCellValue(Object value) {
         if (value instanceof Integer) {
             calendar.set(Calendar.YEAR, (Integer) value);
@@ -101,6 +109,7 @@ public class YearViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDate(Date date) {
         calendar.setTime(date);
     }

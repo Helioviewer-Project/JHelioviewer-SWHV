@@ -50,6 +50,7 @@ public class ChunkedInputStream extends TransferInputStream {
     }
 
     // Returns the length of the payload read
+    @Override
     public int getTotalLength() {
         return totalLength;
     }

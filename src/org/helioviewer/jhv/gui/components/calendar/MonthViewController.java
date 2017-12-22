@@ -22,6 +22,7 @@ public class MonthViewController implements CalendarViewController {
      * <p>
      * A period of one year will be added to the current date.
      */
+    @Override
     public Date moveForward() {
         calendar.add(Calendar.YEAR, 1);
         return calendar.getTime();
@@ -32,6 +33,7 @@ public class MonthViewController implements CalendarViewController {
      * <p>
      * A period of one year will be removed from the current date.
      */
+    @Override
     public Date moveBack() {
         calendar.add(Calendar.YEAR, -1);
         return calendar.getTime();
@@ -40,6 +42,7 @@ public class MonthViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getSelectionButtonText() {
         return dateFormat.format(calendar.getTime());
     }
@@ -47,6 +50,7 @@ public class MonthViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getDate() {
         return calendar.getTime();
     }
@@ -57,6 +61,7 @@ public class MonthViewController implements CalendarViewController {
      * The column headers are numbered serially but this numbers represent no
      * special meaning (except uniqueness).
      */
+    @Override
     public String[] getGridColumnHeader() {
         String[] names = new String[4];
 
@@ -71,6 +76,7 @@ public class MonthViewController implements CalendarViewController {
      * <p>
      * Returns a 2 dimensional array where all month of a year are placed.
      */
+    @Override
     public Object[][] getGridData() {
         // get short names of the months
         String[] months = new DateFormatSymbols().getShortMonths();
@@ -87,6 +93,7 @@ public class MonthViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Point getCorrespondingCellOfCurrentDate() {
         return new Point(calendar.get(Calendar.MONTH) / 4, calendar.get(Calendar.MONTH) % 4);
     }
@@ -94,6 +101,7 @@ public class MonthViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDateOfCellValue(Object value) {
         if (value instanceof String) {
             String[] months = new DateFormatSymbols().getShortMonths();
@@ -109,6 +117,7 @@ public class MonthViewController implements CalendarViewController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDate(Date date) {
         calendar.setTime(date);
     }
