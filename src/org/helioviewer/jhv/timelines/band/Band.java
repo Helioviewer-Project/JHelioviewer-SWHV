@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +41,7 @@ public class Band extends AbstractTimelineLayer {
         optionsPanel = new BandOptionPanel(this);
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), bandType.getUnitLabel(), bandType.isLogScale());
         graphColor = BandColors.getNextColor();
+        fillWarnLevels();
     }
 
     public Band(JSONObject jo) throws Exception {
@@ -60,6 +59,18 @@ public class Band extends AbstractTimelineLayer {
             int g = MathUtils.clip(jcolor.optInt("g", 0), 0, 255);
             int b = MathUtils.clip(jcolor.optInt("b", 0), 0, 255);
             graphColor = new Color(r, g, b);
+        }
+        fillWarnLevels();
+    }
+
+    private void fillWarnLevels() {
+        Map<String, Double> unconvertedWarnLevels = bandType.getWarnLevels();
+        int i = 0, size = unconvertedWarnLevels.size();
+        warnLevels = new int[size];
+        warnLabels = new String[size];
+        for (String label : unconvertedWarnLevels.keySet()) {
+            warnLabels[i] = label;
+            i++;
         }
     }
 
@@ -167,14 +178,9 @@ public class Band extends AbstractTimelineLayer {
     }
 
     private void updateWarnLevels(Rectangle graphArea) {
-        LinkedList<Integer> _warnLevels = new LinkedList<>();
-        LinkedList<String> _warnLabels = new LinkedList<>();
-        HashMap<String, Double> unconvertedWarnLevels = bandType.getWarnLevels();
-        for (Map.Entry<String, Double> pairs : unconvertedWarnLevels.entrySet()) {
-            _warnLevels.add(yAxis.value2pixel(graphArea.y, graphArea.height, pairs.getValue()));
-            _warnLabels.add(pairs.getKey());
-        }
-        setWarn(_warnLevels, _warnLabels);
+        Map<String, Double> unconvertedWarnLevels = bandType.getWarnLevels();
+        for (int i = 0; i < warnLabels.length; i++)
+            warnLevels[i] = yAxis.value2pixel(graphArea.y, graphArea.height, unconvertedWarnLevels.get(warnLabels[i]));
     }
 
     private void updateGraphsData() {
@@ -195,22 +201,6 @@ public class Band extends AbstractTimelineLayer {
             return GOESLevel.getStringValue(val);
         } else {
             return DrawConstants.valueFormatter.format(yAxis.scale(val));
-        }
-    }
-
-    private void setWarn(LinkedList<Integer> _warnLevels, LinkedList<String> _warnLabels) {
-        int numberOfWarnLevels = _warnLevels.size();
-        warnLevels = new int[numberOfWarnLevels];
-        warnLabels = new String[numberOfWarnLevels];
-        int counter = 0;
-        for (Integer warnLevel : _warnLevels) {
-            warnLevels[counter] = warnLevel;
-            counter++;
-        }
-        counter = 0;
-        for (String warnLabel : _warnLabels) {
-            warnLabels[counter] = warnLabel;
-            counter++;
         }
     }
 
