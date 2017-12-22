@@ -10,11 +10,8 @@ import org.helioviewer.jhv.view.fitsview.FITSView;
 
 class LoadFITSTask extends LoadURITask {
 
-    private final URI uri;
-
     LoadFITSTask(ImageLayer _imageLayer, URI _uri) {
-        super(_imageLayer, null);
-        uri = _uri;
+        super(_imageLayer, _uri);
         setThreadName("MAIN--LoadFITS");
     }
 

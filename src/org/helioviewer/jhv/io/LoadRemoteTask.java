@@ -29,7 +29,6 @@ public class LoadRemoteTask extends LoadURITask {
             Message.err("An error occured while opening the remote file: ", e.getMessage(), false);
         } catch (InterruptedException ignore) {
         }
-
         return null;
     }
 
