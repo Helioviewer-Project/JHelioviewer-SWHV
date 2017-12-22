@@ -8,7 +8,11 @@ public class PfssCache {
     private final TreeMap<Long, SoftReference<PfssData>> map = new TreeMap<>();
 
     private PfssData get(Long time) {
-        PfssData ret = map.get(time).get();
+        SoftReference<PfssData> ref = map.get(time);
+        if (ref == null)
+            return null;
+
+        PfssData ret = ref.get();
         if (ret == null)
             map.remove(time); // mark as collected
         return ret;
