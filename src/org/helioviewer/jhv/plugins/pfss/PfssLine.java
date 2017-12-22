@@ -45,7 +45,7 @@ class PfssLine {
         brightColor[3] = 1;
     }
 
-    private double decode(short f) {
+    private static double decode(short f) {
         return (f + 32768.) * (2. / 65535.) - 1.;
     }
 

@@ -64,12 +64,12 @@ public class Timelines implements MainContentPanelPlugin {
         return pluginPanes;
     }
 
-    public void saveState(JSONObject jo) {
-        dc.saveState(jo);
+    public static void saveState(JSONObject jo) {
+        DrawController.saveState(jo);
     }
 
-    public void loadState(JSONObject jo) {
-        dc.loadState(jo);
+    public static void loadState(JSONObject jo) {
+        DrawController.loadState(jo);
     }
 
 }

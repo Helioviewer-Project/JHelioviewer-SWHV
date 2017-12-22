@@ -34,7 +34,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         setSelectedInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
     }
 
-    public void saveState(JSONObject jo) {
+    public static void saveState(JSONObject jo) {
         JSONObject js = new JSONObject();
         js.put("startTime", TimeUtils.format(selectedAxis.start));
         js.put("endTime", TimeUtils.format(selectedAxis.end));
@@ -42,7 +42,7 @@ public class DrawController implements JHVEventHighlightListener, TimeListener, 
         jo.put("locked", isLocked);
     }
 
-    public void loadState(JSONObject jo) {
+    public static void loadState(JSONObject jo) {
         JSONObject js = jo.optJSONObject("selectedAxis");
         if (js != null) {
             long t = System.currentTimeMillis();
