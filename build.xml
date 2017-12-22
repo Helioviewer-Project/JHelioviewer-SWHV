@@ -35,6 +35,18 @@
         </javac>
     </target>
 
+    <target name="prone">
+        <mkdir dir="${bin}"/>
+        <javac srcdir="${src}" destdir="${bin}" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter" debug="true" includeantruntime="false" encoding="utf-8">
+            <compilerclasspath>
+                <pathelement location="shared/error_prone_ant-2.1.3.jar"/>
+            </compilerclasspath>
+            <classpath>
+                <fileset refid="libfiles"/>
+            </classpath>
+        </javac>
+    </target>
+
     <target name="jar" depends="compile">
         <copy file="sentry.properties" tofile="${bin}/sentry.properties"/>
         <replace file="${bin}/sentry.properties" token="@@DSN" value="${DSN}"/>
