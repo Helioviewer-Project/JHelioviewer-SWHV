@@ -21,6 +21,7 @@ public class FixedSizedInputStream extends TransferInputStream {
         in = _in;
     }
 
+    @Override
     public int getTotalLength() {
         return expectedBytes - remainingBytes;
     }

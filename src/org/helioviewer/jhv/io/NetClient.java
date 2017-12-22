@@ -16,7 +16,7 @@ public interface NetClient extends AutoCloseable {
     Reader getReader();
     BufferedSource getSource();
     long getContentLength();
-    void close() throws IOException;
+    @Override void close() throws IOException;
 
     static NetClient of(String uri) throws IOException {
         try {

@@ -84,6 +84,8 @@ import sun.awt.AppContext;
         Runnable shutdownHook =
             new Runnable() {
                 final WeakReference<ExecutorService> executorServiceRef = new WeakReference<>(es);
+
+                @Override
                 public void run() {
                     ExecutorService executorService = executorServiceRef.get();
                     if (executorService != null) {

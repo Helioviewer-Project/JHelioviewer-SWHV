@@ -174,6 +174,7 @@ class FITSImage {
                 lut[i] = (short) (scale * i + .5);
         }
 
+        @Override
         double getGamma() {
             return GAMMA;
         }
@@ -196,6 +197,7 @@ class FITSImage {
                 lut[i] = (short) (scale * Math.log1p(i) + .5);
         }
 
+        @Override
         double getGamma() {
             return 1;
         }
@@ -217,6 +219,7 @@ class FITSImage {
                 lut[i] = (short) (scale * Math.pow(i, p) + .5);
         }
 
+        @Override
         double getGamma() {
             return 1;
         }
