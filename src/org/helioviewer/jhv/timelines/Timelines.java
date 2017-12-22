@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.timelines;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 
@@ -20,7 +21,7 @@ public class Timelines implements MainContentPanelPlugin {
     private static final TimelineLayers layers = new TimelineLayers();
     private static final DrawController dc = new DrawController();
     public static final TimelineDialog td = new TimelineDialog();
-    private final LinkedList<JComponent> pluginPanes = new LinkedList<>();
+    private final ArrayList<JComponent> pluginPanes = new ArrayList<>();
     private final PlotPanel plotOne = new PlotPanel();
     private static final TimelinePanel timelinePanel = new TimelinePanel(layers);
 
@@ -60,7 +61,7 @@ public class Timelines implements MainContentPanelPlugin {
     }
 
     @Override
-    public LinkedList<JComponent> getVisualInterfaces() {
+    public List<JComponent> getVisualInterfaces() {
         return pluginPanes;
     }
 
