@@ -3,13 +3,14 @@ package org.helioviewer.jhv.export;
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.lang.ref.SoftReference;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.ImageUtils;
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -31,15 +32,7 @@ public class ExportMovie implements FrameListener {
     private static RecordMode mode;
     private static boolean stopped = false;
 
-    private static final int NUM_FRAMES = 512;
-    private final ArrayBlockingQueue<Runnable> frameQueue = new ArrayBlockingQueue<>(2 * NUM_FRAMES);
-    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, frameQueue, new JHVThread.NamedThreadFactory("Export Movie"), new ThreadPoolExecutor.DiscardPolicy()) {
-        @Override
-        protected void afterExecute(Runnable r, Throwable t) {
-            super.afterExecute(r, t);
-            JHVThread.afterExecute(r, t);
-        }
-    };
+    private final ExecutorService executor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Export Movie"));
 
     public static BufferedImage EVEImage = null;
     public static int EVEMovieLinePosition = -1;
@@ -77,8 +70,7 @@ public class ExportMovie implements FrameListener {
 
         BufferedImage screenshot = grabber.renderFrame(camera, gl);
         try {
-            if (mode == RecordMode.SHOT || frameQueue.size() <= NUM_FRAMES)
-                executor.execute(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
+            executor.execute(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -160,25 +152,24 @@ public class ExportMovie implements FrameListener {
     private static class FrameConsumer implements Runnable {
 
         private final MovieExporter movieExporter;
-        private BufferedImage mainImage;
-        private BufferedImage eveImage;
+        private final SoftReference<Pair<BufferedImage, BufferedImage>> ref;
         private final int movieLinePosition;
 
         FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
-            mainImage = _mainImage;
-            eveImage = _eveImage == null ? null : ImageUtils.deepCopy(_eveImage);
+            ref = new SoftReference<>(new Pair<>(_mainImage, _eveImage == null ? null : ImageUtils.deepCopy(_eveImage)));
             movieLinePosition = _movieLinePosition;
         }
 
         @Override
         public void run() {
             try {
-                BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, movieExporter.getHeight());
-                mainImage = null;
-                eveImage = null;
-                movieExporter.encode(composite);
-                composite = null;
+                Pair<BufferedImage, BufferedImage> p;
+                if ((p = ref.get()) != null) {
+                    BufferedImage mainImage = p.a, eveImage = p.b;
+                    BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, movieExporter.getHeight());
+                    movieExporter.encode(composite);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
