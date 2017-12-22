@@ -29,7 +29,6 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.math.Mat4;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -341,18 +340,11 @@ public class SWEKLayer extends AbstractLayer {
 
         Vec3 targetDir = new Vec3(x, y, z);
 
-        Mat4 r = Mat4.rotation(Math.atan2(x, z), Vec3.YAxis);
-        r.rotate(-Math.asin(y / targetDir.length()), Vec3.XAxis);
-
-        Vec3 p0 = new Vec3(-width2, -height2, 0);
-        Vec3 p1 = new Vec3(-width2, height2, 0);
-        Vec3 p2 = new Vec3(width2, height2, 0);
-        Vec3 p3 = new Vec3(width2, -height2, 0);
-
-        p0 = r.multiply(p0);
-        p1 = r.multiply(p1);
-        p2 = r.multiply(p2);
-        p3 = r.multiply(p3);
+        Quat q = Quat.rotate(Quat.createRotation(Math.atan2(x, z), Vec3.YAxis), Quat.createRotation(-Math.asin(y / targetDir.length()), Vec3.XAxis));
+        Vec3 p0 = q.rotateVector(new Vec3(-width2, -height2, 0));
+        Vec3 p1 = q.rotateVector(new Vec3(-width2, height2, 0));
+        Vec3 p2 = q.rotateVector(new Vec3(width2, height2, 0));
+        Vec3 p3 = q.rotateVector(new Vec3(width2, -height2, 0));
         p0.add(targetDir);
         p1.add(targetDir);
         p2.add(targetDir);
