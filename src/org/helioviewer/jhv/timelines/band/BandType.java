@@ -2,8 +2,9 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -97,7 +98,7 @@ public class BandType {
         return unitLabel;
     }
 
-    public HashMap<String, Double> getWarnLevels() {
+    public Map<String, Double> getWarnLevels() {
         return warnLevels;
     }
 
