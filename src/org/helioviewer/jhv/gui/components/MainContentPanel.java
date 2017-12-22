@@ -3,7 +3,7 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -25,7 +25,7 @@ public class MainContentPanel extends JPanel {
 
     private static final int DIVIDER_SIZE = 3;
 
-    private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<>();
+    private final ArrayList<MainContentPanelPlugin> pluginList = new ArrayList<>();
 
     private final JSplitPane splitPane;
     private final JPanel pluginContainer;

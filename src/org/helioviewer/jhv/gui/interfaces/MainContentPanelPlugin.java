@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.gui.interfaces;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JComponent;
 
@@ -8,6 +8,6 @@ public interface MainContentPanelPlugin {
 
     String getTabName();
 
-    LinkedList<JComponent> getVisualInterfaces();
+    List<JComponent> getVisualInterfaces();
 
 }

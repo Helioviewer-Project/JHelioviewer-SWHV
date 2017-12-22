@@ -3,7 +3,7 @@ package org.helioviewer.jhv.io;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.jhv.log.Log;
@@ -43,7 +43,7 @@ public class CommandLine {
 
     private static List<URI> getURIOptionValues(String param) {
         List<String> opts = getOptionValues(param);
-        LinkedList<URI> uris = new LinkedList<>();
+        ArrayList<URI> uris = new ArrayList<>();
         for (String opt : opts) {
             try {
                 URI uri = new URI(opt);
@@ -89,7 +89,7 @@ public class CommandLine {
      * @return the values associated to the option.
      * */
     private static List<String> getOptionValues(String param) {
-        LinkedList<String> values = new LinkedList<>();
+        ArrayList<String> values = new ArrayList<>();
         if (arguments != null) {
             for (int i = 0; i < arguments.length; i++) {
                 if (param.equals(arguments[i]) && arguments.length > i + 1) {
