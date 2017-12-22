@@ -56,12 +56,12 @@ public class EVEPlugin implements Plugin {
 
     @Override
     public void saveState(JSONObject jo) {
-        tl.saveState(jo);
+        Timelines.saveState(jo);
     }
 
     @Override
     public void loadState(JSONObject jo) {
-        tl.loadState(jo);
+        Timelines.loadState(jo);
     }
 
 }
