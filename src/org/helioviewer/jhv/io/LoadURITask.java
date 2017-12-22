@@ -18,7 +18,7 @@ import org.helioviewer.jhv.view.simpleimageview.SimpleImageView;
 class LoadURITask extends JHVWorker<View, Void> {
 
     private final ImageLayer imageLayer;
-    private final URI uri;
+    protected final URI uri;
 
     static void get(URI _uri) {
         String scheme = _uri.getScheme();

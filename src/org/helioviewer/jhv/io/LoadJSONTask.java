@@ -10,11 +10,8 @@ import org.helioviewer.jhv.view.View;
 
 class LoadJSONTask extends LoadURITask {
 
-    private final URI uri;
-
     LoadJSONTask(ImageLayer _imageLayer, URI _uri) {
-        super(_imageLayer, null);
-        uri = _uri;
+        super(_imageLayer, _uri);
         setThreadName("MAIN--LoadJSON");
     }
 
