@@ -98,11 +98,7 @@ class SWEKConfig {
         String eventIconValue = obj.getString("icon");
         try {
             URI eventIconURI = new URI(eventIconValue);
-            if (eventIconURI.getScheme().toLowerCase().equals("iconbank")) {
-                return SWEKIconBank.getIcon(eventIconURI.getHost());
-            } else {
-                return SWEKIconBank.getIcon("Other");
-            }
+            return eventIconURI.getScheme().equals("iconbank") ? SWEKIconBank.getIcon(eventIconURI.getHost()) : SWEKIconBank.getIcon("Other");
         } catch (URISyntaxException e) {
             Log.info("Could not parse the URI " + eventIconValue + ", null icon returned");
         }
