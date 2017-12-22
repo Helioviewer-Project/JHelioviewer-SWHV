@@ -1,16 +1,21 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
+import java.lang.ref.SoftReference;
 import java.util.TreeMap;
-
-import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 
 public class PfssCache {
 
-    private final TreeMap<Long, PfssData> map = new TreeMap<>();
+    private final TreeMap<Long, SoftReference<PfssData>> map = new TreeMap<>();
+
+    private PfssData get(Long time) {
+        PfssData ret = map.get(time).get();
+        if (ret == null)
+            map.remove(time); // mark as collected
+        return ret;
+    }
 
     public void addData(long time, PfssData data) {
-        assert map.size() < PfssSettings.CACHE_SIZE;
-        map.put(time, data);
+        map.put(time, new SoftReference<>(data));
     }
 
     public PfssData getNearestData(long time) {
@@ -18,13 +23,13 @@ public class PfssCache {
         Long f = map.floorKey(time);
 
         if (c != null && f != null) {
-            return Math.abs(f - time) < Math.abs(time - c) ? map.get(f) : map.get(c);
+            return Math.abs(f - time) < Math.abs(time - c) ? get(f) : get(c);
         }
 
         try {
             if (f == null)
-                return map.get(c);
-            return map.get(f);
+                return get(c);
+            return get(f);
         } catch (Exception ignore) {
         }
 
@@ -32,7 +37,7 @@ public class PfssCache {
     }
 
     public PfssData getData(long time) {
-        return map.get(time);
+        return get(time);
     }
 
     public void clear() {

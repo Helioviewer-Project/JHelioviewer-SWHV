@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.pfss;
 
 public class PfssSettings {
 
-    public static final int CACHE_SIZE = 365 * 4; // max preload of cache data
     public static final int TIMEOUT_DOWNLOAD = 120; // seconds
 
     public static final int MAX_DETAIL = 8;
