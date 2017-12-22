@@ -29,7 +29,7 @@ public class AbstractView implements View {
     public AbstractView(URI _uri, APIRequest _req) {
         uri = _uri;
         req = _req;
-        isLocal = uri == null ? false : "file".equals(uri.getScheme());
+        isLocal = uri != null && "file".equals(uri.getScheme());
     }
 
     @Override
