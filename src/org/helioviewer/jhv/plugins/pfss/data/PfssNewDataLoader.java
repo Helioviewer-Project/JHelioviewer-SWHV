@@ -15,23 +15,25 @@ import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssSettings;
 import org.helioviewer.jhv.threads.CancelTask;
+import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import okio.BufferedSource;
 
-public class PfssNewDataLoader implements Runnable {
+public class PfssNewDataLoader extends JHVWorker<Void, Void> {
 
     private final long start;
     private final long end;
     private static final TreeMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<>();
 
     public PfssNewDataLoader(long _start, long _end) {
+        PfssPlugin.downloads++;
         start = _start;
         end = _end;
     }
 
     @Override
-    public void run() {
+    protected Void backgroundWork() {
         Calendar cal = GregorianCalendar.getInstance();
 
         cal.setTimeInMillis(start);
@@ -90,6 +92,13 @@ public class PfssNewDataLoader implements Runnable {
                 startMonth++;
             }
         } while (startYear < endYear || (startYear == endYear && startMonth <= endMonth));
+        return null;
     }
+
+    @Override
+    protected void done() {
+        PfssPlugin.downloads--;
+    }
+
 
 }

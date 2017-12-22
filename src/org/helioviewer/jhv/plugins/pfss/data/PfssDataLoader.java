@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
-import java.awt.EventQueue;
-
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
+import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.time.JHVDate;
 
 import nom.tam.fits.BasicHDU;
@@ -11,18 +10,19 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
-class PfssDataLoader implements Runnable {
+class PfssDataLoader extends JHVWorker<PfssData, Void> {
 
     private final long time;
     private final String url;
 
     PfssDataLoader(long _time, String _url) {
+        PfssPlugin.downloads++;
         time = _time;
         url = _url;
     }
 
     @Override
-    public void run() {
+    protected PfssData backgroundWork() {
         try (NetClient nc = NetClient.of(url); Fits fits = new Fits(nc.getStream())) {
             BasicHDU<?> hdus[] = fits.read();
             if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof BinaryTableHDU))
@@ -49,10 +49,25 @@ class PfssDataLoader implements Runnable {
             if (flinex.length != fliney.length || flinex.length != flinez.length || flinex.length != flines.length)
                 throw new Exception("Fieldline arrays not equal " + flinex.length + " " + fliney.length + " " + flinez.length + " " + flinex.length + ": " + url);
 
-            PfssData pfssData = new PfssData(date, flinex, fliney, flinez, flines, points);
-            EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().addData(time, pfssData));
+            return new PfssData(date, flinex, fliney, flinez, flines, points);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    protected void done() {
+        PfssPlugin.downloads--;
+        if (!isCancelled()) {
+            try {
+                PfssData pfssData = get();
+                if (pfssData != null) {
+                    PfssPlugin.getPfsscache().addData(time, pfssData);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
