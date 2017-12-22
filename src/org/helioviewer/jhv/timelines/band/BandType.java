@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,7 +39,8 @@ public class BandType {
     }
 
     public static String[] getGroups() {
-        return groups.keySet().toArray(new String[0]);
+        Set<String> set = groups.keySet();
+        return set.toArray(new String[set.size()]);
     }
 
     private String name = "unknown";
@@ -46,7 +48,7 @@ public class BandType {
     private String baseURL = "";
     private String label = "Unknown";
     private String unitLabel = "unknown";
-    private final HashMap<String, Double> warnLevels = new HashMap<>();
+    private final Map<String, Double> warnLevels;
     private double min = 0;
     private double max = 1;
     private boolean isLog = true;
@@ -76,14 +78,16 @@ public class BandType {
             isLog = true;
 
         JSONArray warn = jo.optJSONArray("warnLevels");
+        HashMap<String, Double> warnHelp = new HashMap<>();
         if (warn != null) {
             for (Object o : warn) {
                 if (o instanceof JSONObject) {
                     JSONObject obj = (JSONObject) o;
-                    warnLevels.put(obj.getString("warnLabel"), obj.getDouble("warnValue"));
+                    warnHelp.put(obj.getString("warnLabel"), obj.getDouble("warnValue"));
                 }
             }
         }
+        warnLevels = Collections.unmodifiableMap(warnHelp);
     }
 
     public void serialize(JSONObject jo) {

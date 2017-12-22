@@ -291,7 +291,7 @@ public class Mat4 {
     public static Mat4 scaling(double sx, double sy, double sz) {
         return new Mat4(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
     }
-
+/*
     public final Mat4 rotate(double angle, Vec3 axis) {
         return this.rotate(angle, axis.x, axis.y, axis.z);
     }
@@ -299,7 +299,7 @@ public class Mat4 {
     public final Mat4 rotate(double angle, double axisx, double axisy, double axisz) {
         return this.multiply(rotation(angle, axisx, axisy, axisz));
     }
-
+*/
     public final Mat4 invert() {
         return this.set(this.inverse());
     }
@@ -333,7 +333,7 @@ public class Mat4 {
         set(i2, temp);
         return this;
     }
-
+/*
     public static Mat4 rotation(double angle, Vec3 axis) {
         return rotation(angle, axis.x, axis.y, axis.z);
     }
@@ -408,7 +408,7 @@ public class Mat4 {
 
         return r;
     }
-
+*/
     public static Mat4 frustum(double l, double r, double b, double t, double n, double f) {
         return new Mat4((2 * n) / (r - l), 0, (r + l) / (r - l), 0, 0, (2 * n) / (t - b), (t + b) / (t - b), 0, 0, 0, -(f + n) / (f - n), (-2 * f * n) / (f - n), 0, 0, -1, 0);
     }
