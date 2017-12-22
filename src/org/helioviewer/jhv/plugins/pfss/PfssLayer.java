@@ -113,6 +113,11 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
         line.dispose(gl);
     }
 
+    @Override
+    public boolean isDownloading() {
+        return PfssPlugin.downloads != 0;
+    }
+
     private int lastDetail;
     private boolean lastFixedColor;
     private double lastRadius;

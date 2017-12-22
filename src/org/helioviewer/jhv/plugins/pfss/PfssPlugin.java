@@ -19,6 +19,8 @@ public class PfssPlugin implements Plugin {
     private static final PfssCache pfssCache = new PfssCache();
     private static final PfssLayer layer = new PfssLayer(null);
 
+    public static int downloads;
+
     private static final BlockingQueue<Runnable> newLoadBlockingQueue = new ArrayBlockingQueue<>(1);
     public static final ExecutorService pfssNewLoadPool = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.MINUTES, newLoadBlockingQueue, new JHVThread.NamedThreadFactory("PFSS NewLoad"), new ThreadPoolExecutor.DiscardPolicy()) {
         @Override
@@ -45,6 +47,7 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
+        downloads = 0;
         ImageViewerGui.getLayers().add(layer);
     }
 
