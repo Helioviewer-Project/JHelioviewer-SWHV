@@ -68,8 +68,8 @@ public class ExportMovie implements FrameListener {
             return;
         }
 
-        BufferedImage screenshot = grabber.renderFrame(camera, gl);
         try {
+            BufferedImage screenshot = grabber.renderFrame(camera, gl);
             executor.execute(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
