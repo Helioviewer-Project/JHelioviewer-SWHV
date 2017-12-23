@@ -71,12 +71,12 @@ public class MoviePanel extends JPanel implements ChangeListener {
         H2160 {
             @Override
             public String toString() {
-                return "3840×2160";
+                return "4096×4096";
             }
 
             @Override
             protected Dimension getSize() {
-                return new Dimension(3840, 2160);
+                return new Dimension(4096, 4096);
             }
 
             @Override
