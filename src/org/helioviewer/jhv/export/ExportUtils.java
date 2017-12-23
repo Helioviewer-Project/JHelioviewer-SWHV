@@ -18,7 +18,7 @@ class ExportUtils {
         if (im2 == null)
             return im1;
 
-        BufferedImage ret = new BufferedImage(im1.getWidth(), height, im1.getType());
+        BufferedImage ret = new BufferedImage(im1.getWidth(), height, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D g2 = ret.createGraphics();
         g2.drawImage(im1, null, 0, 0);
 

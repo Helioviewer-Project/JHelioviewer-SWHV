@@ -1,9 +1,12 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.nio.IntBuffer;
+import java.awt.image.DataBufferByte;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
+import org.helioviewer.jhv.base.image.MappedFileBuffer;
+import org.helioviewer.jhv.base.image.MappedImageFactory;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 
@@ -63,13 +66,21 @@ public class GLGrab {
 
         fbo.use(gl, fboTex);
 
-        BufferedImage screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_INT_RGB);
-        int[] array = ((DataBufferInt) screenshot.getRaster().getDataBuffer()).getData();
-        IntBuffer fb = IntBuffer.wrap(array);
+        BufferedImage screen;
+        Buffer buffer;
+
+        try {
+            screen = MappedImageFactory.createCompatibleMappedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            buffer = ((MappedFileBuffer.DataBufferByte) screen.getRaster().getDataBuffer()).getBuffer();
+        } catch (Exception e) {
+            screen = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            byte[] array = ((DataBufferByte) screen.getRaster().getDataBuffer()).getData();
+            buffer = ByteBuffer.wrap(array);
+        }
 
         gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
-        gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 4);
-        gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, fb);
+        gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
+        gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, buffer);
         gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
 
         fbo.unuse(gl);
@@ -77,7 +88,7 @@ public class GLGrab {
         Displayer.setGLSize(_x, _y, _w, _h);
         Displayer.reshapeAll();
 
-        return screenshot;
+        return screen;
     }
 
 }
