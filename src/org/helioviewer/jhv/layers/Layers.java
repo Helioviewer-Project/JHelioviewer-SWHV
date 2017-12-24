@@ -37,12 +37,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
         public Layer remove(int index) {
             int size = list1.size();
             if (index < size) {
-                Layer ret = list1.remove(index);
-                if (ret == activeLayer) {
-                    size = list1.size();
-                    setActiveImageLayer(size == 0 ? null : list1.get(size - 1));
-                }
-                return ret;
+                return list1.remove(index);
             }
             return list2.remove(index - size);
         }
@@ -129,6 +124,12 @@ public class Layers extends AbstractTableModel implements Reorderable {
         int row = layers.indexOf(layer);
         layers.remove(layer);
         removedLayers.add(layer);
+
+        if (layer == activeLayer) {
+            int size = layers.imageLayers.size();
+            setActiveImageLayer(size == 0 ? null : layers.imageLayers.get(size - 1));
+        }
+
         if (row >= 0)
             fireTableRowsDeleted(row, row);
         Displayer.display();
@@ -265,6 +266,7 @@ public class Layers extends AbstractTableModel implements Reorderable {
     public static void clear() {
         removedLayers.addAll(layers);
         layers = new CompositeList();
+        setActiveImageLayer(null);
     }
 
 }
