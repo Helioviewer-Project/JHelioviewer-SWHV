@@ -19,11 +19,12 @@ class ExportUtils {
             return im1;
 
         BufferedImage ret = new BufferedImage(im1.getWidth(), height, BufferedImage.TYPE_3BYTE_BGR);
-        Graphics2D g2 = ret.createGraphics();
-        g2.drawImage(im1, null, 0, 0);
+        ret.setData(im1.getRaster());
 
         AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(1, 1), AffineTransformOp.TYPE_BILINEAR);
         im2 = op.filter(im2, null);
+
+        Graphics2D g2 = ret.createGraphics();
         g2.drawImage(im2, 0, im1.getHeight(), im1.getWidth(), ret.getHeight() - im1.getHeight(), null);
 
         if (ExportMovie.EVEMovieLinePosition != -1) {
