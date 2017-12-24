@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.export;
 
+import java.io.IOException;
 import java.io.File;
 import java.awt.image.BufferedImage;
 
@@ -18,12 +19,19 @@ public class PNGExporter implements MovieExporter {
     }
 
     @Override
-    public void encode(BufferedImage _image) {
-        image = _image;
+    public Object transform(BufferedImage _image) {
+        return _image;
     }
 
     @Override
-    public void close() throws Exception {
+    public void encode(Object frame) throws IOException {
+        if (!(frame instanceof BufferedImage))
+            throw new IOException("Not Picture");
+        image = (BufferedImage) frame;
+    }
+
+    @Override
+    public void close() throws IOException {
         // ImageUtils.writePNG(image, path);
         ImageIO.write(image, "png", new File(path));
     }

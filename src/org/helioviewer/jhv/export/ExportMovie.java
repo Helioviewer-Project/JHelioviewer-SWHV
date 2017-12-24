@@ -32,19 +32,22 @@ public class ExportMovie implements FrameListener {
     private static RecordMode mode;
     private static boolean stopped = false;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Export Movie"));
+    private final ExecutorService pasteExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Paste"));
+    private final ExecutorService xformExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Transform"));
+    private final ExecutorService encodeExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Encode"));
 
     public static BufferedImage EVEImage = null;
     public static int EVEMovieLinePosition = -1;
 
     public void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
-            Runnable runnable = new CloseWriter(exporter, keep);
             if (keep) {
-                executor.execute(runnable);
+                pasteExecutor.execute(new CloseWriter1(exporter, true));
             } else {
-                executor.shutdownNow();
-                runnable.run();
+                pasteExecutor.shutdownNow();
+                xformExecutor.shutdownNow();
+                encodeExecutor.shutdownNow();
+                new CloseWriter3(exporter, false).run();
             }
             exporter = null;
         }
@@ -70,7 +73,7 @@ public class ExportMovie implements FrameListener {
 
         try {
             BufferedImage screenshot = grabber.renderFrame(camera, gl);
-            executor.execute(new FrameConsumer(exporter, screenshot, EVEImage, EVEMovieLinePosition));
+            pasteExecutor.execute(new Paster(exporter, screenshot, EVEImage, EVEMovieLinePosition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -149,26 +152,26 @@ public class ExportMovie implements FrameListener {
             stop();
     }
 
-    private static class FrameConsumer implements Runnable {
+    private class Paster implements Runnable {
 
         private final MovieExporter movieExporter;
         private final SoftReference<Pair<BufferedImage, BufferedImage>> ref;
         private final int movieLinePosition;
 
-        FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eveImage, int _movieLinePosition) {
+        Paster(MovieExporter _movieExporter, BufferedImage mainImage, BufferedImage eveImage, int _movieLinePosition) {
             movieExporter = _movieExporter;
-            ref = new SoftReference<>(new Pair<>(_mainImage, _eveImage == null ? null : ImageUtils.deepCopy(_eveImage)));
+            ref = new SoftReference<>(new Pair<>(mainImage, eveImage == null ? null : ImageUtils.deepCopy(eveImage)));
             movieLinePosition = _movieLinePosition;
         }
 
         @Override
         public void run() {
             try {
-                Pair<BufferedImage, BufferedImage> p;
-                if ((p = ref.get()) != null) {
+                Pair<BufferedImage, BufferedImage> p = ref.get();
+                if (p != null) {
                     BufferedImage mainImage = p.a, eveImage = p.b;
                     BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, movieExporter.getHeight());
-                    movieExporter.encode(composite);
+                    xformExecutor.execute(new Transformer(movieExporter, composite));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -177,12 +180,94 @@ public class ExportMovie implements FrameListener {
 
     }
 
-    private static class CloseWriter implements Runnable {
+    private class Transformer implements Runnable {
+
+        private final MovieExporter movieExporter;
+        private final SoftReference<BufferedImage> ref;
+
+        Transformer(MovieExporter _movieExporter, BufferedImage image) {
+            movieExporter = _movieExporter;
+            ref = new SoftReference<>(image);
+        }
+
+        @Override
+        public void run() {
+            try {
+                BufferedImage image = ref.get();
+                if (image != null) {
+                    encodeExecutor.execute(new Encoder(movieExporter, movieExporter.transform(image)));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private class Encoder implements Runnable {
+
+        private final MovieExporter movieExporter;
+        private final SoftReference<Object> ref;
+
+        Encoder(MovieExporter _movieExporter, Object frame) {
+            movieExporter = _movieExporter;
+            ref = new SoftReference<>(frame);
+        }
+
+        @Override
+        public void run() {
+            try {
+                Object frame = ref.get();
+                if (frame != null) {
+                    movieExporter.encode(frame);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private class CloseWriter1 implements Runnable {
 
         private final MovieExporter movieExporter;
         private final boolean keep;
 
-        CloseWriter(MovieExporter _movieExporter, boolean _keep) {
+        CloseWriter1(MovieExporter _movieExporter, boolean _keep) {
+            movieExporter = _movieExporter;
+            keep = _keep;
+        }
+
+        @Override
+        public void run() {
+            xformExecutor.execute(new CloseWriter2(movieExporter, keep));
+        }
+
+    }
+
+    private class CloseWriter2 implements Runnable {
+
+        private final MovieExporter movieExporter;
+        private final boolean keep;
+
+        CloseWriter2(MovieExporter _movieExporter, boolean _keep) {
+            movieExporter = _movieExporter;
+            keep = _keep;
+        }
+
+        @Override
+        public void run() {
+            encodeExecutor.execute(new CloseWriter3(movieExporter, keep));
+        }
+
+    }
+
+    private class CloseWriter3 implements Runnable {
+
+        private final MovieExporter movieExporter;
+        private final boolean keep;
+
+        CloseWriter3(MovieExporter _movieExporter, boolean _keep) {
             movieExporter = _movieExporter;
             keep = _keep;
         }
