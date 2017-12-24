@@ -23,9 +23,15 @@ public class JCodecExporter implements MovieExporter {
         encoder = new JHVSequenceEncoder(new File(path), w, h, fps);
     }
 
+
     @Override
-    public void encode(BufferedImage image) throws Exception {
-        encoder.encodeNativeFrame(image);
+    public Object transform(BufferedImage image) {
+        return encoder.transform(image);
+    }
+
+    @Override
+    public void encode(Object frame) throws Exception {
+        encoder.encodeNativeFrame(frame);
     }
 
     @Override

@@ -27,7 +27,6 @@ import org.jcodec.containers.mp4.muxer.MP4Muxer;
 public class JHVSequenceEncoder {
 
     private final SeekableByteChannel ch;
-    private final Picture toEncode;
     private final H264Encoder encoder;
     private final ArrayList<ByteBuffer> spsList;
     private final ArrayList<ByteBuffer> ppsList;
@@ -38,35 +37,35 @@ public class JHVSequenceEncoder {
     private final int fps;
 
     public JHVSequenceEncoder(File out, int w, int h, int _fps) throws IOException {
+        fps = _fps;
         ch = NIOUtils.writableFileChannel(out);
 
         // Muxer that will store the encoded frames
         muxer = new MP4Muxer(ch, Brand.MP4);
-
-        fps = _fps;
         // Add video track to muxer
         outTrack = muxer.addTrack(TrackType.VIDEO, fps);
-
         // Allocate a buffer big enough to hold output frames
         _out = ByteBuffer.allocate(w * h * 6);
-
         // Create an instance of encoder
         encoder = new H264Encoder();
-
-        toEncode = Picture.create(w, h, encoder.getSupportedColorSpaces()[0]);
-
         // Encoder extra data ( SPS, PPS ) to be stored in a special place of MP4
         spsList = new ArrayList<>();
         ppsList = new ArrayList<>();
     }
 
-    public void encodeNativeFrame(BufferedImage img) throws IOException {
-        // Perform conversion
+    public Object transform(BufferedImage img) {
+        Picture toEncode = Picture.create(img.getWidth(), img.getHeight(), encoder.getSupportedColorSpaces()[0]);
         JHVRgbToYuv420j8Bit.transform(img, toEncode);
+        return toEncode;
+    }
+
+    public void encodeNativeFrame(Object frame) throws IOException {
+        if (!(frame instanceof Picture))
+            throw new IOException("Not Picture");
 
         // Encode image into H.264 frame, the result is stored in '_out' buffer
         _out.clear();
-        ByteBuffer result = encoder.encodeFrame(toEncode, _out);
+        ByteBuffer result = encoder.encodeFrame((Picture) frame, _out);
 
         // Based on the frame above form correct MP4 packet
         spsList.clear();
@@ -76,7 +75,6 @@ public class JHVSequenceEncoder {
 
         // Add packet to video track
         outTrack.addFrame(new MP4Packet(result, frameNo, fps, 1, frameNo, true, null, frameNo, 0));
-
         frameNo++;
     }
 
