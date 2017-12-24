@@ -30,7 +30,8 @@ public class ExportMovie implements FrameListener {
     private static GLGrab grabber;
 
     private static RecordMode mode;
-    private static boolean stopped = false;
+    private static boolean stopped;
+    private static boolean shallStop;
 
     private final ExecutorService pasteExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Paste"));
     private final ExecutorService xformExecutor = Executors.newFixedThreadPool(1, new JHVThread.NamedThreadFactory("Movie Transform"));
@@ -134,6 +135,7 @@ public class ExportMovie implements FrameListener {
     }
 
     public static void stop() {
+        shallStop = false;
         if (!stopped) {
             stopped = true;
 
@@ -148,8 +150,10 @@ public class ExportMovie implements FrameListener {
     // loop mode only
     @Override
     public void frameChanged(int frame, boolean last) {
-        if (last) // last frame missed, to be fixed with layers refactor
+        if (shallStop)
             stop();
+        if (last)
+            shallStop = true;
     }
 
     private class Paster implements Runnable {
