@@ -208,7 +208,7 @@ public class ExportMovie implements FrameListener {
 
     }
 
-    private class Encoder implements Runnable {
+    private static class Encoder implements Runnable {
 
         private final MovieExporter movieExporter;
         private final SoftReference<Object> ref;
@@ -266,7 +266,7 @@ public class ExportMovie implements FrameListener {
 
     }
 
-    private class CloseWriter3 implements Runnable {
+    private static class CloseWriter3 implements Runnable {
 
         private final MovieExporter movieExporter;
         private final boolean keep;

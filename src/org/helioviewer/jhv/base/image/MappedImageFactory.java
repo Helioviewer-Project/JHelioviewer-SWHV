@@ -120,6 +120,7 @@ public final class MappedImageFactory {
      * Generic implementation that should work for any JRE, and creates a custom subclass of {@link WritableRaster}.
      */
     static final class GenericRasterFactory implements RasterFactory {
+        @Override
         public WritableRaster createRaster(final SampleModel model, final DataBuffer buffer, final Point origin) {
             return new GenericWritableRaster(model, buffer, origin);
         }
@@ -149,6 +150,7 @@ public final class MappedImageFactory {
             }
         }
 
+        @Override
         public WritableRaster createRaster(final SampleModel model, final DataBuffer buffer, final Point origin) {
             try {
                 return factoryMethod.newInstance(model, buffer, origin);
