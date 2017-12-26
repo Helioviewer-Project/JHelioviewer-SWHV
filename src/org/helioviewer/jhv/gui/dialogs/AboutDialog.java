@@ -48,7 +48,8 @@ public class AboutDialog extends StandardDialog implements ShowableDialog, Hyper
             "<li>The <a href=\"http://www.ocpsoft.org/prettytime/nlp\">PrettyTime NLP</a> human time parsing library.</li>" +
             "<li><a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, ©2002-2017, JIDE Software, Inc.</li>" +
             "<li>The <a href=\"http://nom-tam-fits.github.io/nom-tam-fits/\">FITS in Java</a> public domain library.</li>" +
-            "<li>The <a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>";
+            "<li>The <a href=\"http://logging.apache.org/log4j/index.html\">log4j</a> logging library.</li>" +
+            "<li><a href=\"https://github.com/haraldk/TwelveMonkeys/blob/master/sandbox/sandbox-common/src/main/java/com/twelvemonkeys/image/MappedImageFactory.java\">MappedImageFactory</a>, ©2010, Harald Kuhr.</li>";
 
         JTextPane pane = new JTextPane();
         pane.setContentType("text/html");
