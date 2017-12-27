@@ -111,8 +111,7 @@ public class ExportMovie implements FrameListener {
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {
             try {
-                exporter = new PNGExporter();
-                exporter.open(prefix + ".png", canvasWidth, exportHeight, fps);
+                exporter = new PNGExporter(prefix + ".png", exportHeight);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -120,8 +119,7 @@ public class ExportMovie implements FrameListener {
             Displayer.display();
         } else {
             try {
-                exporter = new JCodecExporter();
-                exporter.open(prefix + ".mp4", canvasWidth, exportHeight, fps);
+                exporter = new JCodecExporter(prefix + ".mp4", canvasWidth, exportHeight, fps);
             } catch (Exception e) {
                 e.printStackTrace();
             }

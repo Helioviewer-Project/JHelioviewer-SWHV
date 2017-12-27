@@ -21,10 +21,10 @@ import org.jcodec.containers.mp4.TrackType;
 import org.jcodec.containers.mp4.muxer.FramesMP4MuxerTrack;
 import org.jcodec.containers.mp4.muxer.MP4Muxer;
 
-public class JCodecExporter implements MovieExporter {
+class JCodecExporter implements MovieExporter {
 
-    private String path;
-    private int width, height, fps;
+    private final String path;
+    private final int width, height, fps;
 
     private FileChannelWrapper ch;
     private H264Encoder encoder;
@@ -35,8 +35,7 @@ public class JCodecExporter implements MovieExporter {
     private int frameNo;
     private MP4Muxer muxer;
 
-    @Override
-    public void open(String _path, int _width, int _height, int _fps) {
+    JCodecExporter(String _path, int _width, int _height, int _fps) {
         path = _path;
         width = _width;
         height = _height;
