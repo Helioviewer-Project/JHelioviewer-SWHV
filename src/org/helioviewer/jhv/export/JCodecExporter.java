@@ -85,6 +85,8 @@ public class JCodecExporter implements MovieExporter {
 
     @Override
     public void close() throws IOException {
+        if (ch == null)
+            throw new IOException("Channel not open");
         // Push saved SPS/PPS to a special storage in MP4
         outTrack.addSampleEntry(H264Utils.createMOVSampleEntry(spsList, ppsList, 4));
         // Write MP4 header and finalize recording
