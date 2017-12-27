@@ -12,7 +12,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 
 class ExportUtils {
 
-    public static BufferedImage pasteCanvases(BufferedImage im1, BufferedImage im2, int movieLinePosition, int height) {
+    static BufferedImage pasteCanvases(BufferedImage im1, BufferedImage im2, int movieLinePosition, int height) {
         ImageUtil.flipImageVertically(im1);
 
         if (im2 == null)

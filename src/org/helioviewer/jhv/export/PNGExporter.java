@@ -6,16 +6,15 @@ import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
 
-public class PNGExporter implements MovieExporter {
+class PNGExporter implements MovieExporter {
 
-    private String path;
-    private int height;
+    private final String path;
+    private final int height;
     private BufferedImage image;
 
-    @Override
-    public void open(String _path, int w, int h, int fps) {
+    PNGExporter(String _path, int _height) {
         path = _path;
-        height = h;
+        height = _height;
     }
 
     @Override
