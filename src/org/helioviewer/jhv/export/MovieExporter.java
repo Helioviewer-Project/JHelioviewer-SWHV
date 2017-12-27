@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 interface MovieExporter {
 
-    void open(String path, int w, int h, int fps) throws Exception;
+    void open(String path, int w, int h, int fps);
 
     Object transform(BufferedImage image);
 
