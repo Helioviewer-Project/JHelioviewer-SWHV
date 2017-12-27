@@ -110,20 +110,10 @@ public class ExportMovie implements FrameListener {
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         if (mode == RecordMode.SHOT) {
-            try {
-                exporter = new PNGExporter(prefix + ".png", exportHeight);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            exporter = new PNGExporter(prefix + ".png", exportHeight);
             Displayer.display();
         } else {
-            try {
-                exporter = new JCodecExporter(prefix + ".mp4", canvasWidth, exportHeight, fps);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            exporter = new JCodecExporter(prefix + ".mp4", canvasWidth, exportHeight, fps);
             if (mode == RecordMode.LOOP) {
                 Movie.addFrameListener(instance);
                 Movie.setFrame(0);
@@ -168,15 +158,11 @@ public class ExportMovie implements FrameListener {
 
         @Override
         public void run() {
-            try {
-                Pair<BufferedImage, BufferedImage> p = ref.get();
-                if (p != null) {
-                    BufferedImage mainImage = p.a, eveImage = p.b;
-                    BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, movieExporter.getHeight());
-                    xformExecutor.execute(new Transformer(movieExporter, composite));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            Pair<BufferedImage, BufferedImage> p = ref.get();
+            if (p != null) {
+                BufferedImage mainImage = p.a, eveImage = p.b;
+                BufferedImage composite = ExportUtils.pasteCanvases(mainImage, eveImage, movieLinePosition, movieExporter.getHeight());
+                xformExecutor.execute(new Transformer(movieExporter, composite));
             }
         }
 
@@ -194,13 +180,9 @@ public class ExportMovie implements FrameListener {
 
         @Override
         public void run() {
-            try {
-                BufferedImage image = ref.get();
-                if (image != null) {
-                    encodeExecutor.execute(new Encoder(movieExporter, movieExporter.transform(image)));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            BufferedImage image = ref.get();
+            if (image != null) {
+                encodeExecutor.execute(new Encoder(movieExporter, movieExporter.transform(image)));
             }
         }
 
