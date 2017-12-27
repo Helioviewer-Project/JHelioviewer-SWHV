@@ -71,10 +71,8 @@ public class Layers extends AbstractTableModel implements Reorderable {
     }
 
     public static void setActiveImageLayer(ImageLayer layer) {
-        if (layer != activeLayer) {
-            activeLayer = layer;
-            Movie.setMaster(activeLayer);
-        }
+        activeLayer = layer;
+        Movie.setMaster(activeLayer);
     }
 
     private static CompositeList layers = new CompositeList();
