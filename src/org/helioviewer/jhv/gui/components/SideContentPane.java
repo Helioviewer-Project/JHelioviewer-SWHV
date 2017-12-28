@@ -38,7 +38,6 @@ public class SideContentPane extends JComponent {
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.PAGE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
-
         add(newPane, c);
 
         c.weighty = 1.;
