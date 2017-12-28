@@ -10,6 +10,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.Pair;
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.log.Log;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -24,7 +25,7 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
 
     private final long start;
     private final long end;
-    private static final TreeMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<>();
+    private static final TreeMap<Integer, ArrayList<Pair<Long, String>>> parsedCache = new TreeMap<>();
 
     public PfssNewDataLoader(long _start, long _end) {
         PfssPlugin.downloads++;
@@ -46,7 +47,7 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
 
         do {
             Integer cacheKey = startYear * 10000 + startMonth;
-            ArrayList<Pair<String, Long>> urls;
+            ArrayList<Pair<Long, String>> urls;
 
             synchronized (parsedCache) {
                 urls = parsedCache.get(cacheKey);
@@ -61,8 +62,10 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
                     BufferedSource source = nc.getSource();
                     String line;
                     while ((line = source.readUtf8Line()) != null) {
-                        String[] splitted = line.split(" ");
-                        urls.add(new Pair<>(splitted[1], TimeUtils.parse(splitted[0])));
+                        String[] splitted = Regex.Space.split(line);
+                        if (splitted.length != 2)
+                            throw new Exception("Invalid line: " + line);
+                        urls.add(new Pair<>(TimeUtils.parse(splitted[0]), splitted[1]));
                     }
                 } catch (Exception e) {
                     Log.warn("Could not read PFSS entries: " + e);
@@ -73,12 +76,12 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
                 }
             }
 
-            ArrayList<Pair<String, Long>> furls = urls;
+            ArrayList<Pair<Long, String>> furls = urls;
             EventQueue.invokeLater(() -> {
-                for (Pair<String, Long> pair : furls) {
-                    long time = pair.b;
+                for (Pair<Long, String> pair : furls) {
+                    long time = pair.a;
                     if (time > start - TimeUtils.DAY_IN_MILLIS && time < end + TimeUtils.DAY_IN_MILLIS && PfssPlugin.getPfsscache().getData(time) == null) {
-                        FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(time, PfssSettings.baseURL + pair.a), null);
+                        FutureTask<Void> dataLoaderTask = new FutureTask<>(new PfssDataLoader(time, PfssSettings.baseURL + pair.b), null);
                         PfssPlugin.pfssDataPool.execute(dataLoaderTask);
                         PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), PfssSettings.TIMEOUT_DOWNLOAD, TimeUnit.SECONDS);
                     }
