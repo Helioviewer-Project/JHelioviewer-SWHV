@@ -211,7 +211,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener {
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
 
-        if (_enabled)
+        if (enabled)
             ImageViewerGui.getInputController().addPlugin(this);
         else {
             ImageViewerGui.getInputController().removePlugin(this);

@@ -9,7 +9,6 @@ import org.helioviewer.jhv.base.plugin.Plugin;
 import org.helioviewer.jhv.data.event.SWEKGroup;
 import org.helioviewer.jhv.data.gui.EventPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONObject;
 
@@ -17,7 +16,6 @@ public class SWEKPlugin implements Plugin {
 
     private static final JPanel swekPanel = new JPanel();
 
-    private static final SWEKData swekData = new SWEKData();
     private static final SWEKLayer layer = new SWEKLayer(null);
     private static final EventTimelineLayer etl = new EventTimelineLayer(null);
 
@@ -30,24 +28,18 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
-        Timelines.getLayers().add(etl);
         ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         ImageViewerGui.getLeftContentPane().revalidate();
-
-        etl.cacheUpdated();
-        swekData.cacheUpdated();
-        Movie.addTimespanListener(swekData);
         ImageViewerGui.getLayers().add(layer);
+        Timelines.getLayers().add(etl);
     }
 
     @Override
     public void uninstallPlugin() {
-        Timelines.getLayers().remove(etl);
-        ImageViewerGui.getLayers().remove(layer);
-        Movie.removeTimespanListener(swekData);
-
         ImageViewerGui.getLeftContentPane().remove(swekPanel);
         ImageViewerGui.getLeftContentPane().revalidate();
+        ImageViewerGui.getLayers().remove(layer);
+        Timelines.getLayers().remove(etl);
     }
 
     @Override

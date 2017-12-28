@@ -34,6 +34,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
     private static int highlightedEventPosition = -1;
 
     public EventTimelineLayer(JSONObject jo) {
+        cacheUpdated();
     }
 
     @Override
