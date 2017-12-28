@@ -5,48 +5,18 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.data.cache.JHVEventCache;
-import org.helioviewer.jhv.data.cache.JHVEventHandler;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.cache.SortedDateInterval;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.layers.TimespanListener;
 
-public class SWEKData implements TimespanListener, JHVEventHandler {
-
-    private static long startTime = Movie.getTime().milli;
-    private static long endTime = startTime;
-
-    private void requestEvents(boolean force, long start, long end) {
-        if (force || start < startTime || end > endTime) {
-            startTime = start;
-            endTime = end;
-            JHVEventCache.requestForInterval(start, end, this);
-        }
-    }
-
-    @Override
-    public void timespanChanged(long start, long end) {
-        requestEvents(false, start, end);
-    }
-
-    @Override
-    public void newEventsReceived() {
-        Displayer.display();
-    }
-
-    @Override
-    public void cacheUpdated() {
-        requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
-    }
+class SWEKData {
 
     static ArrayList<JHVRelatedEvents> getActiveEvents(long timestamp) {
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<>();
-
-        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(startTime, endTime).getAvailableEvents();
+        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(Movie.getStartTime(), Movie.getEndTime()).getAvailableEvents();
         for (SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap : events.values()) {
             for (JHVRelatedEvents evr : eventMap.values()) {
                 if (evr.getStart() <= timestamp && timestamp <= evr.getEnd()) {

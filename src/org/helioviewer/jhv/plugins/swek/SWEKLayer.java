@@ -8,7 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -18,6 +17,8 @@ import javax.swing.SwingConstants;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.data.cache.JHVEventCache;
+import org.helioviewer.jhv.data.cache.JHVEventHandler;
 import org.helioviewer.jhv.data.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.event.JHVEvent;
 import org.helioviewer.jhv.data.event.JHVEventParameter;
@@ -29,6 +30,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.TimespanListener;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -40,7 +42,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL2;
 
-public class SWEKLayer extends AbstractLayer {
+public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEventHandler {
 
     private static final SWEKPopupController controller = new SWEKPopupController(ImageViewerGui.getGLComponent());
     private final JPanel optionsPanel;
@@ -370,9 +372,7 @@ public class SWEKLayer extends AbstractLayer {
 
     private static void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         ArrayList<String> txts = new ArrayList<>();
-        JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
-        JHVEventParameter[] params = evt.getSimpleVisibleEventParameters();
-        for (JHVEventParameter p : params) {
+        for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(controller.currentTime).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
             if (name != "event_description" && name != "event_title") { // interned
                 txts.add(p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue());
@@ -384,8 +384,7 @@ public class SWEKLayer extends AbstractLayer {
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
-            for (JHVRelatedEvents evtr : eventsToDraw) {
+            for (JHVRelatedEvents evtr : SWEKData.getActiveEvents(controller.currentTime)) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus()) {
                     drawCactusArc(gl, evtr, evt, controller.currentTime);
@@ -405,8 +404,7 @@ public class SWEKLayer extends AbstractLayer {
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            List<JHVRelatedEvents> eventsToDraw = SWEKData.getActiveEvents(controller.currentTime);
-            for (JHVRelatedEvents evtr : eventsToDraw) {
+            for (JHVRelatedEvents evtr : SWEKData.getActiveEvents(controller.currentTime)) {
                 JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.isCactus() && (Displayer.mode == Displayer.DisplayMode.LogPolar || Displayer.mode == Displayer.DisplayMode.Polar)) {
                     drawCactusArcScale(gl, evtr, evt, controller.currentTime, Displayer.mode.scale, vp);
@@ -433,7 +431,7 @@ public class SWEKLayer extends AbstractLayer {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-        ImageViewerGui.getInputController().removePlugin(controller);
+        setEnabled(false);
     }
 
     @Override
@@ -450,13 +448,17 @@ public class SWEKLayer extends AbstractLayer {
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
 
-        if (_enabled) {
+        if (enabled) {
+            Movie.addTimespanListener(this);
+            cacheUpdated();
+
             Movie.addTimeListener(controller);
             controller.timeChanged(Movie.getTime().milli);
             ImageViewerGui.getInputController().addPlugin(controller);
         } else {
             ImageViewerGui.getInputController().removePlugin(controller);
             Movie.removeTimeListener(controller);
+            Movie.removeTimespanListener(this);
         }
     }
 
@@ -476,10 +478,36 @@ public class SWEKLayer extends AbstractLayer {
 
     @Override
     public void dispose(GL2 gl) {
-        setEnabled(false);
         for (GLTexture el : iconCacheId.values())
             el.delete(gl);
         iconCacheId.clear();
+    }
+
+    private static long startTime = Movie.getTime().milli;
+    private static long endTime = startTime;
+
+    private void requestEvents(boolean force, long start, long end) {
+        if (force || start < startTime || end > endTime) {
+            startTime = start;
+            endTime = end;
+            JHVEventCache.requestForInterval(start, end, this);
+        }
+    }
+
+    @Override
+    public void timespanChanged(long start, long end) {
+        requestEvents(false, start, end);
+    }
+
+    @Override
+    public void newEventsReceived() {
+        if (enabled)
+            Displayer.display();
+    }
+
+    @Override
+    public void cacheUpdated() {
+        requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
     }
 
     private JPanel optionsPanel() {

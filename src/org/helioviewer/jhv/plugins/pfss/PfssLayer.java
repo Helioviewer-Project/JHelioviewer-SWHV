@@ -82,7 +82,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
 
-        if (!_enabled)
+        if (!enabled)
             timeString = null;
         else if (previousPfssData != null)
             timeString = previousPfssData.dateObs.toString();
