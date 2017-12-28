@@ -67,7 +67,7 @@ public class EventTimelineLayer extends AbstractTimelineLayer implements JHVEven
         highlightedEvent = null;
         highlightedEventPosition = -1;
 
-        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(xAxis.start, xAxis.end, xAxis.start, xAxis.end).getAvailableEvents();
+        Map<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = JHVEventCache.get(xAxis.start, xAxis.end).getAvailableEvents();
         if (events.isEmpty())
             return;
 

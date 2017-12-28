@@ -145,7 +145,11 @@ public class JHVEventCache {
         }
     }
 
-    public static JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
+    public static JHVEventCacheResult get(long startDate, long endDate) {
+        return get(startDate, endDate, startDate, endDate);
+    }
+
+    private static JHVEventCacheResult get(long startDate, long endDate, long extendedStart, long extendedEnd) {
         HashMap<SWEKSupplier, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<>();
         HashMap<SWEKSupplier, List<Interval>> missingIntervals = new HashMap<>();
 
