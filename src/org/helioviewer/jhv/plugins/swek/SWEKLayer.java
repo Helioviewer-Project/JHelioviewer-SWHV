@@ -186,7 +186,6 @@ public class SWEKLayer extends AbstractLayer {
 
         Color color = evtr.getColor();
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
-
         gl.glLineWidth(evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
 
         // draw bounds
@@ -477,9 +476,7 @@ public class SWEKLayer extends AbstractLayer {
 
     @Override
     public void dispose(GL2 gl) {
-        ImageViewerGui.getInputController().removePlugin(controller);
-        Movie.removeTimeListener(controller);
-
+        setEnabled(false);
         for (GLTexture el : iconCacheId.values())
             el.delete(gl);
         iconCacheId.clear();
