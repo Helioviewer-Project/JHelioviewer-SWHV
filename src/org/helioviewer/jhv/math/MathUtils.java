@@ -2,12 +2,6 @@ package org.helioviewer.jhv.math;
 
 import java.text.DecimalFormat;
 
-/**
- * A collection of useful static methods.
- *
- * @author caplins
- *
- */
 public class MathUtils {
 
     public static final double radeg = 180 / Math.PI;

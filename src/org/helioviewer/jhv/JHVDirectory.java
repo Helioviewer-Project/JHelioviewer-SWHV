@@ -6,9 +6,6 @@ import java.io.File;
  * An enum containing all the directories mapped in a system independent way. If
  * a new directory is required, just add it here and it will be created at
  * startup.
- *
- * @author caplins
- *
  */
 public enum JHVDirectory {
     /** The home directory. */

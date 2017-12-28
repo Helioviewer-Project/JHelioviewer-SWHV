@@ -15,15 +15,11 @@ import org.helioviewer.jhv.gui.UIGlobals;
  * Class used for displaying information and statuses in a panel at the very
  * bottom of JHV.
  *
- * <p>
  * The class manages two different areas in the panel, one at the lower left and
  * one at the lower right corner. New plugins can be placed at one of the two
  * areas.
  *
- * <p>
  * In addition, a status text can be displayed in the lower left corner.
- *
- * @author Markus Langenberg
  */
 @SuppressWarnings("serial")
 public class StatusPanel extends JPanel {

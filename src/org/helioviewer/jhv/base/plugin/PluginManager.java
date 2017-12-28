@@ -8,8 +8,6 @@ import org.json.JSONObject;
 /**
  * This class is responsible to manage all plug-ins for JHV. It loads available
  * plug-ins and provides methods to access the loaded plug-ins.
- *
- * @author Stephan Pagel
  */
 public class PluginManager {
 
@@ -83,7 +81,6 @@ public class PluginManager {
                 }
             }
         }
-
     }
 
     public void saveState(JSONObject jo) {
