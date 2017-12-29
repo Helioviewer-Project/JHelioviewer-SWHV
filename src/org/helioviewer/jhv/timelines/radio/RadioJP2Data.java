@@ -19,11 +19,10 @@ import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.view.jp2view.image.ResolutionSet;
 
-class DownloadedJPXData implements ImageDataHandler {
+class RadioJP2Data implements ImageDataHandler {
 
     private JP2ViewCallisto view;
 
@@ -36,9 +35,9 @@ class DownloadedJPXData implements ImageDataHandler {
 
     private BufferedImage bufferedImage;
     private Region region;
-    private boolean downloadJPXFailed = false;
+    private boolean failed;
 
-    DownloadedJPXData(JP2ViewCallisto _view, long start) {
+    RadioJP2Data(JP2ViewCallisto _view, long start) {
         if (_view != null) { // null for empty
             try {
                 ResolutionSet.ResolutionLevel resLevel = _view.getResolutionLevel(0, 0);
@@ -65,7 +64,7 @@ class DownloadedJPXData implements ImageDataHandler {
             _view.abolish();
         }
 
-        downloadJPXFailed = true;
+        failed = true;
         startDate = start;
         endDate = start + TimeUtils.DAY_IN_MILLIS;
     }
@@ -109,9 +108,9 @@ class DownloadedJPXData implements ImageDataHandler {
         return newImage;
     }
 
-    void requestData(TimeAxis xAxis, YAxis yAxis) {
+    void requestData(TimeAxis xAxis) {
         if (view != null) {
-            Rectangle roi = getROI(xAxis, yAxis);
+            Rectangle roi = getROI(xAxis);
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
                 view.setRegion(roi);
                 view.render(null, null, last_resolution);
@@ -146,14 +145,14 @@ class DownloadedJPXData implements ImageDataHandler {
     private int last_y0 = -1;
     private int last_height = -1;
 
-    private Rectangle getROI(TimeAxis xAxis, YAxis yAxis) {
+    private Rectangle getROI(TimeAxis xAxis) {
         double visibleStartFreq = startFreq;
         double visibleEndFreq = endFreq;
-        if (visibleStartFreq < yAxis.start) {
-            visibleStartFreq = yAxis.start;
+        if (visibleStartFreq < RadioData.yAxis.start) {
+            visibleStartFreq = RadioData.yAxis.start;
         }
-        if (visibleEndFreq > yAxis.end) {
-            visibleEndFreq = yAxis.end;
+        if (visibleEndFreq > RadioData.yAxis.end) {
+            visibleEndFreq = RadioData.yAxis.end;
         }
 
         double pixPerFreq = jp2Height / (endFreq - startFreq);
@@ -195,7 +194,7 @@ class DownloadedJPXData implements ImageDataHandler {
         return new Rectangle(x0, y0, width, height);
     }
 
-    void draw(Graphics2D g, Rectangle ga, TimeAxis xAxis, YAxis yAxis) {
+    void draw(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
         if (hasData()) {
             int sx0 = 0;
             int sy0 = 0;
@@ -210,8 +209,8 @@ class DownloadedJPXData implements ImageDataHandler {
             int dx0 = xAxis.value2pixel(ga.x, ga.width, imStart);
             int dx1 = xAxis.value2pixel(ga.x, ga.width, imEnd);
 
-            int dy0 = yAxis.value2pixel(ga.y, ga.height, freqimStart);
-            int dy1 = yAxis.value2pixel(ga.y, ga.height, freqimEnd);
+            int dy0 = RadioData.yAxis.value2pixel(ga.y, ga.height, freqimStart);
+            int dy1 = RadioData.yAxis.value2pixel(ga.y, ga.height, freqimEnd);
 
             g.drawImage(bufferedImage, dx0, dy0, dx1, dy1, sx0, sy0, sx1, sy1, null);
         } else {
@@ -227,7 +226,7 @@ class DownloadedJPXData implements ImageDataHandler {
         g.fillRect(dx0, ga.y, dwidth, ga.height);
         g.setColor(Color.WHITE);
 
-        String text = downloadJPXFailed ? "No data available" : "Fetching data";
+        String text = failed ? "No data available" : "Fetching data";
         Rectangle2D r = g.getFontMetrics().getStringBounds(text, g);
         int tWidth = (int) r.getWidth();
         int tHeight = (int) r.getHeight();
@@ -237,7 +236,7 @@ class DownloadedJPXData implements ImageDataHandler {
     }
 
     boolean isDownloading() {
-        return !downloadJPXFailed && !hasData();
+        return !failed && !hasData();
     }
 
     void changeColormap(ColorModel cm) {
