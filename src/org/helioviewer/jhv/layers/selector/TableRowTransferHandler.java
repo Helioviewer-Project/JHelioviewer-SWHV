@@ -88,8 +88,7 @@ class TableRowTransferHandler extends TransferHandler {
                 int rowFrom = Integer.parseInt((String) obj);
                 if (rowFrom != -1 && rowFrom != index) {
                     ((Reorderable) grid.getModel()).reorder(rowFrom, index);
-                    // if (index > rowFrom)
-                    //    index--;
+                    grid.repaint(); // multiple rows involved
                     return true;
                 }
             } catch (Exception e) {
