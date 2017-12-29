@@ -103,5 +103,4 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
         PfssPlugin.downloads--;
     }
 
-
 }
