@@ -430,8 +430,8 @@ public class SWEKLayer extends AbstractLayer implements TimespanListener, JHVEve
 
     @Override
     public void remove(GL2 gl) {
-        dispose(gl);
         setEnabled(false);
+        dispose(gl);
     }
 
     @Override
