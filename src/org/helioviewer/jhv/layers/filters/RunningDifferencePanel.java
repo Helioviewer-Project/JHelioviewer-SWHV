@@ -54,6 +54,8 @@ public class RunningDifferencePanel implements FilterDetails {
         downloadButton.addActionListener(e -> {
             if (downloadButton.isSelected()) {
                 Insets margin = downloadButton.getMargin();
+                if (margin == null) // satisfy coverity
+                    margin = new Insets(0, 0, 0, 0);
                 Dimension size = downloadButton.getSize(null);
                 progressBar.setPreferredSize(new Dimension(size.width - margin.left - margin.right, size.height - margin.top - margin.bottom));
 
