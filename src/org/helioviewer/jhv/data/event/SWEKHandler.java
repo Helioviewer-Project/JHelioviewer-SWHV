@@ -38,7 +38,7 @@ public abstract class SWEKHandler {
         } catch (JSONException e) {
             Log.error("JSON parse error: " + e);
         } catch (IOException e) {
-            Log.error("Could not create input stream for given URL error: " + e);
+            Log.error("SWEK URL error: " + e);
         }
         return false;
     }
