@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
@@ -21,7 +20,7 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
 
     private final long start;
     private final long end;
-    private static final HashMap<Integer, Map<Long, String>> parsedCache = new HashMap<>();
+    private static final HashMap<Integer, Object> parsedCache = new HashMap<>();
 
     public PfssNewDataLoader(long _start, long _end) {
         PfssPlugin.downloads++;
@@ -43,16 +42,17 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
 
         do {
             Integer cacheKey = startYear * 10000 + startMonth;
-            Map<Long, String> urls;
+            Object have;
 
             synchronized (parsedCache) {
-                urls = parsedCache.get(cacheKey);
+                have = parsedCache.get(cacheKey);
+                parsedCache.put(cacheKey, new Object());
             }
 
-            if (urls == null || urls.isEmpty()) {
-                urls = new HashMap<>();
+            if (have == null) {
                 String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
                 String url = PfssSettings.baseURL + startYear + '/' + m + "/list.txt";
+                HashMap<Long, String> urls = new HashMap<>();
 
                 try (NetClient nc = NetClient.of(url)) {
                     BufferedSource source = nc.getSource();
@@ -67,11 +67,7 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
                     Log.warn("Could not read PFSS entries: " + e);
                 }
 
-                synchronized (parsedCache) {
-                    parsedCache.put(cacheKey, urls);
-                }
-
-                Map<Long, String> furls = urls;
+                HashMap<Long, String> furls = urls;
                 EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(furls));
             }
 
