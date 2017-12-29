@@ -114,23 +114,23 @@ class GimpGradientSegment {
             float[] lHSV = Color.RGBtoHSB(appD(rl), appD(gl), appD(bl), null);
             float[] rHSV = Color.RGBtoHSB(appD(rr), appD(gr), appD(br), null);
             // Making lshv the new color
-            lHSV[1] += (rHSV[1] - lHSV[1]) * (float) f;
-            lHSV[2] += (rHSV[2] - lHSV[2]) * (float) f;
+            lHSV[1] += (float) ((rHSV[1] - lHSV[1]) * f);
+            lHSV[2] += (float) ((rHSV[2] - lHSV[2]) * f);
             if (blendingColor == 1) {
                 if (lHSV[0] < rHSV[0]) {
-                    lHSV[0] += (rHSV[0] - lHSV[0]) * (float) f;
+                    lHSV[0] += (float) ((rHSV[0] - lHSV[0]) * f);
                 } else {
-                    lHSV[0] += (1.0 - (lHSV[0] - rHSV[0])) * (float) f;
+                    lHSV[0] += (float) ((1. - (lHSV[0] - rHSV[0])) * f);
                     if (lHSV[0] > 1.0)
-                        lHSV[0] -= 1.0;
+                        lHSV[0]--;
                 }
             } else if (blendingColor == 2) {
                 if (rHSV[0] < lHSV[0]) {
-                    lHSV[0] -= (lHSV[0] - rHSV[0]) * (float) f;
+                    lHSV[0] -= (float) ((lHSV[0] - rHSV[0]) * f);
                 } else {
-                    lHSV[0] -= (1.0 - (rHSV[0] - lHSV[0])) * (float) f;
+                    lHSV[0] -= (float) ((1. - (rHSV[0] - lHSV[0])) * f);
                     if (lHSV[0] < 0.0)
-                        lHSV[0] += 1.0;
+                        lHSV[0]++;
                 }
             } else {
                 throw new Exception("Unknown blending color " + blendingColor + " for gimp gradient file");
