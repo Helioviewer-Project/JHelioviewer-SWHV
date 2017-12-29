@@ -72,7 +72,7 @@ public class Mat4 {
 
         return this;
     }
-
+/*
     public final Mat4 set(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
         m[0] = M0;
         m[4] = M4;
@@ -117,7 +117,7 @@ public class Mat4 {
                 m[3] * A.m[4] + m[7] * A.m[5] + m[11] * A.m[6] + m[15] * A.m[7], m[3] * A.m[8] + m[7] * A.m[9] + m[11] * A.m[10] + m[15] * A.m[11], m[3] * A.m[12] + m[7] * A.m[13] + m[11] * A.m[14] + m[15] * A.m[15]);
         return this;
     }
-
+*/
     public final Vec3 multiply(Vec3 v) {
         double W = m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15];
         return new Vec3((m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12]) / W, (m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13]) / W, (m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14]) / W);
@@ -127,13 +127,11 @@ public class Mat4 {
         double W = m[12] * v.x + m[13] * v.y + m[14] * v.z + m[15];
         return new Vec3((m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3]) / W, (m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7]) / W, (m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11]) / W);
     }
-
 /*
     public final Vec4 multiply(Vec4 v) {
         return new Vec4(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w, m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w, m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w, m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w);
     }
 */
-
     public final Vec3 translation() {
         return new Vec3(m[12], m[13], m[14]);
     }
@@ -287,11 +285,11 @@ public class Mat4 {
         m[10] *= sz;
         return this;
     }
-
+/*
     public static Mat4 scaling(double sx, double sy, double sz) {
         return new Mat4(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
     }
-/*
+
     public final Mat4 rotate(double angle, Vec3 axis) {
         return this.rotate(angle, axis.x, axis.y, axis.z);
     }
@@ -326,14 +324,14 @@ public class Mat4 {
         m[14] = temp;
         return this;
     }
-
+/*
     public final Mat4 swap(int i1, int i2) {
         double temp = get(i1);
         set(i1, get(i2));
         set(i2, temp);
         return this;
     }
-/*
+
     public static Mat4 rotation(double angle, Vec3 axis) {
         return rotation(angle, axis.x, axis.y, axis.z);
     }
@@ -435,13 +433,11 @@ public class Mat4 {
         // negate the first wh because windows has topdown window coords
         return new Mat4(ww2, 0, 0, ww2 + x, 0, -wh2, 0, wh2 + y, 0, 0, (f - n) * 0.5, (f + n) * 0.5, 0, 0, 0, 1);
     }
-
 /*
     public final Mat3 mat3() {
         return new Mat3(m[0], m[4], m[8], m[1], m[5], m[9], m[2], m[6], m[10]);
     }
 */
-
     public final Mat4 copy() {
         return new Mat4(this);
     }

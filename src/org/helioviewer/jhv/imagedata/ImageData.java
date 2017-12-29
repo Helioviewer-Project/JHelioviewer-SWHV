@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.MetaData;
 
 public abstract class ImageData {
@@ -134,11 +135,7 @@ public abstract class ImageData {
         double factor = BRIGHTNESS_F2 / j;
         // System.out.println(">> " + factor + " " + j);
         factor /= metaData.getResponseFactor();
-        if (factor > 2)
-            return 2;
-        else if (factor < 0.5)
-            return 0.5;
-        return factor;
+        return MathUtils.clip(factor, 0.5, 2);
     }
 
     private static int getUnsigned(byte b) {
