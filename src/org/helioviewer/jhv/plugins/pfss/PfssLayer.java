@@ -58,6 +58,7 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
 
     @Override
     public void remove(GL2 gl) {
+        setEnabled(false);
         dispose(gl);
     }
 
@@ -82,10 +83,14 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
 
-        if (!enabled)
+        if (enabled) {
+            Movie.addTimespanListener(this);
+            timespanChanged(Movie.getStartTime(), Movie.getEndTime());
+        } else {
+            Movie.removeTimespanListener(this);
             timeString = null;
-        else if (previousPfssData != null)
-            timeString = previousPfssData.dateObs.toString();
+            previousPfssData = null;
+        }
     }
 
     @Override
@@ -103,13 +108,10 @@ public class PfssLayer extends AbstractLayer implements TimespanListener {
     @Override
     public void init(GL2 gl) {
         line.init(gl);
-        Movie.addTimespanListener(this);
     }
 
     @Override
     public void dispose(GL2 gl) {
-        Movie.removeTimespanListener(this);
-        previousPfssData = null;
         line.dispose(gl);
     }
 
