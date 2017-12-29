@@ -84,7 +84,7 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
     @Override
     protected void done() {
         PfssPlugin.downloads--;
-        PfssPlugin.getPfsscache().getNearestData(start);
+        PfssPlugin.getPfsscache().getNearestData(start); // preload first
     }
 
 }
