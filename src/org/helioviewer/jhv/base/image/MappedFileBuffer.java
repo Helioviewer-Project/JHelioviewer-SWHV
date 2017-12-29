@@ -56,13 +56,9 @@ public abstract class MappedFileBuffer extends DataBuffer {
         // Create temp file to get a file handle to use for memory mapping
         File tempFile = File.createTempFile(String.format("%s-", getClass().getSimpleName().toLowerCase()), ".tmp");
 
-        try {
-            RandomAccessFile raf = new RandomAccessFile(tempFile, "rw");
-
+        try (RandomAccessFile raf = new RandomAccessFile(tempFile, "rw"); FileChannel channel = raf.getChannel()) {
             long length = ((long) size) * componentSize * numBanks;
-
             raf.setLength(length);
-            FileChannel channel = raf.getChannel();
 
             // Map entire file into memory, let OS virtual memory/paging do the heavy lifting
             MappedByteBuffer byteBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length);
@@ -80,9 +76,7 @@ public abstract class MappedFileBuffer extends DataBuffer {
                 default:
                     throw new IllegalArgumentException("Unsupported data type: " + type);
             }
-
-            // According to the docs, we can safely close the channel and delete the file now
-            channel.close();
+        // According to the docs, we can safely close the channel and delete the file now
         } finally {
             // NOTE: File can't be deleted right now on Windows, as the file is open. Let JVM clean up later
             if (!tempFile.delete()) {
