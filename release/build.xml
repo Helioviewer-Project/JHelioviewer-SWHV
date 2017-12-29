@@ -76,7 +76,7 @@
                     <arg value="bundle.sh"/>
                 </exec>
                 <mkdir dir="${tmp}/mac/"/>
-                <bundleapp outputdirectory="${tmp}/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JHelioviewer" icon="${resources}/mac/JHV_icon.icns" shortversion="${version}" version="${version}.${revision}" copyright="©2017, European Space Agency">
+                <bundleapp outputdirectory="${tmp}/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JHelioviewer" icon="${resources}/mac/JHV_icon.icns" shortversion="${version}" version="${version}.${revision}" copyright="©2018, European Space Agency">
                     <classpath file="${bin}/JHelioviewer.jar"/>
                     <option value="-Xdock:name=JHelioviewer"/>
                 </bundleapp>
