@@ -67,8 +67,7 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
                     Log.warn("Could not read PFSS entries: " + e);
                 }
 
-                HashMap<Long, String> furls = urls;
-                EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(furls));
+                EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(urls));
             }
 
             if (startMonth == 11) {
