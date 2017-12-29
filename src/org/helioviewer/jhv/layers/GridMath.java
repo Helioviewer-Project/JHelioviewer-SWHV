@@ -146,7 +146,7 @@ class GridMath {
             }
         }
 
-        float i = 0;
+        double i = 0;
         for (int j = 0; j < no_lines; j++) {
             i += step;
             Quat q = Quat.createRotation((Math.PI / 180) * i, new Vec3(0, 0, 1));

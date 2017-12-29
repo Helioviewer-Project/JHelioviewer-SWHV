@@ -78,10 +78,10 @@ public class GLText {
 
         // Correct if out of view
         if (w + pt_x - LEFT_MARGIN_TEXT > vp.width) {
-            textInit_x -= (w + pt_x - LEFT_MARGIN_TEXT - vp.width);
+            textInit_x -= (int) (w + pt_x - LEFT_MARGIN_TEXT - vp.width);
         }
         if (h + pt_y - fontSize - TOP_MARGIN_TEXT > vp.height) {
-            textInit_y -= (h + pt_y - fontSize - TOP_MARGIN_TEXT - vp.height);
+            textInit_y -= (int) (h + pt_y - fontSize - TOP_MARGIN_TEXT - vp.height);
         }
         float left = textInit_x - LEFT_MARGIN_TEXT;
         float bottom = textInit_y - fontSize - TOP_MARGIN_TEXT;
@@ -108,7 +108,7 @@ public class GLText {
         int deltaY = 0;
         for (String txt : txts) {
             renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);
-            deltaY += fontSize * 1.1;
+            deltaY += (int) (fontSize * 1.1);
         }
         renderer.endRendering();
         gl.glDisable(GL2.GL_TEXTURE_2D);
