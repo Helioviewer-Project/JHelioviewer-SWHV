@@ -177,7 +177,7 @@ public class TimeSlider extends JSlider implements LazyComponent, MouseListener,
                         end++;
 
                     AtomicBoolean status = view.getFrameCacheStatus(i);
-                    g.setColor(status == null ? notCachedColor : status.get() ? completeCachedColor : partialCachedColor);
+                    g.setColor(status == null ? notCachedColor : (status.get() ? completeCachedColor : partialCachedColor));
                     g.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
                 }
             }
