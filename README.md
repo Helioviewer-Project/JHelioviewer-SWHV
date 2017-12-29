@@ -77,10 +77,3 @@ occured. The log files can be found in the Logs/ directory of your JHelioviewer
 home folder. You can find the correct log file by searching for the correct
 start date. The files have the form:
 jhv.'year'-'month'-'day'T'hours'-'minutes'-'seconds'.log
-
-
-Development Information
------------------------
-
-Some short build and installing instructions can be found in the file INSTALL
-(only contained in the source code).
