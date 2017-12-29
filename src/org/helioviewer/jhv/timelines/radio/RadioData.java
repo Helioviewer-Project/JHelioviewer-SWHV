@@ -119,9 +119,7 @@ public class RadioData extends AbstractTimelineLayer {
         }
 
         if (!toDownloadStartDates.isEmpty()) {
-            JHVWorker<ArrayList<RadioJP2Data>, Void> imageDownloadWorker = new RadioJPXDownload(toDownloadStartDates);
-            imageDownloadWorker.setThreadName("EVE--RadioDownloader");
-            EVEPlugin.executorService.execute(imageDownloadWorker);
+            EVEPlugin.executorService.execute(new RadioJPXDownload(toDownloadStartDates));
         }
     }
 
@@ -135,6 +133,7 @@ public class RadioData extends AbstractTimelineLayer {
             isDownloading++;
             toDownload = _toDownload;
             Timelines.getLayers().downloadStarted(RadioData.this);
+            setThreadName("EVE--RadioDownloader");
         }
 
         @Override
@@ -145,9 +144,8 @@ public class RadioData extends AbstractTimelineLayer {
                 try {
                     APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ANY);
                     URI uri = APIRequestManager.requestRemoteFile(req);
-                    if (uri == null) {
+                    if (uri == null)
                         continue;
-                    }
 
                     if (remotes.contains(uri)) {
                         jpList.add(new RadioJP2Data(null, req.startTime));
@@ -170,7 +168,6 @@ public class RadioData extends AbstractTimelineLayer {
                     cache.put(jp2Data.getStartDate(), jp2Data);
                 }
                 Timelines.getLayers().downloadFinished(RadioData.this);
-                // DrawController.fireRedrawRequest();
                 requestForData();
             } catch (InterruptedException | ExecutionException e) {
                 Log.error("RadioData error: " + e.getCause().getMessage());
