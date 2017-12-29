@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -63,7 +64,8 @@ class PfssDataLoader extends JHVWorker<PfssData, Void> {
             try {
                 PfssData pfssData = get();
                 if (pfssData != null) {
-                    PfssPlugin.getPfsscache().addData(time, pfssData);
+                    PfssPlugin.getPfsscache().putData(url, pfssData);
+                    Displayer.display();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

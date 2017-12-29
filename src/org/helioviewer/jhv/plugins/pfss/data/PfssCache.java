@@ -1,51 +1,50 @@
 package org.helioviewer.jhv.plugins.pfss.data;
 
-import java.lang.ref.SoftReference;
+import java.util.Map;
 import java.util.TreeMap;
+
+import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 public class PfssCache {
 
-    private final TreeMap<Long, SoftReference<PfssData>> map = new TreeMap<>();
+    private final TreeMap<Long, String> map = new TreeMap<>();
+    private final Cache<String, PfssData> cache = CacheBuilder.newBuilder().softValues().build();
 
-    private PfssData get(Long time) {
-        SoftReference<PfssData> ref = map.get(time);
-        if (ref == null)
-            return null;
-
-        PfssData ret = ref.get();
-        if (ret == null)
-            map.remove(time); // mark as collected
-        return ret;
+    void put(Map<Long, String> urls) {
+        map.putAll(urls);
     }
 
-    public void addData(long time, PfssData data) {
-        map.put(time, new SoftReference<>(data));
+    void putData(String url, PfssData data) {
+        cache.put(url, data);
+    }
+
+    private PfssData get(long time, String url) {
+        PfssData ret = cache.asMap().get(url);
+        if (ret == null) {
+            PfssPlugin.pfssDataPool.execute(new PfssDataLoader(time, url));
+        }
+        return ret;
     }
 
     public PfssData getNearestData(long time) {
         Long c = map.ceilingKey(time);
         Long f = map.floorKey(time);
 
-        if (c != null && f != null) {
-            return Math.abs(f - time) < Math.abs(time - c) ? get(f) : get(c);
-        }
-
-        try {
-            if (f == null)
-                return get(c);
-            return get(f);
-        } catch (Exception ignore) {
-        }
-
+        if (f != null && c != null)
+            return Math.abs(f - time) < Math.abs(time - c) ? get(f, map.get(f)) : get(c, map.get(c));
+        if (f == null && c != null)
+            return get(c, map.get(c));
+        if (f != null)
+            return get(f, map.get(f));
         return null;
-    }
-
-    public PfssData getData(long time) {
-        return get(time);
     }
 
     public void clear() {
         map.clear();
+        cache.invalidateAll();
     }
 
 }
