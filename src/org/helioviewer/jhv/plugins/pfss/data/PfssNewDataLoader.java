@@ -20,7 +20,6 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
 
     private final long start;
     private final long end;
-    private static final HashMap<Integer, Object> parsedCache = new HashMap<>();
 
     public PfssNewDataLoader(long _start, long _end) {
         PfssPlugin.downloads++;
@@ -41,34 +40,24 @@ public class PfssNewDataLoader extends JHVWorker<Void, Void> {
         int endMonth = cal.get(Calendar.MONTH);
 
         do {
-            Integer cacheKey = startYear * 10000 + startMonth;
-            Object have;
+            String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
+            String url = PfssSettings.baseURL + startYear + '/' + m + "/list.txt";
+            HashMap<Long, String> urls = new HashMap<>();
 
-            synchronized (parsedCache) {
-                have = parsedCache.get(cacheKey);
-                parsedCache.put(cacheKey, new Object());
-            }
-
-            if (have == null) {
-                String m = startMonth < 9 ? "0" + (startMonth + 1) : Integer.toString(startMonth + 1);
-                String url = PfssSettings.baseURL + startYear + '/' + m + "/list.txt";
-                HashMap<Long, String> urls = new HashMap<>();
-
-                try (NetClient nc = NetClient.of(url)) {
-                    BufferedSource source = nc.getSource();
-                    String line;
-                    while ((line = source.readUtf8Line()) != null) {
-                        String[] splitted = Regex.Space.split(line);
-                        if (splitted.length != 2)
-                            throw new Exception("Invalid line: " + line);
-                        urls.put(TimeUtils.parse(splitted[0]), PfssSettings.baseURL + splitted[1]);
-                    }
-                } catch (Exception e) {
-                    Log.warn("Could not read PFSS entries: " + e);
+            // may come from http cache
+            try (NetClient nc = NetClient.of(url)) {
+                BufferedSource source = nc.getSource();
+                String line;
+                while ((line = source.readUtf8Line()) != null) {
+                    String[] splitted = Regex.Space.split(line);
+                    if (splitted.length != 2)
+                        throw new Exception("Invalid line: " + line);
+                    urls.put(TimeUtils.parse(splitted[0]), PfssSettings.baseURL + splitted[1]);
                 }
-
-                EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(urls));
+            } catch (Exception e) {
+                Log.warn("PFSS list error: " + e);
             }
+            EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(urls));
 
             if (startMonth == 11) {
                 startMonth = 0;
