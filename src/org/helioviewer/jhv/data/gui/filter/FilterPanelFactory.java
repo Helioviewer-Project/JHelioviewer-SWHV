@@ -9,7 +9,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
-import org.helioviewer.jhv.base.conversion.GOESLevel;
 import org.helioviewer.jhv.data.event.SWEKOperand;
 import org.helioviewer.jhv.data.event.SWEKParameter;
 import org.helioviewer.jhv.data.event.SWEKSupplier;
@@ -35,10 +34,10 @@ class FilterPanelFactory {
     }
 
     private static JSpinner generateFlareSpinner(FilterDialog filterDialog, SWEKParameter parameter) {
-        String min = parameter.getParameterFilter().getMin() == null ? GOESLevel.getStringValue(1e-8) : GOESLevel.getStringValue(parameter.getParameterFilter().getMin());
-        String max = parameter.getParameterFilter().getMax() == null ? GOESLevel.getStringValue(1e-3) : GOESLevel.getStringValue(parameter.getParameterFilter().getMax());
-        String start = parameter.getParameterFilter().getStartValue() == null ? GOESLevel.getStringValue(1e-5) : GOESLevel.getStringValue(parameter.getParameterFilter().getStartValue());
-        double step = parameter.getParameterFilter().getStepSize() == null ? 0.1 : parameter.getParameterFilter().getStepSize();
+        double min = parameter.getParameterFilter().getMin() == null ? 1e-8 : parameter.getParameterFilter().getMin();
+        double max = parameter.getParameterFilter().getMax() == null ? 1e-3 : parameter.getParameterFilter().getMax();
+        double start = parameter.getParameterFilter().getStartValue() == null ? 1e-5 : parameter.getParameterFilter().getStartValue();
+        double step = parameter.getParameterFilter().getStepSize() == null ? 0.5 : parameter.getParameterFilter().getStepSize();
 
         FlareSpinnerModel minimumSpinnerModel = new FlareSpinnerModel(start, min, max, step);
         JSpinner spinner = new JSpinner(minimumSpinnerModel);

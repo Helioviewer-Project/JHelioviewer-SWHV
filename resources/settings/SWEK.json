@@ -270,7 +270,7 @@
                             "min"           : 1e-8,
                             "max"           : 1e-3,
                             "start_value"   : 1e-5,
-                            "step_size"     : 0.1,
+                            "step_size"     : 0.5,
                             "units"         : "W/m^2",
                             "dbtype"        : "REAL"
                         }
@@ -331,7 +331,7 @@
                             "min"           : 0,
                             "max"           : 3000,
                             "start_value"   : 1000,
-                            "step_size"     : 1,
+                            "step_size"     : 100,
                             "units"         : "km/s",
                             "dbtype"        : "INTEGER"
                         },
